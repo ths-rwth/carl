@@ -25,7 +25,7 @@ void setInitialLogLevel()
 
 	carl::logging::logger().configure("stdout", std::cout);
 	carl::logging::logger().filter("stdout")
-		("carl", carl::logging::LogLevel::LVL_WARN)
+		//("carl", carl::logging::LogLevel::LVL_WARN)
 		("carl.cad", carl::logging::LogLevel::LVL_DEBUG)
 		("carl.cad.projection", carl::logging::LogLevel::LVL_INFO)
 		("carl.cad.sampleset", carl::logging::LogLevel::LVL_INFO)
@@ -35,6 +35,8 @@ void setInitialLogLevel()
 		("carl.core.rootfinder", carl::logging::LogLevel::LVL_TRACE)
 		("carl.cad.cg", carl::logging::LogLevel::LVL_DEBUG)
 		("carl.formula", carl::logging::LogLevel::LVL_WARN)
+                ("carl.thom", carl::logging::LogLevel::LVL_ALL)
+                ("carl.thom.tarski", carl::logging::LogLevel::LVL_FATAL)
 	;
 	carl::logging::logger().resetFormatter();
 }

@@ -15,7 +15,7 @@ namespace carl {
 
 
 
-struct ThomStandardSettings {
+struct ThomBasicSettings {
         
         
         /*
@@ -48,5 +48,5 @@ struct ThomExperimentalSettings {
 /*
  * Typedef the current settings here!
  */
-typedef ThomStandardSettings ThomCurrentSettings;
+typedef ThomBasicSettings ThomDefaultSettings;
 // typedef ThomExperimentalSettings ThomCurrentSettings;

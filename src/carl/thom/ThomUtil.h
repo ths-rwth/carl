@@ -49,6 +49,24 @@ std::vector<UnivariatePolynomial<Coeff>> der(const UnivariatePolynomial<Coeff>& 
         return derivatives;
 }
 
+template<typename Coeff>
+std::vector<MultivariatePolynomial<Coeff>> der(
+                const MultivariatePolynomial<Coeff>& p,
+                Variable::Arg mainVar,
+                uint upto = 0
+) {
+        size_t d = p.degree(mainVar);
+        assert(upto <= d);
+        if(upto == 0) upto = d;
+        std::vector<MultivariatePolynomial<Coeff>> partialDer;
+        partialDer.reserve(upto + 1);
+        partialDer.push_back(p);
+        for(uint n = 1; n <= upto; n++) {
+                partialDer.push_back(partialDer.back().derivative(mainVar));
+        }
+        return partialDer;
+}
+
 // maybe make a class sign condition some day
 
 // states that tau extends sigma (see Algorithms for RAG, p.387)
@@ -58,11 +76,23 @@ bool extends(const SignCondition& tau, const SignCondition& sigma) {
         for(uint i = tau.size() - sigma.size(); i < tau.size(); i++) {
                 if(tau[i] != sigma[i - (tau.size() - sigma.size())]) return false;
         }
-        //PRINT(tau << " extends " << sigma);
+        return true;
+}
+
+bool isPrefix(const SignCondition& lhs, const SignCondition& rhs) {
+        if(lhs.size() > rhs.size()) {
+                return false;
+        }
+        for(uint i = 0; i < lhs.size(); i++) {
+                if(lhs[i] != rhs[i]) {
+                        return false;
+                }
+        }
         return true;
 }
 
 // compares two sign conditions (associated to the same list of derivatives)
+// optimize this so that is returns a comparison result
 bool operator<(const SignCondition& lhs, const SignCondition& rhs) {
         assert(lhs.size() == rhs.size());
         assert(lhs.back() == rhs.back());

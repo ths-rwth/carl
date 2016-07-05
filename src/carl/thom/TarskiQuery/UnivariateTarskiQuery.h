@@ -36,7 +36,8 @@ Sign signAtPlusInf(const UnivariatePolynomial<Coeff>& p) {
  */
 template<typename Coeff>
 int univariateTarskiQuery(const UnivariatePolynomial<Coeff>& p, const UnivariatePolynomial<Coeff>& q, const UnivariatePolynomial<Coeff>& der_q) {
-        assert(!q.isZero());
+        CARL_LOG_FUNC("carl.thom.tarski", "p = " << p << ", q = " << q << ", der_q = " << der_q);
+        CARL_LOG_ASSERT("carl.thom.tarski", !q.isZero(), "cannot query on an infinite zero set!");
         std::list<UnivariatePolynomial<Coeff>> srs = q.standardSturmSequence(der_q * p); // standardSturmSequence is the signed remainder sequence
         int atMinusInf = (int)signVariations(srs.begin(), srs.end(), [](const UnivariatePolynomial<Coeff>& p){ return signAtMinusInf(p); }); 
         int atPlusInf = (int)signVariations(srs.begin(), srs.end(), [](const UnivariatePolynomial<Coeff>& p){ return signAtPlusInf(p); });

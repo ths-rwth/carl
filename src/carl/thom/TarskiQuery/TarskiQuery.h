@@ -39,7 +39,7 @@ bool isZeroDimensionalSystem(const std::vector<MultivariatePolynomial<Coeff>>& s
  * 
  */
 // http://stackoverflow.com/questions/17056579/template-specialization-and-inheritance
-template<typename Polynomial, typename Settings = ThomCurrentSettings>
+template<typename Polynomial, typename Settings = ThomDefaultSettings>
 class CommonTarskiQueryManager {
         
 public:
@@ -52,7 +52,7 @@ public:
         virtual QueryResultType operator()(const Polynomial&) const = 0;
 };
 
-template<typename Polynomial, typename Settings = ThomCurrentSettings>
+template<typename Polynomial, typename Settings = ThomDefaultSettings>
 class TarskiQueryManager : public CommonTarskiQueryManager<Polynomial, Settings> {};
 
 

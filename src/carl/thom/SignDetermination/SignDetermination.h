@@ -24,10 +24,10 @@ namespace carl {
  * (in theory, it could contain more, but then gcd would have to be computed and we dont want this)
  * in the multivariate case, it should contain as many polynomials as there are variables
  */
-template<typename Polynomial, typename Settings = ThomCurrentSettings>
+template<typename Polynomial, typename Settings = ThomDefaultSettings>
 std::vector<SignCondition> signDetermination(const std::vector<Polynomial>& p, const std::vector<Polynomial>& z);
 
-template<typename Polynomial, typename Settings = ThomCurrentSettings>
+template<typename Polynomial, typename Settings = ThomDefaultSettings>
 std::vector<SignCondition> signDetermination(const std::vector<Polynomial>& p, const Polynomial& z) {
         return signDetermination(p, std::vector<Polynomial>(1, z));
 }
@@ -223,7 +223,7 @@ std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition
 
 
 
-template<typename Polynomial, typename Settings = ThomCurrentSettings>
+template<typename Polynomial, typename Settings = ThomDefaultSettings>
 std::vector<SignCondition> signDetermination(const std::vector<Polynomial>& p, const std::vector<Polynomial>& z) {
         static_assert(is_polynomial<Polynomial>::value, "only call 'signDetermination' on polynomial types");
         PRINT("Input to signDetermination:");

@@ -16,6 +16,11 @@ namespace carl {
 // algorithm ???
 template<typename Coeff>
 int multivariateTarskiQuery(const MultivariatePolynomial<Coeff>& Q, const MultiplicationTable<Coeff>& table, const GB<Coeff>& gb) {
+        CARL_LOG_FUNC("carl.thom.tarski", "Q = " << Q);
+        if(Q.isUnivariate()) {
+                CARL_LOG_WARN("carl.thom.tarski", "input to multivariateTarskiQuery is a univariate polynomial!!");
+        }
+        CARL_LOG_INEFFICIENT();
         BaseRepr<Coeff> q = normalForm(Q, gb);
         std::vector<_Monomial<Coeff>> base = table.getBase();
         // compute the traces...
@@ -25,22 +30,19 @@ int multivariateTarskiQuery(const MultivariatePolynomial<Coeff>& Q, const Multip
                         MultivariatePolynomial<Coeff> Qc = Q * base[i] * base[j];
                         BaseRepr<Coeff> nf_Qc = normalForm(Qc, gb);
                         Coeff t = trace(nf_Qc, table);
-                        std::cout << t << "\t";
                         m(i, j) = t;
                 }
-                std::cout << std::endl;
         }
         std::vector<Coeff> cp = charPol(m);
-        std::cout << "char pol: " << cp << std::endl;
+        CARL_LOG_TRACE("carl.thom.tarski", "char pol: " << cp);
         int v1 = (int)signVariations(cp.begin(), cp.end(), sgn<Coeff>);
-        std::cout << v1 << std::endl;
         for(int i = 1; i < cp.size(); i += 2) {
                 cp[i] *= -Coeff(1);
         }
-        std::cout << "char pol': " << cp << std::endl;
+        CARL_LOG_TRACE("carl.thom.tarski", "char pol': " << cp);
         int v2 = (int)signVariations(cp.begin(), cp.end(), sgn<Coeff>);
-        std::cout << v2 << std::endl;
         
+        CARL_LOG_TRACE("carl.thom.tarski", "result = " << v1 - v2);
         return v1 - v2;
 }
 

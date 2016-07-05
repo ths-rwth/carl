@@ -17,15 +17,15 @@ namespace carl {
 // allgorithm 8.11, p. 290
 template<typename Coeff>
 std::vector<Coeff> newtonSums(const std::vector<Coeff>& newtonSums) {
-        assert(newtonSums.size() >= 1);
+        CARL_LOG_FUNC("carl.thom.tarski", "newtonSums = " << newtonSums);
+        CARL_LOG_ASSERT("carl.thom.tarski", newtonSums.size() >= 1, "newtonSums: invalid argument");
         int p = (int)newtonSums.size() - 1;
         std::vector<Coeff> res(p + 1);
         res[p] = Coeff(1);
         for(int i = 1; i <= p; i++) {
                 Coeff sum(0);
                 for(int j = 1; j <= i; j++) {
-                        sum += res[p - i + j] * newtonSums[j];
-                        
+                        sum += res[p - i + j] * newtonSums[j];                        
                 }
                 sum *= -(Coeff(1) / Coeff(i));
                 res[p-i] = sum;
@@ -49,14 +49,13 @@ void printMatrix(const CoeffMatrix<Coeff>& m) {
 // algorithm 8.17, p. 300
 template<typename Coeff>
 std::vector<Coeff> charPol(const CoeffMatrix<Coeff>& m) {
+        CARL_LOG_FUNC("carl.thom.tarski", "");
         long int n = m.cols();
-        assert(n == m.rows());
+        CARL_LOG_ASSERT("carl.thom.tarski", n == m.rows(), "can only compute characteristic polynomial of square matrix");
         
         // calculate r
         int r = static_cast<int>(std::ceil(std::sqrt(static_cast<double>(n)))); 
         if(r*r == n) r++; // if n is a square number
-        std::cout << "n = " << n << std::endl;
-        std::cout << "r = " << r << std::endl;
         
         CoeffMatrix<Coeff> id = CoeffMatrix<Coeff>::Identity(n, n);
         
@@ -67,9 +66,8 @@ std::vector<Coeff> charPol(const CoeffMatrix<Coeff>& m) {
         for(int i = 0; i < r - 1; i++) {
                 B.push_back(m * B.back());
                 N[i+1] = B.back().trace();
-                printMatrix(B.back());
+                //printMatrix(B.back());
         }
-        std::cout << N << std::endl;
         
         std::vector<CoeffMatrix<Coeff>> C;
         C.push_back(m * B.back());
@@ -77,9 +75,8 @@ std::vector<Coeff> charPol(const CoeffMatrix<Coeff>& m) {
         for(int j = 1; j < r - 1; j++) {
                 C.push_back(C.front() * C.back());
                 N[(j + 1) * r] = C.back().trace();
-                printMatrix(C.back());
+                //printMatrix(C.back());
         }
-        std::cout << N << std::endl;
         
         for(int i = 1; i < r; i++) {
                 for(int j = 1; j < r; j++) {
@@ -87,12 +84,9 @@ std::vector<Coeff> charPol(const CoeffMatrix<Coeff>& m) {
                         N[j*r + i] = tmp.trace();
                 }
         }
-        std::cout << N << std::endl;
         N.resize(n + 1);
-        std::cout << N << std::endl;
         
-        return newtonSums(N);
-        
+        return newtonSums(N);        
 }
 
 } // namespace carl

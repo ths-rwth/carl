@@ -29,30 +29,29 @@ std::vector<std::pair<int, int>> abc(const _Monomial<Coeff>& c, const MonomialBa
 
 template<typename Coeff>
 BaseRepr<Coeff> multiply(const BaseRepr<Coeff>& f, const BaseRepr<Coeff>& g, const MultiplicationTable<Coeff>& tab) {
-        assert(f.size() == g.size());
-        assert(f.size() == tab.getBase().size());
+        CARL_LOG_FUNC("carl.thom.tarski", "f = " << f << ", g = " << g);
+        CARL_LOG_ASSERT("carl.thom.tarski", f.size() == g.size(), "imcompatible arguments");
+        CARL_LOG_ASSERT("carl.thom.tarski", f.size() == tab.getBase().size(), "incompatible arguments");
         
         MonomialBase<Coeff> base = tab.getBase();
         BaseRepr<Coeff> res(base.size(), Coeff(0));
         for(const auto& mon : tab) {
-                std::cout << "calculating abc for " << mon << std::endl;
                 std::vector<std::pair<int, int>> pairs = abc(mon.first, base);
-                std::cout << pairs << std::endl;
+                CARL_LOG_TRACE("carl.thom.tarski", "pairs = " << pairs);
                 for(const auto& pair : pairs) {
                         for(int i = 0; i < base.size(); i++) {
                                 res[i] += mon.second[i] * f[pair.first] * g[pair.second];
                         }
                 }
-        }
-        
-        std::cout << "res = " << res << std::endl;
-        
+        }    
+        CARL_LOG_TRACE("carl.thom.tarski", "res = " << res);     
         return res;
 }
 
 template<typename Coeff>
 Coeff trace(const BaseRepr<Coeff>& f, const MultiplicationTable<Coeff>& table) {
-        assert(f.size() == table.getBase().size());
+        CARL_LOG_FUNC("carl.thom.tarski", "f = " << f);
+        CARL_LOG_ASSERT("carl.thom.tarski", f.size() == table.getBase().size(), "incompatible arguments");
         Coeff res(0);
         MonomialBase<Coeff> base = table.getBase();
         for(int i = 0; i < base.size(); i++) {
@@ -61,8 +60,8 @@ Coeff trace(const BaseRepr<Coeff>& f, const MultiplicationTable<Coeff>& table) {
                         res += f[j] * table.get(ab)[i];
                 }
         }
-        return res;
-        
+        CARL_LOG_TRACE("carl.thom.tarski", "res = " << res);
+        return res;        
 }
 
 } // namespace carl;
