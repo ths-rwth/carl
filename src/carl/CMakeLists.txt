@@ -16,13 +16,6 @@ endforeach()
 
 file(GLOB_RECURSE carl_lib_sources "*.cpp")
 
-install(
-	DIRECTORY ${CMAKE_SOURCE_DIR}/src/carl/
-	DESTINATION include/carl
-	FILES_MATCHING REGEX ".*\.(h|tpp)$"
-)
-
-
 add_library(lib_carl SHARED ${carl_lib_sources})
 add_dependencies(lib_carl resources)
 set_target_properties( lib_carl PROPERTIES
@@ -41,12 +34,6 @@ endif()
 if(USE_GINAC)
 	target_link_libraries(lib_carl PUBLIC GINAC_SHARED)
 endif()
-install(
-	TARGETS lib_carl
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib
-)
 
 if(BUILD_STATIC)
 	add_library(lib_carl_static STATIC ${carl_lib_sources})
@@ -68,12 +55,6 @@ if(BUILD_STATIC)
 	if(USE_GINAC)
 		target_link_libraries(lib_carl_static PUBLIC GINAC_STATIC)
 	endif()
-	install(
-		TARGETS lib_carl_static
-		RUNTIME DESTINATION bin
-		LIBRARY DESTINATION lib
-		ARCHIVE DESTINATION lib
-	)
 
 	set(CARL_TARGETS lib_carl lib_carl_static CACHE STRING INTERNAL FORCE)
 else()
@@ -81,6 +62,7 @@ else()
 endif()
 
 cotire(carl)
+include(install)
 
 if (CLANG_TIDY)
 	add_custom_target(tidy
