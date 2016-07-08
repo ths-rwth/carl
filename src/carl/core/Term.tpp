@@ -495,7 +495,7 @@ bool Term<Coefficient>::isConsistent() const {
 
 
 template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::gcd(std::shared_ptr<const Term<Coefficient>> t1, std::shared_ptr<const Term<Coefficient>> t2)
+Term<Coefficient> Term<Coefficient>::gcd(const std::shared_ptr<const Term<Coefficient>>& t1, const std::shared_ptr<const Term<Coefficient>>& t2)
 {
 	static_assert(is_field<Coefficient>::value, "Not yet defined for other coefficients");
 	assert(t1);
