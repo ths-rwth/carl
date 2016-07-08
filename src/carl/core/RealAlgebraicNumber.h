@@ -229,6 +229,12 @@ public:
 		checkForSimplification();
 	}
 	
+	RealAlgebraicNumber<Number> abs() const {
+		if (isNumeric()) return RealAlgebraicNumber<Number>(carl::abs(mValue), mIsRoot);
+		if (isInterval()) return RealAlgebraicNumber<Number>(mIR->polynomial, mIR->interval.abs(), mIsRoot);
+		return RealAlgebraicNumber<Number>();
+	}
+
 	bool equal(const RealAlgebraicNumber<Number>& n) const;
 	bool less(const RealAlgebraicNumber<Number>& n) const;
 	std::pair<bool,bool> checkOrder(const RealAlgebraicNumber<Number>& n) const;
