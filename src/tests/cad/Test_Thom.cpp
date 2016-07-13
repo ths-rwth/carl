@@ -127,8 +127,7 @@ TEST(Thom, RootFinderMultivariate) {
     
     std::vector<ThomEncoding<Rational>> rootsRightInner2 = realRoots(p2, y, roots_proj2[1]);
     EXPECT_TRUE(rootsRightInner2.size() == 1);
-    
-    
+       
     EXPECT_TRUE(rootsRightInner[0] < rootsRightInner2[0]);
     EXPECT_TRUE(rootsRightInner[1] == rootsRightInner2[0]);
      
@@ -158,4 +157,63 @@ TEST(Thom, IntermediatePointsUnivariate) {
     
     std::cout << "intermediate1 = " << intermediate1 << std::endl;
     std::cout << "intermediate2 = " << intermediate2 << std::endl;
+}
+
+TEST(Thom, ThreeVariables) {
+    typedef MultivariatePolynomial<Rational> Polynomial;
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable z = freshRealVariable("z");
+    Variable w = freshRealVariable("w");
+    
+    Rational a = 1;
+    Rational b = -1;
+    Rational c = 2;
+    
+    Polynomial p1 = x - a;
+    a ++;
+    Polynomial tmp = a - x;
+    Polynomial p2 = (y - b) * tmp;
+    b ++;
+    Polynomial tmp2 = b - x;
+    Polynomial p3 = (z - c) * tmp * tmp2;
+    a--; b--;
+    
+    // p1 = (x- a)
+    // p2 = (y - b) * (a + 1 - x)
+    // p3 = (z - c) * (b + 1 - y) * (a + 1 - x)
+    
+    std::vector<ThomEncoding<Rational>> roots_p1 = realRoots(p1.toUnivariatePolynomial());
+    std::cout << roots_p1[0] << std::endl;
+    EXPECT_TRUE(roots_p1.size() == 1);
+    EXPECT_TRUE(roots_p1[0].represents(a));
+    
+    std::vector<ThomEncoding<Rational>> roots_p2_p1 = realRoots(p2, y, roots_p1[0]);
+    EXPECT_TRUE(roots_p2_p1.size() == 1);
+    std::cout << roots_p2_p1[0] << std::endl;
+    
+    std::vector<ThomEncoding<Rational>> roots_p3_p2_p1 = realRoots(p3, z, roots_p2_p1[0]);
+    EXPECT_TRUE(roots_p3_p2_p1.size() == 1);
+    std::cout << roots_p3_p2_p1[0] << std::endl;
+    
+    Polynomial p4(z);
+    p4 *= z;
+    p4 += x;
+    p4 += y;
+    p4 += Rational(-2);
+    std::vector<ThomEncoding<Rational>> roots_p4_p2_p1 = realRoots(p4, z, roots_p2_p1[0]);
+    EXPECT_TRUE(roots_p4_p2_p1.size() == 2);
+    std::cout << roots_p4_p2_p1[0] << std::endl;
+    std::cout << roots_p4_p2_p1[1] << std::endl;
+    EXPECT_TRUE(roots_p4_p2_p1[0] < roots_p4_p2_p1[1]);
+    
+    
+    Polynomial p5(z);
+    p5 *= z;
+    p5 = w - p5;
+    std::vector<ThomEncoding<Rational>> roots_p5_p4_p2_p1 = realRoots(p5, w, roots_p4_p2_p1[0]);
+    std::cout << roots_p5_p4_p2_p1[0] << std::endl;
+    EXPECT_TRUE(roots_p5_p4_p2_p1.size() == 1);
+    
+
 }

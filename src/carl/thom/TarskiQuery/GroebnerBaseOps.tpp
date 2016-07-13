@@ -20,6 +20,15 @@ using _Monomial = Term<Coeff>;
 template<typename Coeff>
 using GB = std::vector<MultivariatePolynomial<Coeff>>;
 
+template<typename Coeff>
+std::set<Variable> gatherVariables(const GB<Coeff>& g) {
+        std::set<Variable> vars;
+        for(const auto& p : g) {
+                p.gatherVariables(vars);
+        }
+        return vars;
+}
+
         
 // cor (the corners of the staircase) are just the leading monomials of the polynomials in the groebner base
 template<typename Coeff>
@@ -31,14 +40,7 @@ std::vector<carl::_Monomial<Coeff>> cor(const GB<Coeff>& g) {
         return res;
 }
 
-template<typename Coeff>
-std::set<Variable> gatherVariables(const GB<Coeff>& g) {
-        std::set<Variable> vars;
-        for(const auto& p : g) {
-                p.gatherVariables(vars);
-        }
-        return vars;
-}
+
 
 // Checks if the set mon of this groebner basis is finite (Prop. 12.7, page 541)
 // Here we assume that the underlying ring is the polynomial ring in exactly the variables that actually occur in the basis.
@@ -79,7 +81,7 @@ bool anyDivides(const std::vector<_Monomial<Coeff>>& list, const _Monomial<Coeff
 // this functions will assert that the result is finite
 // currently only works for 2 variables
 template<typename Coeff>
-std::vector<_Monomial<Coeff>> mon(const GB<Coeff>& g) {
+std::vector<_Monomial<Coeff>> mon2var(const GB<Coeff>& g) {
         assert(hasFiniteMon(g));      
         std::vector<_Monomial<Coeff>> res;
         std::vector<_Monomial<Coeff>> lmons = cor(g);
@@ -102,8 +104,69 @@ std::vector<_Monomial<Coeff>> mon(const GB<Coeff>& g) {
                 // finally augment the degree of v1 in the current monomial
                 currMon = currMon * v1;
         }
+        return res;
+}
+
+// this is a helper function for mon
+template<typename Coeff> // i dont know why this has to be a template but i get a linker error if its not
+bool nextTuple(std::vector<uint>& tuple, const std::vector<uint>& maxTuple) {
+        assert(tuple.size() == maxTuple.size());
+        if(tuple[0] < maxTuple[0]) {
+                tuple[0]++;
+                return true;
+        }
+        else {
+                assert(tuple[0] == maxTuple[0]);
+                bool succes = false;
+                for(uint i = 1; i < tuple.size(); i++) {
+                        if(tuple[i] < maxTuple[i]) {
+                                for(uint j = 0; j < i; j++) tuple[j] = 0;
+                                tuple[i]++;
+                                succes = true;
+                                break;
+                        }
+                }
+                return succes;
+        }
+}
+
+
+template<typename Coeff>
+std::vector<_Monomial<Coeff>> mon(const GB<Coeff>& g) {
+        assert(hasFiniteMon(g)); 
+        std::set<Variable> varsset = gatherVariables(g);
+        std::vector<Variable> vars;
+        for(const auto& v : varsset) vars.push_back(v);
+        std::vector<_Monomial<Coeff>> lmons = cor(g);
+        std::vector<uint> degrees;
+        for(const auto& v : vars) {
+                for(const auto& m : lmons) {
+                        assert(isOne(m.coeff()));
+                        if(m.hasNoOtherVariable(v)) {
+                                degrees.push_back(m.monomial()->tdeg());
+                                break;
+                        }
+                }
+        }
+        CARL_LOG_ASSERT("carl.thom.tarski", degrees.size() == vars.size(), "");
+        CARL_LOG_TRACE("carl.thom.tarski", "groebner base: " << g);
+        CARL_LOG_TRACE("carl.thom.tarski", "variables: " << vars);
+        CARL_LOG_TRACE("carl.thom.tarski", "vector of degrees: " << degrees);
         
-        
+        std::vector<_Monomial<Coeff>> res;
+        std::vector<uint> currTuple(degrees.size(), 0);
+        do {
+                _Monomial<Coeff> candidate(Coeff(1));
+                for(uint i = 0; i < currTuple.size(); i++) {
+                        for(uint d = 0; d < currTuple[i]; d++) {
+                                candidate = candidate * vars[i];
+                        }
+                }
+                if(!anyDivides(lmons, candidate)) {
+                        res.push_back(candidate);
+                }
+        }
+        while(nextTuple<Coeff>(currTuple, degrees)); 
         return res;
 }
 

@@ -52,6 +52,7 @@ std::vector<Coeff> charPol(const CoeffMatrix<Coeff>& m) {
         CARL_LOG_FUNC("carl.thom.tarski", "");
         long int n = m.cols();
         CARL_LOG_ASSERT("carl.thom.tarski", n == m.rows(), "can only compute characteristic polynomial of square matrix");
+        CARL_LOG_INFO("carl.thom.tarski", "input has size " << n << "x" << n);
         
         // calculate r
         int r = static_cast<int>(std::ceil(std::sqrt(static_cast<double>(n)))); 
@@ -85,8 +86,9 @@ std::vector<Coeff> charPol(const CoeffMatrix<Coeff>& m) {
                 }
         }
         N.resize(n + 1);
-        
-        return newtonSums(N);        
+        std::vector<Coeff> res =  newtonSums(N);
+        CARL_LOG_INFO("carl.thom.tarski", "done computing the char pol ... ");
+        return res;
 }
 
 } // namespace carl

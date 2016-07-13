@@ -27,6 +27,30 @@ std::vector<ThomEncoding<Coeff>> realRoots(
                 //const Interval<Coeff>& interval = Interval<Coeff>::unboundedInterval()       
 ) {
         assert(!polynomial.isZero());
+        
+        std::vector<ThomEncoding<Coeff>> res;
+        
+        // trivial cases
+        
+        // polynomial is constant     
+        if(polynomial.isConstant()) {
+                CARL_LOG_INFO("carl.thom", "real roots for constant polynomial called");
+                return res;
+        }
+             
+        // polynomial is linear
+        if(polynomial.degree() == 1) {
+                CARL_LOG_INFO("carl.thom", "real roots for linear polynomial called");
+                std::shared_ptr<MultivariatePolynomial<Coeff>> p_ptr = std::make_shared<MultivariatePolynomial<Coeff>>(polynomial);
+                ThomEncoding<Coeff> root(p_ptr, SignCondition()); // empty sign condition
+                res.push_back(root);
+                return res;
+        }
+        // polynomial is quadratic
+        if(polynomial.degree() == 2) {
+                // todo implement
+        }
+        
         std::vector<UnivariatePolynomial<Coeff>> derivatives = der(polynomial, polynomial.degree() - 1);
         // todo make nicer
         derivatives.erase(derivatives.begin());
@@ -35,7 +59,6 @@ std::vector<ThomEncoding<Coeff>> realRoots(
         // run the sign determination algorithm on the polynomial as zero set and its derivatives
         std::vector<SignCondition> signConds = signDetermination(derivatives, polynomial);
         
-        std::vector<ThomEncoding<Coeff>> res;
         res.reserve(signConds.size());
         
         std::shared_ptr<MultivariatePolynomial<Coeff>> ptr = std::make_shared<MultivariatePolynomial<Coeff>>(polynomial);
@@ -61,7 +84,23 @@ std::vector<ThomEncoding<Coeff>> realRoots(
 		const ThomEncoding<Coeff>& point//,
 		//const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
-        assert(point.dimension() == 1);
+        
+        // trivial cases
+        
+        // main Var does not appear in p should never happen
+        CARL_LOG_ASSERT("carl.thom", p.degree(mainVar) > 0, "");
+        
+        std::vector<ThomEncoding<Coeff>> res;
+        
+        // p is linear in its main var
+        if(p.degree(mainVar) == 1) {
+                CARL_LOG_INFO("carl.thom", "real roots for linear polynomial called");
+                std::shared_ptr<MultivariatePolynomial<Coeff>> pp = std::make_shared<MultivariatePolynomial<Coeff>>(p);
+                std::shared_ptr<ThomEncoding<Coeff>> ppoint = std::make_shared<ThomEncoding<Coeff>>(point);
+                ThomEncoding<Coeff> root(pp, mainVar, SignCondition(), ppoint);
+                res.push_back(root);
+                return res;
+        }
         
         std::vector<MultivariatePolynomial<Coeff>> zeroSet = point.accumulatePolynomials();
         zeroSet.push_back(p);
@@ -80,7 +119,6 @@ std::vector<ThomEncoding<Coeff>> realRoots(
         
         // we are ready for sign determination!
         std::vector<SignCondition> signConds = signDetermination(derivatives, zeroSet);
-        std::cout << "signConds = " << signConds << std::endl;
         
         // find the sign conditions in signCond with the prefix prevSignCond
         // then cut off this prefix from the resulting sign conds
@@ -98,11 +136,9 @@ std::vector<ThomEncoding<Coeff>> realRoots(
         
         
         // construct the thom encodings from p, this new sign conditions and point
-        std::vector<ThomEncoding<Coeff>> res;
         std::shared_ptr<MultivariatePolynomial<Coeff>> pp = std::make_shared<MultivariatePolynomial<Coeff>>(p);
         std::shared_ptr<ThomEncoding<Coeff>> ppoint = std::make_shared<ThomEncoding<Coeff>>(point);
         for(const auto& s : newConds) {
-                std::cout << "s = " << s << std::endl;
                 ThomEncoding<Coeff> enc(pp, mainVar, s, ppoint);
                 assert(!enc.isOneDimensional());
                 res.push_back(enc);

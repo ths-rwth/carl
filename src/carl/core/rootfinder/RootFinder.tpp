@@ -14,6 +14,8 @@
 namespace carl {
 namespace rootfinder {
 
+        
+// hiervon eine thom version machen!!!
 template<typename Coeff, typename Number>
 std::list<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,

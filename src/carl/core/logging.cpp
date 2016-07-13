@@ -35,8 +35,9 @@ void setInitialLogLevel()
 		("carl.core.rootfinder", carl::logging::LogLevel::LVL_TRACE)
 		("carl.cad.cg", carl::logging::LogLevel::LVL_DEBUG)
 		("carl.formula", carl::logging::LogLevel::LVL_WARN)
-                ("carl.thom", carl::logging::LogLevel::LVL_ALL)
-                ("carl.thom.tarski", carl::logging::LogLevel::LVL_FATAL)
+                ("carl.thom", carl::logging::LogLevel::LVL_DEBUG)
+                ("carl.thom.tarski", carl::logging::LogLevel::LVL_DEBUG)
+                ("carl.thom.sign", carl::logging::LogLevel::LVL_DEBUG)
 	;
 	carl::logging::logger().resetFormatter();
 }

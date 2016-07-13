@@ -43,7 +43,7 @@ ThomEncoding<Coeff>::ThomEncoding(
         p = std::make_shared<MultivariatePolynomial<Coeff>>(mp);
         signs = s;
         mainVar = ptr->mainVar();
-        CARL_LOG_ASSERT("catl.thom", isConsistent(), "");
+        CARL_LOG_ASSERT("carl.thom", isConsistent(), "");
 }
 
 template<typename Coeff>
@@ -95,24 +95,24 @@ ThomEncoding<Coeff>::ThomEncoding(const Coeff& rational, Variable::Arg var) {
 template<typename Coeff>
 bool ThomEncoding<Coeff>::isConsistent() const {
         if(!p) {
-                std::cout << "p is not initialized" << std::endl;
+                CARL_LOG_DEBUG("carl.thom", "p is not initialized");
                 return false;               
         }
         if(signs.size() != p->degree(mainVar) - 1) { 
-                std::cout << "SignCondition has incorrect number of elements" << std::endl;
+                CARL_LOG_DEBUG("carl.thom", "SignCondition has incorrect number of elements");
                 return false;             
         }
         if(isOneDimensional()) {
                 if(!p->isUnivariate()) {   
-                        std::cout << "in the 1-dim case p must be univariate" << std::endl;
+                        CARL_LOG_DEBUG("carl.thom", "in the 1-dim case p must be univariate");
                         return false;                       
                 }
                 if(*(p->gatherVariables().begin()) != mainVar) {
-                        std::cout << "wrong main variable" << std::endl;
+                        CARL_LOG_DEBUG("carl.thom", "wrong main variable");
                         return false;
                 }
                 if(tarskiQuery(UnivariatePolynomial<Coeff>(mainVar, {Coeff(1)}), polynomial().toUnivariatePolynomial()) == 0) { 
-                        std::cout << "p has no roots - this is not ok" << std::endl;
+                        CARL_LOG_DEBUG("carl.thom", "p has no roots - this is not ok");
                         return false;                 
                 }             
                 return true;
@@ -120,11 +120,11 @@ bool ThomEncoding<Coeff>::isConsistent() const {
         else {                                          // p is multidimensional
                 assert(point);
                 if(p->gatherVariables().find(mainVar) == p->gatherVariables().end()) {
-                        std::cout << "main variable is not contained in p" << std::endl;
+                        CARL_LOG_DEBUG("carl.thom", "main variable is not contained in p");
                         return false; 
                 }
                 if(this->mainVar == point->mainVar) {
-                        std::cout << "the main variables of the encodings in a hierarchy must be different" << std::endl;
+                        CARL_LOG_DEBUG("carl.thom", "the main variables of the encodings in a hierarchy must be different");
                         return false;
                 }             
                 return point->isConsistent();           // recursively check consistency of the levels below
@@ -159,7 +159,7 @@ Sign ThomEncoding<Coeff>::operator[](const uint n) const {
                 return signs[n-1];
         }
         else if(n == (unsigned)signs.size() + 1) {
-                return Sign(sgn(p->lcoeff()));
+                return Sign(sgn(p->derivative(mainVar).lcoeff()));
         }
         else {
                 return Sign::ZERO;
@@ -167,7 +167,7 @@ Sign ThomEncoding<Coeff>::operator[](const uint n) const {
 }
 
 template<typename Coeff>
-SignCondition ThomEncoding<Coeff>::fullSignCondition() const {
+SignCondition ThomEncoding<Coeff>::fullSignCondition() const { 
         SignCondition res = signs;
         res.insert(res.begin(), (*this)[0]);
         assert(res[0] == Sign::ZERO);
@@ -212,8 +212,11 @@ std::vector<MultivariatePolynomial<Coeff>> ThomEncoding<Coeff>::accumulatePolyno
 
 template<typename Coeff>
 std::vector<MultivariatePolynomial<Coeff>> ThomEncoding<Coeff>::reducedDer() const {
-        std::vector<MultivariatePolynomial<Coeff>> res = der(polynomial(), mainVar, polynomial().degree(mainVar) - 1);
-        res.erase(res.begin());
+        std::vector<MultivariatePolynomial<Coeff>> res;
+        if(polynomial().degree(mainVar) > 1) {
+                res = der(polynomial(), mainVar, polynomial().degree(mainVar) - 1);
+                res.erase(res.begin());
+        }
         return res;
 }
 
@@ -388,7 +391,7 @@ ComparisonResult compareThom(const ThomEncoding<C>& lhs, const ThomEncoding<C>& 
 template<typename C>
 ThomEncoding<C> intermediatePoint(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
         CARL_LOG_ASSERT("carl.thom", lhs < rhs, "");
-        C epsilon = C(1);
+        C epsilon = C(1); // maaybe put this in settings
         ThomEncoding<C> res = lhs + epsilon;
         while(res >= rhs) {
                 epsilon /= 2;

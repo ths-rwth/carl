@@ -21,12 +21,12 @@ struct ThomBasicSettings {
         /*
          * sign determination settings
          */
-        static const bool SIGN_DETERMINATION_REDUCE = false;
+        static const bool SIGN_DETERMINATION_REDUCE = true;
         
         /*
          * tarski query settings
          */
-        static const bool MULT_TABLE_USE_NF_ALG = true;
+        static const bool MULT_TABLE_USE_NF_ALG = false;
 };
 
 struct ThomExperimentalSettings {

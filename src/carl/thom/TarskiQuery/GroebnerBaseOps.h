@@ -20,7 +20,6 @@ namespace carl {
 template<typename Coeff>
 using _Monomial = Term<Coeff>;
 
-// for now ...
 template<typename Coeff>
 using GB = std::vector<MultivariatePolynomial<Coeff>>;
 
@@ -31,6 +30,8 @@ using GB = std::vector<MultivariatePolynomial<Coeff>>;
 template<typename Coeff>
 bool hasFiniteMon(const GB<Coeff>& g);
 
+template<typename Coeff>
+std::set<Variable> gatherVariables(const GB<Coeff>& g);
 
 // cor (the corners of the staircase) are just the leading monomials of the polynomials in the groebner base
 template<typename Coeff>

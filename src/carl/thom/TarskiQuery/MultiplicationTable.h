@@ -21,20 +21,30 @@ namespace carl {
 template<typename Coeff>
 using MonomialBase = std::vector<_Monomial<Coeff>>;
 
-// helper function that gives the list of coefficients of a polynomial in the base
+// helper function that gives the list of coefficients of a polynomial already represented in that base
 template<typename Coeff>
 std::vector<Coeff> polynomialInBase(const MultivariatePolynomial<Coeff>& p, const MonomialBase<Coeff>& base) {
         CARL_LOG_ASSERT("carl.thom.tarski", base.size() >= p.size(), "p is not in <base>");
-        
+        // MAYBE OPTIMIZE THIS USING THAT THE MONOMIALS IN P AND IN BASE ARE ALREADY ORDERED
         MultivariatePolynomial<Coeff> p_prime(p);              
         std::vector<Term<Coeff>> terms = p_prime.getTerms();
         std::vector<Coeff> res(base.size(), Coeff(0));
-        for(int i = 0; i < base.size(); i++) {
+        for(uint i = 0; i < base.size(); i++) {
                 for(const auto& t : terms) {
                         if(t.monomial() == base[i].monomial()) {
                                 res[i] = t.coeff();
                         }
                 }
+        }
+        return res;
+}
+
+template<typename Coeff>
+MultivariatePolynomial<Coeff> baseReprToPolynomial(const std::vector<Coeff>& repr, const MonomialBase<Coeff>& base) {
+        CARL_LOG_ASSERT("carl.thom.tarski", repr.size() == base.size(), "");
+        MultivariatePolynomial<Coeff> res(Coeff(0));
+        for(uint i = 0; i < repr.size(); i++) {
+                res += repr[i] * base[i];
         }
         return res;
 }
@@ -127,7 +137,7 @@ public:
         
         void init2(const GB<Coeff>& gb) {
                 CARL_LOG_FUNC("carl.thom.tarski", "gb = " << gb);
-                
+                CARL_LOG_INEFFICIENT();
                 MonomialBase<Coeff> Mon = mon(gb);
                 std::sort(Mon.begin(), Mon.end());
                 base = Mon;               
@@ -208,7 +218,7 @@ public:
                                 MultivariatePolynomial<Coeff> sum(Coeff(0));
                                 
                                 // sum over all pairs in Mon^2...
-                                for(int gamma = 0; gamma < Mon.size(); gamma++) {
+                                for(uint gamma = 0; gamma < Mon.size(); gamma++) {
                                         if(nf_x_beta[gamma] == Coeff(0)) {
                                                 continue;
                                         }
@@ -216,7 +226,7 @@ public:
                                         CARL_LOG_ASSERT("carl.thom.tarski", x_gamma_prime < m, "");
                                         CARL_LOG_ASSERT("carl.thom.tarski", tab.find(x_gamma_prime) != tab.end(), "");
                                         BaseRepr nf_x_gamma_prime = tab[x_gamma_prime];
-                                        for(int delta = 0; delta < Mon.size(); delta++) {
+                                        for(uint delta = 0; delta < Mon.size(); delta++) {
                                                 Term<Coeff> prod(nf_x_beta[gamma]);
                                                 prod = prod * nf_x_gamma_prime[delta];
                                                 prod = prod * Mon[delta];
@@ -271,12 +281,11 @@ public:
                                 BaseRepr nf_m(Mon.size(), Coeff(0)); // this is to compute
                                 BaseRepr nf_x_beta = tab[x_beta];
                                 // do the matrix-vector multiplication!
-                                for(int i = 0; i < Mon.size(); i++) {
-                                        for(int j = 0; j < Mon.size(); j++) {
+                                for(uint i = 0; i < Mon.size(); i++) {
+                                        for(uint j = 0; j < Mon.size(); j++) {
                                                 nf_m[i] += mat[j][i] * nf_x_beta[j];
                                         }
                                 }
-                                std::cout << "nf_m = " << nf_m << std::endl;
                                 tab.insert(std::make_pair(m, nf_m));
                                 
                         }

@@ -271,7 +271,10 @@ public:
          */
         template <typename C, typename Settings = ThomDefaultSettings>
 	friend std::ostream& operator<<(std::ostream& os, const ThomEncoding<C>& rhs) {
-                os << "(" << rhs.polynomial() << ", " << rhs.fullSignCondition() << ")" << std::endl;
+                os << "(" << rhs.polynomial() << " with mainVar " << rhs.getMainVar() << ", " << rhs.fullSignCondition() << ")" << std::endl;
+                if(rhs.isMultiDimensional()) {
+                        os << *(rhs.point);
+                }
                 return os;
         }
 };
