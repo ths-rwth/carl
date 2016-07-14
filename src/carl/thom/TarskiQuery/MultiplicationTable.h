@@ -111,21 +111,24 @@ class MultiplicationTable {
 public:
         typedef std::vector<Coeff> BaseRepr;
         typedef std::forward_list<std::pair<uint, uint>> IndexPairs;
+        typedef _Monomial<Coeff> Monomial;
         
 private:
-        std::map<_Monomial<Coeff>, BaseRepr> tab;
-        MonomialBase<Coeff> base;
         
         struct TableContent {
                 BaseRepr br;
                 IndexPairs pairs;
         };
         
+        std::map<Monomial, TableContent> tab;
+        MonomialBase<Coeff> base;
+        
+              
         // returns a list of all pairs of indicdes (i,j) such that base_i * base_j == c
-        IndexPairs abc(const _Monomial<Coeff>& c) const {
-                std::forward_list<std::pair<int, int>> res;
+        IndexPairs indexPairs(const Monomial& c) const {
+                IndexPairs res;
                 for(uint i = 0; i < base.size(); i++) {
-                        for(uint j = 0; j < base.size(); j++) {
+                        for(uint j = i; j < base.size(); j++) {
                                 if(base[i] * base[j] == c) {
                                         res.push_front(std::make_pair(i, j));
                                         if(i != j) res.push_front(std::make_pair(j, i));
@@ -137,20 +140,30 @@ private:
         
 public:
         
-        bool contains(const _Monomial<Coeff>& m) const {
+        inline bool contains(const Monomial& m) const {
                 return tab.find(m) != tab.end();
+        }
+        
+        inline uint size() const {
+                return tab.size();
         }
         
         // only call after initialization!
         BaseRepr& get(const _Monomial<Coeff>& m) {
                 assert(contains(m));
-                return tab[m];
+                return tab[m].br;
         }
         
         BaseRepr get(const _Monomial<Coeff>& m) const {
                 assert(contains(m));
                 auto pair = *(tab.find(m));               
-                return pair.second;
+                return pair.second.br;
+        }
+        
+        IndexPairs getPairs(const Monomial& m) const {
+                assert(contains(m));
+                auto pair = *(tab.find(m));
+                return pair.second.pairs;
         }
         
         MonomialBase<Coeff> getBase() const {
@@ -174,7 +187,8 @@ public:
                 }
                 for(const auto& mon : tabmon) {
                         BaseRepr nf = normalForm(MultivariatePolynomial<Coeff>(mon), gb);
-                        tab.insert(std::make_pair(mon, nf));                       
+                        IndexPairs pairs = indexPairs(mon);
+                        tab[mon] = {nf, pairs};                  
                 }
         }
         
@@ -198,7 +212,8 @@ public:
                 // ---- step 0 ---- (not explicitly mentioned)
                 // put BaseRepr of the monomials form Mon itself in table
                 for(const auto& m : Mon) {
-                        tab.insert(std::make_pair(m, polynomialInBase(MultivariatePolynomial<Coeff>(m), Mon)));
+                        IndexPairs pairs = indexPairs(m);
+                        tab[m] = {polynomialInBase(MultivariatePolynomial<Coeff>(m), Mon), pairs};
                 }
                 
                 // ---- step 1 ----
@@ -216,8 +231,9 @@ public:
                                 }
                                 MultivariatePolynomial<Coeff> diff = G.stripLT();
                                 diff *= Coeff(-1);
-                                tab.insert(std::make_pair(m, polynomialInBase(diff, Mon)));
-                                CARL_LOG_TRACE("carl.thom.tarski", "tab = " << tab);                             
+                                IndexPairs pairs = indexPairs(m);
+                                tab[m] = {polynomialInBase(diff, Mon), pairs};
+                                //CARL_LOG_TRACE("carl.thom.tarski", "tab = " << tab);                             
                         }
                         else {
                                 // the monomial is not in core
@@ -233,10 +249,10 @@ public:
                                 }
                                 CARL_LOG_ASSERT("carl.thom.tarski", std::find(Bor.begin(), Bor.end(), x_beta) != Bor.end(), "");
                                 CARL_LOG_TRACE("carl.thom.tarski", "x_beta = " << x_beta);
-                                CARL_LOG_ASSERT("carl.thom.tarski", tab.find(x_beta) != tab.end(), "");
+                                CARL_LOG_ASSERT("carl.thom.tarski", this->contains(x_beta), "");
                                 CARL_LOG_ASSERT("carl.thom.tarski", x_beta < m, "");
                                 
-                                BaseRepr nf_x_beta = tab[x_beta];
+                                BaseRepr nf_x_beta = tab[x_beta].br;
                                 MultivariatePolynomial<Coeff> sum(Coeff(0));
                                 
                                 // sum over all pairs in Mon^2...
@@ -246,8 +262,8 @@ public:
                                         }
                                         _Monomial<Coeff> x_gamma_prime = var * Mon[gamma];
                                         CARL_LOG_ASSERT("carl.thom.tarski", x_gamma_prime < m, "");
-                                        CARL_LOG_ASSERT("carl.thom.tarski", tab.find(x_gamma_prime) != tab.end(), "");
-                                        BaseRepr nf_x_gamma_prime = tab[x_gamma_prime];
+                                        CARL_LOG_ASSERT("carl.thom.tarski", this->contains(x_gamma_prime), "");
+                                        BaseRepr nf_x_gamma_prime = tab[x_gamma_prime].br;
                                         for(uint delta = 0; delta < Mon.size(); delta++) {
                                                 Term<Coeff> prod(nf_x_beta[gamma]);
                                                 prod = prod * nf_x_gamma_prime[delta];
@@ -255,7 +271,8 @@ public:
                                                 sum += prod;
                                         }
                                 }
-                                tab.insert(std::make_pair(m, polynomialInBase(sum, Mon)));
+                                IndexPairs pairs = indexPairs(m);
+                                tab[m] = {polynomialInBase(sum, Mon), pairs};
                         }
                 }
                 
@@ -277,7 +294,7 @@ public:
                 std::sort(tabmon.begin(), tabmon.end());
                 CARL_LOG_TRACE("carl.thom.tarski", "tabmon = " << tabmon);
                 for(const auto& m : tabmon) {
-                        if(tab.find(m) == tab.end()) {
+                        if(!this->contains(m)) {
                                 // we do not have the normal form of m yet
                                 CARL_LOG_TRACE("carl.thom.tarski", "still to compute: normal form for " << m);
                                 // find variable x_j, s.t. m/x_j = x_beta and nf(x_beta) has already been computed
@@ -285,50 +302,50 @@ public:
                                 auto it = vars.begin();
                                 Variable var = *it;
                                 _Monomial<Coeff> x_beta;
-                                while(!m.divide(var, x_beta) || tab.find(x_beta) == tab.end()) {                                    
+                                while(!m.divide(var, x_beta) || !this->contains(x_beta)) {                                    
                                         it++;
                                         CARL_LOG_ASSERT("carl.thom.tarski", it != vars.end(), "");
                                         var = *it;
                                 }
                                 CARL_LOG_TRACE("carl.thom.tarski", "x_beta = " << x_beta);
                                 CARL_LOG_TRACE("carl.thom.tarski", "var = " << var);
-                                CARL_LOG_ASSERT("carl.thom.tarski", tab.find(x_beta) != tab.end(), "");
+                                CARL_LOG_ASSERT("carl.thom.tarski", this->contains(x_beta), "");
                                 
                                 // this is the matrix M_var
                                 std::vector<BaseRepr> mat;
                                 for(const auto& b : Mon) {
-                                        CARL_LOG_ASSERT("carl.thom.tarski", tab.find(b * var) != tab.end(), "");
-                                        mat.push_back(tab[b * var]);
+                                        CARL_LOG_ASSERT("carl.thom.tarski", this->contains(b * var), "");
+                                        mat.push_back(tab[b * var].br);
                                 }
                                 BaseRepr nf_m(Mon.size(), Coeff(0)); // this is to compute
-                                BaseRepr nf_x_beta = tab[x_beta];
+                                BaseRepr nf_x_beta = tab[x_beta].br;
                                 // do the matrix-vector multiplication!
                                 for(uint i = 0; i < Mon.size(); i++) {
                                         for(uint j = 0; j < Mon.size(); j++) {
                                                 nf_m[i] += mat[j][i] * nf_x_beta[j];
                                         }
                                 }
-                                tab.insert(std::make_pair(m, nf_m));
-                                
+                                IndexPairs pairs = indexPairs(m);
+                                tab[m] = {nf_m, pairs};
                         }
                 }
         }
         
         
         //iterators
-        typename std::map<_Monomial<Coeff>, BaseRepr>::iterator begin() {
+        typename std::map<Monomial, TableContent>::iterator begin() {
                 return tab.begin();
         }
         
-        typename std::map<_Monomial<Coeff>, BaseRepr>::const_iterator begin() const {
+        typename std::map<Monomial, TableContent>::const_iterator begin() const {
                 return tab.begin();
         }
         
-        typename std::map<_Monomial<Coeff>, BaseRepr>::iterator end() {
+        typename std::map<Monomial, TableContent>::iterator end() {
                 return tab.end();
         }
         
-        typename std::map<_Monomial<Coeff>, BaseRepr>::const_iterator end() const {
+        typename std::map<Monomial, TableContent>::const_iterator end() const {
                 return tab.end();
         }
         
@@ -340,9 +357,9 @@ public:
 template<typename C>
 std::ostream& operator<<(std::ostream& o, const MultiplicationTable<C>& table) {
         o << "Base = " << table.getBase() << std::endl;
-        o << "Length = " << table.tab.size() << std::endl;
-        for(const auto& pair : table.tab) {
-                o << pair.first << "\t" << pair.second << std::endl;
+        o << "Length = " << table.size() << std::endl;
+        for(const auto& entry : table) {
+                o << entry.first << "\t" << entry.second.br << std::endl;
         }
         return o;
 }

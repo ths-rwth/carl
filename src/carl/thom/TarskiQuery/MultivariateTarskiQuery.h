@@ -23,15 +23,14 @@ int multivariateTarskiQuery(const MultivariatePolynomial<Coeff>& Q, const Multip
         CoeffMatrix<Coeff> m(base.size(), base.size());
         CARL_LOG_INFO("carl.thom.tarski", "base size is " << base.size());
         CARL_LOG_INFO("carl.thom.tarski", "setting up the matrix now ...");
-        CARL_LOG_WARN("carl.thom.tarski", "dont forget to improve 'multiply'");
+        //CARL_LOG_WARN("carl.thom.tarski", "dont forget to improve 'multiply'");
         for(uint i = 0; i < base.size(); i++) {
-                for(uint j = i; j < base.size(); j++) {
-                        // SCHEINBAR IST DIESE METHODE IM MOMENT NOCH BESSER!!!
+                for(uint j = i; j < base.size(); j++) {    
                         
-                        BaseRepr<Coeff> prod = table.get(base[i] * base[j]);
                         //MultivariatePolynomial<Coeff> Qc = Q * base[i] * base[j];
                         //BaseRepr<Coeff> nf_Qc = normalForm(Qc, gb);
                         //Coeff t = trace(nf_Qc, table);
+                        BaseRepr<Coeff> prod = table.get(base[i] * base[j]);
                         BaseRepr<Coeff> Qc = multiply(q, prod, table);
                         Coeff t = trace(Qc, table);
                         m(i, j) = t;

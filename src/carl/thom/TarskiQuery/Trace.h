@@ -37,16 +37,15 @@ BaseRepr<Coeff> multiply(const BaseRepr<Coeff>& f, const BaseRepr<Coeff>& g, con
         CARL_LOG_ASSERT("carl.thom.tarski", f.size() == tab.getBase().size(), "incompatible arguments");
         
         // this method is called many many times. it must be more efficient
-        CARL_LOG_INEFFICIENT();
+        //CARL_LOG_INEFFICIENT();
         
         MonomialBase<Coeff> base = tab.getBase();
         BaseRepr<Coeff> res(base.size(), Coeff(0));
-        for(const auto& mon : tab) {
-                std::vector<std::pair<int, int>> pairs = abc(mon.first, base);
-                //CARL_LOG_TRACE("carl.thom.tarski", "pairs = " << pairs);
+        for(const auto& entry : tab) {
+                typename MultiplicationTable<Coeff>::IndexPairs pairs = tab.getPairs(entry.first);
                 for(const auto& pair : pairs) {
                         for(uint i = 0; i < base.size(); i++) {
-                                res[i] += mon.second[i] * f[pair.first] * g[pair.second];
+                                res[i] += entry.second.br[i] * f[pair.first] * g[pair.second];
                         }
                 }
         }    
