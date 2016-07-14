@@ -110,23 +110,45 @@ class MultiplicationTable {
         
 public:
         typedef std::vector<Coeff> BaseRepr;
+        typedef std::forward_list<std::pair<uint, uint>> IndexPairs;
         
 private:
         std::map<_Monomial<Coeff>, BaseRepr> tab;
         MonomialBase<Coeff> base;
         
+        struct TableContent {
+                BaseRepr br;
+                IndexPairs pairs;
+        };
+        
+        // returns a list of all pairs of indicdes (i,j) such that base_i * base_j == c
+        IndexPairs abc(const _Monomial<Coeff>& c) const {
+                std::forward_list<std::pair<int, int>> res;
+                for(uint i = 0; i < base.size(); i++) {
+                        for(uint j = 0; j < base.size(); j++) {
+                                if(base[i] * base[j] == c) {
+                                        res.push_front(std::make_pair(i, j));
+                                        if(i != j) res.push_front(std::make_pair(j, i));
+                                }
+                        }
+                }
+                return res;
+        }
+        
 public:
         
-        
+        bool contains(const _Monomial<Coeff>& m) const {
+                return tab.find(m) != tab.end();
+        }
         
         // only call after initialization!
         BaseRepr& get(const _Monomial<Coeff>& m) {
-                assert(tab.find(m) != tab.end());
+                assert(contains(m));
                 return tab[m];
         }
         
         BaseRepr get(const _Monomial<Coeff>& m) const {
-                assert(tab.find(m) != tab.end());
+                assert(contains(m));
                 auto pair = *(tab.find(m));               
                 return pair.second;
         }

@@ -76,7 +76,10 @@ ThomEncoding<Coeff>::ThomEncoding(
 }
 
 template<typename Coeff>
-ThomEncoding<Coeff>::ThomEncoding(const Coeff& rational, Variable::Arg var) {
+ThomEncoding<Coeff>::ThomEncoding(
+                const Coeff& rational,
+                Variable::Arg var
+) {
         CARL_LOG_FUNC("carl.thom", "rational = " << rational << ", var = " << var);
         MultivariatePolynomial<Coeff> polynomial = MultivariatePolynomial<Coeff>(var) - rational;
         std::shared_ptr<MultivariatePolynomial<Coeff>> ptr = std::make_shared<MultivariatePolynomial<Coeff>>(polynomial);
@@ -84,6 +87,22 @@ ThomEncoding<Coeff>::ThomEncoding(const Coeff& rational, Variable::Arg var) {
         p = ptr;
         signs = s;
         mainVar = var;
+        CARL_LOG_ASSERT("carl.thom", isConsistent(), "");
+}
+
+template<typename Coeff>
+ThomEncoding<Coeff>::ThomEncoding(
+                const Coeff& rational,
+                Variable::Arg var,
+                std::shared_ptr<ThomEncoding<Coeff>> point
+) {
+        MultivariatePolynomial<Coeff> polynomial = MultivariatePolynomial<Coeff>(var) - rational;
+        std::shared_ptr<MultivariatePolynomial<Coeff>> ptr = std::make_shared<MultivariatePolynomial<Coeff>>(polynomial);
+        SignCondition s = {};
+        p = ptr;
+        signs = s;
+        mainVar = var;
+        this->point = point;
         CARL_LOG_ASSERT("carl.thom", isConsistent(), "");
 }
 
@@ -131,24 +150,6 @@ bool ThomEncoding<Coeff>::isConsistent() const {
         }
 }
 
-template<typename Coeff>
-bool ThomEncoding<Coeff>::represents(const Coeff& rational) const {
-        std::map<Variable, Coeff> evalMap = {std::make_pair(mainVar, rational)};
-        // a necessary conditions is that the given number must be a root of the polynomial
-        if(!isZero(p->evaluate(evalMap))) {
-                return false;
-        }
-        // otherwise we check if the sign conditions all hold
-        std::vector<MultivariatePolynomial<Coeff>> derivatives = der(p->derivative(mainVar), mainVar);
-        assert(derivatives.size() == p->degree(mainVar));
-        assert(derivatives.size() == signs.size() + 1);
-        for(uint n = 0; n < derivatives.size(); n++) {
-                if(Sign(sgn(derivatives[n].evaluate(evalMap))) != (*this)[n+1]) {
-                        return false;
-                }
-        }
-        return true;
-}
 
 template<typename Coeff>
 Sign ThomEncoding<Coeff>::operator[](const uint n) const {
@@ -233,45 +234,70 @@ std::vector<MultivariatePolynomial<Coeff>> ThomEncoding<Coeff>::accumulateDer() 
         }
 }
 
+template<typename Coeff>
+Sign ThomEncoding<Coeff>::sgnReprNum() const {
+        ThomComparisonResult compRes = compareRational(*this, constant_zero<Coeff>::get());
+        if(compRes == LESS) return Sign::NEGATIVE;
+        else if(compRes == GREATER) return Sign::POSITIVE;
+        else return Sign::ZERO;
+}
+
+template<typename C>
+bool areComparable(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
+        if(lhs.isOneDimensional() && rhs.isOneDimensional()) {
+                return true;
+        }
+        else if(lhs.isMultiDimensional() && rhs.isMultiDimensional()) {
+                if(lhs.point->accumulatePolynomials() != rhs.point->accumulatePolynomials()) return false;
+                if(lhs.point->accumulateSigns() != rhs.point->accumulateSigns()) return false;
+                return true;
+        }
+        return false;
+}
+
 
 ////////////////
 // Comparison //
 ////////////////
 
-// compares one dimensional thom encodings
-template<typename Coeff>
-ComparisonResult compareUnivariate(const ThomEncoding<Coeff>& lhs, const ThomEncoding<Coeff>& rhs) {
-        assert(lhs.isOneDimensional() && rhs.isOneDimensional());
-        // assert that the main variables are the same ???
-        if(lhs.polynomial() == rhs.polynomial()) {
-                
-                // --- same underlying polynomials ---
-                
-                // trivial case...
-                if(lhs.getSigns() == rhs.getSigns()) {
-                        return EQUAL;
-                }
-                
-                // Algorithms for Real Algebraic Geometry, Proposition 2.28, p. 42
-                if(lhs.fullSignCondition() < rhs.fullSignCondition()) {
-                        return LESS;
-                }
-                else if(lhs.fullSignCondition() > rhs.fullSignCondition()) {
-                        return GREATER;
-                }
-                else {
-                        return EQUAL;
-                }
+template<typename C>
+ThomComparisonResult compareRational(const ThomEncoding<C>& t, const C& rat) {
+        if(t.isOneDimensional()) {
+                return compareThom(t, ThomEncoding<C>(rat, t.mainVar));
         }
         else {
-                
-                // --- different underlying polynomials ---
-                
-                std::vector<UnivariatePolynomial<Coeff>> der1 = der(lhs.polynomial().toUnivariatePolynomial());
-                std::vector<UnivariatePolynomial<Coeff>> der2 = der(rhs.polynomial().toUnivariatePolynomial().derivative());
+                return compareThom(t, ThomEncoding<C>(rat, t.mainVar, t.point));
+        }
+}
+
+// compares two RANs represented by thom encodings
+template<typename C>
+ThomComparisonResult compareThom(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
+        CARL_LOG_ASSERT("carl.thom", areComparable(lhs, rhs), "");
+        if(lhs.isOneDimensional()) {
+                return compareUnivariate(lhs, rhs);
+        }
+        else {
+                return compareMultivariate(lhs, rhs);
+        }             
+}
+
+// compares one dimensional thom encodings
+template<typename C>
+ThomComparisonResult compareUnivariate(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
+        // assert that the main variables are the same ???
+        
+        // --- same underlying polynomials ---    
+        if(lhs.polynomial() == rhs.polynomial()) {         
+                return lhs.fullSignCondition() < rhs.fullSignCondition();
+        }
+        
+        // --- different underlying polynomials ---
+        else {
+                std::vector<UnivariatePolynomial<C>> der1 = der(lhs.polynomial().toUnivariatePolynomial());
+                std::vector<UnivariatePolynomial<C>> der2 = der(rhs.polynomial().toUnivariatePolynomial().derivative());
                 der2.pop_back(); // do this nicer
                 der1.insert(der1.end(), der2.begin(), der2.end());
-                PRINTV(der1);
                 std::vector<SignCondition> signConds = signDetermination(der1, rhs.polynomial().toUnivariatePolynomial()); 
                 SignCondition wanted; // linear search here...
                 bool succes = false;
@@ -284,55 +310,29 @@ ComparisonResult compareUnivariate(const ThomEncoding<Coeff>& lhs, const ThomEnc
                 }
                 assert(succes);
                 wanted.erase(wanted.begin() + lhs.polynomial().degree(lhs.getMainVar()) + 1, wanted.end());
-                PRINTV(wanted);
-                PRINTV(lhs.getSigns());
                 assert(wanted.size() == lhs.getSigns().size() + 2);
-                PRINTV(wanted);
-                PRINTV(lhs.fullSignCondition());
 
-                if(lhs.fullSignCondition() < wanted) {
-                        return LESS;
-                }
-                else if(lhs.fullSignCondition() == wanted) {
-                        return EQUAL;
-                }
-                else {
-                        return GREATER;
-                }            
+                return lhs.fullSignCondition() < wanted;             
         }      
 }
 
 template<typename C>
-ComparisonResult compareMultivariate(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-        assert(lhs.isMultiDimensional() && rhs.isMultiDimensional());
-        assert(lhs.dimension() == rhs.dimension());
-        assert(lhs.point->accumulatePolynomials() == rhs.point->accumulatePolynomials());
-        assert(lhs.point->accumulateSigns() == rhs.point->accumulateSigns());
-        if(lhs.p == rhs.p) {
-                            
-                if(lhs.fullSignCondition() < rhs.fullSignCondition()) {
-                        return LESS;
-                }
-                else if(lhs.fullSignCondition() > rhs.fullSignCondition()) {
-                        return GREATER;
-                }
-                else {
-                        return EQUAL;
-                }
+ThomComparisonResult compareMultivariate(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
+        
+        // --- same underlying polynomials --- 
+        if(lhs.polynomial() == rhs.polynomial()) {
+                return lhs.fullSignCondition() < rhs.fullSignCondition();
         }
+        
+        // --- different underlying polynomials ---
         else {
-                // --- different underlying polynomials ---
-                
                 std::vector<MultivariatePolynomial<C>> deriv = lhs.accumulateDer();
                 std::vector<MultivariatePolynomial<C>> der_rhs = der(rhs.polynomial(), rhs.getMainVar());
                 deriv.insert(deriv.end(), der_rhs.begin(), der_rhs.end());
-                PRINTV(deriv);
                 
                 std::vector<MultivariatePolynomial<C>> zeroSet = lhs.accumulatePolynomials();
                 std::vector<SignCondition> signConds = signDetermination(deriv, zeroSet); 
                 SignCondition lhs_signs = lhs.accumulateSigns();
-                PRINTV(signConds);
-                PRINTV(lhs_signs);
                 
                 SignCondition wanted; // linear search here...
                 bool succes = false;
@@ -344,43 +344,11 @@ ComparisonResult compareMultivariate(const ThomEncoding<C>& lhs, const ThomEncod
                         }
                 }
                 assert(succes);
-                PRINTV(wanted);
                 wanted.erase(wanted.begin(), wanted.begin() + lhs_signs.size());
-                PRINTV(wanted);
-
-                PRINTV(rhs.getSigns());
-                PRINTV(rhs.fullSignCondition());
-
                 
-                if(wanted < rhs.fullSignCondition()) {
-                        return LESS;
-                }
-                else if(wanted == rhs.fullSignCondition()) {
-                        return EQUAL;
-                }
-                else {
-                        return GREATER;
-                }                  
+                return wanted < rhs.fullSignCondition();
         }
         return EQUAL;
-}
-
-// compares two RANs represented by thom encodings
-template<typename C>
-ComparisonResult compareThom(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-        if(lhs.isOneDimensional() && rhs.isOneDimensional()) {
-                return compareUnivariate(lhs, rhs);
-        }
-        else if(lhs.isMultiDimensional() && rhs.isMultiDimensional()) {
-                return compareMultivariate(lhs, rhs);
-        }
-        // we can NOT compare encodings on different levels
-        else {
-                CARL_LOG_FATAL("carl.thom", "tried to compare encodings on different levels");
-                assert(false);
-                // this is just to surpress a warning
-                return EQUAL;
-        }              
 }
 
 
@@ -388,10 +356,10 @@ ComparisonResult compareThom(const ThomEncoding<C>& lhs, const ThomEncoding<C>& 
 // Intermediate points //
 /////////////////////////
 
-template<typename C>
+template<typename C, typename Settings = ThomDefaultSettings>
 ThomEncoding<C> intermediatePoint(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-        CARL_LOG_ASSERT("carl.thom", lhs < rhs, "");
-        C epsilon = C(1); // maaybe put this in settings
+        CARL_LOG_ASSERT("carl.thom", lhs < rhs, "please call intermediatePoint with the right order in the arguments");
+        C epsilon = Rational(1);
         ThomEncoding<C> res = lhs + epsilon;
         while(res >= rhs) {
                 epsilon /= 2;

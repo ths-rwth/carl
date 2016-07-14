@@ -132,8 +132,8 @@ TEST(Thom, RootFinderMultivariate) {
     EXPECT_TRUE(rootsRightInner[1] == rootsRightInner2[0]);
      
     Polynomial y5 = sp.parseMultivariatePolynomial<Rational>("y^5 + -5*y^3 + 4*y");
-    //std::vector<ThomEncoding<Rational>> roots5 = realRoots(y5, y, roots_proj1[0]);
-    //std::cout << "roots5 = " << roots5 << std::endl;
+    std::vector<ThomEncoding<Rational>> roots5 = realRoots(y5, y, roots_proj1[0]);
+    std::cout << "roots5 = " << roots5 << std::endl;
 }
 
 TEST(Thom, IntermediatePointsUnivariate) {
@@ -216,4 +216,29 @@ TEST(Thom, ThreeVariables) {
     EXPECT_TRUE(roots_p5_p4_p2_p1.size() == 1);
     
 
+}
+
+TEST(Thom, CompareRational) {
+    typedef MultivariatePolynomial<Rational> Polynomial;
+    typedef std::vector<ThomEncoding<Rational>> RootList;
+    StringParser sp;
+    sp.setVariables({"x", "y"});
+    Variable y = sp.variables().at("y");
+    
+    Polynomial p1 = sp.parseMultivariatePolynomial<Rational>("x^2 + -2");
+    RootList roots = realRoots(p1.toUnivariatePolynomial());
+    EXPECT_TRUE(roots.size() == 2);
+    EXPECT_TRUE(roots[0] < roots[1]);
+    EXPECT_TRUE(roots[0] > Rational(-2));
+    EXPECT_TRUE(roots[0] < Rational(-1));
+    EXPECT_TRUE(roots[1] > Rational(0));
+    EXPECT_TRUE(roots[1] < Rational(27));
+    
+    Polynomial p2 = sp.parseMultivariatePolynomial<Rational>("y + -1 + x^2");
+    RootList roots2 = realRoots(p2, y, roots[0]);
+    EXPECT_TRUE(roots2.size() == 1);
+    std::cout << roots2[0] << std::endl; // represents -1
+    EXPECT_TRUE(roots2[0] == Rational(-1));
+    EXPECT_TRUE(roots2[0] < Rational(42));
+    EXPECT_TRUE(roots2[0] > Rational(-2));
 }

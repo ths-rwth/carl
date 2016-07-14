@@ -19,9 +19,11 @@ template<typename Coeff>
 std::vector<std::pair<int, int>> abc(const _Monomial<Coeff>& c, const MonomialBase<Coeff>& base) {
         std::vector<std::pair<int, int>> res;
         for(uint i = 0; i < base.size(); i++) {
-                for(uint j = 0; j < base.size(); j++) {
+                for(uint j = i; j < base.size(); j++) {
                         if(base[i] * base[j] == c) {
                                 res.push_back(std::make_pair(i, j));
+                                if(i != j)
+                                        res.push_back(std::make_pair(j, i));
                         }
                 }
         }

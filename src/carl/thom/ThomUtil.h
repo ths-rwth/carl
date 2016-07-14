@@ -34,6 +34,8 @@ namespace carl {
 // a list of sign conditions that a list of polynomials realizes at a point
 // we also view this as a mapping from the polynomials to a Sign
 typedef std::vector<Sign> SignCondition; 
+
+enum ThomComparisonResult {LESS, EQUAL, GREATER};
         
 // todo make this recursive
 template<typename Coeff>
@@ -93,7 +95,7 @@ bool isPrefix(const SignCondition& lhs, const SignCondition& rhs) {
 
 // compares two sign conditions (associated to the same list of derivatives)
 // optimize this so that is returns a comparison result
-bool operator<(const SignCondition& lhs, const SignCondition& rhs) {
+/*bool operator<(const SignCondition& lhs, const SignCondition& rhs) {
         assert(lhs.size() == rhs.size());
         assert(lhs.back() == rhs.back());
         if(lhs.size() == 1) return false; // because then they are actually equal
@@ -110,6 +112,26 @@ bool operator<(const SignCondition& lhs, const SignCondition& rhs) {
                 }
         }
         return false;
+}*/
+
+// compares two sign conditions (associated to the same list of derivatives)
+ThomComparisonResult operator<(const SignCondition& lhs, const SignCondition& rhs) {
+        assert(lhs.size() == rhs.size());
+        assert(lhs.back() == rhs.back());
+        if(lhs.size() == 1) return EQUAL;
+        assert(lhs.size() >= 2);
+        for(int i = (int)lhs.size() - 2; i >= 0; i--) {
+                if(lhs[i] != rhs[i]) {
+                        assert(lhs[i+1] == rhs[i+1]);
+                        if(lhs[i+1] == Sign::POSITIVE) {
+                                return (lhs[i] < rhs[i]) ? LESS : GREATER;
+                        }
+                        else {
+                                return (lhs[i] < rhs[i]) ? GREATER : LESS;
+                        }
+                }
+        }
+        return EQUAL;
 }
         
 } // namespace carl

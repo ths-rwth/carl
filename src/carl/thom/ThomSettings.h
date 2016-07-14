@@ -27,6 +27,7 @@ struct ThomBasicSettings {
          * tarski query settings
          */
         static const bool MULT_TABLE_USE_NF_ALG = false;
+        
 };
 
 struct ThomExperimentalSettings {
@@ -41,7 +42,7 @@ struct ThomExperimentalSettings {
          * tarski query settings
          */
         static const bool MULT_TABLE_USE_NF_ALG = false;
-        
+
 };
 
 
