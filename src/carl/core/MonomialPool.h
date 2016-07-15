@@ -27,11 +27,8 @@ namespace carl{
 				std::size_t hash;
 				Monomial::Content content;
 				mutable std::weak_ptr<const Monomial> monomial;
-				PoolEntry(std::size_t h, const Monomial::Content& c, const Monomial::Arg& m): hash(h), content(c), monomial(m) {}
-				PoolEntry(std::size_t h, const Monomial::Content& c): hash(h), content(c) {
-					assert(monomial.expired());
-				}
-				PoolEntry(std::size_t h, Monomial::Content&& c): hash(h), content(std::move(c)) {
+				PoolEntry(std::size_t h, Monomial::Content c, const Monomial::Arg& m): hash(h), content(std::move(c)), monomial(m) {}
+				PoolEntry(std::size_t h, Monomial::Content c): hash(h), content(std::move(c)) {
 					assert(monomial.expired());
 				}
 			};

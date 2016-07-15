@@ -51,8 +51,8 @@ class SortManager : public Singleton<SortManager>
 			 * @param _name The name of the sort content to construct.
 			 * @param _type The carl variable type of the sort content to construct.
 			 */
-			explicit SortContent(const std::string& _name):
-				name(_name),
+			explicit SortContent(std::string _name):
+				name(std::move(_name)),
 				parameters(nullptr),
 				indices(nullptr)
 			{}
@@ -62,13 +62,13 @@ class SortManager : public Singleton<SortManager>
 			 * @param _name The name  of the sort content to construct.
 			 * @param _parameters The sorts of the arguments of the sort content to construct.
 			 */
-			explicit SortContent(const std::string& _name, const std::vector<Sort>& _parameters):
-				name(_name),
+			 explicit SortContent(std::string _name, const std::vector<Sort>& _parameters):
+				name(std::move(_name)),
 				parameters(new std::vector<Sort>(_parameters)),
 				indices(nullptr)
 			{}
-			explicit SortContent(const std::string& _name, std::vector<Sort>&& _parameters):
-				name(_name),
+			explicit SortContent(std::string _name, std::vector<Sort>&& _parameters):
+				name(std::move(_name)),
 				parameters(new std::vector<Sort>(std::move(_parameters))),
 				indices(nullptr)
 			{}
@@ -235,7 +235,7 @@ class SortManager : public Singleton<SortManager>
 		 * @param _parameters The map of sort names to sorts.
 		 * @return The resulting sort.
 		 */
-		Sort replace( const Sort& _sort, const std::map<std::string, Sort>& _parameters );
+		Sort replace(const Sort& sort, const std::map<std::string, Sort>& parameters);
 
 		/**
 		 * Adds a sort declaration.
@@ -330,7 +330,7 @@ class SortManager : public Singleton<SortManager>
 		 * @param _name The name of the sort to get.
 		 * @return The resulting sort.
 		 */
-		Sort getSort(const std::string& _name);
+		Sort getSort(const std::string& name);
 
 		/**
 		 * Gets the sort with arity greater than zero corresponding the given name and having the arguments
@@ -341,9 +341,9 @@ class SortManager : public Singleton<SortManager>
 		 */
 		Sort getSort(const std::string& name, const std::vector<Sort>& params);
 		
-		Sort getSort(const std::string& _name, const std::vector<std::size_t>& _indices);
+		Sort getSort(const std::string& name, const std::vector<std::size_t>& indices);
 		
-		Sort getSort(const std::string& _name, const std::vector<std::size_t>& _indices, const std::vector<Sort>& _params);
+		Sort getSort(const std::string& name, const std::vector<std::size_t>& indices, const std::vector<Sort>& params);
 };
 
 /**

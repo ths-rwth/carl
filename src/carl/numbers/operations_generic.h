@@ -76,9 +76,9 @@ namespace carl
 	 * @return `t` to the power of `exp`.
 	 */
 	template<typename T>
-	T pow(const T& t, std::size_t exp) {
+	T pow(const T& basis, std::size_t exp) {
 		T res = carl::constant_one<T>().get();
-		T mult = t;
+		T mult = basis;
 		for (std::size_t e = exp; e > 0; e /= 2) {
 			if (e & 1) res *= mult;
 			mult *= mult;
