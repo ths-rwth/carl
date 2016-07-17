@@ -9,6 +9,8 @@
 
 #include "RealAlgebraicNumberSettings.h"
 
+#include "../thom/ThomEncoding.h";
+
 namespace carl {
 
 template<typename Number>
@@ -55,6 +57,7 @@ private:
 	mutable Number mValue;
 	bool mIsRoot;
 	mutable std::shared_ptr<IntervalContent> mIR;
+        std::shared_ptr<ThomEncoding<Number>> mTE;
 	
 	void checkForSimplification() const {
 		if (mIR && mIR->interval.isPointInterval()) {
@@ -99,6 +102,14 @@ public:
 			if (i.contains(0)) mIR->refineAvoiding(0, *this);
 		}
 	}
+        
+        explicit RealAlgebraicNumber(const ThomEncoding<Number>& te, bool isRoot = true) :
+                mValue(carl::constant_zero<Number>::get()),
+		mIsRoot(isRoot),
+                mIR(nullptr),
+                mTE(te)
+        }
+        {}
 		
 	RealAlgebraicNumber(const RealAlgebraicNumber& ran):
 		mValue(ran.mValue),
@@ -146,14 +157,15 @@ public:
 	
 	bool isNumeric() const {
 		checkForSimplification();
-		return !mIR;
+		return !mIR && !mTE;
 	}
 	
 	bool isIntegral() const;
 	
 	Number branchingPoint() const {
 		if (isNumeric()) return mValue;
-		else return mIR->interval.sample();
+                assert(mIR);
+		return mIR->interval.sample();
 	}
 	
 	const Number& value() const {
@@ -163,10 +175,12 @@ public:
 	
 	std::size_t getRefinementCount() const {
 		assert(!isNumeric());
+                assert(mIR);
 		return mIR->refinementCount;
 	}
 	const Interval<Number>& getInterval() const {
 		assert(!isNumeric());
+                assert(mIR);
 		return mIR->interval;
 	}
 	const Number& lower() const {
@@ -177,6 +191,7 @@ public:
 	}
 	const Polynomial& getPolynomial() const {
 		assert(!isNumeric());
+                assert(mIR);
 		return mIR->polynomial;
 	}
 	
@@ -184,6 +199,7 @@ public:
 		if (isNumeric()) {
 			return carl::sgn(mValue);
 		} else {
+                        // TODO
 			return mIR->interval.sgn();
 		}
 	}
