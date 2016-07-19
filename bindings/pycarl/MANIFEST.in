@@ -1,0 +1,3 @@
+recursive-include src *.h
+include lib/parse/*.grako
+include lib/parse/README

@@ -1,102 +1,6 @@
 #pragma once
 
 namespace carl {
-	
-	template<typename Number>
-	bool RealAlgebraicNumber<Number>::IntervalContent::refineAvoiding(const Number& n, const RealAlgebraicNumber<Number>& parent) {
-		assert(!parent.isNumeric());
-		
-		if (interval.contains(n)) {
-			if (polynomial.isRoot(n)) {
-				parent.switchToNR(n);
-				return true;
-			}
-			if (polynomial.countRealRoots(Interval<Number>(interval.lower(), BoundType::STRICT, n, BoundType::STRICT)) > 0) {
-				interval.setUpper(n);
-			} else {
-				interval.setLower(n);
-			}
-			refinementCount++;
-		} else if (interval.lower() != n && interval.upper() != n) {
-			return false;
-		}
-		
-		bool isLeft = interval.lower() == n;
-		
-		Number newBound = interval.sample();
-		
-		if (polynomial.isRoot(newBound)) {
-			parent.switchToNR(newBound);
-			return false;
-		}
-		
-		if (isLeft) {
-			interval.setLower(newBound);
-		} else {
-			interval.setUpper(newBound);
-		}
-		
-		while (polynomial.countRealRoots(interval) == 0) {
-			if (isLeft) {
-				Number oldBound = interval.lower();
-				newBound = Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT).sample();
-				if (polynomial.isRoot(newBound)) {
-					parent.switchToNR(newBound);
-					return false;
-				}
-				interval.setUpper(oldBound);
-				interval.setLower(newBound);
-			} else {
-				Number oldBound = interval.upper();
-				newBound = Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT).sample();
-				if (polynomial.isRoot(newBound)) {
-					parent.switchToNR(newBound);
-					return false;
-				}
-				interval.setLower(oldBound);
-				interval.setUpper(newBound);
-			}
-		}
-		return false;
-	}
-	
-	template<typename Number>
-	bool RealAlgebraicNumber<Number>::isIntegral() const {
-		refineToIntegrality();
-		if (isNumeric()) return carl::isInteger(mValue);
-		return false;
-	}
-	
-	template<typename Number>
-	void RealAlgebraicNumber<Number>::refine(RealAlgebraicNumberSettings::RefinementStrategy strategy) const {
-		if (isNumeric()) return;
-		
-		Number m;
-		switch (strategy) {
-			case RealAlgebraicNumberSettings::RefinementStrategy::GENERIC:
-				m = mIR->interval.center();
-				break;
-			case RealAlgebraicNumberSettings::RefinementStrategy::BINARYSAMPLE:
-				m = mIR->interval.sample();
-				break;
-			case RealAlgebraicNumberSettings::RefinementStrategy::BINARYNEWTON:
-				m = mIR->interval.sample();
-				break;
-		}
-		assert(mIR->interval.contains(m));
-		if (mIR->polynomial.isRoot(m)) {
-			switchToNR(m);
-		} else {
-			if (mIR->polynomial.countRealRoots(Interval<Number>(mIR->interval.lower(), BoundType::STRICT, m, BoundType::STRICT)) > 0) {
-				mIR->interval.setUpper(m);
-			} else {
-				mIR->interval.setLower(m);
-			}
-			mIR->refinementCount++;
-			assert(mIR->interval.isConsistent());
-		}
-	}
-	
 	template<typename Number>
 	bool RealAlgebraicNumber<Number>::equal(const RealAlgebraicNumber<Number>& n) const {
 		CARL_LOG_FUNC("carl.ran", *this << ", " << n);
@@ -217,8 +121,8 @@ namespace carl {
 		
 		while (true) {
 			CHECK_ORDER();
-			refine();
-			n.refine();
+			if (isInterval()) mIR->refine();
+			if (n.isInterval()) n.mIR->refine();
 		}
 /*
 			// case: is o.mInterval contained in mInterval?
@@ -256,4 +160,46 @@ namespace carl {
 */
 	}
 	
+	template<typename Number>
+	RealAlgebraicNumber<Number> RealAlgebraicNumber<Number>::sampleBelow(const RealAlgebraicNumber<Number>& n) {
+		if (n.isNumeric()) {
+			CARL_LOG_TRACE("carl.ran", "Selecting from (-oo, " << n << ") -> " << (carl::ceil(n.value()) - 1));
+			return RealAlgebraicNumber<Number>(carl::ceil(n.value()) - 1, false);
+		} else {
+			CARL_LOG_TRACE("carl.ran", "Selecting from (-oo, " << n << ") -> " << (carl::ceil(n.lower()) - 1));
+			return RealAlgebraicNumber<Number>(carl::ceil(n.lower()) - 1, false);
+		}
+	}
+	template<typename Number>
+	RealAlgebraicNumber<Number> RealAlgebraicNumber<Number>::sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper) {
+		carl::Interval<Number> i;
+		if (lower.isNumeric()) i.set(lower.value(), lower.value());
+		else i.set(lower.upper(), lower.upper());
+		if (upper.isNumeric()) i.setUpper(upper.value());
+		else i.setUpper(upper.lower());
+		while (i.isEmpty()) {
+			if (!lower.isNumeric()) {
+				lower.refine();
+				if (lower.isNumeric()) i.setLower(lower.value());
+				else i.setLower(lower.upper());
+			}
+			if (!upper.isNumeric()) {
+				upper.refine();
+				if (upper.isNumeric()) i.setUpper(upper.value());
+				else i.setUpper(upper.lower());
+			}
+		}
+		CARL_LOG_TRACE("carl.ran", "Selecting from (" << lower << ", " << upper << ") -> " << i.sample(false) << " (from " << i << ")");
+		return RealAlgebraicNumber<Number>(i.sample(false), false);
+	}
+	template<typename Number>
+	RealAlgebraicNumber<Number> RealAlgebraicNumber<Number>::sampleAbove(const RealAlgebraicNumber<Number>& n) {
+		if (n.isNumeric()) {
+			CARL_LOG_TRACE("carl.ran", "Selecting from (" << n << ", oo) -> " << (carl::floor(n.value()) + 1));
+			return RealAlgebraicNumber<Number>(carl::floor(n.value()) + 1, false);
+		} else {
+			CARL_LOG_TRACE("carl.ran", "Selecting from (" << n << ", oo) -> " << (carl::floor(n.upper()) + 1));
+			return RealAlgebraicNumber<Number>(carl::floor(n.upper()) + 1, false);
+		}
+	}
 }

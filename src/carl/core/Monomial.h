@@ -145,8 +145,8 @@ namespace carl
 			assert(isConsistent());
 		}
 
-		explicit Monomial(std::size_t hash, const Content& exponents) :
-			mExponents(exponents),
+		explicit Monomial(std::size_t hash, Content exponents) :
+			mExponents(std::move(exponents)),
 			mTotalDegree(0),
 			mHash(hash)
 		{
@@ -156,8 +156,8 @@ namespace carl
 			}
 			assert(isConsistent());
 		}
-		explicit Monomial(std::size_t hash, const Content& exponents, exponent totalDegree) :
-			mExponents(exponents),
+		explicit Monomial(std::size_t hash, Content exponents, uint totalDegree) :
+			mExponents(std::move(exponents)),
 			mTotalDegree(totalDegree),
 			mHash(hash)
 		{
@@ -314,7 +314,7 @@ namespace carl
 			if(mExponents.size() == 1) {
 				return mExponents.front().first == v;
 			}
-			return mExponents.size() == 0;
+			return mExponents.empty();
 		}
 		
 		/**
@@ -380,17 +380,16 @@ namespace carl
 			if(m->nrVariables() > nrVariables()) return false;
 			// Linear, as we expect small monomials.
 			auto itright = m->mExponents.begin();
-			for(auto itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
-			{
+			for (const auto& itleft: mExponents) {
 				// Done with division
 				if(itright == m->mExponents.end())
 				{
 					return true;
 				}
 				// Variable is present in both monomials.
-				if(itleft->first == itright->first)
+				if(itleft.first == itright->first)
 				{
-					if(itright->second > itleft->second)
+					if(itright->second > itleft.second)
 					{
 						// Underflow, itright->exp was larger than itleft->exp.
 						return false;
@@ -398,13 +397,13 @@ namespace carl
 					itright++;
 				}
 				// Variable is not present in lhs, division fails.
-				else if(itleft->first > itright->first) 
+				else if(itleft.first > itright->first) 
 				{
 					return false;
 				}
 				else
 				{
-					assert(itright->first > itleft->first);
+					assert(itright->first > itleft.first);
 				}
 			}
 			// If there remain variables in the m, it fails.
@@ -631,6 +630,12 @@ namespace carl
 		 * @return If this is consistent.
 		 */
 		bool isConsistent() const;
+        
+        /*
+         * TODO: cannot link Monomial::evaluate
+        template<typename SubstitutionType>
+		SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& map) const;
+         */
 	};
 	
 	/// @name Comparison operators

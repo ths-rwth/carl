@@ -180,10 +180,13 @@ template<typename T>
 inline T rationalize(float n);
 
 template<typename T>
-inline T rationalize(sint n);
+inline T rationalize(int n);
 
 template<typename T>
-inline T rationalize(std::size_t n);
+inline T rationalize(uint n);
+
+template<typename T>
+inline T rationalize(sint n);
 
 template<typename T>
 inline T rationalize(const std::string& n);
@@ -203,12 +206,17 @@ inline mpq_class rationalize<mpq_class>(double d) {
 }
 
 template<>
-inline mpq_class rationalize<mpq_class>(std::size_t n) {
+inline mpq_class rationalize<mpq_class>(int n) {
 	return mpq_class(n);
 }
 
 template<>
-inline mpq_class rationalize<mpq_class>(int n) {
+inline mpq_class rationalize<mpq_class>(uint n) {
+	return mpq_class(n);
+}
+
+template<>
+inline mpq_class rationalize<mpq_class>(sint n) {
 	return mpq_class(n);
 }
 
@@ -243,9 +251,8 @@ inline mpz_class round(const mpq_class& n) {
 	mpz_class res;
 	mpz_class rem;
 	mpz_fdiv_qr(res.get_mpz_t(), rem.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
-    rem *= 2;
-    if( rem >= getDenom(n) )
-        ++res;
+	rem *= 2;
+	if (rem >= getDenom(n)) ++res;
 	return res;
 }
 
@@ -351,9 +358,9 @@ inline mpq_class cos(const mpq_class& n) {
 }
 
 template<>
-inline mpz_class pow(const mpz_class& b, std::size_t e) {
+inline mpz_class pow(const mpz_class& basis, std::size_t exp) {
 	mpz_class res;
-	mpz_pow_ui(res.get_mpz_t(), b.get_mpz_t(), e);
+	mpz_pow_ui(res.get_mpz_t(), basis.get_mpz_t(), exp);
 	return res;
 }
 
@@ -484,6 +491,12 @@ inline mpz_class& div_assign(mpz_class& a, const mpz_class& b) {
 inline mpq_class& div_assign(mpq_class& a, const mpq_class& b) {
 	a = carl::quotient(a, b);
     return a;
+}
+
+inline mpq_class reciprocal(const mpq_class& a) {
+	mpq_class res;
+	mpq_inv(res.get_mpq_t(), a.get_mpq_t());
+	return res;
 }
 
 inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)

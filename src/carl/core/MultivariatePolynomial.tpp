@@ -368,8 +368,8 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
 template<typename Coeff, typename Ordering, typename Policies>
 Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness( bool _fullEffort ) const
 {
-    if( isLinear() )
-        return Definiteness::NON;
+	if( isLinear() )
+		return Definiteness::NON;
 	auto term = mTerms.rbegin();
 	if( term == mTerms.rend() ) return Definiteness::NON;
 	Definiteness result = term->definiteness();
@@ -1182,13 +1182,17 @@ MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, 
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename SubstitutionType>
-Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& substitutions) const
+SubstitutionType MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& map) const
 {
-	// We do not have to construct polynomials all the time.
-	CARL_LOG_INEFFICIENT();
-	MultivariatePolynomial result = substitute(substitutions);
-	assert(result.isConstant());
-	return result.constantPart();
+	if(isZero()) {
+		return constant_zero<SubstitutionType>::get();
+	} else {
+		SubstitutionType result(mTerms[0].evaluate(map)); 
+		for (unsigned i = 1; i < mTerms.size(); ++i) {
+			result += mTerms[i].evaluate(map);
+		}
+		return result;
+	};
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1220,8 +1224,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactorWithoutConst
 {
 	assert(nrTerms() != 0);
 	typename TermsType::const_iterator it = mTerms.begin();
-    if(it->isConstant())
-        ++it;
+	if (it->isConstant()) ++it;
 	typename IntegralType<Coeff>::type num = carl::abs(getNum((it)->coeff()));
 	typename IntegralType<Coeff>::type den = carl::abs(getDenom((it)->coeff()));
 	for(++it; it != mTerms.end(); ++it)

@@ -31,6 +31,8 @@ private:
 #else
 	static const std::size_t MAXINT = std::numeric_limits<std::size_t>::max();
 #endif
+public:
+	using value_type = T;
 	struct Node {
 		std::size_t id;
 		mutable T data;
@@ -104,8 +106,15 @@ protected:
 			assert(current != MAXINT);
 			return mTree->nodes[current].depth;
 		}
+		std::size_t id() const {
+			assert(current != MAXINT);
+			return current;
+		}
 		bool isRoot() const {
 			return current == 0;
+		}
+		bool isValid() const {
+			return (mTree != nullptr) && mTree->is_valid(*this);
 		}
 		T& operator*() {
 			assert(current != MAXINT);
@@ -722,6 +731,13 @@ public:
 	Iterator get_parent(const Iterator& it) const {
 		return Iterator(this, nodes[it.current].parent);
 	}
+	template<typename Iterator>
+	Iterator left_sibling(const Iterator& it) const {
+		assert(!is_leftmost(it));
+		auto res = it;
+		res.current = nodes[it.current].previousSibling;
+		return res;
+	}
 
 	/**
 	 * Sets the value of the root element.
@@ -864,14 +880,6 @@ public:
 	void eraseChildren(const Iterator& position) {
 		eraseChildren(position.current);
 	}
-	template<typename TT>
-	friend std::ostream& operator<<(std::ostream& os, const tree<TT>& tree) {
-		for (auto it = tree.begin_preorder(); it != tree.end_preorder(); it++) {
-			os << std::string(it.depth(), '\t') << *it << std::endl;
-		}
-		return os;
-	}
-
 private:
 	std::size_t newNode(const T& data, std::size_t parent, std::size_t depth) {
 		std::size_t newID = 0;
@@ -920,7 +928,7 @@ private:
 		nodes[id].depth = MAXINT;
 		emptyNodes = id;
 	}
-	
+
 public:
 	bool isConsistent() const {
 		for (auto it = this->begin(); it != this->end(); it++) {
@@ -939,7 +947,7 @@ public:
 				child = nodes[child].nextSibling;
 			}
 			assert(child == nodes[node].lastChild);
-			
+
 			child = nodes[node].lastChild;
 			while (nodes[child].previousSibling != MAXINT) {
 				assert(nodes[child].parent == node);
@@ -951,6 +959,15 @@ public:
 		return true;
 	}
 };
+
+
+template<typename TT>
+std::ostream& operator<<(std::ostream& os, const tree<TT>& tree) {
+	for (auto it = tree.begin_preorder(); it != tree.end_preorder(); it++) {
+		os << std::string(it.depth(), '\t') << *it << std::endl;
+	}
+	return os;
+}
 
 template<typename T>
 const std::size_t tree<T>::MAXINT;

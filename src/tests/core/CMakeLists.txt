@@ -23,10 +23,10 @@ cotire(runCoreTests)
 
 if (COMPARE_WITH_Z3)
     include_directories(${Z3_INCLUDE_DIRS})
-    set(libs_dynamic ${libs_dynamic} ${Z3_LIBRARIES})
+    target_link_libraries(runCoreTests ${Z3_LIBRARIES})
 endif()
 
-target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic} prepareTest)
+target_link_libraries(runCoreTests TestCommon)
 
 cotire(runCoreTests)
 

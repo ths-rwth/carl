@@ -57,13 +57,13 @@ protected:
 	bool hasValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
 		if (n.isNumeric()) return n.value() == val;
 		else {
-			return n.getInterval().contains(val);
+			return n.getIntervalContent().interval.contains(val);
 		}
 	}
 	bool hasSqrtValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
 		if (n.isNumeric()) return n.value() * n.value() == val;
 		else {
-			return (n.getInterval() * n.getInterval()).contains(val);
+			return (n.getIntervalContent().interval * n.getIntervalContent().interval).contains(val);
 		}
 	}
 

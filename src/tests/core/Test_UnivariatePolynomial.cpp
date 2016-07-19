@@ -418,6 +418,30 @@ TEST(UnivariatePolynomial, resultant4)
     EXPECT_EQ(res, p.resultant(q));
 }
 
+TEST(UnivariatePolynomial, PrincipalSubresultantCoefficient)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+    MultivariatePolynomial<Rational> my(y);
+    MultivariatePolynomial<Rational> one((Rational)1);
+    MultivariatePolynomial<Rational> zero((Rational)0);
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> p(x, {my, zero, zero, one});
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> q(x, {my, zero, one});
+	
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> res1(x, {my*my+my*my*my});
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> res2(x, {-my});
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> res3(x, {one});
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> res4(x, {one});
+	
+	auto r = UnivariatePolynomial<MultivariatePolynomial<Rational>>::principalSubresultantsCoefficients(p,q);
+	
+	EXPECT_EQ(4, r.size());
+	EXPECT_EQ(res1, r[0]);
+	EXPECT_EQ(res2, r[1]);
+	EXPECT_EQ(res3, r[2]);
+	EXPECT_EQ(res4, r[3]);
+}
+
 TEST(UnivariatePolynomial, intervalCoeffs)
 {
 	Variable a = freshRealVariable("a");

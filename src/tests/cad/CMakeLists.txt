@@ -11,6 +11,6 @@ add_executable( runCADTests
 )
 cotire(runCADTests)
 
-target_link_libraries(runCADTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic} prepareTest)
+target_link_libraries(runCADTests TestCommon)
 
 add_test( NAME cad COMMAND runCADTests )

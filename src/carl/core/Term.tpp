@@ -179,6 +179,28 @@ Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Co
 	}
 }
 
+template<typename Coefficient>
+template<typename SubstitutionType>
+SubstitutionType Term<Coefficient>::evaluate(const std::map<Variable, SubstitutionType>& map) const
+{
+    SubstitutionType result(this->coeff());
+	if (this->monomial())
+    {
+         // TODO: cannot link Monomial::evaluate
+//		result *= this->monomial()->evaluate(map);
+        for(unsigned i = 0; i < this->monomial()->nrVariables(); ++i)
+        {
+            CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << (*this->monomial())[i].first);
+            // We expect every variable to be in the map.
+            CARL_LOG_ASSERT("carl.interval", map.count((*this->monomial())[i].first) > (size_t)0, "Every variable is expected to be in the map.");
+            result *= carl::pow(map.at((*this->monomial())[i].first), (*this->monomial())[i].second);
+            if( carl::isZero( result ) )
+                return result;
+        }
+        return result;
+    }
+	return result;
+}
 
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) const
@@ -473,7 +495,7 @@ bool Term<Coefficient>::isConsistent() const {
 
 
 template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::gcd(std::shared_ptr<const Term<Coefficient>> t1, std::shared_ptr<const Term<Coefficient>> t2)
+Term<Coefficient> Term<Coefficient>::gcd(const std::shared_ptr<const Term<Coefficient>>& t1, const std::shared_ptr<const Term<Coefficient>>& t2)
 {
 	static_assert(is_field<Coefficient>::value, "Not yet defined for other coefficients");
 	assert(t1);

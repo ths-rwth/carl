@@ -10,6 +10,7 @@
 #include "RealAlgebraicNumberSettings.h"
 
 #include "../thom/ThomEncoding.h";
+#include "RealAlgebraicNumber_Interval.h"
 
 namespace carl {
 
@@ -17,42 +18,8 @@ template<typename Number>
 class RealAlgebraicNumber {
 private:
 	friend std::hash<RealAlgebraicNumber<Number>>;
-	using Polynomial = UnivariatePolynomial<Number>;
-	struct IntervalContent {
-		Polynomial polynomial;
-		Interval<Number> interval;
-		std::list<Polynomial> sturmSequence;
-		std::size_t refinementCount;
-		
-		IntervalContent(
-			const Polynomial& p,
-			const Interval<Number> i
-		):
-			polynomial(p),
-			interval(i),
-			sturmSequence(p.standardSturmSequence()),
-			refinementCount(0)
-		{}
-		
-		IntervalContent(
-			const Polynomial& p,
-			const Interval<Number> i,
-			const std::list<UnivariatePolynomial<Number>>& seq
-		):
-			polynomial(p),
-			interval(i),
-			sturmSequence(seq),
-			refinementCount(0)
-		{}
-			
-		/** Refines the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
-		 * @param n
-		 * @rcomplexity constant
-		 * @scomplexity constant
-		 * @return true, if n is the exact numeric representation of this root, otherwise false
-		 */
-		bool refineAvoiding(const Number& n, const RealAlgebraicNumber<Number>& parent);
-	};
+	using IntervalContent = ran::IntervalContent<Number>;
+	using Polynomial = typename IntervalContent::Polynomial;
 	
 	mutable Number mValue;
 	bool mIsRoot;
@@ -66,10 +33,11 @@ private:
 	}
 	
 	void switchToNR(const Number& n) const {
-		assert(mIR);
-		mIR->interval = Interval<Number>(n);
 		mValue = n;
-		mIR.reset();
+		if (mIR) {
+			mIR->interval = Interval<Number>(n);
+			mIR.reset();
+		}
 	}
 	
 public:
@@ -99,7 +67,7 @@ public:
 			Number b = mIR->polynomial.coefficients()[0];
 			switchToNR(-b / a);
 		} else {
-			if (i.contains(0)) mIR->refineAvoiding(0, *this);
+			if (i.contains(0)) refineAvoiding(0);
 		}
 	}
         
@@ -135,6 +103,12 @@ public:
 		return *this;
 	}
 	
+	std::size_t size() const {
+		if (isNumeric()) return carl::bitsize(mValue);
+		else if (isInterval()) return carl::bitsize(mIR->interval.lower()) + carl::bitsize(mIR->interval.upper()) * mIR->polynomial.degree();
+		else return 0;
+	}
+	
 	/**
 	 * @return the flag marking whether the real algebraic number stems from a root computation or not
 	 */
@@ -152,15 +126,25 @@ public:
 	
 	bool isZero() const {
 		if (isNumeric()) return carl::isZero(mValue);
-		else return mIR->interval.isZero();
+		else if (isInterval()) return mIR->interval.isZero();
+		else return false;
 	}
 	
 	bool isNumeric() const {
 		checkForSimplification();
 		return !mIR && !mTE;
 	}
+	bool isInterval() const {
+		checkForSimplification();
+		return bool(mIR);
+	}
 	
-	bool isIntegral() const;
+	bool isIntegral() const {
+		refineToIntegrality();
+		if (isNumeric()) return carl::isInteger(mValue);
+		else if (isInterval()) return mIR->isIntegral();
+		else return false;
+	}
 	
 	Number branchingPoint() const {
 		if (isNumeric()) return mValue;
@@ -178,16 +162,15 @@ public:
                 assert(mIR);
 		return mIR->refinementCount;
 	}
-	const Interval<Number>& getInterval() const {
-		assert(!isNumeric());
-                assert(mIR);
-		return mIR->interval;
+	const ran::IntervalContent<Number>& getIntervalContent() const {
+		return *mIR;
 	}
 	const Number& lower() const {
-		return getInterval().lower();
+		assert(isInterval());
+		return mIR->interval.lower();
 	}
 	const Number& upper() const {
-		return getInterval().upper();
+		return mIR->interval.upper();
 	}
 	const Polynomial& getPolynomial() const {
 		assert(!isNumeric());
@@ -224,45 +207,63 @@ public:
 	
 	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
 		if (isNumeric()) return p.countRealRoots(value()) == 1;
-		else return p.countRealRoots(getInterval()) == 1;
+		else if (isInterval()) return p.countRealRoots(mIR->interval) == 1;
+		else return false;
 	}
 	
 	bool containedIn(const Interval<Number>& i) const {
 		if (isNumeric()) return i.contains(mValue);
-		else {
-			if (getInterval().contains(i.lower())) {
-				mIR->refineAvoiding(i.lower(), *this);
+		else if (isInterval()) {
+			if (mIR->interval.contains(i.lower())) {
+				refineAvoiding(i.lower());
 				if (isNumeric()) return i.contains(mValue);
 			}
-			if (getInterval().contains(i.upper())) {
-				mIR->refineAvoiding(i.upper(), *this);
+			if (mIR->interval.contains(i.upper())) {
+				refineAvoiding(i.upper());
 				if (isNumeric()) return i.contains(mValue);
 			}
 			return i.contains(mIR->interval);
 		}
+		else return false;
 	}
 	
 	bool refineAvoiding(const Number& n) const {
 		assert(!isNumeric());
-		return mIR->refineAvoiding(n, *this);
+		bool res = mIR->refineAvoiding(n);
+		checkForSimplification();
+		return res;
 	}
-	void refine(RealAlgebraicNumberSettings::RefinementStrategy strategy = RealAlgebraicNumberSettings::RefinementStrategy::DEFAULT) const;
 	/// Refines until the number is either numeric or the interval does not contain any integer.
 	void refineToIntegrality() const {
-		while (!isNumeric() && mIR->interval.containsInteger()) {
-			refine();
-		}
+		if (isInterval()) mIR->refineToIntegrality();
+		checkForSimplification();
+	}
+	void refine() const {
+		if (isInterval()) mIR->refine();
+		checkForSimplification();
 	}
 	
+	RealAlgebraicNumber<Number> abs() const {
+		if (isNumeric()) return RealAlgebraicNumber<Number>(carl::abs(mValue), mIsRoot);
+		if (isInterval()) return RealAlgebraicNumber<Number>(mIR->polynomial, mIR->interval.abs(), mIsRoot);
+		return RealAlgebraicNumber<Number>();
+	}
+
 	bool equal(const RealAlgebraicNumber<Number>& n) const;
 	bool less(const RealAlgebraicNumber<Number>& n) const;
 	std::pair<bool,bool> checkOrder(const RealAlgebraicNumber<Number>& n) const;
+private:
 	bool lessWhileUnequal(const RealAlgebraicNumber<Number>& n) const;
-	
+public:
+	static RealAlgebraicNumber<Number> sampleBelow(const RealAlgebraicNumber<Number>& n);
+	static RealAlgebraicNumber<Number> sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper);
+	static RealAlgebraicNumber<Number> sampleAbove(const RealAlgebraicNumber<Number>& n);
+
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
 		if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";
-		else return os << "(IR " << ran.getInterval() << ", " << ran.getPolynomial() << (ran.isRoot() ? " R" : "") << ")";
+		else if (ran.isInterval()) return os << "(IR " << ran.mIR->interval << ", " << ran.getPolynomial() << (ran.isRoot() ? " R" : "") << ")";
+		else return os << "(RAN)";
 	}
 };
 

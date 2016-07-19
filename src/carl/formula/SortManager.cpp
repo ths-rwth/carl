@@ -81,7 +81,7 @@ namespace carl
 	}
 	
 	Sort SortManager::index(const Sort& sort, const std::vector<std::size_t>& indices) {
-		if (indices.size() == 0) return sort;
+		if (indices.empty()) return sort;
 		const SortContent& sc = getContent(sort);
 		SortContent* newsc = new SortContent(sc);
 		if (newsc->indices == nullptr) newsc->indices = new std::vector<std::size_t>(indices);
@@ -129,14 +129,11 @@ namespace carl
 		return Sort(0);
 	}
 	
-	Sort SortManager::getSort( const std::string& _name, const std::vector<std::size_t>& _indices )
-	{
-		auto r = index(getSort(_name), _indices);
-		return r;
+	Sort SortManager::getSort(const std::string& name, const std::vector<std::size_t>& indices) {
+		return index(getSort(name), indices);
 	}
 	
-	Sort SortManager::getSort( const std::string& _name, const std::vector<std::size_t>& _indices, const std::vector<Sort>& _params )
-	{
-		return index(getSort(_name, _params), _indices);
+	Sort SortManager::getSort(const std::string& name, const std::vector<std::size_t>& indices, const std::vector<Sort>& params) {
+		return index(getSort(name, params), indices);
 	}
 }

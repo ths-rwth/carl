@@ -537,7 +537,7 @@ namespace carl
          * @return For a polynomial p, the function value p(x_1,...,x_n).
          */
         template<typename SubstitutionType = CoeffType>
-        CoeffType evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
+        SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
 		
 		/**
          * Replace the given variable by the given value.

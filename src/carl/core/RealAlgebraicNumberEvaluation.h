@@ -91,6 +91,7 @@ UnivariatePolynomial<Number> evaluateCoefficients(
 ////////////////////////////////////////
 // Implementation
 
+// This is called by carl::CAD implementation (from Constraint)
 template<typename Number, typename Coeff>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, const RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
 	assert(point.dim() == variables.size());
@@ -113,6 +114,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
 	return evaluate(pol, RANs);
 }
 
+// This is called by smtrat::CAD implementation (from CAD.h)
 template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
@@ -174,8 +176,10 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 			it->second.refine();
 			if (it->second.isNumeric()) {
 				return evaluate(p, m);
+			} else if (it->second.isInterval()) {
+				varToInterval[it->first] = it->second.getIntervalContent().interval;
 			} else {
-				varToInterval[it->first] = it->second.getInterval();
+				CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
 			}
 		}
 		interval = IntervalEvaluation::evaluate(poly, varToInterval);
@@ -196,10 +200,12 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	for (const auto& i: m) {
 		if (i.second.isNumeric()) {
 			tmp.substituteIn(i.first, Coeff(i.second.value()));
-		} else {
+		} else if (i.second.isInterval()) {
 			UnivariatePolynomial<Coeff> p2(i.first, i.second.getPolynomial().template convert<Coeff>().coefficients());
 			tmp = tmp.switchVariable(i.first).resultant(p2);
-			varToInterval[i.first] = i.second.getInterval();
+			varToInterval[i.first] = i.second.getIntervalContent().interval;
+		} else {
+			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
 		}
 		CARL_LOG_DEBUG("carl.ran", "Substituted " << i.first << " -> " << i.second << ", result: " << tmp);
 	}

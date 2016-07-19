@@ -378,6 +378,26 @@ namespace carl
 		}
 		return true;
 	}
+        
+        /*
+         * TODO: cannot link Monomial::evaluate
+        template<typename SubstitutionType>
+        SubstitutionType Monomial::evaluate(const std::map<Variable, SubstitutionType>& map) const
+        {
+            SubstitutionType result = constant_one<SubstitutionType>::get();
+            // TODO use iterator.
+            CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << *this);
+            for(unsigned i = 0; i < mExponents.size(); ++i)
+            {
+                CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << mExponents[i].first);
+                // We expect every variable to be in the map.
+                CARL_LOG_ASSERT("carl.interval", map.count(mExponents[i].first) > (size_t)0, "Every variable is expected to be in the map.");
+                result *= carl::pow(map.at(mExponents[i].first), mExponents[i].second);
+                if( carl::isZero( result.isZero() ) )
+                    return result;
+            }
+            return result;
+        }*/
 	
 	CompareResult Monomial::lexicalCompare(const Monomial& lhs, const Monomial& rhs)
 	{

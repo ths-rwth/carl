@@ -228,7 +228,6 @@ namespace carl
             }
             else
             {
-                _constraint->initLazy();
                 ConstraintContent<Pol>* constraint = _constraint->simplify();
                 if( constraint != nullptr ) // Constraint could be simplified.
                 {

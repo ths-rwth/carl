@@ -96,7 +96,7 @@ public:
 	 * @param root Real root.
 	 * @param reducePolynomial Flag if polynomial should be reduced.
 	 */
-	virtual void addRoot(RealAlgebraicNumber<Number> root, bool reducePolynomial = true) = 0;
+	virtual void addRoot(const RealAlgebraicNumber<Number>& root, bool reducePolynomial = true) = 0;
 	/**
 	 * Add a root to the list of found roots.
 	 * @param interval Interval that contains the real root.
@@ -283,7 +283,7 @@ public:
 
 protected:
 
-	virtual void addRoot(RealAlgebraicNumber<Number> root, bool reducePolynomial = true) {
+	virtual void addRoot(const RealAlgebraicNumber<Number>& root, bool reducePolynomial = true) {
 		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(root, reducePolynomial);
 	}

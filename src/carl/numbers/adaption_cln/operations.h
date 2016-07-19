@@ -184,6 +184,11 @@ template<>
 cln::cl_RA rationalize<cln::cl_RA>(float n);
 
 template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(int n) {
+    return cln::cl_RA(n);
+}
+
+template<>
 inline cln::cl_RA rationalize<cln::cl_RA>(uint n) {
 	return cln::cl_RA(n);
 }
@@ -503,6 +508,10 @@ inline cln::cl_I operator/(const cln::cl_I& a, const cln::cl_I& b)
 }
 inline cln::cl_I operator/(const cln::cl_I& lhs, const int& rhs) {
 	return lhs / cln::cl_I(rhs);
+}
+
+inline cln::cl_RA reciprocal(const cln::cl_RA& a) {
+	return cln::recip(a);
 }
 
 std::string toString(const cln::cl_RA& _number, bool _infix=true);
