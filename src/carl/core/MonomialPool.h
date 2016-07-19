@@ -24,21 +24,29 @@ namespace carl{
 		public:
 #ifdef PRUNE_MONOMIAL_POOL
 			struct PoolEntry {
-				std::size_t hash;
 				Monomial::Content content;
+				std::size_t hash;
 				mutable std::weak_ptr<const Monomial> monomial;
-				PoolEntry(std::size_t h, Monomial::Content c, const Monomial::Arg& m): hash(h), content(std::move(c)), monomial(m) {}
-				PoolEntry(std::size_t h, Monomial::Content c): hash(h), content(std::move(c)) {
+				PoolEntry(std::size_t h, Monomial::Content c, const Monomial::Arg& m): content(std::move(c)), hash(h), monomial(m) {}
+				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h) {
+					assert(monomial.expired());
+				}
+				PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)) {
 					assert(monomial.expired());
 				}
 			};
 #else
 			struct PoolEntry {
-				std::size_t hash;
 				Monomial::Content content;
+				std::size_t hash;
 				mutable Monomial::Arg monomial;
-				PoolEntry(std::size_t h, const Monomial::Content& c, const Monomial::Arg& m): hash(h), content(c), monomial(m) {}
-				PoolEntry(std::size_t h, Monomial::Content&& c): hash(h), content(std::move(c)), monomial(nullptr) {}
+				PoolEntry(std::size_t h, const Monomial::Content& c, const Monomial::Arg& m): content(c), hash(h), monomial(m) {}
+				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h) {
+					assert(monomial.expired());
+				}
+				PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)) {
+					assert(monomial.expired());
+				}
 			};
 #endif
 			struct hash {
