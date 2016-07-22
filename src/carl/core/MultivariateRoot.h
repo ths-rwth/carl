@@ -59,7 +59,7 @@ public:
 };
 
 template<typename P>
-friend std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
+std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
 	return os << "root(" << mr.poly() << ", " << mr.k() << ", " << mr.var() << ")";
 }
 
