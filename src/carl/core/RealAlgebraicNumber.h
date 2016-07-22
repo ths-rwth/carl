@@ -244,14 +244,14 @@ public:
 	static RealAlgebraicNumber<Number> sampleBelow(const RealAlgebraicNumber<Number>& n);
 	static RealAlgebraicNumber<Number> sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper);
 	static RealAlgebraicNumber<Number> sampleAbove(const RealAlgebraicNumber<Number>& n);
-
-	template<typename Num>
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
-		if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";
-		else if (ran.isInterval()) return os << "(IR " << ran.mIR->interval << ", " << ran.getPolynomial() << (ran.isRoot() ? " R" : "") << ")";
-		else return os << "(RAN)";
-	}
 };
+
+template<typename Num>
+std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
+	if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";
+	else if (ran.isInterval()) return os << "(IR " << ran.getIntervalContent().interval << ", " << ran.getPolynomial() << (ran.isRoot() ? " R" : "") << ")";
+	else return os << "(RAN)";
+}
 
 template<typename Number>
 inline bool operator==(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
