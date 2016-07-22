@@ -56,11 +56,11 @@ public:
 		CARL_LOG_DEBUG("carl.multivariateroot", "Result is " << mRAN);
 		return mRAN;
 	}
-	
-	template<typename P>
-	friend std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
-		return os << "root(" << mr.poly() << ", " << mr.k() << ", " << mr.var() << ")";
-	}
 };
+
+template<typename P>
+friend std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
+	return os << "root(" << mr.poly() << ", " << mr.k() << ", " << mr.var() << ")";
+}
 
 }
