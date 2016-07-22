@@ -15,6 +15,7 @@ add_executable(runCoreTests
 		Test_Resultant.cpp
         Test_Sign.cpp
         Test_FactorizedPolynomial.cpp
+		Test_MultivariateRoot.cpp
 		Test_RationalFunction.cpp
         #Test_TaylorExpansion.cpp
         #Test_Constraint.cpp
