@@ -3,9 +3,9 @@
 #include <iostream>
 #include <memory>
 
-#include "UnivariatePolynomial.h"
-#include "../interval/Interval.h"
-#include "../core/Sign.h"
+#include "../../../core/Sign.h"
+#include "../../../core/UnivariatePolynomial.h"
+#include "../../../interval/Interval.h"
 
 #include "RealAlgebraicNumberSettings.h"
 
