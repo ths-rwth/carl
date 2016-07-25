@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "../core/logging.h"
-#include "../core/RealAlgebraicNumber.h"
+#include "../formula/model/ran/RealAlgebraicNumber.h"
 
 #include "CADSettings.h"
 

@@ -14,7 +14,7 @@
 
 #include "../core/logging.h"
 #include "../interval/IntervalEvaluation.h"
-#include "../core/RealAlgebraicNumberSettings.h"
+#include "../formula/model/ran/RealAlgebraicNumberSettings.h"
 #include "../core/rootfinder/RootFinder.h"
 
 #define PERFORM_PARTIAL_CHECK false

@@ -37,9 +37,9 @@
 
 #include "../core/UnivariatePolynomial.h"
 #include "../core/MultivariatePolynomial.h"
-#include "../core/RealAlgebraicNumber.h"
-#include "../core/RealAlgebraicPoint.h"
 #include "../core/Variable.h"
+#include "../formula/model/ran/RealAlgebraicNumber.h"
+#include "../formula/model/ran/RealAlgebraicPoint.h"
 #include "../util/carlTree.h"
 
 #include "CADConstraints.h"
