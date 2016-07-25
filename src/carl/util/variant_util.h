@@ -9,11 +9,11 @@ namespace carl {
 template<typename T>
 struct variant_is_type: boost::static_visitor<bool> {
 	template<typename TT>
-	std::enable_if_t<std::is_same<T,TT>::value, bool> operator()(const TT&) const {
+	typename std::enable_if<std::is_same<T,TT>::value, bool>::type operator()(const TT&) const {
 		return true;
 	}
 	template<typename TT>
-	std::enable_if_t<!std::is_same<T,TT>::value, bool> operator()(const TT&) const {
+	typename std::enable_if<!std::is_same<T,TT>::value, bool>::type operator()(const TT&) const {
 		return false;
 	}
 	template<typename V>
