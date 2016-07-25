@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include "carl/core/MultivariateRoot.h"
+#include "carl/formula/model/mvroot/MultivariateRoot.h"
 
 #include "../Common.h"
 
