@@ -40,6 +40,9 @@ public:
 	Variable::Arg var() const {
 		return mVar;
 	}
+	bool isUnivariate() const {
+		return mPoly.isUnivariate();
+	}
 	
 	const RAN& evaluate(const EvalMap& m) const {
 		if (mEvalMap == m && mRAN.isRoot()) return mRAN;
@@ -55,6 +58,10 @@ public:
 		mRAN = *it;
 		CARL_LOG_DEBUG("carl.multivariateroot", "Result is " << mRAN);
 		return mRAN;
+	}
+	
+	bool operator==(const MultivariateRoot& mr) const {
+		return mK == mr.mK && mVar == mr.mVar && mPoly == mr.mPoly;
 	}
 };
 
