@@ -29,16 +29,16 @@ namespace carl {
 			const ModelValue<Rational,Poly>& mv = getModelValue(it,model);
 			assert( !mv.isSubstitution() );
 			if (mv.isRational()) {
-				SMTRAT_LOG_WARN("smtrat.model", "Substituting " << var << " = " << mv.asRational() << " into " << mPoly);
+				CARL_LOG_WARN("carl.formula.model", "Substituting " << var << " = " << mv.asRational() << " into " << mPoly);
 				mPoly.substituteIn(var, Poly(mv.asRational()));
-				SMTRAT_LOG_WARN("smtrat.model", "-> " << mPoly);
+				CARL_LOG_WARN("carl.formula.model", "-> " << mPoly);
 			} else if (mv.isRAN()) {
-				SMTRAT_LOG_WARN("smtrat.model", "Substituting " << var << " = " << mv.asRAN() << " into " << mPoly);
+				CARL_LOG_WARN("carl.formula.model", "Substituting " << var << " = " << mv.asRAN() << " into " << mPoly);
 				map.emplace(var, mv.asRAN());
 			} else if (mv.isPoly()) {
-				SMTRAT_LOG_WARN("smtrat.model", "Substituting " << var << " = " << mv.asPoly() << " into " << mPoly);
+				CARL_LOG_WARN("carl.formula.model", "Substituting " << var << " = " << mv.asPoly() << " into " << mPoly);
 				mPoly.substituteIn(var, mv.asPoly());
-				SMTRAT_LOG_WARN("smtrat.model", "-> " << mPoly);
+				CARL_LOG_WARN("carl.formula.model", "-> " << mPoly);
 			} else {
                             return this;
 			}	

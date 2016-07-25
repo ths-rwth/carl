@@ -9,9 +9,11 @@
 
 #include "SortValue.h"
 
+#include "../../uninterpreted/UFManager.h"
 #include "../../uninterpreted/UninterpretedFunction.h"
 
 #include <iostream>
+#include <map>
 #include <utility>
 
 namespace carl

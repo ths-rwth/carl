@@ -7,10 +7,8 @@
 
 #include "SortValueManager.h"
 
-using namespace std;
+namespace carl {
 
-namespace smtrat
-{
     SortValue SortValueManager::newSortValue( const carl::Sort& _sort )
     {
         auto res = mSortValueIDMap.emplace( _sort, SortValue::IDType( 1 ) );
@@ -20,7 +18,7 @@ namespace smtrat
         }
         return SortValue( _sort, res.first->second );
     }
-	SortValue SortValueManager::defaultSortValue( const carl::Sort& _sort )
+	SortValue SortValueManager::defaultSortValue( const Sort& _sort )
 	{
 		return SortValue( _sort, 0 );
 	}

@@ -62,7 +62,7 @@ namespace carl
 			return erase(mData.find(variable));
 		}
 		typename Map::iterator erase(const typename Map::iterator& it) {
-			return erase(Map::const_iterator(it));
+			return erase(typename Map::const_iterator(it));
 		}
 		typename Map::iterator erase(const typename Map::const_iterator& it) {
 			if (it == mData.end()) return mData.end();
@@ -71,7 +71,7 @@ namespace carl
 				if (!val.isSubstitution()) continue;
 				const auto& subs = val.asSubstitution();
 				if (subs->dependsOn(it->first)) {
-					SMTRAT_LOG_DEBUG("smtrat.model", "Evaluating " << m.first << " ->  " << subs << " as " << it->first << " is removed from the model.");
+					CARL_LOG_DEBUG("carl.formula.model", "Evaluating " << m.first << " ->  " << subs << " as " << it->first << " is removed from the model.");
 					m.second = subs->evaluate(*this);
 				}
 			}
@@ -82,7 +82,7 @@ namespace carl
 				const auto& val = m.second;
 				if (!val.isSubstitution()) continue;
 				const auto& subs = val.asSubstitution();
-                SMTRAT_LOG_DEBUG("smtrat.model", "Evaluating " << m.first << " ->  " << subs << " as.");
+                CARL_LOG_DEBUG("carl.formula.model", "Evaluating " << m.first << " ->  " << subs << " as.");
                 m.second = subs->evaluate(*this);
 			}
         }

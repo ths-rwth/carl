@@ -24,7 +24,7 @@ namespace carl
         {
             return iter->second;
         }
-		return defaultSortValue(carl::UFManager::getInstance().getCodomain(uf));
+		return defaultSortValue(UFManager::getInstance().getCodomain(uf));
     }
     
     size_t UFModel::getHash() const
