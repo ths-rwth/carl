@@ -283,3 +283,5 @@ namespace std
         }
     };
 } // namespace std
+
+#include "SqrtEx.tpp"

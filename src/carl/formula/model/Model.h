@@ -115,7 +115,8 @@ namespace carl
 		}
 	};
 
-    //static const Model EMPTY_MODEL = Model(); 
+	template<typename Rational, typename Poly>
+	static const Model<Rational,Poly> EMPTY_MODEL = Model<Rational,Poly>();
 	
 }
 

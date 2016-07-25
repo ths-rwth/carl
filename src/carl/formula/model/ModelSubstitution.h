@@ -63,6 +63,7 @@ namespace carl {
 	template<typename Rational, typename Poly>
 	class ModelPolynomialSubstitution: public ModelSubstitution<Rational,Poly> {
 	private:
+		using Super = ModelSubstitution<Rational,Poly>;
 		Poly mPoly;
 		std::set<carl::Variable> mVars;
 	public:
@@ -81,3 +82,5 @@ namespace carl {
 	};
 	
 }
+
+#include "ModelSubstitution.tpp"

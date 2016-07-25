@@ -26,7 +26,7 @@ namespace carl {
 			if (it == model.end()) {
 				return Poly(var);
 			}
-			const ModelValue<Rational,Poly>& mv = getModelValue(it,model);
+			const ModelValue<Rational,Poly>& mv = Super::getModelValue(it,model);
 			assert( !mv.isSubstitution() );
 			if (mv.isRational()) {
 				CARL_LOG_WARN("carl.formula.model", "Substituting " << var << " = " << mv.asRational() << " into " << mPoly);

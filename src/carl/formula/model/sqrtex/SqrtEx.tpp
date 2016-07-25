@@ -58,8 +58,8 @@ namespace carl
             if( mRadicand.sqrt( sqrtOfRadicand ) )
             {
                 mConstantPart += mFactor * sqrtOfRadicand;
-                mFactor = 0;
-                mRadicand = 0;
+                mFactor = constant_zero<Poly>::get();
+                mRadicand = constant_zero<Poly>::get();
             }
             else
             {
@@ -190,7 +190,7 @@ namespace carl
     }
 
 	template<typename Poly>
-    SqrtEx<Poly> operator+( const SqrtEx<Poly>& _summandA, const SqrtEx<Poly>& _summandB )
+    inline SqrtEx<Poly> operator+( const SqrtEx<Poly>& _summandA, const SqrtEx<Poly>& _summandB )
     {
         assert( !_summandA.hasSqrt() ||!_summandB.hasSqrt() || _summandA.radicand() == _summandB.radicand() );
         SqrtEx<Poly> result = SqrtEx<Poly>( _summandB.denominator() * _summandA.constantPart() + _summandB.constantPart() * _summandA.denominator(),
@@ -200,7 +200,7 @@ namespace carl
     }
 
 	template<typename Poly>
-    SqrtEx<Poly> operator-( const SqrtEx<Poly>& _minuend, const SqrtEx<Poly>& _subtrahend )
+    inline SqrtEx<Poly> operator-( const SqrtEx<Poly>& _minuend, const SqrtEx<Poly>& _subtrahend )
     {
         assert( !_minuend.hasSqrt() || !_subtrahend.hasSqrt() || _minuend.radicand() == _subtrahend.radicand() );
         SqrtEx<Poly> result = SqrtEx<Poly>( _subtrahend.denominator() * _minuend.constantPart() - _subtrahend.constantPart() * _minuend.denominator(),
@@ -210,7 +210,7 @@ namespace carl
     }
 
 	template<typename Poly>
-    SqrtEx<Poly> operator*( const SqrtEx<Poly>& _factorA, const SqrtEx<Poly>& _factorB )
+    inline SqrtEx<Poly> operator*( const SqrtEx<Poly>& _factorA, const SqrtEx<Poly>& _factorB )
     {
         assert( !_factorA.hasSqrt() || !_factorB.hasSqrt() || _factorA.radicand() == _factorB.radicand() );
         SqrtEx<Poly> result = SqrtEx<Poly>( _factorB.constantPart() * _factorA.constantPart() + _factorB.factor() * _factorA.factor() * _factorA.radicand(),
@@ -220,7 +220,7 @@ namespace carl
     }
 
 	template<typename Poly>
-    SqrtEx<Poly> operator/( const SqrtEx<Poly>& _dividend, const SqrtEx<Poly>& _divisor )
+    inline SqrtEx<Poly> operator/( const SqrtEx<Poly>& _dividend, const SqrtEx<Poly>& _divisor )
     {
         assert( !_divisor.hasSqrt() );
         SqrtEx<Poly> result = SqrtEx<Poly>( _dividend.constantPart() * _divisor.denominator(), _dividend.factor() * _divisor.denominator(),
@@ -229,7 +229,7 @@ namespace carl
     }
     
 	template<typename Poly>
-    ostream& operator<<( ostream& _out, const SqrtEx<Poly>& _substitution )
+    inline ostream& operator<<( ostream& _out, const SqrtEx<Poly>& _substitution )
     {
         return (_out << _substitution.toString( true ) );
     }
@@ -394,7 +394,7 @@ namespace carl
          *      ----------------------------------------------
          *                           s^n
          */
-        auto varInfo = _substituteIn.getVarInfo<true>( _varToSubstitute );
+        auto varInfo = _substituteIn.template getVarInfo<true>( _varToSubstitute );
         const auto& coeffs = varInfo.coeffs();
         // Calculate the s^k:   (0<=k<=n)
         auto coeff = coeffs.begin();
