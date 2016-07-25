@@ -190,46 +190,46 @@ namespace carl
     }
 
 	template<typename Poly>
-    inline SqrtEx<Poly> operator+( const SqrtEx<Poly>& _summandA, const SqrtEx<Poly>& _summandB )
+    SqrtEx<Poly> SqrtEx<Poly>::operator+( const SqrtEx<Poly>& rhs ) const
     {
-        assert( !_summandA.hasSqrt() ||!_summandB.hasSqrt() || _summandA.radicand() == _summandB.radicand() );
-        SqrtEx<Poly> result = SqrtEx<Poly>( _summandB.denominator() * _summandA.constantPart() + _summandB.constantPart() * _summandA.denominator(),
-                         _summandB.denominator() * _summandA.factor() + _summandB.factor() * _summandA.denominator(),
-                         _summandA.denominator() * _summandB.denominator(), _summandA.radicand() );
+        assert( !hasSqrt() ||!rhs.hasSqrt() || radicand() == rhs.radicand() );
+        SqrtEx<Poly> result = SqrtEx<Poly>( rhs.denominator() * constantPart() + rhs.constantPart() * denominator(),
+                         rhs.denominator() * factor() + rhs.factor() * denominator(),
+                         denominator() * rhs.denominator(), radicand() );
         return result;
     }
 
 	template<typename Poly>
-    inline SqrtEx<Poly> operator-( const SqrtEx<Poly>& _minuend, const SqrtEx<Poly>& _subtrahend )
+    SqrtEx<Poly> SqrtEx<Poly>::operator-( const SqrtEx<Poly>& rhs ) const
     {
-        assert( !_minuend.hasSqrt() || !_subtrahend.hasSqrt() || _minuend.radicand() == _subtrahend.radicand() );
-        SqrtEx<Poly> result = SqrtEx<Poly>( _subtrahend.denominator() * _minuend.constantPart() - _subtrahend.constantPart() * _minuend.denominator(),
-                         _subtrahend.denominator() * _minuend.factor() - _subtrahend.factor() * _minuend.denominator(),
-                         _minuend.denominator() * _subtrahend.denominator(), _minuend.radicand() );
+        assert( !hasSqrt() || !rhs.hasSqrt() || radicand() == rhs.radicand() );
+        SqrtEx<Poly> result = SqrtEx<Poly>( rhs.denominator() * constantPart() - rhs.constantPart() * denominator(),
+                         rhs.denominator() * factor() - rhs.factor() * denominator(),
+                         denominator() * rhs.denominator(), radicand() );
         return result;
     }
 
 	template<typename Poly>
-    inline SqrtEx<Poly> operator*( const SqrtEx<Poly>& _factorA, const SqrtEx<Poly>& _factorB )
+    SqrtEx<Poly> SqrtEx<Poly>::operator*( const SqrtEx<Poly>& rhs ) const
     {
-        assert( !_factorA.hasSqrt() || !_factorB.hasSqrt() || _factorA.radicand() == _factorB.radicand() );
-        SqrtEx<Poly> result = SqrtEx<Poly>( _factorB.constantPart() * _factorA.constantPart() + _factorB.factor() * _factorA.factor() * _factorA.radicand(),
-                         _factorB.constantPart() * _factorA.factor() + _factorB.factor() * _factorA.constantPart(),
-                         _factorA.denominator() * _factorB.denominator(), _factorA.radicand() );
+        assert( !hasSqrt() || !rhs.hasSqrt() || radicand() == rhs.radicand() );
+        SqrtEx<Poly> result = SqrtEx<Poly>( rhs.constantPart() * constantPart() + rhs.factor() * factor() * radicand(),
+                         rhs.constantPart() * factor() + rhs.factor() * constantPart(),
+                         denominator() * rhs.denominator(), radicand() );
         return result;
     }
 
 	template<typename Poly>
-    inline SqrtEx<Poly> operator/( const SqrtEx<Poly>& _dividend, const SqrtEx<Poly>& _divisor )
+    SqrtEx<Poly> SqrtEx<Poly>::operator/( const SqrtEx<Poly>& rhs ) const
     {
-        assert( !_divisor.hasSqrt() );
-        SqrtEx<Poly> result = SqrtEx<Poly>( _dividend.constantPart() * _divisor.denominator(), _dividend.factor() * _divisor.denominator(),
-                         _dividend.denominator() * _divisor.factor(), _dividend.radicand() );
+        assert( !rhs.hasSqrt() );
+        SqrtEx<Poly> result = SqrtEx<Poly>( constantPart() * rhs.denominator(), factor() * rhs.denominator(),
+                         denominator() * rhs.factor(), radicand() );
         return result;
     }
     
 	template<typename Poly>
-    inline ostream& operator<<( ostream& _out, const SqrtEx<Poly>& _substitution )
+    inline std::ostream& operator<<( std::ostream& _out, const SqrtEx<Poly>& _substitution )
     {
         return (_out << _substitution.toString( true ) );
     }

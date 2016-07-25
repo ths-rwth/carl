@@ -209,21 +209,21 @@ namespace carl
              * @param _summandB  Second summand.
              * @return The sum of the given square root expressions.
              */
-            friend SqrtEx operator+( const SqrtEx& _summandA, const SqrtEx& _summandB );
+            SqrtEx operator+( const SqrtEx& rhs ) const;
             
             /**
              * @param _minuend  Minuend.
              * @param _subtrahend  Subtrahend.
              * @return The difference of the given square root expressions.
              */
-            friend SqrtEx operator-( const SqrtEx& _minuend, const SqrtEx& _subtrahend );
+            SqrtEx operator-( const SqrtEx& rhs ) const;
       
             /**
              * @param _factorA  First factor.
              * @param _factorB  Second factor.
              * @return The product of the given square root expressions.
              */
-            friend SqrtEx operator*( const SqrtEx& _factorA, const SqrtEx& _factorB );
+            SqrtEx operator*( const SqrtEx& rhs ) const;
             
             /**
              * @param _dividend  Dividend.
@@ -231,7 +231,7 @@ namespace carl
              * @return The result of the first given square root expression divided by the second one
              *          Note that the second argument is not allowed to contain a square root.
              */
-            friend SqrtEx operator/( const SqrtEx& _dividend, const SqrtEx& _divisor );
+            SqrtEx operator/( const SqrtEx& rhs ) const;
             
             /**
              * Prints the given square root expression on the given stream.
@@ -239,7 +239,8 @@ namespace carl
              * @param _sqrtEx The square root expression to print.
              * @return The stream after printing the square root expression on it.
              */
-            friend std::ostream& operator<<( std::ostream& _out, const SqrtEx& _sqrtEx );
+			template<typename P>
+            friend std::ostream& operator<<( std::ostream& _out, const SqrtEx<P>& _sqrtEx );
             
             /**
              * @param _infix A string which is printed in the beginning of each row.
