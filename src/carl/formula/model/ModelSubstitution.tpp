@@ -19,36 +19,33 @@ namespace carl {
         }
     
 	template<typename Rational, typename Poly>
-	ModelValue<Rational,Poly> ModelPolynomialSubstitution<Rational,Poly>::evaluate(Model<Rational,Poly>& model) {
+	ModelValue<Rational,Poly> ModelPolynomialSubstitution<Rational,Poly>::evaluateSubstitution(const Model<Rational,Poly>& model) const {
 		RealAlgebraicNumberEvaluation::RANMap<Rational> map;
+		Poly res = mPoly;
 		for (const auto& var: mVars) {
-			auto it = model.find(ModelVariable(var));
-			if (it == model.end()) {
-				return Poly(var);
-			}
-			const ModelValue<Rational,Poly>& mv = Super::getModelValue(it,model);
-			assert( !mv.isSubstitution() );
+			const ModelValue<Rational,Poly>& mv = model.evaluated(var);
+			assert(!mv.isSubstitution());
 			if (mv.isRational()) {
 				CARL_LOG_WARN("carl.formula.model", "Substituting " << var << " = " << mv.asRational() << " into " << mPoly);
-				mPoly.substituteIn(var, Poly(mv.asRational()));
-				CARL_LOG_WARN("carl.formula.model", "-> " << mPoly);
+				res.substituteIn(var, Poly(mv.asRational()));
+				CARL_LOG_WARN("carl.formula.model", "-> " << res);
 			} else if (mv.isRAN()) {
 				CARL_LOG_WARN("carl.formula.model", "Substituting " << var << " = " << mv.asRAN() << " into " << mPoly);
 				map.emplace(var, mv.asRAN());
 			} else if (mv.isPoly()) {
 				CARL_LOG_WARN("carl.formula.model", "Substituting " << var << " = " << mv.asPoly() << " into " << mPoly);
-				mPoly.substituteIn(var, mv.asPoly());
-				CARL_LOG_WARN("carl.formula.model", "-> " << mPoly);
+				res.substituteIn(var, mv.asPoly());
+				CARL_LOG_WARN("carl.formula.model", "-> " << res);
 			} else {
-                            return this;
+				return this;
 			}	
 		}
 		if (map.size() > 0) {
-            RealAlgebraicNumber<Rational> ran = RealAlgebraicNumberEvaluation::evaluate(mPoly, map);
+            RealAlgebraicNumber<Rational> ran = RealAlgebraicNumberEvaluation::evaluate(res, map);
             if (ran.isNumeric())
             	return ModelValue<Rational,Poly>(ran.value());
 			return ModelValue<Rational,Poly>(ran);
 		}
-		return mPoly;
+		return res;
 	}
 }

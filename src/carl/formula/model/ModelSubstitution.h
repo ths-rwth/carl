@@ -3,6 +3,8 @@
 #include "ModelValue.h"
 #include "ModelVariable.h"
 
+#include <boost/optional.hpp>
+
 #include <iostream>
 #include <map>
 #include <memory>
@@ -13,12 +15,23 @@ namespace carl {
 	template<typename Rational, typename Poly>
 	class ModelSubstitution {
 	protected:
+		mutable boost::optional<ModelValue<Rational, Poly>> mCachedValue;
+		
+		/// Evaluates this substitution with respect to the given model.
+		virtual ModelValue<Rational, Poly> evaluateSubstitution(const Model<Rational, Poly>& model) const = 0;
 	public:
 		ModelSubstitution() {}
 		virtual ~ModelSubstitution() {}
 		
-		/// Evaluates this substitution with respect to the given model.
-		virtual ModelValue<Rational, Poly> evaluate(Model<Rational, Poly>& model) = 0;
+		const ModelValue<Rational, Poly>& evaluate(const Model<Rational, Poly>& model) const {
+			if (mCachedValue == boost::none) {
+				mCachedValue = evaluateSubstitution(model);
+			}
+			return *mCachedValue;
+		}
+		void resetCache() const {
+			mCachedValue = boost::none;
+		}
 		
 		/// Checks whether this substitution needs the given model variable.
 		virtual bool dependsOn(const ModelVariable&) const {
@@ -71,7 +84,7 @@ namespace carl {
 		{}
 		virtual void multiplyBy( const Rational& _number );
 		virtual void add( const Rational& _number );
-		virtual ModelValue<Rational,Poly> evaluate(Model<Rational,Poly>& model);
+		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const;
 		virtual bool dependsOn(const ModelVariable& var) const {
 			if (!var.isVariable()) return false;
 			return mPoly.degree(var.asVariable()) > 0;

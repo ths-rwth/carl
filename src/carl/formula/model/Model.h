@@ -8,8 +8,12 @@
 
 namespace carl
 {
-	/// Data type for a assignment assigning a variable, represented as a string, a real algebraic number, represented as a string.
-	/// Basically a wrapper around std::map.
+	/**
+	 * This class represents a model, that is an assignment for variables to some values.
+	 * A variable can be assigned to different values that are represented by a ModelValue.
+	 * Most notably, a value may be a substitution based on the values of other variables.
+	 * If a variable that is used by a substitution for another variable is erased from the model, this substitution is evaluated and replaced by the result.
+	 */
 	template<typename Rational, typename Poly>
 	class Model {
 	public:
@@ -18,24 +22,31 @@ namespace carl
 	private:
 		Map mData;
 		std::map<ModelVariable, std::size_t> mUsedInSubstitution;
+		void resetCaches() const {
+			for (const auto& d: mData) {
+				if (d.second.isSubstitution()) {
+					d.second.asSubstitution()->resetCache();
+				}
+			}
+		}
 	public:
 		// Element access
-		auto at(const typename Map::key_type& key) const -> decltype(mData.at(key)) {
+		const auto& at(const typename Map::key_type& key) const {
 			return mData.at(key);
 		}
 		
 		// Iterators
-		auto begin() const -> decltype(mData.begin()) {
+		auto begin() const {
 			return mData.begin();
 		}
-		auto end() const -> decltype(mData.end()) {
+		auto end() const {
 			return mData.end();
 		}
 		// Capacity
-		auto empty() const -> decltype(mData.empty()) {
+		auto empty() const {
 			return mData.empty();
 		}
-		auto size() const -> decltype(mData.size()) {
+		auto size() const {
 			return mData.size();
 		}
 		// Modifiers
@@ -43,25 +54,31 @@ namespace carl
 			mData.clear();
 		}
 		template<typename P>
-		auto insert(const P& pair) -> decltype(mData.insert(pair)) {
+		auto insert(const P& pair) {
+			resetCaches();
 			return mData.insert(pair);
 		}
 		template<typename P>
-		auto insert(typename Map::const_iterator it, const P& pair) -> decltype(mData.insert(it, pair)) {
+		auto insert(typename Map::const_iterator it, const P& pair) {
+			resetCaches();
 			return mData.insert(it, pair);
 		}
 		template<typename... Args>
-		auto emplace(const typename Map::key_type& key, Args&& ...args) -> decltype(mData.emplace(key,std::forward<Args>(args)...)) {
+		auto emplace(const typename Map::key_type& key, Args&& ...args) {
+			resetCaches();
 			return mData.emplace(key,std::forward<Args>(args)...);
 		}
 		template<typename... Args>
-		auto emplace_hint(typename Map::const_iterator it, const typename Map::key_type& key, Args&& ...args) -> decltype(mData.emplace_hint(it, key,std::forward<Args>(args)...)) {
+		auto emplace_hint(typename Map::const_iterator it, const typename Map::key_type& key, Args&& ...args) {
+			resetCaches();
 			return mData.emplace_hint(it, key,std::forward<Args>(args)...);
 		}
 		typename Map::iterator erase(const ModelVariable& variable) {
+			resetCaches();
 			return erase(mData.find(variable));
 		}
 		typename Map::iterator erase(const typename Map::iterator& it) {
+			resetCaches();
 			return erase(typename Map::const_iterator(it));
 		}
 		typename Map::iterator erase(const typename Map::const_iterator& it) {
@@ -87,10 +104,10 @@ namespace carl
 			}
         }
 		// Lookup
-		auto find(const typename Map::key_type& key) const -> decltype(mData.find(key)) {
+		auto find(const typename Map::key_type& key) const {
 			return mData.find(key);
 		}
-		auto find(const typename Map::key_type& key) -> decltype(mData.find(key)) {
+		auto find(const typename Map::key_type& key) {
 			return mData.find(key);
 		}
 		
@@ -101,17 +118,22 @@ namespace carl
 			if (it == mData.end()) mData.emplace(key, t);
 			else it->second = t;
 		}
-		void merge(const Model& model, bool overwrite = false) {
+		void update(const Model& model, bool disjoint = true) {
 			for (const auto& m: model) {
 				auto res = mData.insert(m);
-				if (overwrite) {
+				if (disjoint) {
+					assert(res.second);
+				} else {
 					if (!res.second) {
 						res.first->second = m.second;
 					}
-				} else {
-					assert(res.second);
 				}
 			}
+		}
+		const ModelValue<Rational,Poly>& evaluated(const typename Map::key_type& key) const {
+			auto it = at(key);
+			if (it.isSubstitution()) return it.asSubstitution()->evaluate(*this);
+			else return it;
 		}
 	};
 
@@ -121,4 +143,3 @@ namespace carl
 }
 
 #include "ModelSubstitution.h"
-    
