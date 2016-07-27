@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Model.h"
+#include "../mvroot/MultivariateRoot.h"
 
 namespace carl {
 namespace model {

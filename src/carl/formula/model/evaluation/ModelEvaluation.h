@@ -4,6 +4,7 @@
 
 #include "ModelEvaluation_helper.h"
 
+#include "ModelEvaluation_Constraint.h"
 #include "ModelEvaluation_MVRoot.h"
 #include "ModelEvaluation_Polynomial.h"
 
