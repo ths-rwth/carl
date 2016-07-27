@@ -156,7 +156,7 @@ namespace carl
 					assert(false);
 				}
 			}
-			OS << ")" << std::endl;
+			os << ")" << std::endl;
 		}
 	};
 
