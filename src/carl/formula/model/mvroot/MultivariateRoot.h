@@ -15,7 +15,7 @@ namespace carl {
 template<typename Poly>
 class MultivariateRoot {
 public:
-	using Number = typename carl::UnderlyingNumberType<Poly>::type;
+	using Number = typename UnderlyingNumberType<Poly>::type;
 	using RAN = RealAlgebraicNumber<Number>;
 	using EvalMap = RealAlgebraicNumberEvaluation::RANMap<Number>;
 private:
@@ -40,6 +40,12 @@ public:
 	}
 	bool isUnivariate() const {
 		return mPoly.isUnivariate();
+	}
+	std::set<Variable> gatherVariables() const {
+		return mPoly.gatherVariables();
+	}
+	void substituteIn(Variable::Arg var, const Poly& poly) {
+		mPoly.substituteIn(var, poly);
 	}
 	
 	const RAN& evaluate(const EvalMap& m) const {

@@ -65,9 +65,6 @@ namespace carl
     void getDefaultModel( Model<Rational,Poly>& _defaultModel, const Constraint<Poly>& _constraint, bool _overwrite = true, size_t _seed = 0 );
 	template<typename Rational, typename Poly>
     void getDefaultModel( Model<Rational,Poly>& _defaultModel, const Formula<Poly>& _formula, bool _overwrite = true, size_t _seed = 0 );
-    
-	template<typename Rational, typename Poly>
-    std::ostream& operator<<( std::ostream& _out, const Model<Rational,Poly>& _model );
 }
 
 #include "Assignment.tpp"

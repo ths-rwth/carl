@@ -4,7 +4,6 @@
 
 #include "ModelVariable.h"
 #include "ModelValue.h"
-#include "ModelSubstitution.h"
 
 namespace carl
 {
@@ -131,15 +130,44 @@ namespace carl
 			}
 		}
 		const ModelValue<Rational,Poly>& evaluated(const typename Map::key_type& key) const {
-			auto it = at(key);
+			const auto& it = at(key);
 			if (it.isSubstitution()) return it.asSubstitution()->evaluate(*this);
 			else return it;
+		}
+		void print(std::ostream& os, bool simple = true) const {
+			os << "(model" << std::endl;
+			for (const auto& ass: mData) {
+				auto value = ass.second;
+				if (simple) value = evaluated(ass.first);
+
+				if (ass.first.isVariable()) {
+					os << "\t(define-fun " << ass.first << " () " << ass.first.asVariable().getType() << std::endl;
+					os << "\t\t" << value << ")" << std::endl;
+				} else if (ass.first.isBVVariable()) {
+					os << "\t(define-fun " << ass.first << " () " << ass.first.asBVVariable().sort() << std::endl;
+					os << "\t\t" << value << ")" << std::endl;
+				} else if (ass.first.isUVariable()) {
+					os << "\t(define-fun " << ass.first << " () " << ass.first.asUVariable().domain() << std::endl;
+					os << "\t\t" << value << ")" << std::endl;
+				} else if (ass.first.isFunction()) {
+					os << value;
+				} else {
+					CARL_LOG_ERROR("carl.model", "Encountered an unknown type of ModelVariable: " << ass.first);
+					assert(false);
+				}
+			}
+			OS << ")" << std::endl;
 		}
 	};
 
 	template<typename Rational, typename Poly>
+	std::ostream& operator<<(std::ostream& os, const Model<Rational,Poly>& model) {
+		model.print(os);
+		return os;
+	}
+
+	template<typename Rational, typename Poly>
 	static const Model<Rational,Poly> EMPTY_MODEL = Model<Rational,Poly>();
-	
 }
 
 #include "ModelSubstitution.h"

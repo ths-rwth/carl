@@ -410,48 +410,4 @@ namespace carl
                     getDefaultModel(_defaultModel, subFormula, _overwrite, _seed);
         }
     }
-
-	template<typename Rational, typename Poly>
-    std::ostream& operator<<( std::ostream& _out, const Model<Rational,Poly>& _model )
-    {
-        _out << "(model" << endl;
-        for( auto ass = _model.begin(); ass != _model.end(); ++ass )
-        {
-            if( ass->first.isVariable() )
-            {
-                _out << "  (define-fun " << ass->first << " () " << ass->first.asVariable().getType() << endl;
-                if( ass->second.isBool() )
-                    _out << "    " << (ass->second.asBool() ? "true" : "false") << ")" << endl;
-                else if( ass->second.isRational() )
-                {
-                    _out << "    " << carl::toString( ass->second.asRational(), false ) << ")" << endl;
-                }
-                else if( ass->second.isSqrtEx() )
-                {
-                    _out << "    " << ass->second.asSqrtEx().toString(false, true) << ")" << endl;
-                }
-                else
-                {
-                    _out << "    " << ass->second << ")" << endl;
-                }
-            }
-            else if( ass->first.isBVVariable() )
-            {
-                _out << "  (define-fun " << ass->first << " () " << ass->first.asBVVariable().sort() << endl;
-                _out << "    " << ass->second << ")" << endl;
-            }
-            else if( ass->first.isUVariable() )
-            {
-                _out << "  (define-fun " << ass->first << " () " << ass->first.asUVariable().domain() << endl;
-                _out << "    " << ass->second << ")" << endl;
-            }
-            else
-            {
-                assert( ass->first.isFunction() );
-                _out << ass->second.asUFModel() << endl;
-            }
-        }
-        _out << ")" << endl;
-        return _out;
-    }
 }    

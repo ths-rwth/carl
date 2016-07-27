@@ -1,13 +1,14 @@
 #pragma once
 
-#include "ModelValue.h"
-#include "ModelVariable.h"
-
-#include <boost/optional.hpp>
-
 #include <iostream>
 #include <map>
 #include <memory>
+
+#include <boost/optional.hpp>
+
+#include "mvroot/MultivariateRoot.h"
+#include "ModelValue.h"
+#include "ModelVariable.h"
 
 namespace carl {
 	template<typename Rational, typename Poly>
@@ -78,9 +79,8 @@ namespace carl {
 	private:
 		using Super = ModelSubstitution<Rational,Poly>;
 		Poly mPoly;
-		std::set<carl::Variable> mVars;
 	public:
-		ModelPolynomialSubstitution(const Poly& p): ModelSubstitution<Rational,Poly>(), mPoly(p), mVars(p.gatherVariables())
+		ModelPolynomialSubstitution(const Poly& p): ModelSubstitution<Rational,Poly>(), mPoly(p)
 		{}
 		virtual void multiplyBy( const Rational& _number );
 		virtual void add( const Rational& _number );
@@ -94,6 +94,31 @@ namespace carl {
 		}
 	};
 	
+	template<typename Rational, typename Poly>
+	class ModelMVRootSubstitution: public ModelSubstitution<Rational,Poly> {
+	public:
+		using MVRoot = MultivariateRoot<Poly>;
+	private:
+		using Super = ModelSubstitution<Rational,Poly>;
+		MVRoot mRoot;
+	public:
+		ModelMVRootSubstitution(const MVRoot& r): ModelSubstitution<Rational,Poly>(), mRoot(r)
+		{}
+		virtual void multiplyBy( const Rational& _number ) {
+			//static_assert(false, "Not implemented.");
+		}
+		virtual void add( const Rational& _number ) {
+			//static_assert(false, "Not implemented.");
+		}
+		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const;
+		virtual bool dependsOn(const ModelVariable& var) const {
+			if (!var.isVariable()) return false;
+			return mRoot.poly().degree(var.asVariable()) > 0;
+		}
+		virtual void print(std::ostream& os) const {
+			os << mRoot;
+		}
+	};
 }
 
 #include "ModelSubstitution.tpp"

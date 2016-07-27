@@ -51,12 +51,12 @@ namespace carl
      * Possible value types are bool, vs::SqrtEx and carl::RealAlgebraicNumberPtr.
      */
 	template<typename Rational, typename Poly>
-    class ModelValue : public boost::variant<bool, Rational, Poly, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>
+    class ModelValue : public boost::variant<bool, Rational, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>
     {
         /**
          * Base type we are deriving from.
          */
-        using Super = boost::variant<bool, Rational, Poly, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, carl::BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>;
+        using Super = boost::variant<bool, Rational, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>;
         
     public:
         /**
@@ -109,14 +109,10 @@ namespace carl
             {
                 return asRational() == _mval.asRational();
             }
-			else if( isPoly() && _mval.isPoly() )
-			{
-				return asPoly() == _mval.asPoly();
-			}
             else if( isSqrtEx() && _mval.isSqrtEx() )
             {
                 return asSqrtEx() == _mval.asSqrtEx();
-            } 
+            }
             else if( isRAN() & _mval.isRAN() )
             {
                 return asRAN() == _mval.asRAN();
@@ -149,10 +145,6 @@ namespace carl
         bool isRational() const {
 			return variant_is_type<Rational>::check(*this);
         }
-		
-		bool isPoly() const {
-			return variant_is_type<Poly>::check(*this);
-		}
         
         /**
          * @return true, if the stored value is a square root expression.
@@ -223,12 +215,6 @@ namespace carl
             assert( isRational() );
             return boost::get<Rational>(*this);
         }
-		
-		const Poly& asPoly() const
-		{
-			assert( isPoly() );
-			return boost::get<Poly>(*this);
-		}
         
         /**
          * @return The stored value as a square root expression.
