@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "Sign.h"
+
 #include <cassert>
 #include <iostream>
 #include <memory>
@@ -48,6 +50,17 @@ inline std::string toString(Relation r) {
 
 inline bool relationIsStrict(Relation r) {
 	return r == Relation::LESS || r == Relation::GREATER || r == Relation::NEQ;
+}
+
+inline bool evaluate(Sign s, Relation r) {
+	switch (s) {
+		case Sign::NEGATIVE:
+			return r == Relation::NEQ || r == Relation::LESS || r == Relation::LEQ;
+		case Sign::ZERO:
+			return r == Relation::EQ || r == Relation::LEQ || r == Relation::GEQ;
+		case Sign::POSITIVE:
+			return r == Relation::NEQ || r == Relation::GREATER || r == Relation::GEQ;
+	}
 }
 	
 }
