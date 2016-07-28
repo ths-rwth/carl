@@ -111,6 +111,13 @@ namespace carl
 		}
 		
 		// Additional (w.r.t. std::map)
+		template<typename Container>
+		bool contains(const Container& c) const {
+			for (const auto& var: c) {
+				if (mData.find(var) == mData.end()) return false;
+			}
+			return true;
+		}
 		template<typename T>
 		void assign(const typename Map::key_type& key, const T& t) {
 			auto it = mData.find(key);
