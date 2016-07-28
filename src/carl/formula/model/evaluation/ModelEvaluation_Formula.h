@@ -67,10 +67,10 @@ namespace model {
 				}
 				break;
 			}
-			case FormulaType::VARCOMPARE: {
-				CARL_LOG_WARN("carl.model.evaluation", "Evaluation of varcompare not yet implemented.");
-				break;
-			}
+			//case FormulaType::VARCOMPARE: {
+			//	CARL_LOG_WARN("carl.model.evaluation", "Evaluation of varcompare not yet implemented.");
+			//	break;
+			//}
 			case FormulaType::BITVECTOR: {
 				BVConstraint bvc = substitute(f.bvConstraint(), m);
 				if (bvc.isTrue()) f = Formula<Poly>(FormulaType::TRUE);
