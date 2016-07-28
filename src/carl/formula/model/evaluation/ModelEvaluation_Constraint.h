@@ -13,10 +13,8 @@ namespace model {
 	 * May fail to substitute some variables, for example if the values are RANs or SqrtEx.
 	 */
 	template<typename Rational, typename Poly>
-	void substitute(Constraint<Poly>& c, const Model<Rational,Poly>& m) {
-		Poly p = c.lhs();
-		substitute(p, m);
-		c = Constraint<Poly>(p, c.relation());
+	void substituteIn(Constraint<Poly>& c, const Model<Rational,Poly>& m) {
+		c = Constraint<Poly>(substitute(c.lhs(), m), c.relation());
 	}
 	
 	/**

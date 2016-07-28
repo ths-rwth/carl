@@ -8,7 +8,7 @@ namespace model {
 	 * Substitutes a variable with a rational within a polynomial.
 	 */
 	template<typename Rational, typename Poly>
-	void substitute(Poly& p, Variable::Arg var, const Rational& r) {
+	void substituteIn(Poly& p, Variable::Arg var, const Rational& r) {
 		p.substituteIn(var, Poly(r));
 	}
 
@@ -17,8 +17,8 @@ namespace model {
 	 * Only works if the real algebraic number is actually numeric.
 	 */
 	template<typename Rational, typename Poly>
-	void substitute(Poly& p, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
-		if (r.isNumeric()) substitute(p, var, r.value());
+	void substituteIn(Poly& p, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
+		if (r.isNumeric()) substituteIn(p, var, r.value());
 	}
 
 	/**
@@ -26,15 +26,15 @@ namespace model {
 	 * May fail to substitute some variables, for example if the values are RANs or SqrtEx.
 	 */
 	template<typename Rational, typename Poly>
-	void substitute(Poly& p, const Model<Rational,Poly>& m) {
+	void substituteIn(Poly& p, const Model<Rational,Poly>& m) {
 		for (auto var: p.gatherVariables()) {
 			auto it = m.find(var);
 			if (it == m.end()) continue;
 			const ModelValue<Rational,Poly>& value = m.evaluated(var);
 			if (value.isRational()) {
-				substitute(p, var, value.asRational());
+				substituteIn(p, var, value.asRational());
 			} else if (value.isRAN()) {
-				substitute(p, var, value.asRAN());
+				substituteIn(p, var, value.asRAN());
 			}
 		}
 	}
@@ -45,7 +45,7 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void evaluate(ModelValue<Rational,Poly>& res, Poly& p, const Model<Rational,Poly>& m) {
-		substitute(p, m);
+		substituteIn(p, m);
 		
 		auto map = collectRANIR(p.gatherVariables(), m);
 		if (map.size() == p.gatherVariables().size()) {

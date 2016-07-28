@@ -9,7 +9,7 @@ namespace model {
 	 * Substitutes a variable with a rational within a MultivariateRoot.
 	 */
 	template<typename Rational, typename Poly>
-	void substitute(MultivariateRoot<Poly>& mvr, Variable::Arg var, const Rational& r) {
+	void substituteIn(MultivariateRoot<Poly>& mvr, Variable::Arg var, const Rational& r) {
 		mvr.substituteIn(var, Poly(r));
 	}
 
@@ -18,8 +18,8 @@ namespace model {
 	 * Only works if the real algebraic number is actually numeric.
 	 */
 	template<typename Rational, typename Poly>
-	void substitute(MultivariateRoot<Poly>& mvr, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
-		if (r.isNumeric()) substitute(mvr, var, r.value());
+	void substituteIn(MultivariateRoot<Poly>& mvr, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
+		if (r.isNumeric()) substituteIn(mvr, var, r.value());
 	}
 
 	/**
@@ -27,15 +27,15 @@ namespace model {
 	 * May fail to substitute some variables, for example if the values are RANs or SqrtEx.
 	 */
 	template<typename Rational, typename Poly>
-	void substitute(MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
+	void substituteIn(MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
 		for (auto var: mvr.gatherVariables()) {
 			auto it = m.find(var);
 			if (it == m.end()) continue;
 			const ModelValue<Rational,Poly>& value = m.evaluated(var);
 			if (value.isRational()) {
-				substitute(mvr, var, value.asRational());
+				substituteIn(mvr, var, value.asRational());
 			} else if (value.isRAN()) {
-				substitute(mvr, var, value.asRAN());
+				substituteIn(mvr, var, value.asRAN());
 			}
 		}
 	}
