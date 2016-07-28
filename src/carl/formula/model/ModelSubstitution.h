@@ -6,6 +6,7 @@
 
 #include <boost/optional.hpp>
 
+#include "../Formula.h"
 #include "mvroot/MultivariateRoot.h"
 #include "ModelValue.h"
 #include "ModelVariable.h"
@@ -104,12 +105,8 @@ namespace carl {
 	public:
 		ModelMVRootSubstitution(const MVRoot& r): ModelSubstitution<Rational,Poly>(), mRoot(r)
 		{}
-		virtual void multiplyBy( const Rational& _number ) {
-			//static_assert(false, "Not implemented.");
-		}
-		virtual void add( const Rational& _number ) {
-			//static_assert(false, "Not implemented.");
-		}
+		virtual void multiplyBy(const Rational&) {}
+		virtual void add(const Rational&) {}
 		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const;
 		virtual bool dependsOn(const ModelVariable& var) const {
 			if (!var.isVariable()) return false;
@@ -117,6 +114,25 @@ namespace carl {
 		}
 		virtual void print(std::ostream& os) const {
 			os << mRoot;
+		}
+	};
+	
+	template<typename Rational, typename Poly>
+	class ModelFormulaSubstitution: public ModelSubstitution<Rational,Poly> {
+	private:
+		using Super = ModelSubstitution<Rational,Poly>;
+		Formula<Poly> mFormula;
+	public:
+		ModelFormulaSubstitution(const Formula<Poly>& f): ModelSubstitution<Rational,Poly>(), mFormula(f)
+		{}
+		virtual void multiplyBy(const Rational&) {}
+		virtual void add(const Rational&) {}
+		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const;
+		virtual bool dependsOn(const ModelVariable& var) const {
+			return mFormula.variables().count(var) > 0;
+		}
+		virtual void print(std::ostream& os) const {
+			os << mFormula;
 		}
 	};
 }

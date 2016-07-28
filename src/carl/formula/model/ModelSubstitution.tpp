@@ -28,4 +28,9 @@ namespace carl {
 	ModelValue<Rational,Poly> ModelMVRootSubstitution<Rational,Poly>::evaluateSubstitution(const Model<Rational,Poly>& model) const {
 		return model::evaluate(mRoot, model);
 	}
+
+	template<typename Rational, typename Poly>
+	ModelValue<Rational,Poly> ModelFormulaSubstitution<Rational,Poly>::evaluateSubstitution(const Model<Rational,Poly>& model) const {
+		return model::evaluate(mFormula, model);
+	}
 }
