@@ -1,0 +1,30 @@
+#pragma once
+
+#include "../ModelSubstitution.h"
+#include "../evaluation/ModelEvaluation.h"
+
+namespace carl {
+	template<typename Rational, typename Poly>
+	class ModelMVRootSubstitution: public ModelSubstitution<Rational,Poly> {
+	public:
+		using MVRoot = MultivariateRoot<Poly>;
+	private:
+		using Super = ModelSubstitution<Rational,Poly>;
+		MVRoot mRoot;
+	public:
+		ModelMVRootSubstitution(const MVRoot& r): ModelSubstitution<Rational,Poly>(), mRoot(r)
+		{}
+		virtual void multiplyBy(const Rational&) {}
+		virtual void add(const Rational&) {}
+		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const {
+			return model::evaluate(mRoot, model);
+		}
+		virtual bool dependsOn(const ModelVariable& var) const {
+			if (!var.isVariable()) return false;
+			return mRoot.poly().degree(var.asVariable()) > 0;
+		}
+		virtual void print(std::ostream& os) const {
+			os << mRoot;
+		}
+	};
+}

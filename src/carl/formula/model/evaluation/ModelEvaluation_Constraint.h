@@ -28,9 +28,9 @@ namespace model {
 		if (res.isRational()) {
 			res = evaluate(res.asRational(), c.relation());
 		} else if (res.isRAN()) {
-			res = evaluate(res.asRAN().sign(), c.relation());
+			res = evaluate(res.asRAN().sgn(), c.relation());
 		} else {
-			res = Constraint<Poly>(p, c.relation());
+			res = ModelSubstitution<Rational,Poly>::template create<ModelFormulaSubstitution<Rational,Poly>>(Formula<Poly>(Constraint<Poly>(p, c.relation())));
 		}
 	}
 }
