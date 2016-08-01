@@ -40,4 +40,8 @@ namespace carl {
 			return mVar == vc.mVar && mValue == vc.mValue;
 		}
 	};
+	template<typename Poly>
+	std::ostream& operator<<(std::ostream& os, const VariableComparison<Poly>& vc) {
+		return os << vc.toString();
+	}
 }
