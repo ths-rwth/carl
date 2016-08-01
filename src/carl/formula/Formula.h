@@ -937,15 +937,7 @@ namespace carl
                 assert( _formula.getId() != 0 );
                 return mpContent->mId >= _formula.getId();
             }
-            
-            /**
-             * @param _assignment The assignment for which to check whether this formula is satisfied by it.
-             * @return 0, if this formula is violated by the given assignment;
-             *         1, if this formula is satisfied by the given assignment;
-             *         2, otherwise.
-             */
-            unsigned satisfiedBy( const EvaluationMap<typename Pol::NumberType>& _assignment ) const;
-            
+
         private:
             
             /**
