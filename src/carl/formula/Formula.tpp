@@ -82,6 +82,9 @@ namespace carl
                         _vars.insert( var );
                 }
                 break;
+			case FormulaType::VARCOMPARE:
+				_vars.insert(variableComparison().var());
+				break;
             case FormulaType::BITVECTOR:
                 if( _bitvectorVars ) 
                 {
@@ -159,6 +162,10 @@ namespace carl
             {
                 return constraint().satisfiedBy( _assignment );
             }
+			case FormulaType::VARCOMPARE:
+			{
+				return variableComparison().satisfiedBy( _assignment );
+			}
             case FormulaType::BITVECTOR:
             {
                 assert(false);

@@ -39,6 +39,7 @@ namespace carl {
 
 		// Arithmetic Theory
 		CONSTRAINT,
+		VARCOMPARE,
 		
 		// Bitvector Theory
 		BITVECTOR,
@@ -154,6 +155,8 @@ namespace carl {
                 ArithmeticConstraintContent<Pol>* mpArithmeticVS;
                 /// The constraint, in case this formula wraps a constraint.
                 Constraint<Pol>* mpConstraintVS;
+				/// A constraint comparing a single variable with a value. 
+				VariableComparison<Pol>* mpVariableComparisonVS;
                 /// The bitvector constraint.
                 BVConstraint* mpBVConstraintVS;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
@@ -173,6 +176,8 @@ namespace carl {
 				ArithmeticConstraintContent<Pol> mArithmetic;
 				/// The constraint, in case this formula wraps a constraint.
 				Constraint<Pol> mConstraint;
+				/// A constraint comparing a single variable with a value. 
+				VariableComparison<Pol> mVariableComparison;
 				/// The bitvector constraint.
 				BVConstraint mBVConstraint;
 				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
@@ -224,6 +229,8 @@ namespace carl {
              * @param _constraint The pointer to the constraint.
              */
             FormulaContent(Constraint<Pol>&& _constraint);
+			
+			FormulaContent(VariableComparison<Pol>&& _variableComparison);
             
             /**
              * Constructs a formula being a bitvector constraint.
@@ -302,6 +309,7 @@ namespace carl {
                     case FormulaType::EXISTS: ;
 					case FormulaType::FORALL: { mpQuantifierContentVS->~QuantifierContent(); break; }
 					case FormulaType::CONSTRAINT: { mpConstraintVS->~Constraint(); break; }
+					case FormulaType::VARCOMPARE: { mpVariableComparisonVS->~VariableComparison(); break; }
 					case FormulaType::BITVECTOR: { mpBVConstraintVS->~BVConstraint(); break; }
 					case FormulaType::UEQ: { mpUIEqualityVS->~UEquality(); break; }
 #else
@@ -309,6 +317,7 @@ namespace carl {
 					case FormulaType::EXISTS:;
 					case FormulaType::FORALL: { mQuantifierContent.~QuantifierContent(); break; }
 					case FormulaType::CONSTRAINT: { mConstraint.~Constraint(); break; }
+					case FormulaType::VARCOMPARE: { mVariableComparison.~VariableComparison(); break; }
 					case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
 					case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
 #endif
@@ -338,6 +347,7 @@ namespace carl {
                     case FormulaType::EXISTS: return false;
                     case FormulaType::FORALL: return false;
                     case FormulaType::CONSTRAINT: return false;
+					case FormulaType::VARCOMPARE: return false;
                     case FormulaType::BITVECTOR: return false;
                     case FormulaType::UEQ: return false;
                 }
