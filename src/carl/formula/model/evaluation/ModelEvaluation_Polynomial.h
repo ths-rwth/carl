@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Model.h"
+#include "../../../core/rootfinder/RootFinder.h"
 
 namespace carl {
 namespace model {
@@ -53,6 +54,13 @@ namespace model {
 			return;
 		}
 		res = ModelSubstitution<Rational,Poly>::template create<ModelPolynomialSubstitution<Rational,Poly>>(p);
+	}
+	
+	template<typename Rational, typename Poly>
+	void realRoots(ModelValue<Rational,Poly>& res, Poly& p, carl::Variable v, const Model<Rational,Poly>& m) {
+		substituteIn(p, m);
+		auto map = collectRANIR(p.gatherVariables(), m);
+		return carl::rootfinder::realRoots(p.toUnivariatePolynomial(v), map);
 	}
 }
 }
