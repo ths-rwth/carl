@@ -23,9 +23,6 @@ namespace carl {
 			assert(id < mFreeIDs.size());
 			mFreeIDs.set(id);
 		}
-		void purgeUnusedIDs(Bitset& b) const {
-			b -= mFreeIDs;
-		}
 		friend std::ostream& operator<<(std::ostream& os, const IDPool& p) {
 			return os << "Free: " << p.mFreeIDs;
 		}
