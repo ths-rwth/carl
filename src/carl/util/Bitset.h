@@ -32,8 +32,11 @@ namespace carl {
 			for (auto b: bits) set(b);
 		}
 		
-		auto resize(std::size_t num_blocks) const -> decltype(mData.resize(num_blocks, mDefault)) {
-			return mData.resize(num_blocks, mDefault);
+		auto resize(std::size_t num_bits, bool value) const {
+			return mData.resize(num_bits, value);
+		}
+		auto resize(std::size_t num_bits) const {
+			return mData.resize(num_bits, mDefault);
 		}
 		
 		Bitset& operator-=(const Bitset& rhs) {
