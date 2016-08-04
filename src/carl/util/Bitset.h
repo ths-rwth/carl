@@ -45,6 +45,12 @@ namespace carl {
 			mData -= rhs.mData;
 			return *this;
 		}
+		Bitset& operator&=(const Bitset& rhs) {
+			assert(mDefault == rhs.mDefault);
+			alignSize(*this, rhs);
+			mData &= rhs.mData;
+			return *this;
+		}
 		Bitset& operator|=(const Bitset& rhs) {
 			assert(mDefault == rhs.mDefault);
 			alignSize(*this, rhs);
