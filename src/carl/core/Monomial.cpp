@@ -146,54 +146,6 @@ namespace carl
 		}
 		return createMonomial(std::move(newExps), mTotalDegree / 2);
 	}
-
-	Monomial::Arg Monomial::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
-	{
-		Content newExps;
-		auto tdegree = mTotalDegree;
-		// Linear, as we expect small monomials.
-		auto itright = m->mExponents.begin();
-		for(auto itleft = mExponents.begin(); itleft != mExponents.end();)
-		{
-			// Done with division
-			if(itright == m->mExponents.end())
-			{
-				// Insert remaining part
-				newExps.insert(newExps.end(), itleft, mExponents.end());
-				return MonomialPool::getInstance().create( std::move(newExps), tdegree );
-			}
-			// Variable is present in both monomials.
-			if(itleft->first == itright->first)
-			{
-				uint newExp = std::max(itleft->second, itright->second) - itright->second;
-				if(newExp != 0)
-				{
-					newExps.emplace_back(itleft->first, newExp);
-					tdegree -= itright->second;
-				}
-				else
-				{
-					tdegree -= itleft->second;
-				}
-				++itright;
-				++itleft;
-			}
-			// Variable is not present in lhs, dividing lcm yields variable will not occur in result
-
-			else if(itleft->first < itright->first)
-			{
-				++itright;
-			}
-			else
-			{
-				assert(itleft->first > itright->first);
-				newExps.push_back(*itleft);
-				++itleft;
-			}
-		}
-                if (newExps.empty()) return nullptr;
-		return MonomialPool::getInstance().create( std::move(newExps), tdegree);
-	}
 	
 	Monomial::Arg Monomial::separablePart() const
 	{

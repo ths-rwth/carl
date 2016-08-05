@@ -426,13 +426,6 @@ namespace carl
 		 * @return The square root of this monomial, iff the monomial is a square as checked by isSquare().
 		 */
 		Monomial::Arg sqrt() const;
-
-		/**
-		 * 
-		 * @param m
-		 * @return 
-		 */
-		Monomial::Arg calcLcmAndDivideBy(const Monomial::Arg& m) const;
 		
 		template<typename Coeff, typename VarInfo>
 		void gatherVarInfo(VarInfo& varinfo, const Coeff& coeffFromTerm) const
@@ -594,6 +587,17 @@ namespace carl
 		 * @return lcm of lhs and rhs.
 		 */
 		static Monomial::Arg lcm(const Monomial::Arg& lhs, const Monomial::Arg& rhs);
+		
+		
+		/**
+		 * Returns lcm(lhs, rhs) / rhs
+		 */
+		static Monomial::Arg calcLcmAndDivideBy(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
+			Monomial::Arg res;
+			bool works = lcm(lhs, rhs)->divide(rhs, res);
+			assert(works);
+			return res;
+		}
 		
 		/**
 		 * This method performs a lexical comparison as defined in @cite GCL92, page 47.

@@ -205,7 +205,7 @@ SubstitutionType Term<Coefficient>::evaluate(const std::map<Variable, Substituti
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) const
 {
-	Monomial::Arg tmp = monomial()->calcLcmAndDivideBy(m);
+	Monomial::Arg tmp = Monomial::calcLcmAndDivideBy(monomial(), m);
 	if(tmp == nullptr)
 	{
 		return Term(carl::constant_one<Coefficient>().get());
