@@ -588,6 +588,9 @@ namespace carl
                     }
                 }
             }
+			case FormulaType::VARCOMPARE: {
+				return Formula<Pol>(subformula().variableComparison().negation());
+			}
             case FormulaType::BITVECTOR: {
                 BVCompareRelation rel = inverse(subformula().bvConstraint().relation());
                 return Formula<Pol>( BVConstraint::create(rel, subformula().bvConstraint().lhs(), subformula().bvConstraint().rhs()));
