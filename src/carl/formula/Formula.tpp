@@ -272,6 +272,9 @@ namespace carl
 #endif
                 break;
             }
+			case FormulaType::VARCOMPARE:
+			{
+			}
             case FormulaType::BITVECTOR:
             {
                 _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_BITVECTOR;

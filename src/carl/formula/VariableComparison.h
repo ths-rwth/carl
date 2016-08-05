@@ -3,6 +3,7 @@
 #include "model/mvroot/MultivariateRoot.h"
 #include "model/ran/RealAlgebraicNumber.h"
 #include "../core/MultivariatePolynomial.h"
+#include "../core/Relation.h"
 #include "../core/Variable.h"
 #include "../numbers/numbers.h"
 
@@ -18,16 +19,20 @@ namespace carl {
 	private:
 		Variable mVar;
 		boost::variant<MR, RAN> mValue;
+		Relation mRelation;
 	public:	
-		VariableComparison(Variable::Arg v, const MR& value): mVar(v), mValue(value) {
-			if (mValue->isUnivariate()) {
-				mValue = mValue.evaluat({});
+		VariableComparison(Variable::Arg v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {
+			if (value.isUnivariate()) {
+				mValue = value.evaluate({});
 			}
 		}
-		VariableComparison(Variable::Arg v, const RAN& value): mVar(v), mValue(value) {}
+		VariableComparison(Variable::Arg v, const RAN& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {}
 		
 		Variable var() const {
 			return mVar;
+		}
+		Relation relation() const {
+			return mRelation;
 		}
 		
 		std::string toString(unsigned _resolveUnequal = 0, bool _infix = false, bool _friendlyNames = true) const {
