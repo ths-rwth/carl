@@ -20,10 +20,13 @@ namespace carl {
 		Variable mVar;
 		boost::variant<MR, RAN> mValue;
 		Relation mRelation;
+	protected:
+		VariableComparison(Variable::Arg v, const boost::variant<MR, RAN>& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {}
 	public:	
 		VariableComparison(Variable::Arg v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {
 			if (value.isUnivariate()) {
 				mValue = value.evaluate({});
+				CARL_LOG_DEBUG("carl.multivariateroot", "Evaluated " << value << "-> " << mValue);
 			}
 		}
 		VariableComparison(Variable::Arg v, const RAN& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {}
@@ -34,15 +37,18 @@ namespace carl {
 		Relation relation() const {
 			return mRelation;
 		}
+		VariableComparison negation() const {
+			return VariableComparison(mVar, mValue, inverse(mRelation));
+		}
 		
 		std::string toString(unsigned _resolveUnequal = 0, bool _infix = false, bool _friendlyNames = true) const {
 			std::stringstream ss;
-			ss << "(= " << mVar << " " << mValue << ")";
+			ss << "(" << mRelation << " " << mVar << " " << mValue << ")";
 			return ss.str();
 		}
 		
 		bool operator==(const VariableComparison& vc) const {
-			return mVar == vc.mVar && mValue == vc.mValue;
+			return mRelation == vc.mRelation && mVar == vc.mVar && mValue == vc.mValue;
 		}
 	};
 	template<typename Poly>
