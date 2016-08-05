@@ -2,14 +2,20 @@
 
 #include "../Model.h"
 #include "../../../core/rootfinder/RootFinder.h"
+#include "../../../core/MultivariatePolynomial.h"
+#include "../../../core/UnivariatePolynomial.h"
 
 namespace carl {
 namespace model {
 	/**
 	 * Substitutes a variable with a rational within a polynomial.
 	 */
-	template<typename Rational, typename Poly>
-	void substituteIn(Poly& p, Variable::Arg var, const Rational& r) {
+	template<typename Rational>
+	void substituteIn(MultivariatePolynomial<Rational>& p, Variable::Arg var, const Rational& r) {
+		p.substituteIn(var, MultivariatePolynomial<Rational>(r));
+	}
+	template<typename Poly, typename Rational>
+	void substituteIn(UnivariatePolynomial<Poly>& p, Variable::Arg var, const Rational& r) {
 		p.substituteIn(var, Poly(r));
 	}
 
@@ -17,8 +23,12 @@ namespace model {
 	 * Substitutes a variable with a real algebraic number within a polynomial.
 	 * Only works if the real algebraic number is actually numeric.
 	 */
-	template<typename Rational, typename Poly>
-	void substituteIn(Poly& p, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
+	template<typename Rational>
+	void substituteIn(MultivariatePolynomial<Rational>& p, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
+		if (r.isNumeric()) substituteIn(p, var, r.value());
+	}
+	template<typename Poly, typename Rational>
+	void substituteIn(UnivariatePolynomial<Poly>& p, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
 		if (r.isNumeric()) substituteIn(p, var, r.value());
 	}
 
@@ -26,12 +36,12 @@ namespace model {
 	 * Substitutes all variables from a model within a polynomial.
 	 * May fail to substitute some variables, for example if the values are RANs or SqrtEx.
 	 */
-	template<typename Rational, typename Poly>
-	void substituteIn(Poly& p, const Model<Rational,Poly>& m) {
+	template<typename Rational, typename Poly, typename ModelPoly>
+	void substituteIn(Poly& p, const Model<Rational,ModelPoly>& m) {
 		for (auto var: p.gatherVariables()) {
 			auto it = m.find(var);
 			if (it == m.end()) continue;
-			const ModelValue<Rational,Poly>& value = m.evaluated(var);
+			const ModelValue<Rational,ModelPoly>& value = m.evaluated(var);
 			if (value.isRational()) {
 				substituteIn(p, var, value.asRational());
 			} else if (value.isRAN()) {
@@ -57,10 +67,16 @@ namespace model {
 	}
 	
 	template<typename Rational, typename Poly>
-	std::list<RealAlgebraicNumber<Rational>> realRoots(const Poly& p, carl::Variable v, const Model<Rational,Poly>& m) {
+	std::list<RealAlgebraicNumber<Rational>> realRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
 		auto map = collectRANIR(tmp.gatherVariables(), m);
 		return carl::rootfinder::realRoots(tmp.toUnivariatePolynomial(v), map);
+	}
+	template<typename Rational, typename Poly>
+	std::list<RealAlgebraicNumber<Rational>> realRoots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
+		UnivariatePolynomial<Poly> tmp = substitute(p, m);
+		auto map = collectRANIR(tmp.gatherVariables(), m);
+		return carl::rootfinder::realRoots(tmp, map);
 	}
 }
 }
