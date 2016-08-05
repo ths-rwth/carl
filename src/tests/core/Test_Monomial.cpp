@@ -189,3 +189,12 @@ TEST(Monomial, OtherComparison)
 
     expectRightOrder(list);
 }
+
+TEST(Monomial, CalcLCM)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Monomial::Arg m1 = y*y;
+	Monomial::Arg m2 = x*x*y;
+	assert(Monomial::calcLcmAndDivideBy(m1, m2) == y);
+}
