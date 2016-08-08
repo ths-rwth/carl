@@ -3,6 +3,7 @@
 
 #include "../../util/variant_util.h"
 #include "../bitvector/BVValue.h"
+#include "mvroot/MultivariateRoot.h"
 #include "ran/RealAlgebraicNumber.h"
 #include "sqrtex/SqrtEx.h"
 #include "uninterpreted/SortValue.h"
@@ -71,11 +72,8 @@ namespace carl
         template<typename T>
         ModelValue(const T& _t): Super(_t)
         {}
-//        template<>
-//        ModelValue(const vs::SqrtEx& _se)
-//        {
-//            Super(_se);
-//        }
+		
+		ModelValue(const MultivariateRoot<Poly>& mr): Super(ModelSubstitution<Rational,Poly>::create(mr).asSubstitution()) {}
 
         /**
          * Assign some value to the underlying variant.

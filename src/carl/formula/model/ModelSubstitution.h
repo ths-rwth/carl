@@ -6,14 +6,16 @@
 
 #include <boost/optional.hpp>
 
-#include "../Formula.h"
 #include "mvroot/MultivariateRoot.h"
 #include "ModelValue.h"
 #include "ModelVariable.h"
 
 namespace carl {
-	template<typename Rational, typename Poly>
-	class Model;
+	template<typename Rational, typename Poly> class Model;
+	template<typename Rational, typename Poly> class ModelFormulaSubstitution;
+	template<typename Rational, typename Poly> class ModelMVRootSubstitution;
+	template<typename Rational, typename Poly> class ModelPolynomialSubstitution;
+
 	template<typename Rational, typename Poly>
 	class ModelSubstitution {
 	protected:
@@ -63,6 +65,9 @@ namespace carl {
 		static ModelValue<Rational,Poly> create(Args&&... args) {
 			return ModelValue<Rational,Poly>(std::make_shared<Substitution>(std::forward<Args>(args)...));
 		}
+		static ModelValue<Rational,Poly> create(const MultivariateRoot<Poly>& mr) {
+			return create<ModelMVRootSubstitution<Rational,Poly>>(mr);
+		}
 	};
 	template<typename Rational, typename Poly>
 	inline std::ostream& operator<<(std::ostream& os, const ModelSubstitution<Rational,Poly>& ms) {
@@ -74,10 +79,6 @@ namespace carl {
 		ms->print(os);
 		return os;
 	}
-
-	template<typename Rational, typename Poly> class ModelFormulaSubstitution;
-	template<typename Rational, typename Poly> class ModelMVRootSubstitution;
-	template<typename Rational, typename Poly> class ModelPolynomialSubstitution;
 }
 
 #include "substitutions/ModelFormulaSubstitution.h"
