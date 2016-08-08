@@ -42,6 +42,12 @@ protected:
 		this->p.push_back(Polynomial({Term<Rational>(x)*x, Term<Rational>(y)*y}));
 		// p[5] = z^3 - 1/2
 		this->p.push_back(Polynomial({Term<Rational>(z)*z*z, Term<Rational>(Rational(-1)/2)}));
+                // p[6] = xy - x - y + 1
+                this->p.push_back(Polynomial({Term<Rational>(x)*y, Term<Rational>(-1)*x, Term<Rational>(-1)*y, Term<Rational>(1)}));
+                // p[7] = x^2 + y^2
+		this->p.push_back(Polynomial({Term<Rational>(x)*x, Term<Rational>(y)*y}));
+                // p[8] = x^3 + y^3 + z^3 - 1
+		this->p.push_back(Polynomial({Term<Rational>(x)*x*x, Term<Rational>(y)*y*y, Term<Rational>(z)*z*z, Term<Rational>(-1)}));
 	}
 
 	virtual void TearDown() {
@@ -52,6 +58,7 @@ protected:
 
 	bool hasNRValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
 		if (n.isNumeric()) return n.value() == val;
+                if(n.isThom()) return n.getThomEncoding().represents(val);
 		return false;
 	}
 	bool hasValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
@@ -62,9 +69,13 @@ protected:
 	}
 	bool hasSqrtValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
 		if (n.isNumeric()) return n.value() * n.value() == val;
-		else {
+		else if(n.isInterval()){
 			return (n.getIntervalContent().interval * n.getIntervalContent().interval).contains(val);
 		}
+                else {
+                    // can't check this for a thom encoding
+                    return true;
+                }
 	}
 
 	carl::CAD<Rational> cad;
@@ -176,6 +187,38 @@ TEST_F(CADTest, Check6)
 	});
 	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
 	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+}
+
+TEST_F(CADTest, Check7)
+{
+	RealAlgebraicPoint<Rational> r;
+	std::vector<Constraint> cons;
+        
+        this->cad.addPolynomial(this->p[7], {x, y});
+	this->cad.addPolynomial(this->p[6], {x, y});
+	this->cad.prepareElimination();
+	cons.assign({
+                Constraint(this->p[7], Sign::ZERO, {x,y}),
+		Constraint(this->p[6], Sign::ZERO, {x,y})
+	});
+	EXPECT_EQ(carl::cad::Answer::False, cad.check(cons, r, this->bounds));
+	//for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+}
+
+TEST_F(CADTest, Check8)
+{
+	RealAlgebraicPoint<Rational> r;
+	std::vector<Constraint> cons;
+        
+        this->cad.addPolynomial(this->p[7], {x, y, z});
+        this->cad.addPolynomial(this->p[8], {x, y, z});
+	this->cad.prepareElimination();
+	cons.assign({
+                Constraint(this->p[7], Sign::NEGATIVE, {x,y, z}),
+                Constraint(this->p[8], Sign::ZERO, {x,y, z})
+	});
+	EXPECT_EQ(carl::cad::Answer::False, cad.check(cons, r, this->bounds));
+	//for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
 }
 
 TEST_F(CADTest, CheckInt)
