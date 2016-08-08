@@ -2,6 +2,7 @@
 
 #include "../Model.h"
 #include "../../Constraint.h"
+#include "../../Formula.h"
 
 #include "ModelEvaluation_Polynomial.h"
 
