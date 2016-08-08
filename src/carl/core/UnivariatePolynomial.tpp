@@ -220,6 +220,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable::Ar
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) const
 {
+        if(nth == 0) return *this;
+            
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	if (this->isConstant()) {
 		return result;
