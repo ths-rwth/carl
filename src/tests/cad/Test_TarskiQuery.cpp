@@ -107,6 +107,65 @@ protected:
     }
 };
 
+TEST(TarskiQuery, Groebner) {
+    typedef MultivariatePolynomial<Rational> Polynomial;
+    
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable z = freshRealVariable("z");
+    
+    Polynomial p1 = Polynomial({Term<Rational>(2)*y*y*y, Term<Rational>(-1)});
+    Polynomial p2 = Polynomial({Term<Rational>(x)*x, Term<Rational>(y)*y});
+    Polynomial p3 = Polynomial({Term<Rational>(y)*y, Term<Rational>(x)*x, Term<Rational>(-1)});
+    Polynomial p4 = Polynomial({Term<Rational>(2)*z*z*z, Term<Rational>(-1)});
+    Polynomial p5 = Polynomial({Term<Rational>(z)*z, Term<Rational>(x)*x});
+    Polynomial p6 = Polynomial({Term<Rational>(z)*z, Term<Rational>(x)*x, Term<Rational>(-1)});
+    Polynomial p7 = Polynomial({Term<Rational>(y)*y*x*x, Term<Rational>(x)*x*x*x, Term<Rational>(y)*y, Term<Rational>(-1)});
+    Polynomial p8 = Polynomial({Term<Rational>(x)*x*x*x, Term<Rational>(-1)});
+    std::cout << "p1 = " << p1 << std::endl;
+    std::cout << "p2 = " << p2 << ", lmon is " << p2.lmon() << std::endl;
+    std::cout << "p3 = " << p3 << std::endl;
+    std::cout << "p4 = " << p4 << std::endl;
+    std::cout << "p5 = " << p5 << std::endl;
+    std::cout << "p6 = " << p6 << std::endl;
+    std::cout << "p7 = " << p7 << std::endl;
+    std::cout << "p8 = " << p8 << std::endl;
+    
+    GBProcedure<Polynomial, Buchberger, StdAdding> gbobject;
+    gbobject.addPolynomial(p1);
+    gbobject.addPolynomial(p2);
+    gbobject.reduceInput();
+    gbobject.calculate();
+    std::cout << "groebner basis of {p1,p2}: " << gbobject.getIdeal().getGenerators() << std::endl;
+    
+    GBProcedure<MultivariatePolynomial<Rational>, Buchberger, StdAdding> gbobject2;
+    gbobject2.addPolynomial(p1);
+    gbobject2.addPolynomial(p3);
+    gbobject2.reduceInput();
+    gbobject2.calculate();
+    std::cout << "groebner basis of {p1,p3}: " << gbobject2.getIdeal().getGenerators() << std::endl;
+    
+    GBProcedure<MultivariatePolynomial<Rational>, Buchberger, StdAdding> gbobject3;
+    gbobject3.addPolynomial(p4);
+    gbobject3.addPolynomial(p5);
+    gbobject3.reduceInput();
+    gbobject3.calculate();
+    std::cout << "groebner basis of {p4,p5}: " << gbobject3.getIdeal().getGenerators() << std::endl;
+    
+    GBProcedure<MultivariatePolynomial<Rational>, Buchberger, StdAdding> gbobject4;
+    gbobject4.addPolynomial(p4);
+    gbobject4.addPolynomial(p6);
+    gbobject4.reduceInput();
+    gbobject4.calculate();
+    std::cout << "groebner basis of {p4,p6}: " << gbobject4.getIdeal().getGenerators() << std::endl;
+    
+    GBProcedure<MultivariatePolynomial<Rational>, Buchberger, StdAdding> gbobject5;
+    gbobject5.addPolynomial(p7);
+    gbobject5.addPolynomial(p8);
+    gbobject5.reduceInput();
+    gbobject5.calculate();
+    std::cout << "groebner basis of {p7,p8}: " << gbobject5.getIdeal().getGenerators() << std::endl;
+}
 
 TEST_F(TarskiQueryMultivariateTest, Cor) {   
     std::cout << "cor = " << cor(gb) << std::endl;

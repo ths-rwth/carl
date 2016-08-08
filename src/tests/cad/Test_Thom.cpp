@@ -56,10 +56,10 @@ TEST(Thom, ComparisonUnivariateSamePoly) {
 
 TEST(Thom, ComparisonUnivariateDifferentPoly) {
     Variable x = freshRealVariable("x");
-    UnivariatePolynomial<Rational> p(x, {(Rational)-2, (Rational)0, (Rational)1});
+    UnivariatePolynomial<Rational> _p(x, {(Rational)-2, (Rational)0, (Rational)1});
     UnivariatePolynomial<Rational> q(x, {(Rational)-3, (Rational)4, (Rational)-1});
     
-    std::vector<ThomEncoding<Rational>> rp = realRoots(p);
+    std::vector<ThomEncoding<Rational>> rp = realRoots(_p);
     std::vector<ThomEncoding<Rational>> rq = realRoots(q);
     EXPECT_TRUE(rp.size() == 2 && rq.size() == 2);
     EXPECT_TRUE(rp[0] < rq[0]);
@@ -91,12 +91,47 @@ TEST(Thom, RootFinderUnivariate) {
     UnivariatePolynomial<Rational> f = f1*f2*f3*f4*f5*f6*f7*f8*f9*f10*f11;
     
     std::vector<ThomEncoding<Rational>> roots = realRoots(f);
-    
+    EXPECT_TRUE(roots.size() == 11);
     unsigned i = 0;
     for(Rational r(-5); r <= Rational(5); r++) {
-        EXPECT_TRUE(roots[i].represents(r));
+        EXPECT_TRUE(roots[i].isOneDimensional());
+        EXPECT_TRUE(roots[i].represents(r)); 
         i++;
     }
+    
+    assert(roots[0].isOneDimensional());
+    EXPECT_TRUE(roots[0].signOnPolynomial(b) == Sign::NEGATIVE);
+    EXPECT_TRUE(roots[10].signOnPolynomial(b) == Sign::POSITIVE);
+}
+
+TEST(Thom, RootFinderUnivariateWithInterval) {
+    Variable x = freshRealVariable("x");
+    
+    UnivariatePolynomial<Rational> f1(x, {(Rational)-5, (Rational)1});
+    UnivariatePolynomial<Rational> f2(x, {(Rational)-4, (Rational)1});
+    UnivariatePolynomial<Rational> f3(x, {(Rational)-3, (Rational)1});
+    UnivariatePolynomial<Rational> f4(x, {(Rational)-2, (Rational)1});
+    UnivariatePolynomial<Rational> f5(x, {(Rational)-1, (Rational)1});
+    UnivariatePolynomial<Rational> f6(x, {(Rational)1, (Rational)1});
+    UnivariatePolynomial<Rational> f7(x, {(Rational)2, (Rational)1});
+    UnivariatePolynomial<Rational> f8(x, {(Rational)3, (Rational)1});
+    UnivariatePolynomial<Rational> f9(x, {(Rational)4, (Rational)1});
+    UnivariatePolynomial<Rational> f10(x, {(Rational)5, (Rational)1});
+    UnivariatePolynomial<Rational> f11(x, {(Rational)0, (Rational)1});
+    UnivariatePolynomial<Rational> f = f1*f2*f3*f4*f5*f6*f7*f8*f9*f10*f11;
+    
+    Interval<Rational> interval(Rational(-3), BoundType::STRICT, Rational(2), BoundType::WEAK);
+    
+    std::vector<ThomEncoding<Rational>> roots = realRoots(f, interval);
+    EXPECT_TRUE(roots.size() == 5);
+    unsigned i = 0;
+    for(Rational r(-2); r <= Rational(2); r++) {
+        EXPECT_TRUE(roots[i].isOneDimensional());
+        EXPECT_TRUE(roots[i].represents(r)); 
+        i++;
+    }
+    std::cout << roots << std::endl;
+    
 }
 
 
@@ -147,11 +182,11 @@ TEST(Thom, IntermediatePointsUnivariate) {
     std::vector<ThomEncoding<Rational>> roots_proj1 = realRoots(proj1.toUnivariatePolynomial());
     std::vector<ThomEncoding<Rational>> roots_proj2 = realRoots(proj2.toUnivariatePolynomial());
     
-    ThomEncoding<Rational> intermediate1 = intermediatePoint(roots_proj1[0], roots_proj2[0]);  
+    ThomEncoding<Rational> intermediate1 = ThomEncoding<Rational>::intermediatePoint(roots_proj1[0], roots_proj2[0]);  
     EXPECT_TRUE(intermediate1 > roots_proj1[0]);
     EXPECT_TRUE(intermediate1 < roots_proj2[0]);
     
-    ThomEncoding<Rational> intermediate2 = intermediatePoint(roots_proj2[1], roots_proj1[1]);
+    ThomEncoding<Rational> intermediate2 = ThomEncoding<Rational>::intermediatePoint(roots_proj2[1], roots_proj1[1]);
     EXPECT_TRUE(intermediate2 > roots_proj2[1]);
     EXPECT_TRUE(intermediate2 < roots_proj1[1]);
     
