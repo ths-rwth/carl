@@ -138,7 +138,7 @@ std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Numb
 	simplification.second = false;
 	for (auto n: this->mSamples) {
 		if (n.isNumeric()) continue;
-		if (!fast && !n.isNumeric() && n.getRefinementCount() == 0) {
+		if (n.isInterval() && !fast && !n.isNumeric() && n.getRefinementCount() == 0) {
 			// Try at least one refinement.
 			n.refine();
 		}

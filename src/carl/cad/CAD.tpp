@@ -16,6 +16,7 @@
 #include "../interval/IntervalEvaluation.h"
 #include "../core/RealAlgebraicNumberSettings.h"
 #include "../core/rootfinder/RootFinder.h"
+#include "../thom/ThomRootFinder.h"
 
 #define PERFORM_PARTIAL_CHECK false
 
@@ -842,6 +843,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	return this->samples(
 		openVariableCount,
 		carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy),
+                //carl::realRootsThom(*p, m, bounds),
 		currentSamples,
 		replacedSamples,
 		bounds
