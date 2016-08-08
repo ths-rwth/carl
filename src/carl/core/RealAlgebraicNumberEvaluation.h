@@ -11,6 +11,7 @@
 #include "../util/SFINAE.h"
 
 #include "../interval/IntervalEvaluation.h"
+#include "../thom/ThomEvaluation.h"
 #include "MultivariatePolynomial.h"
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicPoint.h"
@@ -94,7 +95,7 @@ UnivariatePolynomial<Number> evaluateCoefficients(
 // This is called by carl::CAD implementation (from Constraint)
 template<typename Number, typename Coeff>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, const RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
-	assert(point.dim() == variables.size());
+        assert(point.dim() == variables.size());
 	RANMap<Number> RANs;
 	MultivariatePolynomial<Coeff> pol(p);
 	for (std::size_t i = 0; i < point.dim(); i++) {
@@ -117,7 +118,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
 // This is called by smtrat::CAD implementation (from CAD.h)
 template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
-	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
+	CARL_LOG_TRACE("carl.ran", "Evaluating " << p << " on " << m);
 	MultivariatePolynomial<Number> pol(p);
 	
 	for (auto it = m.begin(); it != m.end();) {
@@ -134,8 +135,15 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
 	if (pol.isNumber()) {
 		return RealAlgebraicNumber<Number>(pol.constantPart());
 	}
-	return evaluateIR(pol, m);
+        
+        // need to evaluate polynomial on non-trivial RANs 
+        assert(m.size() > 0);
+        if(m.begin()->second.isInterval())
+                return evaluateIR(pol, m);
+        else 
+                return evaluateTE(pol, m);
 }
+
 
 /**
  * Evaluates the given polynomial with the given values for the variables.
