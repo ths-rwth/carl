@@ -12,10 +12,10 @@
 #include <algorithm>
 
 #include "SignDetermination/SignDetermination.h"
-#include "ThomUtil.h"
+#include "ThomEncoding.h"
 
-using namespace Eigen;
-using namespace carl;
+//using namespace Eigen;
+
 
 
 /*
@@ -27,6 +27,7 @@ using namespace carl;
  * - ...
  */
 
+namespace carl {
 
 //////////////////
 // Constructors //
@@ -37,7 +38,6 @@ ThomEncoding<Coeff>::ThomEncoding(
                 std::shared_ptr<UnivariatePolynomial<Coeff>> ptr,
                 const SignCondition& s
 ) {
-        CARL_LOG_FUNC("carl.thom", "");
         CARL_LOG_ASSERT("carl.thom", ptr->isUnivariate(), "");
         MultivariatePolynomial<Coeff> mp(*ptr);
         p = std::make_shared<MultivariatePolynomial<Coeff>>(mp);
@@ -51,7 +51,6 @@ ThomEncoding<Coeff>::ThomEncoding(
                 std::shared_ptr<MultivariatePolynomial<Coeff>> ptr, 
                 const SignCondition& s
 ) {
-        CARL_LOG_FUNC("carl.thom", "");
         std::set<Variable> vars = ptr->gatherVariables();
         CARL_LOG_ASSERT("carl.thom", vars.size() == 1, "");
         p = ptr;
@@ -67,7 +66,7 @@ ThomEncoding<Coeff>::ThomEncoding(
                 const SignCondition& s,
                 std::shared_ptr<ThomEncoding<Coeff>> prev
 ) {
-        CARL_LOG_FUNC("carl.thom", "ptr = " << ptr << ", var = " << var << ", s = " << s << ", prev = " << prev);
+        //CARL_LOG_INFO("carl.thom", "ptr = " << ptr << ", var = " << var << ", s = " << s << ", prev = " << prev);
         p = ptr;
         mainVar = var;
         signs = s;
@@ -80,7 +79,7 @@ ThomEncoding<Coeff>::ThomEncoding(
                 const Coeff& rational,
                 Variable::Arg var
 ) {
-        CARL_LOG_FUNC("carl.thom", "rational = " << rational << ", var = " << var);
+        //CARL_LOG_INFO("carl.thom", "rational = " << rational << ", var = " << var);
         MultivariatePolynomial<Coeff> polynomial = MultivariatePolynomial<Coeff>(var) - rational;
         std::shared_ptr<MultivariatePolynomial<Coeff>> ptr = std::make_shared<MultivariatePolynomial<Coeff>>(polynomial);
         SignCondition s = {};
@@ -156,11 +155,13 @@ Sign ThomEncoding<Coeff>::operator[](const uint n) const {
         if(n == 0) {
                 return Sign::ZERO;
         }
-        else if(n <= (unsigned)signs.size()) {
-                return signs[n-1];
+        else if(n <= (unsigned)this->signs.size()) {
+                return this->signs[n-1];
         }
-        else if(n == (unsigned)signs.size() + 1) {
-                return Sign(sgn(p->derivative(mainVar).lcoeff()));
+        else if(n == (unsigned)this->signs.size() + 1) {
+                //return Sign(sgn(p->derivative(mainVar).lcoeff()));
+                MultivariatePolynomial<Coeff> lastDer = der_exp(this->polynomial(), this->mainVar, 0, this->polynomial().degree(this->mainVar)).back();
+                return this->signOnPolynomial(lastDer);
         }
         else {
                 return Sign::ZERO;
@@ -242,6 +243,78 @@ Sign ThomEncoding<Coeff>::sgnReprNum() const {
         else return Sign::ZERO;
 }
 
+template<typename Coeff>
+SignCondition ThomEncoding<Coeff>::signsRealizedOn(const std::vector<UnivariatePolynomial<Coeff>>& list) const {
+        static_assert(is_rational<Coeff>::value, "must provide a rational coefficient type here");
+        std::vector<SignCondition> signConds;
+        
+        if(isMultiDimensional()) {
+                std::vector<MultivariatePolynomial<Coeff>> deriv_list = this->accumulateDer();
+                std::vector<MultivariatePolynomial<Coeff>> list_multiv;
+                for(const auto& p : list) list_multiv.push_back(MultivariatePolynomial<Coeff>(p));
+                deriv_list.insert(deriv_list.end(), list_multiv.begin(), list_multiv.end());
+                signConds = signDetermination(deriv_list, this->accumulatePolynomials());
+        }
+        else {
+                UnivariatePolynomial<Coeff> this_univ = this->polynomial().toUnivariatePolynomial();
+                std::vector<UnivariatePolynomial<Coeff>> deriv_list = der_exp(this_univ, 1, this_univ.degree() - 1);
+                deriv_list.insert(deriv_list.end(), list.begin(), list.end());
+                signConds = signDetermination(deriv_list, this_univ);
+        }
+        
+        SignCondition this_signs = this->accumulateSigns();
+        SignCondition wanted; // linear search here...
+        bool succes = false;
+        for(const SignCondition& s : signConds) {
+                if(isPrefix(this_signs, s)) {
+                        wanted = s;
+                        succes = true;
+                        break;
+                }
+        }
+        assert(succes);
+        wanted.erase(wanted.begin(), wanted.begin() + this_signs.size());
+        return wanted;
+}
+
+template<typename Coeff>
+SignCondition ThomEncoding<Coeff>::signsRealizedOn(const std::vector<MultivariatePolynomial<Coeff>>& list) const {
+        std::vector<SignCondition> signConds;
+        
+        if(isMultiDimensional()) {
+                std::vector<MultivariatePolynomial<Coeff>> deriv_list = this->accumulateDer();
+                std::vector<MultivariatePolynomial<Coeff>> list_multiv;
+                for(const auto& p : list) list_multiv.push_back(p);
+                deriv_list.insert(deriv_list.end(), list_multiv.begin(), list_multiv.end());
+                signConds = signDetermination(deriv_list, this->accumulatePolynomials());
+        }
+        else {
+                MultivariatePolynomial<Coeff> this_univ = this->polynomial();
+                std::vector<MultivariatePolynomial<Coeff>> deriv_list = der_exp(this_univ, this->mainVar, 1, this_univ.degree(this->mainVar) - 1);
+                deriv_list.insert(deriv_list.end(), list.begin(), list.end());
+                signConds = signDetermination(deriv_list, this_univ);
+        }
+        
+        SignCondition this_signs = this->accumulateSigns();
+        SignCondition wanted; // linear search here...
+        bool succes = false;
+        for(const SignCondition& s : signConds) {
+                if(isPrefix(this_signs, s)) {
+                        wanted = s;
+                        succes = true;
+                        break;
+                }
+        }
+        assert(succes);
+        wanted.erase(wanted.begin(), wanted.begin() + this_signs.size());
+        return wanted;
+}
+
+
+////////////////
+// Comparison //
+////////////////
+
 template<typename C>
 bool areComparable(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
         if(lhs.isOneDimensional() && rhs.isOneDimensional()) {
@@ -255,14 +328,18 @@ bool areComparable(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
         return false;
 }
 
-
-////////////////
-// Comparison //
-////////////////
-
 template<typename C>
 ThomComparisonResult compareRational(const ThomEncoding<C>& t, const C& rat) {
+        CARL_LOG_FUNC("carl.thom.compare", "t = " << t << " , rat = " << rat);
         if(t.isOneDimensional()) {
+                UnivariatePolynomial<C> p_univ = t.polynomial().toUnivariatePolynomial();
+                if(p_univ.cauchyBound() < carl::abs(rat)) {
+                    assert(rat != 0);
+                    std::cout << "cauchy bound: " << p_univ.cauchyBound() << std::endl;
+                    std::cout << "rat: " << rat << std::endl;
+                    if(rat > 0) return LESS;
+                    else return GREATER;
+                } 
                 return compareThom(t, ThomEncoding<C>(rat, t.mainVar));
         }
         else {
@@ -273,7 +350,8 @@ ThomComparisonResult compareRational(const ThomEncoding<C>& t, const C& rat) {
 // compares two RANs represented by thom encodings
 template<typename C>
 ThomComparisonResult compareThom(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-        CARL_LOG_ASSERT("carl.thom", areComparable(lhs, rhs), "");
+        CARL_LOG_ASSERT("carl.thom.compare", areComparable(lhs, rhs), "tried to compare\n" << lhs << "\n" << rhs);
+        CARL_LOG_FUNC("carl.thom.compare", "lhs = " << lhs << ", rhs = " << rhs);
         if(lhs.isOneDimensional()) {
                 return compareUnivariate(lhs, rhs);
         }
@@ -285,7 +363,10 @@ ThomComparisonResult compareThom(const ThomEncoding<C>& lhs, const ThomEncoding<
 // compares one dimensional thom encodings
 template<typename C>
 ThomComparisonResult compareUnivariate(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
+        CARL_LOG_FUNC("carl.thom.compare", "lhs = " << lhs << ", rhs = " << rhs);
         // assert that the main variables are the same ???
+    
+    
         
         // --- same underlying polynomials ---    
         if(lhs.polynomial() == rhs.polynomial()) {         
@@ -294,25 +375,30 @@ ThomComparisonResult compareUnivariate(const ThomEncoding<C>& lhs, const ThomEnc
         
         // --- different underlying polynomials ---
         else {
-                std::vector<UnivariatePolynomial<C>> der1 = der(lhs.polynomial().toUnivariatePolynomial());
-                std::vector<UnivariatePolynomial<C>> der2 = der(rhs.polynomial().toUnivariatePolynomial().derivative());
-                der2.pop_back(); // do this nicer
-                der1.insert(der1.end(), der2.begin(), der2.end());
-                std::vector<SignCondition> signConds = signDetermination(der1, rhs.polynomial().toUnivariatePolynomial()); 
+                CARL_LOG_TRACE("carl.thom.compare", "different underlying polynomiasl:\n" << lhs <<"\n" << rhs);
+                UnivariatePolynomial<C> lhs_univ = lhs.polynomial().toUnivariatePolynomial();
+                UnivariatePolynomial<C> rhs_univ = rhs.polynomial().toUnivariatePolynomial();
+                uint deg_lhs = lhs_univ.degree();
+                uint deg_rhs = rhs_univ.degree();
+                std::vector<UnivariatePolynomial<C>> der_lhs_rhs = der_exp(lhs_univ, 1, deg_lhs - 1);
+                std::vector<UnivariatePolynomial<C>> der_rhs = der_exp(rhs_univ, 0, deg_rhs);
+                der_lhs_rhs.insert(der_lhs_rhs.end(), der_rhs.begin(), der_rhs.end());
+                std::vector<SignCondition> signConds = signDetermination(der_lhs_rhs, lhs_univ); 
                 SignCondition wanted; // linear search here...
                 bool succes = false;
                 for(const SignCondition& c : signConds) {
-                        if(extends(c, rhs.getSigns())) {
+                        if(isPrefix(lhs.getSigns(), c)) {
                                 wanted = c;
                                 succes = true;
                                 break;
                         }
                 }
                 assert(succes);
-                wanted.erase(wanted.begin() + lhs.polynomial().degree(lhs.getMainVar()) + 1, wanted.end());
-                assert(wanted.size() == lhs.getSigns().size() + 2);
+                wanted.erase(wanted.begin(), wanted.begin() + lhs.getSigns().size());
 
-                return lhs.fullSignCondition() < wanted;             
+                ThomComparisonResult res = wanted < rhs.fullSignCondition();
+                CARL_LOG_TRACE("carl.thom.compare", "result: " << res);
+                return res;
         }      
 }
 
@@ -352,19 +438,132 @@ ThomComparisonResult compareMultivariate(const ThomEncoding<C>& lhs, const ThomE
 }
 
 
-/////////////////////////
-// Intermediate points //
-/////////////////////////
+////////////////////////////////////////////////
+// Intermediate points and points above/below //
+////////////////////////////////////////////////
 
-template<typename C, typename Settings = ThomDefaultSettings>
-ThomEncoding<C> intermediatePoint(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-        CARL_LOG_ASSERT("carl.thom", lhs < rhs, "please call intermediatePoint with the right order in the arguments");
-        C epsilon = Rational(1);
-        ThomEncoding<C> res = lhs + epsilon;
-        while(res >= rhs) {
-                epsilon /= 2;
-                res = lhs + epsilon;
+template<typename Coeff>
+ThomEncoding<Coeff> ThomEncoding<Coeff>::intermediateRolle(const ThomEncoding<Coeff>& lhs, const ThomEncoding<Coeff>& rhs) {
+        CARL_LOG_FUNC("carl.thom.samples", lhs << ", " << rhs);
+        assert(false);
+        return ThomEncoding<Coeff>();
+}
+
+template<typename Coeff>
+ThomEncoding<Coeff> ThomEncoding<Coeff>::intermediateBound(const ThomEncoding<Coeff>& lhs, const ThomEncoding<Coeff>& rhs) {       
+        CARL_LOG_FUNC("carl.thom.samples", lhs << ", " << rhs);
+        if(lhs.isOneDimensional()) {
+                assert(rhs.isOneDimensional());
+                UnivariatePolynomial<Coeff> prod_der = (lhs.polynomial() * rhs.polynomial()).toUnivariatePolynomial().derivative();
+                Coeff epsilon;
+                switch(SETTINGS.SEPERATION_BOUND) {
+                        case SeperationBound::RUMP:
+                                epsilon = rumpsBound(prod_der);
+                                break;
+                        default:
+                                CARL_LOG_FATAL("carl.thom.samples", "bad settings");
+                                epsilon = rumpsBound(prod_der);
+                }                                            
+                ThomEncoding<Coeff> newEncoding;
+                // choose the encoding whose polynomial has smaller degree for the new encoding
+                if(lhs.polynomial().degree(lhs.mainVar) <= rhs.polynomial().degree(rhs.mainVar)) {
+                        newEncoding = lhs + epsilon;
+                }
+                else {
+                        epsilon = -epsilon;
+                        newEncoding = rhs + epsilon;
+                }
+                CARL_LOG_TRACE("carl.thom.samples", "result: " << newEncoding);
+                return newEncoding;
         }
+        else {
+                return ThomEncoding<Coeff>::intermediateIterative(lhs, rhs);
+        }
+}
+
+template<typename Coeff>
+ThomEncoding<Coeff> ThomEncoding<Coeff>::intermediateIterative(const ThomEncoding<Coeff>& lhs, const ThomEncoding<Coeff>& rhs) {
+        CARL_LOG_FUNC("carl.thom.samples", lhs << ", " << rhs);
+        Coeff epsilon(SETTINGS.INITIAL_OFFSET);
+        ThomEncoding<Coeff> res;
+        // pick the polynomial with smaller degree here (or lhs, if equal degree)
+        if(lhs.degree() <= rhs.degree()) {
+                res = lhs + epsilon;
+                while(res >= rhs) {
+                        epsilon /= 2;
+                        res = lhs + epsilon;
+                }
+        }
+        else {
+                epsilon = -epsilon;
+                res = rhs + epsilon;
+                while(lhs >= res) {
+                        epsilon /= 2;
+                        res = rhs + epsilon;
+                }
+        }
+        CARL_LOG_TRACE("carl.thom.samples", "result: " << res);
+        return res;
+}
+
+template<typename Coeff>
+ThomEncoding<Coeff> ThomEncoding<Coeff>::intermediatePoint(const ThomEncoding<Coeff>& lhs, const ThomEncoding<Coeff>& rhs) {
+        CARL_LOG_ASSERT("carl.thom.samples", areComparable(lhs, rhs), "intermediate points with non-comparable thom encodings called: " << lhs << ", " << rhs);
+        CARL_LOG_ASSERT("carl.thom.samples", lhs < rhs, "intermediatePoint with wrong order or equal arguments called");
+        switch(SETTINGS.INTERMEDIATE_POINT_ALGORITHM) {
+                case IntermediatePointAlgorithm::ROLLE:
+                        return ThomEncoding<Coeff>::intermediateRolle(lhs, rhs);
+                case IntermediatePointAlgorithm::BOUND:
+                        return ThomEncoding<Coeff>::intermediateBound(lhs, rhs);
+                case IntermediatePointAlgorithm::ITERATIVE:
+                        return ThomEncoding<Coeff>::intermediateIterative(lhs, rhs);
+                default:
+                        CARL_LOG_ERROR("carl.thom.samples", "bad settings");
+                        return ThomEncoding<Coeff>::intermediateIterative(lhs, rhs);
+        }
+}
+
+template<typename Coeff>
+Coeff ThomEncoding<Coeff>::intermediatePoint(const ThomEncoding<Coeff>& lhs, const Coeff& rhs) {
+        CARL_LOG_ASSERT("carl.thom.samples", lhs < rhs, "intermediatePoint with wrong order or equal arguments called");
+        Coeff res;
+        if(lhs.isOneDimensional()) {
+                MultivariatePolynomial<Coeff> rhs_poly = lhs.mainVar - rhs;
+                UnivariatePolynomial<Coeff> prod_der = (lhs.polynomial() * rhs_poly).toUnivariatePolynomial().derivative();
+                Coeff epsilon = rumpsBound(prod_der);
+                res = rhs - epsilon;     
+        }
+        else {
+                Coeff epsilon(1);
+                res = rhs - epsilon;
+                while(lhs >= res) {
+                    epsilon /= 2;
+                    res = rhs - epsilon;
+                }
+        }
+        CARL_LOG_TRACE("carl.thom.samples", "result: " << res);
+        return res;
+}
+
+template<typename Coeff>
+Coeff ThomEncoding<Coeff>::intermediatePoint(const Coeff& lhs, const ThomEncoding<Coeff>& rhs) {
+        CARL_LOG_ASSERT("carl.thom.samples", lhs < rhs, "intermediatePoint with wrong order order in arguments called");
+        Coeff res;
+        if(rhs.isOneDimensional()) {
+                MultivariatePolynomial<Coeff> lhs_poly = rhs.mainVar - lhs;
+                UnivariatePolynomial<Coeff> prod_der = (rhs.polynomial() * lhs_poly).toUnivariatePolynomial().derivative();
+                Coeff epsilon = rumpsBound(prod_der);
+                res = lhs + epsilon;     
+        }
+        else {
+                Coeff epsilon(1);
+                res = lhs + epsilon;
+                while(res >= rhs) {
+                    epsilon /= 2;
+                    res = lhs + epsilon;
+                }
+        }
+        CARL_LOG_TRACE("carl.thom.samples", "result: " << res);
         return res;
 }
 
@@ -377,4 +576,6 @@ ThomEncoding<C> operator+(const ThomEncoding<C>& rhs, const C& lhs) {
         result.p = std::make_shared<MultivariatePolynomial<C>>(newPoly);
         return result;
 }
+
+} // namespace carl
 

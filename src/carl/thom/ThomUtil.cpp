@@ -65,14 +65,31 @@ ThomComparisonResult operator<(const SignCondition& lhs, const SignCondition& rh
                 if(lhs[i] != rhs[i]) {
                         assert(lhs[i+1] == rhs[i+1]);
                         if(lhs[i+1] == Sign::POSITIVE) {
-                                return (lhs[i] < rhs[i]) ? LESS : GREATER;
+                                return (lhs[i] < rhs[i]) ? ThomComparisonResult::LESS : ThomComparisonResult::GREATER;
                         }
                         else {
-                                return (lhs[i] < rhs[i]) ? GREATER : LESS;
+                                return (lhs[i] < rhs[i]) ? ThomComparisonResult::GREATER : ThomComparisonResult::LESS;
                         }
                 }
         }
-        return EQUAL;
+        return ThomComparisonResult::EQUAL;
+}
+
+std::ostream& operator<<(std::ostream& os, const SignCondition& s) {
+    os << "[";
+    for(int i = 0; i < (int)s.size(); i++) {
+        switch(s[i]) {
+            case Sign::NEGATIVE:
+                os << "-"; break;
+            case Sign::ZERO:
+                os << "0"; break;
+            case Sign::POSITIVE:
+                os << "+"; break;
+        }
+        if(i != (int)s.size() - 1) os << ","; 
+    }
+    os << "]";
+    return os;
 }
         
 } // namespace carl

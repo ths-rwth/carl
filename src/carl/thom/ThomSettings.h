@@ -9,45 +9,30 @@
 
 namespace carl {
         
+enum class IntermediatePointAlgorithm : unsigned {ROLLE, BOUND, ITERATIVE};
+enum class SeperationBound : unsigned            {RUMP, OTHER};
         
-} // namespace carl;
-
-
-
-
-struct ThomBasicSettings {
-        
-        
-        /*
-         * sign determination settings
-         */
-        static const bool SIGN_DETERMINATION_REDUCE = true;
-        
-        /*
-         * tarski query settings
-         */
-        static const bool MULT_TABLE_USE_NF_ALG = false;
-        
+struct ThomSettings1 {
+               
+        static const bool                       SIGN_DETERMINATION_REDUCE =     true;       
+        static const bool                       MULT_TABLE_USE_NF_ALG =         true;
+        static const IntermediatePointAlgorithm INTERMEDIATE_POINT_ALGORITHM =  IntermediatePointAlgorithm::BOUND;
+        static const SeperationBound            SEPERATION_BOUND =              SeperationBound::RUMP;
+        static constexpr double                 INITIAL_OFFSET =                0.5;
 };
 
-struct ThomExperimentalSettings {
+struct ThomSettings2 : ThomSettings1 {
         
-        
-        /*
-         * sign determination settings
-         */
-        static const bool SIGN_DETERMINATION_REDUCE = true;
-        
-        /*
-         * tarski query settings
-         */
-        static const bool MULT_TABLE_USE_NF_ALG = false;
-
+        static const bool                       SIGN_DETERMINATION_REDUCE =     false;       
+        static const bool                       MULT_TABLE_USE_NF_ALG =         true;
 };
-
-
+        
+  
 /*
  * Typedef the current settings here!
  */
-typedef ThomBasicSettings ThomDefaultSettings;
-// typedef ThomExperimentalSettings ThomCurrentSettings;
+typedef ThomSettings1 ThomDefaultSettings;
+// typedef ThomSettings2 ThomDefaultSettings;
+
+
+} // namespace carl;

@@ -5,6 +5,8 @@
  * Created on 17. Juli 2016, 23:04
  */
 
+#include <algorithm>
+
 #include "SignDetermination.h"
 
 namespace carl {
@@ -67,20 +69,42 @@ std::vector<SignCondition> calculateR(unsigned which, const std::vector<SignCond
 }
 
 std::vector<std::vector<unsigned>> firstNLines(const unsigned n, const MatrixXf& mat, const std::vector<std::vector<unsigned>>& ada) {
+        CARL_LOG_TRACE("carl.thom.sign", "\nn = " << n << "\nmat = \n" << mat << "\nada = " << ada);
         CARL_LOG_ASSERT("carl.thom.sign", n > 0, "");
-        // first n lines as a matrix
-        MatrixXf firstLines(n, mat.cols());
-        for(unsigned i = 0; i < n; i++) {
-                for(unsigned j = 0; j < mat.cols(); j++) {
-                        firstLines(i, j) = mat(i, j);
-                }
-        }
-        FullPivLU<MatrixXf> dec(firstLines);
+        
         // not sure if it is meant to be that the first n lines are always linearly independent
         // or we have to find the "first" lin. ind. n lines.
-        CARL_LOG_ASSERT("carl.thom.sign", dec.rank() == n, "");
-        std::vector<std::vector<unsigned>> res(ada); // this is just the first n elements of ada
-        res.resize(n);
+        
+        std::vector<unsigned> lines(ada.size(), 0);
+        assert(n <= ada.size());
+        assert(mat.rows() == ada.size());
+        for(unsigned i = 0; i < n; i++) {
+            lines[i] = 1;
+        }
+        
+        do {
+            MatrixXf linesMat(n, mat.cols());
+            unsigned row = 0;
+            for(unsigned i = 0; i < lines.size(); i++) {
+                if(lines[i] == 0) continue;
+                for(unsigned j = 0; j < mat.cols(); j++) {
+                    linesMat(row, j) = mat(i, j);
+                }
+                row++;
+            }
+            FullPivLU<MatrixXf> dec(linesMat);
+            if(dec.rank() == n) break;
+            
+        }
+        while(std::prev_permutation(lines.begin(), lines.end()));
+        
+        
+        std::vector<std::vector<unsigned>> res;
+        for(unsigned i = 0; i < lines.size(); i++) {
+            if(lines[i] == 1) res.push_back(ada[i]);
+        }
+        assert(res.size() == n);
+          
         return res;
 }
 
@@ -88,8 +112,9 @@ std::vector<std::vector<unsigned>> firstNLines(const unsigned n, const MatrixXf&
 std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition>& sign,                // Sign(Q,Z)
                                                  const std::vector<SignCondition>& newSign,             // Sign({P} u Q, Z)
                                                  const std::vector<std::vector<unsigned>>& ada) {       // Ada(Q, Z)
-        CARL_LOG_FUNC("carl.thom.sign", "sign = " << sign << ", newSign = " << newSign << ", ada = " << ada);
+        CARL_LOG_TRACE("carl.thom.sign", "sign = " << sign << ", newSign = " << newSign << ", ada = " << ada);
         CARL_LOG_ASSERT("carl.thom.sign", sign.front().size() > 0, "");
+        CARL_LOG_ASSERT("carl.thom.sign", sign.size() <= newSign.size(), "newSign contains the extended sign conditions from sign and can not be smaller!!");
         // TODO implement for the case where Q is empty
         unsigned r_1 = (unsigned)sign.size();
         std::vector<std::vector<unsigned>> res(ada);
@@ -104,6 +129,7 @@ std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition
                 CARL_LOG_TRACE("carl.thom.sign", "need to compute r_2");
                 std::vector<SignCondition> sign2 = calculateR(2, sign, newSign);
                 unsigned r_2 = (unsigned)sign2.size();
+                assert(r_2 != 0);
                 MatrixXf mat2 = adaptedMat(ada, sign2);
                 std::vector<std::vector<unsigned>> A_2 = firstNLines(r_2, mat2, ada);
                 for(const std::vector<unsigned>& a : A_2) {
@@ -113,12 +139,13 @@ std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition
                         CARL_LOG_TRACE("carl.thom.sign", "need to compute r_3");
                         std::vector<SignCondition> sign3 = calculateR(3, sign, newSign);
                         unsigned r_3 = (unsigned)sign3.size();
+                        assert(r_3 != 0);
                         std::vector<std::vector<unsigned>> A_3 = firstNLines(r_3, mat2, ada);
                         for(const auto& a : A_3) {
                                 res.push_back((unsigned)2 * a);
                         }
                 }       
-        }       
+        }
         return res;      
 }
     

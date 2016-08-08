@@ -48,11 +48,15 @@ private:
          */
         std::shared_ptr<ThomEncoding<Coeff>> point;
         
+        static const ThomDefaultSettings SETTINGS;
+        
 public:
         
         //////////////////
         // Constructors //
         //////////////////
+        
+        ThomEncoding() {}
               
         /*
          * Constructs a univariate thom encoding with the given polynomial and the sign conditions
@@ -99,6 +103,17 @@ public:
                 std::shared_ptr<ThomEncoding<Coeff>> point
         );
         
+        /*
+         * 
+         */
+        ThomEncoding(
+                const Coeff& rational,
+                const ThomEncoding<Coeff>& other
+        ) :
+                ThomEncoding(rational, other.mainVar, other.point)
+        {}
+        
+        
         /////////////////////////////////////
         // general public member functions //
         /////////////////////////////////////
@@ -106,7 +121,11 @@ public:
         /*
          * returns the polynomial
          */
-        inline MultivariatePolynomial<Coeff> polynomial() const { return *p; }
+        inline const MultivariatePolynomial<Coeff>& polynomial() const { assert(p); return *p; }
+        
+        inline uint degree() const { return this->polynomial().degree(this->mainVar); }
+        
+        inline const ThomEncoding<Coeff>& getPoint() const {assert(point); return *point; }
         
         /*
          * returns a list of all the underlying polynomials, including the lower levels
@@ -154,7 +173,7 @@ public:
          * query if the encoding is one or multidimensional
          */
         inline bool isOneDimensional() const { 
-                bool res = point.get() == nullptr;
+                bool res = !bool(point);
                 if(res) assert(polynomial().gatherVariables().size() == 1);
                 return res;
         }       
@@ -176,16 +195,47 @@ public:
          */
         inline bool represents(const Coeff& rational) const { return *(this) == rational; }
         
+        inline bool isZero() const { return *(this) == constant_zero<Coeff>::get(); }
+        
         /*
          * returns the sign of the respresented RAN
          */
         Sign sgnReprNum() const;
+        
+        SignCondition signsRealizedOn(const std::vector<UnivariatePolynomial<Coeff>>& list) const;
+        
+        SignCondition signsRealizedOn(const std::vector<MultivariatePolynomial<Coeff>>& list) const;
+        
+        template<typename Polynomial>
+        Sign signOnPolynomial(const Polynomial& p) const {
+                assert(this->dimension() >= p.gatherVariables().size());
+                if(p.isConstant()) {
+                        if(!p.isZero()) return Sign(sgn(p.lcoeff()));
+                        else return Sign::ZERO;
+                }
+                SignCondition s = signsRealizedOn({p});
+                assert(s.size() == 1);
+                return s.front();
+        }
+        
+        bool makesPolynomialZero(const MultivariatePolynomial<Coeff>& pol, Variable::Arg pol_mainVar) const {
+                assert(!pol.isZero());
+                assert(mainVar != pol_mainVar);
+                UnivariatePolynomial<MultivariatePolynomial<Coeff>> pol_univ = pol.toUnivariatePolynomial(pol_mainVar);
+                // maybe check first if pol_univ has some constant coefficient...
+                for(const auto t : pol_univ.coefficients()) {
+                        assert(this->dimension() >= t.gatherVariables().size());
+                        if(this->signOnPolynomial(t) != Sign::ZERO) return false;
+                }
+                return true;
+        }
         
         /*
          * states if the given encoding can be compared by our operators
          */
         template<typename C>
         friend bool areComparable(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
+        
         
         ////////////////
         // Comparison //
@@ -195,7 +245,6 @@ public:
          * Compares the RANs represented by the given Thom ecodings
          * This is quite expensive if the underlying polynomials are different.
          * Note that no encodings with different previous points can be compared
-         * 
          */
         template<typename C>
         friend ThomComparisonResult compareRational(const ThomEncoding<C>& t, const C& rat);
@@ -247,38 +296,73 @@ public:
         template<typename C>
         friend bool operator!=(const C& lhs, const ThomEncoding<C>& rhs) { return rhs != lhs; }
              
-        /////////////////////////
-        // Intermediate points //
-        /////////////////////////
         
-        // returns a thom encoding representing a number in the interval (lhs, rhs)
-        template<typename C, typename Settings>
-        friend ThomEncoding<C> intermediatePoint(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
+        ////////////////////////////////////////////////
+        // Intermediate points and points above/below //
+        ////////////////////////////////////////////////
         
-        // adding rational numbers to ran's represented by thom encodings
+private:
+        /*
+         * computes an intermediate point using Rolle's theorem and comparison as described
+         * in "Algorithms for Real Algebraic Geometry" 
+         */
+        static ThomEncoding<Coeff> intermediateRolle(const ThomEncoding<Coeff>& lhs, const ThomEncoding<Coeff>& rhs);
+        
+        /*
+         * computes an intermediate point using a bound for real root seperation (in the univariate case)
+         * and in the multivariate case invokes intermediateInterative(...)
+         */
+        static ThomEncoding<Coeff> intermediateBound(const ThomEncoding<Coeff>& lhs, const ThomEncoding<Coeff>& rhs);
+        
+        /*
+         * computes an intermediate point iteratively using comparisons
+         * (kind of semi-numeric)
+         */
+        static ThomEncoding<Coeff> intermediateIterative(const ThomEncoding<Coeff>& lhs, const ThomEncoding<Coeff>& rhs);
+   
+public:
+        
+        /*
+         * returns a thom encoding representing a number in the interval (lhs, rhs)
+         * uses the method defined in settings
+         */ 
+        static ThomEncoding<Coeff> intermediatePoint(const ThomEncoding<Coeff>& lhs, const ThomEncoding<Coeff>& rhs);
+        
+        /*
+         * finds an intermediate point between the thom encoding and the rational
+         * always returns a rational
+         */
+        static Coeff intermediatePoint(const ThomEncoding<Coeff>& lhs, const Coeff& rhs);
+        static Coeff intermediatePoint(const Coeff& lhs, const ThomEncoding<Coeff>& rhs);
+        
+        /*
+         * finds a sample point above or below
+         */
+        Coeff pointAbove() const;
+        Coeff pointBelow() const;
+        
+        /*
+         * computes the sum of the number represented by the thom encoding and the given rational number
+         * the result is a thom encoding
+         */
         template<typename C>
         friend ThomEncoding<C> operator+(const ThomEncoding<C>& rhs, const C& lhs);
-        
         template<typename C>
         friend ThomEncoding<C> operator+(const C& lhs, const ThomEncoding<C>& rhs) { return rhs + lhs; }
             
         /*
          * output operator
          */
-        template <typename C, typename Settings = ThomDefaultSettings>
+        template<typename C, typename Settings = ThomDefaultSettings>
 	friend std::ostream& operator<<(std::ostream& os, const ThomEncoding<C>& rhs) {
-                os << "(" << rhs.polynomial() << " with mainVar " << rhs.getMainVar() << ", " << rhs.fullSignCondition() << ")" << std::endl;
+                os << rhs.polynomial() << " in " << rhs.getMainVar() << ", " << rhs.signs;
                 if(rhs.isMultiDimensional()) {
-                        os << *(rhs.point);
+                        os << " OVER " << *(rhs.point);
                 }
                 return os;
         }
 };
 
-
-#include "ThomEncoding.tpp"
 } // namespace carl
 
-
-
-
+#include "ThomEncoding.tpp"

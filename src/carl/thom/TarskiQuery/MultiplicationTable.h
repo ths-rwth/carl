@@ -359,7 +359,7 @@ std::ostream& operator<<(std::ostream& o, const MultiplicationTable<C>& table) {
         o << "Base = " << table.getBase() << std::endl;
         o << "Length = " << table.size() << std::endl;
         for(const auto& entry : table) {
-                o << entry.first << "\t" << entry.second.br << std::endl;
+                o << entry.first << "\t" << entry.second.br << "\t" << entry.second.pairs << std::endl;
         }
         return o;
 }

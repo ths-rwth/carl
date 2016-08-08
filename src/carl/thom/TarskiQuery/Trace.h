@@ -39,6 +39,8 @@ BaseRepr<Coeff> multiply(const BaseRepr<Coeff>& f, const BaseRepr<Coeff>& g, con
         // this method is called many many times. it must be more efficient
         //CARL_LOG_INEFFICIENT();
         
+        std::cout << tab << std::endl;
+        
         MonomialBase<Coeff> base = tab.getBase();
         BaseRepr<Coeff> res(base.size(), Coeff(0));
         for(const auto& entry : tab) {

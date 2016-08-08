@@ -25,7 +25,23 @@ bool isZeroDimensionalSystem(const std::vector<UnivariatePolynomial<Coeff>>& sys
 
 template<typename Coeff>
 bool isZeroDimensionalSystem(const std::vector<MultivariatePolynomial<Coeff>>& system) {
-        return true;
+        CARL_LOG_TRACE("carl.thom.tarski", "checking if " << system << " is zero-dimensional...");
+        GBProcedure<MultivariatePolynomial<Coeff>, Buchberger, StdAdding> gbobject;
+        for(const auto& _p : system) gbobject.addPolynomial(_p);
+        gbobject.reduceInput();
+        gbobject.calculate();
+        GB<Coeff> gb = gbobject.getIdeal().getGenerators();
+        bool res = true;
+        if(gatherVariables(system).size() != gatherVariables(gb).size()) res = false;
+        else if(!hasFiniteMon(gb)) res = false;
+        CARL_LOG_TRACE("carl.thom.tarski", "result is " << res);
+        
+        if(!res) {
+                std::cout << "system: " << system << std::endl;
+                std::cout << "groebner basis: " << gb << std::endl;
+         }
+                
+        return res;
 }
 
 
@@ -79,12 +95,12 @@ private:
 public:
         TarskiQueryManager(const std::vector<UnivariatePolynomial<C>>& zeroSet) : der_z(zeroSet.front().derivative()), z(zeroSet.front()) {
                 static_assert(is_rational<C>::value, "must setup the univariate tarski query manager on univariate rational polynomials");
-                CARL_LOG_ASSERT("carl.thom.tarski", zeroSet.size() == 1, "the univariate taq query accepts only one polynomial as zero set");
+                CARL_LOG_ASSERT("carl.thom.tarski", zeroSet.size() == 1, "the univariate tarski query accepts only one polynomial as zero set");
                 //assert(isZeroDimensionalSystem(z));
         }
         
-        typename CommonTarskiQueryManager<UnivariatePolynomial<C>>::QueryResultType operator()(const UnivariatePolynomial<C>& p) const {
-                return univariateTarskiQuery(p, z, der_z);
+        typename CommonTarskiQueryManager<UnivariatePolynomial<C>>::QueryResultType operator()(const UnivariatePolynomial<C>& _p) const {
+                return univariateTarskiQuery(_p, z, der_z);
         }
         
         // query on the constant polynomial n
@@ -117,6 +133,8 @@ private:
         MultiplicationTable<C> tab;
         GB<C> gb;
         
+        mutable std::map<MultivariatePolynomial<C>, int> alreadyComputed;
+        
 public:
         TarskiQueryManager(const std::vector<MultivariatePolynomial<C>>& zeroSet) {
                 static_assert(is_rational<C>::value, "must setup the multivariate tarski query manager on multiv. rational polynomials");
@@ -126,12 +144,14 @@ public:
                 }
 #endif
                 // set up the groebner base
+                //std::cout << "zero set: " << zeroSet << std::endl;
                 GBProcedure<MultivariatePolynomial<C>, Buchberger, StdAdding> gbobject;
-                for(const auto& p : zeroSet) gbobject.addPolynomial(p);
+                for(const auto& _p : zeroSet) gbobject.addPolynomial(_p);
                 gbobject.reduceInput();
                 gbobject.calculate();
                 gb = gbobject.getIdeal().getGenerators();
-                CARL_LOG_ASSERT("carl.thom.tarski", hasFiniteMon(gb), "tried to setup a tarski query manager on an infinite zero set");
+                //std::cout << "groebner basis: " << gb << std::endl;
+                CARL_LOG_ASSERT("carl.thom.tarski", hasFiniteMon(gb), "tried to setup a tarski query manager on an infinite zero set: gb is " << gb );
                 CARL_LOG_INFO("carl.thom.tarski", "size of mon is " << mon(gb).size());
                 // set up the multiplication table
                 if(Settings::MULT_TABLE_USE_NF_ALG) {
@@ -140,10 +160,19 @@ public:
                 else {
                         tab.init(gb);
                 }
+                alreadyComputed = std::map<MultivariatePolynomial<C>, int>();
         }
         
-        typename CommonTarskiQueryManager<MultivariatePolynomial<C>>::QueryResultType operator()(const MultivariatePolynomial<C>& p) const {
-                return multivariateTarskiQuery(p, tab, gb);
+        typename CommonTarskiQueryManager<MultivariatePolynomial<C>>::QueryResultType operator()(const MultivariatePolynomial<C>& _p) const {
+                auto it = alreadyComputed.find(_p);
+                if(it != alreadyComputed.end()) {
+                        return it->second;
+                }
+                else {
+                        int queryRes = multivariateTarskiQuery(_p, tab, gb);
+                        alreadyComputed.insert(std::make_pair(_p, queryRes));
+                        return queryRes;
+                }
         }
         
         // query on the constant polynomial n
@@ -153,9 +182,9 @@ public:
         }
         
         MultivariatePolynomial<C> reduceProduct(const MultivariatePolynomial<C>& a, const MultivariatePolynomial<C>& b) const {
-                //return baseReprToPolynomial(multiply(normalForm(a, gb), normalForm(b, gb), tab), tab.getBase());
-                CARL_LOG_WARN("carl.thom.tarski", "in theory we should use 'multiply' here!");
-                return baseReprToPolynomial(normalForm(a * b, gb), tab.getBase());
+                return baseReprToPolynomial(multiply(normalForm(a, gb), normalForm(b, gb), tab), tab.getBase());
+                //CARL_LOG_WARN("carl.thom.tarski", "in theory we should use 'multiply' here!");
+                //return baseReprToPolynomial(normalForm(a * b, gb), tab.getBase());
         }
 };
 
@@ -164,14 +193,14 @@ public:
  * 
  */
 template<typename Polynomial>
-int tarskiQuery(const Polynomial& p, const std::vector<Polynomial>& zeroSet) {
+int tarskiQuery(const Polynomial& _p, const std::vector<Polynomial>& zeroSet) {
         TarskiQueryManager<Polynomial> taq(zeroSet);
-        return taq(p);
+        return taq(_p);
 }
 
 template<typename Polynomial>
-int tarskiQuery(const Polynomial& p, const Polynomial& zeroSet) {
-        return tarskiQuery(p, std::vector<Polynomial>(1, zeroSet));
+int tarskiQuery(const Polynomial& _p, const Polynomial& zeroSet) {
+        return tarskiQuery(_p, std::vector<Polynomial>(1, zeroSet));
 }
 
 

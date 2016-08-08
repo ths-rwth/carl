@@ -166,7 +166,8 @@ std::vector<_Monomial<Coeff>> mon(const GB<Coeff>& g) {
                         res.push_back(candidate);
                 }
         }
-        while(nextTuple<Coeff>(currTuple, degrees)); 
+        while(nextTuple<Coeff>(currTuple, degrees));
+        CARL_LOG_TRACE("carl.thom.tarski", "result: " << res);
         return res;
 }
 

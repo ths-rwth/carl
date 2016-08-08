@@ -21,7 +21,7 @@
 #else
         #define PRINTV(x)
         #define PRINTV2(x)
-        #define PRINT
+        #define PRINT(x)
         #define LINE
 #endif
 
@@ -36,6 +36,7 @@ namespace carl {
 typedef std::vector<Sign> SignCondition; 
 
 enum ThomComparisonResult {LESS, EQUAL, GREATER};
+
         
 // todo make this recursive
 template<typename Coeff>
@@ -47,6 +48,36 @@ std::vector<UnivariatePolynomial<Coeff>> der(const UnivariatePolynomial<Coeff>& 
         derivatives.push_back(p);
         for(uint n = 1; n <= upto; n++) {
                 derivatives.push_back(p.derivative(n));
+        }
+        return derivatives;
+}
+
+// list of derivatives p^(from), ..., p^(upto) (including both from and upto)
+template<typename Coeff>
+std::vector<UnivariatePolynomial<Coeff>> der_exp(const UnivariatePolynomial<Coeff>& p, uint from, uint upto) {
+        assert(upto <= p.degree());
+        std::vector<UnivariatePolynomial<Coeff>> derivatives;
+        if(from > upto) return derivatives; // empty list  
+        derivatives.reserve(upto - from + 1);
+        derivatives.push_back(p.derivative(from));
+        for(uint n = from + 1; n <= upto; n++) {
+                derivatives.push_back(derivatives.back().derivative());
+        }
+        return derivatives;
+}
+
+// list of derivatives p^(from), ..., p^(upto) (including both from and upto)
+template<typename Coeff>
+std::vector<MultivariatePolynomial<Coeff>> der_exp(const MultivariatePolynomial<Coeff>& p, Variable::Arg var, uint from, uint upto) {
+        assert(upto <= p.degree(var));
+        std::vector<MultivariatePolynomial<Coeff>> derivatives;
+        if(from > upto) return derivatives; // empty list  
+        derivatives.reserve(upto - from + 1);
+        MultivariatePolynomial<Coeff> from_th = p;
+        for(uint i = 0; i < from; i++) from_th = from_th.derivative(var);
+        derivatives.push_back(from_th);
+        for(uint n = from + 1; n <= upto; n++) {
+                derivatives.push_back(derivatives.back().derivative(var));
         }
         return derivatives;
 }
@@ -72,66 +103,29 @@ std::vector<MultivariatePolynomial<Coeff>> der(
 // maybe make a class sign condition some day
 
 // states that tau extends sigma (see Algorithms for RAG, p.387)
-bool extends(const SignCondition& tau, const SignCondition& sigma) {
-        //assert(tau.size() == sigma.size() +1);
-        assert(tau.size() > sigma.size());
-        for(uint i = tau.size() - sigma.size(); i < tau.size(); i++) {
-                if(tau[i] != sigma[i - (tau.size() - sigma.size())]) return false;
-        }
-        return true;
-}
+bool extends(const SignCondition& tau, const SignCondition& sigma);
 
-bool isPrefix(const SignCondition& lhs, const SignCondition& rhs) {
-        if(lhs.size() > rhs.size()) {
-                return false;
-        }
-        for(uint i = 0; i < lhs.size(); i++) {
-                if(lhs[i] != rhs[i]) {
-                        return false;
-                }
-        }
-        return true;
-}
+bool isPrefix(const SignCondition& lhs, const SignCondition& rhs);
 
 // compares two sign conditions (associated to the same list of derivatives)
-// optimize this so that is returns a comparison result
-/*bool operator<(const SignCondition& lhs, const SignCondition& rhs) {
-        assert(lhs.size() == rhs.size());
-        assert(lhs.back() == rhs.back());
-        if(lhs.size() == 1) return false; // because then they are actually equal
-        assert(lhs.size() >= 2);
-        for(int i = (int)lhs.size() - 2; i >= 0; i--) {
-                if(lhs[i] != rhs[i]) {
-                        assert(lhs[i+1] == rhs[i+1]);
-                        if(lhs[i+1] == Sign::POSITIVE) {
-                                return lhs[i] < rhs[i];
-                        }
-                        else {
-                                return lhs[i] > rhs[i];
-                        }
-                }
-        }
-        return false;
-}*/
+ThomComparisonResult operator<(const SignCondition& lhs, const SignCondition& rhs);
 
-// compares two sign conditions (associated to the same list of derivatives)
-ThomComparisonResult operator<(const SignCondition& lhs, const SignCondition& rhs) {
-        assert(lhs.size() == rhs.size());
-        assert(lhs.back() == rhs.back());
-        if(lhs.size() == 1) return EQUAL;
-        assert(lhs.size() >= 2);
-        for(int i = (int)lhs.size() - 2; i >= 0; i--) {
-                if(lhs[i] != rhs[i]) {
-                        assert(lhs[i+1] == rhs[i+1]);
-                        if(lhs[i+1] == Sign::POSITIVE) {
-                                return (lhs[i] < rhs[i]) ? LESS : GREATER;
-                        }
-                        else {
-                                return (lhs[i] < rhs[i]) ? GREATER : LESS;
-                        }
-                }
+std::ostream& operator<<(std::ostream& os, const SignCondition& s);
+
+template<typename Number>
+Number rumpsBound(const UnivariatePolynomial<Number>& p) {
+        assert(!p.isZero());
+        uint n = p.degree();
+        uint n_half = n % 2 == 0 ? n/2 : (n+1)/2;
+        Number norm(0);
+        for(const auto& coeff : p.coefficients()) {
+                norm += carl::abs(coeff);
         }
-        return EQUAL;
+        norm += Number(1);
+        Number res = Number(14) / Number(5);
+        res /= carl::pow(Number(n), n_half + 1);       
+        res /= carl::pow(norm, n);
+        return res;
 }
         
 } // namespace carl
