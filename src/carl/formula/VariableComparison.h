@@ -2,6 +2,7 @@
 
 #include "model/mvroot/MultivariateRoot.h"
 #include "model/ran/RealAlgebraicNumber.h"
+#include "model/ModelValue.h"
 #include "../core/MultivariatePolynomial.h"
 #include "../core/Relation.h"
 #include "../core/Variable.h"
@@ -20,6 +21,14 @@ namespace carl {
 		Variable mVar;
 		boost::variant<MR, RAN> mValue;
 		Relation mRelation;
+		struct ValueToModelValue: public boost::static_visitor<ModelValue<Number,Poly>> {
+			ModelValue<Number,Poly> operator()(const MR& mr) const {
+				return mr;
+			}
+			ModelValue<Number,Poly> operator()(const RAN& ran) const {
+				return ran;
+			}
+		};
 	protected:
 		VariableComparison(Variable::Arg v, const boost::variant<MR, RAN>& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {}
 	public:	
@@ -36,6 +45,9 @@ namespace carl {
 		}
 		Relation relation() const {
 			return mRelation;
+		}
+		ModelValue<Number,Poly> value() const {
+			return boost::apply_visitor(ValueToModelValue(), mValue);
 		}
 		VariableComparison negation() const {
 			return VariableComparison(mVar, mValue, inverse(mRelation));
