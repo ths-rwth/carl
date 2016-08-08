@@ -865,6 +865,8 @@ namespace carl
              *         false, otherwise.
              */
             bool getSubstitution( Variable& _substitutionVariable, Pol& _substitutionTerm, bool _negated = false, const Variable& _exclude = carl::Variable::NO_VARIABLE ) const;
+			
+			bool getAssignment(Variable& _substitutionVariable, typename Pol::NumberType& _substitutionValue) const;
             
             /**
              * Gives the string representation of this constraint.

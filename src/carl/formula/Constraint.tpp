@@ -766,6 +766,16 @@ namespace carl
         }
         return false;
     }
+	
+	template<typename Pol>
+    bool Constraint<Pol>::getAssignment(Variable& _substitutionVariable, typename Pol::NumberType& _substitutionValue) const {
+		if (lhs().nrTerms() > 2) return false;
+		if (lhs().nrTerms() == 2 && !lhs().trailingTerm().isConstant()) return false;
+		if (!lhs().lterm().isSingleVariable()) return false;
+		_substitutionVariable = lhs().lterm().getSingleVariable();
+		_substitutionValue = lhs().constantPart() / lhs().lterm().coeff();
+		return true;
+	}
     
     template<typename Pol>
     ostream& operator<<( ostream& _out, const Constraint<Pol>& _constraint )
