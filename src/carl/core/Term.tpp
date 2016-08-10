@@ -150,6 +150,26 @@ Definiteness Term<Coefficient>::definiteness() const
 }
 
 template<typename Coefficient>
+Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Coefficient>& substitutions) const
+{
+	if (mMonomial) {
+		Monomial::Content content;
+		Coefficient coeff = mCoeff;
+		for (const auto& c: *mMonomial) {
+			auto it = substitutions.find(c.first);
+			if (it == substitutions.end()) {
+				content.push_back(c);
+			} else {
+				coeff *= carl::pow(it->second, c.second);
+			}
+		}
+		return Term<Coefficient>(mCoeff, createMonomial(std::move(content)));
+	} else {
+		return Term<Coefficient>(mCoeff);
+	}
+}
+
+template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
 {
 	if (mMonomial) {
