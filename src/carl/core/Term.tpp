@@ -150,37 +150,22 @@ Definiteness Term<Coefficient>::definiteness() const
 }
 
 template<typename Coefficient>
-template<typename SubstitutionType>
-Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
-{
-	if(mMonomial)
-	{
-		return std::move(mMonomial->substitute<Coefficient>(substitutions, coeff()));
-	}
-	else
-	{
-		return std::move(Term<Coefficient>(mCoeff));
-	}
-}
-
-template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
 {
 	if (mMonomial) {
-		return mCoeff * mMonomial->evaluate(substitutions);
+		return mCoeff * mMonomial->substitute(substitutions);
 	} else {
 		return Term<Coefficient>(mCoeff);
 	}
 }
 
 template<typename Coefficient>
-template<typename SubstitutionType>
-SubstitutionType Term<Coefficient>::evaluate(const std::map<Variable, SubstitutionType>& map) const
+Coefficient Term<Coefficient>::evaluate(const std::map<Variable, Coefficient>& map) const
 {
 	if (mMonomial) {
-		return SubstitutionType(mCoeff) * mMonomial->evaluate(map);
+		return mCoeff * mMonomial->evaluate(map);
 	} else {
-		return SubstitutionType(mCoeff);
+		return mCoeff;
 	}
 }
 

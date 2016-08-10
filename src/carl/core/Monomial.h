@@ -471,6 +471,8 @@ namespace carl
 		 * @return \f$ this[<substitutions>] \f$
 		 */
 		template<typename Coefficient>
+		Coefficient substitute(const std::map<Variable, Coefficient>& substitutions) const;
+		template<typename Coefficient>
 		Coefficient evaluate(const std::map<Variable, Coefficient>& substitutions) const;
 
 		///////////////////////////
