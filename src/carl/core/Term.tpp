@@ -7,7 +7,6 @@
 
 #include "../numbers/numbers.h"
 #include "Term.h"
-#include "Monomial_derivative.h"
 #include "Monomial_substitute.h"
 
 namespace carl
@@ -134,9 +133,8 @@ Term<Coefficient> Term<Coefficient>::derivative(Variable::Arg v) const
 		// Derivatives of constants are zero.
 		return std::move(Term<Coefficient>(carl::constant_zero<Coefficient>().get()));
 	}
-	Term<Coefficient> t = mMonomial->derivative<Coefficient>(v);
-	t *= mCoeff;
-	return std::move(t);
+	auto derivative = mMonomial->derivative(v);
+	return Term<Coefficient>(mCoeff * derivative.first, derivative.second);
 }
 
 template<typename Coefficient>

@@ -466,8 +466,7 @@ namespace carl
 		 * @param v Variable.
 		 * @return Partial derivative.
 		 */
-		template<typename Coefficient>
-		Term<Coefficient> derivative(Variable::Arg v) const;
+		std::pair<std::size_t,Monomial::Arg> derivative(Variable::Arg v) const;
 		
 		/**
 		 * Applies the given substitutions to this monomial.
