@@ -7,7 +7,6 @@
 
 #include "../numbers/numbers.h"
 #include "Term.h"
-#include "Monomial_substitute.h"
 
 namespace carl
 {
@@ -167,13 +166,10 @@ Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable,Substitu
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
 {
-	if(mMonomial)
-	{
-		return std::move(mMonomial->substitute<Coefficient>(substitutions, coeff()));
-	}
-	else
-	{
-		return std::move(Term<Coefficient>(mCoeff));
+	if (mMonomial) {
+		return mCoeff * mMonomial->evaluate(substitutions);
+	} else {
+		return Term<Coefficient>(mCoeff);
 	}
 }
 
@@ -181,23 +177,11 @@ template<typename Coefficient>
 template<typename SubstitutionType>
 SubstitutionType Term<Coefficient>::evaluate(const std::map<Variable, SubstitutionType>& map) const
 {
-    SubstitutionType result(this->coeff());
-	if (this->monomial())
-    {
-         // TODO: cannot link Monomial::evaluate
-//		result *= this->monomial()->evaluate(map);
-        for(unsigned i = 0; i < this->monomial()->nrVariables(); ++i)
-        {
-            CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << (*this->monomial())[i].first);
-            // We expect every variable to be in the map.
-            CARL_LOG_ASSERT("carl.interval", map.count((*this->monomial())[i].first) > (size_t)0, "Every variable is expected to be in the map.");
-            result *= carl::pow(map.at((*this->monomial())[i].first), (*this->monomial())[i].second);
-            if( carl::isZero( result ) )
-                return result;
-        }
-        return result;
-    }
-	return result;
+	if (mMonomial) {
+		return SubstitutionType(mCoeff) * mMonomial->evaluate(map);
+	} else {
+		return SubstitutionType(mCoeff);
+	}
 }
 
 template<typename Coefficient>

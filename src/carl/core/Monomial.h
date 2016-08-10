@@ -20,11 +20,7 @@
 #include <sstream>
 
 namespace carl
-{   
-
-	template<typename Coefficient>
-	class Term;
-	
+{
 	/// Type of an exponent.
 	using exponent = uint;
 	
@@ -470,22 +466,13 @@ namespace carl
 		
 		/**
 		 * Applies the given substitutions to this monomial.
-		 * Every variable may be substituted by some number. Additionally, a constant factor may be given that is multiplied with the result.
+		 * Every variable may be substituted by some value.
 		 * @param substitutions Maps variables to numbers.
-		 * @param factor A constant factor.
-		 * @return \f$ factor \cdot this[<substitutions>] \f$
+		 * @return \f$ this[<substitutions>] \f$
 		 */
 		template<typename Coefficient>
-		Term<Coefficient> substitute(const std::map<Variable, Coefficient>& substitutions, Coefficient factor) const;
-		/**
-		 * Applies the given substitutions to this monomial.
-		 * Every variable may be substituted by some term. Additionally, a constant factor may be given that is multiplied with the result.
-		 * @param substitutions Maps variables to terms.
-		 * @param factor A constant factor.
-		 * @return \f$ factor \cdot this[<substitutions>] \f$
-		 */
-		template<typename Coefficient>
-		Term<Coefficient> substitute(const std::map<Variable, Term<Coefficient>>& substitutions, const Coefficient& factor) const;
+		Coefficient evaluate(const std::map<Variable, Coefficient>& substitutions) const;
+
 		///////////////////////////
 		// Orderings
 		///////////////////////////
@@ -759,6 +746,11 @@ namespace carl
 	
 	Monomial::Arg operator*(Variable::Arg lhs, Variable::Arg rhs);
 	/// @}
+	
+	Monomial::Arg pow(Variable::Arg v, std::size_t exp);
+	inline Monomial::Arg pow(const Monomial::Arg& m, std::size_t exp) {
+		return m->pow(exp);
+	}
 
 	struct hashLess {
 		bool operator()(const Monomial& lhs, const Monomial& rhs) const {
@@ -829,3 +821,5 @@ namespace std
 		}
 	};
 } // namespace std
+
+#include "Monomial.tpp"
