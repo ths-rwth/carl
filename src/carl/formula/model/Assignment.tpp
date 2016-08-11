@@ -410,4 +410,33 @@ namespace carl
                     getDefaultModel(_defaultModel, subFormula, _overwrite, _seed);
         }
     }
+	
+	template<typename Rational, typename Poly>
+	Formula<Poly> representingFormula(const ModelVariable& mv, const Model<Rational,Poly>& model) {
+		auto it = model.find(mv);
+		assert(it != model.end());
+		const auto& val = it->second;
+		if (val.isBool()) {
+			assert(mv.isVariable());
+			if (val.isBool()) return Formula<Poly>(mv.asVariable());
+			else return Formula<Poly>(FormulaType::NOT, Formula<Poly>(mv.asVariable()));
+		} else if (val.isRational()) {
+			assert(mv.isVariable());
+			return Formula<Poly>(mv.asVariable() - val.asRational(), Relation::EQ);
+		} else if (val.isSqrtEx()) {
+			assert(false);
+		} else if (val.isRAN()) {
+			return Formula<Poly>(VariableComparison<Poly>(mv.asVariable(), val.asRAN(), Relation::EQ));
+		} else if (val.isBVValue()) {
+			assert(false);
+		} else if (val.isSortValue()) {
+			assert(false);
+		} else if (val.isUFModel()) {
+			assert(false);
+		} else if (val.isSubstitution()) {
+			return val.asSubstitution()->representingFormula(mv);
+		}
+		assert(false);
+		return Formula<Poly>(FormulaType::FALSE);
+	}
 }    

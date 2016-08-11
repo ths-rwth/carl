@@ -6,6 +6,7 @@
 
 #include <boost/optional.hpp>
 
+#include "../Formula.h"
 #include "mvroot/MultivariateRoot.h"
 #include "ModelValue.h"
 #include "ModelVariable.h"
@@ -49,6 +50,8 @@ namespace carl {
 		virtual void multiplyBy( const Rational& _number ) = 0;
 		/// Adds a rational to this model substitution.
 		virtual void add( const Rational& _number ) = 0;
+		
+		virtual Formula<Poly> representingFormula( const ModelVariable& mv ) = 0;
         
 		template<typename Iterator>
 		const ModelValue<Rational,Poly>& getModelValue( Iterator _mvit, Model<Rational,Poly>& _model )
