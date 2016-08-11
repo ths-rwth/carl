@@ -769,6 +769,7 @@ namespace carl
 	
 	template<typename Pol>
     bool Constraint<Pol>::getAssignment(Variable& _substitutionVariable, typename Pol::NumberType& _substitutionValue) const {
+		if (relation() != Relation::EQ) return false;
 		if (lhs().nrTerms() > 2) return false;
 		if (lhs().nrTerms() == 2 && !lhs().trailingTerm().isConstant()) return false;
 		if (!lhs().lterm().isSingleVariable()) return false;
