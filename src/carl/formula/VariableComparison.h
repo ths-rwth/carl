@@ -29,6 +29,14 @@ namespace carl {
 				return ran;
 			}
 		};
+		struct VariableCollector: public boost::static_visitor<Variables> {
+			Variables operator()(const MR& mr) const {
+				return mr.gatherVariables();
+			}
+			Variables operator()(const RAN& ran) const {
+				return Variables();
+			}
+		};
 	protected:
 		VariableComparison(Variable::Arg v, const boost::variant<MR, RAN>& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {}
 	public:	
@@ -51,6 +59,11 @@ namespace carl {
 		}
 		VariableComparison negation() const {
 			return VariableComparison(mVar, mValue, inverse(mRelation));
+		}
+		void collectVariables(Variables& vars) const {
+			vars.insert(mVar);
+			auto newVars = boost::apply_visitor(VariableCollector(), mValue);
+			vars.insert(newVars.begin(), newVars.end());
 		}
 		
 		std::string toString(unsigned _resolveUnequal = 0, bool _infix = false, bool _friendlyNames = true) const {
