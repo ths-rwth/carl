@@ -83,7 +83,7 @@ namespace carl
                 }
                 break;
 			case FormulaType::VARCOMPARE:
-				_vars.insert(variableComparison().var());
+				variableComparison().collectVariables(_vars);
 				break;
             case FormulaType::BITVECTOR:
                 if( _bitvectorVars ) 
