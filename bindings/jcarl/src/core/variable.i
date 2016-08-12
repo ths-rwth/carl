@@ -1,8 +1,8 @@
 
 %module ModVariable
 %{
-#include "Variable.h"
-#include "Monomial.h"
+#include <carl/core/Variable.h>
+#include <carl/core/Monomial.h>
 %}
 
 
