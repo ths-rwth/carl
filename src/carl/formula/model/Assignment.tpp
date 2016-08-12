@@ -415,7 +415,10 @@ namespace carl
 	Formula<Poly> representingFormula(const ModelVariable& mv, const Model<Rational,Poly>& model) {
 		auto it = model.find(mv);
 		assert(it != model.end());
-		const auto& val = it->second;
+		return representingFormula(mv, it->second);
+	}
+	template<typename Rational, typename Poly>
+	Formula<Poly> representingFormula(const ModelVariable& mv, const ModelValue<Rational,Poly>& val) {
 		if (val.isBool()) {
 			assert(mv.isVariable());
 			if (val.isBool()) return Formula<Poly>(mv.asVariable());
