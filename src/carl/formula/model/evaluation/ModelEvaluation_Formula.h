@@ -17,6 +17,24 @@ namespace model {
 		f = Formula<Poly>(f.getType(), std::move(res));
 	}
 	
+	template<typename Rational, typename Poly>
+	void evaluateVarCompare(Formula<Poly>& f, const Model<Rational,Poly>& m) {
+		assert(f.getType() == FormulaType::VARCOMPARE);
+		const auto& vc = f.variableComparison();
+		auto it = m.find(vc.var());
+		if (it == m.end()) return;
+		const auto& value = m.evaluated(vc.var());
+		assert(value.isRational() || value.isRAN());
+		RealAlgebraicNumber<Rational> reference = value.isRational() ? RealAlgebraicNumber<Rational>(value.asRational()) : value.asRAN();
+		auto cmp = vc.value();
+		if (cmp.isSubstitution()) cmp = cmp.asSubstitution()->evaluate(m);
+		if (cmp.isSubstitution()) return;
+		assert(cmp.isRational() || cmp.isRAN());
+		RealAlgebraicNumber<Rational> val = cmp.isRational() ? RealAlgebraicNumber<Rational>(cmp.asRational()) : cmp.asRAN();
+		if (val == reference) f = Formula<Poly>(FormulaType::TRUE);
+		else f = Formula<Poly>(FormulaType::FALSE);
+	}
+	
 	/**
 	 * Substitutes all variables from a model within a formula.
 	 * May fail to substitute some variables, for example if the values are RANs or SqrtEx.
@@ -67,10 +85,11 @@ namespace model {
 				}
 				break;
 			}
-			//case FormulaType::VARCOMPARE: {
-			//	CARL_LOG_WARN("carl.model.evaluation", "Evaluation of varcompare not yet implemented.");
-			//	break;
-			//}
+			case FormulaType::VARCOMPARE: {
+				evaluateVarCompare(f, m);
+				CARL_LOG_WARN("carl.model.evaluation", "Evaluation of varcompare not yet implemented.");
+				break;
+			}
 			case FormulaType::BITVECTOR: {
 				BVConstraint bvc = substitute(f.bvConstraint(), m);
 				if (bvc.isTrue()) f = Formula<Poly>(FormulaType::TRUE);
