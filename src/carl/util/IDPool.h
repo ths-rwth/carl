@@ -14,6 +14,12 @@ namespace carl {
 		std::mutex mMutex;
 #endif
 	public:
+        IDPool() : mFreeIDs(true) {}
+        IDPool& operator=(const IDPool& _idPool) {
+            this->mFreeIDs = _idPool.mFreeIDs;
+            return *this;
+        }
+
 		std::size_t get() {
 #ifdef THREAD_SAFE
 			std::lock_guard<std::mutex> lock(mMutex);
