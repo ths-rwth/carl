@@ -370,18 +370,6 @@ namespace carl
             bool operator==( const ConstraintContent& _constraint ) const;
             
             /**
-             * Prints the representation of the given constraints on the given stream.
-             * @param _out The stream to print on.
-             * @param _constraint The constraint to print.
-             * @return The given stream after printing.
-             */
-            template<typename P>
-            friend std::ostream& operator<<( std::ostream& _out, const ConstraintContent<P>& _cc )
-            {
-                return (_out << _cc.toString());
-            }
-            
-            /**
              * Gives the string representation of this constraint.
              * @param _unequalSwitch A switch to indicate which kind of unequal should be used.
              *         For p != 0 with infix:  0: "p != 0", 1: "p <> 0", 2: "p /= 0"
@@ -394,6 +382,18 @@ namespace carl
             std::string toString( unsigned _unequalSwitch = 0, bool _infix = true, bool _friendlyVarNames = true ) const;
             
     };
+            
+    /**
+     * Prints the representation of the given constraints on the given stream.
+     * @param _out The stream to print on.
+     * @param _constraint The constraint to print.
+     * @return The given stream after printing.
+     */
+    template<typename P>
+    std::ostream& operator<<( std::ostream& _out, const ConstraintContent<P>& _cc )
+    {
+        return (_out << _cc.toString());
+    }
 
     /**
      * The constraint class.

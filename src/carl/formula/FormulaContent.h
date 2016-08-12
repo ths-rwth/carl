@@ -370,17 +370,17 @@ namespace carl {
              */
             std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true ) const; 
             
-            /**
-             * The output operator of a formula.
-             * @param _out The stream to print on.
-             * @param _formula
-             */
-            template<typename P>
-            friend std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>& _formula )
-            {
-                return (_out << _formula.toString());
-            }
     };
+/**
+     * The output operator of a formula.
+     * @param _out The stream to print on.
+     * @param _formula
+     */
+    template<typename P>
+    std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>& _formula )
+    {
+        return (_out << _formula.toString());
+    }
 	
 }
 
