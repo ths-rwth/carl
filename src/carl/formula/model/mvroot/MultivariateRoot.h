@@ -44,7 +44,9 @@ public:
 		return mPoly.isUnivariate();
 	}
 	std::set<Variable> gatherVariables() const {
-		return mPoly.gatherVariables();
+		Variables var = mPoly.gatherVariables();
+		var.erase(mVar);
+		return var;
 	}
 	void substituteIn(Variable::Arg var, const Poly& poly) {
 		mPoly.substituteIn(var, poly);
