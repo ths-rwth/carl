@@ -27,7 +27,9 @@ private:
 public:
 	MultivariateRoot(const Poly& p, std::size_t k, Variable::Arg v):
 		mPoly(p), mK(k), mVar(v), mEvalMap(), mRAN(0, false)
-	{}
+	{
+		assert(mK > 0);
+	}
 	
 	const Poly& poly() const {
 		return mPoly;

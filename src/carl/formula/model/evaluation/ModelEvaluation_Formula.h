@@ -99,7 +99,9 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void evaluate(ModelValue<Rational,Poly>& res, Formula<Poly>& f, const Model<Rational,Poly>& m) {
-		substitute(f, m);
+		substituteIn(f, m);
+		if (f.isTrue()) res = true;
+		else if (f.isFalse()) res = false;
 	}
 }
 }

@@ -57,5 +57,14 @@ ModelValue<Rational,Poly> evaluate(const T& t, const Model<Rational,Poly>& m) {
 	return res;
 }
 
+template<typename T, typename Rational, typename Poly>
+unsigned satisfiedBy(const T& t, const Model<Rational,Poly>& m) {
+	auto mv = evaluate(t, m);
+	if (mv.isBool()) {
+		return mv.asBool() ? 1 : 0;
+	}
+	return 2;
+}
+
 }
 }

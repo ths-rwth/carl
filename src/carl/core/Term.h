@@ -278,11 +278,9 @@ class Term
 		
 		Definiteness definiteness() const;
 		
-		template<typename SubstitutionType=Coefficient>
-		Term substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
+		Term substitute(const std::map<Variable, Coefficient>& substitutions) const;
 		Term substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
-        template<typename SubstitutionType = Coefficient>
-		SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& map) const;
+        Coefficient evaluate(const std::map<Variable, Coefficient>& map) const;
 		
 		
 		template<bool gatherCoeff, typename CoeffType>

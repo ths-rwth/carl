@@ -146,54 +146,6 @@ namespace carl
 		}
 		return createMonomial(std::move(newExps), mTotalDegree / 2);
 	}
-
-	Monomial::Arg Monomial::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
-	{
-		Content newExps;
-		auto tdegree = mTotalDegree;
-		// Linear, as we expect small monomials.
-		auto itright = m->mExponents.begin();
-		for(auto itleft = mExponents.begin(); itleft != mExponents.end();)
-		{
-			// Done with division
-			if(itright == m->mExponents.end())
-			{
-				// Insert remaining part
-				newExps.insert(newExps.end(), itleft, mExponents.end());
-				return MonomialPool::getInstance().create( std::move(newExps), tdegree );
-			}
-			// Variable is present in both monomials.
-			if(itleft->first == itright->first)
-			{
-				uint newExp = std::max(itleft->second, itright->second) - itright->second;
-				if(newExp != 0)
-				{
-					newExps.emplace_back(itleft->first, newExp);
-					tdegree -= itright->second;
-				}
-				else
-				{
-					tdegree -= itleft->second;
-				}
-				++itright;
-				++itleft;
-			}
-			// Variable is not present in lhs, dividing lcm yields variable will not occur in result
-
-			else if(itleft->first < itright->first)
-			{
-				++itright;
-			}
-			else
-			{
-				assert(itleft->first > itright->first);
-				newExps.push_back(*itleft);
-				++itleft;
-			}
-		}
-                if (newExps.empty()) return nullptr;
-		return MonomialPool::getInstance().create( std::move(newExps), tdegree);
-	}
 	
 	Monomial::Arg Monomial::separablePart() const
 	{
@@ -219,6 +171,34 @@ namespace carl
 			expsum += newExps.back().second;
 		}
 		return createMonomial(std::move(newExps), expsum);
+	}
+	
+	std::pair<std::size_t,Monomial::Arg> Monomial::derivative(Variable::Arg v) const {
+		CARL_LOG_FUNC("carl.core.monomial", *this << ", " << v);
+	    
+	     // Linear implementation, as we expect very small monomials.
+	    auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
+	    if(it == mExponents.cend())
+	    {
+	        return std::make_pair(0, nullptr);
+	    } else if (it->second == 1) {
+			// If the exponent is one, the variable does not occur in the new monomial.
+			if (mExponents.size() == 1) {
+				// If it was the only variable, we get the one-term.
+				return std::make_pair(1, nullptr);
+			} else {
+				std::vector<std::pair<Variable, exponent>> newExps;
+				newExps.assign(mExponents.begin(), it);
+				newExps.insert(newExps.end(), it+1, mExponents.end());
+				return std::make_pair(1, createMonomial(std::move(newExps), mTotalDegree-1));
+			}
+		} else {
+			// We have to decrease the exponent of the variable by one.
+			std::vector<std::pair<Variable, exponent>> newExps;
+			newExps.assign(mExponents.begin(), mExponents.end());
+			newExps[uint(it - mExponents.begin())].second -= exponent(1);
+			return std::make_pair(it->second, createMonomial(std::move(newExps), mTotalDegree-1));
+		}
 	}
 	
 	std::string Monomial::toString(bool infix, bool friendlyVarNames) const
@@ -378,27 +358,7 @@ namespace carl
 		}
 		return true;
 	}
-        
-        /*
-         * TODO: cannot link Monomial::evaluate
-        template<typename SubstitutionType>
-        SubstitutionType Monomial::evaluate(const std::map<Variable, SubstitutionType>& map) const
-        {
-            SubstitutionType result = constant_one<SubstitutionType>::get();
-            // TODO use iterator.
-            CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << *this);
-            for(unsigned i = 0; i < mExponents.size(); ++i)
-            {
-                CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << mExponents[i].first);
-                // We expect every variable to be in the map.
-                CARL_LOG_ASSERT("carl.interval", map.count(mExponents[i].first) > (size_t)0, "Every variable is expected to be in the map.");
-                result *= carl::pow(map.at(mExponents[i].first), mExponents[i].second);
-                if( carl::isZero( result.isZero() ) )
-                    return result;
-            }
-            return result;
-        }*/
-	
+
 	CompareResult Monomial::lexicalCompare(const Monomial& lhs, const Monomial& rhs)
 	{
 		assert( (&lhs != &rhs) || (lhs.id() == rhs.id()) );
@@ -522,5 +482,9 @@ namespace carl
 		else
 			newExps.emplace_back( lhs, 2 );
 		return MonomialPool::getInstance().create( std::move(newExps), 2 );
+	}
+	
+	Monomial::Arg pow(Variable::Arg v, std::size_t exp) {
+		return createMonomial(v, exp);
 	}
 }

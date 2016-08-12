@@ -111,6 +111,12 @@ namespace carl
 		}
 		
 		// Additional (w.r.t. std::map)
+		Model() {}
+		Model(const std::map<Variable, Rational>& assignment) {
+			for (const auto& a: assignment) {
+				mData.emplace(a.first, a.second);
+			}
+		}
 		template<typename Container>
 		bool contains(const Container& c) const {
 			for (const auto& var: c) {

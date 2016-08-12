@@ -12,8 +12,11 @@
 #include "ModelVariable.h"
 
 namespace carl {
-	template<typename Rational, typename Poly>
-	class Model;
+	template<typename Rational, typename Poly> class Model;
+	template<typename Rational, typename Poly> class ModelFormulaSubstitution;
+	template<typename Rational, typename Poly> class ModelMVRootSubstitution;
+	template<typename Rational, typename Poly> class ModelPolynomialSubstitution;
+
 	template<typename Rational, typename Poly>
 	class ModelSubstitution {
 	protected:
@@ -47,6 +50,8 @@ namespace carl {
 		virtual void multiplyBy( const Rational& _number ) = 0;
 		/// Adds a rational to this model substitution.
 		virtual void add( const Rational& _number ) = 0;
+		
+		virtual Formula<Poly> representingFormula( const ModelVariable& mv ) = 0;
         
 		template<typename Iterator>
 		const ModelValue<Rational,Poly>& getModelValue( Iterator _mvit, Model<Rational,Poly>& _model )
@@ -63,6 +68,9 @@ namespace carl {
 		static ModelValue<Rational,Poly> create(Args&&... args) {
 			return ModelValue<Rational,Poly>(std::make_shared<Substitution>(std::forward<Args>(args)...));
 		}
+		static ModelValue<Rational,Poly> create(const MultivariateRoot<Poly>& mr) {
+			return create<ModelMVRootSubstitution<Rational,Poly>>(mr);
+		}
 	};
 	template<typename Rational, typename Poly>
 	inline std::ostream& operator<<(std::ostream& os, const ModelSubstitution<Rational,Poly>& ms) {
@@ -74,67 +82,8 @@ namespace carl {
 		ms->print(os);
 		return os;
 	}
-	
-	template<typename Rational, typename Poly>
-	class ModelPolynomialSubstitution: public ModelSubstitution<Rational,Poly> {
-	private:
-		using Super = ModelSubstitution<Rational,Poly>;
-		Poly mPoly;
-	public:
-		ModelPolynomialSubstitution(const Poly& p): ModelSubstitution<Rational,Poly>(), mPoly(p)
-		{}
-		virtual void multiplyBy( const Rational& _number );
-		virtual void add( const Rational& _number );
-		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const;
-		virtual bool dependsOn(const ModelVariable& var) const {
-			if (!var.isVariable()) return false;
-			return mPoly.degree(var.asVariable()) > 0;
-		}
-		virtual void print(std::ostream& os) const {
-			os << mPoly;
-		}
-	};
-	
-	template<typename Rational, typename Poly>
-	class ModelMVRootSubstitution: public ModelSubstitution<Rational,Poly> {
-	public:
-		using MVRoot = MultivariateRoot<Poly>;
-	private:
-		using Super = ModelSubstitution<Rational,Poly>;
-		MVRoot mRoot;
-	public:
-		ModelMVRootSubstitution(const MVRoot& r): ModelSubstitution<Rational,Poly>(), mRoot(r)
-		{}
-		virtual void multiplyBy(const Rational&) {}
-		virtual void add(const Rational&) {}
-		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const;
-		virtual bool dependsOn(const ModelVariable& var) const {
-			if (!var.isVariable()) return false;
-			return mRoot.poly().degree(var.asVariable()) > 0;
-		}
-		virtual void print(std::ostream& os) const {
-			os << mRoot;
-		}
-	};
-	
-	template<typename Rational, typename Poly>
-	class ModelFormulaSubstitution: public ModelSubstitution<Rational,Poly> {
-	private:
-		using Super = ModelSubstitution<Rational,Poly>;
-		Formula<Poly> mFormula;
-	public:
-		ModelFormulaSubstitution(const Formula<Poly>& f): ModelSubstitution<Rational,Poly>(), mFormula(f)
-		{}
-		virtual void multiplyBy(const Rational&) {}
-		virtual void add(const Rational&) {}
-		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const;
-		virtual bool dependsOn(const ModelVariable& var) const {
-			return mFormula.variables().count(var) > 0;
-		}
-		virtual void print(std::ostream& os) const {
-			os << mFormula;
-		}
-	};
 }
 
-#include "ModelSubstitution.tpp"
+#include "substitutions/ModelFormulaSubstitution.h"
+#include "substitutions/ModelMVRootSubstitution.h"
+#include "substitutions/ModelPolynomialSubstitution.h"
