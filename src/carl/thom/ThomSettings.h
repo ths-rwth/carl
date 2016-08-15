@@ -16,9 +16,9 @@ struct ThomSettings1 {
                
         static const bool                       SIGN_DETERMINATION_REDUCE =     true;       
         static const bool                       MULT_TABLE_USE_NF_ALG =         true;
-        static const IntermediatePointAlgorithm INTERMEDIATE_POINT_ALGORITHM =  IntermediatePointAlgorithm::BOUND;
+        static const IntermediatePointAlgorithm INTERMEDIATE_POINT_ALGORITHM =  IntermediatePointAlgorithm::ITERATIVE;
         static const SeperationBound            SEPERATION_BOUND =              SeperationBound::RUMP;
-        static constexpr double                 INITIAL_OFFSET =                0.5;
+        static constexpr double                 INITIAL_OFFSET =                1.0;
 };
 
 struct ThomSettings2 : ThomSettings1 {

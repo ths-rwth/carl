@@ -527,6 +527,7 @@ template<typename Coeff>
 Coeff ThomEncoding<Coeff>::intermediatePoint(const ThomEncoding<Coeff>& lhs, const Coeff& rhs) {
         CARL_LOG_ASSERT("carl.thom.samples", lhs < rhs, "intermediatePoint with wrong order or equal arguments called");
         Coeff res;
+        /*
         if(lhs.isOneDimensional()) {
                 MultivariatePolynomial<Coeff> rhs_poly = lhs.mainVar - rhs;
                 UnivariatePolynomial<Coeff> prod_der = (lhs.polynomial() * rhs_poly).toUnivariatePolynomial().derivative();
@@ -534,13 +535,14 @@ Coeff ThomEncoding<Coeff>::intermediatePoint(const ThomEncoding<Coeff>& lhs, con
                 res = rhs - epsilon;     
         }
         else {
+        */
                 Coeff epsilon(1);
                 res = rhs - epsilon;
                 while(lhs >= res) {
                     epsilon /= 2;
                     res = rhs - epsilon;
                 }
-        }
+        //}
         CARL_LOG_TRACE("carl.thom.samples", "result: " << res);
         return res;
 }
@@ -549,6 +551,7 @@ template<typename Coeff>
 Coeff ThomEncoding<Coeff>::intermediatePoint(const Coeff& lhs, const ThomEncoding<Coeff>& rhs) {
         CARL_LOG_ASSERT("carl.thom.samples", lhs < rhs, "intermediatePoint with wrong order order in arguments called");
         Coeff res;
+        /*
         if(rhs.isOneDimensional()) {
                 MultivariatePolynomial<Coeff> lhs_poly = rhs.mainVar - lhs;
                 UnivariatePolynomial<Coeff> prod_der = (rhs.polynomial() * lhs_poly).toUnivariatePolynomial().derivative();
@@ -556,13 +559,14 @@ Coeff ThomEncoding<Coeff>::intermediatePoint(const Coeff& lhs, const ThomEncodin
                 res = lhs + epsilon;     
         }
         else {
+        */
                 Coeff epsilon(1);
                 res = lhs + epsilon;
                 while(res >= rhs) {
                     epsilon /= 2;
                     res = lhs + epsilon;
                 }
-        }
+        //}
         CARL_LOG_TRACE("carl.thom.samples", "result: " << res);
         return res;
 }

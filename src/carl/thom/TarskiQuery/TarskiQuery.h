@@ -130,8 +130,10 @@ private:
          * are always computed w.r.t. the same set of zeros.
          * We therefore cache the multiplication table and the groebner base.
          */
-        MultiplicationTable<C> tab;
-        GB<C> gb;
+        //MultiplicationTable<C> tab;
+        //GB<C> gb;
+        
+        MultiplicationTable2<C> tab;
         
         mutable std::map<MultivariatePolynomial<C>, int> alreadyComputed;
         
@@ -145,7 +147,7 @@ public:
 #endif
                 // set up the groebner base
                 //std::cout << "zero set: " << zeroSet << std::endl;
-                GBProcedure<MultivariatePolynomial<C>, Buchberger, StdAdding> gbobject;
+                /*GBProcedure<MultivariatePolynomial<C>, Buchberger, StdAdding> gbobject;
                 for(const auto& _p : zeroSet) gbobject.addPolynomial(_p);
                 gbobject.reduceInput();
                 gbobject.calculate();
@@ -153,13 +155,18 @@ public:
                 //std::cout << "groebner basis: " << gb << std::endl;
                 CARL_LOG_ASSERT("carl.thom.tarski", hasFiniteMon(gb), "tried to setup a tarski query manager on an infinite zero set: gb is " << gb );
                 CARL_LOG_INFO("carl.thom.tarski", "size of mon is " << mon(gb).size());
+                 */
+                GroebnerBase<C> gb(zeroSet.begin(), zeroSet.end());
                 // set up the multiplication table
-                if(Settings::MULT_TABLE_USE_NF_ALG) {
+                /*if(Settings::MULT_TABLE_USE_NF_ALG) {
                         tab.init2(gb);
                 }
                 else {
                         tab.init(gb);
                 }
+                */
+                tab = MultiplicationTable2<C>(gb);
+                
                 alreadyComputed = std::map<MultivariatePolynomial<C>, int>();
         }
         
@@ -169,7 +176,7 @@ public:
                         return it->second;
                 }
                 else {
-                        int queryRes = multivariateTarskiQuery(_p, tab, gb);
+                        int queryRes = multivariateTarskiQuery(_p, tab);
                         alreadyComputed.insert(std::make_pair(_p, queryRes));
                         return queryRes;
                 }
@@ -182,9 +189,10 @@ public:
         }
         
         MultivariatePolynomial<C> reduceProduct(const MultivariatePolynomial<C>& a, const MultivariatePolynomial<C>& b) const {
-                return baseReprToPolynomial(multiply(normalForm(a, gb), normalForm(b, gb), tab), tab.getBase());
+                //return baseReprToPolynomial(multiply(normalForm(a, gb), normalForm(b, gb), tab), tab.getBase());
                 //CARL_LOG_WARN("carl.thom.tarski", "in theory we should use 'multiply' here!");
                 //return baseReprToPolynomial(normalForm(a * b, gb), tab.getBase());
+                return tab.baseReprToPolynomial(tab.multiply(tab.reduce(a), tab.reduce(b)));
         }
 };
 

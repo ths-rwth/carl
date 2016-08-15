@@ -5,6 +5,8 @@
 #include "carl/groebner/groebner.h"
 
 #include "carl/thom/TarskiQuery/TarskiQuery.h"
+#include "carl/thom/TarskiQuery/GroebnerBase.h"
+#include "carl/thom/TarskiQuery/MultiplicationTable2.h"
 
 #include "../Common.h"
 
@@ -107,6 +109,46 @@ protected:
     }
 };
 
+TEST(TarskiQuery, Table2) {
+    typedef MultivariatePolynomial<Rational> Polynomial;
+    StringParser sp;  
+    sp.setVariables({"x", "y"});
+    Polynomial circle = sp.parseMultivariatePolynomial<Rational>("x^2 + y^2 + -1");
+    Polynomial ellipse = sp.parseMultivariatePolynomial<Rational>("x^2 + 4*y^2 + x*y + -2");
+    Polynomial curve = sp.parseMultivariatePolynomial<Rational>("y^3*x + -4*y + -1*x");
+    Polynomial pol = sp.parseMultivariatePolynomial<Rational>("y^2*x^2 + x*y + -1*x + 2");
+    std::vector<Polynomial> polys = {circle, ellipse};
+    
+    GroebnerBase<Rational> gb(polys.begin(), polys.end());
+    std::cout << "input: " << polys << std::endl;
+    std::cout << "groebner base: " << gb.get() << std::endl;
+    std::cout << "reduce " << circle << ": " << gb.reduce(circle) << std::endl;
+    std::cout << "reduce " << curve << ": " << gb.reduce(curve) << std::endl;
+    std::cout << "cor: " << gb.cor() << std::endl;
+    std::cout << "mon: " << gb.mon() << std::endl;
+    std::cout << "bor: " << gb.bor() << std::endl;
+    
+    MultiplicationTable2<Rational> mult_tab(gb);
+    std::cout << mult_tab << std::endl;
+    BaseRepresentation<Rational> curve_br(mult_tab.getBase(), gb.reduce(curve));
+    BaseRepresentation<Rational> pol_br(mult_tab.getBase(), gb.reduce(pol));
+    std::cout << "curve_br = " << curve_br << std::endl;
+    std::cout << "pol_br = " << pol_br << std::endl;
+    std::cout << "multiply(curve_br, pol_br): " << mult_tab.multiply(curve_br, pol_br) << std::endl;
+    
+    _Monomial<Rational> mon1 = sp.parseTerm<Rational>("x^4");
+    _Monomial<Rational> mon2 = sp.parseTerm<Rational>("x^2*y");
+    BaseRepresentation<Rational> br_mon1 = mult_tab.getEntry(mon1).br;
+    BaseRepresentation<Rational> br_mon2 = mult_tab.getEntry(mon2).br;
+    std::cout << "br_mon1 = " << br_mon1 << std::endl;
+    std::cout << "br_mon2 = " << br_mon2 << std::endl;
+    std::cout << "multiply(br_mon1, br_mon2): " << mult_tab.multiply(br_mon1, br_mon2) << std::endl;
+    std::cout << "multiply(br_mon2, br_mon1): " << mult_tab.multiply(br_mon2, br_mon1) << std::endl;
+    
+    MultivariatePolynomial<Rational> p = sp.parseMultivariatePolynomial<Rational>("x^4 + y^3");
+    std::cout << "trace: " << mult_tab.trace(mult_tab.reduce(p)) << std::endl;
+}
+
 TEST(TarskiQuery, Groebner) {
     typedef MultivariatePolynomial<Rational> Polynomial;
     
@@ -200,7 +242,7 @@ TEST_F(TarskiQueryMultivariateTest, MultiplicationTable) {
     std::cout << "representation of x^4: " << tab.get(mon1) << std::endl;
     std::cout << "representation of x^2*y: " << tab.get(mon2) << std::endl;
     
-    multiply(tab.get(mon1), tab.get(mon2), tab);  
+    std::cout << "multiply: " << multiply(tab.get(mon1), tab.get(mon2), tab) << std::endl;  
 }
 
 TEST_F(TarskiQueryMultivariateTest, NormalForm) {
@@ -235,16 +277,16 @@ TEST_F(TarskiQueryMultivariateTest, Trace) {
     std::cout << trace(normalForm(p, gb), tab) << std::endl;
 }
 
-TEST_F(TarskiQueryMultivariateTest, MultivariateTarskiQuery) {
+/*TEST_F(TarskiQueryMultivariateTest, MultivariateTarskiQuery) {
     MultiplicationTable<Rational> tab;
     tab.init2(gb);
     
     MultivariatePolynomial<Rational> Q = sp.parseMultivariatePolynomial<Rational>("x^2 + -1*y^2 + -2");
-    int q = multivariateTarskiQuery(Q, tab, gb);
+    int q = multivariateTarskiQuery(Q, tab);
     std::cout << "tarski query: " << q << std::endl;
     
     
-}
+}*/
 
 TEST_F(TarskiQueryMultivariateTest, Query) {
     
@@ -292,7 +334,7 @@ protected:
     
 };
 
-TEST_F(TarskiQueryMultivariateTest2, MultivariateTarskiQuery) {
+/*TEST_F(TarskiQueryMultivariateTest2, MultivariateTarskiQuery) {
     MultiplicationTable<Rational> tab;
     tab.init2(gb);
     
@@ -301,7 +343,7 @@ TEST_F(TarskiQueryMultivariateTest2, MultivariateTarskiQuery) {
     MultivariatePolynomial<Rational> Q = sp.parseMultivariatePolynomial<Rational>("1");
     int q = multivariateTarskiQuery(Q, tab, gb);
     std::cout << "tarski query: " << q << std::endl;
-}
+}*/
 
 
 

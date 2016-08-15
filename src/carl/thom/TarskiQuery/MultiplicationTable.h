@@ -256,6 +256,7 @@ public:
                                 MultivariatePolynomial<Coeff> sum(Coeff(0));
                                 
                                 // sum over all pairs in Mon^2...
+                                CARL_LOG_TRACE("carl.thom.tarski", "nf_x_beta" << nf_x_beta);
                                 for(uint gamma = 0; gamma < Mon.size(); gamma++) {
                                         if(nf_x_beta[gamma] == Coeff(0)) {
                                                 continue;
@@ -264,13 +265,16 @@ public:
                                         CARL_LOG_ASSERT("carl.thom.tarski", x_gamma_prime < m, "");
                                         CARL_LOG_ASSERT("carl.thom.tarski", this->contains(x_gamma_prime), "");
                                         BaseRepr nf_x_gamma_prime = tab[x_gamma_prime].br;
+                                        CARL_LOG_TRACE("carl.thom.tarski", "nf_x_gamma_prime" << nf_x_gamma_prime);
                                         for(uint delta = 0; delta < Mon.size(); delta++) {
+                                                CARL_LOG_TRACE("carl.thom.tarski", "sum = " << sum);
                                                 Term<Coeff> prod(nf_x_beta[gamma]);
                                                 prod = prod * nf_x_gamma_prime[delta];
                                                 prod = prod * Mon[delta];
                                                 sum += prod;
                                         }
                                 }
+                                CARL_LOG_TRACE("carl.thom.tarski", "sum = " << sum);
                                 IndexPairs pairs = indexPairs(m);
                                 tab[m] = {polynomialInBase(sum, Mon), pairs};
                         }
