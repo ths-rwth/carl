@@ -7,7 +7,7 @@
 #pragma once
 
 #include "../../interval/Interval.h"
-#include "../RealAlgebraicNumber.h"
+#include "../../formula/model/ran/RealAlgebraicNumber.h"
 #include "../UnivariatePolynomial.h"
 
 namespace carl {

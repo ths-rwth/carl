@@ -9,7 +9,7 @@
 
 #include "RootFinder.h"
 
-#include "../RealAlgebraicNumberEvaluation.h"
+#include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
 
 namespace carl {
 namespace rootfinder {

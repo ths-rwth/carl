@@ -9,8 +9,8 @@
 #include <list>
 #include <map>
 
-#include "../RealAlgebraicNumber.h"
-#include "../RealAlgebraicNumberEvaluation.h"
+#include "../../formula/model/ran/RealAlgebraicNumber.h"
+#include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
 #include "../UnivariatePolynomial.h"
 #include "../Sign.h"
 #include "../logging.h"

@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "carl/core/Variable.h"
 #include "carl/core/Monomial.h"
-#include "carl/core/Monomial_derivative.h"
+#include "carl/core/MonomialPool.h"
 #include "Util.h"
 #include <list>
 #include <boost/variant.hpp>
@@ -105,9 +105,9 @@ TEST(Monomial, derivative)
     Variable v0((unsigned)1);
     Variable v1((unsigned)2);
     Monomial::Arg m0 = v0 * v1;
-    Term<int> t = m0->derivative<int>(v0);
-    EXPECT_EQ((unsigned)1, t.getNrVariables());
-
+	auto d1 = m0->derivative(v0);
+	EXPECT_EQ(1, d1.first);
+	EXPECT_EQ(v1, d1.second);
 }
 
 TEST(Monomial, division)
@@ -188,4 +188,13 @@ TEST(Monomial, OtherComparison)
     list.push_back(x * x * x * x);
 
     expectRightOrder(list);
+}
+
+TEST(Monomial, CalcLCM)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Monomial::Arg m1 = y*y;
+	Monomial::Arg m2 = x*x*y;
+	assert(Monomial::calcLcmAndDivideBy(m1, m2) == y);
 }

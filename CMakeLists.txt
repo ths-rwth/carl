@@ -52,6 +52,7 @@ option( BUILD_STATIC "Build the static library as well" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
+option( EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
 
 option( BINDINGS_PYTHON "Build python bindings" OFF )
 
@@ -170,7 +171,9 @@ add_subdirectory(src)
 # F. Export Compile Information
 # # # # # # # # # # # # # # # # # # # # # #
 
-include(export)
+if(EXPORT_TO_CMAKE)
+	include(export)
+endif()
 
 #write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
 #	 VERSION 0.1.0

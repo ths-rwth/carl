@@ -71,6 +71,11 @@ namespace carl
 		return MonomialPool::add(PoolEntry(std::move(c)), totalDegree);
 	}
 	
+	Monomial::Arg MonomialPool::create()
+	{
+		return add(Monomial::Arg());
+	}
+
 	Monomial::Arg MonomialPool::create( Variable::Arg _var, exponent _exp )
 	{
 		return add(Monomial::Arg(new Monomial(_var, _exp)));

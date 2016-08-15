@@ -20,6 +20,7 @@
 #include "uninterpreted/UFManager.h"
 #include "bitvector/BVConstraintPool.h"
 #include "bitvector/BVConstraint.h"
+#include "VariableComparison.h"
 
 #include "FormulaContent.h"
 
@@ -104,6 +105,10 @@ namespace carl
             explicit Formula( const Constraint<Pol>& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
+
+			explicit Formula( const VariableComparison<Pol>& _variableComparison ):
+				Formula( FormulaPool<Pol>::getInstance().create( _variableComparison ) )
+			{}
             
             explicit Formula( const BVConstraint& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
@@ -511,6 +516,15 @@ namespace carl
 		return mpContent->mConstraint;
 #endif
             }
+			
+			const VariableComparison<Pol>& variableComparison() const {
+				assert(mpContent->mType == FormulaType::VARCOMPARE);
+#ifdef __VS
+				return *mpContent->mpVariableComparisonVS;
+#else
+				return mpContent->mVariableComparison;
+#endif
+			}
             
             const BVConstraint& bvConstraint() const
             {
@@ -673,7 +687,7 @@ namespace carl
              */
             bool isAtom() const
             {
-                return (mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::BOOL 
+                return (mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::VARCOMPARE || mpContent->mType == FormulaType::BOOL 
                         || mpContent->mType == FormulaType::UEQ || mpContent->mType == FormulaType::BITVECTOR
                         || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::TRUE);
             }
@@ -923,15 +937,7 @@ namespace carl
                 assert( _formula.getId() != 0 );
                 return mpContent->mId >= _formula.getId();
             }
-            
-            /**
-             * @param _assignment The assignment for which to check whether this formula is satisfied by it.
-             * @return 0, if this formula is violated by the given assignment;
-             *         1, if this formula is satisfied by the given assignment;
-             *         2, otherwise.
-             */
-            unsigned satisfiedBy( const EvaluationMap<typename Pol::NumberType>& _assignment ) const;
-            
+
         private:
             
             /**

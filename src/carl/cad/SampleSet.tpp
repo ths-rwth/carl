@@ -10,7 +10,7 @@
 
 #include <cassert>
 
-#include "../core/RealAlgebraicNumber.h"
+#include "../formula/model/ran/RealAlgebraicNumber.h"
 #include "../util/debug.h"
 #include "../numbers/numbers.h"
 

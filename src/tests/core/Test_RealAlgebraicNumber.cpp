@@ -1,10 +1,10 @@
 #include "gtest/gtest.h"
 #include <map>
 
-#include "carl/core/RealAlgebraicNumber.h"
-#include "carl/core/RealAlgebraicNumberEvaluation.h"
-#include "carl/core/RealAlgebraicPoint.h"
 #include "carl/core/UnivariatePolynomial.h"
+#include "carl/formula/model/ran/RealAlgebraicNumber.h"
+#include "carl/formula/model/ran/RealAlgebraicNumberEvaluation.h"
+#include "carl/formula/model/ran/RealAlgebraicPoint.h"
 
 #include "../Common.h"
 

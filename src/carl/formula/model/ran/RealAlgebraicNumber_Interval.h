@@ -1,8 +1,8 @@
 #pragma once
 
-#include "UnivariatePolynomial.h"
+#include "../../../core/UnivariatePolynomial.h"
 
-#include "../interval/Interval.h"
+#include "../../../interval/Interval.h"
 
 #include <list>
 

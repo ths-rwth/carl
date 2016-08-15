@@ -20,11 +20,7 @@
 #include <sstream>
 
 namespace carl
-{   
-
-	template<typename Coefficient>
-	class Term;
-	
+{
 	/// Type of an exponent.
 	using exponent = uint;
 	
@@ -426,13 +422,6 @@ namespace carl
 		 * @return The square root of this monomial, iff the monomial is a square as checked by isSquare().
 		 */
 		Monomial::Arg sqrt() const;
-
-		/**
-		 * 
-		 * @param m
-		 * @return 
-		 */
-		Monomial::Arg calcLcmAndDivideBy(const Monomial::Arg& m) const;
 		
 		template<typename Coeff, typename VarInfo>
 		void gatherVarInfo(VarInfo& varinfo, const Coeff& coeffFromTerm) const
@@ -473,27 +462,19 @@ namespace carl
 		 * @param v Variable.
 		 * @return Partial derivative.
 		 */
-		template<typename Coefficient>
-		Term<Coefficient> derivative(Variable::Arg v) const;
+		std::pair<std::size_t,Monomial::Arg> derivative(Variable::Arg v) const;
 		
 		/**
 		 * Applies the given substitutions to this monomial.
-		 * Every variable may be substituted by some number. Additionally, a constant factor may be given that is multiplied with the result.
+		 * Every variable may be substituted by some value.
 		 * @param substitutions Maps variables to numbers.
-		 * @param factor A constant factor.
-		 * @return \f$ factor \cdot this[<substitutions>] \f$
+		 * @return \f$ this[<substitutions>] \f$
 		 */
 		template<typename Coefficient>
-		Term<Coefficient> substitute(const std::map<Variable, Coefficient>& substitutions, Coefficient factor) const;
-		/**
-		 * Applies the given substitutions to this monomial.
-		 * Every variable may be substituted by some term. Additionally, a constant factor may be given that is multiplied with the result.
-		 * @param substitutions Maps variables to terms.
-		 * @param factor A constant factor.
-		 * @return \f$ factor \cdot this[<substitutions>] \f$
-		 */
+		Coefficient substitute(const std::map<Variable, Coefficient>& substitutions) const;
 		template<typename Coefficient>
-		Term<Coefficient> substitute(const std::map<Variable, Term<Coefficient>>& substitutions, const Coefficient& factor) const;
+		Coefficient evaluate(const std::map<Variable, Coefficient>& substitutions) const;
+
 		///////////////////////////
 		// Orderings
 		///////////////////////////
@@ -594,6 +575,17 @@ namespace carl
 		 * @return lcm of lhs and rhs.
 		 */
 		static Monomial::Arg lcm(const Monomial::Arg& lhs, const Monomial::Arg& rhs);
+		
+		
+		/**
+		 * Returns lcm(lhs, rhs) / rhs
+		 */
+		static Monomial::Arg calcLcmAndDivideBy(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
+			Monomial::Arg res;
+			bool works = lcm(lhs, rhs)->divide(rhs, res);
+			assert(works);
+			return res;
+		}
 		
 		/**
 		 * This method performs a lexical comparison as defined in @cite GCL92, page 47.
@@ -756,6 +748,11 @@ namespace carl
 	
 	Monomial::Arg operator*(Variable::Arg lhs, Variable::Arg rhs);
 	/// @}
+	
+	Monomial::Arg pow(Variable::Arg v, std::size_t exp);
+	inline Monomial::Arg pow(const Monomial::Arg& m, std::size_t exp) {
+		return m->pow(exp);
+	}
 
 	struct hashLess {
 		bool operator()(const Monomial& lhs, const Monomial& rhs) const {
@@ -826,3 +823,5 @@ namespace std
 		}
 	};
 } // namespace std
+
+#include "Monomial.tpp"

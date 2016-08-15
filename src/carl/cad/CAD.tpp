@@ -14,7 +14,7 @@
 
 #include "../core/logging.h"
 #include "../interval/IntervalEvaluation.h"
-#include "../core/RealAlgebraicNumberSettings.h"
+#include "../formula/model/ran/RealAlgebraicNumberSettings.h"
 #include "../core/rootfinder/RootFinder.h"
 #include "../thom/ThomRootFinder.h"
 

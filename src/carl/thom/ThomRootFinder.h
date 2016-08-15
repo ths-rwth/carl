@@ -13,7 +13,7 @@
 #include "../interval/Interval.h"
 #include "ThomUtil.h"
 
-#include "../core/RealAlgebraicNumber.h"
+#include "../formula/model/ran/RealAlgebraicNumber.h"
 
 
 namespace carl {

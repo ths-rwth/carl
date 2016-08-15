@@ -71,6 +71,21 @@ namespace carl {
 	}
 
 	template<typename Pol>
+	FormulaContent<Pol>::FormulaContent(VariableComparison<Pol>&& _variableComparison):
+#ifdef __VS
+        mType( FormulaType::VARCOMPARE )
+    {
+		mpVariableComparisonVS = new VariableComparison<Pol>(std::move(_variableComparison));
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mpVariableComparisonVS);
+#else
+		mType(FormulaType::VARCOMPARE),
+		mVariableComparison(std::move(_variableComparison))
+	{
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mVariableComparison);
+#endif
+	}
+
+	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(BVConstraint&& _constraint):
         mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
 #ifdef __VS
@@ -196,6 +211,8 @@ namespace carl {
 				return *mpSubformulasVS == *_content.mpSubformulasVS;
 			case FormulaType::CONSTRAINT:
 				return *mpConstraintVS == *_content.mpConstraintVS;
+			case FormulaType::VARCOMPARE:
+				return *mVariableComparison == *_content.mVariableComparison;
 			case FormulaType::BITVECTOR:
 				return *mpBVConstraintVS == *_content.mpBVConstraintVS;
 			case FormulaType::UEQ:
@@ -209,6 +226,8 @@ namespace carl {
 				return mSubformulas == _content.mSubformulas;
 			case FormulaType::CONSTRAINT:
 				return mConstraint == _content.mConstraint;
+			case FormulaType::VARCOMPARE:
+				return mVariableComparison == _content.mVariableComparison;
 			case FormulaType::BITVECTOR:
 				return mBVConstraint == _content.mBVConstraint;
 			case FormulaType::UEQ:
@@ -240,6 +259,8 @@ namespace carl {
         }
         else if( mType == FormulaType::CONSTRAINT )
             return (_init + mpConstraintVS->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+		else if( mType == FormulaType::VARCOMPARE )
+            return (_init + mpVariableComparisonVS->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         else if (mType == FormulaType::BITVECTOR) {
             return (_init + mpBVConstraintVS->toString(_init, _oneline, _infix, _friendlyNames) + activity);
         }
@@ -254,6 +275,8 @@ namespace carl {
 		}
 		else if (mType == FormulaType::CONSTRAINT)
 			return (_init + mConstraint.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
+		else if (mType == FormulaType::VARCOMPARE)
+			return (_init + mVariableComparison.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
 		else if (mType == FormulaType::BITVECTOR) {
 			return (_init + mBVConstraint.toString(_init, _oneline, _infix, _friendlyNames) + activity);
 		}

@@ -8,14 +8,15 @@
 #include <map>
 #include <vector>
 
-#include "../util/SFINAE.h"
 
-#include "../interval/IntervalEvaluation.h"
-#include "../thom/ThomEvaluation.h"
-#include "MultivariatePolynomial.h"
+
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicPoint.h"
-#include "VariablePool.h"
+
+#include "../../../core/MultivariatePolynomial.h"
+#include "../../../interval/IntervalEvaluation.h"
+#include "../../../thom/ThomEvaluation.h"   
+#include "../../../util/SFINAE.h"
 
 namespace carl {
 namespace RealAlgebraicNumberEvaluation {
@@ -67,6 +68,11 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 		const UnivariatePolynomial<Coeff>& p, 
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		std::map<Variable, Interval<Number>>& varToInterval
+);
+template<typename Number>
+MultivariatePolynomial<Number> evaluatePolynomial(
+		const MultivariatePolynomial<Number>& p, 
+		const std::map<Variable, RealAlgebraicNumber<Number>>& m
 );
 
 /**
@@ -219,6 +225,29 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	}
 	CARL_LOG_DEBUG("carl.ran", "Result: " << tmp.switchVariable(v).toNumberCoefficients());
 	return tmp.switchVariable(v).toNumberCoefficients();
+}
+
+template<typename Number>
+MultivariatePolynomial<Number> evaluatePolynomial(
+		const MultivariatePolynomial<Number>& p, 
+		const std::map<Variable, RealAlgebraicNumber<Number>>& m
+) {
+	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
+	using Coeff = MultivariatePolynomial<Number>;
+	UnivariatePolynomial<Coeff> tmp = p.toUnivariatePolynomial(m.begin()->first);
+	for (const auto& i: m) {
+		if (i.second.isNumeric()) {
+			tmp.substituteIn(i.first, Coeff(i.second.value()));
+		} else if (i.second.isInterval()) {
+			UnivariatePolynomial<Coeff> p2(i.first, i.second.getPolynomial().template convert<Coeff>().coefficients());
+			tmp = tmp.switchVariable(i.first).resultant(p2);
+		} else {
+			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
+		}
+		CARL_LOG_DEBUG("carl.ran", "Substituted " << i.first << " -> " << i.second << ", result: " << tmp);
+	}
+	CARL_LOG_DEBUG("carl.ran", "Result: " << MultivariatePolynomial<Number>(tmp));
+	return MultivariatePolynomial<Number>(tmp);
 }
 
 
