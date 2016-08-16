@@ -22,7 +22,11 @@ void define_interval(py::module& m) {
 		.def(py::init<const Rational&>())
 		.def(py::init<const Rational&, const Rational&>())
 		.def(py::init<const Rational&, carl::BoundType, const Rational&, carl::BoundType>())
-		
+
+		.def_static("unboundedInterval", &Interval::unboundedInterval)
+		.def_static("emptyInterval", &Interval::emptyInterval)
+		.def_static("zeroInterval", &Interval::zeroInterval)
+
 		// TODO: does not work :-(
 		//.def_property("lower", &Interval::lower, &Interval::setLower)
 		.def("lower", &Interval::lower)
