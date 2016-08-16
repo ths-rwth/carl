@@ -5,10 +5,10 @@
 #include "formula/formula.h"
 
 PYBIND11_PLUGIN(formula) {
-	py::module m("pycarl.formula", "pycarl formula handling");
+	py::module m("formula", "pycarl formula handling");
 
 	// Constraint relies on Rational
-	m.import("pycarl");
+	m.import("pycarl.core");
 
 	define_relation(m);
 	define_constraint(m);

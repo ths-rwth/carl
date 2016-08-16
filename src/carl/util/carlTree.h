@@ -31,6 +31,8 @@ private:
 #else
 	static const std::size_t MAXINT = std::numeric_limits<std::size_t>::max();
 #endif
+public:
+	using value_type = T;
 	struct Node {
 		std::size_t id;
 		mutable T data;
@@ -103,6 +105,10 @@ protected:
 		std::size_t depth() const {
 			assert(current != MAXINT);
 			return mTree->nodes[current].depth;
+		}
+		std::size_t id() const {
+			assert(current != MAXINT);
+			return current;
 		}
 		bool isRoot() const {
 			return current == 0;
@@ -727,7 +733,10 @@ public:
 	}
 	template<typename Iterator>
 	Iterator left_sibling(const Iterator& it) const {
-		return Iterator(this, nodes[it.current].previousSibling);
+		assert(!is_leftmost(it));
+		auto res = it;
+		res.current = nodes[it.current].previousSibling;
+		return res;
 	}
 
 	/**

@@ -278,11 +278,9 @@ class Term
 		
 		Definiteness definiteness() const;
 		
-		template<typename SubstitutionType=Coefficient>
-		Term substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
+		Term substitute(const std::map<Variable, Coefficient>& substitutions) const;
 		Term substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
-        template<typename SubstitutionType = Coefficient>
-		SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& map) const;
+        Coefficient evaluate(const std::map<Variable, Coefficient>& map) const;
 		
 		
 		template<bool gatherCoeff, typename CoeffType>
@@ -366,7 +364,7 @@ class Term
 		{
 			return lhs.mMonomial == rhs.mMonomial;
 		}
-		static bool monomialEqual(std::shared_ptr<const Term> lhs, std::shared_ptr<const Term> rhs)
+		static bool monomialEqual(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
 		{
 			if (lhs == rhs) return true;
 			if (lhs && rhs) return monomialEqual(*lhs, *rhs);
@@ -376,7 +374,7 @@ class Term
 		{
 			return lhs.mMonomial < rhs.mMonomial;
 		}
-		static bool monomialLess(std::shared_ptr<const Term> lhs, std::shared_ptr<const Term> rhs)
+		static bool monomialLess(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
 		{
 			if (lhs && rhs) return monomialLess(*lhs, *rhs);
 			if (lhs) return false;
@@ -390,7 +388,7 @@ class Term
          * @param t2 second term
          * @return gcd(t1,t2);
          */
-		static Term gcd(std::shared_ptr<const Term> t1, std::shared_ptr<const Term> t2);
+		static Term gcd(const std::shared_ptr<const Term>& t1, const std::shared_ptr<const Term>& t2);
 		/**
 		 * Calculates the gcd of (t1, t2).
 		 * If t1 or t2 is zero, undefined.

@@ -129,7 +129,7 @@ struct Sink {
 	/**
 	 * Default destructor.
      */
-	virtual ~Sink() {}
+	virtual ~Sink() = default;
 	/**
 	 * Abstract logging interface.
 	 * The intended usage is to write any log output to the output stream returned by this function.
@@ -149,7 +149,7 @@ struct StreamSink: public Sink {
      * @param os Output stream.
      */
 	explicit StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
-	~StreamSink() override {}
+	~StreamSink() override = default;
 	std::ostream& log() override { return os; }
 };
 /**
@@ -253,7 +253,7 @@ struct Formatter {
 	/// Print information like log level, file etc.
 	bool printInformation = true;
 	
-	virtual ~Formatter() {}
+	virtual ~Formatter() = default;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
      * @param f Filter.

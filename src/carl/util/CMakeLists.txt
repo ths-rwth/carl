@@ -10,32 +10,3 @@ foreach (variableName ${variableNames})
 endforeach()
 
 configure_file( ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp.in ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp )
-if(FALSE)
-set(carl_lib_util_headers
-	BitVector.h
-	CompactTree.h
-	debug.h
-	Heap.h
-	SFINAE.h
-	Cache.h
-	TermAdditionManager.h
-	Common.h
-	parser/Common.h
-	parser/Parser.h
-	parser/FormulaParser.h
-	parser/PolynomialParser.h
-	parser/RationalFunctionParser.h
-)
-# Source files in here
-set(carl_lib_util_sources
-	util/BitVector.cpp
-	util/debug.cpp
-	util/CMakeOptions.cpp
-
-PARENT_SCOPE)
-
-# Installation of header files
-install(FILES			${carl_lib_util_headers}
-		DESTINATION		include/carl/util
-)
-endif()

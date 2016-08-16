@@ -7,8 +7,6 @@
 
 #include "../numbers/numbers.h"
 #include "Term.h"
-#include "Monomial_derivative.h"
-#include "Monomial_substitute.h"
 
 namespace carl
 {
@@ -134,9 +132,8 @@ Term<Coefficient> Term<Coefficient>::derivative(Variable::Arg v) const
 		// Derivatives of constants are zero.
 		return std::move(Term<Coefficient>(carl::constant_zero<Coefficient>().get()));
 	}
-	Term<Coefficient> t = mMonomial->derivative<Coefficient>(v);
-	t *= mCoeff;
-	return std::move(t);
+	auto derivative = mMonomial->derivative(v);
+	return Term<Coefficient>(mCoeff * derivative.first, derivative.second);
 }
 
 template<typename Coefficient>
@@ -153,59 +150,50 @@ Definiteness Term<Coefficient>::definiteness() const
 }
 
 template<typename Coefficient>
-template<typename SubstitutionType>
-Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
+Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Coefficient>& substitutions) const
 {
-	if(mMonomial)
-	{
-		return std::move(mMonomial->substitute<Coefficient>(substitutions, coeff()));
-	}
-	else
-	{
-		return std::move(Term<Coefficient>(mCoeff));
+	if (mMonomial) {
+		Monomial::Content content;
+		Coefficient coeff = mCoeff;
+		for (const auto& c: *mMonomial) {
+			auto it = substitutions.find(c.first);
+			if (it == substitutions.end()) {
+				content.push_back(c);
+			} else {
+				coeff *= carl::pow(it->second, c.second);
+			}
+		}
+		if (content.empty()) return Term<Coefficient>(mCoeff);
+		return Term<Coefficient>(mCoeff, createMonomial(std::move(content)));
+	} else {
+		return Term<Coefficient>(mCoeff);
 	}
 }
 
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
 {
-	if(mMonomial)
-	{
-		return std::move(mMonomial->substitute<Coefficient>(substitutions, coeff()));
-	}
-	else
-	{
-		return std::move(Term<Coefficient>(mCoeff));
+	if (mMonomial) {
+		return mCoeff * mMonomial->substitute(substitutions);
+	} else {
+		return Term<Coefficient>(mCoeff);
 	}
 }
 
 template<typename Coefficient>
-template<typename SubstitutionType>
-SubstitutionType Term<Coefficient>::evaluate(const std::map<Variable, SubstitutionType>& map) const
+Coefficient Term<Coefficient>::evaluate(const std::map<Variable, Coefficient>& map) const
 {
-    SubstitutionType result(this->coeff());
-	if (this->monomial())
-    {
-         // TODO: cannot link Monomial::evaluate
-//		result *= this->monomial()->evaluate(map);
-        for(unsigned i = 0; i < this->monomial()->nrVariables(); ++i)
-        {
-            CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << (*this->monomial())[i].first);
-            // We expect every variable to be in the map.
-            CARL_LOG_ASSERT("carl.interval", map.count((*this->monomial())[i].first) > (size_t)0, "Every variable is expected to be in the map.");
-            result *= carl::pow(map.at((*this->monomial())[i].first), (*this->monomial())[i].second);
-            if( carl::isZero( result ) )
-                return result;
-        }
-        return result;
-    }
-	return result;
+	if (mMonomial) {
+		return mCoeff * mMonomial->evaluate(map);
+	} else {
+		return mCoeff;
+	}
 }
 
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) const
 {
-	Monomial::Arg tmp = monomial()->calcLcmAndDivideBy(m);
+	Monomial::Arg tmp = Monomial::calcLcmAndDivideBy(monomial(), m);
 	if(tmp == nullptr)
 	{
 		return Term(carl::constant_one<Coefficient>().get());
@@ -495,7 +483,7 @@ bool Term<Coefficient>::isConsistent() const {
 
 
 template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::gcd(std::shared_ptr<const Term<Coefficient>> t1, std::shared_ptr<const Term<Coefficient>> t2)
+Term<Coefficient> Term<Coefficient>::gcd(const std::shared_ptr<const Term<Coefficient>>& t1, const std::shared_ptr<const Term<Coefficient>>& t2)
 {
 	static_assert(is_field<Coefficient>::value, "Not yet defined for other coefficients");
 	assert(t1);

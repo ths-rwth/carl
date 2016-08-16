@@ -1,7 +1,9 @@
-language: cpp
-
-#sudo: required
+language: generic
+sudo: required
 dist: trusty
+
+cache:
+  apt: true
 
 env:
   global:
@@ -25,7 +27,6 @@ addons:
       - libcln-dev
       - libeigen3-dev
       - libgmp-dev
-      - libgmp
       - libgtest-dev
       - g++-4.8
       - g++-4.9

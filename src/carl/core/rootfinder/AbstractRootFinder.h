@@ -7,7 +7,7 @@
 #pragma once
 
 #include "../../interval/Interval.h"
-#include "../RealAlgebraicNumber.h"
+#include "../../formula/model/ran/RealAlgebraicNumber.h"
 #include "../UnivariatePolynomial.h"
 
 namespace carl {
@@ -114,7 +114,7 @@ protected:
 	 * @param root Pointer to new root.
 	 * @param reducePolynomial Indicates if the polynomial should be reduced.
 	 */
-	virtual void addRoot(RealAlgebraicNumber<Number> root, bool reducePolynomial = true);
+	virtual void addRoot(const RealAlgebraicNumber<Number>& root, bool reducePolynomial = true);
 	
 	/**
 	 * Adds a new root to the internal root list from an interval.

@@ -82,6 +82,9 @@ namespace carl
                         _vars.insert( var );
                 }
                 break;
+			case FormulaType::VARCOMPARE:
+				variableComparison().collectVariables(_vars);
+				break;
             case FormulaType::BITVECTOR:
                 if( _bitvectorVars ) 
                 {
@@ -136,170 +139,7 @@ namespace carl
             });
         return result;
     }
-    
-    template<typename Pol>
-    unsigned Formula<Pol>::satisfiedBy( const EvaluationMap<typename Pol::NumberType>& _assignment ) const
-    {
-        switch( getType() )
-        {
-            case FormulaType::TRUE:
-            {
-                return 1;
-            }
-            case FormulaType::FALSE:
-            {
-                return 0;
-            }
-            case FormulaType::BOOL:
-            {
-                auto ass = _assignment.find( boolean() );
-                return ass == _assignment.end() ? 2 : (ass->second == typename Pol::NumberType( 1 ) ? 1 : 0);
-            }
-            case FormulaType::CONSTRAINT:
-            {
-                return constraint().satisfiedBy( _assignment );
-            }
-            case FormulaType::BITVECTOR:
-            {
-                assert(false);
-                std::cerr << "Implement BVConstraint::satisfiedBy()" << std::endl;
-                //return bvConstraint().satisfiedBy( _assignment );
-            }
-            case FormulaType::NOT:
-            {
-                switch( subformula().satisfiedBy( _assignment ) )
-                {
-                    case 0:
-                        return 1;
-                    case 1:
-                        return 0;
-                    default:
-                        return 2;
-                }   
-            }
-            case FormulaType::OR:
-            {
-                unsigned result = 0;
-                for( auto subFormula = subformulas().begin(); subFormula != subformulas().end(); ++subFormula )
-                {
-                    switch( subFormula->satisfiedBy( _assignment ) )
-                    {
-                        case 0:
-                            break;
-                        case 1:
-                            return 1;
-                        default:
-                            if( result != 2 ) result = 2;
-                    }
-                }
-                return result;
-            }
-            case FormulaType::AND:
-            {
-                unsigned result = 1;
-                for( auto subFormula = subformulas().begin(); subFormula != subformulas().end(); ++subFormula )
-                {
-                    switch( subFormula->satisfiedBy( _assignment ) )
-                    {
-                        case 0:
-                            return 0;
-                        case 1:
-                            break;
-                        default:
-                            if( result != 2 ) result = 2;
-                    }
-                }
-                return result;
-            }
-            case FormulaType::IMPLIES:
-            {
-                unsigned result = premise().satisfiedBy( _assignment );
-                if( result == 0 ) return 1;
-                switch( conclusion().satisfiedBy( _assignment ) )
-                {
-                    case 0:
-                        return result == 1 ? 0 : 2;
-                    case 1:
-                        return 1;
-                    default:
-                        return 2;
-                }
-            }
-            case FormulaType::ITE:
-            {
-                unsigned result = condition().satisfiedBy( _assignment );
-                switch( result )
-                {
-                    case 0:
-                        return secondCase().satisfiedBy( _assignment );
-                    case 1:
-                        return firstCase().satisfiedBy( _assignment );
-                    default:
-                        return 2;
-                }
-            }
-            case FormulaType::IFF:
-            {
-                auto subFormula = subformulas().begin();
-                unsigned result = subFormula->satisfiedBy( _assignment );
-                bool containsTrue = (result == 1 ? true : false);
-                bool containsFalse = (result == 0 ? true : false);
-                ++subFormula;
-                while( subFormula != subformulas().end() )
-                {
-                    unsigned resultTmp = subFormula->satisfiedBy( _assignment );
-                    switch( resultTmp )
-                    {
-                        case 0:
-                            containsFalse = true;
-                            break;
-                        case 1:
-                            containsTrue = true;
-                        default:
-                            result = 2;
-                    }
-                    if( containsFalse && containsTrue )
-                        return 0;
-                    ++subFormula;
-                }
-                return (result == 2 ? 2 : 1);
-            }
-            case FormulaType::XOR:
-            {
-                auto subFormula = subformulas().begin();
-                unsigned result = subFormula->satisfiedBy( _assignment );
-                if( result == 2 ) return 2;
-                ++subFormula;
-                while( subFormula != subformulas().end() )
-                {
-                    unsigned resultTmp = subFormula->satisfiedBy( _assignment );
-                    if( resultTmp == 2 ) return 2;
-                    result = resultTmp != result;
-                    ++subFormula;
-                }
-                return result;
-            }
-            case FormulaType::EXISTS:
-            {
-                ///@todo do something here
-                return 2;
-                break;
-            }
-            case FormulaType::FORALL:
-            {
-                ///@todo do something here
-                return 2;
-                break;
-            }
-            default:
-            {
-                assert( false );
-                cerr << "Undefined operator!" << endl;
-                return 2;
-            }
-        }
-    }
-    
+
     template<typename Pol>
     void Formula<Pol>::init( FormulaContent<Pol>& _content )
     {
@@ -432,6 +272,9 @@ namespace carl
 #endif
                 break;
             }
+			case FormulaType::VARCOMPARE:
+			{
+			}
             case FormulaType::BITVECTOR:
             {
                 _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_BITVECTOR;
@@ -745,6 +588,9 @@ namespace carl
                     }
                 }
             }
+			case FormulaType::VARCOMPARE: {
+				return Formula<Pol>(subformula().variableComparison().negation());
+			}
             case FormulaType::BITVECTOR: {
                 BVCompareRelation rel = inverse(subformula().bvConstraint().relation());
                 return Formula<Pol>( BVConstraint::create(rel, subformula().bvConstraint().lhs(), subformula().bvConstraint().rhs()));

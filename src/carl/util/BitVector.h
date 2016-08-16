@@ -40,20 +40,18 @@ namespace carl
 		
         bool empty() const
         {
-            for( auto it = mBits.begin(); it != mBits.end(); ++it )
-            {
-                if(*it != 0) return false;
-            }
+			for (const auto& b: mBits) {
+				if (b != 0) return false;
+			}
             return true;
         }
         
         size_t findFirstSetBit() const
         {
             size_t pos = 0;
-            for( auto it = mBits.begin();  it != mBits.end(); ++it )
-            {
-                if(*it != 0) {
-                    unsigned elem = *it;
+			for (const auto& b: mBits) {
+				if(b != 0) {
+                    unsigned elem = b;
                     while( (elem & unsigned(1)) == 0 )
                     {
                         elem >>= 1;
@@ -88,7 +86,7 @@ namespace carl
 			unsigned vecElem =  pos >> 5;
 			if(vecElem < mBits.size()) {
 				unsigned bitNr = pos & unsigned(31);
-				return (mBits[vecElem] >> bitNr) & unsigned(1);
+				return ((mBits[vecElem] >> bitNr) & unsigned(1)) != 0;
 			} 
 			else 
 			{
@@ -109,11 +107,11 @@ namespace carl
 		
 		
 		BitVector& operator|= (const BitVector& rhs) {
-			std::vector<unsigned>::iterator lhsIt = mBits.begin();
-			std::vector<unsigned>::const_iterator rhsIt = rhs.mBits.begin();
+			auto lhsIt = mBits.begin();
+			auto rhsIt = rhs.mBits.begin();
 			
-			std::vector<unsigned>::const_iterator lhsEnd = mBits.end();
-			std::vector<unsigned>::const_iterator rhsEnd = rhs.mBits.end();
+			auto lhsEnd = mBits.end();
+			auto rhsEnd = rhs.mBits.end();
 			
 			while(true) {
 				if(lhsIt == lhsEnd) {

@@ -358,9 +358,9 @@ inline mpq_class cos(const mpq_class& n) {
 }
 
 template<>
-inline mpz_class pow(const mpz_class& b, std::size_t e) {
+inline mpz_class pow(const mpz_class& basis, std::size_t exp) {
 	mpz_class res;
-	mpz_pow_ui(res.get_mpz_t(), b.get_mpz_t(), e);
+	mpz_pow_ui(res.get_mpz_t(), basis.get_mpz_t(), exp);
 	return res;
 }
 

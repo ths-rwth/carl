@@ -171,6 +171,12 @@ namespace carl
             const FormulaContent<Pol>* create(const Constraint<Pol>& _constraint) {
                 return create(std::move(Constraint<Pol>(_constraint)));
             }
+			const FormulaContent<Pol>* create(VariableComparison<Pol>&& _variableComparison) {
+                return add(new FormulaContent<Pol>(std::move(_variableComparison)));
+            }
+            const FormulaContent<Pol>* create(const VariableComparison<Pol>& _variableComparison) {
+                return create(std::move(VariableComparison<Pol>(_variableComparison)));
+            }
             
             const FormulaContent<Pol>* create(BVConstraint&& _constraint) {
                 #ifdef SIMPLIFY_FORMULA

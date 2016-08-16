@@ -91,14 +91,10 @@ std::list<RealAlgebraicNumber<Number>> AbstractRootFinder<Number>::getAllRoots()
 }
 
 template<typename Number>
-void AbstractRootFinder<Number>::addRoot(RealAlgebraicNumber<Number> root, bool reducePolynomial) {
+void AbstractRootFinder<Number>::addRoot(const RealAlgebraicNumber<Number>& root, bool reducePolynomial) {
 	if (root.isNumeric()) {
 		if (reducePolynomial) {
 			this->polynomial.eliminateRoot(root.value());
-		}
-	} else {
-		if (root.getInterval().diameter() == 0) {
-			root = RealAlgebraicNumber<Number>(root.getInterval().lower());
 		}
 	}
 	this->roots.push_back(root);

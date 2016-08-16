@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "../numbers/numbers.h"
-
 namespace carl {
 namespace RealAlgebraicNumberSettings {
 
@@ -22,10 +20,10 @@ enum class RefinementStrategy {
 };
 
 /// Maximum number of refinements in which the sample() value should be computed for splitting. Otherwise the midpoint is taken.
-static const uint MAXREFINE = 8;
+static const std::size_t MAXREFINE = 8;
 
 /// Maximum bound of an isolating interval so that the OpenInterval::sample method is used for splitting point selection.
-static const uint MAX_FASTSAMPLE_BOUND = SHRT_MAX;
+static const std::size_t MAX_FASTSAMPLE_BOUND = SHRT_MAX;
 /// Maximum denominator for the sample search is bounded to the square of the common denominator of the bounds; anything above that value is disregarded and a maybe non-optimal, intermediate value is returned instead
 static const bool MAX_SAMPLE_DENOMINATOR_BOUNDED = true;
 

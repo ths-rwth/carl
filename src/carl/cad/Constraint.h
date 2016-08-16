@@ -14,10 +14,10 @@
 
 #include "../core/logging.h"
 #include "../core/MultivariatePolynomial.h"
-#include "../core/RealAlgebraicPoint.h"
-#include "../core/RealAlgebraicNumberEvaluation.h"
 #include "../core/Sign.h"
 #include "../core/Variable.h"
+#include "../formula/model/ran/RealAlgebraicPoint.h"
+#include "../formula/model/ran/RealAlgebraicNumberEvaluation.h"
 #include "../interval/IntervalEvaluation.h"
 #include "CADSettings.h"
 #include "Variables.h"
