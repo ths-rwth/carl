@@ -379,6 +379,16 @@ TEST(MultivariatePolynomial, Substitute)
     EXPECT_EQ(f2.substitute(substitutions4), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions4g), vars));
     EXPECT_EQ(f2.substitute(substitutions5), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions5g), vars));
     #endif
+
+    EvaluationMap<Rational> evMapA;
+    evMapA[x] = carl::constant_zero<Rational>::get();
+    MultivariatePolynomial<Rational> pxA({x});
+    EXPECT_EQ(pxA.substitute(evMapA),carl::constant_zero<Rational>::get());
+    
+    EvaluationMap<Rational> evMapB;
+    evMapB[x] = Rational(-1);
+    MultivariatePolynomial<Rational> pxB = pxA + (Rational)1;
+    EXPECT_EQ(pxB.substitute(evMapB),carl::constant_zero<Rational>::get());
 }
 
 //typedef Rational Rat;
