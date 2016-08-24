@@ -222,7 +222,8 @@ namespace carl
                     // Arithmetic Theory
                     case CONSTRAINT:
                         assert(false); break;
-
+					case VARCOMPARE:
+                        assert(false); break;
                     case BITVECTOR:
                     case UEQ:
                         assert(false); break;
@@ -263,6 +264,8 @@ namespace carl
                         return createNAry(_type, std::move(_subformulas));
                     // Arithmetic Theory
                     case CONSTRAINT:
+					// VarCompare
+					case VARCOMPARE:
                     // Bitvector Theory
                     case BITVECTOR:
                     // Uninterpreted Theory
