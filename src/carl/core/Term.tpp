@@ -163,7 +163,7 @@ Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Coeffic
 				coeff *= carl::pow(it->second, c.second);
 			}
 		}
-		if (content.empty()) return Term<Coefficient>(mCoeff);
+		if (content.empty()) return Term<Coefficient>(coeff);
 		return Term<Coefficient>(mCoeff, createMonomial(std::move(content)));
 	} else {
 		return Term<Coefficient>(mCoeff);
