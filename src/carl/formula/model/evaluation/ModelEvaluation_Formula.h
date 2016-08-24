@@ -36,8 +36,27 @@ namespace model {
 		if (cmp.isSubstitution()) return;
 		assert(cmp.isRational() || cmp.isRAN());
 		RealAlgebraicNumber<Rational> val = cmp.isRational() ? RealAlgebraicNumber<Rational>(cmp.asRational()) : cmp.asRAN();
-		if (val == reference) f = Formula<Poly>(FormulaType::TRUE);
-		else f = Formula<Poly>(FormulaType::FALSE);
+		f = Formula<Poly>(FormulaType::FALSE);
+		switch (vc.relation()) {
+			case Relation::EQ:
+				if (reference == val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::NEQ:
+				if (reference != val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::LESS:
+				if (reference < val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::LEQ:
+				if (reference <= val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::GREATER:
+				if (reference > val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::GEQ:
+				if (reference >= val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+		}
 	}
 	
 	/**
@@ -92,7 +111,6 @@ namespace model {
 			}
 			case FormulaType::VARCOMPARE: {
 				evaluateVarCompare(f, m);
-				CARL_LOG_WARN("carl.model.evaluation", "Evaluation of varcompare not yet implemented.");
 				break;
 			}
 			case FormulaType::BITVECTOR: {
