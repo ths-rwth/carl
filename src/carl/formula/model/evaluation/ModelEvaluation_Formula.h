@@ -27,7 +27,12 @@ namespace model {
 		assert(value.isRational() || value.isRAN());
 		RealAlgebraicNumber<Rational> reference = value.isRational() ? RealAlgebraicNumber<Rational>(value.asRational()) : value.asRAN();
 		auto cmp = vc.value();
-		if (cmp.isSubstitution()) cmp = cmp.asSubstitution()->evaluate(m);
+		if (cmp.isSubstitution()) {
+			// If assigned directly, the shared_ptr<Substitution> goes out of scope before the result is copied into cmp.
+			// Therefore, we start by copying the data and overwriting it afterwards.
+			auto res = cmp.asSubstitution()->evaluate(m);
+			cmp = res;
+		}
 		if (cmp.isSubstitution()) return;
 		assert(cmp.isRational() || cmp.isRAN());
 		RealAlgebraicNumber<Rational> val = cmp.isRational() ? RealAlgebraicNumber<Rational>(cmp.asRational()) : cmp.asRAN();
