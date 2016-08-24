@@ -1792,6 +1792,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case VARCOMPARE:
 		case BITVECTOR:
 		case TRUE:
 		case FALSE:
@@ -1852,6 +1853,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case VARCOMPARE:
 		case BITVECTOR:
 		case TRUE:
 		case FALSE:
