@@ -46,7 +46,7 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void evaluate(ModelValue<Rational,Poly>& res, MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
-		substitute(mvr, m);
+		substituteIn(mvr, m);
 		
 		auto map = collectRANIR(mvr.gatherVariables(), m);
 		if (map.size() == mvr.gatherVariables().size()) {
