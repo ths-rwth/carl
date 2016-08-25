@@ -262,12 +262,12 @@ TEST(MultivariatePolynomial, Substitute)
     EXPECT_EQ(mp2, mp.substitute(substitutions));
     substitutions[v0] = MultivariatePolynomial<Rational>((Rational)0);
     EXPECT_EQ(MultivariatePolynomial<Rational>((Rational)4 * v1), mp.substitute(substitutions));
-    #ifdef USE_GINAC
     Variable v = freshRealVariable("v");
     Variable x = freshRealVariable("x");
     Variable y = freshRealVariable("y");
     Variable z = freshRealVariable("z");
 
+    #ifdef USE_GINAC
     std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> vars;
     GiNaC::symbol vg("v"), xg("x"), yg("y"), zg("z");
     vars.insert(std::pair<GiNaC::ex, Variable>(vg, v));
@@ -379,6 +379,16 @@ TEST(MultivariatePolynomial, Substitute)
     EXPECT_EQ(f2.substitute(substitutions4), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions4g), vars));
     EXPECT_EQ(f2.substitute(substitutions5), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions5g), vars));
     #endif
+
+    EvaluationMap<Rational> evMapA;
+    evMapA[x] = carl::constant_zero<Rational>::get();
+    MultivariatePolynomial<Rational> pxA({x});
+    EXPECT_EQ(pxA.substitute(evMapA),carl::constant_zero<Rational>::get());
+    
+    EvaluationMap<Rational> evMapB;
+    evMapB[x] = Rational(-1);
+    MultivariatePolynomial<Rational> pxB = pxA + (Rational)1;
+    EXPECT_EQ(pxB.substitute(evMapB),carl::constant_zero<Rational>::get());
 }
 
 //typedef Rational Rat;
