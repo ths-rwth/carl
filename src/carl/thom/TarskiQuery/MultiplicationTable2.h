@@ -80,7 +80,7 @@ public:
         
         MultiplicationTable2(const GroebnerBase<Number>& gb) : mGb(gb){
                 this->init(gb);
-                std::cout << *this << std::endl;
+                //std::cout << *this << std::endl;
         }
         
         inline bool contains(const Monomial& m) const {

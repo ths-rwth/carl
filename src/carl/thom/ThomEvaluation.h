@@ -16,15 +16,21 @@ namespace carl {
  */
 template<typename Number>
 RealAlgebraicNumber<Number> evaluateTE(const MultivariatePolynomial<Number>& p, std::map<Variable, RealAlgebraicNumber<Number>>& m) {
-        CARL_LOG_TRACE("carl.thom", "evaluating " << p << " on " << m);
+        CARL_LOG_TRACE("carl.thom.evaluation", "evaluating " << p << " on " << m);
 #ifdef DEVELOPER
         for(const auto& entry : m) assert(entry->second.isThom());
 #endif
+        // throw away all variables that do not appear in p
+        for(auto it = m.begin(); it != m.end(); ) {
+                if(!p.has(it->first)) it = m.erase(it);
+                else it++;
+        }
+        CARL_LOG_TRACE("carl.thom.evaluation", "after removing uneeded variables: m = " << m);
         if(m.size() == 1) {
                 RealAlgebraicNumber<Number> ran = m.begin()->second;
                 assert(ran.isThom());
                 int sgn = (int)ran.getThomEncoding().signOnPolynomial(p);
-                CARL_LOG_TRACE("carl.thom", "sign of evaluated polynomial is " << sgn);
+                CARL_LOG_TRACE("carl.thom.evaluation", "sign of evaluated polynomial is " << sgn);
                 return RealAlgebraicNumber<Number>((Number)sgn, false);
                 
         }
@@ -35,7 +41,7 @@ RealAlgebraicNumber<Number> evaluateTE(const MultivariatePolynomial<Number>& p, 
                 RealAlgebraicNumber<Number> ran2 = it->second;
                 assert(ran1.getThomEncoding().getPoint() == ran2.getThomEncoding());
                 int sgn = (int)ran1.getThomEncoding().signOnPolynomial(p);
-                CARL_LOG_TRACE("carl.thom", "sign of evaluated polynomial is " << sgn);
+                CARL_LOG_TRACE("carl.thom.evaluation", "sign of evaluated polynomial is " << sgn);
                 return RealAlgebraicNumber<Number>((Number)sgn, false);
         }
         else {

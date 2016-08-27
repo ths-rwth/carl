@@ -317,7 +317,7 @@ SignCondition ThomEncoding<Coeff>::signsRealizedOn(const std::vector<Multivariat
 
 template<typename C>
 bool areComparable(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-        if(lhs.isOneDimensional() && rhs.isOneDimensional()) {
+        if(lhs.isOneDimensional() && rhs.isOneDimensional() && lhs.getMainVar() == rhs.getMainVar()) {
                 return true;
         }
         else if(lhs.isMultiDimensional() && rhs.isMultiDimensional()) {
@@ -350,8 +350,12 @@ ThomComparisonResult compareRational(const ThomEncoding<C>& t, const C& rat) {
 // compares two RANs represented by thom encodings
 template<typename C>
 ThomComparisonResult compareThom(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-        CARL_LOG_ASSERT("carl.thom.compare", areComparable(lhs, rhs), "tried to compare\n" << lhs << "\n" << rhs);
         CARL_LOG_FUNC("carl.thom.compare", "lhs = " << lhs << ", rhs = " << rhs);
+        //CARL_LOG_ASSERT("carl.thom.compare", areComparable(lhs, rhs), "tried to compare\n" << lhs << "\n" << rhs);
+        if(!areComparable(lhs, rhs)) {
+                CARL_LOG_WARN("carl.thom.compare", "are not comparable: " << lhs << ", " << rhs << " ... returning LESS");
+                return LESS;
+        }
         if(lhs.isOneDimensional()) {
                 return compareUnivariate(lhs, rhs);
         }

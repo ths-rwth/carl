@@ -183,7 +183,7 @@ std::vector<ThomEncoding<Coeff>> realRoots(
                         newConds.push_back(s);
                 }
         }
-        std::cout << "newConds" << newConds << std::endl;
+        //std::cout << "newConds" << newConds << std::endl;
         
         
         // construct the thom encodings from p, this new sign conditions and point
