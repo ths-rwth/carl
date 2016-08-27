@@ -39,7 +39,9 @@ void setInitialLogLevel()
                 ("carl.thom.samples", carl::logging::LogLevel::LVL_INFO)
                 ("carl.thom.compare", carl::logging::LogLevel::LVL_INFO)
                 ("carl.thom.evaluation", carl::logging::LogLevel::LVL_INFO)
-                ("carl.thom.tarski", carl::logging::LogLevel::LVL_INFO)
+                ("carl.thom.tarski", carl::logging::LogLevel::LVL_WARN)
+                ("carl.thom.tarski.manager", carl::logging::LogLevel::LVL_TRACE)
+                ("carl.thom.tarski.table", carl::logging::LogLevel::LVL_TRACE)
                 ("carl.thom.sign", carl::logging::LogLevel::LVL_INFO)
 	;
 	carl::logging::logger().resetFormatter();
