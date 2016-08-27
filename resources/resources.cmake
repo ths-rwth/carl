@@ -16,7 +16,7 @@ endif()
 
 ##### Boost
 if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl Boost 1.55 REQUIRED)
+	load_library(carl Boost 1.54 REQUIRED)
 endif()
 if(BOOST_FOUND)
 	message(STATUS "Use system version of Boost ${BOOST_VERSION}")
