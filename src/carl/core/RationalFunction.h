@@ -325,7 +325,7 @@ namespace carl
 		{
 			if (isConstant()) return *this;
 			else {
-				return nominatorAsPolynomial().substitute(substitutions) / denominatorAsPolynomial().substitute(substitutions);
+				return RationalFunction(nominatorAsPolynomial().substitute(substitutions), denominatorAsPolynomial().substitute(substitutions));
 			}
 		}
 
