@@ -10,24 +10,107 @@
 #include "../interval/Interval.h"
 #include "ThomEncoding.h"
 #include "ThomUtil.h"
+#include "../formula/model/ran/RealAlgebraicNumber.h"
 
 namespace carl {
+        
+// forward declarations
+template<typename Number>
+class ThomEncoding;
+template<typename Number>
+class RealAlgebraicNumber;
+  
 
 template<typename Number>
 std::list<ThomEncoding<Number>> realRootsThom(
                 const MultivariatePolynomial<Number>& p,
+                Variable::Arg mainVar,
+		std::shared_ptr<ThomEncoding<Number>> point_ptr,
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
+);
+        
+/*
+ * Analyzes p and m in order to find a (recursive) Thom encoding on which p can be lifted
+ */
+template<typename Number>
+std::list<ThomEncoding<Number>> realRootsThom(
+                const MultivariatePolynomial<Number>& p,
+                Variable::Arg mainVar,
 		const std::map<Variable, ThomEncoding<Number>>& m = {},
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
-        CARL_LOG_ASSERT("carl.thom.rootfinder", p.gatherVariables().size() == m.size() + 1, "invalid arguments for realRootsThom");
+        CARL_LOG_INFO("carl.thom.rootfinder",
+                "\n---------------------------------------------\n"
+                << "Thom Root Finder called:\n"
+                << "---------------------------------------------\n"
+                << "p = " << p << " in " << mainVar << "\n"
+                << "m = " << m << "\n"
+                << "interval = " << interval << "\n"
+                << "---------------------------------------------");
+        CARL_LOG_ASSERT("carl.thom.rootfinder", !p.isConstant(), "this should not be handled here but somewhere before");
+        CARL_LOG_ASSERT("carl.thom.rootfinder", p.has(mainVar), "");
+        for(const auto& entry : m) {
+                CARL_LOG_ASSERT("carl.thom.rootfinder", entry.first == entry.second.mainVar(), "invalid map Variable -> Thom encoding");
+        }
+        for(const auto& v : p.gatherVariables()) {
+                if(v != mainVar) {
+                        CARL_LOG_ASSERT("carl.thom.rootfinder", m.find(v) != m.end(), "there is a variable which is in p but not in m");
+                }
+        }
+        
+        if(p.isUnivariate()) {
+                return realRootsThom<Number>(p, mainVar, nullptr, interval);
+        }
+        CARL_LOG_ASSERT("carl.thom.rootfinder", m.size() > 0, "");
+        
+        /* In m, there is either one descending chain and a dimension-1 encoding or just one descending chain (but not quite sure about this) */
+        
+        ThomEncoding<Number> point = std::max_element(m.begin(), m.end(),
+                        [](const std::pair<Variable, ThomEncoding<Number>>& lhs, const std::pair<Variable, ThomEncoding<Number>>& rhs) {
+                                return lhs.second.dimension() < rhs.second.dimension();
+                        }
+        )->second;
+        CARL_LOG_TRACE("carl.thom.rootfinder", "maximal encoding in m w.r.t. to dimension: " << point);
+        
+        // TODO assert that the encodings in the chain are actually the encodings in the map
+        
+        if(point.dimension() == m.size()) {
+                // in this case there is just one descending chain
+                CARL_LOG_TRACE("carl.thom.rootfinder", "found single descending chain in m: " << point);
+                std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);
+                return realRootsThom(p, mainVar, point_ptr, interval);
+        }
+        
+        else{
+                // in this case we assume that there is just ONE other element in m which is not in the chain and which is 1-dimensional
+                CARL_LOG_ASSERT("carl.thom.rootfinder", point.dimension() == m.size() - 1, "");
+                // i suspect this element is exactly the first one in m
+                CARL_LOG_ASSERT("carl.thom.rootfinder", m.begin()->second.dimension() == 1, "");
+                ThomEncoding<Number> point1 = m.begin()->second;
+                CARL_LOG_TRACE("carl.thom.rootfinder", "going to construct a new point from point = " << point << " and point1 = " << point1);
+                // TODO IMPLEMENT
+                assert(false);
+                return {};
+        }
+}
+
+/*
+ * don't call this directly
+ */
+template<typename Number>
+std::list<ThomEncoding<Number>> realRootsThom(
+                const MultivariatePolynomial<Number>& p,
+                Variable::Arg mainVar,
+		std::shared_ptr<ThomEncoding<Number>> point_ptr,
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
+) {
         using Polynomial = MultivariatePolynomial<Number>;
         std::list<ThomEncoding<Number>> result;
         
-        if(p.isUnivariate()) {
-                Variable pMainVar = *p.gatherVariables().begin();
-                std::list<Polynomial> derivatives = der(p, pMainVar, 1, p.degree(pMainVar));
+        if(point_ptr == nullptr) {
+                std::list<Polynomial> derivatives = der(p, mainVar, 1, p.degree(mainVar));
                 
-                std::vector<MultivariatePolynomial<Number>> zeroSet = {p};
+                std::vector<Polynomial> zeroSet = {p};
                 SignDetermination<Number> sd(zeroSet.begin(), zeroSet.end());
                 
                 uint numOfRoots = sd.sizeOfZeroSet();
@@ -44,98 +127,218 @@ std::list<ThomEncoding<Number>> realRootsThom(
                         ThomEncoding<Number> newEncoding(
                                 sigma,
                                 p,
-                                pMainVar,
+                                mainVar,
                                 nullptr,
                                 sd_ptr,
-                                1);
+                                sigma.size());
                         result.push_back(newEncoding);
                 }
-                std::cout << "result = " << result << std::endl;
-                std::vector<ThomEncoding<Number>> result_vec(result.begin(), result.end());
-                std::sort(result_vec.begin(), result_vec.end());
-                result = std::list<ThomEncoding<Number>>(result_vec.begin(), result_vec.end());
-                return result;
                 
-                // todo check bounds
+                
+                // TODO CHECK BOUNDS
         }
-        else {
-                // some consistency checks...
-#ifdef DEVELOPER
-                for(const auto& entry : m) {
-                        CARL_LOG_ASSERT("carl.thom.rootfinder", entry.first == entry.second.mainVar(), "invalid map Variable -> Thom encoding");
-                        CARL_LOG_ASSERT("carl.thom.rootfinder", p.has(entry.first), "");
-                }
-                
-                std::vector<ThomEncoding<Number>> encodings(m.size());
-                std::transform(m.begin(), m.end(), encodings.begin(),
-                        [](const std::pair<Variable, ThomEncoding<Number>>& entry) {
-                                return entry.second();
-                        }
-                );
-                std:::sort(encodings.begin(), encodings.end(),
-                        [](const ThomEncoding<Number>& lhs, const ThomEncoding<Number>& rhs) {
-                                return lhs.dimension() > rhs.dimension();
-                        }
-                );
-                for(uint i = 0; i < encodings.size() - 1; i++) {
-                        CARL_LOG_ASSERT("carl.thom.rootfinder", encodings[i].point() == encodings[i+1], "");
-                }
-#endif
-                // find main var of p
-                std::set<Variable> vars = p.gatherVariables();
-                for(const auto& entry : m) {
-                        vars.erase(entry.first);
-                }
-                CARL_LOG_ASSERT("carl.thom.rootfinder", vars.size() == 1, "invalid arguments to rootfinder: main var of p could not be determined");
-                Variable pMainVar = *vars.begin();
-                
-                ThomEncoding<Number> point = std::max_element(m.begin(), m.end(),
-                        [](const std::pair<Variable, ThomEncoding<Number>>& lhs, const std::pair<Variable, ThomEncoding<Number>>& rhs) {
-                                return lhs.second.dimension() < rhs.second.dimension();
-                        }
-                )->second;
-                
-                std::list<MultivariatePolynomial<Number>> zeroSet = point.accumulatePolynomials();
+        else {      
+                std::list<Polynomial> zeroSet = point_ptr->accumulatePolynomials();
                 zeroSet.push_front(p);
 
-                
-                
                 SignDetermination<Number> sd(zeroSet.begin(), zeroSet.end());
                 uint numOfRoots = sd.sizeOfZeroSet();
+                if(numOfRoots == 0) return {};
                 
-                std::list<MultivariatePolynomial<Number>> previousDerivatives = point.sd().processedPolynomials();
-                sd.getSignsAndAddAll(previousDerivatives.rbegin(), previousDerivatives.rend());
+                std::list<Polynomial> pointDerivatives = point_ptr->sd().processedPolynomials();
+                sd.getSignsAndAddAll(pointDerivatives.rbegin(), pointDerivatives.rend());
                 
-                std::list<MultivariatePolynomial<Number>> pDerivatives = der(p, pMainVar, 1, p.degree(pMainVar));
+                std::list<Polynomial> pDerivatives = der(p, mainVar, 1, p.degree(mainVar));
                 
                 std::list<SignCondition> signs = {};
+                uint relevant = 0;
                 auto it = pDerivatives.rbegin();
                 while(signs.size() < numOfRoots) {
                         signs = sd.getSignsAndAdd(*it);
                         it++;
+                        relevant++;
                 }
                 
                 std::shared_ptr<SignDetermination<Number>> sd_ptr = std::make_shared<SignDetermination<Number>>(sd);
-                std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);
-                SignCondition pointSigns = point.accumulateSigns();
+                SignCondition pointSigns = point_ptr->accumulateRelevantSigns();
                 for(const auto& sigma : signs) {
+                        CARL_LOG_ASSERT("carl.thom.rootfinder", sigma.size() == pointSigns.size() + relevant, "");
                         if(pointSigns.isSuffixOf(sigma)) {
                                 SignCondition newSigma(sigma);
-                                newSigma.resize(sigma.size() - pointSigns.size());
+                                newSigma.resize(relevant);
                                 ThomEncoding<Number> newEncoding(
                                         newSigma,
                                         p,
-                                        pMainVar,
+                                        mainVar,
                                         point_ptr,
                                         sd_ptr,
-                                        point.dimension() + 1);
+                                        relevant
+                                );
                                 result.push_back(newEncoding);
                         }
                 }
-                return result;
         }
+        
+        // convert in a vector because std::sort needs random acces iterator
+        std::vector<ThomEncoding<Number>> result_vec(result.begin(), result.end());
+        std::sort(result_vec.begin(), result_vec.end());
+        result = std::list<ThomEncoding<Number>>(result_vec.begin(), result_vec.end());
+        
+        // check bounds
+        // this could be optimized e.g. using binary search ...
+        if(interval.lowerBoundType() == BoundType::STRICT) {
+                auto it = result.begin();
+                while(it != result.end() && *it <= interval.lower()) {
+                        it = result.erase(it);
+                }
+        }
+        else if(interval.lowerBoundType() == BoundType::WEAK) {
+                auto it = result.begin();
+                while(it != result.end() && *it < interval.lower()) {
+                        it = result.erase(it);
+                }
+        }
+        
+        if(interval.upperBoundType() == BoundType::STRICT) {
+                std::reverse(result.begin(), result.end());
+                auto it = result.begin();
+                while(it != result.end() && *it >= interval.upper()) {
+                        it = result.erase(it);;
+                }
+                std::reverse(result.begin(), result.end());
+        }
+        else if(interval.upperBoundType() == BoundType::WEAK) {
+                std::reverse(result.begin(), result.end());
+                auto it = result.begin();
+                while(it != result.end() && *it > interval.upper()) {
+                        it = result.erase(it);
+                }
+                std::reverse(result.begin(), result.end());
+        }
+        
+        CARL_LOG_INFO("carl.thom.rootfinder", "found the following roots: " << result);
+        return result;
 }
 
+/*
+ * Interface to the Thom mechanism used in the CAD.
+ * 
+ * Input:
+ *      A (possibly multivariate) polynomial p represented with respect
+ *      to the variable of the current level.
+ *      A mapping m from a set of variables to a set of RANs that are either
+ *      represented explicitly or as Thom encodings. All variables of p that
+ *      are not the main variable must appear in m.
+ *      An interval where we are looking for roots.
+ * 
+ * Output:
+ *      The list of RANs representing the real roots of the univariate polynomial
+ *      obtained by substituting the coeffcients of p according to m.
+ *      
+ * Overview:
+ *      1. Plug in all RANs in m which are explicitly represented into p
+ *      2. If the resulting polynomial has at most degree 2, try to solve trivial
+ *      3. Use the remaining Thom encodings in m to construct a real alg. point
+ *         represented as a Thom encoding
+ *      4. Determine roots according to this point
+ */
+        
+
+template<typename Coeff, typename Number>
+std::list<RealAlgebraicNumber<Number>> realRootsThom(
+		const UnivariatePolynomial<Coeff>& p,
+		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
+		const Interval<Number>& interval
+) {
+        CARL_LOG_TRACE("carl.thom.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
+	assert(m.count(p.mainVar()) == 0);
+        assert(!p.isZero());
+        
+        std::list<ThomEncoding<Number>> roots;
+        
+        UnivariatePolynomial<Coeff> tmp(p);
+	std::map<Variable, ThomEncoding<Number>> TEmap;
+	
+	for (Variable v: tmp.gatherVariables()) {
+		if (v == p.mainVar()) continue;
+		assert(m.count(v) > 0);
+		if (m.at(v).isNumeric()) {
+			tmp.substituteIn(v, Coeff(m.at(v).value()));
+		} else {
+			TEmap.emplace(v, m.at(v).getThomEncoding());
+		}
+	}
+        CARL_LOG_TRACE("carl.thom.rootfinder", "TEmap = " << TEmap);
+        CARL_LOG_TRACE("carl.thom.rootfinder", "tmp = " << tmp);
+        if(TEmap.empty()) {
+                if(tmp.isZero()) return {RealAlgebraicNumber<Number>(0)};
+                assert(tmp.gatherVariables().size() == 1);
+                 // Coeff = MultivariatePolynomial<Number>, but all coefficients of tmp are numerical
+                UnivariatePolynomial<Number> tmp_univ = tmp.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ assert(c.isUnivariate()); return c.constantPart(); }));
+                std::list<RealAlgebraicNumber<Number>> roots_triv;
+                if(tmp_univ.zeroIsRoot()) {
+                        roots_triv.push_back(RealAlgebraicNumber<Number>(0));
+                        tmp_univ.eliminateZeroRoots();
+                }
+                CARL_LOG_TRACE("carl.thom.rootfinder", "tmp_univ = " << tmp_univ);
+                switch (tmp_univ.degree()) {
+                        case 0: {
+                                CARL_LOG_TRACE("carl.thom.rootfinder", "roots_triv = " << roots_triv);
+                                return roots_triv;
+                        }
+                        case 1: {
+                                Number a = tmp_univ.coefficients()[1], b = tmp_univ.coefficients()[0];
+                                assert(a != Number(0));
+                                roots_triv.push_back(RealAlgebraicNumber<Number>(-b / a));
+                                CARL_LOG_TRACE("carl.thom.rootfinder", "roots_triv = " << roots_triv);
+                                return roots_triv;
+                        }
+                        case 2: {
+                                Number a = tmp_univ.coefficients()[2], b = tmp_univ.coefficients()[1], c = tmp_univ.coefficients()[0];
+                                assert(a != Number(0));
+                                /* Use this formulation of p-q-formula:
+                                 * x = ( -b +- \sqrt{ b*b - 4*a*c } ) / (2*a)
+                                 */
+                                Number rad = b*b - 4*a*c;
+                                if (rad == 0) {
+                                        roots_triv.push_back(RealAlgebraicNumber<Number>(-b / (2*a)));
+                                        CARL_LOG_TRACE("carl.thom.rootfinder", "roots_triv = " << roots_triv);
+                                        return roots_triv;
+                                }
+                                else if (rad > 0) {
+                                        std::pair<Number, Number> res = carl::sqrt_fast(rad);
+                                        if (res.first == res.second) {
+                                                // Root could be calculated exactly
+                                                roots_triv.push_back(RealAlgebraicNumber<Number>((-b - res.first) / (2*a)));
+                                                roots_triv.push_back(RealAlgebraicNumber<Number>((-b + res.first) / (2*a)));
+                                                CARL_LOG_TRACE("carl.thom.rootfinder", "roots_triv = " << roots_triv);
+                                                return roots_triv;
+                                        }
+                                }
+                                break;
+                        }
+                }
+               
+                roots = realRootsThom<Number>(MultivariatePolynomial<Number>(tmp_univ), tmp_univ.mainVar(), nullptr, interval);
+        }
+        else {
+                // need to perform 'real' lifting
+                
+                MultivariatePolynomial<Number> p_multiv(tmp);
+                //std::cout << "p_multiv = " << p_multiv << std::endl;
+
+                roots = realRootsThom(p_multiv, p.mainVar(), TEmap, interval);
+        }
+        
+        CARL_LOG_TRACE("carl.thom.rootfinder", "found the following roots: " << roots);
+        
+	std::list<RealAlgebraicNumber<Number>> res;
+        for(const auto& te : roots) res.push_back(RealAlgebraicNumber<Number>(te));
+        return res;
+}
+
+
+        
 } // namespace carl
 
 

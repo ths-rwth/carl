@@ -1,6 +1,6 @@
 # Add test cpp file
 add_executable( runCADTests
-    #Test_CAD.cpp
+    Test_CAD.cpp
     #Test_ConflictGraph.cpp
     #Test_Constraint.cpp
     #Test_EliminationSet.cpp
@@ -8,7 +8,7 @@ add_executable( runCADTests
     #Test_TarskiQuery.cpp
     #Test_SignDetermination.cpp
     #Test_Thom.cpp
-    Test_Thom2.cpp
+    #Test_Thom2.cpp
 )
 cotire(runCADTests)
 

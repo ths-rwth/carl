@@ -16,7 +16,7 @@
 #include "../interval/IntervalEvaluation.h"
 #include "../formula/model/ran/RealAlgebraicNumberSettings.h"
 #include "../core/rootfinder/RootFinder.h"
-#include "../thom/ThomRootFinder.h"
+#include "../thom2/ThomRootFinder.h"
 
 #define PERFORM_PARTIAL_CHECK false
 

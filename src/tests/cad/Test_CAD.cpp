@@ -9,6 +9,7 @@
 #include "carl/cad/Constraint.h"
 #include "carl/util/platform.h"
 
+
 #include "../Common.h"
 
 using namespace carl;
@@ -58,7 +59,6 @@ protected:
 
 	bool hasNRValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
 		if (n.isNumeric()) return n.value() == val;
-                if(n.isThom()) return n.getThomEncoding().represents(val);
 		return false;
 	}
 	bool hasValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {

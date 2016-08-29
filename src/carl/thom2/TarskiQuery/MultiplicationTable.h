@@ -58,13 +58,13 @@ public:
         
         typedef std::forward_list<std::pair<uint, uint>> IndexPairs;
         typedef Term<Number> Monomial;
-private:
-
+        
         struct TableContent {
                 BaseRepresentation<Number> br;
                 IndexPairs pairs;               
         };
-        
+private:
+
         // main datastructure
         std::unordered_map<Monomial, TableContent> mTable;
         
@@ -83,6 +83,12 @@ public:
                 this->init(gb);
                 CARL_LOG_TRACE("carl.thom.tarski.table", "done setting up multiplication table:\n" << *this);
         }
+        
+        typename std::unordered_map<Monomial, TableContent>::const_iterator begin() const { return mTable.cbegin(); }
+        typename std::unordered_map<Monomial, TableContent>::const_iterator end() const { return mTable.cend(); }
+        typename std::unordered_map<Monomial, TableContent>::const_iterator cbegin() const { return mTable.cbegin(); }
+        typename std::unordered_map<Monomial, TableContent>::const_iterator cend() const { return mTable.cend(); }
+        
         
         inline bool contains(const Monomial& m) const {
                 return mTable.find(m) != mTable.end();

@@ -34,14 +34,25 @@ public:
                 return true;
         }
         
-        friend ThomComparisonResult compare(const SignCondition& lhs, const SignCondition& rhs) {
+        SignCondition trailingPart(uint count) const {
+                SignCondition result;
+                auto it = this->rbegin();
+                for(uint i = 0; i < count; i++) {
+                        result.push_front(*it);
+                        it++;
+                }
+                assert(result.size() == count);
+                return result;
+        }
+        
+        static ThomComparisonResult compare(const SignCondition& lhs, const SignCondition& rhs) {
                 assert(lhs.size() == rhs.size());
                 assert(lhs.back() == rhs.back());
                 if(lhs.size() == 1) return EQUAL;
                 assert(lhs.size() >= 2);
                 auto it_lhs = lhs.rbegin();
                 auto it_rhs = rhs.rbegin();
-                it_lhs++; it_rhs++;
+                it_lhs++; it_rhs++; // let the iterators point to the second last element
                 while(it_lhs != lhs.rend() && it_rhs != rhs.rend()) {
                         if(*it_lhs != *it_rhs) {
                                 it_lhs--; it_rhs--;
@@ -55,6 +66,7 @@ public:
                                         return (*it_lhs < *it_rhs) ? ThomComparisonResult::GREATER : ThomComparisonResult::LESS;
                                 }
                         }
+                        it_rhs++; it_lhs++;
                 }
                 return ThomComparisonResult::EQUAL;
         }

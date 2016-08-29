@@ -218,9 +218,11 @@ private:
                         for(const auto& n : mAdaHelper) {
                                 if(n >= 2) {
                                         r2++;
-                                        removeColumn(m2, index);
+                                        index++;
                                 }
-                                index++;
+                                else {
+                                        removeColumn(m2, index);
+                                }    
                         }
                         std::vector<Polynomial> products(mProducts.begin(), mProducts.end());
                         std::list<Alpha> A_2 = firstNLines(
@@ -244,9 +246,11 @@ private:
                                 for(const auto& n : mAdaHelper) {
                                         if(n >= 3) {
                                                 r3++;
-                                                removeColumn(m3, index);
+                                                index++;
                                         }
-                                        index++;
+                                        else {
+                                                removeColumn(m3, index);
+                                        }      
                                 }
                                 products = std::vector<Polynomial>(mProducts.begin(), mProducts.end());
                                 std::list<Alpha> A_3 = firstNLines(
@@ -266,6 +270,7 @@ private:
                 }
                 mAda = newAda;
                 mMatrix = adaptedMat(mAda, mSigns);
+                CARL_LOG_ASSERT("carl.thom.sign", Eigen::FullPivLU<Eigen::MatrixXf>(mMatrix).rank() == mMatrix.cols(), "mMatrix must be invertible!");
                 mProducts = adaptedProducts;
                 mNeedsUpdate = false;
                 CARL_LOG_DEBUG("carl.thom.sign", *this);

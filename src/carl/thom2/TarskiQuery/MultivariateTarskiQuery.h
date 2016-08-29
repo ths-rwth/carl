@@ -23,16 +23,34 @@ int multivariateTarskiQuery(const MultivariatePolynomial<Number>& Q, const Multi
         CoeffMatrix<Number> m(base.size(), base.size());
         CARL_LOG_INFO("carl.thom.tarski", "base size is " << base.size());
         CARL_LOG_INFO("carl.thom.tarski", "setting up the matrix now ...");
+        /*for(const auto& entry : table) {
+                BaseRepresentation<Number> Qc = table.multiply(q, entry.second.br);
+                Number t = table.trace(Qc);
+                for(const auto& pair : entry.second.pairs) {
+                        m(pair.first, pair.second) = t;
+                }
+        }*/
+        
         for(uint i = 0; i < base.size(); i++) {
                 for(uint j = i; j < base.size(); j++) {    
-                        //BaseRepresentation<Coeff> prod = table.getEntry(base[i] * base[j]).br;
-                        //BaseRepresentation<Coeff> Qc = table.multiply(q, prod);
-                        BaseRepresentation<Number> Qc = table.reduce(base[i] * base[j] * Q);
+                        BaseRepresentation<Number> prod = table.getEntry(base[i] * base[j]).br;
+                        BaseRepresentation<Number> Qc = table.multiply(q, prod);
+                        //BaseRepresentation<Number> Qc = table.reduce(base[i] * base[j] * Q);
                         Number t = table.trace(Qc);
                         m(i, j) = t;
                         m(j, i) = t;
                 }
         }
+        
+        /*
+        for(uint i = 0; i < base.size(); i++) {
+                for(uint j = i; j < base.size(); j++) {
+                        std::cout << m(i, j) << "\t\t";
+                }
+                std::cout << std::endl;
+        }
+        std::cout << std::endl;
+        */
         CARL_LOG_INFO("carl.thom.tarski", "... done setting up matrix.");
         std::vector<Number> cp = charPol(m);
         CARL_LOG_TRACE("carl.thom.tarski", "char pol: " << cp);
