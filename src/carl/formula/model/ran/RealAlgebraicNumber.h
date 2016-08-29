@@ -9,7 +9,7 @@
 
 #include "RealAlgebraicNumberSettings.h"
 
-#include "../../../thom/ThomEncoding.h"
+#include "../../../thom2/ThomEncoding.h"
 #include "RealAlgebraicNumber_Interval.h"
 
 namespace carl {
@@ -221,7 +221,7 @@ public:
 		}
                 else {
                         assert(isThom());
-                        return mTE->signOnPolynomial(p);
+                        return mTE->signOnPolynomial(MultivariatePolynomial<Number>(p));
                 }
 	}
 	
