@@ -320,6 +320,14 @@ namespace carl
                 return nominatorAsPolynomial().evaluate(substitutions) / denominatorAsPolynomial().evaluate(substitutions);
             }
         }
+		
+		RationalFunction substitute(const std::map<Variable, CoeffType>& substitutions) const
+		{
+			if (isConstant()) return *this;
+			else {
+				return nominatorAsPolynomial().substitute(substitutions) / denominatorAsPolynomial().substitute(substitutions);
+			}
+		}
 
 		/**
 		 * Derivative of the rational function with respect to variable x
