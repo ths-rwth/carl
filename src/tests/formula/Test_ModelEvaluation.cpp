@@ -9,8 +9,10 @@
 using namespace carl;
 
 typedef MultivariatePolynomial<Rational> Pol;
-typedef Constraint<Pol> Constr;
+typedef Constraint<Pol> ConstraintT;
 typedef Formula<Pol> FormulaT;
+typedef Interval<Rational> IntervalT;
+typedef RealAlgebraicNumber<Rational> RANT;
 typedef Model<Rational,Pol> ModelT;
 
 TEST(ModelEvaluation, Formula)
@@ -30,4 +32,17 @@ TEST(ModelEvaluation, EvaluateMVR)
 	auto res = model::evaluate(mvr, m);
 	EXPECT_TRUE(res.isRational());
 	EXPECT_TRUE(isZero(res.asRational()));
+}
+
+TEST(ModelEvaluation, EvaluateRANIR)
+{
+	Variable x = freshRealVariable("x");
+	ModelT m;
+	IntervalT i(Rational(-3)/2, Rational(-1));
+	UnivariatePolynomial<Rational> p(x, {Rational(-2), Rational(0), Rational(1)});
+	m.assign(x, RANT(p, i));
+	FormulaT f = FormulaT(ConstraintT(Pol(p), Relation::EQ));
+	auto res = model::evaluate(f, m);
+	EXPECT_TRUE(res.isBool());
+	EXPECT_TRUE(res.asBool());
 }
