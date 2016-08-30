@@ -274,6 +274,7 @@ namespace carl
             }
 			case FormulaType::VARCOMPARE:
 			{
+				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
 			}
             case FormulaType::BITVECTOR:
             {
@@ -1794,6 +1795,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case VARCOMPARE:
 		case BITVECTOR:
 		case TRUE:
 		case FALSE:
@@ -1854,6 +1856,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case VARCOMPARE:
 		case BITVECTOR:
 		case TRUE:
 		case FALSE:

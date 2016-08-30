@@ -27,12 +27,36 @@ namespace model {
 		assert(value.isRational() || value.isRAN());
 		RealAlgebraicNumber<Rational> reference = value.isRational() ? RealAlgebraicNumber<Rational>(value.asRational()) : value.asRAN();
 		auto cmp = vc.value();
-		if (cmp.isSubstitution()) cmp = cmp.asSubstitution()->evaluate(m);
+		if (cmp.isSubstitution()) {
+			// If assigned directly, the shared_ptr<Substitution> goes out of scope before the result is copied into cmp.
+			// Therefore, we start by copying the data and overwriting it afterwards.
+			auto res = cmp.asSubstitution()->evaluate(m);
+			cmp = res;
+		}
 		if (cmp.isSubstitution()) return;
 		assert(cmp.isRational() || cmp.isRAN());
 		RealAlgebraicNumber<Rational> val = cmp.isRational() ? RealAlgebraicNumber<Rational>(cmp.asRational()) : cmp.asRAN();
-		if (val == reference) f = Formula<Poly>(FormulaType::TRUE);
-		else f = Formula<Poly>(FormulaType::FALSE);
+		f = Formula<Poly>(FormulaType::FALSE);
+		switch (vc.relation()) {
+			case Relation::EQ:
+				if (reference == val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::NEQ:
+				if (reference != val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::LESS:
+				if (reference < val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::LEQ:
+				if (reference <= val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::GREATER:
+				if (reference > val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+			case Relation::GEQ:
+				if (reference >= val) f = Formula<Poly>(FormulaType::TRUE);
+				break;
+		}
 	}
 	
 	/**
@@ -87,7 +111,6 @@ namespace model {
 			}
 			case FormulaType::VARCOMPARE: {
 				evaluateVarCompare(f, m);
-				CARL_LOG_WARN("carl.model.evaluation", "Evaluation of varcompare not yet implemented.");
 				break;
 			}
 			case FormulaType::BITVECTOR: {

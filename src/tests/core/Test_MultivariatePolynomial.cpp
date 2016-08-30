@@ -262,12 +262,12 @@ TEST(MultivariatePolynomial, Substitute)
     EXPECT_EQ(mp2, mp.substitute(substitutions));
     substitutions[v0] = MultivariatePolynomial<Rational>((Rational)0);
     EXPECT_EQ(MultivariatePolynomial<Rational>((Rational)4 * v1), mp.substitute(substitutions));
-    #ifdef USE_GINAC
     Variable v = freshRealVariable("v");
     Variable x = freshRealVariable("x");
     Variable y = freshRealVariable("y");
     Variable z = freshRealVariable("z");
 
+    #ifdef USE_GINAC
     std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> vars;
     GiNaC::symbol vg("v"), xg("x"), yg("y"), zg("z");
     vars.insert(std::pair<GiNaC::ex, Variable>(vg, v));

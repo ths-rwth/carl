@@ -19,3 +19,15 @@ TEST(ModelEvaluation, Formula)
 	FormulaT f = FormulaT(FormulaType::TRUE);
 	std::cout << model::substitute(f, m) << std::endl;
 }
+
+TEST(ModelEvaluation, EvaluateMVR)
+{
+	Variable x = freshRealVariable("x");
+	Variable z = freshRealVariable("_z");
+	ModelT m;
+	m.assign(x, Rational(-1));
+	MultivariateRoot<Pol> mvr(Pol(x)*z, 1, z);
+	auto res = model::evaluate(mvr, m);
+	EXPECT_TRUE(res.isRational());
+	EXPECT_TRUE(isZero(res.asRational()));
+}
