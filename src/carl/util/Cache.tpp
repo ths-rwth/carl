@@ -189,7 +189,7 @@ namespace carl
     void Cache<T>::clean()
     {
         CARL_LOG_TRACE( "carl.util.cache", "Cleaning cache..." );
-        if( mNumOfUnusedEntries < ((double) mCache.size() * mCacheReductionAmount) )
+        if( double(mNumOfUnusedEntries) < (double(mCache.size()) * mCacheReductionAmount) )
         {
             if( mNumOfUnusedEntries > 0 )
             {
