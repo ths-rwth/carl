@@ -78,6 +78,7 @@ namespace carl
     static const Condition PROP_VARIABLE_DEGREE_GREATER_THAN_TWO  = Condition( 27 );
     static const Condition PROP_VARIABLE_DEGREE_GREATER_THAN_THREE  = Condition( 28 );
     static const Condition PROP_VARIABLE_DEGREE_GREATER_THAN_FOUR = Condition( 29 );
+    static const Condition PROP_CONTAINS_WEAK_INEQUALITY       = Condition( 30 );
     static const Condition WEAK_CONDITIONS                       = PROP_CONTAINS_EQUATION | PROP_CONTAINS_INEQUALITY | PROP_CONTAINS_STRICT_INEQUALITY
                                              | PROP_CONTAINS_LINEAR_POLYNOMIAL | PROP_CONTAINS_LINEAR_POLYNOMIAL | PROP_CONTAINS_NONLINEAR_POLYNOMIAL
                                              | PROP_CONTAINS_MULTIVARIATE_POLYNOMIAL | PROP_CONTAINS_INEQUALITY | PROP_CONTAINS_BOOLEAN

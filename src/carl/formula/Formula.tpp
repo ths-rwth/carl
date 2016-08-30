@@ -332,15 +332,18 @@ namespace carl
         {
             case Relation::EQ:
                 _properties |= PROP_CONTAINS_EQUATION;
+                _properties |= PROP_CONTAINS_WEAK_INEQUALITY;
                 break;
             case Relation::NEQ:
                 _properties |= PROP_CONTAINS_STRICT_INEQUALITY;
                 break;
             case Relation::LEQ:
                 _properties |= PROP_CONTAINS_INEQUALITY;
+                _properties |= PROP_CONTAINS_WEAK_INEQUALITY;
                 break;
             case Relation::GEQ:
                 _properties |= PROP_CONTAINS_INEQUALITY;
+                _properties |= PROP_CONTAINS_WEAK_INEQUALITY;
                 break;
             case Relation::LESS:
                 _properties |= PROP_CONTAINS_STRICT_INEQUALITY;
