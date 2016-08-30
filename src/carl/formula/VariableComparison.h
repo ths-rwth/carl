@@ -8,6 +8,7 @@
 #include "../core/Variable.h"
 #include "../numbers/numbers.h"
 
+#include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
 namespace carl {
@@ -56,6 +57,12 @@ namespace carl {
 		}
 		ModelValue<Number,Poly> value() const {
 			return boost::apply_visitor(ValueToModelValue(), mValue);
+		}
+		boost::optional<Constraint<Poly>> asConstraint() const {
+			auto v = value();
+			if (!v.isRAN()) return boost::none;
+			if (!v.asRAN().isNumeric()) return boost::none;
+			return Constraint<Poly>(Poly(mVar) - Poly(v.asRAN().value()), mRelation);
 		}
 		VariableComparison negation() const {
 			return VariableComparison(mVar, mValue, inverse(mRelation));
