@@ -364,3 +364,35 @@ TEST(RationalFunction, Evaluation)
     Rational resrf1 = rf1.evaluate(substitutions);
     EXPECT_EQ( Rational(6), resrf1 );
 }
+
+TEST(RationalFunction, Substitute)
+{
+    carl::StringParser parser;
+    parser.setVariables({"x", "y", "z"});
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Variable z = freshRealVariable("z");
+
+    // Nessecessary - if not present, later formula parsing fails with BUGGY exception!
+    RFunc rf1 = RFunc(Pol(x));
+    RFunc rf2 = RFunc(Pol(y));
+    RFunc rf3 = RFunc(Pol(z));
+   
+    RFunc rf4(RFunc(Rational(2)) * rf1);
+    RFunc rf5(rf1 * rf2);
+    RFunc rf6(rf3 / RFunc(Rational(2)));
+   
+    RFunc rationalFunction(rf4 + rf5 + rf6);
+
+    RFunc rf7(Pol(z), Pol(Rational(2)));
+   
+    std::map<Variable, Rational> replacement = {{x, Rational(2)}};
+    RFunc subX = rationalFunction.substitute(replacement);
+   
+    RFunc cmp(z / Rational(2) + Rational(2) * y + Rational(4), Pol(1));
+    EXPECT_EQ(subX, cmp);
+   
+    Pol poly(Rational(2) * x + x*y + z / Rational(2));
+    Pol polySub = poly.substitute(replacement);
+    EXPECT_EQ(polySub, z / Rational(2) + Rational(2) * y + Rational(4));
+}
