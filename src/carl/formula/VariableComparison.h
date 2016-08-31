@@ -34,7 +34,7 @@ namespace carl {
 			Variables operator()(const MR& mr) const {
 				return mr.gatherVariables();
 			}
-			Variables operator()(const RAN& ran) const {
+			Variables operator()(const RAN&) const {
 				return Variables();
 			}
 		};
@@ -73,7 +73,7 @@ namespace carl {
 			vars.insert(newVars.begin(), newVars.end());
 		}
 		
-		std::string toString(unsigned _resolveUnequal = 0, bool _infix = false, bool _friendlyNames = true) const {
+		std::string toString(unsigned = 0, bool = false, bool = true) const {
 			std::stringstream ss;
 			ss << "(" << mRelation << " " << mVar << " " << mValue << ")";
 			return ss.str();
