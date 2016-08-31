@@ -50,8 +50,11 @@ namespace model {
 		
 		auto map = collectRANIR(mvr.gatherVariables(), m);
 		if (map.size() == mvr.gatherVariables().size()) {
-            res = mvr.evaluate(map);
-			return;
+			auto r = mvr.evaluate(map);
+			if (r) {
+				res = *r;
+				return;
+			}
 		}
 		res = ModelSubstitution<Rational,Poly>::template create<ModelMVRootSubstitution<Rational,Poly>>(mvr);
 	}

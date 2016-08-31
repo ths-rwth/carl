@@ -43,8 +43,11 @@ namespace carl {
 	public:	
 		VariableComparison(Variable::Arg v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {
 			if (value.isUnivariate()) {
-				mValue = value.evaluate({});
-				CARL_LOG_DEBUG("carl.multivariateroot", "Evaluated " << value << "-> " << mValue);
+				auto res = value.evaluate({});
+				if (res) {
+					mValue = *res;
+					CARL_LOG_DEBUG("carl.multivariateroot", "Evaluated " << value << "-> " << mValue);
+				}
 			}
 		}
 		VariableComparison(Variable::Arg v, const RAN& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {}
