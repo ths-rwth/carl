@@ -19,13 +19,14 @@ TEST(ModelEvaluation, Formula)
 {
 	ModelT m;
 	FormulaT f = FormulaT(FormulaType::TRUE);
-	std::cout << model::substitute(f, m) << std::endl;
+	auto res = model::substitute(f, m);
+	EXPECT_TRUE(res.isTrue());
 }
 
 TEST(ModelEvaluation, EvaluateMVR)
 {
 	Variable x = freshRealVariable("x");
-	Variable z = freshRealVariable("_z");
+	Variable z = freshRealVariable("z_");
 	ModelT m;
 	m.assign(x, Rational(-1));
 	MultivariateRoot<Pol> mvr(Pol(x)*z, 1, z);
@@ -38,7 +39,7 @@ TEST(ModelEvaluation, EvaluateRANIR)
 {
 	Variable x = freshRealVariable("x");
 	ModelT m;
-	IntervalT i(Rational(-3)/2, Rational(-1));
+	IntervalT i(Rational(-3)/2, BoundType::STRICT, Rational(-1), BoundType::STRICT);
 	UnivariatePolynomial<Rational> p(x, {Rational(-2), Rational(0), Rational(1)});
 	m.assign(x, RANT(p, i));
 	FormulaT f = FormulaT(ConstraintT(Pol(p), Relation::EQ));
