@@ -6,6 +6,7 @@
 
 #include "carl/thom2/SignDetermination/SignDetermination.h"
 #include "carl/thom2/ThomRootFinder.h"
+#include "carl/thom2/ThomEvaluation.h"
 
 using namespace carl;
 
@@ -235,4 +236,43 @@ TEST(Thom2, Samples) {
         std::cout << intermediate3 << std::endl;
         
         
+}
+
+TEST(Thom2, Evaluation) {
+        typedef MultivariatePolynomial<Rational> Polynomial;
+        typedef ThomEncoding<Rational> TE;
+        typedef RealAlgebraicNumber<Rational> RAN;
+        Variable x = freshRealVariable("x");
+        Variable y = freshRealVariable("y");
+        Variable z = freshRealVariable("z");
+        
+        Polynomial poly1({Rational(1)*x*x, Term<Rational>(Rational(-2))});      // x² - 2
+        Polynomial poly2({Rational(1)*y*y, Term<Rational>(Rational(-2))});      // y² - 2
+        Polynomial poly3({Rational(1)*z*z, Term<Rational>(Rational(-2))});      // z² - 2
+        Polynomial poly4({Rational(1)*x*x,Rational(1)*y*y, Rational(1)*z*z, Term<Rational>(Rational(-6))});     // x² + y² +z² - 6
+        Polynomial poly5({Rational(1)*x*x, Rational(1)*y*y, Term<Rational>(Rational(-2))});     // x² + y² - 2
+        
+        std::list<TE> realRootsPoly1 = realRootsThom(poly1, x);
+        std::list<TE> realRootsPoly2 = realRootsThom(poly2, y);
+        std::list<TE> realRootsPoly3 = realRootsThom(poly3, z);
+        EXPECT_EQ(realRootsPoly1.size(), 2);
+        EXPECT_EQ(realRootsPoly2.size(), 2);
+        EXPECT_EQ(realRootsPoly3.size(), 2);
+        TE sqrt2x = realRootsPoly1.back();
+        TE sqrt2y = realRootsPoly2.back();
+        TE sqrt2z = realRootsPoly3.back();
+        
+        std::map<Variable, RAN> m1 = {std::make_pair(x, RAN(sqrt2x))};
+        EXPECT_TRUE(evaluateTE(poly1, m1).sgn() == Sign::ZERO);
+        m1 = {std::make_pair(x, RAN(sqrt2x)), std::make_pair(y, RAN(sqrt2y))};
+        EXPECT_TRUE(evaluateTE(poly1, m1).sgn() == Sign::ZERO);
+        
+        std::map<Variable, RAN> m2 = {std::make_pair(x, RAN(sqrt2x)), std::make_pair(y, RAN(sqrt2y)), std::make_pair(z, RAN(sqrt2z))};
+        EXPECT_TRUE(evaluateTE(poly4, m2).sgn() == Sign::ZERO);
+        
+        std::map<Variable, TE> m3 = {std::make_pair(x, sqrt2x)};
+        std::list<TE> realRootsPoly5 = realRootsThom(poly5, y, m3);
+        EXPECT_EQ(realRootsPoly5.size(), 1);
+        std::map<Variable, RAN> m4 = {std::make_pair(x, RAN(sqrt2x)), std::make_pair(y, RAN(realRootsPoly5.front())), std::make_pair(z, RAN(sqrt2z))};
+        EXPECT_TRUE(evaluateTE(poly4, m4).sgn() == Sign::NEGATIVE);
 }

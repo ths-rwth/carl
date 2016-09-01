@@ -93,6 +93,20 @@ public:
         inline const ThomEncoding<Number>& point() const {assert(mPoint); return *mPoint; }
         inline SignDetermination<Number> sd() const {assert(mSd); return *mSd; }
         
+        std::list<Polynomial> relevantDerivatives() const {
+                std::list<Polynomial> derivatives = der(mP, mMainVar, 0, mP.degree(mMainVar));
+                std::reverse(derivatives.begin(), derivatives.end());
+                derivatives.resize(mRelevant);
+                std::reverse(derivatives.begin(), derivatives.end());
+                assert(derivatives.size() == mRelevant);
+                return derivatives;
+        }
+        
+        ThomEncoding<Number> lowestInChain() const {
+                if(mPoint == nullptr) return ThomEncoding<Number>(*this);
+                return mPoint.lowestInChain();
+        }
+        
         uint dimension() const {
                 if(mPoint == nullptr) return 1;
                 return 1 + point().dimension(); 
@@ -122,12 +136,26 @@ public:
         
         Sign signOnPolynomial(const Polynomial& p) const {
                 CARL_LOG_ASSERT("carl.thom", p.gatherVariables().size() <= this->dimension(), "");
+                if(p.isZero()) return Sign(0);
+                if(p.isConstant()) return Sign(sgn(p.lcoeff()));
                 std::list<SignCondition> signs = mSd->getSigns(p);
                 SignCondition relevant = accumulateRelevantSigns();
                 for(const auto& sigma : signs) {
                         if(relevant.isSuffixOf(sigma)) return sigma.front();
                 }
                 CARL_LOG_ASSERT("carl.thom", false, "we should never get here");
+        }
+        
+        bool makesPolynomialZero(const Polynomial& pol, Variable::Arg pol_mainVar) const {
+                assert(!pol.isZero());
+                assert(mMainVar != pol_mainVar);
+                UnivariatePolynomial<Polynomial> pol_univ = pol.toUnivariatePolynomial(pol_mainVar);
+                // maybe check first if pol_univ has some constant coefficient...
+                for(const auto t : pol_univ.coefficients()) {
+                        assert(this->dimension() >= t.gatherVariables().size());
+                        if(this->signOnPolynomial(t) != Sign::ZERO) return false;
+                }
+                return true;
         }
         
         

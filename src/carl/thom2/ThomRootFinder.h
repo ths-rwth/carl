@@ -74,7 +74,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
         
         // TODO assert that the encodings in the chain are actually the encodings in the map
         
-        if(point.dimension() == m.size()) {
+        if(point.dimension() >= m.size()) {
                 // in this case there is just one descending chain
                 CARL_LOG_TRACE("carl.thom.rootfinder", "found single descending chain in m: " << point);
                 std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);
@@ -82,15 +82,21 @@ std::list<ThomEncoding<Number>> realRootsThom(
         }
         
         else{
-                // in this case we assume that there is just ONE other element in m which is not in the chain and which is 1-dimensional
-                CARL_LOG_ASSERT("carl.thom.rootfinder", point.dimension() == m.size() - 1, "");
-                // i suspect this element is exactly the first one in m
-                CARL_LOG_ASSERT("carl.thom.rootfinder", m.begin()->second.dimension() == 1, "");
-                ThomEncoding<Number> point1 = m.begin()->second;
-                CARL_LOG_TRACE("carl.thom.rootfinder", "going to construct a new point from point = " << point << " and point1 = " << point1);
-                // TODO IMPLEMENT
-                assert(false);
-                return {};
+                for(const auto& entry : m) {
+                        CARL_LOG_ASSERT("carl.thom.rootfinder", entry.second.dimension() == 1, "this is an assumption i have made");
+                }
+                auto m_it = m.begin();
+                point = m_it->second;
+                m_it++;
+                std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);
+                while(m_it != m.end()) {
+                        ThomEncoding<Number> newPoint(m_it->second, point_ptr);
+                        point = newPoint;
+                        point_ptr = std::make_shared<ThomEncoding<Number>>(point);
+                        m_it++;
+                }
+                CARL_LOG_TRACE("carl.thom.rootfinder", "point = " << point);
+                return realRootsThom(p, mainVar, point_ptr, interval);
         }
 }
 
@@ -133,11 +139,14 @@ std::list<ThomEncoding<Number>> realRootsThom(
                                 sigma.size());
                         result.push_back(newEncoding);
                 }
-                
-                
-                // TODO CHECK BOUNDS
+            
         }
-        else {      
+        else {
+                // check if p vanishes on point
+                if(point_ptr->makesPolynomialZero(p, mainVar)) {
+                        return {ThomEncoding<Number>(Number(0), mainVar)};
+                }
+                
                 std::list<Polynomial> zeroSet = point_ptr->accumulatePolynomials();
                 zeroSet.push_front(p);
 
@@ -179,7 +188,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 }
         }
         
-        // convert in a vector because std::sort needs random acces iterator
+        // convert in a vector because std::sort needs random access iterator
         std::vector<ThomEncoding<Number>> result_vec(result.begin(), result.end());
         std::sort(result_vec.begin(), result_vec.end());
         result = std::list<ThomEncoding<Number>>(result_vec.begin(), result_vec.end());

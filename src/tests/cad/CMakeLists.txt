@@ -8,7 +8,7 @@ add_executable( runCADTests
     #Test_TarskiQuery.cpp
     #Test_SignDetermination.cpp
     #Test_Thom.cpp
-    #Test_Thom2.cpp
+    Test_Thom2.cpp
 )
 cotire(runCADTests)
 
