@@ -16,7 +16,7 @@ typedef mpq_class Rational;
 typedef carl::Term<Rational> Term;
 
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
-typedef carl::RationalFunction<Polynomial> RationalFunctionPoly; 
+typedef carl::RationalFunction<Polynomial> RationalFunction; 
 
 %}
 
@@ -153,25 +153,25 @@ carl::sint toInt() {
 	} 
 
 
-	RationalFunctionPoly div(const RationalFunctionPoly& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const RationalFunction& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
-	RationalFunctionPoly div(const Polynomial& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const Polynomial& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
-	RationalFunctionPoly div(const Term& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const Term& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
-	RationalFunctionPoly div(const carl::Monomial::Arg& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const carl::Monomial::Arg& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
 
-	RationalFunctionPoly div(carl::Variable::Arg rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(carl::Variable::Arg rhs) {
+		return RationalFunction(*$self) / rhs;
 	} 
 
 
@@ -235,4 +235,4 @@ typedef mpq_class Rational;
 typedef carl::Term<Rational> Term;
 
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
-typedef carl::RationalFunction<Polynomial> RationalFunctionPoly;  */
+typedef carl::RationalFunction<Polynomial> RationalFunction;  */

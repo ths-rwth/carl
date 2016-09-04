@@ -15,10 +15,11 @@ endforeach()
 
 #compile the test
 ADD_CUSTOM_COMMAND(
-OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/test/TestBindings.class 
+OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/test/*.class
 COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/test
 COMMAND ${Java_JAVAC_EXECUTABLE} -d ${CMAKE_CURRENT_BINARY_DIR}/test -cp "${CMAKE_CURRENT_SOURCE_DIR}/test:${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar"
-${CMAKE_CURRENT_SOURCE_DIR}/test/TestBindings.java
+${CMAKE_CURRENT_SOURCE_DIR}/test/*java
+DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/*.java
 )
 
 
@@ -49,10 +50,11 @@ swig_link_libraries(jcarl lib_carl)
 ADD_CUSTOM_TARGET(jcarl.jar
 ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar jcarl)
 
-ADD_CUSTOM_TARGET(TestBindings.class
-ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test/TestBindings.class ${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar jcarl)
+ADD_CUSTOM_TARGET(tests
+ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test/*.class ${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar jcarl)
 
-ADD_DEPENDENCIES(TestBindings.class jcarl.jar)
+#DD_DEPENDENCIES(tests jcarl.jar)
+
 
 
 

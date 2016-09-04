@@ -40,17 +40,17 @@ typedef long unsigned int size_t;  //this should be okay for 64 bits at least
 typedef carl::Term<Rational> Term;
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
 typedef carl::FactorizedPolynomial<Polynomial> FactorizedPolynomial;
-typedef carl::RationalFunction<Polynomial> RationalFunction;
+
 typedef carl::RationalFunction<FactorizedPolynomial> FactorizedRationalFunction;
 
 
-%rename(RationalFunctionPoly) carl::RationalFunction<Polynomial,false>;
-%rename(FactorizedRationalFunction) carl::RationalFunction<FactorizedPolynomial,false>;
+%rename(RationalFunction) carl::RationalFunction<Polynomial>;
+%rename(FactorizedRationalFunction) carl::RationalFunction<FactorizedPolynomial>;
 namespace carl {
 
 
 
-class RationalFunction<Polynomial,false>
+class RationalFunction<Polynomial>
 {
 public:
 typedef typename Rational CoeffType;
@@ -85,106 +85,110 @@ typedef typename Rational CoeffType;
         }
 	
 
-	bool equals(const carl::RationalFunction<Polynomial, false>& other) {
+	bool equals(const carl::RationalFunction<Polynomial>& other) {
 		return *$self == other;
 	}
-	bool notEquals(const carl::RationalFunction<Polynomial, false>& other) {
+	bool notEquals(const carl::RationalFunction<Polynomial>& other) {
 		return *$self != other;
 	}
 
 
 
 
-	carl::RationalFunction<Polynomial, false> add(const Polynomial& rhs) {
+	carl::RationalFunction<Polynomial> add(const Polynomial& rhs) {
 		return *($self)+rhs;
 	}
 	
 
-	carl::RationalFunction<Polynomial, false> add(const Term<Rational>& rhs) {
+	carl::RationalFunction<Polynomial> add(const Term& rhs) {
 		return *($self)+rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> add(const Monomial::Arg& rhs) {
+	carl::RationalFunction<Polynomial> add(const Monomial::Arg& rhs) {
 		return *($self)+rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> add(carl::Variable::Arg rhs) {
+	carl::RationalFunction<Polynomial> add(carl::Variable::Arg rhs) {
 		return *($self)+rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> add(Rational rhs) {
+	carl::RationalFunction<Polynomial> add(Rational rhs) {
 		return *($self)+rhs;
 	}
 
 
-	carl::RationalFunction<Polynomial, false> sub(const Polynomial& rhs) {
+	carl::RationalFunction<Polynomial> sub(const Polynomial& rhs) {
 		return *($self)-rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> sub(const Term<Rational>& rhs) {
+	carl::RationalFunction<Polynomial> sub(const Term& rhs) {
 		return *($self)-rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> sub(const Monomial::Arg& rhs) {
+	carl::RationalFunction<Polynomial> sub(const Monomial::Arg& rhs) {
 		return *($self)-rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> sub(carl::Variable::Arg rhs) {
+	carl::RationalFunction<Polynomial> sub(carl::Variable::Arg rhs) {
 		return *($self)-rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> sub(Rational rhs) {
+	carl::RationalFunction<Polynomial> sub(Rational rhs) {
 		return *($self)-rhs;
 	}
 
 
 
-	carl::RationalFunction<Polynomial, false> mul(const Polynomial& rhs) {
+	carl::RationalFunction<Polynomial> mul(const Polynomial& rhs) {
 		return *($self)*rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false>mul(const Term<Rational>& rhs) {
+	carl::RationalFunction<Polynomial>mul(const Term& rhs) {
 		return *($self)*rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> mul(const Monomial::Arg& rhs) {
+	carl::RationalFunction<Polynomial> mul(const Monomial::Arg& rhs) {
 		return *($self)*rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> mul(carl::Variable::Arg rhs) {
+	carl::RationalFunction<Polynomial> mul(carl::Variable::Arg rhs) {
 		return *($self)*rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> mul(Rational rhs) {
+	carl::RationalFunction<Polynomial> mul(Rational rhs) {
 		return *($self)*rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> div(const Polynomial& rhs) {
+	carl::RationalFunction<Polynomial> div(const Polynomial& rhs) {
 		return *($self)/rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> div(const Term<Rational>& rhs) {
+	carl::RationalFunction<Polynomial> div(const Term& rhs) {
 		return *($self)/rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> div(const Monomial::Arg& rhs) {
+	carl::RationalFunction<Polynomial> div(const Monomial::Arg& rhs) {
 		return *($self)/rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> div(carl::Variable::Arg rhs) {
+	carl::RationalFunction<Polynomial> div(carl::Variable::Arg rhs) {
 		return *($self)/rhs;
 	}
 
-	carl::RationalFunction<Polynomial, false> div(Rational rhs) {
+	carl::RationalFunction<Polynomial> div(Rational rhs) {
+		return *($self)/rhs;
+	}
+
+	carl::RationalFunction<Polynomial> div(const RationalFunction rhs) {
 		return *($self)/rhs;
 	}
 
 
-        carl::RationalFunction<Polynomial, false> pow(uint exp) {
+        carl::RationalFunction<Polynomial> pow(uint exp) {
 	    return carl::pow(*($self),exp);
 	}
 
-	carl::RationalFunction<Polynomial, false> neg() {
+	carl::RationalFunction<Polynomial> neg() {
 		return *$self*Rational(-1);
 	}
 }
@@ -193,7 +197,7 @@ typedef typename Rational CoeffType;
 
 
 
-class RationalFunction<FactorizedPolynomial,false> {
+class RationalFunction<FactorizedPolynomial> {
 public:
 typedef typename Rational CoeffType;
         explicit RationalFunction(const FactorizedPolynomial& nom, const FactorizedPolynomial& denom):
@@ -231,8 +235,10 @@ typedef typename Rational CoeffType;
 
 }
 
+typedef carl::RationalFunction<Polynomial> RationalFunction;
+
 
 /*
-%template(RationalFunctionPoly) carl::RationalFunction<Polynomial,false>;
+%template(RationalFunctionPoly) carl::RationalFunction<Polynomial>;
 %template(FactorizedRationalFunction) carl::RationalFunction<carl::FactorizedPolynomial<Polynomial>,false>; */
 

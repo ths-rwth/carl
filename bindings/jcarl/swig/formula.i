@@ -107,7 +107,7 @@ template<typename Pol> class Formula {
         Formula( carl::FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
     {}
 
-//Apparently satisfiedBy is no longer existent
+//Apparently satisfiedBy no longer exists
     //unsigned satisfiedBy( const carl::EvaluationMap<typename Pol::NumberType>& _assignment ) const;
 
     std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true, bool _withVariableDefinition = false ) const;
@@ -152,9 +152,10 @@ template<typename Pol> class Formula {
 
 		//instead of iterator
 
-		carl::Formula<Pol> carl::Formula<Pol>::get(int i) {
-			return Formula<Pol>::mpContent->mpSubformulasVS->get(i);
+		carl::Formula<Pol> getItem(int i) {
+			return $self->subformulas().at(i);
 		}
+
 
 	}
 

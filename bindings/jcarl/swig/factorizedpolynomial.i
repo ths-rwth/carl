@@ -48,7 +48,6 @@ typedef FactorizedPolynomial::CACHE FactorizationCache;
 
 namespace carl {
 
-//TODO: wrap the CACHE properly / check if this works
 %rename(FactorizationCache) Cache<FactorizationPair>;
 class Cache<FactorizationPair> {
 public:

@@ -206,7 +206,7 @@ public class TestBindings {
 	System.out.println("fp2: "+fp2.toString());
 	System.out.println("fp3: "+fp3.toString());
 	System.out.println("fp1.constantPart: "+fp1.constantPart().toString());
-	System.out.println("evaluate fp3: "+fp2.evaluate(map).toString()); 
+	System.out.println("evaluate fp3: "+fp3.evaluate(map).toString()); 
 	varlist = fp2.gatherVariables();
 	System.out.println("fp2.gatherVariables: "+varlist.get(0).toString());
 	System.out.println("fp1 == fp1: "+fp1.equals(fp1));
@@ -215,7 +215,10 @@ public class TestBindings {
 	System.out.println("fp1 != fp2: "+fp1.notEquals(fp2));
 
 
-//TODO: test all operators!!
+//Test the operators:
+	System.out.println("*****************************************************");
+	System.out.println("                                      ");
+	System.out.println("Test FactorizedPolynomial...");
 
 
 

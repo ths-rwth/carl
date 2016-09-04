@@ -12,7 +12,7 @@ typedef mpq_class Rational;
 
 typedef carl::Term<Rational> Term;
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
-typedef carl::RationalFunction<Polynomial> RationalFunctionPoly;
+typedef carl::RationalFunction<Polynomial> RationalFunction;
 
 
 typedef unsigned int uint;
@@ -38,7 +38,7 @@ typedef long unsigned int size_t;  //this should be okay for 64 bits at least
 
 %include "std_vector.i"
 typedef mpq_class Rational;
-typedef carl::RationalFunction<Polynomial> RationalFunctionPoly;
+typedef carl::RationalFunction<Polynomial> RationalFunction;
 
 namespace std {
  %template(VarVector) vector<carl::Variable>;
@@ -148,25 +148,25 @@ size_t size() const;
 	}
 
 
-	RationalFunctionPoly div(const RationalFunctionPoly& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const RationalFunction& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
-	RationalFunctionPoly div(const Polynomial& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const Polynomial& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
-	RationalFunctionPoly div(const Term& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const Term& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
-	RationalFunctionPoly div(const Monomial::Arg& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const Monomial::Arg& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
 
-	RationalFunctionPoly div(carl::Variable::Arg rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(carl::Variable::Arg rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
 	Polynomial div(const Rational& rhs) {
@@ -203,5 +203,5 @@ namespace std {
 
 
 %template(evaluate) carl::MultivariatePolynomial::evaluate<Rational>;
-%template(PolynomialRational) carl::MultivariatePolynomial<Rational>;
+%template(Polynomial) carl::MultivariatePolynomial<Rational>;
 

@@ -12,7 +12,7 @@ typedef mpq_class Rational;
 
 typedef carl::Term<Rational> Term;
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
-typedef carl::RationalFunction<Polynomial> RationalFunctionPoly;
+typedef carl::RationalFunction<Polynomial> RationalFunction;
 
 
 typedef unsigned int uint;
@@ -38,7 +38,7 @@ typedef long unsigned int size_t;  //this should be okay for 64 bits at least
 
 %include "std_vector.i"
 typedef mpq_class Rational;
-typedef carl::RationalFunction<Polynomial> RationalFunctionPoly;
+typedef carl::RationalFunction<Polynomial> RationalFunction;
 
 namespace std {
  %template(VarVector) vector<carl::Variable>;
@@ -51,7 +51,7 @@ class MultivariatePolynomial
 {
 public:
 typedef Coeff CoeffType;
-typedef Coeff NumberType; //ATTENTION: This is only correct, if polynomials are never instantiated with a type that's not a number
+typedef Coeff NumberType; //ATTENTION: This is only correct if polynomials are never instantiated with a type that's not a number
 explicit MultivariatePolynomial(const carl::Term<Coeff>& t);
 explicit MultivariatePolynomial(const std::shared_ptr<const carl::Monomial>& m);
 explicit MultivariatePolynomial(Variable::Arg v);
@@ -148,25 +148,25 @@ size_t size() const;
 	}
 
 
-	RationalFunctionPoly div(const RationalFunctionPoly& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const RationalFunction& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
-	RationalFunctionPoly div(const Polynomial& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const Polynomial& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
-	RationalFunctionPoly div(const Term& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const Term& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
-	RationalFunctionPoly div(const Monomial::Arg& rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(const Monomial::Arg& rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
 
-	RationalFunctionPoly div(carl::Variable::Arg rhs) {
-		return RationalFunctionPoly(*$self) / rhs;
+	RationalFunction div(carl::Variable::Arg rhs) {
+		return RationalFunction(*$self) / rhs;
 	}
 
 	Polynomial div(const Rational& rhs) {

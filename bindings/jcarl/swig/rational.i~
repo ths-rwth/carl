@@ -61,7 +61,7 @@ mpq_class(double d) { mpq_init(mp); mpq_set_d(mp, d); }
    return carl::toString(*$self,true);	
  } 
 
-//TODO: fix operators that use the type Rational!
+
 
 int nominator() {
  return carl::toInt<carl::sint>(carl::getNum(*$self));

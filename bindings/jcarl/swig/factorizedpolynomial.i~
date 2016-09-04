@@ -53,11 +53,6 @@ namespace carl {
 class Cache<FactorizationPair> {
 public:
 Cache( size_t _maxCacheSize = 10000, double _cacheReductionAmount = 0.2, double _decay = 0.98 );
-%extend {
-Cache() {
- Cache(10000, 0.2, 0.98 );
-}
-}
 
 };
 

@@ -14,7 +14,8 @@ typedef mpq_class Rational;
 typedef carl::Term<Rational> Term;
 
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
-typedef carl::RationalFunction<Polynomial> RationalFunctionPoly;
+typedef carl::RationalFunction<Polynomial> RationalFunction;
+
 %}
 
 
@@ -39,7 +40,8 @@ typedef mpq_class Rational;
 typedef carl::Term<Rational> Term;
 
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
-typedef carl::RationalFunction<Polynomial> RationalFunctionPoly;
+//typedef carl::RationalFunction<Polynomial> RationalFunction;
+
 
 namespace carl {
 
@@ -179,8 +181,8 @@ std::size_t getRank();
 	}
 
 	Polynomial mul(const Monomial::Arg& rhs) {
-		const std::shared_ptr<const carl::Monomial> ptr(rhs);
-		return carl::operator*(*($self),Polynomial(ptr));
+		//const std::shared_ptr<const carl::Monomial> ptr(rhs);
+		return carl::operator*(*($self),Polynomial(rhs));
 	} 
 
 	Polynomial mul(carl::Variable::Arg rhs) {
@@ -193,26 +195,26 @@ std::size_t getRank();
 
 
 
-	RationalFunctionPoly div(const RationalFunctionPoly& rhs) {
-		return RationalFunctionPoly(*($self)) / rhs;
+	RationalFunction div(const carl::RationalFunction<Polynomial>& rhs) {
+		return RationalFunction(*($self)) / rhs;
 	}
 
-	RationalFunctionPoly div(const Polynomial& rhs) {
-		return RationalFunctionPoly(*($self)) / rhs;
+	RationalFunction div(const Polynomial& rhs) {
+		return RationalFunction(*($self)) / rhs;
 	}
 
-	RationalFunctionPoly div(const Term& rhs) {
-		return RationalFunctionPoly(*($self)) / rhs;
+	RationalFunction div(const Term& rhs) {
+		return RationalFunction(*($self)) / rhs;
 	}
 
 
 
-	RationalFunctionPoly div(const carl::Monomial::Arg& rhs) {
-		return RationalFunctionPoly(*($self)) / rhs;
+	RationalFunction div(const carl::Monomial::Arg& rhs) {
+		return RationalFunction(*($self)) / rhs;
 	} 
 
-	RationalFunctionPoly div(carl::Variable::Arg rhs) {
-		return RationalFunctionPoly(*($self)) / rhs;
+	RationalFunction div(carl::Variable::Arg rhs) {
+		return RationalFunction(*($self)) / rhs;
 	}
 
 	Polynomial div(const Rational& rhs) {

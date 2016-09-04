@@ -152,9 +152,10 @@ template<typename Pol> class Formula {
 
 		//instead of iterator
 
-		carl::Formula<Pol> carl::Formula<Pol>::get(int i) {
-			return Formula<Pol>::mpContent->mpSubformulasVS->get(i);
+		carl::Formula<Pol> getItem(int i) {
+			return $self->subformulas().at(i);
 		}
+
 
 	}
 
@@ -164,7 +165,7 @@ template<typename Pol> class Formula {
 }
 
 
-%template(Formula) carl::Formula<Polynomial>;
+%template(JFormula) carl::Formula<Polynomial>;
 
 
 
