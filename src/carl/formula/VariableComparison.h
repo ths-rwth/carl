@@ -63,7 +63,13 @@ namespace carl {
 		}
 		boost::optional<Constraint<Poly>> asConstraint() const {
 			auto v = value();
-			if (!v.isRAN()) return boost::none;
+			if (!v.isRAN()) {
+				const MR& mr = boost::get<MR>(mValue);
+				if (mr.poly().degree(mr.var()) == 1 && mr.poly().lcoeff(mr.var()).isOne()) {
+					return Constraint<Poly>(Poly(mVar) + mr.poly().coeff(mr.var(), 0), mRelation);
+				}
+				return boost::none;
+			}
 			if (!v.asRAN().isNumeric()) return boost::none;
 			return Constraint<Poly>(Poly(mVar) - Poly(v.asRAN().value()), mRelation);
 		}
