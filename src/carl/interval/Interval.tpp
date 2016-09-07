@@ -676,6 +676,7 @@ Interval<Number> Interval<Number>::div(const Interval<Number>& rhs) const
 	{
 		assert(this->isConsistent());
 		assert(rhs.isConsistent());
+		assert(!rhs.contains(carl::constant_zero<Number>().get()));
 		BoundType lowerBoundType = BoundType::WEAK;
         BoundType upperBoundType = BoundType::WEAK;
 		///@todo Correctly determine if bounds are strict or weak.
