@@ -129,14 +129,14 @@ public class TestFormula {
 //Formula:
     System.out.println("*****************************************************");
     System.out.println("                                      ");
-    System.out.println("Constraint: ");	
-    System.out.println("NOT c2: "+c2.not_().toString());
-    System.out.println("c2 AND c1: "+c2.and_(c1).toString());
-    System.out.println("c2 AND f4: "+c2.and_(f4).toString());
-    System.out.println("c2 OR c1: "+c2.or_(c1).toString());
-    System.out.println("c2 OR f4: "+c2.or_(f4).toString());
-    System.out.println("c2 XOR c1: "+c2.xor_(c1).toString());
-    System.out.println("c2 XOR f4: "+c2.xor_(f4).toString());
+    System.out.println("Formula: ");	
+    System.out.println("NOT f2: "+f2.not_().toString());
+    System.out.println("f2 AND c1: "+f2.and_(c1).toString());
+    System.out.println("f2 AND f4: "+f2.and_(f4).toString());
+    System.out.println("f2 OR c1: "+f2.or_(c1).toString());
+    System.out.println("f2 OR f4: "+f2.or_(f4).toString());
+    System.out.println("f2 XOR c1: "+f2.xor_(c1).toString());
+    System.out.println("f2 XOR f4: "+f2.xor_(f4).toString());
 
 
 

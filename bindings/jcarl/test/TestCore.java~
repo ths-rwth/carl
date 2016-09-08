@@ -139,6 +139,7 @@ public class TestCore {
 	System.out.println("ceil i1: "+JInterval.ceil(i1).toString());
 	System.out.println("quotient i1 i2: "+JInterval.quotient(i1,i2).toString());
 	System.out.println("isInteger i1: "+JInterval.isInteger(i1));
+
 	
 
 	//Monomial:
@@ -146,9 +147,9 @@ public class TestCore {
 	System.out.println("                                      ");
 	System.out.println("Test monomial...");
 	
-	Monomial m1 = new Monomial(v1);
-	Monomial m2 = new Monomial(v2,3);
-	Monomial m3 = new Monomial(v3,2);
+	Monomial m1 = Monomial.createMonomial(v1);
+	Monomial m2 = Monomial.createMonomial(v2,3);
+	Monomial m3 = Monomial.createMonomial(v3,2);
 	System.out.println(m1.toString()); 
 	System.out.println(m2.toString()); 
    	System.out.println(m3.toString()); 
@@ -159,12 +160,12 @@ public class TestCore {
 	System.out.println("m2.exponents: "+result.get(0).getFirst().toString()+", "+result.get(0).getSecond());
 	System.out.println("m2.getItem(0): "+m2.getItem(0).getFirst().toString()+", "+m2.getItem(0).getSecond());
 
-	//JTerm:
+	//Term:
 	System.out.println("*****************************************************");
 	System.out.println("                                      ");
-	System.out.println("Test JTerm...");
+	System.out.println("Test Term...");
 	
-	JTerm t = new JTerm(new Rational(5.5),m2);
+	Term t = new Term(new Rational(5.5),m2);
 	System.out.println(t.toString());
 	System.out.println("t.coeff: "+t.coeff().toString());
 	System.out.println("t.monomial(): "+t.monomial().toString()); 
@@ -206,6 +207,8 @@ public class TestCore {
 	VarVector varlist = p1.gatherVariables();
 	System.out.println("p1 gatherVariables: "+varlist.get(0).toString());
 	System.out.println("p1.getItem(0): "+p1.getItem(0).toString());
+
+
 	
 	
 
@@ -534,8 +537,5 @@ public class TestCore {
 
 
 
-
-
-    System.out.println( "Goodbye" );
   }
 }

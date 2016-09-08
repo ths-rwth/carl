@@ -152,4 +152,4 @@ class Term {
 }
 
 
-%template(JTerm) carl::Term<Rational>;
+%template(TermRational) carl::Term<Rational>;

@@ -13,11 +13,13 @@ foreach(file ${i_files})
 endforeach()
 
 
-#compile the test
+enable_testing()
+
+#compile the tests
 ADD_CUSTOM_COMMAND(
 OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/test/*.class
 COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/test
-COMMAND ${Java_JAVAC_EXECUTABLE} -d ${CMAKE_CURRENT_BINARY_DIR}/test -cp "${CMAKE_CURRENT_SOURCE_DIR}/test:${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar"
+COMMAND ${Java_JAVAC_EXECUTABLE} -d ${CMAKE_CURRENT_BINARY_DIR}/test -cp "${CMAKE_CURRENT_SOURCE_DIR}/test:${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar:/usr/share/java/junit4.jar"
 ${CMAKE_CURRENT_SOURCE_DIR}/test/*java
 DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/*.java
 )
@@ -31,6 +33,9 @@ COMMAND jar cvf jcarl.jar ${CMAKE_SWIG_OUTDIR}/*.class
 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+
+add_test(NAME jcarl COMMAND ${Java_JAVA_EXECUTABLE} -classpath .:/usr/share/java/junit4.jar:../ -Djava.library.path=../ org.junit.runner.JUnitCore TestVariable
+WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/test )
 
 
 
@@ -53,7 +58,9 @@ ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar jcarl)
 ADD_CUSTOM_TARGET(tests
 ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test/*.class ${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar jcarl)
 
-#DD_DEPENDENCIES(tests jcarl.jar)
+
+
+
 
 
 

@@ -66,19 +66,19 @@ typedef unsigned int exponent;
 
 
 
-
+%nodefaultctor carl::Monomial;
 class Monomial {
 public:
 typedef std::shared_ptr<const carl::Monomial> Arg;
 typedef std::vector<VarIntPair> Content;
 
-
+/*
 explicit Monomial(Variable::Arg v, carl::exponent e = 1) :
 	mExponents(1, std::make_pair(v,e)),
 	mTotalDegree(e)
 {
 }
-
+*/
 
  carl::exponent tdeg() const;
 
@@ -92,6 +92,11 @@ size_t nrVariables() const;
 
 
 %extend {
+
+
+	static carl::Monomial::Arg createMonomial(Variable::Arg v, carl::exponent e = 1) {
+		return carl::MonomialPool::getInstance().create(v, e);	
+	}
 
 	Polynomial add(const Polynomial& rhs) {
 	    carl::Monomial::Content exp($self->exponents());	
@@ -178,56 +183,56 @@ size_t nrVariables() const;
 	} 
 
 	Polynomial mul(carl::Variable::Arg rhs) {
-	    carl::Monomial::Content exp = $self->exponents();	
+	    carl::Monomial::Content exp($self->exponents());	
 	    const std::shared_ptr<const carl::Monomial> ptr = std::make_shared<const carl::Monomial>(std::move(exp));
 	    return carl::operator*(ptr,Polynomial(rhs));
 	}  
 
 	Term mul(const Rational& rhs) {
-	    carl::Monomial::Content exp = $self->exponents();	
+	    carl::Monomial::Content exp($self->exponents());	
 	    const std::shared_ptr<const carl::Monomial> ptr = std::make_shared<const carl::Monomial>(std::move(exp));
 	    return ptr*rhs;
 	}
 
 
 	RationalFunction div(const RationalFunction& rhs) {
-	    carl::Monomial::Content exp = $self->exponents();	
+	    carl::Monomial::Content exp($self->exponents());	
 	    const std::shared_ptr<const carl::Monomial> ptr = std::make_shared<const carl::Monomial>(std::move(exp));
 		return RationalFunction(Polynomial(ptr)) / rhs;
 	}
 
 	RationalFunction div(const Polynomial& rhs) {
-	    carl::Monomial::Content exp = $self->exponents();	
+	    carl::Monomial::Content exp($self->exponents());	
 	    const std::shared_ptr<const carl::Monomial> ptr = std::make_shared<const carl::Monomial>(std::move(exp));
 		return RationalFunction(Polynomial(ptr)) / rhs;
 	}
 
 	RationalFunction div(const Term& rhs) {
-	    carl::Monomial::Content exp = $self->exponents();	
+	    carl::Monomial::Content exp($self->exponents());	
 	    const std::shared_ptr<const carl::Monomial> ptr = std::make_shared<const carl::Monomial>(std::move(exp));
 		return RationalFunction(Polynomial(ptr)) / rhs;
 	}
 
 	RationalFunction div(const Monomial::Arg& rhs) {
-	    carl::Monomial::Content exp = $self->exponents();	
+	    carl::Monomial::Content exp($self->exponents());	
 	    const std::shared_ptr<const carl::Monomial> ptr = std::make_shared<const carl::Monomial>(std::move(exp));
 		return RationalFunction(Polynomial(ptr)) / rhs;
 	}
 
 	RationalFunction div(carl::Variable::Arg rhs) {
-	        carl::Monomial::Content exp = $self->exponents();	
+	        carl::Monomial::Content exp($self->exponents());	
 	        const std::shared_ptr<const carl::Monomial> ptr = std::make_shared<const carl::Monomial>(std::move(exp));
 		return RationalFunction(Polynomial(ptr)) / rhs;
 	}
 
 	Term div(const Rational& rhs) {
-	    carl::Monomial::Content exp = $self->exponents();	
+	    carl::Monomial::Content exp($self->exponents());	
 	    const std::shared_ptr<const carl::Monomial> ptr = std::make_shared<const carl::Monomial>(std::move(exp));
 		return Term(ptr) / rhs;
 	}
 
 	Term neg() {
-		carl::Monomial::Content exp = $self->exponents();	
+		carl::Monomial::Content exp($self->exponents());	
 	        const std::shared_ptr<const carl::Monomial> ptr = std::make_shared<const carl::Monomial>(std::move(exp));
 		return ptr*Rational(-1);
 	}

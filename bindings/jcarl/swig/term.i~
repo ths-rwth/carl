@@ -23,6 +23,7 @@ typedef carl::RationalFunction<Polynomial> RationalFunction;
 %import "rational.i"
 %import "polynomial.i"
 %import "rationalfunction.i"
+typedef mpq_class Rational;
 typedef carl::Term<Rational> Term;
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
 typedef carl::RationalFunction<Polynomial> RationalFunction;
