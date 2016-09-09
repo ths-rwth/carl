@@ -19,7 +19,7 @@ enable_testing()
 ADD_CUSTOM_COMMAND(
 OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/test/*.class
 COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/test
-COMMAND ${Java_JAVAC_EXECUTABLE} -d ${CMAKE_CURRENT_BINARY_DIR}/test -cp "${CMAKE_CURRENT_SOURCE_DIR}/test:${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar:/usr/share/java/junit4.jar"
+COMMAND ${Java_JAVAC_EXECUTABLE} -d ${CMAKE_CURRENT_BINARY_DIR}/test -cp "${CMAKE_CURRENT_SOURCE_DIR}/test:${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar:/usr/share/java/junit.jar"
 ${CMAKE_CURRENT_SOURCE_DIR}/test/*java
 DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/*.java
 )
@@ -34,7 +34,7 @@ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 
-add_test(NAME jcarl COMMAND ${Java_JAVA_EXECUTABLE} -classpath .:/usr/share/java/junit4.jar:../ -Djava.library.path=../ org.junit.runner.JUnitCore TestVariable
+add_test(NAME jcarl COMMAND ${Java_JAVA_EXECUTABLE} -classpath .:/usr/share/java/junit.jar:/usr/share/java/hamcrest-core.jar:../ -Djava.library.path=../ org.junit.runner.JUnitCore TestVariable
 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/test )
 
 
@@ -46,7 +46,7 @@ set(CMAKE_JNI_TARGET TRUE)
 
 
 #this is for swig
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${JAVA_AWT_INCLUDE_PATH} -I${JAVA_AWT_INCLUDE_PATH}/linux")
 
 swig_add_module(jcarl java ${i_files})
 swig_link_libraries(jcarl lib_carl)
