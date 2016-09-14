@@ -229,6 +229,10 @@ typedef typename Rational CoeffType;
 	   std::set<carl::Variable> asSet = $self->gatherVariables();
    	   return std::vector<carl::Variable>(asSet.begin(),asSet.end());
         }
+
+	bool equals(const carl::RationalFunction<FactorizedPolynomial>& other) {
+		return *$self == other;
+	}
 	
 }
 };

@@ -139,6 +139,6 @@ template<typename LhsType> class SimpleConstraint {
 
 %include "std_map.i"
 
-%template(JConstraint) carl::Constraint<Polynomial>;
-%template(JSimpleConstraint) carl::SimpleConstraint<Polynomial>;
+%template(ConstraintRational) carl::Constraint<Polynomial>;
+%template(SimpleConstraintRational) carl::SimpleConstraint<Polynomial>;
 %template(SimpleConstraintFunc) carl::SimpleConstraint<FactorizedRationalFunction>;

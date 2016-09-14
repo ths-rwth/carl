@@ -118,7 +118,6 @@ bool notEquals(const carl::FactorizedPolynomial<P>& rhs) {
 %template(evaluate) carl::FactorizedPolynomial::evaluate<Rational>;
 
 }
-/*%template(FactorizationPair) carl::PolynomialFactorizationPair<Polynomial>;
-%template(FactorizationCache) carl::Cache<FactorizationPair>; */
-%template(JFactorizedPolynomial) carl::FactorizedPolynomial<Polynomial>;
+
+%template(FactorizedPolynomialRational) carl::FactorizedPolynomial<Polynomial>;
 

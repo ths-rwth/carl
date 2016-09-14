@@ -240,5 +240,5 @@ bool greater(const Rational rhs) {
 };
 
 }
-%template(JInterval) carl::Interval<Rational>;
+%template(IntervalRational) carl::Interval<Rational>;
 

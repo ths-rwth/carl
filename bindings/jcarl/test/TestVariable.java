@@ -22,7 +22,7 @@ public void testToString() {
 @Test
 public void testIdTypeRank() {
 	assertEquals(v1.getId(),1);
-	assertEquals(v1.getType(),VariableType.VT_BOOL);
+	assertEquals(v1.getType(),VariableType.VT_REAL);
 	assertEquals(v1.getRank(),0);
 
 }

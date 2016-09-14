@@ -156,6 +156,10 @@ template<typename Pol> class Formula {
 			return $self->subformulas().at(i);
 		}
 
+		bool equals(const carl::Formula<Pol>& rhs) {
+			return *$self == rhs;
+		}
+
 
 	}
 
@@ -165,7 +169,7 @@ template<typename Pol> class Formula {
 }
 
 
-%template(JFormula) carl::Formula<Polynomial>;
+%template(FormulaRational) carl::Formula<Polynomial>;
 
 
 

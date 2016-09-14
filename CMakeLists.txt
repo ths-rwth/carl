@@ -198,3 +198,5 @@ endif()
 if (BINDINGS_PYTHON)
 	add_subdirectory(bindings/pycarl)
 endif()
+
+add_subdirectory(bindings/jcarl)

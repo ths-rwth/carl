@@ -13,6 +13,19 @@ foreach(file ${i_files})
 endforeach()
 
 
+set(test_filenames "")
+file(GLOB_RECURSE test_files "test/*.java")
+foreach(file ${test_files})
+	get_filename_component(filename ${file} NAME_WE)
+	IF (NOT (${filename} MATCHES "TestCarl")) 
+		set(test_filenames ${test_filenames} ${filename})
+	ENDIF ()
+endforeach()
+
+
+
+
+
 enable_testing()
 
 #compile the tests
@@ -34,7 +47,7 @@ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 
-add_test(NAME jcarl COMMAND ${Java_JAVA_EXECUTABLE} -classpath .:/usr/share/java/junit.jar:/usr/share/java/hamcrest-core.jar:../ -Djava.library.path=../ org.junit.runner.JUnitCore TestVariable
+add_test(NAME jcarl COMMAND ${Java_JAVA_EXECUTABLE} -classpath .:/usr/share/java/junit.jar:/usr/share/java/hamcrest-core.jar:../ -Djava.library.path=../ org.junit.runner.JUnitCore ${test_filenames}
 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/test )
 
 
