@@ -18,7 +18,7 @@ namespace carl {
  */
 template<typename Number>
 RealAlgebraicNumber<Number> evaluateTE(const MultivariatePolynomial<Number>& p, std::map<Variable, RealAlgebraicNumber<Number>>& m) {
-        using Polynomial = MultivariatePolynomial<Number>;
+        //using Polynomial = MultivariatePolynomial<Number>;
         
         CARL_LOG_INFO("carl.thom.evaluation",
                 "\n****************************\n"
@@ -61,34 +61,39 @@ RealAlgebraicNumber<Number> evaluateTE(const MultivariatePolynomial<Number>& p, 
         
         CARL_LOG_TRACE("carl.thom.evaluation", "mTE = " << mTE);
         
-        std::list<Polynomial> polynomials;
-        std::list<Polynomial> derivatives;
-        SignCondition sc;
-        for(const auto& entry : mTE) {
-                polynomials.push_front(entry.second.polynomial());
-                std::list<Polynomial> der = entry.second.relevantDerivatives();
-                derivatives.insert(derivatives.begin(), der.begin(), der.end());
-                SignCondition relSign = entry.second.relevantSignCondition();
-                sc.insert(sc.begin(), relSign.begin(), relSign.end());
-        }
+        ThomEncoding<Number> point = ThomEncoding<Number>::analyzeTEMap(mTE);
+        int sgn = (int)point.signOnPolynomial(p);
+        CARL_LOG_TRACE("carl.thom.", "sign of evaluated polynomial is " << sgn);
+        return RealAlgebraicNumber<Number>((Number)sgn, false);
         
-        CARL_LOG_TRACE("carl.thom.evaluation", "polynomials = " << polynomials);
-        CARL_LOG_TRACE("carl.thom.evaluation", "derivatives = " << derivatives);
-        CARL_LOG_TRACE("carl.thom.evaluation", "sc = " << sc);
-                
-        SignDetermination<Number> sd(polynomials.begin(), polynomials.end());
-        sd.getSignsAndAddAll(derivatives.rbegin(), derivatives.rend());
-        std::list<SignCondition> signConditions = sd.getSigns(p);
-        CARL_LOG_TRACE("carl.thom.evaluation", "signConditions =  " << signConditions);
-        for(const auto sigma : signConditions) {
-                if(sc.isSuffixOf(sigma)) {
-                        int sgn = (int)sigma.front();
-                        CARL_LOG_TRACE("carl.thom.", "sign of evaluated polynomial is " << sgn);
-                        return RealAlgebraicNumber<Number>((Number)sgn, false);
-                }
-        }
-        
-        CARL_LOG_ASSERT("carl.thom.evaluation", false, "we should never get here");
+//        std::list<Polynomial> polynomials;
+//        std::list<Polynomial> derivatives;
+//        SignCondition sc;
+//        for(const auto& entry : mTE) {
+//                polynomials.push_front(entry.second.polynomial());
+//                std::list<Polynomial> der = entry.second.relevantDerivatives();
+//                derivatives.insert(derivatives.begin(), der.begin(), der.end());
+//                SignCondition relSign = entry.second.relevantSignCondition();
+//                sc.insert(sc.begin(), relSign.begin(), relSign.end());
+//        }
+//        
+//        CARL_LOG_TRACE("carl.thom.evaluation", "polynomials = " << polynomials);
+//        CARL_LOG_TRACE("carl.thom.evaluation", "derivatives = " << derivatives);
+//        CARL_LOG_TRACE("carl.thom.evaluation", "sc = " << sc);
+//                
+//        SignDetermination<Number> sd(polynomials.begin(), polynomials.end());
+//        sd.getSignsAndAddAll(derivatives.rbegin(), derivatives.rend());
+//        std::list<SignCondition> signConditions = sd.getSigns(p);
+//        CARL_LOG_TRACE("carl.thom.evaluation", "signConditions =  " << signConditions);
+//        for(const auto sigma : signConditions) {
+//                if(sc.isSuffixOf(sigma)) {
+//                        int sgn = (int)sigma.front();
+//                        CARL_LOG_TRACE("carl.thom.", "sign of evaluated polynomial is " << sgn);
+//                        return RealAlgebraicNumber<Number>((Number)sgn, false);
+//                }
+//        }
+//        
+//        CARL_LOG_ASSERT("carl.thom.evaluation", false, "we should never get here");
 }
 
         /*

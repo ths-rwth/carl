@@ -104,7 +104,7 @@ public:
         
         ThomEncoding<Number> lowestInChain() const {
                 if(mPoint == nullptr) return ThomEncoding<Number>(*this);
-                return mPoint.lowestInChain();
+                return mPoint->lowestInChain();
         }
         
         uint dimension() const {
@@ -116,6 +116,13 @@ public:
                 if(mPoint == nullptr) return {polynomial()};
                 std::list<Polynomial> res = point().accumulatePolynomials();
                 res.push_front(polynomial());
+                return res;
+        }
+        
+        std::list<Variable> accumulateVariables() const {
+                if(mPoint == nullptr) return {mainVar()};
+                std::list<Variable> res = point().accumulateVariables();
+                res.push_front(mainVar());
                 return res;
         }
         
@@ -135,7 +142,7 @@ public:
         }
         
         Sign signOnPolynomial(const Polynomial& p) const {
-                CARL_LOG_ASSERT("carl.thom", p.gatherVariables().size() <= this->dimension(), "");
+                CARL_LOG_ASSERT("carl.thom", p.gatherVariables().size() <= this->dimension(), "\np = " << p << "\nthis = " << *this);
                 if(p.isZero()) return Sign(0);
                 if(p.isConstant()) return Sign(sgn(p.lcoeff()));
                 std::list<SignCondition> signs = mSd->getSigns(p);
@@ -177,6 +184,135 @@ public:
                 return sgnReprNum() == Sign::ZERO;
         }
         
+        ThomEncoding<Number> concat(const ThomEncoding<Number>& other) const {
+                CARL_LOG_TRACE("carl.thom", "concating: \n" << *this << "\nwith\n" << other);
+                ThomEncoding<Number> result = other;
+                
+                std::list<ThomEncoding<Number>> thisEncodings;
+                thisEncodings.push_back(ThomEncoding<Number>(*this));
+                std::shared_ptr<ThomEncoding<Number>> curr = mPoint;
+                while(curr != nullptr) {
+                        thisEncodings.push_back(ThomEncoding<Number>(*curr));
+                        curr = thisEncodings.back().mPoint;
+                }
+                assert(thisEncodings.size() == this->dimension());
+                CARL_LOG_TRACE("carl.thom", "thisEncodings = " << thisEncodings);
+                
+                SignCondition thisSignCondition = this->accumulateRelevantSigns();
+                SignCondition signCondition = other.accumulateRelevantSigns();
+                signCondition.insert(signCondition.begin(), thisSignCondition.begin(), thisSignCondition.end());
+                
+                for(auto itEncoding = thisEncodings.rbegin(); itEncoding != thisEncodings.rend(); itEncoding++) {
+                        std::list<Variable> vars = result.accumulateVariables();
+                        if(std::find(vars.begin(), vars.end(), itEncoding->mainVar()) != vars.end()) {
+                                continue;
+                        }
+                        std::shared_ptr<ThomEncoding<Number>> result_ptr = std::make_shared<ThomEncoding<Number>>(result);
+                        std::list<ThomEncoding<Number>> roots = realRootsThom(itEncoding->polynomial(), itEncoding->mainVar(), result_ptr);
+                        bool succes = false;
+                        for(const auto& r : roots) {
+                                if(r.accumulateRelevantSigns().isSuffixOf(signCondition)) {
+                                        result = r;
+                                        succes = true;
+                                        break;
+                                }
+                        }
+                        CARL_LOG_ASSERT("carl.thom", succes, "");      
+                }
+                CARL_LOG_TRACE("carl.thom", "result of concat: " << result);
+                return result;
+                
+//                std::list<Polynomial> thisPolynomials = this->accumulatePolynomials();
+//                std::list<Variable> thisVars = this->accumulateVariables();
+//                assert(thisPolynomials.size() == thisVars.size());
+//                
+//                SignCondition thisSignCondition = this->accumulateRelevantSigns();
+//                SignCondition signCondition = other.accumulateRelevantSigns();
+//                signCondition.insert(signCondition.begin(), thisSignCondition.begin(), thisSignCondition.end());
+//                        
+//                auto itVars = thisVars.rbegin();
+//                for(auto itPoly = thisPolynomials.rbegin(); itPoly != thisPolynomials.rend(); itPoly++) {
+//                        std::shared_ptr<ThomEncoding<Number>> result_ptr = std::make_shared<ThomEncoding<Number>>(result);
+//                        std::list<ThomEncoding<Number>> roots = realRootsThom(*itPoly, *itVars, result_ptr);
+//                        bool succes = false;
+//                        for(const auto& r : roots) {
+//                                if(r.accumulateRelevantSigns().isSuffixOf(signCondition)) {
+//                                        result = r;
+//                                        succes = true;
+//                                        break;
+//                                }
+//                        }
+//                        CARL_LOG_ASSERT("carl.thom", succes, "");
+//                        itVars++;
+//                }
+//                
+//                CARL_LOG_TRACE("carl.thom", "result of concat: " << result);
+                
+        }
+        
+        static ThomEncoding<Number> analyzeTEMap(const std::map<Variable, ThomEncoding<Number>>& m) {
+                CARL_LOG_ASSERT("carl.thom", !m.empty(), "called analyzeTEMap with empty map");
+                
+                // collect variables 
+                // the thom ecodings can additionally contain other variables than these!!
+                std::list<Variable> vars;
+                for(const auto& entry : m) {
+                        CARL_LOG_ASSERT("carl.thom", std::find(vars.begin(), vars.end(), entry.first) == vars.end(), "variable appears twice in map");
+                        vars.push_back(entry.first);
+                }
+                std::list<Variable> originalVars = vars;
+                
+                // collect thom encodings
+                std::list<ThomEncoding<Number>> encodings;
+                for(const auto& entry : m) {
+                        encodings.push_back(entry.second);
+                }
+                
+                // sort thom encodings in descending dimension
+                encodings.sort(
+                        [](const ThomEncoding<Number>& lhs, const ThomEncoding<Number>& rhs) {
+                                return lhs.dimension() > rhs.dimension();
+                        }
+                );
+                
+                CARL_LOG_TRACE("carl.thom", "encodings = " << encodings);
+                
+                ThomEncoding<Number> result = encodings.front();
+                for(const auto& v : encodings.front().accumulateVariables()) {
+                        auto it = std::find(vars.begin(), vars.end(), v);
+                        if(it != vars.end()) vars.erase(it);
+                }
+                encodings.erase(encodings.begin());
+                
+                while(!vars.empty()) {
+                        CARL_LOG_ASSERT("carl.thom", !encodings.empty(), "");
+                        bool takeit = true;
+                        for(const auto& v : encodings.front().accumulateVariables()) {
+                                if(std::find(originalVars.begin(), originalVars.end(), v) == originalVars.end()) {
+                                        continue;
+                                }
+                                auto it = std::find(vars.begin(), vars.end(), v);
+                                if(it == vars.end()) {
+                                        takeit = false;
+                                        break;
+                                }
+                        }
+                        if(takeit) {
+                                result = result.concat(encodings.front());
+                                for(const auto& v : encodings.front().accumulateVariables()) {
+                                        auto it = std::find(vars.begin(), vars.end(), v);
+                                        if(it != vars.end()) vars.erase(it);
+                                }
+                        }
+                        encodings.erase(encodings.begin());
+                }
+                
+                CARL_LOG_TRACE("carl.thom", "result = " << result);
+                
+                return result;
+                
+        }
+        
         //*******************//
         //    COMPARISON     //
         //*******************//
@@ -186,8 +322,8 @@ private:
                 CARL_LOG_INFO("carl.thom.compare", "lhs = " << lhs << ", rhs = " << rhs);
                 
                 // 1. Encodings from different levels
-                if(lhs.mainVar() != rhs.mainVar()) {
-                        CARL_LOG_TRACE("carl.thom.compare", "encodings are from different levels");
+                if(!areComparable(lhs, rhs)) {
+                        CARL_LOG_TRACE("carl.thom.compare", "encodings are not comparable");
                         // in this case it is not necessary to compare them by the numbers they actually represent
                         return compareDifferentLevels(lhs, rhs);
                 }
@@ -200,6 +336,7 @@ private:
                 }
                 
                 // 3. different underlying polynomial
+                // both are nullptr or both are not nullptr
                 if( !(lhs.mPoint == nullptr && rhs.mPoint != nullptr) && !(lhs.mPoint != nullptr && rhs.mPoint == nullptr)) {
                         CARL_LOG_TRACE("carl.thom.compare", "comparing encodings with different underlying polynomials, !!hopefully with same defining point!!");
                         return compareDifferentPoly(lhs, rhs);
@@ -208,6 +345,7 @@ private:
                 // 4. one of the encodings is "new" on this level and therefore has no underlying point
                 CARL_LOG_ASSERT("carl.thom.compare", lhs.mPoint == nullptr || rhs.mPoint == nullptr, "");
                 CARL_LOG_ASSERT("carl.thom.compare", lhs.mPoint != nullptr || rhs.mPoint != nullptr, "");
+                CARL_LOG_TRACE("carl.thom.compare", "one of the encodings is new on this level");
                 if(lhs.mPoint == nullptr) {
                         return compare(ThomEncoding<Number>(lhs, rhs.mPoint), rhs);
                 }
@@ -219,13 +357,34 @@ private:
                 return EQUAL;
         }
         
+        /*
+         * This is not the case if
+         *      1. lhs and rhs do not have the same main variable
+         *      2. they both have a different underlying point which is not nullptr
+         */
+        static bool areComparable(const ThomEncoding<Number>& lhs, const ThomEncoding<Number>& rhs) {
+                if(lhs.mainVar() != rhs.mainVar()) {
+                        return false;
+                }
+                // they have the same main var
+                if(lhs.mPoint != nullptr && rhs.mPoint != nullptr) {
+                        CARL_LOG_TRACE("carl.thom.compare", "\nlhs = " << lhs << "\nrhs = " << rhs << "\nlhs.mPoint = " << lhs.mPoint << "\nrhs.mPoint = " << rhs.mPoint);
+                        if(!lhs.point().equals(rhs.point())) {
+                                CARL_LOG_TRACE("carl.thom.compare", "underlying points are unequal");
+                                return false;
+                        }
+                        CARL_LOG_TRACE("carl.thom.compare", "underlying points are equal");
+                }
+                return true;
+        }
+        
         static ThomComparisonResult compareDifferentLevels(const ThomEncoding<Number>& lhs, const ThomEncoding<Number>& rhs) {
-                // TODO implement sinnvolle ordnung
-                //CARL_LOG_WARN("carl.thom.compare", "returning LESS as comparison result for encodings on different levels");
-                //return LESS;
                 if(lhs.polynomial() < rhs.polynomial()) return LESS;
-                else if(lhs.polynomial() > rhs.polynomial()) return GREATER;
-                else return EQUAL;
+                if(lhs.polynomial() > rhs.polynomial()) return GREATER;
+                CARL_LOG_ASSERT("carl.thom.compare", !(lhs.mPoint == nullptr && rhs.mPoint == nullptr), "i think this should not happen")
+                if(lhs.mPoint == nullptr && rhs.mPoint != nullptr) return LESS;
+                if(lhs.mPoint != nullptr && rhs.mPoint == nullptr) return GREATER;
+                return compareDifferentLevels(lhs.point(), rhs.point());
         }
         
         static ThomComparisonResult compareRational(const ThomEncoding<Number>& lhs, const Number& rhs) {
@@ -234,6 +393,17 @@ private:
         }
         
         static ThomComparisonResult compareDifferentPoly(const ThomEncoding<Number>& lhs, const ThomEncoding<Number>& rhs);
+        
+        // checks if the thom encodings are "literally" the same (this is not the same as operator =)
+        bool equals(const ThomEncoding<Number>& other) const {
+                if(this->polynomial() != other.polynomial()) return false;
+                if(this->relevantSignCondition() !=  other.relevantSignCondition()) return false;
+                if(this->dimension() != other.dimension()) return false;
+                if(this->mPoint != nullptr && other.mPoint != nullptr) {
+                        return this->point().equals(other.point());
+                }
+                return true;
+        }
                 
 
 public:       

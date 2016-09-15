@@ -62,42 +62,47 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 return realRootsThom<Number>(p, mainVar, nullptr, interval);
         }
         CARL_LOG_ASSERT("carl.thom.rootfinder", m.size() > 0, "");
+        CARL_LOG_ASSERT("carl.thom.rootfinder", m.size() == p.gatherVariables().size() - 1, "");
+        
+        ThomEncoding<Number> point = ThomEncoding<Number>::analyzeTEMap(m);
+        std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);
+        return realRootsThom(p, mainVar, point_ptr, interval);
         
         /* In m, there is either one descending chain and a dimension-1 encoding or just one descending chain (but not quite sure about this) */
         
-        ThomEncoding<Number> point = std::max_element(m.begin(), m.end(),
-                        [](const std::pair<Variable, ThomEncoding<Number>>& lhs, const std::pair<Variable, ThomEncoding<Number>>& rhs) {
-                                return lhs.second.dimension() < rhs.second.dimension();
-                        }
-        )->second;
-        CARL_LOG_TRACE("carl.thom.rootfinder", "maximal encoding in m w.r.t. to dimension: " << point);
-        
-        // TODO assert that the encodings in the chain are actually the encodings in the map
-        
-        if(point.dimension() >= m.size()) {
-                // in this case there is just one descending chain
-                CARL_LOG_TRACE("carl.thom.rootfinder", "found single descending chain in m: " << point);
-                std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);
-                return realRootsThom(p, mainVar, point_ptr, interval);
-        }
-        
-        else{
-                for(const auto& entry : m) {
-                        CARL_LOG_ASSERT("carl.thom.rootfinder", entry.second.dimension() == 1, "this is an assumption i have made");
-                }
-                auto m_it = m.begin();
-                point = m_it->second;
-                m_it++;
-                std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);
-                while(m_it != m.end()) {
-                        ThomEncoding<Number> newPoint(m_it->second, point_ptr);
-                        point = newPoint;
-                        point_ptr = std::make_shared<ThomEncoding<Number>>(point);
-                        m_it++;
-                }
-                CARL_LOG_TRACE("carl.thom.rootfinder", "point = " << point);
-                return realRootsThom(p, mainVar, point_ptr, interval);
-        }
+//        ThomEncoding<Number> point = std::max_element(m.begin(), m.end(),
+//                        [](const std::pair<Variable, ThomEncoding<Number>>& lhs, const std::pair<Variable, ThomEncoding<Number>>& rhs) {
+//                                return lhs.second.dimension() < rhs.second.dimension();
+//                        }
+//        )->second;
+//        CARL_LOG_TRACE("carl.thom.rootfinder", "maximal encoding in m w.r.t. to dimension: " << point);
+//        
+//        // TODO assert that the encodings in the chain are actually the encodings in the map
+//        
+//        if(point.dimension() >= m.size()) {
+//                // in this case there is just one descending chain
+//                CARL_LOG_TRACE("carl.thom.rootfinder", "found single descending chain in m: " << point);
+//                std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);
+//                return realRootsThom(p, mainVar, point_ptr, interval);
+//        }
+//        
+//        else{
+//                for(const auto& entry : m) {
+//                        CARL_LOG_ASSERT("carl.thom.rootfinder", entry.second.dimension() == 1, "this is an assumption i have made");
+//                }
+//                auto m_it = m.begin();
+//                point = m_it->second;
+//                m_it++;
+//                std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);
+//                while(m_it != m.end()) {
+//                        ThomEncoding<Number> newPoint(m_it->second, point_ptr);
+//                        point = newPoint;
+//                        point_ptr = std::make_shared<ThomEncoding<Number>>(point);
+//                        m_it++;
+//                }
+//                CARL_LOG_TRACE("carl.thom.rootfinder", "point = " << point);
+//                return realRootsThom(p, mainVar, point_ptr, interval);
+//        }
 }
 
 /*
@@ -279,7 +284,7 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
 	}
         CARL_LOG_TRACE("carl.thom.rootfinder", "TEmap = " << TEmap);
         CARL_LOG_TRACE("carl.thom.rootfinder", "tmp = " << tmp);
-        if(TEmap.empty()) {
+        if(tmp.gatherVariables().size() == 1) {
                 if(tmp.isZero()) return {RealAlgebraicNumber<Number>(0)};
                 assert(tmp.gatherVariables().size() == 1);
                  // Coeff = MultivariatePolynomial<Number>, but all coefficients of tmp are numerical

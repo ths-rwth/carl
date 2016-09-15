@@ -57,6 +57,10 @@ public:
                         CARL_LOG_TRACE("carl.thom.tarski.manager", "as a MULTIVARIATE manager");
                         GroebnerBase<Number> gb(first, last);
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", gb.hasFiniteMon(), "");
+                        if(!gb.hasFiniteMon()) {
+                                std::cout << "aborting because it was tried to set up a tarki query manager on a non zero-dimensional zero set" << std::endl;
+                                std::exit(23);
+                        }
                         mTab = MultiplicationTable<Number>(gb);
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", !this->isUnivariateManager(), "");
                 }
