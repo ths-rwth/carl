@@ -381,7 +381,7 @@ private:
         static ThomComparisonResult compareDifferentLevels(const ThomEncoding<Number>& lhs, const ThomEncoding<Number>& rhs) {
                 if(lhs.polynomial() < rhs.polynomial()) return LESS;
                 if(lhs.polynomial() > rhs.polynomial()) return GREATER;
-                CARL_LOG_ASSERT("carl.thom.compare", !(lhs.mPoint == nullptr && rhs.mPoint == nullptr), "i think this should not happen")
+                CARL_LOG_ASSERT("carl.thom.compare", !(lhs.mPoint == nullptr && rhs.mPoint == nullptr), "i think this should not happen");
                 if(lhs.mPoint == nullptr && rhs.mPoint != nullptr) return LESS;
                 if(lhs.mPoint != nullptr && rhs.mPoint == nullptr) return GREATER;
                 return compareDifferentLevels(lhs.point(), rhs.point());
