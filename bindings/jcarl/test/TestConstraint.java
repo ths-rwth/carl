@@ -48,7 +48,7 @@ public void testGetters() {
 public void testEvaluate() {
 	VarRationalMap map = new VarRationalMap();
 	map.set(v11,new Rational(10));
-	assertEquals(c2.satisfiedBy(map),1);
+	assertEquals(c2.satisfiedBy(map),0);
 }
 
 
