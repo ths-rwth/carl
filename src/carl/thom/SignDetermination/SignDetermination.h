@@ -120,7 +120,7 @@ std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition
 
 
 
-template<typename Polynomial, typename Settings = ThomDefaultSettings>
+template<typename Polynomial, typename Settings>
 std::vector<SignCondition> signDetermination(const std::vector<Polynomial>& p, const std::vector<Polynomial>& z) {
         static_assert(is_polynomial<Polynomial>::value, "only call 'signDetermination' on polynomial types");
         CARL_LOG_DEBUG("carl.thom.sign", "p = " << p << ", z = " << z);
