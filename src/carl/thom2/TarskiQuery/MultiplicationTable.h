@@ -198,6 +198,7 @@ private:
                                 // find the polynomial in the basis with the corresponding leading monomial
                                 MultivariatePolynomial<Number> G;
                                 for(const auto& p : gb.get()) {
+                                        assert(!p.isZero());
                                         if(p.lterm() == m) {
                                                 G = p;
                                                 break;

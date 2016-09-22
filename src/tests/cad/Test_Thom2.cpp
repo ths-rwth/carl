@@ -10,6 +10,11 @@
 
 using namespace carl;
 
+TEST(Thom2, sqrttest) {
+        Rational test = Rational(1) / Rational(10);
+        std::cout << carl::sqrt_fast(test) << std::endl;
+}
+
 TEST(Thom2, SignDetermination) {
         typedef UnivariatePolynomial<Rational> UPolynomial;
         typedef MultivariatePolynomial<Rational> MPolynomial;

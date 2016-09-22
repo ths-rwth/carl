@@ -388,7 +388,7 @@ private:
                 if(lhs.mPoint != nullptr && rhs.mPoint != nullptr) return compareDifferentLevels(lhs.point(), rhs.point());
                 // same polynomials, mPoint both nullptr
                 CARL_LOG_ASSERT("carl.thom.compare", lhs.mPoint == nullptr && rhs.mPoint == nullptr, "i think this should not happen");
-                return lhs.relevantSignCondition().compare(rhs.relevantSignCondition());
+                return SignCondition::compare(lhs.relevantSignCondition(), rhs.relevantSignCondition());
                 
         }
         

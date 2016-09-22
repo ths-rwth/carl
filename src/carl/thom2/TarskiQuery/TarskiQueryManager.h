@@ -35,11 +35,12 @@ private:
         
         // for the multivariate case
         MultiplicationTable<Number> mTab;
+        bool mTrivialGb;
         
         mutable std::map<Polynomial, QueryResultType> mCache;
         
 public:
-        TarskiQueryManager() : mZ(Variable::NO_VARIABLE), mDer(Variable::NO_VARIABLE), mTab(), mCache() {}
+        TarskiQueryManager() : mZ(Variable::NO_VARIABLE), mDer(Variable::NO_VARIABLE), mTab(), mTrivialGb(false), mCache() {}
         
         template<typename InputIt>
         TarskiQueryManager(InputIt first, InputIt last) : TarskiQueryManager() {
@@ -56,18 +57,24 @@ public:
                 else {
                         CARL_LOG_TRACE("carl.thom.tarski.manager", "as a MULTIVARIATE manager");
                         GroebnerBase<Number> gb(first, last);
-                        CARL_LOG_ASSERT("carl.thom.tarski.manager", gb.hasFiniteMon(), "");
-                        if(!gb.hasFiniteMon()) {
-                                std::cout << "aborting because it was tried to set up a tarki query manager on a non zero-dimensional zero set" << std::endl;
-                                std::exit(23);
+                        if(gb.isTrivialBase()) {
+                                mTrivialGb = true;
                         }
-                        mTab = MultiplicationTable<Number>(gb);
+                        else {
+                                CARL_LOG_ASSERT("carl.thom.tarski.manager", gb.hasFiniteMon(), "");
+                                if(!gb.hasFiniteMon()) {
+                                        std::cout << "aborting because it was tried to set up a tarki query manager on a non zero-dimensional zero set" << std::endl;
+                                        std::exit(23);
+                                }
+                                mTab = MultiplicationTable<Number>(gb);
+                        }
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", !this->isUnivariateManager(), "");
                 }
         }
         
         QueryResultType operator()(const Polynomial& p) const {
                 CARL_LOG_TRACE("carl.thom.tarski.manager", "computing taq on " << p << " ... ");
+                if(p.isZero()) return 0;
                 QueryResultType res;
                 
                 // return cached query result
@@ -89,8 +96,11 @@ public:
                 
                 // multivariate manager
                 else {
+                        if(mTrivialGb) res = 0;
+                        else {
                         // todo: check if variables in p are also in the polynomials defining the zero set
-                        res = multivariateTarskiQuery(p, mTab);
+                                res = multivariateTarskiQuery(p, mTab);
+                        }
                 }
                 cache(p, res);
                 CARL_LOG_TRACE("carl.thom.tarski.manager", res);

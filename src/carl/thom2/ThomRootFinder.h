@@ -48,7 +48,12 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 << "interval = " << interval << "\n"
                 << "---------------------------------------------");
         CARL_LOG_ASSERT("carl.thom.rootfinder", !p.isConstant(), "this should not be handled here but somewhere before");
-        CARL_LOG_ASSERT("carl.thom.rootfinder", p.has(mainVar), "");
+        //CARL_LOG_ASSERT("carl.thom.rootfinder", p.has(mainVar), "");
+        // attention ...
+        if(!p.has(mainVar)) {
+                return std::list<ThomEncoding<Number>>();
+        }
+        
         for(const auto& entry : m) {
                 CARL_LOG_ASSERT("carl.thom.rootfinder", entry.first == entry.second.mainVar(), "invalid map Variable -> Thom encoding");
         }
@@ -284,12 +289,12 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
 	}
         CARL_LOG_TRACE("carl.thom.rootfinder", "TEmap = " << TEmap);
         CARL_LOG_TRACE("carl.thom.rootfinder", "tmp = " << tmp);
-        if(tmp.gatherVariables().size() == 1) {
+        std::list<RealAlgebraicNumber<Number>> roots_triv;
+        if(tmp.gatherVariables().size() <= 1) {
                 if(tmp.isZero()) return {RealAlgebraicNumber<Number>(0)};
                 assert(tmp.gatherVariables().size() == 1);
                  // Coeff = MultivariatePolynomial<Number>, but all coefficients of tmp are numerical
                 UnivariatePolynomial<Number> tmp_univ = tmp.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ assert(c.isUnivariate()); return c.constantPart(); }));
-                std::list<RealAlgebraicNumber<Number>> roots_triv;
                 if(tmp_univ.zeroIsRoot()) {
                         roots_triv.push_back(RealAlgebraicNumber<Number>(0));
                         tmp_univ.eliminateZeroRoots();
@@ -310,6 +315,7 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
                         case 2: {
                                 Number a = tmp_univ.coefficients()[2], b = tmp_univ.coefficients()[1], c = tmp_univ.coefficients()[0];
                                 assert(a != Number(0));
+                                CARL_LOG_TRACE("carl.thom.rootfinder", "a = " << a << ", b = " << b << ", c = " << c);
                                 /* Use this formulation of p-q-formula:
                                  * x = ( -b +- \sqrt{ b*b - 4*a*c } ) / (2*a)
                                  */
@@ -319,8 +325,10 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
                                         CARL_LOG_TRACE("carl.thom.rootfinder", "roots_triv = " << roots_triv);
                                         return roots_triv;
                                 }
+                                /*
                                 else if (rad > 0) {
                                         std::pair<Number, Number> res = carl::sqrt_fast(rad);
+                                        CARL_LOG_TRACE("carl.thom.rootfinder", "carl::sqrt_fast(rad) returned " << res);
                                         if (res.first == res.second) {
                                                 // Root could be calculated exactly
                                                 roots_triv.push_back(RealAlgebraicNumber<Number>((-b - res.first) / (2*a)));
@@ -329,11 +337,13 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
                                                 return roots_triv;
                                         }
                                 }
+                                */
                                 break;
                         }
                 }
                
                 roots = realRootsThom<Number>(MultivariatePolynomial<Number>(tmp_univ), tmp_univ.mainVar(), nullptr, interval);
+                
         }
         else {
                 // need to perform 'real' lifting
@@ -344,10 +354,14 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
                 roots = realRootsThom(p_multiv, p.mainVar(), TEmap, interval);
         }
         
-        CARL_LOG_TRACE("carl.thom.rootfinder", "found the following roots: " << roots);
+        
         
 	std::list<RealAlgebraicNumber<Number>> res;
         for(const auto& te : roots) res.push_back(RealAlgebraicNumber<Number>(te));
+        for(const auto& number : roots_triv) res.push_back(number);
+        
+        CARL_LOG_TRACE("carl.thom.rootfinder", "found the following roots: " << res);
+        
         return res;
 }
 

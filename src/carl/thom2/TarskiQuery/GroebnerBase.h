@@ -52,6 +52,11 @@ public:
                 return mBase->getGenerators();
         }
         
+        // means that this gb contains only 1
+        inline bool isTrivialBase() const {
+                return this->get().size() == 1 && this->get().front().isOne(); 
+        }
+        
         bool hasFiniteMon() const;
         
         std::vector<Monomial> cor() const;
