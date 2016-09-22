@@ -113,7 +113,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 const MultivariatePolynomial<Number>& p,
                 Variable::Arg mainVar,
 		std::shared_ptr<ThomEncoding<Number>> point_ptr,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
+		const Interval<Number>& interval
 ) {
         using Polynomial = MultivariatePolynomial<Number>;
         std::list<ThomEncoding<Number>> result;

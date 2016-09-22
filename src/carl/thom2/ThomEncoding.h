@@ -151,6 +151,8 @@ public:
                         if(relevant.isSuffixOf(sigma)) return sigma.front();
                 }
                 CARL_LOG_ASSERT("carl.thom", false, "we should never get here");
+                std::exit(42);
+                return Sign(0);
         }
         
         bool makesPolynomialZero(const Polynomial& pol, Variable::Arg pol_mainVar) const {
@@ -464,6 +466,8 @@ public:
                         if(lhs.relevantSignCondition() == r.mSc) return r;
                 }
                 CARL_LOG_ASSERT("carl.thom.samples", false, "we should never get here");
+                std::exit(42);
+                return lhs;
         }
         
         
