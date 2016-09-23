@@ -288,14 +288,14 @@ public:
                 
                 while(!vars.empty()) {
                         CARL_LOG_ASSERT("carl.thom", !encodings.empty(), "");
-                        bool takeit = true;
+                        bool takeit = false;
                         for(const auto& v : encodings.front().accumulateVariables()) {
                                 if(std::find(originalVars.begin(), originalVars.end(), v) == originalVars.end()) {
                                         continue;
                                 }
                                 auto it = std::find(vars.begin(), vars.end(), v);
-                                if(it == vars.end()) {
-                                        takeit = false;
+                                if(it != vars.end()) {
+                                        takeit = true;
                                         break;
                                 }
                         }
