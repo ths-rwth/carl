@@ -148,6 +148,11 @@ namespace carl
 			mValue = _int;
 		}
 
+		explicit FLOAT_T<FloatType>(int _int, CARL_RND /*unused*/ = CARL_RND::N)
+		{
+			mValue = _int;
+		}
+
 		/**
 		 * Constructor, which takes an unsigned integer as input and optional rounding, which
 		 * can be used, if the underlying fp implementation allows this.
