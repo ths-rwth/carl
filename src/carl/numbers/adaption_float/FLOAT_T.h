@@ -247,6 +247,12 @@ namespace carl
 			return *this;
 		}
 
+		FLOAT_T<FloatType>& operator =(const FloatType& _rhs)
+		{
+			mValue = _rhs;
+			return *this;
+		}
+
 		/**
 		 * Comparison operator for equality.
 		 * @param _rhs Righthand side of the comparison.
