@@ -123,6 +123,8 @@ std::list<ThomEncoding<Number>> realRootsThom(
         using Polynomial = MultivariatePolynomial<Number>;
         std::list<ThomEncoding<Number>> result;
         
+        
+        
         if(point_ptr == nullptr) {
                 std::list<Polynomial> derivatives = der(p, mainVar, 1, p.degree(mainVar));
                 
@@ -236,6 +238,13 @@ std::list<ThomEncoding<Number>> realRootsThom(
         }
         
         CARL_LOG_INFO("carl.thom.rootfinder", "found the following roots: " << result);
+        
+        /////////////////////////////////////////////////////////
+        // THIS IS JUST TO TEST HOW OFTEN THOM ENCODINGS ARE USED
+        /////////////////////////////////////////////////////////
+        if(!result.empty()) std::exit(42);
+        /////////////////////////////////////////////////////////
+        
         return result;
 }
 
