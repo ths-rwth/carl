@@ -7,3 +7,4 @@
 #cmakedefine LOGGING_CARL
 #cmakedefine LOGGING_DISABLE_INEFFICIENT
 #cmakedefine THREAD_SAFE
+#cmakedefine USE_COCOA
