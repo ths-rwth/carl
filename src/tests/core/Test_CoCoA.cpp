@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 
+#ifdef USE_COCOA
+
 #include "CoCoA/library.H"
 
 using namespace carl;
@@ -23,3 +25,5 @@ TEST(CoCoA, Basic)
 	auto g = CoCoA::gcd(p, q);
 	EXPECT_EQ(x[0]+1, g);
 }
+
+#endif
