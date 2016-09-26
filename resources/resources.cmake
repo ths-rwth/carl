@@ -46,6 +46,21 @@ if(USE_CLN_NUMBERS)
 endif()
 
 
+##### CoCoALib
+if(USE_COCOA)
+	if(NOT FORCE_SHIPPED_RESOURCES)
+		load_library(carl CoCoA 0.99542)
+	endif()
+	if(COCOA_FOUND)
+		message(STATUS "Use system version of CoCoA ${COCOA_VERSION}")
+	else()
+		set(COCOA_VERSION "0.99542")
+		include(resources/cocoa.cmake)
+		message(STATUS "Use shipped version of CoCoA ${COCOA_VERSION}")
+	endif()
+endif()
+
+
 ##### Eigen3
 if(NOT FORCE_SHIPPED_RESOURCES)
 	load_library(carl EIGEN3 3.2)

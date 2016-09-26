@@ -46,6 +46,7 @@ option( USE_GINAC "Compile with testing with the runtime and result comparisons 
 option( COMPARE_WITH_Z3 "Compile benchmarks that compare to z3" OFF )
 option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )
+option( USE_COCOA "Use CoCoALib" OFF )
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
