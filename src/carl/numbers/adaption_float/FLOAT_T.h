@@ -83,7 +83,7 @@ namespace carl
 	template<typename Number>
 	inline bool AlmostEqual2sComplement(const Number& A, const Number& B, unsigned /*unused*/ = 128)
 	{
-		return AlmostEqual2sComplement<double>(double(A), double(B), 128);
+		return A == B;
 	}
 
 	template<>
@@ -145,12 +145,12 @@ namespace carl
 		 */
 		explicit FLOAT_T<FloatType>(sint _int, CARL_RND /*unused*/ = CARL_RND::N)
 		{
-			mValue = _int;
+			mValue = FloatType(_int);
 		}
 
 		explicit FLOAT_T<FloatType>(int _int, CARL_RND /*unused*/ = CARL_RND::N)
 		{
-			mValue = _int;
+			mValue = FloatType(_int);
 		}
 
 		/**
@@ -159,9 +159,9 @@ namespace carl
 		 * @param _int Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		explicit FLOAT_T<FloatType>(uint _int, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(unsigned _int, CARL_RND /*unused*/ = CARL_RND::N)
 		{
-			mValue = _int;
+			mValue = FloatType(_int);
 		}
 
 		/**
@@ -174,7 +174,7 @@ namespace carl
 		FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, CARL_RND /*unused*/ = CARL_RND::N) : mValue(_float.mValue)
 		{}
 
-		FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, CARL_RND /*unused*/ = CARL_RND::N) noexcept : mValue(_float.value())
+		explicit FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, CARL_RND /*unused*/ = CARL_RND::N) noexcept : mValue(_float.value())
 		{}
 
 		/**
@@ -1218,7 +1218,7 @@ namespace carl
 		 */
 		friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
-			assert(_rhs != 0);
+			assert(_rhs != FLOAT_T<FloatType>(0));
 			return FLOAT_T<FloatType>(_lhs.mValue / _rhs.mValue);
 		}
 
@@ -1229,7 +1229,7 @@ namespace carl
 		 */
 		friend FLOAT_T<FloatType>& operator ++(FLOAT_T<FloatType>& _num)
 		{
-			_num.mValue += 1;
+			_num.mValue += FLOAT_T<FloatType>(1);
 			return _num;
 		}
 
@@ -1240,7 +1240,7 @@ namespace carl
 		 */
 		friend FLOAT_T<FloatType>& operator --(FLOAT_T<FloatType>& _num)
 		{
-			_num.mValue -= 1;
+			_num.mValue -= FLOAT_T<FloatType>(1);
 			return _num;
 		}
 
