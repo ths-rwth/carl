@@ -774,7 +774,7 @@ namespace carl
 		if (lhs().nrTerms() == 2 && !lhs().trailingTerm().isConstant()) return false;
 		if (!lhs().lterm().isSingleVariable()) return false;
 		_substitutionVariable = lhs().lterm().getSingleVariable();
-		_substitutionValue = lhs().constantPart() / lhs().lterm().coeff();
+		_substitutionValue = -lhs().constantPart() / lhs().lterm().coeff();
 		return true;
 	}
     

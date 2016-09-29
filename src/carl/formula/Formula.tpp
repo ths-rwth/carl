@@ -83,7 +83,7 @@ namespace carl
                 }
                 break;
 			case FormulaType::VARCOMPARE:
-				_vars.insert(variableComparison().var());
+				variableComparison().collectVariables(_vars);
 				break;
             case FormulaType::BITVECTOR:
                 if( _bitvectorVars ) 
@@ -274,6 +274,7 @@ namespace carl
             }
 			case FormulaType::VARCOMPARE:
 			{
+				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
 			}
             case FormulaType::BITVECTOR:
             {
@@ -331,15 +332,18 @@ namespace carl
         {
             case Relation::EQ:
                 _properties |= PROP_CONTAINS_EQUATION;
+                _properties |= PROP_CONTAINS_WEAK_INEQUALITY;
                 break;
             case Relation::NEQ:
                 _properties |= PROP_CONTAINS_STRICT_INEQUALITY;
                 break;
             case Relation::LEQ:
                 _properties |= PROP_CONTAINS_INEQUALITY;
+                _properties |= PROP_CONTAINS_WEAK_INEQUALITY;
                 break;
             case Relation::GEQ:
                 _properties |= PROP_CONTAINS_INEQUALITY;
+                _properties |= PROP_CONTAINS_WEAK_INEQUALITY;
                 break;
             case Relation::LESS:
                 _properties |= PROP_CONTAINS_STRICT_INEQUALITY;
@@ -1791,6 +1795,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case VARCOMPARE:
 		case BITVECTOR:
 		case TRUE:
 		case FALSE:
@@ -1851,6 +1856,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case VARCOMPARE:
 		case BITVECTOR:
 		case TRUE:
 		case FALSE:

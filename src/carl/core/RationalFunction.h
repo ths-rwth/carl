@@ -208,7 +208,7 @@ namespace carl
         inline CoeffType nominatorAsNumber() const
         {
             assert( isConstant() );
-            return carl::getDenom(mNumberQuotient);
+            return carl::getNum(mNumberQuotient);
         }
 
         /**
@@ -217,7 +217,7 @@ namespace carl
         inline CoeffType denominatorAsNumber() const
         {
             assert( isConstant() );
-            return carl::getNum(mNumberQuotient);
+            return carl::getDenom(mNumberQuotient);
         }
 
         /**
@@ -320,6 +320,14 @@ namespace carl
                 return nominatorAsPolynomial().evaluate(substitutions) / denominatorAsPolynomial().evaluate(substitutions);
             }
         }
+		
+		RationalFunction substitute(const std::map<Variable, CoeffType>& substitutions) const
+		{
+			if (isConstant()) return *this;
+			else {
+				return RationalFunction(nominatorAsPolynomial().substitute(substitutions), denominatorAsPolynomial().substitute(substitutions));
+			}
+		}
 
 		/**
 		 * Derivative of the rational function with respect to variable x

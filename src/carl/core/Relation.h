@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "logging.h"
 #include "Sign.h"
 
 #include <cassert>
@@ -60,6 +61,10 @@ inline bool evaluate(Sign s, Relation r) {
 			return r == Relation::EQ || r == Relation::LEQ || r == Relation::GEQ;
 		case Sign::POSITIVE:
 			return r == Relation::NEQ || r == Relation::GREATER || r == Relation::GEQ;
+		default:
+			CARL_LOG_ERROR("carl.relation", "Evaluating unsupported sign " << s);
+			assert(false);
+			return false;
 	}
 }
 	

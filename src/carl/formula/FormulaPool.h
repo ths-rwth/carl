@@ -175,6 +175,8 @@ namespace carl
                 return add(new FormulaContent<Pol>(std::move(_variableComparison)));
             }
             const FormulaContent<Pol>* create(const VariableComparison<Pol>& _variableComparison) {
+				auto val = _variableComparison.asConstraint();
+				if (val) return create(*val);
                 return create(std::move(VariableComparison<Pol>(_variableComparison)));
             }
             
@@ -222,7 +224,8 @@ namespace carl
                     // Arithmetic Theory
                     case CONSTRAINT:
                         assert(false); break;
-
+					case VARCOMPARE:
+                        assert(false); break;
                     case BITVECTOR:
                     case UEQ:
                         assert(false); break;
@@ -263,6 +266,8 @@ namespace carl
                         return createNAry(_type, std::move(_subformulas));
                     // Arithmetic Theory
                     case CONSTRAINT:
+					// VarCompare
+					case VARCOMPARE:
                     // Bitvector Theory
                     case BITVECTOR:
                     // Uninterpreted Theory

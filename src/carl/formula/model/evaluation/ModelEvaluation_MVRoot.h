@@ -46,12 +46,15 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void evaluate(ModelValue<Rational,Poly>& res, MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
-		substitute(mvr, m);
+		substituteIn(mvr, m);
 		
 		auto map = collectRANIR(mvr.gatherVariables(), m);
 		if (map.size() == mvr.gatherVariables().size()) {
-            res = mvr.evaluate(map);
-			return;
+			auto r = mvr.evaluate(map);
+			if (r) {
+				res = *r;
+				return;
+			}
 		}
 		res = ModelSubstitution<Rational,Poly>::template create<ModelMVRootSubstitution<Rational,Poly>>(mvr);
 	}

@@ -7,6 +7,8 @@
 #include "../ran/RealAlgebraicNumber.h"
 #include "../ran/RealAlgebraicNumberEvaluation.h"
 
+#include <boost/optional.hpp>
+
 #include <algorithm>
 #include <iostream>
 
@@ -22,11 +24,9 @@ private:
 	Poly mPoly;
 	std::size_t mK;
 	Variable mVar;
-	mutable EvalMap mEvalMap;
-	mutable RAN mRAN;
 public:
 	MultivariateRoot(const Poly& p, std::size_t k, Variable::Arg v):
-		mPoly(p), mK(k), mVar(v), mEvalMap(), mRAN(0, false)
+		mPoly(p), mK(k), mVar(v)
 	{
 		assert(mK > 0);
 	}
@@ -44,26 +44,26 @@ public:
 		return mPoly.isUnivariate();
 	}
 	std::set<Variable> gatherVariables() const {
-		return mPoly.gatherVariables();
+		Variables var = mPoly.gatherVariables();
+		var.erase(mVar);
+		return var;
 	}
 	void substituteIn(Variable::Arg var, const Poly& poly) {
 		mPoly.substituteIn(var, poly);
 	}
 	
-	const RAN& evaluate(const EvalMap& m) const {
-		if (mEvalMap == m && mRAN.isRoot()) return mRAN;
+	boost::optional<RAN> evaluate(const EvalMap& m) const {
 		CARL_LOG_DEBUG("carl.multivariateroot", "Evaluating " << *this << " against " << m);
-		mEvalMap = m;
 		auto poly = mPoly.toUnivariatePolynomial(mVar);
 		std::map<Variable, Interval<Number>> intervalMap;
-		auto unipoly = RealAlgebraicNumberEvaluation::evaluateCoefficients(poly, mEvalMap, intervalMap);
+		auto unipoly = RealAlgebraicNumberEvaluation::evaluateCoefficients(poly, m, intervalMap);
 		auto roots = rootfinder::realRoots(unipoly);
+		if (roots.size() < mK) return boost::none;
 		assert(roots.size() >= mK);
 		auto it = roots.begin();
 		std::advance(it, mK-1);
-		mRAN = *it;
-		CARL_LOG_DEBUG("carl.multivariateroot", "Result is " << mRAN);
-		return mRAN;
+		CARL_LOG_DEBUG("carl.multivariateroot", "Result is " << *it);
+		return *it;
 	}
 	
 	bool operator==(const MultivariateRoot& mr) const {

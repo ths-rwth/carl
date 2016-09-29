@@ -56,17 +56,25 @@ namespace carl {
      */
     inline std::string formulaTypeToString(FormulaType _type) {
         switch (_type) {
+			case FormulaType::ITE: return "ite";
+			case FormulaType::EXISTS: return "exists";
+			case FormulaType::FORALL: return "forall";
             case FormulaType::TRUE: return "true";
             case FormulaType::FALSE: return "false";
+			case FormulaType::BOOL: return "bool";
             case FormulaType::NOT: return "not";
             case FormulaType::IMPLIES: return "=>";
             case FormulaType::AND: return "and";
             case FormulaType::OR: return "or";
             case FormulaType::XOR: return "xor";
             case FormulaType::IFF: return "=";
-            case FormulaType::ITE: return "ite";
-            default:
-                return "";
+			case FormulaType::CONSTRAINT: return "constraint";
+			case FormulaType::VARCOMPARE: return "varcompare";
+			case FormulaType::BITVECTOR: return "bv";
+			case FormulaType::UEQ: return "ueq";
+			default:
+				CARL_LOG_ERROR("carl.formula", "Unknown formula type " << unsigned(_type));
+				return "???";
         }
     }
     inline std::ostream& operator<<(std::ostream& os, FormulaType t) {
