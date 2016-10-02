@@ -20,10 +20,6 @@ typedef carl::RationalFunction<Polynomial> RationalFunction;
 typedef carl::RationalFunction<FactorizedPolynomial> FactorizedRationalFunction;
 typedef carl::PolynomialFactorizationPair<Polynomial> FactorizationPair;
 
-
-
-
-
 %}
 
 %import "formula.i"

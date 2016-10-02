@@ -20,8 +20,8 @@ typedef carl::RationalFunction<Polynomial> RationalFunction;
 typedef carl::RationalFunction<FactorizedPolynomial> FactorizedRationalFunction;
 typedef carl::PolynomialFactorizationPair<Polynomial> FactorizationPair;
 
-typedef carl::Formula<Polynomial> FormulaPoly;
-typedef std::vector<FormulaPoly> FormulaVector;
+typedef carl::Formula<Polynomial> FormulaPolynomial;
+typedef std::vector<FormulaPolynomial> FormulaVector;
 
 
 
@@ -40,14 +40,14 @@ typedef std::vector<FormulaPoly> FormulaVector;
 
 
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
-typedef std::vector<FormulaPoly> FormulaVector;
+typedef std::vector<FormulaPolynomial> FormulaVector;
 
 
 
 %template(FormulaVector) std::vector<carl::Formula<carl::MultivariatePolynomial<Rational>>>;
 
 
-typedef carl::Formula<Polynomial> FormulaPoly;
+typedef carl::Formula<Polynomial> FormulaPolynomial;
 
 
 
@@ -169,7 +169,7 @@ template<typename Pol> class Formula {
 }
 
 
-%template(FormulaRational) carl::Formula<Polynomial>;
+%template(FormulaPolynomial) carl::Formula<Polynomial>;
 
 
 

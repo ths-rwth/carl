@@ -18,7 +18,7 @@ protected static Polynomial p4;
 protected static RationalFunction f; 
 
 protected static ConstraintRational c1,c2,c3;
-protected static FormulaRational f1,f2,f3,f4;
+protected static FormulaPolynomial f1,f2,f3,f4;
 
 protected static FactorizationCache cache;
 protected static FactorizedPolynomialRational fp1,fp2;
@@ -55,13 +55,13 @@ c2 = new ConstraintRational(v11,Relation.EQ,new Rational(10));
 c3 = new ConstraintRational(v21,Relation.GEQ);
 
 x = new Variable("y",VariableType.VT_BOOL);
-f1 = new FormulaRational(x);
-f2 = new FormulaRational(c2);
-f3 = new FormulaRational(FormulaType.NOT,f2);
+f1 = new FormulaPolynomial(x);
+f2 = new FormulaPolynomial(c2);
+f3 = new FormulaPolynomial(FormulaType.NOT,f2);
 FormulaVector subformulas = new FormulaVector();
 subformulas.add(f1);	
 subformulas.add(f2);
-f4 = new FormulaRational(FormulaType.AND,subformulas);
+f4 = new FormulaPolynomial(FormulaType.AND,subformulas);
 
 cache = new FactorizationCache();
 fp1 = new FactorizedPolynomialRational(new Rational(2));

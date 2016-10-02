@@ -72,7 +72,13 @@ ADD_CUSTOM_TARGET(tests
 ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test/*.class ${CMAKE_CURRENT_BINARY_DIR}/jcarl.jar jcarl)
 
 
+find_package(PythonInterp)
 
+if (PYTHONINTERP_FOUND)
+	add_test( NAME pycarl COMMAND  ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/runAllTests.py)
+else()
+	status(WARNING "Did not find a python interpreter, disabling pycarl tests.")
+endif()
 
 
 
