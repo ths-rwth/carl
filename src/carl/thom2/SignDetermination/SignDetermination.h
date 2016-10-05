@@ -11,7 +11,7 @@
 #include "../TarskiQuery/TarskiQueryManager.h"
 #include "SignCondition.h"
 
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #include <cmath>
 #include <list>
 #include <queue>
