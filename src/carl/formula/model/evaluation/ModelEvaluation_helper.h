@@ -11,7 +11,6 @@ RealAlgebraicNumberEvaluation::RANMap<Rational> collectRANIR(const std::set<Vari
 	for (auto var: vars) {
 		if (model.find(var) == model.end()) continue;
 		const ModelValue<Rational,Poly>& mv = model.evaluated(var);
-		assert(!mv.isSubstitution());
 		if (mv.isRAN()) {
 			map.emplace(var, mv.asRAN());
 		}
