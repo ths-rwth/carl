@@ -58,7 +58,6 @@ public:
 		std::map<Variable, Interval<Number>> intervalMap;
 		auto unipoly = RealAlgebraicNumberEvaluation::evaluateCoefficients(poly, m, intervalMap);
 		auto roots = rootfinder::realRoots(unipoly);
-		if (roots.size() < mK) return boost::none;
 		assert(roots.size() >= mK);
 		auto it = roots.begin();
 		std::advance(it, mK-1);
