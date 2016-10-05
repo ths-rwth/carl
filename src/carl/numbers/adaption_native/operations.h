@@ -164,6 +164,10 @@ inline double sqrt(double in) {
 	return std::sqrt(in);
 }
 
+inline std::pair<double,double> sqrt_safe(double in) {
+	return std::make_pair(std::sqrt(in), std::sqrt(in));
+}
+
 inline double pow(double in, uint exp) {
 	return std::pow(in,exp);
 }

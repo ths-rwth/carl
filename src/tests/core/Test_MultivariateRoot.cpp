@@ -45,6 +45,6 @@ TYPED_TEST(MultivariateRootTest, Evaluate)
 
 	typename MultiRoot::EvalMap m;
 	m.emplace(x, RealAlgebraicNumber<TypeParam>(2));
-	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(-1), mr1.evaluate(m));
-	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(0), mr2.evaluate(m));
+	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(-1), *mr1.evaluate(m));
+	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(0), *mr2.evaluate(m));
 }

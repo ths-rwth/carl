@@ -72,6 +72,9 @@ namespace carl {
 			case FormulaType::VARCOMPARE: return "varcompare";
 			case FormulaType::BITVECTOR: return "bv";
 			case FormulaType::UEQ: return "ueq";
+			default:
+				CARL_LOG_ERROR("carl.formula", "Unknown formula type " << unsigned(_type));
+				return "???";
         }
     }
     inline std::ostream& operator<<(std::ostream& os, FormulaType t) {

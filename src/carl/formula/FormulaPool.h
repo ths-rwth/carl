@@ -175,6 +175,8 @@ namespace carl
                 return add(new FormulaContent<Pol>(std::move(_variableComparison)));
             }
             const FormulaContent<Pol>* create(const VariableComparison<Pol>& _variableComparison) {
+				auto val = _variableComparison.asConstraint();
+				if (val) return create(*val);
                 return create(std::move(VariableComparison<Pol>(_variableComparison)));
             }
             

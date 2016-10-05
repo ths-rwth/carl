@@ -18,6 +18,48 @@ namespace model {
 	}
 	
 	template<typename Rational, typename Poly>
+	void evaluate(ModelValue<Rational,Poly>& res, VariableComparison<Poly>& vc, const Model<Rational,Poly>& m) {
+		auto it = m.find(vc.var());
+		if (it == m.end()) return;
+		const auto& value = m.evaluated(vc.var());
+		//if (!value.isRational() && !value.isRAN()) return;
+		if (!(value.isRational() || value.isRAN())) std::exit(83);
+		assert(value.isRational() || value.isRAN());
+		RealAlgebraicNumber<Rational> reference = value.isRational() ? RealAlgebraicNumber<Rational>(value.asRational()) : value.asRAN();
+		auto cmp = vc.value();
+		if (cmp.isSubstitution()) {
+			// If assigned directly, the shared_ptr<Substitution> goes out of scope before the result is copied into cmp.
+			// Therefore, we start by copying the data and overwriting it afterwards.
+			auto res = cmp.asSubstitution()->evaluate(m);
+			cmp = res;
+		}
+		if (cmp.isSubstitution()) return;
+		assert(cmp.isRational() || cmp.isRAN());
+		RealAlgebraicNumber<Rational> val = cmp.isRational() ? RealAlgebraicNumber<Rational>(cmp.asRational()) : cmp.asRAN();
+		res = false;
+		switch (vc.relation()) {
+			case Relation::EQ:
+				if (reference == val) res = true;
+				break;
+			case Relation::NEQ:
+				if (reference != val) res = true;
+				break;
+			case Relation::LESS:
+				if (reference < val) res = true;
+				break;
+			case Relation::LEQ:
+				if (reference <= val) res = true;
+				break;
+			case Relation::GREATER:
+				if (reference > val) res = true;
+				break;
+			case Relation::GEQ:
+				if (reference >= val) res = true;
+				break;
+		}
+	}
+	
+	template<typename Rational, typename Poly>
 	void evaluateVarCompare(Formula<Poly>& f, const Model<Rational,Poly>& m) {
 		assert(f.getType() == FormulaType::VARCOMPARE);
 		const auto& vc = f.variableComparison();
@@ -101,11 +143,15 @@ namespace model {
 			case FormulaType::XOR: substituteSubformulas(f, m); break;
 			case FormulaType::IFF: substituteSubformulas(f, m); break;
 			case FormulaType::CONSTRAINT: {
-				Constraint<Poly> c = substitute(f.constraint(), m);
-				switch (c.isConsistent()) {
-					case 0: f = Formula<Poly>(FormulaType::FALSE); break;
-					case 1: f = Formula<Poly>(FormulaType::TRUE); break;
-					case 2: f = Formula<Poly>(c); break;
+				auto res = evaluate(f.constraint(), m);
+				if (res.isBool()) {
+					if (res.asBool()) f = Formula<Poly>(FormulaType::TRUE);
+					else f = Formula<Poly>(FormulaType::FALSE);
+				} else {
+					assert(res.isSubstitution());
+					auto subs = res.asSubstitution();
+					auto fsubs = static_cast<ModelFormulaSubstitution<Rational,Poly>*>(subs.get());
+					f = fsubs->getFormula();
 				}
 				break;
 			}
@@ -144,6 +190,7 @@ namespace model {
 		substituteIn(f, m);
 		if (f.isTrue()) res = true;
 		else if (f.isFalse()) res = false;
+		else res = ModelSubstitution<Rational,Poly>::template create<ModelFormulaSubstitution<Rational,Poly>>(f);
 	}
 }
 }

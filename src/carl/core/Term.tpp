@@ -164,7 +164,7 @@ Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Coeffic
 			}
 		}
 		if (content.empty()) return Term<Coefficient>(coeff);
-		return Term<Coefficient>(mCoeff, createMonomial(std::move(content)));
+		return Term<Coefficient>(coeff, createMonomial(std::move(content)));
 	} else {
 		return Term<Coefficient>(mCoeff);
 	}

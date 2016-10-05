@@ -36,5 +36,9 @@ namespace carl {
 		virtual void print(std::ostream& os) const {
 			os << mFormula;
 		}
+		
+		const Formula<Poly>& getFormula() const {
+			return mFormula;
+		}
 	};
 }
