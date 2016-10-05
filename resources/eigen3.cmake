@@ -9,4 +9,4 @@ ExternalProject_Get_Property(EIGEN3_REPO INSTALL_DIR)
 
 add_imported_library(EIGEN3 SHARED "" "${INSTALL_DIR}/include")
 
-add_dependencies(resources EIGEN3)
+add_dependencies(resources EIGEN3_REPO)
