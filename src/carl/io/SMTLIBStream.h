@@ -1,9 +1,13 @@
 #pragma once
 
 #include "../core/Monomial.h"
+#include "../core/MultivariatePolynomial.h"
 #include "../core/Relation.h"
 #include "../core/Term.h"
+#include "../core/UnivariatePolynomial.h"
 #include "../core/Variable.h"
+#include "../formula/Constraint.h"
+#include "../formula/Sort.h"
 
 #include <iostream>
 #include <type_traits>
@@ -11,6 +15,18 @@
 namespace carl {
 
 class SMTLIBStream: public std::ostream {
+	
+	void declare(const Sort& s) {
+		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
+	}
+	void declare(const Variable& v) {
+		*this << "(declare-fun " << v << " () " << v.getType() << ")" << std::endl;
+	}
+
+	template<typename Pol>
+	void write(const Constraint<Pol>& c) {
+		*this << "(" << c.relation() << " " << c.lhs() << " 0)";
+	}
 
 	void write(const Monomial::Arg& m) {
 		if (m) *this << *m;
@@ -31,6 +47,19 @@ class SMTLIBStream: public std::ostream {
 		else {
 			*this << "(*";
 			for (const auto& e: m.exponents()) *this << " " << e;
+			*this << ")";
+		}
+	}
+	
+	template<typename Coeff>
+	void write(const MultivariatePolynomial<Coeff>& mp) {
+		if (mp.isZero()) *this << "0";
+		else if (mp.nrTerms() == 1) *this << mp.lterm();
+		else {
+			*this << "(+";
+			for (auto it = mp.rbegin(); it != mp.rend(); it++) {
+				*this << " " << *it;
+			}
 			*this << ")";
 		}
 	}
@@ -57,9 +86,34 @@ class SMTLIBStream: public std::ostream {
 			}
 		}
 	}
+	
+	template<typename Coeff>
+	void write(const UnivariatePolynomial<Coeff>& up) {
+		if (up.isConstant()) *this << up.constantPart();
+		else {
+			*this << "(+";
+			for (std::size_t i = 0; i < up.coefficients().size(); i++) {
+				std::size_t exp = up.coefficients().size() - i - 1;
+				const auto& coeff = up.coefficients()[exp];
+				if (exp == 0) *this << " " << coeff;
+				else *this << " (* " << coeff << " " << Monomial(up.mainVar(), exp) << ")";
+			}
+			*this << ")";
+		}
+	}
 
-	void write(Variable::Arg v) {
+	void write(const Variable& v) {
 		*this << v.getName();
+	}
+	void write(const VariableType& vt) {
+		switch (vt) {
+			case VariableType::VT_BOOL:				*this << "Bool"; break;
+			case VariableType::VT_REAL:				*this << "Real"; break;
+			case VariableType::VT_INT:				*this << "Int"; break;
+			case VariableType::VT_UNINTERPRETED:	*this << "?_Uninterpreted"; break;
+			case VariableType::VT_BITVECTOR:		*this << "?_Bitvector"; break;
+			default:								*this << "?"; break;
+		}
 	}
 	
 	template<typename T>
@@ -68,6 +122,7 @@ class SMTLIBStream: public std::ostream {
 	}
 	
 public:
+	
 	SMTLIBStream(std::ostream& base) {
 		rdbuf(base.rdbuf());
 	}
@@ -77,6 +132,11 @@ public:
 		write(static_cast<const std::decay_t<T>&>(t));
 		return *this;
 	}
+	//
+	SMTLIBStream& operator<<(std::ostream& (*os)(std::ostream&)) {
+		write(os);
+        return *this;
+    }
 };
 
 
