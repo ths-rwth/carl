@@ -4,9 +4,9 @@
 #include "carl/core/VariablePool.h"
 #include "carl/util/stringparser.h"
 
-#include "carl/thom2/SignDetermination/SignDetermination.h"
-#include "carl/thom2/ThomRootFinder.h"
-#include "carl/thom2/ThomEvaluation.h"
+#include "carl/thom/SignDetermination/SignDetermination.h"
+#include "carl/thom/ThomRootFinder.h"
+#include "carl/thom/ThomEvaluation.h"
 
 using namespace carl;
 
