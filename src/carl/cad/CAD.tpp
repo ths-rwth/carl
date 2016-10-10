@@ -842,8 +842,8 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	CARL_LOG_FUNC("carl.cad", *p << " on " << m);
 	return this->samples(
 		openVariableCount,
-		//carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy),
-                carl::realRootsThom(*p, m, bounds),
+		carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy),
+        //carl::realRootsThom(*p, m, bounds),
 		currentSamples,
 		replacedSamples,
 		bounds
