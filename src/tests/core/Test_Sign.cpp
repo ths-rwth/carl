@@ -36,13 +36,13 @@ TEST(Sign, sgn)
 
 // Helper function for next test case
 template<typename Object, typename Function>
-unsigned int signVar(const std::initializer_list<Object>& l, const Function& f) {
+std::size_t signVar(const std::initializer_list<Object>& l, const Function& f) {
 	return carl::signVariations(l.begin(), l.end(), f);
 }
 
 // Helper function for next test case
 template<typename Object>
-unsigned int signVar(const std::initializer_list<Object>& l) {
+std::size_t signVar(const std::initializer_list<Object>& l) {
 	return carl::signVariations(l.begin(), l.end());
 }
 
