@@ -238,13 +238,6 @@ std::list<ThomEncoding<Number>> realRootsThom(
         }
         
         CARL_LOG_INFO("carl.thom.rootfinder", "found the following roots: " << result);
-        
-        /////////////////////////////////////////////////////////
-        // THIS IS JUST TO TEST HOW OFTEN THOM ENCODINGS ARE USED
-        /////////////////////////////////////////////////////////
-        if(!result.empty()) std::exit(42);
-        /////////////////////////////////////////////////////////
-        
         return result;
 }
 
@@ -377,5 +370,3 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
 
         
 } // namespace carl
-
-
