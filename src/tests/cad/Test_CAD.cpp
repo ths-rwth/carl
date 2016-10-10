@@ -25,7 +25,7 @@ protected:
 		x(freshRealVariable("x")),
 		y(freshRealVariable("y")),
 		z(freshRealVariable("z")),
-                w(freshRealVariable("w"))
+		w(freshRealVariable("w"))
 	{
 		CARL_LOG_INFO("carl.core", "Variables " << x << ", " << y);
 	}
@@ -44,21 +44,21 @@ protected:
 		this->p.push_back(Polynomial({Term<Rational>(x)*x, Term<Rational>(y)*y}));
 		// p[5] = z^3 - 1/2
 		this->p.push_back(Polynomial({Term<Rational>(z)*z*z, Term<Rational>(Rational(-1)/2)}));
-                // p[6] = xy - x - y + 1
-                this->p.push_back(Polynomial({Term<Rational>(x)*y, Term<Rational>(-1)*x, Term<Rational>(-1)*y, Term<Rational>(1)}));
-                // p[7] = x^2 + y^2
+		// p[6] = xy - x - y + 1
+		this->p.push_back(Polynomial({Term<Rational>(x)*y, Term<Rational>(-1)*x, Term<Rational>(-1)*y, Term<Rational>(1)}));
+		// p[7] = x^2 + y^2
 		this->p.push_back(Polynomial({Term<Rational>(x)*x, Term<Rational>(y)*y}));
-                // p[8] = x^3 + y^3 + z^3 - 1
+		// p[8] = x^3 + y^3 + z^3 - 1
 		this->p.push_back(Polynomial({Term<Rational>(x)*x*x, Term<Rational>(y)*y*y, Term<Rational>(z)*z*z, Term<Rational>(-1)}));
-                
-                // p[9] = x^2 - 2
-                this->p.push_back(Polynomial({Term<Rational>(x)*x, Term<Rational>(Rational(-2))}));
-                // p[10] = y^2 - 2
-                this->p.push_back(Polynomial({Term<Rational>(y)*y, Term<Rational>(Rational(-2))}));
-                // p[11] = z^2 - 2
-                this->p.push_back(Polynomial({Term<Rational>(z)*z, Term<Rational>(Rational(-2))}));
-                // p[12] = w^2 - 2
-                this->p.push_back(Polynomial({Term<Rational>(w)*w, Term<Rational>(Rational(-2))}));
+		
+		// p[9] = x^2 - 2
+		this->p.push_back(Polynomial({Term<Rational>(x)*x, Term<Rational>(Rational(-2))}));
+		// p[10] = y^2 - 2
+		this->p.push_back(Polynomial({Term<Rational>(y)*y, Term<Rational>(Rational(-2))}));
+		// p[11] = z^2 - 2
+		this->p.push_back(Polynomial({Term<Rational>(z)*z, Term<Rational>(Rational(-2))}));
+		// p[12] = w^2 - 2
+		this->p.push_back(Polynomial({Term<Rational>(w)*w, Term<Rational>(Rational(-2))}));
 	}
 
 	virtual void TearDown() {
@@ -82,10 +82,10 @@ protected:
 		else if(n.isInterval()){
 			return (n.getIntervalContent().interval * n.getIntervalContent().interval).contains(val);
 		}
-                else {
-                    // can't check this for a thom encoding
-                    return true;
-                }
+		else {
+		    // can't check this for a thom encoding
+		    return true;
+		}
 	}
 
 	carl::CAD<Rational> cad;
@@ -203,12 +203,12 @@ TEST_F(CADTest, Check7)
 {
 	RealAlgebraicPoint<Rational> r;
 	std::vector<Constraint> cons;
-        
-        this->cad.addPolynomial(this->p[7], {x, y});
+	
+	this->cad.addPolynomial(this->p[7], {x, y});
 	this->cad.addPolynomial(this->p[6], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-                Constraint(this->p[7], Sign::ZERO, {x,y}),
+		Constraint(this->p[7], Sign::ZERO, {x,y}),
 		Constraint(this->p[6], Sign::ZERO, {x,y})
 	});
 	EXPECT_EQ(carl::cad::Answer::False, cad.check(cons, r, this->bounds));
@@ -219,13 +219,13 @@ TEST_F(CADTest, Check8)
 {
 	RealAlgebraicPoint<Rational> r;
 	std::vector<Constraint> cons;
-        
-        this->cad.addPolynomial(this->p[7], {x, y, z});
-        this->cad.addPolynomial(this->p[8], {x, y, z});
+	
+	this->cad.addPolynomial(this->p[7], {x, y, z});
+	this->cad.addPolynomial(this->p[8], {x, y, z});
 	this->cad.prepareElimination();
 	cons.assign({
-                Constraint(this->p[7], Sign::NEGATIVE, {x,y, z}),
-                Constraint(this->p[8], Sign::ZERO, {x,y, z})
+		Constraint(this->p[7], Sign::NEGATIVE, {x,y, z}),
+		Constraint(this->p[8], Sign::ZERO, {x,y, z})
 	});
 	EXPECT_EQ(carl::cad::Answer::False, cad.check(cons, r, this->bounds));
 	//for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
@@ -235,17 +235,17 @@ TEST_F(CADTest, Check9)
 {
 	RealAlgebraicPoint<Rational> r;
 	std::vector<Constraint> cons;
-        
-        this->cad.addPolynomial(this->p[9], {x, y, z, w});
-        this->cad.addPolynomial(this->p[10], {x, y, z, w});
-        this->cad.addPolynomial(this->p[11], {x, y, z, w});
-        this->cad.addPolynomial(this->p[12], {x, y, z, w});
+	
+	this->cad.addPolynomial(this->p[9], {x, y, z, w});
+	this->cad.addPolynomial(this->p[10], {x, y, z, w});
+	this->cad.addPolynomial(this->p[11], {x, y, z, w});
+	this->cad.addPolynomial(this->p[12], {x, y, z, w});
 	this->cad.prepareElimination();
 	cons.assign({
-                Constraint(this->p[9], Sign::NEGATIVE, {x,y,z,w}),
-                Constraint(this->p[10], Sign::ZERO, {x,y,z,w}),
-                Constraint(this->p[11], Sign::POSITIVE, {x,y,z,w}),
-                Constraint(this->p[12], Sign::ZERO, {x,y,z,w})
+		Constraint(this->p[9], Sign::NEGATIVE, {x,y,z,w}),
+		Constraint(this->p[10], Sign::ZERO, {x,y,z,w}),
+		Constraint(this->p[11], Sign::POSITIVE, {x,y,z,w}),
+		Constraint(this->p[12], Sign::ZERO, {x,y,z,w})
 	});
 	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
 	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));

@@ -10,12 +10,7 @@
 
 using namespace carl;
 
-TEST(Thom2, sqrttest) {
-        Rational test = Rational(1) / Rational(10);
-        std::cout << carl::sqrt_fast(test) << std::endl;
-}
-
-TEST(Thom2, SignDetermination) {
+TEST(Thom, SignDetermination) {
         typedef UnivariatePolynomial<Rational> UPolynomial;
         typedef MultivariatePolynomial<Rational> MPolynomial;
         Variable x = freshRealVariable("x");
@@ -30,15 +25,13 @@ TEST(Thom2, SignDetermination) {
         std::vector<MPolynomial> zeroSet = {MPolynomial(z)};
         
         SignDetermination<Rational> sd(zeroSet.begin(), zeroSet.end());
-        std::cout << "sd.getSigns(MPolynomial(p3)): " << sd.getSigns(MPolynomial(p3)) << std::endl;;
-        std::cout << "sd.getSignsAndAdd(MPolynomial(p3)): " << sd.getSignsAndAdd(MPolynomial(p3)) << std::endl; 
-        std::cout << "sd.getSigns(MPolynomial(p2)): " << sd.getSigns(MPolynomial(p2)) << std::endl;
-        std::cout << "sd.getSignsAndAdd(MPolynomial(p2)): " << sd.getSignsAndAdd(MPolynomial(p2)) << std::endl;
-        std::cout << "sd.getSigns(MPolynomial(p1)): " << sd.getSigns(MPolynomial(p1)) << std::endl;
-        std::cout << "sd.getSignsAndAdd(MPolynomial(p1)): " << sd.getSignsAndAdd(MPolynomial(p1)) << std::endl;
-        
-        std::cout << "\n\n\n" << std::endl;
-        
+        sd.getSigns(MPolynomial(p3));
+        sd.getSignsAndAdd(MPolynomial(p3));
+        sd.getSigns(MPolynomial(p2));
+        sd.getSignsAndAdd(MPolynomial(p2));
+        sd.getSigns(MPolynomial(p1));
+        sd.getSignsAndAdd(MPolynomial(p1));
+
         UPolynomial f1(x, {(Rational)-5, (Rational)1});
         
         MPolynomial product(Rational(1));
@@ -54,8 +47,6 @@ TEST(Thom2, SignDetermination) {
         sd2.getSignsAndAdd(MPolynomial(p1));
         sd2.getSignsAndAdd(MPolynomial(p1));
         sd2.getSignsAndAdd(MPolynomial(p1));
-        
-        std::cout << "\n\n\n" << std::endl;
         
         Variable y = freshRealVariable("y");
         UPolynomial f2(x, {(Rational)-2, (Rational)1});
@@ -75,11 +66,10 @@ TEST(Thom2, SignDetermination) {
         sd3.getSignsAndAdd(fourZeros.derivative(x));
         sd3.getSignsAndAdd(ellipse.derivative(y).derivative(y));
         sd3.getSignsAndAdd(ellipse.derivative(y));
-        
 }
 
 
-TEST(Thom2, RootFinder) {
+TEST(Thom, RootFinder) {
         typedef MultivariatePolynomial<Rational> Polynomial;
         typedef ThomEncoding<Rational> TE;
         Variable x = freshRealVariable("x");
@@ -114,7 +104,7 @@ TEST(Thom2, RootFinder) {
 }
 
 
-TEST(Thom2, Comparison) {
+TEST(Thom, Comparison) {
         typedef MultivariatePolynomial<Rational> Polynomial;
         typedef ThomEncoding<Rational> TE;
         Variable x = freshRealVariable("x");
@@ -194,7 +184,7 @@ TEST(Thom2, Comparison) {
         
 }
 
-TEST(Thom2, Samples) {
+TEST(Thom, Samples) {
         typedef MultivariatePolynomial<Rational> Polynomial;
         typedef ThomEncoding<Rational> TE;
         Variable x = freshRealVariable("x");
@@ -243,7 +233,7 @@ TEST(Thom2, Samples) {
         
 }
 
-TEST(Thom2, Evaluation) {
+TEST(Thom, Evaluation) {
         typedef MultivariatePolynomial<Rational> Polynomial;
         typedef ThomEncoding<Rational> TE;
         typedef RealAlgebraicNumber<Rational> RAN;
