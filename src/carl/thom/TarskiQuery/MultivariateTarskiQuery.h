@@ -26,8 +26,8 @@ int multivariateTarskiQuery(const MultivariatePolynomial<Number>& Q, const Multi
         for(const auto& entry : table) {
                 BaseRepresentation<Number> Qc = table.multiply(q, entry.second.br);
                 Number t = table.trace(Qc);
-                for(const auto& pair : entry.second.pairs) {
-                        m(pair.first, pair.second) = t;
+                for (const auto& pair : entry.second.pairs) {
+                        m(long(pair.first), long(pair.second)) = t;
                 }
         }
         
