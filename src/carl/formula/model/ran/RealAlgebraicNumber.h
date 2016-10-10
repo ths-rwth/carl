@@ -9,7 +9,7 @@
 
 #include "RealAlgebraicNumberSettings.h"
 
-#include "../../../thom2/ThomEncoding.h"
+#include "../../../thom/ThomEncoding.h"
 #include "RealAlgebraicNumber_Interval.h"
 
 namespace carl {
@@ -24,7 +24,7 @@ private:
 	mutable Number mValue;
 	bool mIsRoot;
 	mutable std::shared_ptr<IntervalContent> mIR;
-        std::shared_ptr<ThomEncoding<Number>> mTE;
+	std::shared_ptr<ThomEncoding<Number>> mTE;
 	
 	void checkForSimplification() const {
 		if (mIR && mIR->interval.isPointInterval()) {
@@ -52,12 +52,14 @@ public:
 	explicit RealAlgebraicNumber(Variable::Arg var, bool isRoot = true):
 		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
-		mIR(std::make_shared<IntervalContent>(Polynomial(var), Interval<Number>::zeroInterval()))
+		mIR(std::make_shared<IntervalContent>(Polynomial(var), Interval<Number>::zeroInterval())),
+		mTE(nullptr)
 	{}
 	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, bool isRoot = true):
 		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
-		mIR(std::make_shared<IntervalContent>(p.normalized(), i))
+		mIR(std::make_shared<IntervalContent>(p.normalized(), i)),
+		mTE(nullptr)
 	{
 		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
 		assert(i.isOpenInterval() || i.isPointInterval());
@@ -70,39 +72,39 @@ public:
 			if (i.contains(0)) refineAvoiding(0);
 		}
 	}
-        
-        explicit RealAlgebraicNumber(const ThomEncoding<Number>& te, bool isRoot = true) :
-                mValue(carl::constant_zero<Number>::get()),
+
+	explicit RealAlgebraicNumber(const ThomEncoding<Number>& te, bool isRoot = true):
+		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
-                mIR(nullptr),
-                mTE(std::make_shared<ThomEncoding<Number>>(te))
-        {}
+		mIR(nullptr),
+		mTE(std::make_shared<ThomEncoding<Number>>(te))
+	{}
 		
 	RealAlgebraicNumber(const RealAlgebraicNumber& ran):
 		mValue(ran.mValue),
 		mIsRoot(ran.mIsRoot),
 		mIR(ran.mIR),
-                mTE(ran.mTE)
+		mTE(ran.mTE)
 	{}
 	RealAlgebraicNumber(RealAlgebraicNumber&& ran):
 		mValue(std::move(ran.mValue)),
 		mIsRoot(ran.mIsRoot),
 		mIR(std::move(ran.mIR)),
-                mTE(std::move(ran.mTE))
+		mTE(std::move(ran.mTE))
 	{}
 		
 	RealAlgebraicNumber& operator=(const RealAlgebraicNumber& n) {
 		mValue = n.mValue;
 		mIsRoot = n.mIsRoot;
 		mIR = n.mIR;
-                mTE = n.mTE;
+		mTE = n.mTE;
 		return *this;
 	}
 	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) {
 		mValue = std::move(n.mValue);
 		mIsRoot = n.mIsRoot;
 		mIR = std::move(n.mIR);
-                mTE = std::move(n.mTE);
+		mTE = std::move(n.mTE);
 		return *this;
 	}
 	
@@ -130,7 +132,7 @@ public:
 	bool isZero() const {
 		if (isNumeric()) return carl::isZero(mValue);
 		else if (isInterval()) return mIR->interval.isZero();
-                else if (isThom()) return mTE->isZero();
+		else if (isThom()) return mTE->isZero();
 		else return false;
 	}
 	
@@ -142,14 +144,14 @@ public:
 		checkForSimplification();
 		return bool(mIR);
 	}
-        
-        bool isThom() const {
-                return bool(mTE);
-        }
-        const ThomEncoding<Number>& getThomEncoding() const {
-                return *mTE;
-        }
-        
+	bool isThom() const {
+		return bool(mTE);
+	}
+	const ThomEncoding<Number>& getThomEncoding() const {
+		assert(isThom());
+		return *mTE;
+	}
+
 	
 	bool isIntegral() const {
 		refineToIntegrality();
@@ -160,7 +162,7 @@ public:
 	
 	Number branchingPoint() const {
 		if (isNumeric()) return mValue;
-                assert(mIR);
+		assert(isInterval());
 		return mIR->interval.sample();
 	}
 	
@@ -171,7 +173,7 @@ public:
 	
 	std::size_t getRefinementCount() const {
 		assert(!isNumeric() && !isThom());
-                assert(mIR);
+		assert(isInterval());
 		return mIR->refinementCount;
 	}
 	const ran::IntervalContent<Number>& getIntervalContent() const {
@@ -186,7 +188,7 @@ public:
 	}
 	const Polynomial& getPolynomial() const {
 		assert(!isNumeric());
-                assert(mIR);
+		assert(isInterval());
 		return mIR->polynomial;
 	}
 	
@@ -194,13 +196,13 @@ public:
 		if (isNumeric()) {
 			return carl::sgn(mValue);
 		}
-                else if (isInterval()) {
+		else if (isInterval()) {
 			return mIR->interval.sgn();
 		}
-                else if(isThom()) {
-                        return mTE->sgnReprNum();
-                }
-                else return Sign::ZERO;
+		else if(isThom()) {
+			return mTE->sgnReprNum();
+		}
+		else return Sign::ZERO;
 	}
 	
 	Sign sgn(const Polynomial& p) const {
@@ -218,17 +220,16 @@ public:
 			}
 			CARL_LOG_ERROR("carl.ran", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
 			return Sign::ZERO;
+		} else {
+			assert(isThom());
+			return mTE->signOnPolynomial(MultivariatePolynomial<Number>(p));
 		}
-                else {
-                        assert(isThom());
-                        return mTE->signOnPolynomial(MultivariatePolynomial<Number>(p));
-                }
 	}
 	
 	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
 		if (isNumeric()) return p.countRealRoots(value()) == 1;
 		else if (isInterval()) return p.countRealRoots(mIR->interval) == 1;
-                else if (isThom()) return this->sgn(p) == Sign::ZERO;
+		else if (isThom()) return this->sgn(p) == Sign::ZERO;
 		else return false;
 	}
 	
@@ -244,18 +245,17 @@ public:
 				if (isNumeric()) return i.contains(mValue);
 			}
 			return i.contains(mIR->interval);
+		} else if (isThom()) {
+			if(i.lowerBoundType() != BoundType::INFTY) {
+				if(i.lowerBoundType() == BoundType::STRICT && *mTE <= i.lower()) return false;
+				if(i.lowerBoundType() == BoundType::WEAK && *mTE < i.lower()) return false;
+			}
+			if(i.upperBoundType() != BoundType::INFTY) {
+				if(i.upperBoundType() == BoundType::STRICT && *mTE >= i.upper()) return false;
+				if(i.upperBoundType() == BoundType::WEAK && *mTE > i.upper()) return false;
+			}
+			return true;
 		}
-                else if (isThom()) {
-                        if(i.lowerBoundType() != BoundType::INFTY) {
-                                if(i.lowerBoundType() == BoundType::STRICT && *mTE <= i.lower()) return false;
-                                if(i.lowerBoundType() == BoundType::WEAK && *mTE < i.lower()) return false;
-                        }
-                        if(i.upperBoundType() != BoundType::INFTY) {
-                                if(i.upperBoundType() == BoundType::STRICT && *mTE >= i.upper()) return false;
-                                if(i.upperBoundType() == BoundType::WEAK && *mTE > i.upper()) return false;
-                        }
-                        return true;
-                }
 		else return false;
 	}
 	
@@ -296,7 +296,7 @@ template<typename Num>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
 	if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";
 	else if (ran.isInterval()) return os << "(IR " << ran.getIntervalContent().interval << ", " << ran.getPolynomial() << (ran.isRoot() ? " R" : "") << ")";
-        else if (ran.isThom()) return os << "(TE " << ran.getThomEncoding() << (ran.isRoot() ? " R" : "") << ")";
+	else if (ran.isThom()) return os << "(TE " << ran.getThomEncoding() << (ran.isRoot() ? " R" : "") << ")";
 	else return os << "(RAN)";
 }
 

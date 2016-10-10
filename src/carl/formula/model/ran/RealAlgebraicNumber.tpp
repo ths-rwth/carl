@@ -8,22 +8,20 @@ namespace carl {
 	bool RealAlgebraicNumber<Number>::equal(const RealAlgebraicNumber<Number>& n) const {
 		CARL_LOG_FUNC("carl.ran", *this << ", " << n);
 		if (this == &n) return true;
-                
-                if(this->isThom() || n.isThom()) {
-                    assert(!this->isInterval() && !n.isInterval());
-                    if(this->isThom() && n.isThom()) {
-                        return *(this->mTE) == *(n.mTE);
-                    }
-                    else if(this->isThom() && n.isNumeric()) {
-                        return *(this->mTE) == n.value();
-                    }
-                    else {
-                        assert(this->isNumeric() && n.isThom());
-                        return this->value() == *(n.mTE);
-                    }
-                }
-                assert(!isThom() && !n.isThom());
-                
+
+		if(this->isThom() || n.isThom()) {
+			assert(!this->isInterval() && !n.isInterval());
+			if(this->isThom() && n.isThom()) {
+				return *(this->mTE) == *(n.mTE);
+			} else if(this->isThom() && n.isNumeric()) {
+				return *(this->mTE) == n.value();
+			} else {
+				assert(this->isNumeric() && n.isThom());
+				return this->value() == *(n.mTE);
+			}
+		}
+		assert(!isThom() && !n.isThom());
+
 		if (isNumeric()) {
 			if (n.isNumeric()) {
 				return value() == n.value();
@@ -76,11 +74,11 @@ namespace carl {
 					return value() <= n.lower();
 				}
 			} else {
-                                assert(n.isThom());
-                                bool res = this->value() < *(n.mTE);
-                                CARL_LOG_TRACE("carl.ran", "result is " << res);
-                                return res;
-                        }
+				assert(n.isThom());
+				bool res = this->value() < *(n.mTE);
+				CARL_LOG_TRACE("carl.ran", "result is " << res);
+				return res;
+			}
 		} else if(isInterval()) {
 			if (n.isNumeric()) {
 				refineAvoiding(n.value());
@@ -91,21 +89,19 @@ namespace carl {
 				}
 			}
 		} else {
-                        assert(isThom());
-                        if(n.isNumeric()) {
-                                bool res = *mTE < n.value();
-                                CARL_LOG_TRACE("carl.ran", "result is " << res);
-                                return res;
-                        }
-                        else {
-                                assert(n.isThom());
-                                bool res =  *mTE < *(n.mTE);
-                                CARL_LOG_TRACE("carl.ran", "result is " << res);
-                                return res;
-                        }
-                        
-                }
-		
+			assert(isThom());
+			if(n.isNumeric()) {
+				bool res = *mTE < n.value();
+				CARL_LOG_TRACE("carl.ran", "result is " << res);
+				return res;
+			} else {
+				assert(n.isThom());
+				bool res =  *mTE < *(n.mTE);
+				CARL_LOG_TRACE("carl.ran", "result is " << res);
+				return res;
+			}
+		}
+
 		if (mIR == n.mIR) return false;
 		if (upper() <= n.lower()) return true;
 		if (lower() >= n.upper()) return false;
@@ -200,7 +196,7 @@ namespace carl {
 	
 	template<typename Number>
 	RealAlgebraicNumber<Number> RealAlgebraicNumber<Number>::sampleBelow(const RealAlgebraicNumber<Number>& n) {
-                CARL_LOG_FUNC("carl.ran", n);
+		CARL_LOG_FUNC("carl.ran", n);
 		if (n.isNumeric()) {
 			CARL_LOG_TRACE("carl.ran", "Selecting from (-oo, " << n << ") -> " << (carl::ceil(n.value()) - 1));
 			return RealAlgebraicNumber<Number>(carl::ceil(n.value()) - 1, false);
@@ -208,55 +204,52 @@ namespace carl {
 			CARL_LOG_TRACE("carl.ran", "Selecting from (-oo, " << n << ") -> " << (carl::ceil(n.lower()) - 1));
 			return RealAlgebraicNumber<Number>(carl::ceil(n.lower()) - 1, false);
 		} else {
-                        assert(n.isThom());
-                        RealAlgebraicNumber<Number> res(*(n.mTE) + Number(-1), false);
-                        CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
-                        return res;
-                }
+			assert(n.isThom());
+			RealAlgebraicNumber<Number> res(*(n.mTE) + Number(-1), false);
+			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
+			return res;
+		}
 	}
 	template<typename Number>
 	RealAlgebraicNumber<Number> RealAlgebraicNumber<Number>::sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper) {
-                CARL_LOG_FUNC("carl.ran", lower << ", " << upper);
-                if(lower.isThom() || upper.isThom()) {
-                        RealAlgebraicNumber<Number> res;
-                        if(lower.isThom() && upper.isThom()) {
-                                res =  RealAlgebraicNumber<Number>(ThomEncoding<Number>::intermediatePoint(*(lower.mTE), *(upper.mTE)), false);
-                        }
-                        else if(lower.isNumeric() && upper.isThom()) {
-                                res = RealAlgebraicNumber<Number>(ThomEncoding<Number>::intermediatePoint(lower.value(), *(upper.mTE)), false);
-                        }
-                        else {
-                                assert(lower.isThom() && upper.isNumeric());
-                                res = RealAlgebraicNumber<Number>(ThomEncoding<Number>::intermediatePoint(*(lower.mTE), upper.value()), false);
-                        }
-                        CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
-                        return res;
-                }
-                else {
-                        carl::Interval<Number> i;
-                        if (lower.isNumeric()) i.set(lower.value(), lower.value());
-                        else i.set(lower.upper(), lower.upper());
-                        if (upper.isNumeric()) i.setUpper(upper.value());
-                        else i.setUpper(upper.lower());
-                        while (i.isEmpty()) {
-                                if (!lower.isNumeric()) {
-                                        lower.refine();
-                                        if (lower.isNumeric()) i.setLower(lower.value());
-                                        else i.setLower(lower.upper());
-                                }
-                                if (!upper.isNumeric()) {
-                                        upper.refine();
-                                        if (upper.isNumeric()) i.setUpper(upper.value());
-                                        else i.setUpper(upper.lower());
-                                }
-                        }
-                        CARL_LOG_TRACE("carl.ran", "Selecting from (" << lower << ", " << upper << ") -> " << i.sample(false) << " (from " << i << ")");
-                        return RealAlgebraicNumber<Number>(i.sample(false), false);
-                }
+		CARL_LOG_FUNC("carl.ran", lower << ", " << upper);
+		if(lower.isThom() || upper.isThom()) {
+			RealAlgebraicNumber<Number> res;
+			if(lower.isThom() && upper.isThom()) {
+				res =  RealAlgebraicNumber<Number>(ThomEncoding<Number>::intermediatePoint(*(lower.mTE), *(upper.mTE)), false);
+			} else if(lower.isNumeric() && upper.isThom()) {
+				res = RealAlgebraicNumber<Number>(ThomEncoding<Number>::intermediatePoint(lower.value(), *(upper.mTE)), false);
+			} else {
+				assert(lower.isThom() && upper.isNumeric());
+				res = RealAlgebraicNumber<Number>(ThomEncoding<Number>::intermediatePoint(*(lower.mTE), upper.value()), false);
+			}
+			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
+			return res;
+		} else {
+			carl::Interval<Number> i;
+			if (lower.isNumeric()) i.set(lower.value(), lower.value());
+			else i.set(lower.upper(), lower.upper());
+			if (upper.isNumeric()) i.setUpper(upper.value());
+			else i.setUpper(upper.lower());
+			while (i.isEmpty()) {
+				if (!lower.isNumeric()) {
+					lower.refine();
+					if (lower.isNumeric()) i.setLower(lower.value());
+					else i.setLower(lower.upper());
+				}
+				if (!upper.isNumeric()) {
+					upper.refine();
+					if (upper.isNumeric()) i.setUpper(upper.value());
+					else i.setUpper(upper.lower());
+				}
+			}
+			CARL_LOG_TRACE("carl.ran", "Selecting from (" << lower << ", " << upper << ") -> " << i.sample(false) << " (from " << i << ")");
+			return RealAlgebraicNumber<Number>(i.sample(false), false);
+		}
 	}
 	template<typename Number>
 	RealAlgebraicNumber<Number> RealAlgebraicNumber<Number>::sampleAbove(const RealAlgebraicNumber<Number>& n) {
-                CARL_LOG_FUNC("carl.ran", n);
+		CARL_LOG_FUNC("carl.ran", n);
 		if (n.isNumeric()) {
 			CARL_LOG_TRACE("carl.ran", "Selecting from (" << n << ", oo) -> " << (carl::floor(n.value()) + 1));
 			return RealAlgebraicNumber<Number>(carl::floor(n.value()) + 1, false);
@@ -264,10 +257,10 @@ namespace carl {
 			CARL_LOG_TRACE("carl.ran", "Selecting from (" << n << ", oo) -> " << (carl::floor(n.upper()) + 1));
 			return RealAlgebraicNumber<Number>(carl::floor(n.upper()) + 1, false);
 		} else {
-                        assert(n.isThom());
-                        RealAlgebraicNumber<Number> res(*(n.mTE) + Number(1), false);
-                        CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
-                        return res;
-                }
+			assert(n.isThom());
+			RealAlgebraicNumber<Number> res(*(n.mTE) + Number(1), false);
+			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
+			return res;
+		}
 	}
 }
