@@ -415,7 +415,7 @@ public:
 	
 	/* Addition */
 
-	ThomEncoding<Number> operator+(const Number& rhs) {
+	ThomEncoding<Number> operator+(const Number& rhs) const {
 		Polynomial subs = Polynomial(mMainVar) - rhs;
 		Polynomial p = mP.substitute(mMainVar, subs);
 		std::list<ThomEncoding<Number>> roots = realRootsThom(p, mMainVar, mPoint);
