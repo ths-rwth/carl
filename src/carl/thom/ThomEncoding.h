@@ -414,23 +414,18 @@ public:
 public:       
 	
 	/* Addition */
-	
-	template<typename N>
-	friend ThomEncoding<N> operator+(const ThomEncoding<N>& lhs, const N& rhs) {
-		Polynomial subs = Polynomial(lhs.mMainVar) - rhs;
-		Polynomial p = lhs.mP.substitute(lhs.mMainVar, subs);
-		std::list<ThomEncoding<N>> roots = realRootsThom(p, lhs.mMainVar, lhs.mPoint);
-		for(const auto r : roots) {
-			if(lhs.relevantSignCondition() == r.mSc) return r;
+
+	ThomEncoding<Number> operator+(const Number& rhs) {
+		Polynomial subs = Polynomial(mMainVar) - rhs;
+		Polynomial p = mP.substitute(mMainVar, subs);
+		std::list<ThomEncoding<Number>> roots = realRootsThom(p, mMainVar, mPoint);
+		for(const auto& r: roots) {
+			if (relevantSignCondition() == r.mSc) return r;
 		}
 		CARL_LOG_ASSERT("carl.thom.samples", false, "we should never get here");
 		std::exit(42);
-		return lhs;
+		return *this;
 	}
-	
-	
-	template<typename N>
-	friend ThomEncoding<N> operator+(const N& lhs, const ThomEncoding<N>& rhs) { return rhs + lhs; }
 	
 	/*
 	 * returns a thom encoding representing a number in the interval (lhs, rhs)
@@ -514,15 +509,6 @@ public:
 		os << "---------------------------------------------------" << std::endl;
 	}
 	
-	template<typename N>
-	friend std::ostream& operator<<(std::ostream& os, const ThomEncoding<N>& rhs) {
-		os << rhs.mP << " in " << rhs.mMainVar << ", " << rhs.mSc << "(" << rhs.mRelevant << ")";
-		if(rhs.dimension() > 1) {
-			os << " OVER " << rhs.point();
-		}
-		return os;
-	}
-	
 }; // class ThomEncoding
 
 
@@ -569,6 +555,17 @@ bool operator==(const N& lhs, const ThomEncoding<N>& rhs) { return rhs == lhs; }
 template<typename N>
 bool operator!=(const N& lhs, const ThomEncoding<N>& rhs) { return rhs != lhs; }
 
+template<typename N>
+ThomEncoding<N> operator+(const N& lhs, const ThomEncoding<N>& rhs) { return rhs + lhs; }
+
+template<typename N>
+std::ostream& operator<<(std::ostream& os, const ThomEncoding<N>& rhs) {
+	os << rhs.polynomial() << " in " << rhs.mainVar() << ", " << rhs.signCondition();
+	if(rhs.dimension() > 1) {
+		os << " OVER " << rhs.point();
+	}
+	return os;
+}
 
 } // namespace carl
 
