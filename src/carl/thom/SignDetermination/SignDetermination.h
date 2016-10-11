@@ -345,7 +345,7 @@ private:
 		std::list<SignCondition> newSigns;
 		adaHelper = std::list<uint>(mSigns.size(), 0);
 		long k = 0;
-		for(long i = 0; i < currSigns.size(); i++) {
+		for(long i = 0; i < long(currSigns.size()); i++) {
 			auto helper_it = adaHelper.begin();
 			for(const auto& sigma : mSigns) {
 				if ((std::round(c(k))) != 0) {
