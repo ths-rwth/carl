@@ -14,7 +14,7 @@ namespace carl {
 /**
  * This class represents the sign of a number \f$n\f$.
  */
-enum class Sign {
+enum class Sign: int {
 	/// Indicates that \f$n < 0\f$.
 	NEGATIVE = -1,
 	/// Indicates that \f$n = 0\f$.

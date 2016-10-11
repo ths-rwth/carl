@@ -136,7 +136,7 @@ private:
         bool getCached(const Polynomial& p, QueryResultType& res) const {
                 auto it = mCache.find(p.normalize());
                 if(it != mCache.end()) {
-                        res = sgn(p.lcoeff()) * (it->second);
+						res = int(sgn(p.lcoeff())) * (it->second);
                         return true;
                 }
                 return false;
@@ -146,7 +146,7 @@ private:
          * writes normalized p with correspoding result in cache
          */
         void cache(const Polynomial& p, const QueryResultType res) const {
-                mCache.insert(std::make_pair(p.normalize(), sgn(p.lcoeff()) * res));
+                mCache.insert(std::make_pair(p.normalize(), int(sgn(p.lcoeff())) * res));
         }
         
 }; // class TarskiQueryManager
