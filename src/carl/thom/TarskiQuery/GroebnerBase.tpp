@@ -14,16 +14,18 @@ template<typename Number>
 bool GroebnerBase<Number>::hasFiniteMon() const {
         std::set<Variable> vars = this->gatherVariables();
         std::vector<typename GroebnerBase<Number>::Monomial> lmons = this->cor();
-        for(const auto& v : vars) {
-                for(const auto& m : lmons) {
-                        assert(isOne(m.coeff()));
-                        if(m.hasNoOtherVariable(v)) {
-                                vars.erase(v);
-                                break;
-                        }
-                }
-        }
-        return vars.empty();
+		for (auto it = vars.begin(); it != vars.end();) {
+			bool found = true;
+			for (const auto& m : lmons) {
+				assert(isOne(m.coeff()));
+				if (m.hasNoOtherVariable(*it)) {
+					found = false;
+					break;
+				}
+			}
+			if (found) return false;
+		}
+		return true;
 }
         
         
