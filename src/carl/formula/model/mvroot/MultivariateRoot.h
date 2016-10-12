@@ -60,7 +60,7 @@ public:
 		auto roots = rootfinder::realRoots(unipoly);
 		assert(roots.size() >= mK);
 		auto it = roots.begin();
-		std::advance(it, mK-1);
+		std::advance(it, long(mK)-1);
 		CARL_LOG_DEBUG("carl.multivariateroot", "Result is " << *it);
 		return *it;
 	}
