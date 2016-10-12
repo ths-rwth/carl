@@ -76,7 +76,12 @@ public:
 		return (uint)res;
 	}
 	
-	inline const std::list<Polynomial>& processedPolynomials() const { return mP; }
+	const auto& processedPolynomials() const { return mP; }
+	const auto& signs() const { return mSigns; }
+	const auto& products() const { return mProducts; }
+	const auto& adaptedList() const { return mAda; }
+	const auto& matrix() const { return mMatrix; }
+	bool needsUpdate() const { return mNeedsUpdate(); }
 	
 	
 private:
@@ -407,25 +412,21 @@ public:
 		for(; first != last; first++) getSignsAndAdd(*first);
 		return mSigns;
 	}
-	
-	template<typename N>
-	friend std::ostream& operator<<(std::ostream& os, const SignDetermination<N>& rhs) {
-		os << "\n---------------------------------------------------------------------" << std::endl;
-		os << "Status of sign determination object:" << std::endl;
-		os << "---------------------------------------------------------------------" << std::endl;
-		os << "processed polynomials:\t\t" << rhs.mP << std::endl;
-		os << "sign conditions:\t\t" << rhs.mSigns << std::endl;
-		os << "adapted list:\t\t\t" << rhs.mAda << std::endl;
-		os << "products:\t\t\t" << rhs.mProducts << std::endl;
-		os << "matrix dimension:\t\t" << rhs.mMatrix.rows() << " x " << rhs.mMatrix.cols() << std::endl;
-		os << "ada helper:\t\t\t" << rhs.mAdaHelper << std::endl;
-		os << "needs update:\t\t\t" << rhs.mNeedsUpdate << std::endl;
-		os << "---------------------------------------------------------------------" << std::endl;
-		return os;
-	}
-	
 }; // class SignDetermination
 
-
+template<typename N>
+std::ostream& operator<<(std::ostream& os, const SignDetermination<N>& rhs) {
+	os << "\n---------------------------------------------------------------------" << std::endl;
+	os << "Status of sign determination object:" << std::endl;
+	os << "---------------------------------------------------------------------" << std::endl;
+	os << "processed polynomials:\t\t" << rhs.processedPolynomials() << std::endl;
+	os << "sign conditions:\t\t" << rhs.signs() << std::endl;
+	os << "adapted list:\t\t\t" << rhs.adaptedList() << std::endl;
+	os << "products:\t\t\t" << rhs.products() << std::endl;
+	os << "matrix dimension:\t\t" << rhs.matrix().rows() << " x " << rhs.matrix().cols() << std::endl;
+	os << "needs update:\t\t\t" << rhs.needsUpdate() << std::endl;
+	os << "---------------------------------------------------------------------" << std::endl;
+	return os;
+}
 	
 } // namespace carl
