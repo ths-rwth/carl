@@ -81,7 +81,7 @@ public:
 	const auto& products() const { return mProducts; }
 	const auto& adaptedList() const { return mAda; }
 	const auto& matrix() const { return mMatrix; }
-	bool needsUpdate() const { return mNeedsUpdate(); }
+	bool needsUpdate() const { return mNeedsUpdate; }
 	
 	
 private:
