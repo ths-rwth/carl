@@ -46,16 +46,14 @@ matrix:
       env: USE=g++-5
     - os: linux
       env: USE=g++-6
-#    - os: linux
-#      env: USE=g++-6
     - os: linux
       env: USE=clang++-3.6
     - os: linux
       env: USE=clang++-3.7
     - os: linux
       env: USE=clang++-3.8
-    - os: linux
-      env: USE=clang++-3.9
+#    - os: linux
+#      env: USE=clang++-3.9
     - os: linux
       env: USE=clang++-3.6 TASK=doxygen
     - os: osx
