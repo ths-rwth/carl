@@ -1,6 +1,6 @@
 
 
-%module ModConstraint
+%module ConstraintRationalT
 %{
 #include <carl/formula/Constraint.h>
 #include <carl/core/SimpleConstraint.h>

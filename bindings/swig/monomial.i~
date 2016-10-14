@@ -1,7 +1,7 @@
 
 
 
-%module ModMonomial
+%module MonomialT
 %{
 #include <carl/core/Monomial.h>
 #include <carl/core/Term.h>
@@ -32,17 +32,28 @@ typedef long unsigned int size_t;  //this should be okay for 64 bits at least
 
 typedef unsigned int uint;
 
+
+
+
+
+
 %import "variable.i"
 %import "term.i"
 %import "polynomial.i"
 %import "rationalfunction.i"
 
-typedef std::pair<carl::Variable,uint> VarIntPair;
-%include "std_pair.i"
-%include "std_vector.i"
+
+
+
 %include "std_shared_ptr.i"
 %shared_ptr(carl::Monomial);
-
+%include "std_pair.i"
+%include "std_vector.i"
+typedef std::pair<carl::Variable,uint> VarIntPair;
+namespace std {
+ %template(VarIntPair) pair<carl::Variable,uint>;
+ %template(VarIntPairVector) vector<VarIntPair>;
+}
 
 typedef carl::Term<Rational> Term;
 
@@ -51,10 +62,7 @@ typedef carl::RationalFunction<Polynomial> RationalFunction;
 
 
 
-namespace std {
- %template(VarIntPair) pair<carl::Variable,uint>;
- %template(VarIntPairVector) vector<VarIntPair>;
-}
+
 
 
 

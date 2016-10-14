@@ -1,6 +1,6 @@
 
 
-%module ModPolynomial
+%module PolynomialT
 %{
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/RationalFunction.h>
@@ -21,9 +21,11 @@ typedef std::pair<carl::Variable,uint> VarIntPair;
 
 
 %include "std_string.i"
+%include "std_vector.i"
 
-
-
+namespace std {
+ %template(VarVector) vector<carl::Variable>;
+}
 
 //TODO: for 32 bit support this has to be changed..
 //%import <stddef> //for size_t maybe?
@@ -36,13 +38,11 @@ typedef long unsigned int size_t;  //this should be okay for 64 bits at least
 %import "rationalfunction.i"
 
 
-%include "std_vector.i"
+
 typedef mpq_class Rational;
 typedef carl::RationalFunction<Polynomial> RationalFunction;
 
-namespace std {
- %template(VarVector) vector<carl::Variable>;
-}
+
 
 namespace carl {
 
@@ -51,7 +51,7 @@ class MultivariatePolynomial
 {
 public:
 typedef Coeff CoeffType;
-typedef Coeff NumberType; //ATTENTION: This is only correct, if polynomials are never instantiated with a type that's not a number
+typedef Coeff NumberType; //ATTENTION: This is only correct if polynomials are never instantiated with a type that's not a number
 explicit MultivariatePolynomial(const carl::Term<Coeff>& t);
 explicit MultivariatePolynomial(const std::shared_ptr<const carl::Monomial>& m);
 explicit MultivariatePolynomial(Variable::Arg v);

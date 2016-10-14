@@ -1,6 +1,6 @@
 
 
-%module ModRational 
+%module Rational 
 %{
 #include <carl/core/Monomial.h>
 #include <carl/core/Term.h>

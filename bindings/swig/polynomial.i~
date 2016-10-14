@@ -1,6 +1,6 @@
 
 
-%module ModPolynomial
+%module PolynomialT
 %{
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/RationalFunction.h>

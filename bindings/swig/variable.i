@@ -1,5 +1,5 @@
 
-%module ModVariable
+%module VariableT
 %{
 #include <carl/core/Variable.h>
 #include <carl/core/Monomial.h>
@@ -49,9 +49,9 @@ namespace carl {
 %include "enums.swg"
 %javaconst(1);
 //maybe also define the toString for this enum, if needed
-enum VariableType { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, VT_BITVECTOR = 4, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_BITVECTOR};
+//enum VariableType { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, VT_BITVECTOR = 4, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_BITVECTOR};
 
-
+enum class VariableType { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, VT_BITVECTOR = 4, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_BITVECTOR, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
 
 
 

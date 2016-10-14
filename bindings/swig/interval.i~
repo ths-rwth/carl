@@ -2,7 +2,7 @@
 
 
 
-%module IntervalMod
+%module IntervalRationalT
 %{
 #include <carl/interval/Interval.h>
 
@@ -18,11 +18,11 @@ typedef unsigned int uint;
 namespace carl {
 
 
-%include "enums.swg"
-%javaconst(1);
+//%include "enums.swg"
+//%javaconst(1);
 
 
-enum BoundType {
+enum class BoundType {
         /// the given bound is compared by a strict ordering relation
         STRICT=0,
         /// the given bound is compared by a weak ordering relation

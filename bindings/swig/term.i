@@ -1,5 +1,5 @@
 
-%module ModTerm 
+%module TermRationalT 
 %{
 #include <carl/core/Term.h>
 #include <carl/core/MultivariatePolynomial.h>

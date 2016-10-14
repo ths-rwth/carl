@@ -2,7 +2,7 @@
 
 
 
-%module ModFactorizedPolynomial
+%module FactorizedPolynomialRational
 %{
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/FactorizedPolynomial.h>

@@ -1,6 +1,6 @@
 
 
-%module ModFormula
+%module FormulaPolynomialT
 %{
 #include <carl/formula/Formula.h>
 #include <carl/formula/Constraint.h>
@@ -103,9 +103,9 @@ template<typename Pol> class Formula {
         Formula(carl::FormulaPool<Pol>::getInstance().create(_type, std::move(Formula(_subformula))))
     {}
 
-    explicit Formula( carl::FormulaType _type, const std::vector<Formula<Pol>>& _subasts  ):
-        Formula( carl::FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
-    {}
+    //explicit Formula( carl::FormulaType _type, const std::vector<Formula<Pol>>& _subasts  ):
+    //    Formula( carl::FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
+    //{}
 
 //Apparently satisfiedBy no longer exists
     //unsigned satisfiedBy( const carl::EvaluationMap<typename Pol::NumberType>& _assignment ) const;
