@@ -1,5 +1,8 @@
 
 
+SWIG_JAVABODY_PROXY(public, public, SWIGTYPE)
+SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
+
 %module FormulaPolynomialT
 %{
 #include <carl/formula/Formula.h>
@@ -27,6 +30,9 @@ typedef std::vector<FormulaPolynomial> FormulaVector;
 
 
 %}
+
+
+
 
 %import "constraint.i"
 
