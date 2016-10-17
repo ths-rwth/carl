@@ -2,6 +2,10 @@
 
 namespace carl {
 
+
+//TODO: was ist der Unterschied zwischen den einstelligen und zweistelligen Operatoren und welche brauchen wir?
+//      auch bei Sachen wie gcd, soll das innerhalb oder außerhalb der Klasse sein?
+
 	template<typename T>
 	class BaseNumber {
 	protected:
@@ -257,7 +261,9 @@ inline mpz_class& div_assign(mpz_class& a, const mpz_class& b) {
 		//TODO: this...
 		Number(const Number<mpz_class>& a,const Number<mpz_class>& b) {}
 
-		//TODO: conversion constructors
+		//TODO: these conversion constructors
+		Number(const Number<mpz_class>& n);
+		Number(const mpz_class& n);
 		
 
 		//NOTE: isZero, isOne are exactly the same as for mpz_class!!
@@ -279,6 +285,9 @@ inline mpz_class& div_assign(mpz_class& a, const mpz_class& b) {
 		inline bool isNegative() {
 			return mData < carl::constant_zero<mpq_class>().get();
 		}
+
+
+
 
 		inline Number<mpz_class> getNum() {
 			return Number<mpz_class>(mData.get_num());
