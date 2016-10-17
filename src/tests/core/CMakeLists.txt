@@ -18,6 +18,7 @@ add_executable(runCoreTests
         Test_FactorizedPolynomial.cpp
 		Test_MultivariateRoot.cpp
 		Test_RationalFunction.cpp
+		Test_SMTLIBStream.cpp
         #Test_TaylorExpansion.cpp
         #Test_Constraint.cpp
 )
