@@ -10,6 +10,7 @@
 # # # # # # # # # # # # # # # # # # # # # #
 
 cmake_minimum_required (VERSION 3.0 FATAL_ERROR)
+cmake_policy(VERSION 3.1)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # A. Project properties
