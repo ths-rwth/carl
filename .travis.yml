@@ -61,7 +61,7 @@ matrix:
       env: USE=clang++-3.6 TASK=doxygen
     - os: osx
       osx_image: xcode6.4
-      env: USE=clang++-3.5
+      env: USE=clang++-3.8
     - os: osx
       osx_image: xcode7.3
       env: USE=clang++-3.8
