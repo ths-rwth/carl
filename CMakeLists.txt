@@ -10,7 +10,9 @@
 # # # # # # # # # # # # # # # # # # # # # #
 
 cmake_minimum_required (VERSION 3.0 FATAL_ERROR)
-cmake_policy(VERSION 3.1)
+if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.0)
+	cmake_policy(VERSION 3.1)
+endif()
 
 # # # # # # # # # # # # # # # # # # # # # #
 # A. Project properties
