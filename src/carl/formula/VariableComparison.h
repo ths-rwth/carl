@@ -22,6 +22,7 @@ namespace carl {
 		Variable mVar;
 		boost::variant<MR, RAN> mValue;
 		Relation mRelation;
+		bool mNegated;
 		struct ValueToModelValue: public boost::static_visitor<ModelValue<Number,Poly>> {
 			ModelValue<Number,Poly> operator()(const MR& mr) const {
 				return mr;
@@ -39,9 +40,9 @@ namespace carl {
 			}
 		};
 	protected:
-		VariableComparison(Variable::Arg v, const boost::variant<MR, RAN>& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {}
+		VariableComparison(Variable::Arg v, const boost::variant<MR, RAN>& value, Relation rel, bool neg): mVar(v), mValue(value), mRelation(rel), mNegated(neg) {}
 	public:	
-		VariableComparison(Variable::Arg v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {
+		VariableComparison(Variable::Arg v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {
 			if (value.isUnivariate()) {
 				auto res = value.evaluate({});
 				if (res) {
@@ -50,7 +51,7 @@ namespace carl {
 				}
 			}
 		}
-		VariableComparison(Variable::Arg v, const RAN& value, Relation rel): mVar(v), mValue(value), mRelation(rel) {}
+		VariableComparison(Variable::Arg v, const RAN& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {}
 		
 		Variable var() const {
 			return mVar;
@@ -58,23 +59,27 @@ namespace carl {
 		Relation relation() const {
 			return mRelation;
 		}
+		bool negated() const {
+			return mNegated;
+		}
 		ModelValue<Number,Poly> value() const {
 			return boost::apply_visitor(ValueToModelValue(), mValue);
 		}
 		boost::optional<Constraint<Poly>> asConstraint() const {
+			Relation rel = negated() ? inverse(mRelation) : mRelation;
 			auto v = value();
 			if (!v.isRAN()) {
 				const MR& mr = boost::get<MR>(mValue);
 				if (mr.poly().degree(mr.var()) == 1 && mr.poly().lcoeff(mr.var()).isOne()) {
-					return Constraint<Poly>(Poly(mVar) + mr.poly().coeff(mr.var(), 0), mRelation);
+					return Constraint<Poly>(Poly(mVar) + mr.poly().coeff(mr.var(), 0), rel);
 				}
 				return boost::none;
 			}
 			if (!v.asRAN().isNumeric()) return boost::none;
-			return Constraint<Poly>(Poly(mVar) - Poly(v.asRAN().value()), mRelation);
+			return Constraint<Poly>(Poly(mVar) - Poly(v.asRAN().value()), rel);
 		}
 		VariableComparison negation() const {
-			return VariableComparison(mVar, mValue, inverse(mRelation));
+			return VariableComparison(mVar, mValue, mRelation, !mNegated);
 		}
 		void collectVariables(Variables& vars) const {
 			vars.insert(mVar);
@@ -84,12 +89,14 @@ namespace carl {
 		
 		std::string toString(unsigned = 0, bool = false, bool = true) const {
 			std::stringstream ss;
-			ss << "(" << mRelation << " " << mVar << " " << mValue << ")";
+			if (negated()) ss << "(not ";
+			ss << "(" << relation() << " " << var() << " " << mValue << ")";
+			if (negated()) ss << ")";
 			return ss.str();
 		}
 		
 		bool operator==(const VariableComparison& vc) const {
-			return mRelation == vc.mRelation && mVar == vc.mVar && mValue == vc.mValue;
+			return mRelation == vc.mRelation && mVar == vc.mVar && mValue == vc.mValue && mNegated == vc.mNegated;
 		}
 	};
 	template<typename Poly>
