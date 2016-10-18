@@ -10,7 +10,7 @@ TEST(SMTLIBStream, Base)
 {
 
 	carl::Variable x = carl::freshRealVariable("x");
-	carl::SMTLIBStream sls(std::cout);
+	carl::SMTLIBStream sls;
 	//sls << x;
 	
 	auto mon = x*x*x;
@@ -20,7 +20,8 @@ TEST(SMTLIBStream, Base)
 	carl::UnivariatePolynomial<Rational> up(x, {r*r*r, r*r, r});
 	carl::MultivariatePolynomial<Rational> mp = Rational(r*r)*x*x + r*x + r;
 
-	sls << mp << std::endl;;
+	sls << mp << std::endl;
+	std::cout << sls << std::endl;
 	std::cout << mp << std::endl;
 
 

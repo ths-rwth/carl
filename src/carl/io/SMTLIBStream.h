@@ -10,11 +10,14 @@
 #include "../formula/Sort.h"
 
 #include <iostream>
+#include <sstream>
 #include <type_traits>
 
 namespace carl {
 
-class SMTLIBStream: public std::ostream {
+class SMTLIBStream {
+private:
+	std::stringstream mStream;
 	
 	void declare(const Sort& s) {
 		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
@@ -118,15 +121,10 @@ class SMTLIBStream: public std::ostream {
 	
 	template<typename T>
 	void write(T&& t) {
-		static_cast<std::ostream&>(*this) << t;
+		mStream << t;
 	}
 	
 public:
-	
-	SMTLIBStream(std::ostream& base) {
-		rdbuf(base.rdbuf());
-	}
-	
 	template<typename T>
 	SMTLIBStream& operator<<(T&& t) {
 		write(static_cast<const std::decay_t<T>&>(t));
@@ -135,9 +133,16 @@ public:
 	//
 	SMTLIBStream& operator<<(std::ostream& (*os)(std::ostream&)) {
 		write(os);
-        return *this;
-    }
+		return *this;
+	}
+	
+	const auto& content() const {
+		return mStream.rdbuf();
+	}
 };
 
+std::ostream& operator<<(std::ostream& os, const SMTLIBStream& ss) {
+	return os << ss.content();
+}
 
 }
