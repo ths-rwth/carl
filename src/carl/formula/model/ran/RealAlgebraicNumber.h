@@ -192,6 +192,12 @@ public:
 		return mIR->polynomial;
 	}
 	
+	RealAlgebraicNumber changeVariable(Variable::Arg v) const {
+		if (isNumeric()) return *this;
+		assert(isInterval());
+		return RealAlgebraicNumber<Number>(mIR->polynomial.replaceVariable(v), mIR->interval, mIsRoot);
+	}
+	
 	Sign sgn() const {
 		if (isNumeric()) {
 			return carl::sgn(mValue);
