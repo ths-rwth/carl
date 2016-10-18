@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+#endif
+
+
+
 namespace carl {
 
 
@@ -20,11 +26,12 @@ namespace carl {
 		explicit BaseNumber(T&& t): mData(std::move(t)) {}
 		BaseNumber(const BaseNumber<T>& n): mData(n.mData) {}
 		BaseNumber(BaseNumber<T>&& n) noexcept : mData(std::move(n.mData)) {}
-		BaseNumber(long long int n) : mData(n) {}
-		BaseNumber(unsigned long long int n): mData(n) {}
+		//TODO: is this really the best way? one could also create an mpz_class, multiply it by 10^whatever and add the rest...
+		BaseNumber(long long int n) { std::string s = std::to_string(n); mData = mpq_class(s); }
+		BaseNumber(unsigned long long int n) { std::string s = std::to_string(n); mData= mpq_class(s); }
 		BaseNumber(const std::string& s) : mData(s) {}
 
-		const T& getNumber() {
+		const T& getNumber() const {
 			return mData;
 		};
 
@@ -58,7 +65,7 @@ namespace carl {
 
 
 	template<>
-	class Number<mpz_class> : BaseNumber<mpz_class> {
+	class Number<mpz_class> : public BaseNumber<mpz_class> {
 	public:
 	
 
@@ -67,6 +74,9 @@ namespace carl {
 		explicit Number(mpz_class&& t): BaseNumber(t) {}
 		Number(const Number<mpz_class>& n): BaseNumber(n) {}
 		Number(Number<mpz_class>&& n) noexcept : BaseNumber(n) {}
+		Number(long long int n) : BaseNumber(n) {}
+		Number(unsigned long long int n): BaseNumber(n) {}
+		Number(const std::string& s) : BaseNumber(s) {}
 
 
 	
@@ -242,7 +252,7 @@ inline mpz_class& div_assign(mpz_class& a, const mpz_class& b) {
 
 
 	template<>
-	class Number<mpq_class> : BaseNumber<mpq_class> {
+	class Number<mpq_class> : public BaseNumber<mpq_class> {
 	public:
 
 		Number(): BaseNumber() {}
@@ -250,6 +260,9 @@ inline mpz_class& div_assign(mpz_class& a, const mpz_class& b) {
 		explicit Number(mpq_class&& t): BaseNumber(t) {}
 		Number(const Number<mpq_class>& n): BaseNumber(n) {}
 		Number(Number<mpq_class>&& n) noexcept : BaseNumber(n) {}
+		Number(long long int n) : BaseNumber(n) {}
+		Number(unsigned long long int n): BaseNumber(n) {}
+
 
 		//TODO: explicit or not?
 		Number(float f) { mData = mpq_class(f); }
@@ -258,12 +271,11 @@ inline mpz_class& div_assign(mpz_class& a, const mpz_class& b) {
 		Number(const std::string& s);
 
 		//constructs a/b:
-		//TODO: this...
-		Number(const Number<mpz_class>& a,const Number<mpz_class>& b) {}
+		Number(const Number<mpz_class>& a,const Number<mpz_class>& b) { mData = mpq_class(a.getNumber(),b.getNumber()); }
 
-		//TODO: these conversion constructors
-		Number(const Number<mpz_class>& n);
-		Number(const mpz_class& n);
+	
+		Number(const Number<mpz_class>& n) { mData = mpq_class(n.getNumber()); }
+		Number(const mpz_class& n) { mData = mpq_class(n); }
 		
 
 		//NOTE: isZero, isOne are exactly the same as for mpz_class!!
@@ -516,6 +528,220 @@ inline mpz_class& div_assign(mpz_class& a, const mpz_class& b) {
 
 
 
+
+
+
+
+//***************************************************************   CLN:
+
+
+#ifdef USE_CLN_NUMBERS
+
+	template<>
+	class Number<cln::cl_I> : public BaseNumber<cln::cl_I> {
+	public:
+
+		Number(): BaseNumber() {}
+		explicit Number(const cln::cl_I& t): BaseNumber(t) {}
+		explicit Number(cln::cl_I&& t): BaseNumber(t) {}
+		Number(const Number<cln::cl_I>& n): BaseNumber(n) {}
+		Number(Number<cln::cl_I>&& n) noexcept : BaseNumber(n) {}
+		Number(long long int n) : BaseNumber(n) {}
+		Number(unsigned long long int n): BaseNumber(n) {}
+		Number(const std::string& s) : BaseNumber(s) {}
+
+		//TODO: conversion constructors etc
+	
+		//could probably be implemented the same way as for mpq, mpz
+		inline bool isZero() {
+			return zerop(mData);
+		}
+
+
+		
+		//these 3 methods are the same as for mpq, mpz
+		inline bool isOne() {
+			return mData == carl::constant_one<cln::cl_I>().get();
+		}
+
+
+		inline bool isPositive() {
+			return mData > carl::constant_zero<cln::cl_RA>().get();
+		}
+
+
+
+		inline bool isNegative() {
+			return mData < carl::constant_zero<cln::cl_RA>().get();
+		}
+
+
+
+
+
+		/**
+		 * Check if a number is integral.
+		 * As cln::cl_I are always integral, this method returns true.
+		 * @param An integer.
+		 * @return true.
+		 */
+
+		//this is the same as for mpz
+		inline bool isInteger() {
+			return true;
+		}
+
+
+		/**
+		 * Get the bit size of the representation of a integer.
+		 * @param n An integer.
+		 * @return Bit size of n.
+		 */
+		inline std::size_t bitsize() {
+			return cln::integer_length(mData);
+		}
+
+
+		/**
+		 * Converts the given integer to a double.
+		 * @param n An integer.
+		 * @return Double.
+		 */
+		inline double toDouble() {
+			return cln::double_approx(mData);
+		}
+
+		template<typename Integer>
+		inline Integer toInt();
+
+		/**
+		 * Get absolute value of an integer.
+		 * @param n An integer.
+		 * @return \f$|n|\f$.
+		 */
+		inline Number<cln::cl_I> abs() {
+			return Number(cln::abs(mData));
+		}
+
+		/*
+		 * Calculate the greatest common divisor of two integers.
+		 * @param a First argument.
+		 * @param b Second argument.
+		 * @return Gcd of a and b.
+		 */
+		inline Number<cln::cl_I> gcd(const Number<cln::cl_I>& b) {
+			return Number(cln::gcd(mData,b.mData));
+		}
+
+
+		/**
+		 * Calculate the least common multiple of two integers.
+		 * @param a First argument.
+		 * @param b Second argument.
+		 * @return Lcm of a and b.
+		 */
+		inline Number<cln::cl_I> lcm(const Number<cln::cl_I>& b) {
+			return Number(cln::lcm(mData,b.mData));
+		}
+
+
+
+
+		/**
+		 * Calculate the remainder of the integer division.
+		 * @param a First argument.
+		 * @param b Second argument.
+		 * @return \f$a \% b\f$.
+		 */
+		inline Number<cln::cl_I> mod(const Number<cln::cl_I>& b) {
+			return Number(cln::rem(mData, b.mData));
+		}
+
+
+		/**
+		 * Divide two integers.
+		 * Asserts that the remainder is zero.
+		 * @param a First argument.
+		 * @param b Second argument.
+		 * @return \f$ a / b \f$.
+		 */
+		inline Number<cln::cl_I> div(const Number<cln::cl_I>& b) {
+			assert(cln::mod(mData, b.mData) == 0);
+			return Number(cln::exquo(mData, b.mData));
+		}
+
+
+
+
+		/**
+		 * Divide two integers.
+		 * Discards the remainder of the division.
+		 * @param a First argument.
+		 * @param b Second argument.
+		 * @return \f$ a / b \f$.
+		 */
+		inline Number<cln::cl_I> quotient(const Number<cln::cl_I>& b)
+		{
+			return Number(cln::exquo(mData - cln::rem(mData, b.mData), b.mData));
+		}
+
+
+		/**
+		 * Calculate the remainder of the integer division.
+		 * @param a First argument.
+		 * @param b Second argument.
+		 * @return \f$a \% b\f$.
+		 */
+		inline Number<cln::cl_I> remainder(const Number<cln::cl_I>& b) {
+			return Number(cln::rem(mData, b.mData));
+		}
+
+
+		/**
+		 * Divide two integers.
+		 * Discards the remainder of the division.
+		 * @param a First argument.
+		 * @param b Second argument.
+		 * @return \f$ a / b \f$.
+		 */
+		inline Number<cln::cl_I> operator/(const Number<cln::cl_I>& b)
+		{
+			return this->quotient(b);
+		}
+		inline Number<cln::cl_I> operator/(const int& rhs) {
+			return Number(mData / cln::cl_I(rhs));
+		}
+
+		std::string toString(bool _infix=true);
+	};
+
+
+	//template specializations of member-functions of Number<cln::cl_I>
+	template<>
+	inline sint Number<cln::cl_I>::toInt<sint>() {
+	    assert(mData <= std::numeric_limits<sint>::max());
+	    assert(mData >= std::numeric_limits<sint>::min());
+	    return cln::cl_I_to_long(mData);
+	}
+	template<>
+	inline uint Number<cln::cl_I>::toInt<uint>() {
+	    assert(mData <= std::numeric_limits<uint>::max());
+	    assert(mData >= std::numeric_limits<uint>::min());
+	    return uint(cln::cl_I_to_long(mData));
+	}
+
+
+
+
+	template<>
+	class Number<cln::cl_RA> : public BaseNumber<cln::cl_RA> {
+	
+
+
+	};
+
+
+#endif
 
 
 

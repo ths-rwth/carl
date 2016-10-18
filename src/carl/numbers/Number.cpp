@@ -6,14 +6,14 @@
 namespace carl {
 
     template<>
-    class Number<mpz_class> : BaseNumber<mpz_class> {	
+    class Number<mpz_class> : public BaseNumber<mpz_class> {	
 
 	    std::string toString(bool _infix)
 	    {
 		std::stringstream s;
 		bool negative = this->isNegative();
 		if(negative) s << "(-" << (_infix ? "" : " ");
-		s << this->abs();
+		s << this->abs().mData;
 		if(negative)
 		    s << ")";
 		return s.str();
@@ -21,7 +21,7 @@ namespace carl {
     };
 
     template<>
-    class Number<mpq_class> : BaseNumber<mpq_class> {
+    class Number<mpq_class> : public BaseNumber<mpq_class> {
 
 	Number(const std::string& inputstring) {
 		std::vector<std::string> strs;
@@ -55,7 +55,7 @@ namespace carl {
 		{
 		    Number<mpz_class> d = this->getDenom();
 		    if(!d.isOne()) s << "(/ " << this->getNum().abs() << " " << d.abs() << ")";
-		    else s << this->abs();
+		    else s << this->abs().mData;
 		}
 		if(negative)
 		    s << ")";
@@ -152,6 +152,31 @@ namespace carl {
 	    }
 
     };
+
+    template<>
+    class Number<cln::cl_I> : public BaseNumber<cln::cl_I> {
+
+    	std::string toString(bool _infix)
+	{
+		std::stringstream s;
+		bool negative = (mData < cln::cl_I(0));
+		if(negative) s << "(-" << (_infix ? "" : " ");
+		s << this->abs().mData;
+		if(negative)
+		    s << ")";
+		return s.str();
+	}
+
+
+
+
+
+    };
+
+
+
+
+
 
 
 
