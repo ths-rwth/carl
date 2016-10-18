@@ -25,8 +25,8 @@ template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l);
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::list<T>& l);
-template<typename Key, typename Value>
-std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& m);
+template<typename Key, typename Value, typename Comparator>
+std::ostream& operator<<(std::ostream& os, const std::map<Key, Value, Comparator>& m);
 template<typename U, typename V>
 std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p);
 template<typename T, typename C>

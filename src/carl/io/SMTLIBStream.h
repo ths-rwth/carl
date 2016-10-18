@@ -136,7 +136,7 @@ public:
 		return *this;
 	}
 	
-	const auto& content() const {
+	auto content() const {
 		return mStream.rdbuf();
 	}
 };
