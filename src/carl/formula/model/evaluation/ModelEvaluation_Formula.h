@@ -73,6 +73,10 @@ namespace model {
 			// If assigned directly, the shared_ptr<Substitution> goes out of scope before the result is copied into cmp.
 			// Therefore, we start by copying the data and overwriting it afterwards.
 			auto res = cmp.asSubstitution()->evaluate(m);
+			if (res.isBool() && !res.asBool()) {
+				f = Formula<Poly>(FormulaType::FALSE);
+				return;
+			}
 			cmp = res;
 		}
 		if (cmp.isSubstitution()) return;
@@ -81,24 +85,25 @@ namespace model {
 		f = Formula<Poly>(FormulaType::FALSE);
 		switch (vc.relation()) {
 			case Relation::EQ:
-				if (reference == val) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference == val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::NEQ:
-				if (reference != val) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference != val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::LESS:
-				if (reference < val) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference < val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::LEQ:
-				if (reference <= val) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference <= val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::GREATER:
-				if (reference > val) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference > val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::GEQ:
-				if (reference >= val) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference >= val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 		}
+		if (vc.negated()) f = f.negated();
 	}
 	
 	/**
