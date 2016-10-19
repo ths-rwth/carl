@@ -88,7 +88,9 @@ namespace carl
 				const auto& subs = val.asSubstitution();
 				if (subs->dependsOn(it->first)) {
 					CARL_LOG_DEBUG("carl.formula.model", "Evaluating " << m.first << " ->  " << subs << " as " << it->first << " is removed from the model.");
-					m.second = subs->evaluate(*this);
+					// Prevent memory error due to deallocation in operator=()
+					auto tmp = subs->evaluate(*this);
+					m.second = tmp;
 				}
 			}
 			return mData.erase(it);
