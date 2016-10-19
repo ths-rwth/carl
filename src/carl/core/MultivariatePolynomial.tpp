@@ -85,7 +85,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(EnableIf
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Coeff& c) :
 Policies(),
-mTerms(c == (Coeff)0 ? 0 : 1,Term<Coeff>(c))
+mTerms(c == Coeff(0) ? 0 : 1, Term<Coeff>(c))
 {
 	mOrdered = true;
 	assert(this->isConsistent());

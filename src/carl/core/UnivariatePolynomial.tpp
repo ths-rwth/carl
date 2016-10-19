@@ -558,6 +558,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd(const UnivariatePol
 	// We want degree(b) <= degree(a).
 	assert(!a.isZero());
 	assert(!b.isZero());
+	assert(a.mainVar() == b.mainVar());
 	if(a.degree() < b.degree()) return gcd_recursive(b.normalized(),a.normalized()).normalized();
 	else return gcd_recursive(a.normalized(),b.normalized()).normalized();
 }
