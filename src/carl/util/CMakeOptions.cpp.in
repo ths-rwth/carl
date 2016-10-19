@@ -23,4 +23,8 @@ void printCMakeOptions(std::ostream& os) {
 	${VARLIST}
 }
 
+namespace cmakeoptions {
+${CMAKEOPTIONSEXPORT}
+}
+
 }

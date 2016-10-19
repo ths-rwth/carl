@@ -5,7 +5,7 @@
 #)
 
 # include util in library.
-#add_subdirectory(util)
+add_subdirectory(util)
 
 # Configure all .in files
 file(GLOB_RECURSE carl_lib_tpl "*.in")
