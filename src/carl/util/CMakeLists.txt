@@ -8,7 +8,7 @@ foreach (variableName ${variableNames})
 	get_property(TYPE CACHE ${variableName} PROPERTY TYPE)
 	if((NOT ${ISADV}) AND (NOT ${TYPE} MATCHES "INTERNAL") AND (NOT ${TYPE} MATCHES "STATIC"))
 		set(VARLIST "${VARLIST}\n\t p(\"${variableName}\", R\"VAR(${${variableName}})VAR\");")
-		set(CMAKEOPTIONSEXPORT "${CMAKEOPTIONSEXPORT}\n\tstatic constexpr auto ${variableName} = \"${${variableName}}\";")
+		set(CMAKEOPTIONSEXPORT "${CMAKEOPTIONSEXPORT}\n\tstatic constexpr auto _${variableName} = \"${${variableName}}\";")
 	endif()
 endforeach()
 
