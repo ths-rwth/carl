@@ -65,15 +65,19 @@ namespace carl {
 		ModelValue<Number,Poly> value() const {
 			return boost::apply_visitor(ValueToModelValue(), mValue);
 		}
+		bool isEquality() const {
+			return negated() ? relation() == Relation::NEQ : relation() == Relation::EQ;
+		}
 		boost::optional<Constraint<Poly>> asConstraint() const {
 			Relation rel = negated() ? inverse(mRelation) : mRelation;
 			auto v = value();
 			if (!v.isRAN()) {
 				const MR& mr = boost::get<MR>(mValue);
-				if (mr.poly().degree(mr.var()) == 1 && mr.poly().lcoeff(mr.var()).isOne()) {
-					return Constraint<Poly>(Poly(mVar) + mr.poly().coeff(mr.var(), 0), rel);
-				}
-				return boost::none;
+				if (mr.poly().degree(mr.var()) != 1) return boost::none;
+				auto lcoeff = mr.poly().coeff(mr.var(), 1);
+				if (!lcoeff.isConstant()) return boost::none;
+				auto ccoeff = mr.poly().coeff(mr.var(), 0);
+				return Constraint<Poly>(Poly(mVar) + ccoeff / lcoeff, rel);
 			}
 			if (!v.asRAN().isNumeric()) return boost::none;
 			return Constraint<Poly>(Poly(mVar) - Poly(v.asRAN().value()), rel);
@@ -89,9 +93,7 @@ namespace carl {
 		
 		std::string toString(unsigned = 0, bool = false, bool = true) const {
 			std::stringstream ss;
-			if (negated()) ss << "(not ";
-			ss << "(" << relation() << " " << var() << " " << mValue << ")";
-			if (negated()) ss << ")";
+			ss << "(" << (negated() ? "!" : "") << relation() << " " << var() << " " << mValue << ")";
 			return ss.str();
 		}
 		
