@@ -1,31 +1,13 @@
-#include "Number.h"
 
+#include "NumberMpq.h"
 
-//TODO: this file probably still has to be included in the build process
 
 namespace carl {
 
-    template<>
-    class Number<mpz_class> : public BaseNumber<mpz_class> {	
 
-	    std::string toString(bool _infix)
-	    {
-		std::stringstream s;
-		bool negative = this->isNegative();
-		if(negative) s << "(-" << (_infix ? "" : " ");
-		s << this->abs().mData;
-		if(negative)
-		    s << ")";
-		return s.str();
-	    }
-    };
-
-    template<>
-    class Number<mpq_class> : public BaseNumber<mpq_class> {
-
-	Number(const std::string& inputstring) {
+	Number<mpq_class>::Number(const std::string& s) {
 		std::vector<std::string> strs;
-		boost::split(strs, inputstring, boost::is_any_of("."));
+		boost::split(strs, s, boost::is_any_of("."));
 
 		if(strs.size() > 2)
 		{
@@ -45,7 +27,7 @@ namespace carl {
 	}
    
 
-	std::string toString(bool _infix)
+	std::string Number<mpq_class>::toString(bool _infix) const
 	{
 		std::stringstream s;
 		bool negative = (_number < mpq_class(0));
@@ -63,7 +45,7 @@ namespace carl {
 	}
 
 
-	 bool sqrt_exact(Number<mpq_class>& b)
+	 bool Number<mpq_class>::sqrt_exact(Number<mpq_class>& b)
 	    {
 		if( mpq_sgn(mData.__get_mp()) < 0 ) return false;
 		mpz_class den = mData.get_den();
@@ -92,12 +74,12 @@ namespace carl {
 		return true;
 	    }
 
-	    Number<mpq_class> sqrt() {
+	    Number<mpq_class> Number<mpq_class>::sqrt() {
 		auto r = this->sqrt_safe();
 		return (r.first + r.second) / 2;
 	    }
 
-	    std::pair<Number<mpq_class>,Number<mpq_class>> sqrt_safe()
+	    std::pair<Number<mpq_class>,Number<mpq_class>> Number<mpq_class>::sqrt_safe()
 	    {
 		assert( mpq_sgn(mData.__get_mp()) > 0 );
 		mpz_class den = mData.get_den();
@@ -129,7 +111,7 @@ namespace carl {
 		return std::make_pair(Number(lower),Number(upper));
 	    }
 
-	    std::pair<Number<mpq_class>, Number<mpq_class>> sqrt_fast()
+	    std::pair<Number<mpq_class>, Number<mpq_class>> Number<mpq_class>::sqrt_fast()
 	    {
 		assert(mData >= 0);
 	#if 1
@@ -151,33 +133,7 @@ namespace carl {
 	#endif
 	    }
 
-    };
-
-    template<>
-    class Number<cln::cl_I> : public BaseNumber<cln::cl_I> {
-
-    	std::string toString(bool _infix)
-	{
-		std::stringstream s;
-		bool negative = (mData < cln::cl_I(0));
-		if(negative) s << "(-" << (_infix ? "" : " ");
-		s << this->abs().mData;
-		if(negative)
-		    s << ")";
-		return s.str();
-	}
-
-
-
-
-
-    };
-
-
-
-
-
-
 
 
 }
+
