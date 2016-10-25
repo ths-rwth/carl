@@ -85,6 +85,9 @@ namespace carl {
 		VariableComparison negation() const {
 			return VariableComparison(mVar, mValue, mRelation, !mNegated);
 		}
+		VariableComparison invertRelation() const {
+			return VariableComparison(mVar, mValue, carl::inverse(mRelation), mNegated);
+		}
 		void collectVariables(Variables& vars) const {
 			vars.insert(mVar);
 			auto newVars = boost::apply_visitor(VariableCollector(), mValue);
