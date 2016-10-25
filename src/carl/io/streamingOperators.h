@@ -20,7 +20,6 @@
 
 namespace carl {
 
-/*
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l);
 template<typename T>
@@ -41,7 +40,6 @@ template<typename T, typename H, typename K, typename A>
 std::ostream& operator<<(std::ostream& os, const std::unordered_set<T, H, K, A>& s);
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::vector<T>& v);
-*/
 
 
 /**
