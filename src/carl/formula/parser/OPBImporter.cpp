@@ -5,7 +5,7 @@
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/fusion/include/std_pair.hpp>
-#include <boost/fusion/include/std_tuple.hpp>
+#include <boost/fusion/adapted/std_tuple.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 
