@@ -1,11 +1,13 @@
 #pragma once
 
+#include "../../core/logging.h"
+
+#include "../Formula.h"
+
 #include <iostream>
 #include <map>
 #include <vector>
 
-#include "../core/logging.h"
-#include "Formula.h"
 
 namespace carl {
 

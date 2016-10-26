@@ -6,7 +6,7 @@
 #include <string>
 
 #include "../Formula.h"
-#include "../core/logging.h"
+#include "../../core/logging.h"
 
 
 #ifdef USE_BOOST_REGEX
