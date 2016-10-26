@@ -49,7 +49,7 @@ void define_constraint(py::module& m) {
             return Formula(carl::FormulaType::XOR, {Formula(lhs), rhs});
         })
 
-        .def("satisfied_by", [](const Constraint& constraint, const carl::EvaluationMap<Rational>& evaluation) { return Formula(constraint).satisfiedBy(evaluation); })
+        //.def("satisfied_by", [](const Constraint& constraint, const carl::EvaluationMap<Rational>& evaluation) { return Formula(constraint).satisfiedBy(evaluation); })
 
         .def_property_readonly("relation", &Constraint::relation)
         .def_property_readonly("lhs", &Constraint::lhs)

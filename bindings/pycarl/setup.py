@@ -21,7 +21,7 @@ rpath = dist.get_option_dict('build_ext')['rpath'][1]
 # Configuration shared between external modules follows
 include_dirs = ['.', 'src', 'resources/pybind11/include']
 libraries = ['carl']
-extra_compile_args = ['-std=c++11']
+extra_compile_args = ['-std=c++14']
 extra_link_args = []
 # Mac OS X needs special treatment
 if platform.system() == 'Darwin':

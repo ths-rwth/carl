@@ -62,7 +62,7 @@ void define_formula(py::module& m) {
             return Formula(carl::FormulaType::XOR, {lhs, rhs});
         })
 
-        .def("satisfied_by", &Formula::satisfiedBy)
+        //.def("satisfied_by", &Formula::satisfiedBy)
 
        .def("__len__", &Formula::size)
        .def("__iter__", [](const Formula& f) { return py::make_iterator(f.begin(), f.end()); },
