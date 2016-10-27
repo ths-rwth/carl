@@ -36,7 +36,7 @@ namespace carl {
 		if (mIR == n.mIR) return true;
 		if (upper() <= n.lower()) return false;
 		if (lower() >= n.upper()) return false;
-		if (getPolynomial() == n.getPolynomial()) {
+		if (getIRPolynomial() == n.getIRPolynomial()) {
 			if (n.lower() <= lower()) {
 				if (upper() <= n.upper()) return true;
 				refineAvoiding(n.upper());
@@ -46,8 +46,9 @@ namespace carl {
 				refineAvoiding(n.lower());
 			}
 		} else {
-			assert(getPolynomial() != n.getPolynomial());
-			auto g = UnivariatePolynomial<Number>::gcd(getPolynomial(), n.getPolynomial());
+			assert(getIRPolynomial() != n.getIRPolynomial());
+			assert(getIRPolynomial().mainVar() == n.getIRPolynomial().mainVar());
+			auto g = UnivariatePolynomial<Number>::gcd(getIRPolynomial(), n.getIRPolynomial());
 			if (!isRootOf(g)) return false;
 			mIR->polynomial = g;
 			mIR->sturmSequence = g.standardSturmSequence();

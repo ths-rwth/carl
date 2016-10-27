@@ -178,17 +178,17 @@ public:
 		assert(isInterval());
 		return mIR->refinementCount;
 	}
-	const ran::IntervalContent<Number>& getIntervalContent() const {
-		return *mIR;
+	const Interval<Number>& getInterval() const {
+		assert(isInterval());
+		return mIR->interval;
 	}
 	const Number& lower() const {
-		assert(isInterval());
-		return mIR->interval.lower();
+		return getInterval().lower();
 	}
 	const Number& upper() const {
-		return mIR->interval.upper();
+		return getInterval().upper();
 	}
-	const Polynomial& getPolynomial() const {
+	const Polynomial& getIRPolynomial() const {
 		assert(!isNumeric());
 		assert(isInterval());
 		return mIR->polynomial;
@@ -293,7 +293,7 @@ public:
 template<typename Num>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
 	if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";
-	else if (ran.isInterval()) return os << "(IR " << ran.getIntervalContent().interval << ", " << ran.getPolynomial() << (ran.isRoot() ? " R" : "") << ")";
+	else if (ran.isInterval()) return os << "(IR " << ran.getInterval() << ", " << ran.getIRPolynomial() << (ran.isRoot() ? " R" : "") << ")";
 	else if (ran.isThom()) return os << "(TE " << ran.getThomEncoding() << (ran.isRoot() ? " R" : "") << ")";
 	else return os << "(RAN)";
 }

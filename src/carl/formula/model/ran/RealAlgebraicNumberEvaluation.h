@@ -191,7 +191,7 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 			if (it->second.isNumeric()) {
 				return evaluate(p, m);
 			} else if (it->second.isInterval()) {
-				varToInterval[it->first] = it->second.getIntervalContent().interval;
+				varToInterval[it->first] = it->second.getInterval();
 			} else {
 				CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
 			}
@@ -215,9 +215,9 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 		if (i.second.isNumeric()) {
 			tmp.substituteIn(i.first, Coeff(i.second.value()));
 		} else if (i.second.isInterval()) {
-			UnivariatePolynomial<Coeff> p2(i.first, i.second.getPolynomial().template convert<Coeff>().coefficients());
+			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
 			tmp = tmp.switchVariable(i.first).resultant(p2);
-			varToInterval[i.first] = i.second.getIntervalContent().interval;
+			varToInterval[i.first] = i.second.getInterval();
 		} else {
 			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
 		}
