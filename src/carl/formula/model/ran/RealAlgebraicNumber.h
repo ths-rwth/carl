@@ -18,6 +18,8 @@ template<typename Number>
 class RealAlgebraicNumber {
 private:
 	friend std::hash<RealAlgebraicNumber<Number>>;
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream&, const RealAlgebraicNumber<Num>&);
 	using IntervalContent = ran::IntervalContent<Number>;
 	using Polynomial = typename IntervalContent::Polynomial;
 	
@@ -215,17 +217,7 @@ public:
 		if (isNumeric()) {
 			return carl::sgn(p.evaluate(mValue));
 		} else if (isInterval()){
-			if (mIR->polynomial == p) return Sign::ZERO;
-			auto seq = mIR->polynomial.standardSturmSequence(mIR->polynomial.derivative() * p);
-			int variations = Polynomial::countRealRoots(seq, mIR->interval);
-			assert((variations == -1) || (variations == 0) || (variations == 1));
-			switch (variations) {
-				case -1: return Sign::NEGATIVE;
-				case 0: return Sign::ZERO;
-				case 1: return Sign::POSITIVE;
-			}
-			CARL_LOG_ERROR("carl.ran", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
-			return Sign::ZERO;
+			return mIR->sgn(p);
 		} else {
 			assert(isThom());
 			return mTE->signOnPolynomial(MultivariatePolynomial<Number>(p));

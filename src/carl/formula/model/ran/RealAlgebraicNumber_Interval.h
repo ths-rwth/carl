@@ -11,16 +11,23 @@ namespace ran {
 	template<typename Number>
 	struct IntervalContent {
 		using Polynomial = UnivariatePolynomial<Number>;
+		
+		static const Variable auxVariable;
+		
 		Polynomial polynomial;
 		Interval<Number> interval;
 		std::list<Polynomial> sturmSequence;
 		std::size_t refinementCount;
 		
+		Polynomial replaceVariable(const Polynomial& p) const {
+			return p.replaceVariable(auxVariable);
+		}
+		
 		IntervalContent(
 			const Polynomial& p,
 			const Interval<Number> i
 		):
-			polynomial(p),
+			polynomial(replaceVariable(p)),
 			interval(i),
 			sturmSequence(p.standardSturmSequence()),
 			refinementCount(0)
@@ -31,13 +38,28 @@ namespace ran {
 			const Interval<Number> i,
 			const std::list<UnivariatePolynomial<Number>>& seq
 		):
-			polynomial(p),
+			polynomial(replaceVariable(p)),
 			interval(i),
 			sturmSequence(seq),
 			refinementCount(0)
 		{}
 		bool isIntegral() {
 			return interval.isPointInterval() && carl::isInteger(interval.lower());
+		}
+		
+		Sign sgn(const Polynomial& p) const {
+			Polynomial tmp = replaceVariable(p);
+			if (polynomial == tmp) return Sign::ZERO;
+			auto seq = polynomial.standardSturmSequence(polynomial.derivative() * tmp);
+			int variations = Polynomial::countRealRoots(seq, interval);
+			assert((variations == -1) || (variations == 0) || (variations == 1));
+			switch (variations) {
+				case -1: return Sign::NEGATIVE;
+				case 0: return Sign::ZERO;
+				case 1: return Sign::POSITIVE;
+			}
+			CARL_LOG_ERROR("carl.ran", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
+			return Sign::ZERO;
 		}
 		
 		void refine() {
@@ -123,5 +145,8 @@ namespace ran {
 			}
 		}
 	};
+
+	template<typename Number>
+	const Variable IntervalContent<Number>::auxVariable = freshRealVariable("__r");
 }
 }
