@@ -16,7 +16,7 @@ bool represents(const carl::RealAlgebraicNumber<Number> root, const Number& exac
 	if (root.isNumeric()) {
 		return root.value() == exact;
 	} else {
-		return root.getIntervalContent().interval.contains(exact);
+		return root.getInterval().contains(exact);
 	}
 }
 

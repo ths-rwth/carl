@@ -74,13 +74,13 @@ protected:
 	bool hasValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
 		if (n.isNumeric()) return n.value() == val;
 		else {
-			return n.getIntervalContent().interval.contains(val);
+			return n.getInterval().contains(val);
 		}
 	}
 	bool hasSqrtValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
 		if (n.isNumeric()) return n.value() * n.value() == val;
 		else if(n.isInterval()){
-			return (n.getIntervalContent().interval * n.getIntervalContent().interval).contains(val);
+			return (n.getInterval() * n.getInterval()).contains(val);
 		}
 		else {
 		    // can't check this for a thom encoding
