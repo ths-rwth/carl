@@ -1,5 +1,8 @@
+#include "numbers.h"
 #include "NumberClRA.h"
 
+#include <limits>
+#include <boost/numeric/interval/interval.hpp>
 
 namespace carl {
 
@@ -25,7 +28,7 @@ namespace carl {
 		{
 		    result += (cln::cl_RA(strs.back().c_str())/carl::pow(cln::cl_RA(10),static_cast<unsigned>(strs.back().size())));
 		}
-		return Number(result);
+		mData = cln::cl_RA(result);
 	    }
 	
 
@@ -57,7 +60,8 @@ namespace carl {
 		cln::cl_RA result;
 		bool boolResult = cln::sqrtp( mData, &result );
 		//TODO: test if this works, otherwise implement and use setValue for Number
-		b(result);
+		//TODO: return b
+		//b = Number(result);
 		return boolResult;
 	 }
 
@@ -66,11 +70,11 @@ namespace carl {
 	 Number<cln::cl_RA> Number<cln::cl_RA>::sqrt()
 	 {
 		auto r = this->sqrt_safe();
-		return (r.first + r.second) / 2;
+		return Number((r.first + r.second) / 2);
 	 }
 	
 
-	cln::cl_RA Number<cln::cl_RA>::scaleByPowerOfTwo(const cln::cl_RA& a, int exp) {
+	cln::cl_RA scaleByPowerOfTwo(const cln::cl_RA& a, int exp) {
 		if (exp > 0) {
 			return cln::cl_RA(cln::numerator(a) << exp) / cln::denominator(a);
 		} else if (exp < 0) {
@@ -97,7 +101,7 @@ namespace carl {
 					i.assign(cln::double_approx(2*n-nra), dn);
 					assert(2*n-nra <= n);
 				} else {
-					i.assign(dn, toDouble(2*n-nra));
+					i.assign(dn, cln::double_approx(2*n-nra));
 					assert(n <= 2*n-nra);
 				}
 				i = boost::numeric::sqrt(i);
