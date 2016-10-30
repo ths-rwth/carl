@@ -59,14 +59,22 @@ namespace carl {
 			return mData;
 		}
 
-		virtual std::string toString(bool _infix=true) const = 0;
+		virtual std::string toString(bool _infix) const = 0;
 	};
 
 	
 
 	template<typename T>
-	class Number : BaseNumber<T> {};
-
+	class Number : public BaseNumber<T> {
+		public:
+		explicit Number(const T& t) : BaseNumber<T>(t) {}
+		std::string toString(bool _infix=true) const override;
+		bool isOne();
+		Number<T> abs() const;
+		template <typename Integer>
+		Integer toInt();
+	
+	};
 
 	template<typename T>
 	Number<T> operator+(const Number<T>& lhs, const Number<T>& rhs) {

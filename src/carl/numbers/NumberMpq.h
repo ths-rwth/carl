@@ -33,6 +33,8 @@ namespace carl {
 		Number(const Number<mpz_class>& n) { mData = mpq_class(n.getNumber()); }
 		Number(const mpz_class& n) { mData = mpq_class(n); }
 
+		std::string toString(bool _infix=true) const;
+
 		//TODO: check if this works or if there is a better possibility. Otherwise maybe retrieve "pieces" that fit into the data type and add them together again
 
 #ifdef USE_CLN_NUMBERS
@@ -266,7 +268,6 @@ namespace carl {
 			return Number(res);
 		}
 
-		std::string toString(bool _infix=true);
 
 	};
 

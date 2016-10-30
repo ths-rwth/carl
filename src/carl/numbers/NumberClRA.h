@@ -4,31 +4,41 @@
 
 
 
+
+
 namespace carl {
+
+
 
 #ifdef USE_CLN_NUMBERS
 
+	//TODO: where to put this?
+	//NOTE: this can only be uncommented once adaption_cln/operations.h is not used anymore (defined twice)
+	//static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 23);
+	//static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
+
 	template<>
 	class Number<cln::cl_RA> : public BaseNumber<cln::cl_RA> {
+	public:
 
 		Number(): BaseNumber() {}
 		explicit Number(const cln::cl_RA& t): BaseNumber(t) {}
 		explicit Number(cln::cl_RA&& t): BaseNumber(t) {}
 		Number(const Number<cln::cl_RA>& n): BaseNumber(n) {}
 		Number(Number<cln::cl_RA>&& n) noexcept : BaseNumber(n) {}
-		Number(long long int n) : BaseNumber(n) {}
-		Number(unsigned long long int n): BaseNumber(n) {}
+		Number(long long int n) { mData = cln::cl_RA(n); }
+		Number(unsigned long long int n) { mData = cln::cl_RA(n); }
 
 
 		//The following constructors can maybe be grouped together in a Rational-superclass	
 		//TODO: explicit or not?
-		Number(float f) { mData = cln::cl_RA(f); }
-		Number(double d) { mData = cln::cl_RA(d); }
+		Number(float f) { mData = cln::cl_RA((long long int)f); }
+		Number(double d) { mData = cln::cl_RA((long long int)d); }
 
 		Number(const std::string& s);
 
 		//constructs a/b:
-		Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) { mData = cln::cl_RA(a.getNumber(),b.getNumber()); }
+		Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) { mData = cln::cl_RA(a.getNumber()/b.getNumber()); }
 
 	
 		Number(const Number<cln::cl_I>& n) { mData = cln::cl_RA(n.getNumber()); }
@@ -67,16 +77,16 @@ namespace carl {
 		 * Extract the numerator from a fraction.
 		 * @return Numerator.
 		 */
-		inline Number<cln::cl_I> getNum() {
-			return Number(cln::numerator(mData));
+		inline Number<cln::cl_I> getNum() const {
+			return Number<cln::cl_I> (cln::numerator(mData));
 		}
 
 		/**
 		 * Extract the denominator from a fraction.
 		 * @return Denominator.
 		 */
-		inline Number<cln::cl_I> getDenom() {
-			return Number(cln::denominator(mData));
+		inline Number<cln::cl_I> getDenom() const {
+			return Number<cln::cl_I> (cln::denominator(mData));
 		}
 
 		/**
@@ -113,34 +123,9 @@ namespace carl {
 
 
 
-		/**
-		 * Convert a fraction to an integer.
-		 * This method assert, that the given fraction is an integer, i.e. that the denominator is one.
-		 * @param n A fraction.
-		 * @return An integer.
-		 */
-		template<>
-		inline Number<cln::cl_I> toInt<cln::cl_I>() {
-			assert(isInteger());
-			return getNum();
-		}
-		//TODO: is this correct?!
-		template<>
-		inline sint toInt<sint>() {
-			return toInt<sint>(toInt<cln::cl_I>(n));
-		}
-		template<>
-		inline uint toInt<uint>() {
-		    return toInt<uint>(toInt<cln::cl_I>(n));
-		}
-
-		//TODO: where to put this?
-		static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 23);
-		static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
-
 		
 		//TODO: Rationalize as constructors!!
-		template<>
+		/*template<>
 		cln::cl_RA rationalize<cln::cl_RA>(double n);
 
 		template<>
@@ -162,7 +147,7 @@ namespace carl {
 		}
 
 		template<>
-		cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring);
+		cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring); */
 
 
 
@@ -170,7 +155,7 @@ namespace carl {
 		 * Get absolute value of a fraction.
 		 * @return \f$|n|\f$.
 		 */
-		inline Number<cln::cl_RA> abs() {
+		inline Number<cln::cl_RA> abs() const {
 			return Number(cln::abs(mData));
 		}
 
@@ -179,7 +164,7 @@ namespace carl {
 		 * @return The next integer.
 		 */
 		inline Number<cln::cl_I> round() {
-			return Number(cln::round1(mData));
+			return Number<cln::cl_I> (cln::round1(mData));
 		}
 
 
@@ -189,7 +174,7 @@ namespace carl {
 		 * @return \f$\lfloor n \rfloor\f$.
 		 */
 		inline Number<cln::cl_I> floor() {
-			return Number(cln::floor1(mData));
+			return Number<cln::cl_I> (cln::floor1(mData));
 		}
 
 
@@ -199,7 +184,7 @@ namespace carl {
 		 * @return \f$\lceil n \rceil\f$.
 		 */
 		inline Number<cln::cl_I> ceil() {
-			return Number(cln::ceiling1(mData));
+			return Number<cln::cl_I> (cln::ceiling1(mData));
 		}
 
 
@@ -234,7 +219,6 @@ namespace carl {
 		 * @param e Exponent.
 		 * @return \f$n^e\f$
 		 */
-		template<>
 		inline Number<cln::cl_RA> pow(std::size_t e) {
 			return Number(cln::expt(mData, int(e)));
 		}
@@ -314,6 +298,27 @@ namespace carl {
 
 
 	};
+
+		/**
+		 * Convert a fraction to an integer.
+		 * This method assert, that the given fraction is an integer, i.e. that the denominator is one.
+		 * @param n A fraction.
+		 * @return An integer.
+		 */
+		template<>
+		inline Number<cln::cl_I> Number<cln::cl_RA>::toInt<Number<cln::cl_I>>() {
+			assert(isInteger());
+			return Number<cln::cl_I>(getNum());
+		}
+		//TODO: is this correct?!
+		template<>
+		inline sint Number<cln::cl_RA>::toInt<sint>() {
+			return toInt<Number<cln::cl_I>>().toInt<sint>();
+		}
+		template<>
+		inline uint Number<cln::cl_RA>::toInt<uint>() {
+		    return toInt<Number<cln::cl_I>>().toInt<uint>();
+		}
 
 
 #endif

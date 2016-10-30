@@ -20,15 +20,15 @@ namespace carl {
 		Number(Number<cln::cl_I>&& n) noexcept : BaseNumber(n) {}
 		Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//TODO: this might not be the best way to do it
-		Number(long long int n) : Number(std::to_string(n)) {}
-		Number(unsigned long long int n): Number(std::to_string(n)) {}
+		Number(long long int n) { mData = cln::cl_I(n); }
+		Number(unsigned long long int n) { mData = cln::cl_I(n);}
 	
 
 		//TODO: conversion constructors etc
 		//Number(const Number<mpz_class>& n) : Number(n.toString()) {}
 
 
-
+		std::string toString(bool _infix = true) const;
 
 	
 		//could probably be implemented the same way as for mpq, mpz
@@ -191,7 +191,7 @@ namespace carl {
 			return Number(mData / cln::cl_I(rhs));
 		}
 
-		std::string toString(bool _infix=true) const;
+		
 	};
 
 
