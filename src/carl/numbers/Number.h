@@ -30,6 +30,7 @@ namespace carl {
 		//TODO: is this really the best way? one could also create an mpz_class, multiply it by 10^whatever and add the rest...
 		BaseNumber(long long int n) { std::string s = std::to_string(n); mData = T(s); }
 		BaseNumber(unsigned long long int n) { std::string s = std::to_string(n); mData= T(s); }
+		BaseNumber(int i) : mData(i) {}
 		BaseNumber(const std::string& s) : mData(s) {}
 
 		const T& getNumber() const {
@@ -60,6 +61,8 @@ namespace carl {
 		}
 
 		virtual std::string toString(bool _infix) const = 0;
+
+
 	};
 
 	
@@ -68,77 +71,81 @@ namespace carl {
 	class Number : public BaseNumber<T> {
 		public:
 		explicit Number(const T& t) : BaseNumber<T>(t) {}
+		Number(int i) : BaseNumber<T>(i) {}
 		std::string toString(bool _infix=true) const override;
 		bool isOne();
 		Number<T> abs() const;
 		template <typename Integer>
 		Integer toInt();
+
+
+
+		Number<T> operator+(const Number<T>& rhs) {
+			return Number(this->mData + rhs.mData);
+		}
+
+		/*BaseNumber<T> operator+=(const BaseNumber<T>& rhs) {
+			return T(lhs) += T(rhs);
+		}*/
+
+		Number<T> operator-(const Number<T>& rhs) {
+			return Number(this->mData - rhs.mData);
+		}
+
+		/*BaseNumber<T> operator-=(const BaseNumber<T>& rhs) {
+			return T(lhs) -= T(rhs);
+		} */
+
+		Number<T> operator*(const Number<T>& rhs) {
+			Number(this->mData * rhs.mData);
+		}
+
+		/*BaseNumber<T> operator*=(const BaseNumber<T>& rhs) {
+			return T(lhs) *= T(rhs);
+		} */
+
+		Number<T> operator/(const Number<T>& rhs) {
+			Number(this->mData / rhs.mData);
+		}
+
+		/*BaseNumber<T> operator/=(const BaseNumber<T>& rhs) {
+			return T(lhs) /= T(rhs);
+		}*/
+
+
+		bool operator==(const Number<T>& rhs) {
+			return this->mData == rhs.mData;
+		}
+
+		bool operator!=(const Number<T>& rhs) {
+			return this->mData != rhs.mData;
+		}
+
+		bool operator<(const Number<T>& rhs) {
+			return this->mData < rhs.mData;;
+		}
+
+		bool operator<=(const Number<T>& rhs) {
+			return this->mData <= rhs.mData;
+		}
+
+		bool operator>=(const Number<T>& rhs) {
+			return this->mData >= rhs.mData;
+		}
+
+		bool operator>(const Number<T>& rhs) {
+			return this->mData > rhs.mData;
+		}
+
+
+
 	
 	};
 
-	template<typename T>
-	Number<T> operator+(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(T(lhs) + T(rhs));
-	}
-	template<typename T>
-	Number<T> operator+=(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) += T(rhs);
-	}
-	template<typename T>
-	Number<T> operator-(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(T(lhs) - T(rhs));
-	}
-	template<typename T>
-	Number<T> operator-=(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) -= T(rhs);
-	}
-	template<typename T>
-	Number<T> operator*(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) * T(rhs);
-	}
-	template<typename T>
-	Number<T> operator*=(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) *= T(rhs);
-	}
-	template<typename T>
-	Number<T> operator/(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) / T(rhs);
-	}
-	template<typename T>
-	Number<T> operator/=(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) /= T(rhs);
-	}
-
-	template<typename T>
-	bool operator==(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) == T(rhs);
-	}
-	template<typename T>
-	bool operator!=(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) != T(rhs);
-	}
-	template<typename T>
-	bool operator<(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) < T(rhs);
-	}
-	template<typename T>
-	bool operator<=(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) <= T(rhs);
-	}
-	template<typename T>
-	bool operator>=(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) >= T(rhs);
-	}
-	template<typename T>
-	bool operator>(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) > T(rhs);
-	}
-
-	template<typename T>
-	std::ostream& operator <<(std::ostream& os, const Number<T>& n) {
-		return os << T(n);
-	}
-
+		template <typename T>
+		std::ostream& operator <<(std::ostream& os, const Number<T>& n) {
+			return os << T(n);
+		} 
 
 
 

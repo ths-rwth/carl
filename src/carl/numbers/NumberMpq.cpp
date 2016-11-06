@@ -30,7 +30,7 @@ namespace carl {
 	std::string Number<mpq_class>::toString(bool _infix) const
 	{
 		std::stringstream s;
-		bool negative = (_number < mpq_class(0));
+		bool negative = (mData < mpq_class(0));
 		if(negative) s << "(-" << (_infix ? "" : " ");
 		if(_infix) s << this->abs();
 		else
@@ -44,7 +44,7 @@ namespace carl {
 		return s.str();
 	}
 
-
+/* TODO: this!!
 	 bool Number<mpq_class>::sqrt_exact(Number<mpq_class>& b)
 	    {
 		if( mpq_sgn(mData.__get_mp()) < 0 ) return false;
@@ -70,12 +70,12 @@ namespace carl {
 		mpq_class fraction;
 		mpq_div(fraction.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
 		//TODO: test if this works, otherwise implement and use setValue for Number
-		b(divResult);
+		b(fraction);
 		return true;
-	    }
+	    } */
 
 	    Number<mpq_class> Number<mpq_class>::sqrt() {
-		auto r = this->sqrt_safe();
+		std::pair<Number<mpq_class>,Number<mpq_class>> r = this->sqrt_safe();
 		return (r.first + r.second) / 2;
 	    }
 

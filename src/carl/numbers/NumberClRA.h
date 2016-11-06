@@ -19,6 +19,8 @@ namespace carl {
 
 	template<>
 	class Number<cln::cl_RA> : public BaseNumber<cln::cl_RA> {
+	private:
+	cln::cl_RA scaleByPowerOfTwo(const cln::cl_RA& a, int exp); //auxiliary function 
 	public:
 
 		Number(): BaseNumber() {}

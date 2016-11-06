@@ -1,8 +1,13 @@
 #include "numbers.h"
 #include "NumberClRA.h"
 
+
+
 #include <limits>
 #include <boost/numeric/interval/interval.hpp>
+#include <boost/numeric/interval/policies.hpp>
+#include <boost/numeric/interval/arith2.hpp>
+#include <boost/numeric/interval/checking.hpp>
 
 namespace carl {
 
@@ -69,19 +74,19 @@ namespace carl {
 	//this is the same as for mpq_class	
 	 Number<cln::cl_RA> Number<cln::cl_RA>::sqrt()
 	 {
-		auto r = this->sqrt_safe();
+		std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> r = this->sqrt_safe();
 		return Number((r.first + r.second) / 2);
 	 }
 	
 
-	cln::cl_RA scaleByPowerOfTwo(const cln::cl_RA& a, int exp) {
+	cln::cl_RA Number<cln::cl_RA>::scaleByPowerOfTwo(const cln::cl_RA& a, int exp) {
 		if (exp > 0) {
 			return cln::cl_RA(cln::numerator(a) << exp) / cln::denominator(a);
 		} else if (exp < 0) {
 			return cln::cl_RA(cln::numerator(a)) / (cln::denominator(a) << -exp);
 		}
 		return a;
-	}
+	} 
 
 	    std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> Number<cln::cl_RA>::sqrt_safe()
 	    {

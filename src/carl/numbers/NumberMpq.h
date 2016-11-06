@@ -15,6 +15,7 @@ namespace carl {
 		explicit Number(mpq_class&& t): BaseNumber(t) {}
 		Number(const Number<mpq_class>& n): BaseNumber(n) {}
 		Number(Number<mpq_class>&& n) noexcept : BaseNumber(n) {}
+		Number(int i) : BaseNumber(i) {}
 		Number(long long int n) : BaseNumber(n) {}
 		Number(unsigned long long int n): BaseNumber(n) {}
 
@@ -67,11 +68,11 @@ namespace carl {
 
 
 
-		inline Number<mpz_class> getNum() {
+		inline Number<mpz_class> getNum() const {
 			return Number<mpz_class>(mData.get_num());
 		}
 
-		inline Number<mpz_class> getDenom() {
+		inline Number<mpz_class> getDenom() const {
 			return Number<mpz_class>(mData.get_den());
 		}
 
@@ -116,7 +117,7 @@ namespace carl {
 		 */
 
 
-		inline Number<mpq_class> abs() {
+		inline Number<mpq_class> abs() const {
 			mpq_class res;
 			mpq_abs(res.get_mpq_t(), mData.get_mpq_t());
 			return Number(res);
@@ -266,6 +267,10 @@ namespace carl {
 			mpq_class res;
 			mpq_mul(res.get_mpq_t(), mData.get_mpq_t(), rhs.mData.get_mpq_t());
 			return Number(res);
+		}
+
+		Number<mpq_class> operator+(const Number<mpq_class>& rhs) {
+			return Number(this->mData + rhs.mData);
 		}
 
 
