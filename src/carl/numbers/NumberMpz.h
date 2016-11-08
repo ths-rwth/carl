@@ -34,7 +34,7 @@ namespace carl {
 			return constant_zero<mpz_class>::get() == mData;
 		}
 
-		inline bool isOne() const {
+		bool isOne() const {
 			return constant_one<mpz_class>::get() == mData;
 		}
 

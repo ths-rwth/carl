@@ -2,6 +2,7 @@
 #include "NumberMpq.h"
 
 
+
 namespace carl {
 
 
@@ -35,9 +36,15 @@ namespace carl {
 		if(_infix) s << this->abs();
 		else
 		{
-		    Number<mpz_class> d = this->getDenom();
-		    if(!d.isOne()) s << "(/ " << this->getNum().abs() << " " << d.abs() << ")";
-		    else s << this->abs().mData;
+		    mpz_class d = mData.get_den();
+		    if(constant_one<mpz_class>::get() != mData) {
+			mpz_class abs1, abs2;
+			mpz_abs(abs1.get_mpz_t(), mData.get_num().get_mpz_t());
+			mpz_abs(abs2.get_mpz_t(), d.get_mpz_t());
+			s << "(/ " << abs1 << " " << abs2 << ")";
+		    } else {
+			s << this->abs().mData;
+			}
 		}
 		if(negative)
 		    s << ")";

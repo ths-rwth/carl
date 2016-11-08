@@ -2,7 +2,7 @@
 
 #include "Number.h"
 
-#include "NumberMpz.h"
+
 
 
 namespace carl {
@@ -39,7 +39,7 @@ namespace carl {
 
 		
 		//these 3 methods are the same as for mpq, mpz
-		inline bool isOne()  {
+		bool isOne()  {
 			return mData == carl::constant_one<cln::cl_I>().get();
 		}
 
@@ -98,7 +98,7 @@ namespace carl {
 		 * @param n An integer.
 		 * @return \f$|n|\f$.
 		 */
-		inline Number<cln::cl_I> abs() const {
+		Number<cln::cl_I> abs() const {
 			return Number(cln::abs(mData));
 		}
 

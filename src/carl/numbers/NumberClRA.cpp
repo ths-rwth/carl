@@ -40,14 +40,15 @@ namespace carl {
 
 	    std::string Number<cln::cl_RA>::toString(bool _infix) const
 	    {
+
 		std::stringstream s;
 		bool negative = (mData < cln::cl_RA(0));
 		if(negative) s << "(-" << (_infix ? "" : " ");
 		if(_infix) s << this->abs().mData;
 		else
 		{
-		    Number<cln::cl_I> d = this->getDenom();
-		    if(!d.isOne()) s << "(/ " << this->getNum().abs().getNumber() << " " << d.abs().getNumber() << ")";
+		    cln::cl_I d = cln::denominator(mData);
+		    if(mData != carl::constant_one<cln::cl_I>().get()) s << "(/ " << cln::abs(cln::numerator(mData)) << " " << cln::abs(d) << ")";
 		    else s << this->abs().getNumber();
 		}
 		if(negative)
