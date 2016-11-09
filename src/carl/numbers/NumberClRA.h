@@ -2,6 +2,10 @@
 
 #include "Number.h"
 
+#include "NumberMpz.h"
+#include "NumberMpq.h"
+#include "NumberClI.h"
+
 
 
 
@@ -28,6 +32,7 @@ namespace carl {
 		explicit Number(cln::cl_RA&& t): BaseNumber(t) {}
 		Number(const Number<cln::cl_RA>& n): BaseNumber(n) {}
 		Number(Number<cln::cl_RA>&& n) noexcept : BaseNumber(n) {}
+		Number(int n) : BaseNumber(n) {}
 		Number(long long int n) { mData = cln::cl_RA(n); }
 		Number(unsigned long long int n) { mData = cln::cl_RA(n); }
 
@@ -37,19 +42,35 @@ namespace carl {
 		Number(float f) { mData = cln::cl_RA((long long int)f); }
 		Number(double d) { mData = cln::cl_RA((long long int)d); }
 
-		Number(const std::string& s);
+		//Number(const std::string& s); 
 
 		//constructs a/b:
-		Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) { mData = cln::cl_RA(a.getNumber()/b.getNumber()); }
+		Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) { mData = cln::cl_RA(a.getValue()/b.getValue()); }
 
 	
-		Number(const Number<cln::cl_I>& n) { mData = cln::cl_RA(n.getNumber()); }
-		Number(const cln::cl_I& n) { mData = cln::cl_RA(n); }
+		Number(const Number<cln::cl_I>& n) { mData = cln::cl_RA(n.getValue()); }
+		//Number(const cln::cl_I& n) { mData = cln::cl_RA(n); }
 
 		//TODO: check if this works or if there is a better possibility. Otherwise maybe retrieve "pieces" that fit into the data type and add them together again
-		Number(const Number<mpq_class>& n) : Number(n.toString()) {} 
-		Number(const Number<mpz_class>& n) : Number(n.toString()) {} 
+		Number(const Number<mpq_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
+		Number(const Number<mpz_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
 
+
+		Number<cln::cl_RA>& operator=(const Number<cln::cl_RA>& n) {
+			this->mData = n.mData;
+			return *this;
+		}
+
+		template<typename Other>
+		Number<cln::cl_RA>& operator=(const Other& n) {
+			this->mData = n;
+			return *this;
+		}
+
+		Number<cln::cl_RA>& operator=(Number<cln::cl_RA>&& n) noexcept {
+			this->mData = std::move(n.mData);
+			return *this;
+		}
 
 		
 
@@ -213,7 +234,7 @@ namespace carl {
 		inline Number<cln::cl_RA> lcm(const Number<cln::cl_RA>& b) {
 		    assert( this->isInteger());
 		    assert( b.isInteger() );
-			return cln::lcm(cln::numerator(mData),cln::numerator(b.mData));
+			return Number(cln::lcm(cln::numerator(mData),cln::numerator(b.mData)));
 		}
 
 		/**

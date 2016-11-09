@@ -14,6 +14,7 @@ add_executable( runNumbersTests
 	Test_operations_division.cpp
 	Test_operations_properties.cpp
 	Test_operations_rounding.cpp
+    Test_Number.cpp
 )
 cotire(runNumbersTests)
 target_link_libraries(runNumbersTests TestCommon)

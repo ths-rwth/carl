@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Number.h"
+#include "NumberMpz.h"
 
 
 
@@ -18,14 +19,33 @@ namespace carl {
 		explicit Number(cln::cl_I&& t): BaseNumber(t) {}
 		Number(const Number<cln::cl_I>& n): BaseNumber(n) {}
 		Number(Number<cln::cl_I>&& n) noexcept : BaseNumber(n) {}
-		Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
+		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
+		Number(int n) : BaseNumber(n) {}
 		//TODO: this might not be the best way to do it
 		Number(long long int n) { mData = cln::cl_I(n); }
 		Number(unsigned long long int n) { mData = cln::cl_I(n);}
 	
 
 		//TODO: conversion constructors etc
-		//Number(const Number<mpz_class>& n) : Number(n.toString()) {}
+		Number(const Number<mpz_class>& n) : Number(cln::cl_I(n.toString().c_str())) {}
+
+
+		Number<cln::cl_I>& operator=(const Number<cln::cl_I>& n) {
+			this->mData = n.mData;
+			return *this;
+		}
+
+		template<typename Other>
+		Number<cln::cl_I>& operator=(const Other& n) {
+			this->mData = n;
+			return *this;
+		}
+
+		Number<cln::cl_I>& operator=(Number<cln::cl_I>&& n) noexcept {
+			this->mData = std::move(n.mData);
+			return *this;
+		}
+
 
 
 		std::string toString(bool _infix = true) const;

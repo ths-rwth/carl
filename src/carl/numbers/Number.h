@@ -33,7 +33,7 @@ namespace carl {
 		BaseNumber(int i) : mData(i) {}
 		BaseNumber(const std::string& s) : mData(s) {}
 
-		const T& getNumber() const {
+		const T& getValue() const {
 			return mData;
 		};
 
@@ -60,14 +60,16 @@ namespace carl {
 			return mData;
 		}
 
-		virtual std::string toString(bool _infix) const = 0;
+		//virtual std::string toString(bool _infix) const = 0;
 
 
 	};
 
-	
-
 	template<typename T>
+	class Number : public BaseNumber<T> {};	
+
+
+/*	template<typename T>
 	class Number : public BaseNumber<T> {
 		public:
 		explicit Number(const T& t) : BaseNumber<T>(t) {}
@@ -80,13 +82,15 @@ namespace carl {
 
 
 
+
 		Number<T> operator+(const Number<T>& rhs) {
 			return Number(this->mData + rhs.mData);
 		}
 
 		/*BaseNumber<T> operator+=(const BaseNumber<T>& rhs) {
 			return T(lhs) += T(rhs);
-		}*/
+		} */
+/*
 
 		Number<T> operator-(const Number<T>& rhs) {
 			return Number(this->mData - rhs.mData);
@@ -96,7 +100,7 @@ namespace carl {
 			return T(lhs) -= T(rhs);
 		} */
 
-		Number<T> operator*(const Number<T>& rhs) {
+	/*	Number<T> operator*(const Number<T>& rhs) {
 			Number(this->mData * rhs.mData);
 		}
 
@@ -104,7 +108,7 @@ namespace carl {
 			return T(lhs) *= T(rhs);
 		} */
 
-		Number<T> operator/(const Number<T>& rhs) {
+	/*	Number<T> operator/(const Number<T>& rhs) {
 			Number(this->mData / rhs.mData);
 		}
 
@@ -112,7 +116,7 @@ namespace carl {
 			return T(lhs) /= T(rhs);
 		}*/
 
-
+/*
 		bool operator==(const Number<T>& rhs) {
 			return this->mData == rhs.mData;
 		}
@@ -140,10 +144,10 @@ namespace carl {
 
 
 	
-	};
+	}; */
 
 		template <typename T>
-		std::ostream& operator <<(std::ostream& os, const Number<T>& n) {
+		std::ostream& operator <<(std::ostream& os, const BaseNumber<T>& n) {
 			return os << T(n);
 		} 
 

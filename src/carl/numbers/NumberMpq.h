@@ -1,10 +1,20 @@
 #pragma once
 
 #include "Number.h"
+#include "NumberMpz.h"
 
 
 
 namespace carl {
+
+
+#ifdef USE_CLN_NUMBERS
+	template<>
+	class Number<cln::cl_I> ;
+
+	template<>
+	class Number<cln::cl_RA> ;
+#endif
 
 	template<>
 	class Number<mpq_class> : public BaseNumber<mpq_class> {
@@ -25,23 +35,42 @@ namespace carl {
 		Number(float f) { mData = mpq_class(f); }
 		Number(double d) { mData = mpq_class(d); }
 
-		Number(const std::string& s);
+		explicit Number(const std::string& s);
 
 		//constructs a/b:
-		Number(const Number<mpz_class>& a,const Number<mpz_class>& b) { mData = mpq_class(a.getNumber(),b.getNumber()); }
+		Number(const Number<mpz_class>& a,const Number<mpz_class>& b) { mData = mpq_class(a.getValue(),b.getValue()); }
 
 	
-		Number(const Number<mpz_class>& n) { mData = mpq_class(n.getNumber()); }
+		Number(const Number<mpz_class>& n) { mData = mpq_class(n.getValue()); }
 		Number(const mpz_class& n) { mData = mpq_class(n); }
+
+#ifdef USE_CLN_NUMBERS
+		Number(const Number<cln::cl_RA>& n);
+		Number(const Number<cln::cl_I>& n);
+#endif
 
 		std::string toString(bool _infix=true) const;
 
-		//TODO: check if this works or if there is a better possibility. Otherwise maybe retrieve "pieces" that fit into the data type and add them together again
 
-#ifdef USE_CLN_NUMBERS
-		Number(const Number<cln::cl_RA>& n) : Number(n.toString()) {} 
-		Number(const Number<cln::cl_I>& n) : Number(n.toString()) {} 
-#endif
+
+
+
+		Number<mpq_class>& operator=(const Number<mpq_class>& n) {
+			this->mData = n.mData;
+			return *this;
+		}
+
+		template<typename Other>
+		Number<mpq_class>& operator=(const Other& n) {
+			this->mData = n;
+			return *this;
+		}
+
+		Number<mpq_class>& operator=(Number<mpq_class>&& n) noexcept {
+			this->mData = std::move(n.mData);
+			return *this;
+		}
+
 		
 		
 

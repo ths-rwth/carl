@@ -15,7 +15,7 @@ namespace carl {
 
 
 		//this can maybe be done such that it's the same as for mpq_class
-    	    Number<cln::cl_RA>::Number(const std::string& s) {	
+    	/*    Number<cln::cl_RA>::Number(const std::string& s) {	
 
 		std::vector<std::string> strs;
 		boost::split(strs, s, boost::is_any_of("."));
@@ -34,7 +34,7 @@ namespace carl {
 		    result += (cln::cl_RA(strs.back().c_str())/carl::pow(cln::cl_RA(10),static_cast<unsigned>(strs.back().size())));
 		}
 		mData = cln::cl_RA(result);
-	    }
+	    } */
 	
 
 
@@ -49,7 +49,7 @@ namespace carl {
 		{
 		    cln::cl_I d = cln::denominator(mData);
 		    if(mData != carl::constant_one<cln::cl_I>().get()) s << "(/ " << cln::abs(cln::numerator(mData)) << " " << cln::abs(d) << ")";
-		    else s << this->abs().getNumber();
+		    else s << this->abs().getValue();
 		}
 		if(negative)
 		    s << ")";

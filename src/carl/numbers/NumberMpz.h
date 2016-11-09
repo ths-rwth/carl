@@ -3,11 +3,16 @@
 
 
 #include "Number.h"
-#include "NumberClI.h"
+
 
 
 
 namespace carl {
+
+#ifdef USE_CLN_NUMBERS
+	template<>
+	class Number<cln::cl_I> ;
+#endif
 
 	template<>
 	class Number<mpz_class> : public BaseNumber<mpz_class> {
@@ -19,13 +24,31 @@ namespace carl {
 		explicit Number(mpz_class&& t): BaseNumber(t) {}
 		Number(const Number<mpz_class>& n): BaseNumber(n) {}
 		Number(Number<mpz_class>&& n) noexcept : BaseNumber(n) {}
+		Number(int n) : BaseNumber(n) {}
 		Number(long long int n) : BaseNumber(n) {}
 		Number(unsigned long long int n): BaseNumber(n) {}
-		Number(const std::string& s) : BaseNumber(s) {}
-
+		explicit Number(const std::string& s) : BaseNumber(s) {}
 #ifdef USE_CLN_NUMBERS
-		//Number(const Number<cln::cl_I>& n) : Number(n.toString()) {}
+		Number(const Number<cln::cl_I>& n);
 #endif
+
+
+
+		Number<mpz_class>& operator=(const Number<mpz_class>& n) {
+			this->mData = n.mData;
+			return *this;
+		}
+
+		template<typename Other>
+		Number<mpz_class>& operator=(const Other& n) {
+			this->mData = n;
+			return *this;
+		}
+
+		Number<mpz_class>& operator=(Number<mpz_class>&& n) noexcept {
+			this->mData = std::move(n.mData);
+			return *this;
+		}
 
 
 	
