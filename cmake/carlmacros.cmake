@@ -94,3 +94,8 @@ macro(load_library group name version)
         message("-- Library ${name} was not found.")
     endif()
 endmacro(load_library)
+
+macro(get_include_dir var name)
+	get_target_property(INCLUDE_DIR ${name} INTERFACE_INCLUDE_DIRECTORIES)
+	set(${var} ${${var}}:${INCLUDE_DIR})
+endmacro(get_include_dir)

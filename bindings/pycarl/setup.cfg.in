@@ -1,11 +1,10 @@
 [build_ext]
 # uncomment the following to enable CLN
-#define=PYCARL_USE_CLN
+@PYCARL_DEFINE_CLN@
 # uncomment the following to link with these libraries
 # not required, as libcarl does so already
-#libraries=cln
-#libraries=gmp,gmpxx
+libraries=@PYCARL_LIBRARIES@
 # uncomment the following to use carl lib from parent directory
-include_dirs=${CMAKE_SOURCE_DIR}/src
-library_dirs=${CMAKE_SOURCE_DIR}/build
-rpath=${CMAKE_SOURCE_DIR}/build
+include_dirs=@PYCARL_INCLUDE_DIRS@
+library_dirs=@PYCARL_LIBRARY_DIRS@
+rpath=@PYCARL_RPATH@
