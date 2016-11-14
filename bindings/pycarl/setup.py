@@ -69,4 +69,5 @@ setup(name="pycarl",
       package_dir={'':'lib'},
       ext_package='pycarl',
       ext_modules=[ext_core, ext_formula, ext_parse],
+      install_requires=['grako'],
 )
