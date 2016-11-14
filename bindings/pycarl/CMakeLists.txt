@@ -26,8 +26,8 @@ if (PYTHONINTERP_FOUND)
 	#get_include_dir(PYCARL_INCLUDE_DIRS GTESTMAIN_STATIC)
 
 	# Set configuration file
-	set(PYCARL_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/build")
-	set(PYCARL_RPATH "${CMAKE_SOURCE_DIR}/build")
+	set(PYCARL_LIBRARY_DIRS "${CMAKE_BINARY_DIR}")
+	set(PYCARL_RPATH "${CMAKE_BINARY_DIR}")
 
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.cfg.in ${CMAKE_CURRENT_SOURCE_DIR}/setup.cfg)
 	add_custom_target(PythonBindingsBuild
