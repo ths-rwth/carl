@@ -574,7 +574,7 @@ public:
 	 * @param q
 	 * @return 
 	 */
-	MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
+	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
 
 	void square();
 
@@ -754,7 +754,7 @@ public:
 	 * @return `lhs == rhs`
 	 */
 	template<typename C, typename O, typename P>
-	static bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
 	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>
