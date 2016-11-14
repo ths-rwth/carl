@@ -574,7 +574,7 @@ public:
 	 * @param q
 	 * @return 
 	 */
-	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
+	MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
 
 	void square();
 

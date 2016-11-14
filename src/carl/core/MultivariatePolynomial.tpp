@@ -1520,7 +1520,7 @@ typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial
 }
 
 template<typename C, typename O, typename P>
-static bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	// Try to avoid sorting
 	if (&lhs == &rhs) return true;
 	if (lhs.nrTerms() != rhs.nrTerms()) return false;
