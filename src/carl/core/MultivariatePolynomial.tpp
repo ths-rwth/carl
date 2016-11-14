@@ -1519,16 +1519,16 @@ typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial
 	return res;
 }
 
-
-
 template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+static bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	// Try to avoid sorting
 	if (&lhs == &rhs) return true;
 	if (lhs.nrTerms() != rhs.nrTerms()) return false;
 	if (lhs.nrTerms() == 0) return true;
+#ifdef THREAD_SAFE
 	static std::mutex mutex;
 	std::lock_guard<std::mutex> lock(mutex);
+#endif
 	static std::vector<const C*> coeffs;
 #ifdef __VS
     coeffs.resize(MonomialPool::getInstance().nextID());
