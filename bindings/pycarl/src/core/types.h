@@ -27,8 +27,8 @@ typedef carl::Monomial::Arg Monomial;
 typedef carl::Term<Rational> Term;
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
 typedef carl::FactorizedPolynomial<Polynomial> FactorizedPolynomial;
-typedef carl::RationalFunction<Polynomial> RationalFunction;
-typedef carl::RationalFunction<FactorizedPolynomial> FactorizedRationalFunction;
+typedef carl::RationalFunction<Polynomial, true> RationalFunction;
+typedef carl::RationalFunction<FactorizedPolynomial, true> FactorizedRationalFunction;
 typedef carl::PolynomialFactorizationPair<Polynomial> FactorizationPair;
 
 using Interval = carl::Interval<Rational>;
