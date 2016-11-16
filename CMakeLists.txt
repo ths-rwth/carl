@@ -57,11 +57,12 @@ option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
 option( EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
-
 option( BINDINGS_PYTHON "Build python bindings" OFF )
 
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+
 if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "RELEASE")
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type")
 endif()
 
 # Include own macros.
