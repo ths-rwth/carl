@@ -4,6 +4,7 @@ ExternalProject_Add(
 	URL_MD5 19be2e8a20b1cc274dbfd69be7807a95
 	BUILD_IN_SOURCE YES
 	CONFIGURE_COMMAND ./configure --threadsafe-hack
+	PATCH_COMMAND patch configure ${CMAKE_SOURCE_DIR}/resources/cocoa_1.patch
 	BUILD_COMMAND make cocoalib
 	INSTALL_COMMAND ""
 )
