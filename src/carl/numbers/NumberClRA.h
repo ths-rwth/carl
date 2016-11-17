@@ -32,26 +32,46 @@ namespace carl {
 		explicit Number(cln::cl_RA&& t): BaseNumber(t) {}
 		Number(const Number<cln::cl_RA>& n): BaseNumber(n) {}
 		Number(Number<cln::cl_RA>&& n) noexcept : BaseNumber(n) {}
-		Number(int n) : BaseNumber(n) {}
-		Number(long long int n) { mData = cln::cl_RA(n); }
-		Number(unsigned long long int n) { mData = cln::cl_RA(n); }
+		explicit Number(int n) : BaseNumber(n) {}
+		explicit Number(long long int n) { mData = cln::cl_RA(n); }
+		explicit Number(unsigned long long int n) { mData = cln::cl_RA(n); }
 
 
 		//The following constructors can maybe be grouped together in a Rational-superclass	
 		//TODO: explicit or not?
-		Number(float f) { mData = cln::cl_RA((long long int)f); }
-		Number(double d) { mData = cln::cl_RA((long long int)d); }
+		explicit Number(double d) { mData = cln::rationalize(d);
+			/*std::ostringstream os;
+			os << d;
+ 			std::istringstream istr(os.str()); 
+			cln::cl_read_flags flags = {cln::syntax_float, cln::lsyntax_all, 10, cln::default_float_format, cln::default_float_format, false}; 
+			mData = cln::cl_RA(cln::read_float(istr,flags)); */
+		} 
+		explicit Number(float f) { mData = cln::rationalize(f);
+		/*	std::ostringstream os;
+			os << f;
+ 			std::istringstream istr(os.str()); 
+			cln::cl_read_flags flags = {cln::syntax_float, cln::lsyntax_all, 10, cln::default_float_format, cln::default_float_format, false}; 
+			mData = cln::cl_RA(cln::read_float(istr,flags)); */
+		 } 
 
-		//Number(const std::string& s); 
+
+		Number(const std::string& s); /* {
+			cln::cl_read_flags flags = {cln::syntax_float, cln::lsyntax_all, 10, cln::default_float_format, cln::default_float_format, false}; 
+			std::istringstream istr(s);
+			mData = cln::cl_RA(cln::read_rational(istr,flags));
+		} */
 
 		//constructs a/b:
-		Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) { mData = cln::cl_RA(a.getValue()/b.getValue()); }
+		//(this looks hacky.. seems to be the only really functioning way though: take the integers as strings, put the sign at the front and construct
+		//cl_RA from the string "[-]a/b")
+		Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) :
+			 Number(((a.isNegative() xor b.isNegative()) ? "-" : "") + a.abs().toString()+"/"+b.abs().toString()) {}
 
 	
 		Number(const Number<cln::cl_I>& n) { mData = cln::cl_RA(n.getValue()); }
 		//Number(const cln::cl_I& n) { mData = cln::cl_RA(n); }
 
-		//TODO: check if this works or if there is a better possibility. Otherwise maybe retrieve "pieces" that fit into the data type and add them together again
+		//TODO: Is there a better way? Maybe retrieve "pieces" that fit into the data type and add them together again
 		Number(const Number<mpq_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
 		Number(const Number<mpz_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
 
@@ -72,6 +92,7 @@ namespace carl {
 			return *this;
 		}
 
+
 		
 
 		
@@ -87,12 +108,12 @@ namespace carl {
 		}
 
 
-		inline bool isPositive() {
+		inline bool isPositive() const {
 			return mData > carl::constant_zero<cln::cl_RA>().get();
 		}
 
 
-		inline bool isNegative() {
+		inline bool isNegative() const {
 			return mData < carl::constant_zero<cln::cl_RA>().get();
 		}
 
@@ -250,12 +271,13 @@ namespace carl {
 			return Number(cln::rationalize(cln::realpart(cln::log(mData))));
 		}
 
+		//Note that with std::cos, std::sin the result is more precise than with cln::sin, cln::cos!!
 		inline Number<cln::cl_RA> sin() {
-			return Number(cln::rationalize(cln::sin(mData)));
+			return Number(std::sin(toDouble()));
 		}
 
 		inline Number<cln::cl_RA> cos() {
-			return Number(cln::rationalize(cln::cos(mData)));
+			return Number(std::cos(toDouble()));
 		}
 
 		/**

@@ -13,7 +13,7 @@ namespace carl {
 #endif
 
 
-
+	//TODO: probably also add possibility to construct from fraction strings
 	Number<mpq_class>::Number(const std::string& s) {
 		std::vector<std::string> strs;
 		boost::split(strs, s, boost::is_any_of("."));
@@ -36,6 +36,7 @@ namespace carl {
 	}
    
 
+	//TODO: doesn't mpq_class have a standard "output" as well?
 	std::string Number<mpq_class>::toString(bool _infix) const
 	{
 		std::stringstream s;
@@ -59,7 +60,7 @@ namespace carl {
 		return s.str();
 	}
 
-/* TODO: this!!
+
 	 bool Number<mpq_class>::sqrt_exact(Number<mpq_class>& b)
 	    {
 		if( mpq_sgn(mData.__get_mp()) < 0 ) return false;
@@ -85,9 +86,9 @@ namespace carl {
 		mpq_class fraction;
 		mpq_div(fraction.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
 		//TODO: test if this works, otherwise implement and use setValue for Number
-		b(fraction);
+		b = Number<mpq_class>(fraction);
 		return true;
-	    } */
+	    } 
 
 	    Number<mpq_class> Number<mpq_class>::sqrt() {
 		std::pair<Number<mpq_class>,Number<mpq_class>> r = this->sqrt_safe();

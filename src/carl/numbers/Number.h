@@ -53,12 +53,20 @@ namespace carl {
 			return *this;
 		}
 
+		bool operator==(const BaseNumber<T>& rhs) const {
+			return this->mData == rhs.mData;
+		}
+
+		bool operator!=(const BaseNumber<T>& rhs) const {
+			return this->mData != rhs.mData;
+		}
+/*
 		operator T&() {
 			return mData;
 		}
 		operator const T&() const {
 			return mData;
-		}
+		} */
 
 		//virtual std::string toString(bool _infix) const = 0;
 
@@ -148,7 +156,7 @@ namespace carl {
 
 		template <typename T>
 		std::ostream& operator <<(std::ostream& os, const BaseNumber<T>& n) {
-			return os << T(n);
+			return os << n.getValue();
 		} 
 
 

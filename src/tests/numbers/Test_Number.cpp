@@ -9,18 +9,6 @@
 TEST(Number, Constructor)
 {
 
-/*
-	Number(): BaseNumber() {}
-	explicit Number(const mpz_class& t): BaseNumber(t) {}
-	explicit Number(mpz_class&& t): BaseNumber(t) {}  //how to test this?
-	Number(const Number<mpz_class>& n): BaseNumber(n) {}
-	Number(Number<mpz_class>&& n) noexcept : BaseNumber(n) {}
-	Number(long long int n) : BaseNumber(n) {}
-	Number(unsigned long long int n): BaseNumber(n) {}
-	Number(const std::string& s) : BaseNumber(s) {}
-
-*/
-//Mpz class
 	mpz_class mpz(2);	
 	carl::Number<mpz_class> z1, z2, z3, z4, z5, z6, z7, z8, z9, z10;
 	ASSERT_NO_THROW(z1 = carl::Number<mpz_class>());
@@ -76,7 +64,7 @@ TEST(Number, Constructor)
 
 	EXPECT_EQ(q9.getValue(),mpq_class(3.5));
 	EXPECT_EQ(q10.getValue(),mpq_class(3.5));
-	EXPECT_EQ(q11.getValue(),mpq_class(-0.1));
+	EXPECT_EQ(q11.getValue(),mpq_class(3,-30));
 	EXPECT_EQ(q12.getValue(),mpq_class(3));
 	EXPECT_EQ(q13.getValue(),mpq_class(2));
 	EXPECT_EQ(q14.getValue(),mpq_class(0));
@@ -107,7 +95,7 @@ TEST(Number, Constructor)
 	EXPECT_EQ(i6.getValue(),cln::cl_I(4));
 	EXPECT_EQ(i7.getValue(),cln::cl_I(-30));
 	EXPECT_EQ(i8.getValue(),cln::cl_I(3));
-	EXPECT_EQ(i9.getValue(),cln::cl_I(3));
+	EXPECT_EQ(i9.getValue(),cln::cl_I(0));
 	EXPECT_EQ(i10.getValue(),cln::cl_I(0));
 
 	//conversion constructor cl_i -> mpz
@@ -124,7 +112,7 @@ TEST(Number, Constructor)
 	ASSERT_NO_THROW(r4 = carl::Number<cln::cl_RA>(clRA));
 	ASSERT_NO_THROW(r5 = carl::Number<cln::cl_RA>(3ll));
 	ASSERT_NO_THROW(r6 = carl::Number<cln::cl_RA>(4ull));
-	ASSERT_NO_THROW(r7 = carl::Number<cln::cl_RA>("-30"));
+	ASSERT_NO_THROW(r7 = carl::Number<cln::cl_RA>((std::string)"-30"));
 	ASSERT_NO_THROW(r8 = carl::Number<cln::cl_RA>(3));
 
 	ASSERT_NO_THROW(r9 = carl::Number<cln::cl_RA>(3.5f));
@@ -141,15 +129,18 @@ TEST(Number, Constructor)
 	EXPECT_EQ(r1.getValue(),cln::cl_RA(0));
 	EXPECT_EQ(r2.getValue(),cln::cl_RA(2));
 	EXPECT_EQ(r3.getValue(),cln::cl_RA(2));
-	EXPECT_EQ(r4.getValue(),cln::cl_RA(0));
+	EXPECT_EQ(r4.getValue(),cln::cl_RA(2));
 	EXPECT_EQ(r5.getValue(),cln::cl_RA(3));
 	EXPECT_EQ(r6.getValue(),cln::cl_RA(4));
 	EXPECT_EQ(r7.getValue(),cln::cl_RA(-30));
 	EXPECT_EQ(r8.getValue(),cln::cl_RA(3));
 
-	EXPECT_EQ(r9.getValue(),"3.5");
-	EXPECT_EQ(r10.getValue(),"3.5");
-	EXPECT_EQ(r11.getValue(),"-0.1");
+
+	std::string s = "7/2";
+	EXPECT_EQ(r9.getValue(),cln::cl_RA(s.c_str()));
+	EXPECT_EQ(r10.getValue(),cln::cl_RA(s.c_str()));
+	s = "-1/10";
+	EXPECT_EQ(r11.getValue(),cln::cl_RA(s.c_str()));
 	EXPECT_EQ(r12.getValue(),cln::cl_RA(3));
 	EXPECT_EQ(r13.getValue(),cln::cl_RA(2));
 	EXPECT_EQ(r14.getValue(),cln::cl_RA(0));
@@ -163,7 +154,171 @@ TEST(Number, Constructor)
 
 	EXPECT_EQ(q15.getValue(),mpq_class(0));
 	EXPECT_EQ(q16.getValue(),mpq_class(0));
+		
+}
+
+
+TEST(Number,IntegerOperations) {
+
+//mpz
+	carl::Number<mpz_class> z(1);
+	EXPECT_FALSE(z.isZero());
+	EXPECT_TRUE(z.isOne());
+	EXPECT_TRUE(z.isPositive());
+	EXPECT_FALSE(z.isNegative());
+	EXPECT_TRUE(z.isInteger());
+	EXPECT_EQ(z.bitsize(),1);
+	EXPECT_EQ(z.toDouble(),1);
+	EXPECT_EQ(z.abs(),carl::Number<mpz_class>(1)); 
+	carl::Number<mpz_class> x(3);
+	EXPECT_EQ(z.gcd(x),carl::Number<mpz_class>(1));
+	EXPECT_EQ(z.lcm(x),carl::Number<mpz_class>(3));
+	EXPECT_EQ(x.pow(2),carl::Number<mpz_class>(9));
 	
+	EXPECT_EQ(z.mod(x),z);	
+	EXPECT_EQ(z.remainder(x),z);	
+	EXPECT_EQ(z.quotient(x),carl::Number<mpz_class>(0));
+	EXPECT_EQ(z/x,carl::Number<mpz_class>(0));
+	EXPECT_EQ(z.div(z),z);
+
+	EXPECT_EQ(z.toInt<carl::sint>(),1);
+	EXPECT_EQ(z.toInt<carl::uint>(),1);
+
+	EXPECT_EQ(z.toString(),"1");
+
+
+//clI
+	carl::Number<cln::cl_I> i(1);
+	EXPECT_FALSE(i.isZero());
+	EXPECT_TRUE(i.isOne());
+	EXPECT_TRUE(i.isPositive());
+	EXPECT_FALSE(i.isNegative());
+	EXPECT_TRUE(i.isInteger());
+	EXPECT_EQ(i.bitsize(),1);
+	EXPECT_EQ(i.toDouble(),1);
+	EXPECT_EQ(i.abs(),carl::Number<cln::cl_I>(1)); 
+	carl::Number<cln::cl_I> j(3);
+	EXPECT_EQ(i.gcd(j),carl::Number<cln::cl_I>(1));
+	EXPECT_EQ(i.lcm(j),carl::Number<cln::cl_I>(3));
+	EXPECT_EQ(j.pow(2),carl::Number<cln::cl_I>(9));
+	
+	EXPECT_EQ(i.mod(j),i);	
+	EXPECT_EQ(i.remainder(j),i);	
+	EXPECT_EQ(i.quotient(j),carl::Number<cln::cl_I>(0));
+	EXPECT_EQ(i/j,carl::Number<cln::cl_I>(0));
+	EXPECT_EQ(i.div(i),i);
+
+	EXPECT_EQ(i.toInt<carl::sint>(),1);
+	EXPECT_EQ(i.toInt<carl::uint>(),1);
+
+	EXPECT_EQ(i.toString(),"1");
+}
+
+
+TEST(Number,RationalOperations) {
+
+//mpq
+	carl::Number<mpq_class> q(1);
+
+	EXPECT_TRUE(q.isOne());
+	EXPECT_TRUE(q.isPositive());
+	EXPECT_FALSE(q.isNegative());
+	EXPECT_TRUE(q.isInteger());
+	EXPECT_EQ(q.bitsize(),2);
+	EXPECT_EQ(q.toDouble(),1);
+	EXPECT_EQ(q.getNum(),carl::Number<mpz_class>(1));
+	EXPECT_EQ(q.getDenom(),carl::Number<mpz_class>(1));
+	EXPECT_EQ(q.abs(),carl::Number<mpq_class>(1)); 
+
+
+	EXPECT_EQ(q.round(),carl::Number<mpz_class>(1));
+	EXPECT_EQ(q.floor(),carl::Number<mpz_class>(1));
+	EXPECT_EQ(q.ceil(),carl::Number<mpz_class>(1));
+	
+	carl::Number<mpq_class> p(3);
+
+	EXPECT_EQ(q.gcd(p),carl::Number<mpq_class>(1));
+	EXPECT_EQ(q.lcm(p),carl::Number<mpq_class>(3));
+	EXPECT_EQ(p.pow(2),carl::Number<mpq_class>(9));
+	EXPECT_EQ(q.log(),carl::Number<mpq_class>(0));
+	EXPECT_EQ(q.sin(),carl::Number<mpq_class>(std::sin(1)));
+	EXPECT_EQ(q.cos(),carl::Number<mpq_class>(std::cos(1)));
+	carl::Number<mpq_class> result;
+	q.sqrt_exact(result);
+	EXPECT_EQ(result,q);
+	EXPECT_EQ(q.sqrt(),q);
+	auto pair = q.sqrt_safe();
+	EXPECT_EQ(pair.first,q);
+	EXPECT_EQ(pair.second,q);
+	pair = q.sqrt_fast();
+	EXPECT_EQ(pair.first,q);
+	EXPECT_EQ(pair.second,q);
+	
+	EXPECT_EQ(q.quotient(p),carl::Number<mpq_class>(1,3));
+	EXPECT_EQ(q.div(p),carl::Number<mpq_class>(1,3));
+	EXPECT_EQ(q/p,carl::Number<mpq_class>(1,3));
+	EXPECT_EQ(q.reciprocal(),q);
+
+	EXPECT_EQ(q.toInt<carl::Number<mpz_class>>(),carl::Number<mpz_class>(1));
+	EXPECT_EQ(q.toInt<carl::sint>(),1);
+	EXPECT_EQ(q.toInt<carl::uint>(),1);
+
+	EXPECT_EQ(q.toString(),"1");
+
+// clRA:
+
+	carl::Number<cln::cl_RA> r(1);
+
+	EXPECT_TRUE(r.isOne());
+	EXPECT_TRUE(r.isPositive());
+	EXPECT_FALSE(r.isNegative());
+	EXPECT_TRUE(r.isInteger());
+	EXPECT_EQ(r.bitsize(),2);
+	EXPECT_EQ(r.toDouble(),1);
+	EXPECT_EQ(r.getNum(),carl::Number<cln::cl_I>(1));
+	EXPECT_EQ(r.getDenom(),carl::Number<cln::cl_I>(1));
+	EXPECT_EQ(r.abs(),carl::Number<cln::cl_RA>(1)); 
+
+
+	EXPECT_EQ(r.round(),carl::Number<cln::cl_I>(1));
+	EXPECT_EQ(r.floor(),carl::Number<cln::cl_I>(1));
+	EXPECT_EQ(r.ceil(),carl::Number<cln::cl_I>(1));
+	
+	carl::Number<cln::cl_RA> s(3);
+
+	EXPECT_EQ(r.gcd(s),carl::Number<cln::cl_RA>(1));
+	EXPECT_EQ(r.lcm(s),carl::Number<cln::cl_RA>(3));
+	EXPECT_EQ(s.pow(2),carl::Number<cln::cl_RA>(9));
+	EXPECT_EQ(r.log(),carl::Number<cln::cl_RA>(0));
+	EXPECT_EQ(r.sin(),carl::Number<cln::cl_RA>(std::sin(1)));
+	EXPECT_EQ(r.cos(),carl::Number<cln::cl_RA>(std::cos(1)));
+
+	carl::Number<cln::cl_RA> result2;
+	r.sqrt_exact(result2);
+	EXPECT_EQ(result2,r);
+	EXPECT_EQ(r.sqrt(),r);
+	auto pair2 = r.sqrt_safe();
+	EXPECT_EQ(pair2.first,r);
+	EXPECT_EQ(pair2.second,r);
+	pair2 = r.sqrt_fast();
+	EXPECT_EQ(pair2.first,r);
+	EXPECT_EQ(pair2.second,r);
+	
+	std::cout << "quotient r/s: " << r.quotient(s) << "\n";
+	std::cout << "constructing Number(1,3): " << carl::Number<cln::cl_RA>(1,3) << "\n";
+	EXPECT_EQ(r.quotient(s),carl::Number<cln::cl_RA>(1,3));
+	EXPECT_EQ(r.div(s),carl::Number<cln::cl_RA>(1,3));
+	//EXPECT_EQ(r/s,carl::Number<cln::cl_RA>(1,3)); not yet implemented
+	EXPECT_EQ(r.reciprocal(),r);
+
+	EXPECT_EQ(r.toInt<carl::Number<cln::cl_I>>(),carl::Number<cln::cl_I>(1));
+	EXPECT_EQ(r.toInt<carl::sint>(),1);
+	EXPECT_EQ(r.toInt<carl::uint>(),1);
+
+	EXPECT_EQ(r.toString(),"1");
 
 	
 }
+
+
+

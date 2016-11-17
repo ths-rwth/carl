@@ -51,6 +51,8 @@ namespace carl {
 		}
 
 
+
+
 	
 		
 		inline bool isZero() const {
@@ -172,11 +174,7 @@ namespace carl {
 		}
 
 
-/*		NOTE: doesn't seem to get used!
 
-		inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_class& quotient, mpz_class& remainder) {
-			mpz_divmod(quotient.get_mpz_t(), remainder.get_mpz_t(), dividend.get_mpz_t(), divisor.get_mpz_t());
-		} */
 
 
 		/**
@@ -192,12 +190,6 @@ namespace carl {
 		}
 
 
-/*	NOTE: Doesn't seem to get used!
-
-inline mpz_class& div_assign(mpz_class& a, const mpz_class& b) {
-	a = carl::quotient(a, b);
-    return a;
-} */
 
 
 		virtual std::string toString(bool _infix=true) const;

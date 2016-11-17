@@ -64,13 +64,13 @@ namespace carl {
 		}
 
 
-		inline bool isPositive()  {
+		inline bool isPositive() const {
 			return mData > carl::constant_zero<cln::cl_RA>().get();
 		}
 
 
 
-		inline bool isNegative()  {
+		inline bool isNegative() const {
 			return mData < carl::constant_zero<cln::cl_RA>().get();
 		}
 
@@ -144,6 +144,7 @@ namespace carl {
 		}
 
 
+		Number<cln::cl_I> pow(std::size_t exp) const;
 
 
 		/**
@@ -207,11 +208,13 @@ namespace carl {
 		{
 			return this->quotient(b);
 		}
-		inline Number<cln::cl_I> operator/(const int& rhs) {
+
+//probably superfluous because one can construct Number from int implicitly anyway (hopefully)
+	/*	inline Number<cln::cl_I> operator/(const int& rhs) {
 			return Number(mData / cln::cl_I(rhs));
 		}
 
-		
+	*/	
 	};
 
 

@@ -1,10 +1,12 @@
 #include "NumberClI.h"
+#include "NumberClRA.h"
 
 
 namespace carl {
 
 #ifdef USE_CLN_NUMBERS
 
+//TODO: why not use the standard output of cln here?! Surely that works?
     	std::string Number<cln::cl_I>::toString(bool _infix) const
 	{
 		std::stringstream s;
@@ -14,6 +16,12 @@ namespace carl {
 		if(negative)
 		    s << ")";
 		return s.str();
+	}
+
+	Number<cln::cl_I> Number<cln::cl_I>::pow(std::size_t exp) const {
+		Number<cln::cl_RA> ra = Number<cln::cl_RA>(cln::expt(mData, int(exp)));
+		return ra.toInt<Number<cln::cl_I>>();
+
 	}
 
 #endif

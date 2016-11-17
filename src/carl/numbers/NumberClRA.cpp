@@ -15,29 +15,80 @@ namespace carl {
 
 
 		//this can maybe be done such that it's the same as for mpq_class
-    	/*    Number<cln::cl_RA>::Number(const std::string& s) {	
+    	   Number<cln::cl_RA>::Number(const std::string& s) {	
+		//here, we need to distinguish two cases: we want to deal with normal floating point inputs (as "3.5") but also fractions ("7/2")
+		if (s.find_first_of("/") == std::string::npos) { //this is the floating point case				
+		
+			std::vector<std::string> strs;
+			boost::split(strs, s, boost::is_any_of("."));
 
-		std::vector<std::string> strs;
-		boost::split(strs, s, boost::is_any_of("."));
+			if(strs.size() > 2)
+			{
+			    throw std::invalid_argument("More than one delimiter in the string.");
+			}
+			cln::cl_RA result(0);
+			if(!strs.front().empty())
+			{
+			    result += cln::cl_RA(strs.front().c_str());
+			}
+			if(strs.size() > 1)
+			{
+			    result += (cln::cl_RA(strs.back().c_str())/carl::pow(cln::cl_RA(10),static_cast<unsigned>(strs.back().size())));
+			}
+			mData = cln::cl_RA(result);
+		} else { //the case where we have a fraction as input
+			cln::cl_read_flags flags = {cln::syntax_rational, cln::lsyntax_all, 10, cln::default_float_format, cln::default_float_format, false}; 
+			std::istringstream istr(s);
+			mData = cln::cl_RA(cln::read_rational(istr,flags));
+		}
+	    } 
+	 /*   Number<cln::cl_RA>::Number(double n) {
+		switch (std::fpclassify(n)) {
+		    case FP_NORMAL: // normalized are fully supported
+		        mData = cln::rationalize(convert<mpq_class, cln::cl_RA>(n));
+		    case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
+					static_assert(sizeof(n) == 8, "double is assumed to be eight bytes wide.");
+		        sint significandBits = reinterpret_cast<sint>(&n);
+		        significandBits = (significandBits << 12) >> 12;
+		        if( n < 0 )
+		            significandBits = -significandBits;
+		        mData = cln::cl_RA( significandBits ) * ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52;
+		}
+		case FP_ZERO:
+		    mData = cln::cl_RA(0);
+		case FP_NAN: // NaN and infinite are not supported
+		case FP_INFINITE:
+		    assert(false);
+		    break;
+		}
+		mData = cln::cl_RA(0);
+	}
 
-		if(strs.size() > 2)
+	Number<cln::cl_RA>::Number(float n) {
+		switch (std::fpclassify(n))
 		{
-		    throw std::invalid_argument("More than one delimiter in the string.");
+		    case FP_NORMAL: // normalized are fully supported
+		        mData = cln::rationalize(convert<mpq_class, cln::cl_RA>(n));
+		    case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
+					static_assert(sizeof(n) == 4, "float is assumed to be four bytes wide.");
+		        sint significandBits = reinterpret_cast<sint>(&n);
+		        significandBits = (significandBits << 9) >> 9;
+		        if( n < 0 )
+		            significandBits = -significandBits;
+		        mData = cln::cl_RA( significandBits ) * ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23;
 		}
-		cln::cl_RA result(0);
-		if(!strs.front().empty())
-		{
-		    result += cln::cl_RA(strs.front().c_str());
+		case FP_ZERO:
+		    mData = cln::cl_RA(0);
+		case FP_NAN: // NaN and infinite are not supported
+		case FP_INFINITE:
+		    assert(false);
+		    break;
 		}
-		if(strs.size() > 1)
-		{
-		    result += (cln::cl_RA(strs.back().c_str())/carl::pow(cln::cl_RA(10),static_cast<unsigned>(strs.back().size())));
-		}
-		mData = cln::cl_RA(result);
-	    } */
+		mData = cln::cl_RA(0);
+	} */
 	
 
-
+	//TODO: why not use the standard output of cln here?! Surely that works?
 	    std::string Number<cln::cl_RA>::toString(bool _infix) const
 	    {
 
@@ -54,7 +105,7 @@ namespace carl {
 		if(negative)
 		    s << ")";
 		return s.str();
-	    }
+	    } 
 
 
 
@@ -65,9 +116,7 @@ namespace carl {
 		if( mData < 0 ) return false;
 		cln::cl_RA result;
 		bool boolResult = cln::sqrtp( mData, &result );
-		//TODO: test if this works, otherwise implement and use setValue for Number
-		//TODO: return b
-		//b = Number(result);
+		b = Number(result);
 		return boolResult;
 	 }
 
@@ -76,7 +125,7 @@ namespace carl {
 	 Number<cln::cl_RA> Number<cln::cl_RA>::sqrt()
 	 {
 		std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> r = this->sqrt_safe();
-		return Number((r.first + r.second) / 2);
+		return Number((r.first.getValue() + r.second.getValue()) / 2); //TODO: remove the getValue once operators are implemented!!
 	 }
 	
 
