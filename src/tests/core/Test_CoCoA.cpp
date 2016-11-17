@@ -5,6 +5,8 @@
 #include <carl/converter/CoCoAAdaptor.h>
 #include <carl/core/MultivariatePolynomial.h>
 
+#include <random>
+
 #ifdef USE_COCOA
 
 #include "CoCoA/library.H"
@@ -76,4 +78,50 @@ TEST(CoCoA, Factorize)
 		EXPECT_EQ(it2->second, 1);
 	}
 }
+
+MultivariatePolynomial<mpq_class> randomPoly(const std::initializer_list<Variable>& vars) {
+	static std::mt19937 rand(4);
+	MultivariatePolynomial<mpq_class> res;
+	for (std::size_t i = 0; i < 20; i++) {
+		mpq_class coeff = rand() % 1024;
+		Monomial::Arg m = nullptr;
+		std::size_t left = i;
+		for (const auto& v: vars) {
+			if (left == 0) break;
+			std::size_t e = rand() % (left + 1);
+			if (e == 0) continue;
+			m = m * createMonomial(v, e);
+			left -= e;
+		}
+		res += coeff * m;
+	}
+	return res;
+}
+
+TEST(CoCoA, Benchmark)
+{
+	using Poly = MultivariatePolynomial<mpq_class>;
+	CoCoA::GlobalManager CoCoAFoundations;
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	
+	std::size_t count = 10;
+	std::cout << "Generating " << count << "..." << std::endl;
+	std::vector<std::tuple<Poly,Poly,Poly>> instances;
+	for (std::size_t i = 0; i < count; i++) {
+		Poly a = randomPoly({x, y});
+		Poly b = randomPoly({x, y});
+		Poly c = randomPoly({x, y});
+		instances.emplace_back(a*c, b*c, c);
+	}
+	std::cout << "Starting..." << std::endl;
+	CoCoAAdaptor<Poly> conv({randomPoly({x, y})});
+	carl::Timer timer;
+	for (const auto& i: instances) {
+		auto res = conv.gcd(std::get<0>(i), std::get<1>(i));
+		EXPECT_EQ(res, std::get<2>(i));
+	}
+	std::cout << "Passed: " << (double(timer.passed()) / count) << "ms per instance" << std::endl;
+}
+
 #endif
