@@ -44,10 +44,9 @@ private:
 		res = convert(r);
 	}
 	
-	static std::vector<Variable> collectVariables(const Poly& p1, const Poly& p2) {
+	static std::vector<Variable> collectVariables(const std::initializer_list<Poly>& polys) {
 		std::set<Variable> vars;
-		p1.gatherVariables(vars);
-		p2.gatherVariables(vars);
+		for (const auto& p: polys) p.gatherVariables(vars);
 		return std::vector<Variable>(vars.begin(), vars.end());
 	}
 	
@@ -99,8 +98,8 @@ public:
 	}
 	
 public:
-	CoCoAAdaptor(const Poly& p1, const Poly& p2):
-	 	mSymbolBack(collectVariables(p1, p2)),
+	CoCoAAdaptor(const std::initializer_list<Poly>& polys):
+		mSymbolBack(collectVariables(polys)),
 		mRing(CoCoA::NewPolyRing(mQ, long(mSymbolBack.size())))
 	{
 		auto indets = CoCoA::indets(mRing);

@@ -39,7 +39,7 @@ TEST(CoCoA, Adaptor)
 	
 	CoCoA::GlobalManager CoCoAFoundations;
 	
-	CoCoAAdaptor<Poly> c(p1, p2);
+	CoCoAAdaptor<Poly> c({p1, p2});
 	Poly q = c.gcd(p1, p2);
 	EXPECT_EQ(p3, q);
 }
