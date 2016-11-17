@@ -1,0 +1,120 @@
+#pragma once
+
+#include "../core/MonomialPool.h"
+#include "../core/Term.h"
+#include "../core/Variable.h"
+
+#include <map>
+
+#ifdef USE_COCOA
+
+#include "CoCoA/library.H"
+
+namespace carl {
+
+template<typename Poly>
+class CoCoAAdaptor {
+private:
+	std::map<Variable, CoCoA::RingElem> mSymbolThere;
+	std::vector<Variable> mSymbolBack;
+	CoCoA::ring mQ = CoCoA::RingQQ();
+	CoCoA::SparsePolyRing mRing;
+	
+	CoCoA::BigInt convert(const mpz_class& n) const {
+		return CoCoA::BigInt(n.get_mpz_t());
+	}
+	mpz_class convert(const CoCoA::BigInt& n) const {
+		return mpz_class(CoCoA::mpzref(n));
+	}
+	CoCoA::BigRat convert(const mpq_class& n) const {
+		return CoCoA::BigRat(n.get_mpq_t());
+	}
+	mpq_class convert(const CoCoA::BigRat& n) const {
+		return mpq_class(CoCoA::mpqref(n));
+	}
+	
+	void convert(mpz_class& res, const CoCoA::RingElem& n) const {
+		CoCoA::BigInt i;
+		CoCoA::IsInteger(i, n);
+		res = convert(i);
+	}
+	void convert(mpq_class& res, const CoCoA::RingElem& n) const {
+		CoCoA::BigRat r;
+		CoCoA::IsRational(r, n);
+		res = convert(r);
+	}
+	
+	static std::vector<Variable> collectVariables(const Poly& p1, const Poly& p2) {
+		std::set<Variable> vars;
+		p1.gatherVariables(vars);
+		p2.gatherVariables(vars);
+		return std::vector<Variable>(vars.begin(), vars.end());
+	}
+	
+public:
+	CoCoA::RingElem convert(const Poly& p) const {
+		CoCoA::RingElem res(mRing);
+		for (const auto& t: p) {
+			if (!t.monomial()) {
+				res += convert(t.coeff());
+				continue;
+			}
+			std::vector<long> exponents(mSymbolBack.size());
+			for (const auto& p: *t.monomial()) {
+				auto it = mSymbolThere.find(p.first);
+				assert(it != mSymbolThere.end());
+				long indetIndex;
+				if (CoCoA::IsIndet(indetIndex, it->second)) {
+					exponents[std::size_t(indetIndex)] = long(p.second);
+				} else {
+					assert(false && "The symbol is not an inderminant.");
+				}
+			}
+			res += CoCoA::monomial(mRing, convert(t.coeff()), exponents);
+		}
+		return res;
+	}
+	
+	Poly convert(const CoCoA::RingElem& p) const {
+		Poly res;
+		for (CoCoA::SparsePolyIter i = CoCoA::BeginIter(p); !CoCoA::IsEnded(i); ++i) {
+			typename Poly::CoeffType coeff;
+			convert(coeff, CoCoA::coeff(i));
+			if (CoCoA::IsOne(CoCoA::PP(i))) {
+				res += coeff;
+			} else {
+				std::vector<long> exponents;
+				CoCoA::exponents(exponents, CoCoA::PP(i));
+				Monomial::Content monContent;
+				std::size_t tdeg = 0;
+				for (std::size_t i = 0; i < exponents.size(); i++) {
+					if (exponents[i] == 0) continue;
+					monContent.emplace_back(mSymbolBack[i], exponents[i]);
+					tdeg += std::size_t(exponents[i]);
+				}
+				res += typename Poly::TermType(std::move(coeff), createMonomial(std::move(monContent), tdeg));
+			}
+		}
+		return res;
+	}
+	
+public:
+	CoCoAAdaptor(const Poly& p1, const Poly& p2):
+	 	mSymbolBack(collectVariables(p1, p2)),
+		mRing(CoCoA::NewPolyRing(mQ, long(mSymbolBack.size())))
+	{
+		auto indets = CoCoA::indets(mRing);
+
+		for (std::size_t i = 0; i < mSymbolBack.size(); i++) {
+			mSymbolThere.emplace(mSymbolBack[i], indets[i]);
+		}
+	}
+	
+	Poly gcd(const Poly& p1, const Poly& p2) const {
+		return convert(CoCoA::gcd(convert(p1), convert(p2)));
+	}
+};
+
+}
+
+#endif
