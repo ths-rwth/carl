@@ -3,6 +3,7 @@
 #include "../core/MonomialPool.h"
 #include "../core/Term.h"
 #include "../core/Variable.h"
+#include "../util/Common.h"
 
 #include <map>
 
@@ -111,6 +112,19 @@ public:
 	
 	Poly gcd(const Poly& p1, const Poly& p2) const {
 		return convert(CoCoA::gcd(convert(p1), convert(p2)));
+	}
+	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
+		auto finfo = CoCoA::factor(convert(p));
+		Factors<Poly> res;
+		if (includeConstants) {
+			if (!CoCoA::IsOne(finfo.myRemainingFactor())) {
+				res.emplace(convert(finfo.myRemainingFactor()), 1);
+			}
+		}
+		for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
+			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
+		}
+		return res;
 	}
 };
 
