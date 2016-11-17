@@ -40,7 +40,7 @@ private:
 		else if (m.second == 1) *this << m.first;
 		else {
 			*this << "(*";
-			for (auto i = 0; i < m.second; i++) *this << " " << m.first;
+			for (std::size_t i = 0; i < m.second; i++) *this << " " << m.first;
 			*this << ")";
 		}
 	}
