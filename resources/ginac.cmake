@@ -19,8 +19,8 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(ginac INSTALL_DIR)
 
-add_imported_library(GINAC SHARED "${source_dir}/lib/libginac.so" "${INSTALL_DIR}/include")
-add_imported_library(GINAC STATIC "${source_dir}/lib/libginac.a" "${INSTALL_DIR}/include")
+add_imported_library(GINAC SHARED "${INSTALL_DIR}/lib/libginac.so" "${INSTALL_DIR}/include")
+add_imported_library(GINAC STATIC "${INSTALL_DIR}/lib/libginac.a" "${INSTALL_DIR}/include")
 
 add_dependencies(resources ginac)
 
