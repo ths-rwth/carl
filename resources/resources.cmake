@@ -12,7 +12,24 @@ endif()
 
 ###############
 ##### Load resources
+#####
+##### Note that the resources may have dependencies among each other.
 ###############
+
+
+##### GMP / GMPXX
+if(NOT FORCE_SHIPPED_RESOURCES)
+	load_library(carl GMP 5.1)
+	load_library(carl GMPXX 5.1)
+endif()
+if(GMP_FOUND)
+	message(STATUS "Use system version of GMP ${GMP_VERSION}")
+else()
+	set(GMP_VERSION "6.1.0")
+	include(resources/gmp.cmake)
+	message(STATUS "Use shipped version of GMP ${GMP_VERSION}")
+endif()
+
 
 ##### Boost
 if(NOT FORCE_SHIPPED_RESOURCES)
@@ -22,13 +39,9 @@ if(Boost_FOUND)
 	message(STATUS "Use system version of Boost ${Boost_VERSION}")
 else()
 	set(BOOST_VERSION "1.60.0")
-	message(STATUS "Use shipped version of Boost ${BOOST_VERSION}")
 	include(resources/boost.cmake)
-	#link_directories(${BOOST_LIBRARY_DIR})
+	message(STATUS "Use shipped version of Boost ${BOOST_VERSION}")
 endif()
-#include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-#list(APPEND carl_LIBRARIES_DYNAMIC ${Boost_LIBRARIES_DYNAMIC})
-#list(APPEND carl_LIBRARIES_STATIC ${Boost_LIBRARIES_STATIC})
 
 
 ##### CLN
@@ -54,6 +67,7 @@ if(USE_COCOA)
 	if(COCOA_FOUND)
 		message(STATUS "Use system version of CoCoA ${COCOA_VERSION}")
 	else()
+		# Depends on GMP
 		set(COCOA_VERSION "0.99542")
 		include(resources/cocoa.cmake)
 		message(STATUS "Use shipped version of CoCoA ${COCOA_VERSION}")
@@ -88,19 +102,6 @@ if(USE_GINAC)
 	endif()
 endif()
 
-
-##### GMP / GMPXX
-if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl GMP 5.1)
-	load_library(carl GMPXX 5.1)
-endif()
-if(GMP_FOUND)
-	message(STATUS "Use system version of GMP ${GMP_VERSION}")
-else()
-	set(GMP_VERSION "6.1.0")
-	include(resources/gmp.cmake)
-	message(STATUS "Use shipped version of GMP ${GMP_VERSION}")
-endif()
 
 ##### GTest
 if(NOT FORCE_SHIPPED_RESOURCES)
