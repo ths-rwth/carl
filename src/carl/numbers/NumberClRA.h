@@ -22,7 +22,7 @@ namespace carl {
 	//static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
 
 	template<>
-	class Number<cln::cl_RA> : public BaseNumber<cln::cl_RA> {
+	class Number<cln::cl_RA> : public BaseNumber<cln::cl_RA,Number<cln::cl_RA>> {
 	private:
 	cln::cl_RA scaleByPowerOfTwo(const cln::cl_RA& a, int exp); //auxiliary function 
 	public:

@@ -13,7 +13,7 @@ namespace carl {
 //TODO: was ist der Unterschied zwischen den einstelligen und zweistelligen Operatoren und welche brauchen wir?
 //      auch bei Sachen wie gcd, soll das innerhalb oder außerhalb der Klasse sein?
 
-	template<typename T>
+	template<typename T, typename N>
 	class BaseNumber {
 	protected:
 		T mData;
@@ -25,8 +25,8 @@ namespace carl {
 		BaseNumber(): mData(carl::constant_zero<T>::get()) {}
 		explicit BaseNumber(const T& t): mData(t) {}
 		explicit BaseNumber(T&& t): mData(std::move(t)) {}
-		BaseNumber(const BaseNumber<T>& n): mData(n.mData) {}
-		BaseNumber(BaseNumber<T>&& n) noexcept : mData(std::move(n.mData)) {}
+		BaseNumber(const BaseNumber<T,N>& n): mData(n.mData) {}
+		BaseNumber(BaseNumber<T,N>&& n) noexcept : mData(std::move(n.mData)) {}
 		//TODO: is this really the best way? one could also create an mpz_class, multiply it by 10^whatever and add the rest...
 		BaseNumber(long long int n) { std::string s = std::to_string(n); mData = T(s); }
 		BaseNumber(unsigned long long int n) { std::string s = std::to_string(n); mData= T(s); }
@@ -35,32 +35,87 @@ namespace carl {
 
 		const T& getValue() const {
 			return mData;
-		};
+		}
 
-		BaseNumber<T>& operator=(const BaseNumber<T>& n) {
+		BaseNumber<T,N>& operator=(const BaseNumber<T,N>& n) {
 			mData = n.mData;
 			return *this;
 		}
 
 		template<typename Other>
-		BaseNumber<T>& operator=(const Other& n) {
+		BaseNumber<T,N>& operator=(const Other& n) {
 			mData = n;
 			return *this;
 		}
 
-		BaseNumber<T>& operator=(BaseNumber<T>&& n) noexcept {
+		BaseNumber<T,N>& operator=(BaseNumber<T,N>&& n) noexcept {
 			mData = std::move(n.mData);
 			return *this;
 		}
 
-		bool operator==(const BaseNumber<T>& rhs) const {
+		bool operator==(const BaseNumber<T,N>& rhs) const {
 			return this->mData == rhs.mData;
 		}
 
-		bool operator!=(const BaseNumber<T>& rhs) const {
+		bool operator!=(const BaseNumber<T,N>& rhs) const {
 			return this->mData != rhs.mData;
 		}
-/*
+
+		bool operator<(const BaseNumber<T,N>& rhs) {
+			return this->mData < rhs.mData;;
+		}
+
+		bool operator<=(const BaseNumber<T,N>& rhs) {
+			return this->mData <= rhs.mData;
+		}
+
+		bool operator>=(const BaseNumber<T,N>& rhs) {
+			return this->mData >= rhs.mData;
+		}
+
+		bool operator>(const BaseNumber<T,N>& rhs) {
+			return this->mData > rhs.mData;
+		}
+
+
+		N operator+(const BaseNumber<T,N>& rhs) {
+			return N(this->mData + rhs.mData);
+		}
+
+		/*BaseNumber<T> operator+=(const BaseNumber<T>& rhs) {
+			return T(lhs) += T(rhs);
+		} 
+
+
+		Number<T> operator-(const Number<T>& rhs) {
+			return Number(this->mData - rhs.mData);
+		}
+
+		BaseNumber<T> operator-=(const BaseNumber<T>& rhs) {
+			return T(lhs) -= T(rhs);
+		} 
+
+		Number<T> operator*(const Number<T>& rhs) {
+			Number(this->mData * rhs.mData);
+		}
+
+		BaseNumber<T> operator*=(const BaseNumber<T>& rhs) {
+			return T(lhs) *= T(rhs);
+		} 
+
+		Number<T> operator/(const Number<T>& rhs) {
+			Number(this->mData / rhs.mData);
+		}
+
+		BaseNumber<T> operator/=(const BaseNumber<T>& rhs) {
+			return T(lhs) /= T(rhs);
+		}
+
+
+
+
+
+
 		operator T&() {
 			return mData;
 		}
@@ -74,7 +129,7 @@ namespace carl {
 	};
 
 	template<typename T>
-	class Number : public BaseNumber<T> {};	
+	class Number : public BaseNumber<T,Number<T>> {};	
 
 
 /*	template<typename T>
@@ -154,8 +209,8 @@ namespace carl {
 	
 	}; */
 
-		template <typename T>
-		std::ostream& operator <<(std::ostream& os, const BaseNumber<T>& n) {
+		template <typename T, typename N>
+		std::ostream& operator <<(std::ostream& os, const BaseNumber<T,N>& n) {
 			return os << n.getValue();
 		} 
 

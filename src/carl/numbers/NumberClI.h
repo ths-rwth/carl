@@ -11,7 +11,7 @@ namespace carl {
 #ifdef USE_CLN_NUMBERS
 
 	template<>
-	class Number<cln::cl_I> : public BaseNumber<cln::cl_I> {
+	class Number<cln::cl_I> : public BaseNumber<cln::cl_I,Number<cln::cl_I>> {
 	public:
 
 		Number(): BaseNumber() {}

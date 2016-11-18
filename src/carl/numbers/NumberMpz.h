@@ -15,7 +15,7 @@ namespace carl {
 #endif
 
 	template<>
-	class Number<mpz_class> : public BaseNumber<mpz_class> {
+	class Number<mpz_class> : public BaseNumber<mpz_class,Number<mpz_class>> {
 	public:
 	
 

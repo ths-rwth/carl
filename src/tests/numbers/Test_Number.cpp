@@ -321,4 +321,48 @@ TEST(Number,RationalOperations) {
 }
 
 
+TEST(Number,ComparisonOperators) {
+
+//mpz
+	carl::Number<mpz_class> z1(1), z2(2);
+	EXPECT_TRUE(z1 != z2);
+	EXPECT_FALSE(z1 == z2);
+	EXPECT_TRUE(z1 < z2);
+	EXPECT_TRUE(z1 <= z2);
+	EXPECT_FALSE(z1 > z2);
+	EXPECT_FALSE(z1 >= z2);
+
+//mpq
+	carl::Number<mpq_class> q1(1), q2(2);
+	EXPECT_TRUE(q1 != q2);
+	EXPECT_FALSE(q1 == q2);
+	EXPECT_TRUE(q1 < q2);
+	EXPECT_TRUE(q1 <= q2);
+	EXPECT_FALSE(q1 > q2);
+	EXPECT_FALSE(q1 >= q2);
+
+//clI
+	carl::Number<cln::cl_I> i1(1), i2(2);
+	EXPECT_TRUE(i1 != i2);
+	EXPECT_FALSE(i1 == i2);
+	EXPECT_TRUE(i1 < i2);
+	EXPECT_TRUE(i1 <= i2);
+	EXPECT_FALSE(i1 > i2);
+	EXPECT_FALSE(i1 >= i2);
+
+//clRA
+	carl::Number<cln::cl_RA> r1(1), r2(2);
+	EXPECT_TRUE(r1 != r2);
+	EXPECT_FALSE(r1 == r2);
+	EXPECT_TRUE(r1 < r2);
+	EXPECT_TRUE(r1 <= r2);
+	EXPECT_FALSE(r1 > r2);
+	EXPECT_FALSE(r1 >= r2);
+
+
+
+
+}
+
+
 
