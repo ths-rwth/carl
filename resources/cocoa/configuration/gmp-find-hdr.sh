@@ -11,6 +11,12 @@ fi
 
 GMP_LIB="$1"
 
+PLATFORM=`basename "$GMP_LIB"`
+if [ "$PLATFORM" = "lib" ]
+then
+  PLATFORM=
+fi
+
 GMP_LIB_DIR=`dirname "$GMP_LIB"`
 GMP_LIB_DIR_DIR=`dirname "$GMP_LIB_DIR"`
 # Special handling if libgmp.a is not fully installed...
@@ -22,18 +28,22 @@ else
   # GMP is installed -- have to check two possible locations for the header file
   GMP_INC_DIR1="$GMP_LIB_DIR_DIR"/include
   GMP_INC_DIR2=`dirname "$GMP_LIB_DIR_DIR"`/include
+  GMP_INC_DIR3="$GMP_LIB_DIR_DIR/include/$PLATFORM"
   if [ -f "$GMP_INC_DIR1/gmp.h" ]
   then
     GMP_INC_DIR="$GMP_INC_DIR1"
   elif [ -f "$GMP_INC_DIR2/gmp.h" ]
   then
     GMP_INC_DIR="$GMP_INC_DIR2"
+  elif [ -n "$PLATFORM" -a -f "$GMP_INC_DIR3/gmp.h" ]
+  then
+    GMP_INC_DIR="$GMP_INC_DIR3"
   else
-    echo "ERROR: $0: Cannot find GMP header for $GMP_LIB; searched in $GMP_INC_DIR1 and $GMP_INC_DIR2"
+    echo "ERROR: $0: Cannot find GMP header for $GMP_LIB; searched in $GMP_INC_DIR1 and $GMP_INC_DIR2 and $GMP_INC_DIR3"
     exit 3
   fi
 fi
-if [ -f "$GMP_INC_DIR/gmp.h" -a -r "$GMP_INC_DIR/gmp.h" ]
+if [ -r "$GMP_INC_DIR/gmp.h" ]
 then
   # We've found a plausible gmp.h.
   echo "$GMP_INC_DIR"
