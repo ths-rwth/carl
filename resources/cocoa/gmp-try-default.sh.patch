@@ -13,12 +13,11 @@
 ---
 > TODAY=`date "+%Y-%m-%d"`
 > TIME=`date "+%H:%M:%S"`
-> TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-try-default-$TIME
+> TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-try-default-$TIME-$$
 > /bin/rm -rf $TMP_DIR  &&  mkdir -p $TMP_DIR
 > if [ $? -ne 0 ]; then
 >   echo "ERROR: $0 failed to create temporary directory \"$TMP_DIR\""
-38,45c34
-< cd $TMP_DIR
+39,45d34
 < # define fn for cleaning up temp dir
 < cleanup()
 < {
@@ -26,8 +25,6 @@
 <   /bin/rm  -rf "$TMP_DIR"
 < }
 < 
----
-> pushd $TMP_DIR  >/dev/null
 74a64
 > DYN_LINK=ok
 83a74,79
@@ -53,12 +50,13 @@
 <     # GMPXX passed, so we have both GMP and GMPXX
 ---
 >     # We have both GMP and GMPXX
-95c99,100
+95c99,101
 <   cleanup
 ---
->   popd > /dev/null
+>   # Clean-up TMP_DIR
+>   cd # leave TMP_DIR
 >   /bin/rm -rf $TMP_DIR
-97a103,108
+97a104,109
 > 
 > if [ DYN_LINK -ne "ok" ]
 > then

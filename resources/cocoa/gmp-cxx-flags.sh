@@ -46,7 +46,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-pushd $TMP_DIR  >/dev/null
+cd $TMP_DIR
 cat > prog.C <<EOF
 #include "gmp.h"
 #include <iostream>
@@ -87,7 +87,9 @@ if [ $? -ne 0 ]
 then
   COCOALIB_CXXFLAGS=""
 fi
-popd  > /dev/null
+
+# Clean up TMP_DIR
+cd # Leave TMP_DIR
 /bin/rm -rf $TMP_DIR
 
 echo $COCOALIB_CXXFLAGS

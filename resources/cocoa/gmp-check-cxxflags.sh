@@ -55,14 +55,14 @@ umask 22
 # name clashes if several people try to install CoCoALib simultaneously.
 TODAY=`date "+%Y-%m-%d"`
 TIME=`date "+%H:%M:%S"`
-TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-check-cxxflags-$TIME
+TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-check-cxxflags-$TIME-$$
 /bin/rm -rf $TMP_DIR  &&  mkdir -p $TMP_DIR
 if [ $? -ne 0 ]; then
   echo "ERROR: $0 failed to create temporary directory \"$TMP_DIR\""
   exit 1
 fi
 
-pushd $TMP_DIR  >/dev/null
+cd $TMP_DIR
 cat > TestProg.c <<EOF
 #include "gmp.h"
 
@@ -101,6 +101,7 @@ then
   exit 3
 fi
 
-popd > /dev/null
+# Clean up TMP_DIR
+cd # Leave TMP_DIR
 /bin/rm -rf $TMP_DIR
 exit 0

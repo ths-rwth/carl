@@ -42,14 +42,14 @@ fi
 umask 22
 TODAY=`date "+%Y-%m-%d"`
 TIME=`date "+%H:%M:%S"`
-TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-version-$TIME
+TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-version-$TIME-$$
 /bin/rm -rf $TMP_DIR  &&  mkdir -p $TMP_DIR
 if [ $? -ne 0 ]; then
   echo "ERROR: $0 failed to create temporary directory \"$TMP_DIR\""
   exit 1
 fi
 
-pushd $TMP_DIR  >/dev/null
+cd $TMP_DIR
 
 cat > TestProg.C <<EOF
 #include "gmp.h"
@@ -75,7 +75,8 @@ fi
 # Compilation succeeded, so run $PROG which will print out the version.
 GMP_LIB_VERSION=`./TestProg`
 
-popd > /dev/null
+# Clean up TMP_DIR
+cd # Leave TMP_DIR
 /bin/rm -rf $TMP_DIR
 
 # If we get here, all tests have passed, so print version number and exit with code 0.

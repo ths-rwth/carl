@@ -32,12 +32,8 @@
 ---
 > TODAY=`date "+%Y-%m-%d"`
 > TIME=`date "+%H:%M:%S"`
-> TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-check-cxxflags-$TIME
+> TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-check-cxxflags-$TIME-$$
 > /bin/rm -rf $TMP_DIR  &&  mkdir -p $TMP_DIR
-36c65
-< cd $TMP_DIR
----
-> pushd $TMP_DIR  >/dev/null
 53c82
 < $CXX $CXXFLAGS $CXXFLAGS_FOR_GMP TestProg.c -o TestProg -I ../ExternalLibs/include -L../ExternalLibs/lib $GMP_LDLIB 2> /dev/null
 ---
@@ -57,7 +53,8 @@
 ---
 >   # Deliberately leave $TMP_DIR to assist debugging.
 >   echo "ERROR: $0: TestProg crashed (probably linker problem for libgmp)"
-77c104
+77c104,105
 < cd ..
 ---
-> popd > /dev/null
+> # Clean up TMP_DIR
+> cd # Leave TMP_DIR

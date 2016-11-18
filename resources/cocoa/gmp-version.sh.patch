@@ -34,7 +34,7 @@
 > umask 22
 > TODAY=`date "+%Y-%m-%d"`
 > TIME=`date "+%H:%M:%S"`
-> TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-version-$TIME
+> TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-version-$TIME-$$
 > /bin/rm -rf $TMP_DIR  &&  mkdir -p $TMP_DIR
 37c48
 <   echobox "ERROR: $0: failed to create temporary directory \"$TMP_DIR\"";
@@ -44,7 +44,7 @@
 < pushd $TMP_DIR >/dev/null
 ---
 > 
-> pushd $TMP_DIR  >/dev/null
+> cd $TMP_DIR
 > 
 52c65
 < $CXX -I ../ExternalLibs/include  TestProg.C -o TestProg 2> /dev/null
@@ -58,7 +58,8 @@
 ---
 >   echo "ERROR: $0: unable to determine version of GMP library"   > /dev/stderr
 >   echo "ERROR: $0: (compilation failed in gmp-version.sh)"       > /dev/stderr
-67c78
+67c78,79
 < popd >/dev/null
 ---
-> popd > /dev/null
+> # Clean up TMP_DIR
+> cd # Leave TMP_DIR

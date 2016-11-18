@@ -24,14 +24,14 @@ fi
 umask 22
 TODAY=`date "+%Y-%m-%d"`
 TIME=`date "+%H:%M:%S"`
-TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-try-default-$TIME
+TMP_DIR=/tmp/CoCoALib-config-$USER-$TODAY/gmp-try-default-$TIME-$$
 /bin/rm -rf $TMP_DIR  &&  mkdir -p $TMP_DIR
 if [ $? -ne 0 ]; then
   echo "ERROR: $0 failed to create temporary directory \"$TMP_DIR\""
   exit 1
 fi
 
-pushd $TMP_DIR  >/dev/null
+cd $TMP_DIR
 
 # Here is the simple source code we shall use to test for gmp:
 cat > TestGMP.C <<EOF
@@ -96,7 +96,8 @@ do
     # We have both GMP and GMPXX
     echo GMPXX
   fi
-  popd > /dev/null
+  # Clean-up TMP_DIR
+  cd # leave TMP_DIR
   /bin/rm -rf $TMP_DIR
   exit 0
 done

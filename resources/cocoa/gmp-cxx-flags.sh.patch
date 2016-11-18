@@ -33,10 +33,11 @@
 < #   echo "ERROR: $0 expects the $EXTLIBS/ subtree to exist"
 < #   exit 1
 < # fi
-28,30c40,48
+28,31c40,49
 < TMP_DIR=configuration/get-gmp-cxxflags-$UID@$HOSTNAME-$$
 < /bin/rm -rf $TMP_DIR
 < mkdir $TMP_DIR
+< pushd $TMP_DIR  >/dev/null
 ---
 > TODAY=`date "+%Y-%m-%d"`
 > TIME=`date "+%H:%M:%S"`
@@ -47,6 +48,7 @@
 >   exit 1
 > fi
 > 
+> cd $TMP_DIR
 42c60
 < $CXX -I ../ExternalLibs/include prog.C -o prog 2> /dev/null
 ---
@@ -70,7 +72,7 @@
 <     CoCoALib_CXXFLAGS="$CoCoALib_CXXFLAGS $opt";;
 ---
 >     COCOALIB_CXXFLAGS="$COCOALIB_CXXFLAGS $opt";;
-64c80,93
+64c80,95
 < echo $CoCoALib_CXXFLAGS
 ---
 > #######################################################
@@ -83,7 +85,9 @@
 > then
 >   COCOALIB_CXXFLAGS=""
 > fi
-> popd  > /dev/null
+> 
+> # Clean up TMP_DIR
+> cd # Leave TMP_DIR
 > /bin/rm -rf $TMP_DIR
 > 
 > echo $COCOALIB_CXXFLAGS
