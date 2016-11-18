@@ -11,6 +11,7 @@ ExternalProject_Add(
 		COMMAND patch --forward configuration/gmp-find-hdr.sh ${CMAKE_SOURCE_DIR}/resources/cocoa/gmp-find-hdr.sh.patch
 		COMMAND patch --forward configuration/gmp-try-default.sh ${CMAKE_SOURCE_DIR}/resources/cocoa/gmp-try-default.sh.patch
 		COMMAND patch --forward configuration/gmp-version.sh ${CMAKE_SOURCE_DIR}/resources/cocoa/gmp-version.sh.patch
+		COMMAND cp ${CMAKE_SOURCE_DIR}/resources/cocoa/fpic-ldflag.sh configuration/
 	BUILD_COMMAND make cocoalib
 	INSTALL_COMMAND ""
 )
