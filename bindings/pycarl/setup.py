@@ -21,6 +21,7 @@ rpath = dist.get_option_dict('build_ext')['rpath'][1]
 # Configuration shared between external modules follows
 include_dirs = ['.', 'src', 'resources/pybind11/include']
 libraries = ['carl']
+library_dirs = []
 extra_compile_args = ['-std=c++14']
 extra_link_args = []
 # Mac OS X needs special treatment
@@ -34,6 +35,7 @@ ext_core = Extension(
     libraries=libraries,
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
+    library_dirs=library_dirs,
     runtime_library_dirs=[rpath]
 )
 
@@ -44,6 +46,7 @@ ext_formula = Extension(
     libraries=libraries,
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
+    library_dirs=library_dirs,
     runtime_library_dirs=[rpath]
 )
 
@@ -54,6 +57,7 @@ ext_parse = Extension(
     libraries=libraries,
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
+    library_dirs=library_dirs,
     runtime_library_dirs=[rpath]
 )
 
