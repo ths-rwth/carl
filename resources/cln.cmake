@@ -1,6 +1,7 @@
 find_program(AUTORECONF autoreconf)
 if(NOT AUTORECONF)
 	message(ERROR "Can not build cln, missing binary for autoreconf")
+	return()
 endif()
 
 string(REPLACE "." "-" CLN_TAG ${CLN_VERSION})

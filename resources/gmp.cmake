@@ -1,6 +1,7 @@
 find_program(M4 m4)
 if(NOT M4)
 	message(FATAL_ERROR "Can not build gmp, missing binary for m4")
+	return()
 endif()
 mark_as_advanced(M4)
 

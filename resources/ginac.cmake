@@ -1,11 +1,13 @@
 find_program(AUTORECONF autoreconf)
 if(NOT AUTORECONF)
 	message(ERROR "Can not build GiNaC, missing binary for autoreconf")
+	return()
 endif()
 
 find_program(PYTHON2 python2)
 if(NOT PYTHON2)
 	message(ERROR "Can not build GiNaC, missing binary for python2")
+	return()
 endif()
 
 string(REPLACE "." "-" GINAC_TAG ${GINAC_VERSION})
