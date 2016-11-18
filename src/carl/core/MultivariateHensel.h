@@ -117,7 +117,7 @@ class DiophantineEquations
                         // Univariate Case
                         /// @todo implement
                         // the list of equations is empty, a contains univarate polnomials
-                        Variable x_1 = a[0].mainVar();
+                        //Variable x_1 = a[0].mainVar();
                         // sigma = zero lost of length  r
                         std::vector<Polynomial> sigma(r, Polynomial(0));
                         for(auto& z : c.getTerms()) {
