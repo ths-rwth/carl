@@ -19,14 +19,10 @@ namespace carl {
 		explicit Number(cln::cl_I&& t): BaseNumber(t) {}
 		Number(const Number<cln::cl_I>& n): BaseNumber(n) {}
 		Number(Number<cln::cl_I>&& n) noexcept : BaseNumber(n) {}
-		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
+		explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		Number(int n) : BaseNumber(n) {}
-		//TODO: this might not be the best way to do it
 		Number(long long int n) { mData = cln::cl_I(n); }
 		Number(unsigned long long int n) { mData = cln::cl_I(n);}
-	
-
-		//TODO: conversion constructors etc
 		Number(const Number<mpz_class>& n) : Number(cln::cl_I(n.toString().c_str())) {}
 
 
@@ -48,31 +44,10 @@ namespace carl {
 
 
 
+
 		std::string toString(bool _infix = true) const;
 
 	
-		//could probably be implemented the same way as for mpq, mpz
-		inline bool isZero()  {
-			return zerop(mData);
-		}
-
-
-		
-		//these 3 methods are the same as for mpq, mpz
-		bool isOne()  {
-			return mData == carl::constant_one<cln::cl_I>().get();
-		}
-
-
-		inline bool isPositive() const {
-			return mData > carl::constant_zero<cln::cl_RA>().get();
-		}
-
-
-
-		inline bool isNegative() const {
-			return mData < carl::constant_zero<cln::cl_RA>().get();
-		}
 
 
 
@@ -197,24 +172,6 @@ namespace carl {
 		}
 
 
-		/**
-		 * Divide two integers.
-		 * Discards the remainder of the division.
-		 * @param a First argument.
-		 * @param b Second argument.
-		 * @return \f$ a / b \f$.
-		 */
-		inline Number<cln::cl_I> operator/(const Number<cln::cl_I>& b)
-		{
-			return this->quotient(b);
-		}
-
-//probably superfluous because one can construct Number from int implicitly anyway (hopefully)
-	/*	inline Number<cln::cl_I> operator/(const int& rhs) {
-			return Number(mData / cln::cl_I(rhs));
-		}
-
-	*/	
 	};
 
 

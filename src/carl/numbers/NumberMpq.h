@@ -75,27 +75,7 @@ namespace carl {
 
 
 		
-		
 
-		//NOTE: isZero, isOne are exactly the same as for mpz_class!!
-		inline bool isZero() {
-			return constant_zero<mpz_class>::get() == mData;
-		}
-
-
-		inline bool isOne() {
-			return constant_one<mpz_class>::get() == mData;
-		}
-
-
-		//these two are the same as for mpz_class, just template-dependent
-		inline bool isPositive() {
-			return mData > carl::constant_zero<mpq_class>().get();
-		}
-
-		inline bool isNegative() {
-			return mData < carl::constant_zero<mpq_class>().get();
-		}
 
 
 
@@ -274,12 +254,6 @@ namespace carl {
 
 
 
-		//this and div is the same as for mpz!!
-		inline Number<mpq_class> operator/(const Number<mpq_class>& d)
-		{
-			return this->quotient(d);
-		}
-
 
 		inline Number<mpq_class> div(const Number<mpq_class>& b) {
 			return this->quotient(b);
@@ -294,16 +268,6 @@ namespace carl {
 			return Number(res);
 		}
 
-		inline Number<mpq_class> operator *(const Number<mpq_class>& rhs)
-		{
-			mpq_class res;
-			mpq_mul(res.get_mpq_t(), mData.get_mpq_t(), rhs.mData.get_mpq_t());
-			return Number(res);
-		}
-
-		Number<mpq_class> operator+(const Number<mpq_class>& rhs) {
-			return Number(this->mData + rhs.mData);
-		}
 
 
 	};
@@ -311,7 +275,7 @@ namespace carl {
 	
 	//template specializations of template member-functions of Number<mpq_class>
 
-	//TODO: is this one necessary or should it be done in a constructor?
+
 	template<>
 	inline Number<mpz_class> Number<mpq_class>::toInt<Number<mpz_class>>() {
 		assert(this->isInteger());

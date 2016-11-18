@@ -20,7 +20,6 @@ namespace carl {
 	public:
 
 		//TODO: which constructors explicit?
-		//TODO: check if these constructors actually work for all possible instantiations
 		//TODO: possibly implement setValue(T) as well
 		BaseNumber(): mData(carl::constant_zero<T>::get()) {}
 		explicit BaseNumber(const T& t): mData(t) {}
@@ -37,21 +36,43 @@ namespace carl {
 			return mData;
 		}
 
-		BaseNumber<T,N>& operator=(const BaseNumber<T,N>& n) {
+
+		inline bool isZero() {
+			return constant_zero<T>::get() == mData;
+		}
+
+
+		inline bool isOne() {
+			return mData  == carl::constant_one<T>().get();
+		}
+
+
+		inline bool isPositive() const {
+			return mData > carl::constant_zero<T>().get();
+		}
+
+
+		inline bool isNegative() const {
+			return mData < carl::constant_zero<T>().get();
+		}
+			
+
+/*
+		N& operator=(const BaseNumber<T,N>& n) {
 			mData = n.mData;
 			return *this;
 		}
 
 		template<typename Other>
-		BaseNumber<T,N>& operator=(const Other& n) {
+		N& operator=(const Other& n) {
 			mData = n;
 			return *this;
 		}
 
-		BaseNumber<T,N>& operator=(BaseNumber<T,N>&& n) noexcept {
+		N& operator=(BaseNumber<T,N>&& n) noexcept {
 			mData = std::move(n.mData);
 			return *this;
-		}
+		} */
 
 		bool operator==(const BaseNumber<T,N>& rhs) const {
 			return this->mData == rhs.mData;
@@ -82,48 +103,37 @@ namespace carl {
 			return N(this->mData + rhs.mData);
 		}
 
-		/*BaseNumber<T> operator+=(const BaseNumber<T>& rhs) {
-			return T(lhs) += T(rhs);
+		N operator-(const BaseNumber<T,N>& rhs) {
+			return N(this->mData - rhs.mData);
+		}
+
+		N operator*(const BaseNumber<T,N>& rhs) {
+			return N(this->mData * rhs.mData);
+		}
+
+		N operator/(const BaseNumber<T,N>& rhs) {
+			return N(this->mData / rhs.mData);
+		}
+
+/*		TODO: do we want these operators? Or is Number immutable?
+		N operator+=(const BaseNumber<T,N>& rhs) {
+			return N(mData += rhs.mData);
+		} 
+
+		N operator-=(const BaseNumber<T,N>& rhs) {
+			return N(mData -= rhs.mData);
 		} 
 
 
-		Number<T> operator-(const Number<T>& rhs) {
-			return Number(this->mData - rhs.mData);
-		}
-
-		BaseNumber<T> operator-=(const BaseNumber<T>& rhs) {
-			return T(lhs) -= T(rhs);
+		N operator*=(const BaseNumber<T,N>& rhs) {
+			return N(mData *= rhs.mData);
 		} 
 
-		Number<T> operator*(const Number<T>& rhs) {
-			Number(this->mData * rhs.mData);
-		}
 
-		BaseNumber<T> operator*=(const BaseNumber<T>& rhs) {
-			return T(lhs) *= T(rhs);
-		} 
-
-		Number<T> operator/(const Number<T>& rhs) {
-			Number(this->mData / rhs.mData);
-		}
-
-		BaseNumber<T> operator/=(const BaseNumber<T>& rhs) {
-			return T(lhs) /= T(rhs);
-		}
-
-
-
-
-
-
-		operator T&() {
-			return mData;
-		}
-		operator const T&() const {
-			return mData;
+		N operator/=(const BaseNumber<T,N>& rhs) {
+			return N(mData /= rhs.mData);
 		} */
 
-		//virtual std::string toString(bool _infix) const = 0;
 
 
 	};
@@ -132,87 +142,11 @@ namespace carl {
 	class Number : public BaseNumber<T,Number<T>> {};	
 
 
-/*	template<typename T>
-	class Number : public BaseNumber<T> {
-		public:
-		explicit Number(const T& t) : BaseNumber<T>(t) {}
-		Number(int i) : BaseNumber<T>(i) {}
-		std::string toString(bool _infix=true) const override;
-		bool isOne();
-		Number<T> abs() const;
-		template <typename Integer>
-		Integer toInt();
 
-
-
-
-		Number<T> operator+(const Number<T>& rhs) {
-			return Number(this->mData + rhs.mData);
-		}
-
-		/*BaseNumber<T> operator+=(const BaseNumber<T>& rhs) {
-			return T(lhs) += T(rhs);
-		} */
-/*
-
-		Number<T> operator-(const Number<T>& rhs) {
-			return Number(this->mData - rhs.mData);
-		}
-
-		/*BaseNumber<T> operator-=(const BaseNumber<T>& rhs) {
-			return T(lhs) -= T(rhs);
-		} */
-
-	/*	Number<T> operator*(const Number<T>& rhs) {
-			Number(this->mData * rhs.mData);
-		}
-
-		/*BaseNumber<T> operator*=(const BaseNumber<T>& rhs) {
-			return T(lhs) *= T(rhs);
-		} */
-
-	/*	Number<T> operator/(const Number<T>& rhs) {
-			Number(this->mData / rhs.mData);
-		}
-
-		/*BaseNumber<T> operator/=(const BaseNumber<T>& rhs) {
-			return T(lhs) /= T(rhs);
-		}*/
-
-/*
-		bool operator==(const Number<T>& rhs) {
-			return this->mData == rhs.mData;
-		}
-
-		bool operator!=(const Number<T>& rhs) {
-			return this->mData != rhs.mData;
-		}
-
-		bool operator<(const Number<T>& rhs) {
-			return this->mData < rhs.mData;;
-		}
-
-		bool operator<=(const Number<T>& rhs) {
-			return this->mData <= rhs.mData;
-		}
-
-		bool operator>=(const Number<T>& rhs) {
-			return this->mData >= rhs.mData;
-		}
-
-		bool operator>(const Number<T>& rhs) {
-			return this->mData > rhs.mData;
-		}
-
-
-
-	
-	}; */
-
-		template <typename T, typename N>
-		std::ostream& operator <<(std::ostream& os, const BaseNumber<T,N>& n) {
-			return os << n.getValue();
-		} 
+	template <typename T, typename N>
+	std::ostream& operator <<(std::ostream& os, const BaseNumber<T,N>& n) {
+		return os << n.getValue();
+	} 
 
 
 
@@ -220,27 +154,7 @@ namespace carl {
 }
 
 /* template<typename T>
-class Number {
-public:
-        Number(const T&);
-        Number(long long int)
-        Number(unsigned long long int)
-        Number(std::string)
-        const T& getNum();
-};
 
-template<>
-class Number<mpq_class>: public PlusMixin<mpq_class, Number> {
-       
-        explicit Number(const Number<mpz_class>&);
-};
-
-
-
-mpz_class
-mpq_class
-cln::cl_I
-cln::cl_RA
 
 int, unsigned, float, double
 mpfr

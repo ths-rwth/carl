@@ -55,21 +55,7 @@ namespace carl {
 
 	
 		
-		inline bool isZero() const {
-			return constant_zero<mpz_class>::get() == mData;
-		}
 
-		bool isOne() const {
-			return constant_one<mpz_class>::get() == mData;
-		}
-
-		inline bool isPositive() const {
-			return mData > carl::constant_zero<mpz_class>().get();
-		}
-
-		inline bool isNegative() const {
-			return mData < carl::constant_zero<mpz_class>().get();
-		}
 		
 		//getNum, getDenom removed (they don't make sense here, but could be implemented)
 		
@@ -124,15 +110,6 @@ namespace carl {
 			return Number(res);
 		}
 
-		/*
-
-		NOTE: doesn't seem to be used anywhere
-
-		inline mpz_class& gcd_assign(mpz_class& a, const mpz_class& b) {
-		    a = carl::gcd(a,b);
-			return a;
-		}  */
-
 
 
 
@@ -166,12 +143,7 @@ namespace carl {
 			mpz_div(res.get_mpz_t(), this->abs().mData.get_mpz_t(), d.abs().mData.get_mpz_t());
 			return this->isNegative() == d.isNegative() ? Number(res) : Number(mpz_class(-res));
 		}
-		
-		//TODO: operators inside or outside the number-class?
-		inline Number<mpz_class> operator/(const Number<mpz_class>& d) const
-		{
-			return this->quotient(d);
-		}
+
 
 
 

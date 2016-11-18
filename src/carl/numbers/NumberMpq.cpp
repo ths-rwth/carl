@@ -13,7 +13,7 @@ namespace carl {
 #endif
 
 
-	//TODO: probably also add possibility to construct from fraction strings
+	//TODO: probably also add possibility to construct from fraction strings; is there a reason for this complicated method? instead of using mpq_class constructor??
 	Number<mpq_class>::Number(const std::string& s) {
 		std::vector<std::string> strs;
 		boost::split(strs, s, boost::is_any_of("."));
@@ -85,7 +85,7 @@ namespace carl {
 		
 		mpq_class fraction;
 		mpq_div(fraction.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
-		//TODO: test if this works, otherwise implement and use setValue for Number
+
 		b = Number<mpq_class>(fraction);
 		return true;
 	    } 

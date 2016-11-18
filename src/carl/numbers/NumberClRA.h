@@ -39,27 +39,11 @@ namespace carl {
 
 		//The following constructors can maybe be grouped together in a Rational-superclass	
 		//TODO: explicit or not?
-		explicit Number(double d) { mData = cln::rationalize(d);
-			/*std::ostringstream os;
-			os << d;
- 			std::istringstream istr(os.str()); 
-			cln::cl_read_flags flags = {cln::syntax_float, cln::lsyntax_all, 10, cln::default_float_format, cln::default_float_format, false}; 
-			mData = cln::cl_RA(cln::read_float(istr,flags)); */
-		} 
-		explicit Number(float f) { mData = cln::rationalize(f);
-		/*	std::ostringstream os;
-			os << f;
- 			std::istringstream istr(os.str()); 
-			cln::cl_read_flags flags = {cln::syntax_float, cln::lsyntax_all, 10, cln::default_float_format, cln::default_float_format, false}; 
-			mData = cln::cl_RA(cln::read_float(istr,flags)); */
-		 } 
+		explicit Number(double d) { mData = cln::rationalize(d); }
+		explicit Number(float f) { mData = cln::rationalize(f); } 
 
 
-		Number(const std::string& s); /* {
-			cln::cl_read_flags flags = {cln::syntax_float, cln::lsyntax_all, 10, cln::default_float_format, cln::default_float_format, false}; 
-			std::istringstream istr(s);
-			mData = cln::cl_RA(cln::read_rational(istr,flags));
-		} */
+		Number(const std::string& s); 
 
 		//constructs a/b:
 		//(this looks hacky.. seems to be the only really functioning way though: take the integers as strings, put the sign at the front and construct
@@ -74,6 +58,7 @@ namespace carl {
 		//TODO: Is there a better way? Maybe retrieve "pieces" that fit into the data type and add them together again
 		Number(const Number<mpq_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
 		Number(const Number<mpz_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
+
 
 
 		Number<cln::cl_RA>& operator=(const Number<cln::cl_RA>& n) {
@@ -93,36 +78,18 @@ namespace carl {
 		}
 
 
-		
 
 		
-		//could probably be changed such that it's the same as in all other classes
-		inline bool isZero() {
-			return zerop(mData);
-		}
 
+		
 
-		//these 3 methods are the same as for mpq, mpz
-		inline bool isOne() {
-			return mData  == carl::constant_one<cln::cl_RA>().get();
-		}
-
-
-		inline bool isPositive() const {
-			return mData > carl::constant_zero<cln::cl_RA>().get();
-		}
-
-
-		inline bool isNegative() const {
-			return mData < carl::constant_zero<cln::cl_RA>().get();
-		}
 
 		/**
 		 * Extract the numerator from a fraction.
 		 * @return Numerator.
 		 */
 		inline Number<cln::cl_I> getNum() const {
-			return Number<cln::cl_I> (cln::numerator(mData));
+			return Number<cln::cl_I>(cln::numerator(mData));
 		}
 
 		/**
@@ -130,7 +97,7 @@ namespace carl {
 		 * @return Denominator.
 		 */
 		inline Number<cln::cl_I> getDenom() const {
-			return Number<cln::cl_I> (cln::denominator(mData));
+			return Number<cln::cl_I>(cln::denominator(mData));
 		}
 
 		/**
@@ -164,34 +131,6 @@ namespace carl {
 
 		template<typename Integer>
 		inline Integer toInt();
-
-
-
-		
-		//TODO: Rationalize as constructors!!
-		/*template<>
-		cln::cl_RA rationalize<cln::cl_RA>(double n);
-
-		template<>
-		cln::cl_RA rationalize<cln::cl_RA>(float n);
-
-		template<>
-		inline cln::cl_RA rationalize<cln::cl_RA>(int n) {
-		    return cln::cl_RA(n);
-		}
-
-		template<>
-		inline cln::cl_RA rationalize<cln::cl_RA>(uint n) {
-			return cln::cl_RA(n);
-		}
-
-		template<>
-		inline cln::cl_RA rationalize<cln::cl_RA>(sint n) {
-			return cln::cl_RA(n);
-		}
-
-		template<>
-		cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring); */
 
 
 
@@ -355,7 +294,7 @@ namespace carl {
 			assert(isInteger());
 			return Number<cln::cl_I>(getNum());
 		}
-		//TODO: is this correct?!
+	
 		template<>
 		inline sint Number<cln::cl_RA>::toInt<sint>() {
 			return toInt<Number<cln::cl_I>>().toInt<sint>();

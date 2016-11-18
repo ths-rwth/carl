@@ -8,7 +8,7 @@
 
 TEST(Number, Constructor)
 {
-
+//mpz
 	mpz_class mpz(2);	
 	carl::Number<mpz_class> z1, z2, z3, z4, z5, z6, z7, z8, z9, z10;
 	ASSERT_NO_THROW(z1 = carl::Number<mpz_class>());
@@ -81,7 +81,7 @@ TEST(Number, Constructor)
 	ASSERT_NO_THROW(i4 = carl::Number<cln::cl_I>(z1));
 	ASSERT_NO_THROW(i5 = carl::Number<cln::cl_I>(3ll));
 	ASSERT_NO_THROW(i6 = carl::Number<cln::cl_I>(4ull));
-	ASSERT_NO_THROW(i7 = carl::Number<cln::cl_I>("-30"));
+	ASSERT_NO_THROW(i7 = carl::Number<cln::cl_I>((std::string)"-30"));
 	ASSERT_NO_THROW(i8 = carl::Number<cln::cl_I>(3));
 	ASSERT_NO_THROW(i9 = carl::Number<cln::cl_I>(std::move(i1)));
 	ASSERT_NO_THROW(i10 = carl::Number<cln::cl_I>(z1));
@@ -321,7 +321,7 @@ TEST(Number,RationalOperations) {
 }
 
 
-TEST(Number,ComparisonOperators) {
+TEST(Number,BinaryOperators) {
 
 //mpz
 	carl::Number<mpz_class> z1(1), z2(2);
@@ -332,6 +332,12 @@ TEST(Number,ComparisonOperators) {
 	EXPECT_FALSE(z1 > z2);
 	EXPECT_FALSE(z1 >= z2);
 
+	EXPECT_EQ(z1+z2, carl::Number<mpz_class>(3));
+	EXPECT_EQ(z1-z2, carl::Number<mpz_class>(-1));
+	EXPECT_EQ(z1*z2, carl::Number<mpz_class>(2));
+	EXPECT_EQ(z1/z2, carl::Number<mpz_class>(0));
+	
+
 //mpq
 	carl::Number<mpq_class> q1(1), q2(2);
 	EXPECT_TRUE(q1 != q2);
@@ -340,6 +346,11 @@ TEST(Number,ComparisonOperators) {
 	EXPECT_TRUE(q1 <= q2);
 	EXPECT_FALSE(q1 > q2);
 	EXPECT_FALSE(q1 >= q2);
+
+	EXPECT_EQ(q1+q2, carl::Number<mpq_class>(3));
+	EXPECT_EQ(q1-q2, carl::Number<mpq_class>(-1));
+	EXPECT_EQ(q1*q2, carl::Number<mpq_class>(2));
+	EXPECT_EQ(q1/q2, carl::Number<mpq_class>(0.5));
 
 //clI
 	carl::Number<cln::cl_I> i1(1), i2(2);
@@ -350,8 +361,14 @@ TEST(Number,ComparisonOperators) {
 	EXPECT_FALSE(i1 > i2);
 	EXPECT_FALSE(i1 >= i2);
 
+	EXPECT_EQ(i1+i2, carl::Number<cln::cl_I>(3));
+	EXPECT_EQ(i1-i2, carl::Number<cln::cl_I>(-1));
+	EXPECT_EQ(i1*i2, carl::Number<cln::cl_I>(2));
+	EXPECT_EQ(i1/i2, carl::Number<cln::cl_I>(0));
+
 //clRA
 	carl::Number<cln::cl_RA> r1(1), r2(2);
+
 	EXPECT_TRUE(r1 != r2);
 	EXPECT_FALSE(r1 == r2);
 	EXPECT_TRUE(r1 < r2);
@@ -359,7 +376,10 @@ TEST(Number,ComparisonOperators) {
 	EXPECT_FALSE(r1 > r2);
 	EXPECT_FALSE(r1 >= r2);
 
-
+	EXPECT_EQ(r1+r2, carl::Number<cln::cl_RA>(3));
+	EXPECT_EQ(r1-r2, carl::Number<cln::cl_RA>(-1));
+	EXPECT_EQ(r1*r2, carl::Number<cln::cl_RA>(2));
+	EXPECT_EQ(r1/r2, carl::Number<cln::cl_RA>(0.5));
 
 
 }
