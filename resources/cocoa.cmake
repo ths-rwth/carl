@@ -21,10 +21,10 @@ ExternalProject_Add(
 	INSTALL_COMMAND ""
 )
 
-ExternalProject_Get_Property(CoCoALib_EP source_dir)
+ExternalProject_Get_Property(CoCoALib_EP SOURCE_DIR)
 
-add_imported_library(COCOA SHARED "${source_dir}/lib/libcocoa.a" "${source_dir}/include")
-add_imported_library(COCOA STATIC "${source_dir}/lib/libcocoa.a" "${source_dir}/include")
+add_imported_library(COCOA SHARED "${SOURCE_DIR}/lib/libcocoa.a" "${SOURCE_DIR}/include")
+add_imported_library(COCOA STATIC "${SOURCE_DIR}/lib/libcocoa.a" "${SOURCE_DIR}/include")
 
 add_dependencies(CoCoALib_EP GMP_STATIC)
 add_dependencies(COCOA_SHARED CoCoALib_EP)
