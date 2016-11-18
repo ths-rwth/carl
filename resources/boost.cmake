@@ -1,4 +1,3 @@
-message(STATUS "Get actual version of Boost and install it in resources")
 set( Boost_Bootstrap_Command )
 if( UNIX )
 	set( Boost_Bootstrap_Command ./bootstrap.sh )
@@ -14,17 +13,52 @@ ExternalProject_Add(
 	boost
 	GIT_SUBMODULES 
 		libs/algorithm
+		libs/any
+		libs/array
+		libs/assert
+		libs/bind
+		libs/concept_check
 		libs/config
+		libs/container
+		libs/core
+		libs/detail
 		libs/dynamic_bitset
 		libs/filesystem
+		libs/foreach
+		libs/format
+		libs/function
+		libs/function_types
 		libs/functional
 		libs/fusion
+		libs/integer
+		libs/intrusive
+		libs/io
+		libs/iostreams
+		libs/iterator
+		libs/lexical_cast
+		libs/math
+		libs/move
+		libs/mpl
+		libs/numeric/conversion
 		libs/numeric/interval
 		libs/optional 
 		libs/phoenix
+		libs/predef
+		libs/preprocessor
 		libs/program_options
+		libs/proto
+		libs/range
+		libs/regex
+		libs/smart_ptr
 		libs/spirit
+		libs/static_assert
 		libs/system
+		libs/throw_exception
+		libs/tokenizer
+		libs/type_index
+		libs/type_traits
+		libs/typeof
+		libs/utility
 		libs/variant
 		tools/build
 		tools/inspect 
@@ -34,8 +68,8 @@ ExternalProject_Add(
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
 	CONFIGURE_COMMAND ${Boost_Bootstrap_Command} --prefix=<INSTALL_DIR>
-	BUILD_COMMAND  ${Boost_b2_Command} --variant=release headers
-	INSTALL_COMMAND ${Boost_b2_Command} --variant=release install
+	BUILD_COMMAND  ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release headers
+	INSTALL_COMMAND ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release install
 )
 
 ExternalProject_Get_Property(boost INSTALL_DIR)
