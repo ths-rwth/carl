@@ -5,6 +5,7 @@ add_executable(runFormulaTests
 	Test_Model.cpp
 	Test_ModelEvaluation.cpp
 	Test_OPBParser.cpp
+	Test_PBConstraint.cpp
 )
 cotire(runFormulaTests)
 
