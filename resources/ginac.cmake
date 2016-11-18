@@ -11,17 +11,20 @@ endif()
 string(REPLACE "." "-" GINAC_TAG ${GINAC_VERSION})
 
 ExternalProject_Add(
-    ginac
+    GiNaC
     GIT_REPOSITORY "git://www.ginac.de/ginac.git"
 	GIT_TAG "release_${GINAC_TAG}"
 	CONFIGURE_COMMAND ${AUTORECONF} -iv <SOURCE_DIR> COMMAND PYTHON=${PYTHON2} <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
 )
 
-ExternalProject_Get_Property(ginac INSTALL_DIR)
+ExternalProject_Get_Property(GiNaC INSTALL_DIR)
 
 add_imported_library(GINAC SHARED "${INSTALL_DIR}/lib/libginac.so" "${INSTALL_DIR}/include")
 add_imported_library(GINAC STATIC "${INSTALL_DIR}/lib/libginac.a" "${INSTALL_DIR}/include")
 
-add_dependencies(resources ginac)
+add_dependencies(GiNaC CLN_SHARED CLN_STATIC)
+add_dependencies(GINAC_SHARED GiNaC)
+add_dependencies(GINAC_STATIC GiNaC)
+add_dependencies(resources GINAC_SHARED GINAC_STATIC)
 
 mark_as_advanced(AUTORECONF)
