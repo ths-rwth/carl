@@ -22,6 +22,24 @@ if [[ ${TASK} == "doxygen" ]]; then
 	git commit -m "Updated documentation for carl" || return 1
 	git push origin master || return 1
 
+elif [[ ${TASK} == "coverage" ]]; then
+	gem install coveralls-lcov
+	cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_COCOA=ON -D COVERAGE=ON ../ || return 1
+	
+	/usr/bin/time make resources -j1 || return 1
+	/usr/bin/time make -j1 lib_carl || return 1
+	/usr/bin/time make -j1 || return 1
+	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
+	
+	cat > lcov-wrapper <<EOF
+#!/bin/bash
+exec llvm-cov gcov "$@"
+EOF
+	chmod +x lcov-wrapper
+	
+	lcov --directory . --base-directory . --gcov-tool ./lcov-wrapper --capture -o coverage.info
+	lcov --list coverage.info
+	coveralls-lcov --repo-roken ${COVERALLS_TOKEN} coverage.info
 else
 	/usr/bin/time make resources -j1 || return 1
 	/usr/bin/time make -j1 lib_carl || return 1

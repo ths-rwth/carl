@@ -56,6 +56,7 @@ option( BUILD_STATIC "Build the static library as well" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
+option( COVERAGE "Enable collection of coverage statistics" OFF )
 option( EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
 option( BINDINGS_PYTHON "Build python bindings" OFF )
 
@@ -165,6 +166,7 @@ endif()
 #get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
 include(clang-tidy)
+include(coverage)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # E. Invoke subdirectories.
