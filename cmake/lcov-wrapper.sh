@@ -1,2 +1,3 @@
 #!/bin/bash
-exec llvm-cov gcov "$@"
+echo "Calling llvm-cov with $@"
+llvm-cov gcov "$@"
