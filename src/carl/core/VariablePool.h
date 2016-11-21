@@ -149,8 +149,19 @@ public:
 	std::size_t nrVariables(VariableType type = VariableType::VT_REAL) const noexcept {
 		return nextID(type) - 1;
 	}
+
+	/**
+	 * Print variable names to the stream.
+	 */
+	void printVariableNamesToStream(std::ostream& os = std::cout) {
+		for(auto const& v : mVariableNames) {
+			os << v.second << " ";
+		}
+	}
+
 	friend inline Variable freshVariable(const VariableType& vt) noexcept;
 	friend inline Variable freshVariable(const std::string& name, const VariableType& vt);
+
 };
 
 inline Variable freshVariable(const VariableType& vt) noexcept {
@@ -189,6 +200,10 @@ inline Variable freshUninterpretedVariable() noexcept {
 }
 inline Variable freshUninterpretedVariable(const std::string& name) {
 	return freshVariable(name, VariableType::VT_UNINTERPRETED);
+}
+
+inline void printRegisteredVariableNames() {
+	return VariablePool::getInstance().printVariableNamesToStream();
 }
 
 }
