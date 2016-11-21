@@ -23,7 +23,7 @@ enum class Sign: int {
 	POSITIVE = 1
 };
 
-std::ostream& operator<<(std::ostream& os, const Sign& sign) {
+inline std::ostream& operator<<(std::ostream& os, const Sign& sign) {
 	switch (sign) {
 		case Sign::NEGATIVE: os << "NEGATIVE"; break;
 		case Sign::ZERO: os << "ZERO"; break;

@@ -12,6 +12,12 @@
 
 using namespace carl;
 
+TEST(Sign, Output)
+{
+	EXPECT_EQ("NEGATIVE", getOutput(Sign::NEGATIVE));
+	EXPECT_EQ("ZERO", getOutput(Sign::ZERO));
+	EXPECT_EQ("POSITIVE", getOutput(Sign::POSITIVE));
+}
 
 TEST(Sign, sgn)
 {
@@ -19,7 +25,7 @@ TEST(Sign, sgn)
 	ASSERT_EQ(carl::sgn((int)0), Sign::ZERO);
 	ASSERT_EQ(carl::sgn((int)1), Sign::POSITIVE);
 
-        #ifdef USE_CLN_NUMBERS
+	#ifdef USE_CLN_NUMBERS
 	ASSERT_EQ(carl::sgn((cln::cl_I)-1), Sign::NEGATIVE);
 	ASSERT_EQ(carl::sgn((cln::cl_I)0), Sign::ZERO);
 	ASSERT_EQ(carl::sgn((cln::cl_I)1), Sign::POSITIVE);
@@ -27,7 +33,7 @@ TEST(Sign, sgn)
 	ASSERT_EQ(carl::sgn((cln::cl_RA)-1), Sign::NEGATIVE);
 	ASSERT_EQ(carl::sgn((cln::cl_RA)0), Sign::ZERO);
 	ASSERT_EQ(carl::sgn((cln::cl_RA)1), Sign::POSITIVE);
-        #endif
+	#endif
 
 	ASSERT_EQ(carl::sgn((mpz_class)-1), Sign::NEGATIVE);
 	ASSERT_EQ(carl::sgn((mpz_class)0), Sign::ZERO);
