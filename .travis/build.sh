@@ -29,15 +29,8 @@ elif [[ ${TASK} == "coverage" ]]; then
 	/usr/bin/time make resources -j1 || return 1
 	/usr/bin/time make -j1 lib_carl || return 1
 	/usr/bin/time make -j1 || return 1
-	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
+	/usr/bin/time make -j1 coverage-collect || return 1
 	
-	cat > lcov-wrapper <<EOF
-#!/bin/bash
-exec llvm-cov gcov "$@"
-EOF
-	chmod +x lcov-wrapper
-	
-	lcov --directory . --base-directory . --gcov-tool ./lcov-wrapper --capture -o coverage.info
 	lcov --list coverage.info
 	coveralls-lcov --repo-roken ${COVERALLS_TOKEN} coverage.info
 else
