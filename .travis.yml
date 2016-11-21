@@ -25,7 +25,6 @@ addons:
       - cmake
       - cmake-data
       - doxygen
-      - gcov
       - lcov
       - libboost1.55-all-dev
       - libcln-dev
