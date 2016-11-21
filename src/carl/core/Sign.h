@@ -23,7 +23,14 @@ enum class Sign: int {
 	POSITIVE = 1
 };
 
-std::ostream& operator<<(std::ostream& os, const Sign& sign);
+std::ostream& operator<<(std::ostream& os, const Sign& sign) {
+	switch (sign) {
+		case Sign::NEGATIVE: os << "NEGATIVE"; break;
+		case Sign::ZERO: os << "ZERO"; break;
+		case Sign::POSITIVE: os << "POSITIVE"; break;
+	}
+	return os;
+}
 
 /**
  * Obtain the sign of the given number.
