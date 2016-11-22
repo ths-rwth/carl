@@ -98,32 +98,6 @@ namespace carl
     }
 
     /**
-     * Checks whether the given value satisfies the given relation to zero.
-     * @param _value The value to compare with zero.
-     * @param _rel The relation between the given value and zero.
-     * @return true,  if the given value satisfies the given relation to zero;
-     *          false, otherwise.
-     */
-    template<typename Number>
-    inline bool evaluate( const Number& _value, const Relation& _rel )
-    {
-        switch( _rel )
-        {
-            case Relation::EQ:		return carl::isZero(_value);
-            case Relation::NEQ:		return !carl::isZero(_value);
-            case Relation::LESS:	return _value < carl::constant_zero<Number>::get();
-            case Relation::GREATER:	return _value > carl::constant_zero<Number>::get();
-            case Relation::LEQ:		return _value <= carl::constant_zero<Number>::get();
-            case Relation::GEQ:		return _value >= carl::constant_zero<Number>::get();
-            default:
-            {
-                std::cerr << "Error in isConsistent: unexpected relation symbol." << std::endl;
-                return false;
-            }
-        }
-    }
-
-    /**
      * Inverts the given relation symbol.
      * @param _rel The relation symbol to invert.
      * @return The resulting inverted relation symbol.

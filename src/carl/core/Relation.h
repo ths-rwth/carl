@@ -67,6 +67,11 @@ inline bool evaluate(Sign s, Relation r) {
 			return false;
 	}
 }
+
+template<typename T>
+inline bool evaluate(const T& t, Relation r) {
+	return evaluate(sgn(t), r);
+}
 	
 }
 
