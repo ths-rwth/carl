@@ -79,6 +79,29 @@ TEST(CoCoA, Factorize)
 	}
 }
 
+TEST(CoCoA, SquareFreePart)
+{
+	using Poly = MultivariatePolynomial<mpq_class>;
+	CoCoA::GlobalManager CoCoAFoundations;
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	
+	std::function<void()> f;
+	f();
+	
+	CoCoAAdaptor<Poly> c({Poly(x*y)});
+	{
+		Poly p = (x*x - mpq_class(1)) * (x*x - mpq_class(1)) * (x+mpq_class(1)) * (x-mpq_class(2));
+		Poly res = Poly(x*x*x) - mpq_class(2)*x*x - x + mpq_class(2);
+		EXPECT_EQ(c.squareFreePart(p), res);
+	}
+	{
+		Poly p = (x*x - mpq_class(4)) * (x - mpq_class(2)) + (x*x*y - mpq_class(4)*y) * (x - mpq_class(2));
+		Poly res = Poly(x*x*y) + x*x - mpq_class(4)*y - mpq_class(4);
+		EXPECT_EQ(c.squareFreePart(p), res);
+	}
+}
+
 MultivariatePolynomial<mpq_class> randomPoly(const std::initializer_list<Variable>& vars) {
 	static std::mt19937 rand(4);
 	MultivariatePolynomial<mpq_class> res;
