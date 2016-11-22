@@ -1,51 +1,28 @@
 namespace carl {
 
 template<typename Rational, typename Poly>
-void PBConstraint::substituteIn(PBConstraint& c, const carl::Model<Rational, Poly>& m){
+void PBConstraint::substituteIn(const Model<Rational, Poly>& m){
     std::vector<std::pair<Variable, int>> newLHS;
-    for(auto it = c.getLHS().begin(); it != c.getLHS().end(); it++){
-        auto element = m.find(it->first);
-        if(element != m.end()){
-            if(element->second.isBool()){
-                if(element->second == true){
-                    c.setRHS(c.getRHS() - it->second);
-                }
-                it = c.getLHS().erase(it);
+    for(auto it = getLHS().begin(); it != getLHS().end(); it++){
+		auto element = m.find(it->first);
+        if(element != m.end()) {
+			assert(element->second.isBool());
+            if(element->second.asBool() == true){
+                setRHS(getRHS() - it->second);
             }
-        }else{
-            newLHS.push_back(std::make_pair(it->first, it->second));
+        } else {
+            newLHS.push_back(*it);
         }
     }
-    c.setLHS(newLHS);
-
-//    std::vector<std::pair<Variable, int>> newLHS;
-//    for(auto it = c.getLHS().begin(); it != c.getLHS().end();){
-//        auto element = m.find(it->first);
-//        if(element != m.end()){
-//            if(element->second.isBool()){
-//                if(element->second == true){
-//                    c.setRHS(c.getRHS() - it->second);
-//                }
-//                it = c.getLHS().erase(it);
-//            }else{
-//                it++;
-//            }
-//        }else{
-//            newLHS.push_back(std::make_pair(it->first, it->second));
-//            it++;
-//        }
-//    }
-//    c.setLHS(newLHS);
+    setLHS(newLHS);
 }
 
 
 
-template<typename Rational, typename Poly, typename Number>
-void PBConstraint::evaluate(carl::ModelValue<Rational,Poly>& res, PBConstraint& c, const
-    carl::Model<Rational,Poly>& m){
-    substituteIn(c, m);
-    evaluate(Number(c.getRHS()), c.getRelation());
-
+template<typename Rational, typename Poly>
+void PBConstraint::evaluate(carl::ModelValue<Rational,Poly>& res, const carl::Model<Rational,Poly>& m){
+    substituteIn(m);
+    res = carl::evaluate(-getRHS(), getRelation());
 }
 
 }
