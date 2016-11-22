@@ -24,7 +24,7 @@ private:
 	mutable std::mutex mMutex;
 #endif
 public:
-	IDGenerator(): mNext(1) {}
+	IDGenerator(): mNext(1), mFree() {}
 	std::size_t get() {
 #ifdef THREAD_SAFE
 		std::lock_guard<std::mutex> lock(mMutex);

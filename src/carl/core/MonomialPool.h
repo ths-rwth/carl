@@ -28,10 +28,10 @@ namespace carl{
 				std::size_t hash;
 				mutable std::weak_ptr<const Monomial> monomial;
 				PoolEntry(std::size_t h, Monomial::Content c, const Monomial::Arg& m): content(std::move(c)), hash(h), monomial(m) {}
-				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h) {
+				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h), monomial() {
 					assert(monomial.expired());
 				}
-				PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)) {
+				PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)), monomial() {
 					assert(monomial.expired());
 				}
 			};
@@ -41,10 +41,10 @@ namespace carl{
 				std::size_t hash;
 				mutable Monomial::Arg monomial;
 				PoolEntry(std::size_t h, const Monomial::Content& c, const Monomial::Arg& m): content(c), hash(h), monomial(m) {}
-				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h) {
+				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h), monomial() {
 					assert(monomial.expired());
 				}
-				PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)) {
+				PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)), monomial() {
 					assert(monomial.expired());
 				}
 			};
@@ -98,7 +98,9 @@ namespace carl{
 			 */
 			explicit MonomialPool( std::size_t _capacity = 10000 ):
 				Singleton<MonomialPool>(),
-				mPool(_capacity)
+				mIDs(),
+				mPool(_capacity),
+				mMutex()
 			{}
 
 			Monomial::Arg add( MonomialPool::PoolEntry&& pe, exponent totalDegree = 0 );

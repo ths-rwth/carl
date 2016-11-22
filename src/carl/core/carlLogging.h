@@ -179,7 +179,7 @@ struct Filter {
 	 * Constructor.
 	 * @param level Default minimal log level.
 	 */
-	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT) {
+	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT): data() {
 		(*this)("", level);
 	}
 	/**
@@ -271,10 +271,10 @@ struct Formatter {
      * @param level LogLevel.
      * @param info Auxiliary information.
      */
-	virtual void prefix(std::ostream& os, const Timer& timer, const std::string& channel, LogLevel level, const RecordInfo& info) {
+	virtual void prefix(std::ostream& os, const Timer& /*timer*/, const std::string& channel, LogLevel level, const RecordInfo& info) {
 		if (!printInformation) return;
 		os.fill(' ');
-		os << "[" << std::right << std::setw(5) << timer << "] ";
+		//os << "[" << std::right << std::setw(5) << timer << "] ";
 #ifdef THREAD_SAFE
 		os << std::this_thread::get_id() << " ";
 #endif
@@ -311,7 +311,7 @@ class Logger: public carl::Singleton<Logger> {
 	/**
 	 * Default constructor.
      */
-	Logger() {}
+	Logger(): data(), mutex(), timer() {}
 public:
 	/**
 	 * Desctructor.
