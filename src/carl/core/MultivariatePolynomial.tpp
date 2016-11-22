@@ -125,7 +125,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>& p):
 	Policies(),
 	mTerms(),
-	mOrdered(true)
+	mOrdered(false)
 {
 	auto id = mTermAdditionManager.getId();
 	exponent exp = 0;
