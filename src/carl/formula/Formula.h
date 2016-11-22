@@ -114,6 +114,10 @@ namespace carl
             explicit Formula( const BVConstraint& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
+			
+			explicit Formula( const PBConstraint& _constraint ):
+                Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
+            {}
             
             explicit Formula( FormulaType _type, Formula&& _subformula ):
                 Formula(FormulaPool<Pol>::getInstance().create(_type, std::move(_subformula)))
@@ -178,6 +182,10 @@ namespace carl
             
             explicit Formula( const UEquality& _eq ):
                 Formula( FormulaPool<Pol>::getInstance().create( std::move( UEquality( _eq ) ) ) )
+            {}
+				
+			explicit Formula( PBConstraint&& _pbc ):
+                Formula( FormulaPool<Pol>::getInstance().create( std::move( _pbc ) ) )
             {}
             
             Formula( const Formula& _formula ):

@@ -75,15 +75,16 @@ namespace carl
     static const Condition PROP_CONTAINS_REAL_VALUED_VARS        = Condition( 24 );
     static const Condition PROP_CONTAINS_UNINTERPRETED_EQUATIONS = Condition( 25 );
     static const Condition PROP_CONTAINS_BITVECTOR               = Condition( 26 );
-    static const Condition PROP_VARIABLE_DEGREE_GREATER_THAN_TWO  = Condition( 27 );
-    static const Condition PROP_VARIABLE_DEGREE_GREATER_THAN_THREE  = Condition( 28 );
-    static const Condition PROP_VARIABLE_DEGREE_GREATER_THAN_FOUR = Condition( 29 );
-    static const Condition PROP_CONTAINS_WEAK_INEQUALITY       = Condition( 30 );
+	static const Condition PROP_CONTAINS_PSEUDOBOOLEAN           = Condition( 27 );
+    static const Condition PROP_VARIABLE_DEGREE_GREATER_THAN_TWO  = Condition( 28 );
+    static const Condition PROP_VARIABLE_DEGREE_GREATER_THAN_THREE  = Condition( 29 );
+    static const Condition PROP_VARIABLE_DEGREE_GREATER_THAN_FOUR = Condition( 30 );
+    static const Condition PROP_CONTAINS_WEAK_INEQUALITY       = Condition( 31 );
     static const Condition WEAK_CONDITIONS                       = PROP_CONTAINS_EQUATION | PROP_CONTAINS_INEQUALITY | PROP_CONTAINS_STRICT_INEQUALITY
                                              | PROP_CONTAINS_LINEAR_POLYNOMIAL | PROP_CONTAINS_LINEAR_POLYNOMIAL | PROP_CONTAINS_NONLINEAR_POLYNOMIAL
                                              | PROP_CONTAINS_MULTIVARIATE_POLYNOMIAL | PROP_CONTAINS_INEQUALITY | PROP_CONTAINS_BOOLEAN
                                              | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS
-                                             | PROP_CONTAINS_UNINTERPRETED_EQUATIONS | PROP_CONTAINS_BITVECTOR
+                                             | PROP_CONTAINS_UNINTERPRETED_EQUATIONS | PROP_CONTAINS_BITVECTOR | PROP_CONTAINS_PSEUDOBOOLEAN
                                              | PROP_VARIABLE_DEGREE_GREATER_THAN_TWO | PROP_VARIABLE_DEGREE_GREATER_THAN_THREE | PROP_VARIABLE_DEGREE_GREATER_THAN_FOUR;
 
 }     // namespace carl

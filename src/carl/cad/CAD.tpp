@@ -783,8 +783,8 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		 */
 
 		//std::cout << *this << std::endl;
-		carl::VariableType type = mVariables[openVariableCount].getType();
-		if (!this->setting.exploreInteger) type = VariableType::VT_REAL;
+		//carl::VariableType type = mVariables[openVariableCount].getType();
+		//if (!this->setting.exploreInteger) type = VariableType::VT_REAL;
 		//std::cout << "Current var: " << openVariableCount << " -> " << mVariables[openVariableCount] << std::endl;
 		//REGISTERED_ASSERT(openVariableCount > 1);
 		// next: right neighbor

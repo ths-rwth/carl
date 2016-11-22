@@ -41,27 +41,28 @@ TEST(BVConstraint, Construction)
 
     BVTerm bvzeroext(BVTermType::EXT_U, bvconcat, 2);
     BVTerm bvzeroext2(BVTermType::EXT_U, bvconcat, 2);
-    assert(bvzeroext == bvzeroext2);
+    EXPECT_TRUE(bvzeroext == bvzeroext2);
 
     // check for copy assignment
     check_for_default_constructor = bvzeroext;
 
     BVConstraint constraint = BVConstraint::create(BVCompareRelation::SLT, oxaa, bvzeroext);
+	EXPECT_TRUE(constraint.relation() == BVCompareRelation::SLT);
     // std::cout << constraint.toString("", false, false, true) << std::endl;
 
     // check for simplification of terms (division)
     BVTerm oxaa33(BVTermType::CONSTANT, BVValue(16, 43571));
     BVTerm simplifyMe(BVTermType::DIV_U, oxfff0, BVTerm(BVTermType::CONSTANT, BVValue(16, 235)));
-    assert(simplifyMe == BVTerm(BVTermType::CONSTANT, BVValue(16, (65520 / 235))));
+    EXPECT_TRUE(simplifyMe == BVTerm(BVTermType::CONSTANT, BVValue(16, (65520 / 235))));
 
     BVTerm factor1(BVTermType::CONSTANT, BVValue(16, 43 /* 00101011 */));
     BVTerm factor2(BVTermType::CONSTANT, BVValue(16, 9 /* 00001001 */));
     BVTerm product(BVTermType::MUL, factor1, factor2);
-    assert(product == BVTerm(BVTermType::CONSTANT, BVValue(16, 43*9)));
+    EXPECT_TRUE(product == BVTerm(BVTermType::CONSTANT, BVValue(16, 43*9)));
 
     // check for simplification of constraints
     BVConstraint simplifyMeToo = BVConstraint::create(BVCompareRelation::SGT, oxfff0, oxaa33);
-    assert(simplifyMeToo == BVConstraint::create(true));
+    EXPECT_TRUE(simplifyMeToo == BVConstraint::create(true));
 
 #ifdef USE_CLN_NUMBERS
     // Test BVValue construction from CLN / GMP objects
@@ -75,8 +76,8 @@ TEST(BVConstraint, Construction)
 
         BVValue clnVal(8, clnNumber);
         BVValue gmpVal(8, gmpNumber);
-        assert(clnVal == gmpVal);
-        assert(clnVal().to_ulong() == ((i + 256) % 256));
+        EXPECT_TRUE(clnVal == gmpVal);
+        EXPECT_TRUE(clnVal().to_ulong() == ((i + 256) % 256));
     }
 
     // Test BVValue construction from CLN / GMP objects
@@ -86,7 +87,7 @@ TEST(BVConstraint, Construction)
 
     BVValue hugeVal(512, hugeNumber);
     BVValue hugeClnVal(512, hugeClnNumber);
-    assert(hugeVal == hugeClnVal);
+    EXPECT_TRUE(hugeVal == hugeClnVal);
 #endif
     /* BV_TERM_POOL.print();
     BV_CONSTRAINT_POOL.print(); */

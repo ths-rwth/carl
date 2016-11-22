@@ -10,6 +10,7 @@ using namespace carl;
 
 typedef MultivariatePolynomial<Rational> Pol;
 typedef Constraint<Pol> ConstraintT;
+typedef MultivariateRoot<Pol> MVRootT;
 typedef Formula<Pol> FormulaT;
 typedef Interval<Rational> IntervalT;
 typedef RealAlgebraicNumber<Rational> RANT;

@@ -190,6 +190,9 @@ namespace carl
             const FormulaContent<Pol>* create(const BVConstraint& _constraint) {
                 return create(std::move(BVConstraint(_constraint)));
             }
+			const FormulaContent<Pol>* create(const PBConstraint& _constraint) {
+                return create(std::move(PBConstraint(_constraint)));
+            }
             
             
             /**
@@ -389,6 +392,11 @@ namespace carl
 			const FormulaContent<Pol>* create( UEquality&& eq )
 			{
 				return add( new FormulaContent<Pol>( std::move( eq ) ) );
+			}
+			
+			const FormulaContent<Pol>* create( PBConstraint&& pbc )
+			{
+				return add( new FormulaContent<Pol>( std::move( pbc ) ) );
 			}
             
             void free( const FormulaContent<Pol>* _elem )

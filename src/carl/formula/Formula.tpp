@@ -286,10 +286,15 @@ namespace carl
                 _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_UNINTERPRETED_EQUATIONS;
                 break;
             }
+            case FormulaType::PBCONSTRAINT:
+            {
+                _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_PSEUDOBOOLEAN;
+                break;
+            }
             default:
             {
+				CARL_LOG_ERROR("carl.formula", "Undefined formula type " << _content.mType);
                 assert( false );
-                cerr << "Undefined operator!" << endl;
             }
         }
     }
@@ -1800,6 +1805,7 @@ namespace carl
 		case TRUE:
 		case FALSE:
 		case UEQ:
+		case PBCONSTRAINT:
 			break;
 		case EXISTS:
 		case FORALL: {
@@ -1861,6 +1867,7 @@ namespace carl
 		case TRUE:
 		case FALSE:
 		case UEQ:
+		case PBCONSTRAINT:
 			break;
 		case EXISTS:
 		case FORALL: {
