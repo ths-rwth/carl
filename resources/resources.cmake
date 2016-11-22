@@ -116,6 +116,10 @@ else()
 	include(resources/gtest.cmake)
 endif()
 
+if(COVERAGE)
+	include(resources/lcov.cmake)
+endif()
+
 ##### MPFR
 IF(USE_MPFR_FLOAT)
 	load_library(carl MPFR 0.0 REQUIRED)
