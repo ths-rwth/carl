@@ -12,7 +12,7 @@ if (COVERAGE)
 			COMMAND lcov --directory . --base-directory . --gcov-tool ./lcov-wrapper.sh --capture -o coverage.info
 			COMMAND lcov --remove coverage.info '/usr/*' 'build/resources/*' 'src/tests/*' --output-file coverage.info
 			COMMAND genhtml coverage.info -o "coverage/"
-			COMMAND rm lcov-wrapper
+			COMMAND rm lcov-wrapper.sh
 			WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 		)
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
