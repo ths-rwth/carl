@@ -558,7 +558,8 @@ namespace carl
          * @param n The passed double.
          */
         template<typename Num = Number, typename Rational, EnableIf<std::is_floating_point<Num >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
-        explicit Interval(Rational n)
+        explicit Interval(Rational n):
+			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(n, n);
         }
@@ -570,7 +571,8 @@ namespace carl
          * @param upper The desired upper bound.
          */
         template<typename Num = Number, typename Rational, EnableIf<std::is_floating_point<Num >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
-        Interval(Rational lower, Rational upper)
+        Interval(Rational lower, Rational upper):
+			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
         }
@@ -624,7 +626,8 @@ namespace carl
          * @param n The passed double.
          */
         template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
-        explicit Interval(Float n)
+        explicit Interval(Float n):
+			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(n, n);
         }
@@ -636,7 +639,8 @@ namespace carl
          * @param upper The desired upper bound.
          */
         template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
-        Interval(Float lower, Float upper)
+        Interval(Float lower, Float upper):
+			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
         }
@@ -652,10 +656,9 @@ namespace carl
          * @param upperBoundType The desired upper bound type.
          */
         template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy, DisableIf<std::is_floating_point<Num >> = dummy>
-        Interval(Float lower, BoundType lowerBoundType, Float upper, BoundType upperBoundType)
+        Interval(Float lower, BoundType lowerBoundType, Float upper, BoundType upperBoundType):
+			mContent(), mLowerBoundType(lowerBoundType), mUpperBoundType(upperBoundType)
         {
-            mLowerBoundType = lowerBoundType;
-            mUpperBoundType = upperBoundType;
             Num left = carl::rationalize<Num>(toDouble(lower));
             Num right = carl::rationalize<Num>(toDouble(upper));
             //if(left == -std::numeric_limits<double>::infinity()) mLowerBoundType = BoundType::INFTY;
@@ -690,7 +693,8 @@ namespace carl
          * @param n The passed double.
          */
         template<typename Num = Number, typename Rational, EnableIf<is_rational<Num >> = dummy, EnableIf<is_rational<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
-        explicit Interval(Rational n)
+        explicit Interval(Rational n):
+			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(n, n);
         }
@@ -702,7 +706,8 @@ namespace carl
          * @param upper The desired upper bound.
          */
         template<typename Num = Number, typename Rational, EnableIf<is_rational<Num >> = dummy, EnableIf<is_rational<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
-        Interval(Rational lower, Rational upper)
+        Interval(Rational lower, Rational upper):
+			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
         }

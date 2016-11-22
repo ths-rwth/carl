@@ -24,22 +24,24 @@ class GFNumber
 	
 	public:
 
-	GFNumber()
-	: mN(carl::constant_zero<IntegerType>::get()), mGf(nullptr)
+	GFNumber():
+		mN(carl::constant_zero<IntegerType>::get()),
+		mGf(nullptr)
 	{
 	}
-	explicit GFNumber(IntegerType n, const GaloisField<IntegerType>* gf= nullptr)
-	: mN(gf == nullptr ? n : gf->symmetricModulo(n)), mGf(gf)
+	explicit GFNumber(IntegerType n, const GaloisField<IntegerType>* gf = nullptr):
+		mN(gf == nullptr ? n : gf->symmetricModulo(n)),
+		mGf(gf)
 	{
-		
 	}
 	
-	GFNumber(const GFNumber& n, const GaloisField<IntegerType>* gf) :
-	mN(n.mN),
-	mGf(gf)
+	GFNumber(const GFNumber& n, const GaloisField<IntegerType>* gf):
+		mN(n.mN),
+		mGf(gf)
 	{
-		
 	}
+	
+	GFNumber& operator=(const GFNumber&) = default;
 
 	const GaloisField<IntegerType>* gf() const
 	{

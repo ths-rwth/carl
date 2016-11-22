@@ -42,8 +42,8 @@ class GaloisField
      * @param k A exponent
 	 * @see GaloisFieldManager where the overhead of creating several GFs is prevented by storing them.
      */
-	explicit GaloisField(unsigned p, unsigned k = 1)
-	: mP(p), mK(k), mPK(pow(IntegerType(p),k)), symmetricModuloOperationOffset( (mPK-1)/2 )
+	explicit GaloisField(unsigned p, unsigned k = 1):
+		mP(p), mK(k), mPK(pow(IntegerType(p),k)), symmetricModuloOperationOffset( (mPK-1)/2 )
 	{ 
 	}
 	
@@ -101,10 +101,7 @@ class GaloisFieldManager
 	static std::once_flag mOnceFlag;
 	std::map<std::pair<unsigned, unsigned>, const GaloisField<IntegerType>*, IntegerPairCompare<unsigned>> mGaloisFields;
 	
-	GaloisFieldManager()
-	{
-		
-	}
+	GaloisFieldManager(): mGaloisFields() {}
 	
 	public:
 	static GaloisFieldManager& getInstance();

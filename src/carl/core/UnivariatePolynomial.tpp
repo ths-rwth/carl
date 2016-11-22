@@ -23,15 +23,17 @@ namespace carl
 {
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(const UnivariatePolynomial& p)
-: mMainVar(p.mMainVar), mCoefficients(p.mCoefficients) {
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(const UnivariatePolynomial& p):
+	mMainVar(p.mMainVar), mCoefficients(p.mCoefficients)
+{
 	assert(this->isConsistent());
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(UnivariatePolynomial&& p)
-: mMainVar(p.mMainVar) {
-	std::swap(this->mCoefficients, p.mCoefficients);
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(UnivariatePolynomial&& p):
+	mMainVar(p.mMainVar), mCoefficients()
+{
+	std::swap(mCoefficients, p.mCoefficients);
 	assert(this->isConsistent());
 }
 

@@ -244,35 +244,41 @@ namespace carl {
 
     public:
         Contraction() = delete;
-        Contraction(const Polynomial& constraint) : Operator<Polynomial>(),
+        Contraction(const Polynomial& constraint):
+			Operator<Polynomial>(),
             mConstraint(constraint),
             mpOriginal(nullptr),
             #ifdef USE_HORNER
             mHornerForm(constraint),
             #endif
             mDerivatives(),
-            mVarSolutionFormulas() 
+            mVarSolutionFormulas(),
+			mHornerSchemes()
         {}
 
-        Contraction(const Polynomial& constraint, const Polynomial& _original ) : Operator<Polynomial>(),
+        Contraction(const Polynomial& constraint, const Polynomial& _original ):
+			Operator<Polynomial>(),
             mConstraint(constraint),
             mpOriginal (_original.isLinear() ? nullptr : new Polynomial(_original)),
             #ifdef USE_HORNER
             mHornerForm( mpOriginal == nullptr ? constraint :  _original ),
             #endif
             mDerivatives(),
-            mVarSolutionFormulas() 
+            mVarSolutionFormulas() ,
+			mHornerSchemes()
         {}
         Contraction(const Contraction&) = delete;
         
-        Contraction(Contraction&& _contraction ): Operator<Polynomial>(),
+        Contraction(Contraction&& _contraction ):
+			Operator<Polynomial>(),
             mConstraint(std::move(_contraction.mConstraint)),
             mpOriginal(_contraction.mpOriginal),
             #ifdef USE_HORNER
             mHornerForm(std::move(_contraction.mHornerForm)),
             #endif
             mDerivatives(std::move(_contraction.mDerivatives)),
-            mVarSolutionFormulas(std::move(_contraction.mVarSolutionFormulas)) 
+            mVarSolutionFormulas(std::move(_contraction.mVarSolutionFormulas)),
+			mHornerSchemes(std::move(_constration.mHornerSchemes))
         {
             _contraction.mpOriginal = nullptr;
         }
