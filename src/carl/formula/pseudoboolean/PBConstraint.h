@@ -54,7 +54,7 @@ namespace carl {
 			return rhs;
 		}
 		
-		std::string toString(bool resolveUnequal, bool infix, bool friendlyNames) const {
+		std::string toString(bool, bool, bool) const {
 			std::stringstream ss;
 			ss << *this;
 			return ss.str();
