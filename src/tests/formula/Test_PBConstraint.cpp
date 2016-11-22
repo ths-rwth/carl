@@ -22,13 +22,14 @@ TEST(PBConstraint, Basic)
 	m.emplace(x, true);
 	m.emplace(z, false);
 	
-	std::cout << pbc << std::endl;
 	pbc.substituteIn(m);
-	std::cout << pbc << std::endl;
+	EXPECT_TRUE(pbc.getLHS().size() == 1);
+	EXPECT_TRUE(pbc.getLHS()[0].first == y);
+	EXPECT_TRUE(pbc.getLHS()[0].second == 5);
+	EXPECT_TRUE(pbc.getRHS() == 4);
 	
 	m.emplace(y, true);
 	carl::ModelValue<Rational,Poly> res;
 	pbc.evaluate(res, m);
-	std::cout << pbc << std::endl;
-	std::cout << res << std::endl;
+	EXPECT_TRUE(res.isBool() && res.asBool());
 }

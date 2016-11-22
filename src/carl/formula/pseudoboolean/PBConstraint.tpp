@@ -21,8 +21,9 @@ void PBConstraint::substituteIn(const Model<Rational, Poly>& m){
 
 template<typename Rational, typename Poly>
 void PBConstraint::evaluate(carl::ModelValue<Rational,Poly>& res, const carl::Model<Rational,Poly>& m){
-    substituteIn(m);
-    res = carl::evaluate(-getRHS(), getRelation());
+	PBConstraint tmp = *this;
+    tmp.substituteIn(m);
+    res = carl::evaluate(-tmp.getRHS(), tmp.getRelation());
 }
 
 }
