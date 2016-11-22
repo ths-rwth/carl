@@ -125,6 +125,9 @@ private:
 	}
 	
 public:
+	SMTLIBStream(): mStream() {
+	}
+	
 	template<typename T>
 	SMTLIBStream& operator<<(T&& t) {
 		write(static_cast<const std::decay_t<T>&>(t));

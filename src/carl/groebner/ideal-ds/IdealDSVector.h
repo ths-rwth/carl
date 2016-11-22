@@ -25,7 +25,7 @@ class IdealDatastructureVector
 public:
 
     IdealDatastructureVector(const std::vector<Polynomial>& generators, const std::unordered_set<size_t>& eliminated, const sortByLeadingTerm<Polynomial>& order)
-    : mGenerators(generators), mEliminated(eliminated), mOrder(order)
+    : mGenerators(generators), mEliminated(eliminated), mOrder(order), mDivList()
     {
         
     }

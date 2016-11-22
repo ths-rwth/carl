@@ -39,7 +39,7 @@ public:
 		std::shared_ptr<ThomEncoding<Number>> point, 
 		std::shared_ptr<SignDetermination<Number>> sd,
 		uint mRelevant
-	) :
+	):
 		mSc(sc),
 		mP(p),
 		mMainVar(mainVar),
@@ -52,14 +52,14 @@ public:
 		const Number& n,
 		Variable::Arg mainVar,
 		std::shared_ptr<ThomEncoding<Number>> point = nullptr
-	) {
+	):
+		mSc(), mP(), mMainVar(mainVar), mPoint(point), mSd(), mRelevant()
+	{
 		Polynomial p = Polynomial(mainVar) - n;
 		std::list<ThomEncoding<Number>> roots = realRootsThom(p, mainVar, point);
 		CARL_LOG_ASSERT("carl.thom", roots.size() == 1, "");
 		mSc = roots.front().mSc;
 		mP = roots.front().mP;
-		mMainVar = mainVar;
-		mPoint = point;
 		mSd = roots.front().mSd;
 		mRelevant = roots.front().mRelevant;      
 	}
@@ -67,7 +67,9 @@ public:
 	ThomEncoding(
 		const ThomEncoding<Number>& te,
 		std::shared_ptr<ThomEncoding<Number>> point
-	) {
+	):
+		mSc(), mP(), mMainVar(), mPoint(), mSd(), mRelevant()
+	{
 		CARL_LOG_ASSERT("carl.thom", te.mP.isUnivariate(), "");
 		CARL_LOG_ASSERT("carl.thom", te.mPoint == nullptr, "");
 		CARL_LOG_ASSERT("carl.thom", point != nullptr, "");

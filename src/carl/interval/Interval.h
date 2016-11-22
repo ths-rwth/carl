@@ -168,18 +168,20 @@ namespace carl
          * Default constructor which constructs the empty interval at point 0.
          */
         Interval() :
-        mContent(carl::constant_zero<Number>().get()),
-        mLowerBoundType(BoundType::STRICT),
-        mUpperBoundType(BoundType::STRICT) { }
+	        mContent(carl::constant_zero<Number>().get()),
+	        mLowerBoundType(BoundType::STRICT),
+	        mUpperBoundType(BoundType::STRICT)
+		{ }
 
         /**
          * Constructor which constructs the pointinterval at n.
          * @param n Location of the pointinterval.
          */
         Interval(const Number& n) :
-        mContent(n),
-        mLowerBoundType(BoundType::WEAK),
-        mUpperBoundType(BoundType::WEAK) { }
+	        mContent(n),
+	        mLowerBoundType(BoundType::WEAK),
+	        mUpperBoundType(BoundType::WEAK)
+		{ }
 
         /**
          * Constructor which constructs the weak-bounded interval between lower
@@ -188,7 +190,8 @@ namespace carl
          * @param lower The desired lower bound.
          * @param upper The desired upper bound.
          */
-        Interval(const Number& lower, const Number& upper)
+        Interval(const Number& lower, const Number& upper):
+			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK))
             {
@@ -214,7 +217,8 @@ namespace carl
          * @param lowerBoundType The desired lower bound type, defaults to WEAK.
          * @param upperBoundType The desired upper bound type, defaults to WEAK.
          */
-        Interval(const BoostInterval& content, BoundType lowerBoundType = BoundType::WEAK, BoundType upperBoundType = BoundType::WEAK)
+        Interval(const BoostInterval& content, BoundType lowerBoundType = BoundType::WEAK, BoundType upperBoundType = BoundType::WEAK):
+			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             if (BOUNDS_OK(content.lower(), lowerBoundType, content.upper(), upperBoundType))
             {
@@ -261,7 +265,8 @@ namespace carl
          * @param upper The desired upper bound.
          * @param upperBoundType The desired upper bound type.
          */
-        Interval(const Number& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType)
+        Interval(const Number& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType):
+			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType))
             {

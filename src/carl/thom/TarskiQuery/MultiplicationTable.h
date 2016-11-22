@@ -61,7 +61,7 @@ public:
 	
 	struct TableContent {
 		BaseRepresentation<Number> br;
-		IndexPairs pairs;	       
+		IndexPairs pairs;
 	};
 private:
 

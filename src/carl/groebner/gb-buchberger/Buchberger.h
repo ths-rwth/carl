@@ -54,6 +54,7 @@ private:
 	BuchbergerProc* procedure;
 public:
 	UpdateFnct(BuchbergerProc* proc) : procedure(proc) {}
+	virtual ~UpdateFnct() = default;
 	
 	void operator()(size_t index)
 	{
@@ -93,25 +94,25 @@ protected:
 
 
 public:
-	Buchberger() :
-    pCritPairs(new CritPairs()),
-	mUpdateCallBack(this)
+	Buchberger():
+		pGb(),
+		mGbElementsIndices(),
+	    pCritPairs(new CritPairs()),
+		mUpdateCallBack(this)
 	{
 		
 	}
 	
 	virtual ~Buchberger()
 	{
-	
 	}
 	
-	Buchberger(const Buchberger& rhs) :
-	pGb(new Ideal<Polynomial>(*rhs.pGb)),
-	mGbElementsIndices(rhs.mGbElementsIndices),
-	pCritPairs(new CritPairs(*rhs.pCritPairs)),
-	mUpdateCallBack(this)
+	Buchberger(const Buchberger& rhs):
+		pGb(new Ideal<Polynomial>(*rhs.pGb)),
+		mGbElementsIndices(rhs.mGbElementsIndices),
+		pCritPairs(new CritPairs(*rhs.pCritPairs)),
+		mUpdateCallBack(this)
 	{
-		
 	}
 	
 	void calculate(const std::list<Polynomial>& scheduledForAdding);

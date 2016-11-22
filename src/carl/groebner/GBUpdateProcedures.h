@@ -12,6 +12,7 @@ namespace carl
 struct UpdateFnc
 {
 	virtual void operator()(size_t index) = 0;
+	virtual ~UpdateFnc() = default;
 };
 
 
