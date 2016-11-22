@@ -3,7 +3,7 @@
 
 add_library(TestCommon SHARED Common.cpp)
 target_link_libraries(TestCommon lib_carl ${GTEST_LIBRARIES})
-add_dependencies(TestCommon resources lib_carl)
+add_dependencies(TestCommon resources lib_carl GTESTCORE_STATIC GTESTMAIN_STATIC)
 
 ################################
 # Unit Tests
