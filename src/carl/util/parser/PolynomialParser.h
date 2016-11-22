@@ -74,7 +74,12 @@ namespace parser {
 
 template<typename Pol>
 struct PolynomialParser: public qi::grammar<Iterator, Pol(), Skipper> {
-	PolynomialParser(): PolynomialParser<Pol>::base_type(main, "polynomial") {
+	PolynomialParser():
+		PolynomialParser<Pol>::base_type(main, "polynomial"),
+		operation(), varmap(), varname(), number(),
+		variable(), monomial(), term(), polynomial(),
+		expr(), expr_product(), expr_sum(), main()
+	{
 		operation.add("+", ADD)("-", SUB);
 		varname = qi::lexeme[ (qi::alpha | qi::char_("~!@$%^&_=<>.?/")) > *(qi::alnum | qi::char_("~!@$%^&_=<>.?/"))];
 		variable = (varmap[qi::_val = qi::_1]) | (varname[qi::_val = px::bind(&PolynomialParser<Pol>::newVariable, px::ref(*this), qi::_1)]);

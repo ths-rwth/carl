@@ -127,7 +127,8 @@ namespace carl
             {
                 public:
                     c_iterator( const Tree& tree ):
-                        mTree( tree )
+                        mTree( tree ),
+						pos()
                     {}
 
 #ifdef __VS

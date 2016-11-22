@@ -31,7 +31,14 @@ private:
 		return qi::phrase_parse(begin, s.end(), parser, skipper, res);
 	}
 public:
-	
+	Parser():
+		skipper(),
+		polynomialParser(),
+		ratfunParser(),
+		formulaParser()
+	{
+	}
+
 	Pol polynomial(const std::string& s) {
 		Pol res;
 		if (!parse(s, polynomialParser, res)) {

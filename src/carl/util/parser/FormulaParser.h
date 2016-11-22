@@ -12,7 +12,11 @@ namespace parser {
 
 template<typename Pol>
 struct FormulaParser: public qi::grammar<Iterator, Formula<Pol>(), Skipper> {
-	FormulaParser(): FormulaParser<Pol>::base_type(main, "formula") {
+	FormulaParser():
+		FormulaParser<Pol>::base_type(main, "formula"),
+		varmap(), binaryop(), naryop(),
+		varname(), variable(), formula_op(), formula(), main()
+	{
         binaryop.add("IMPLIES", FormulaType::IMPLIES);
         binaryop.add("iff", FormulaType::IFF);
         binaryop.add("xor", FormulaType::XOR);
