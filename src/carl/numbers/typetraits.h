@@ -39,6 +39,19 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 
 
 namespace carl {
+	
+template<typename T, typename U =
+	typename std::remove_cv<
+		typename std::remove_pointer<
+			typename std::remove_reference<
+				typename std::remove_extent<
+					T
+				>::type
+			>::type
+		>::type
+	>::type
+> struct remove_all : remove_all<U> {};
+template<typename T> struct remove_all<T, T> { typedef T type; };
 
 /**
  * This template is designed to provide types that are related to other types.
@@ -65,15 +78,15 @@ struct has_subtype {
 
 #define TRAIT_TRUE(name,type,groups) \
 /** States that type has the trait name. @ingroup typetraits_ ## name groups */ \
-template<> struct name<type>: std::true_type {}
+template<> struct name<type>: std::true_type {};
 
 #define TRAIT_FALSE(name,type,groups) \
 /** States that type does not have the trait name. @ingroup typetraits_ ## name groups */ \
-template<> struct name<type>: std::false_type {}
+template<> struct name<type>: std::false_type {};
 
 #define TRAIT_TYPE(name,_type,value,groups) \
 /** States that name of _type is value. @ingroup typetraits_ ## name groups */ \
-template<> struct name<_type>: carl::has_subtype<value> {}
+template<> struct name<_type>: carl::has_subtype<value> {};
 
 namespace carl {
 
