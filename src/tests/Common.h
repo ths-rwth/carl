@@ -45,3 +45,10 @@ using IntervalTypes = testing::Types<
 	carl::Interval<int>,
 	carl::Interval<double>
 >;
+
+template<typename T>
+std::string getOutput(const T& t) {
+	std::stringstream ss;
+	ss << t;
+	return ss.str();
+}
