@@ -4,6 +4,7 @@
 #include "../Model.h"
 
 #include "ModelEvaluation_Constraint.h"
+#include "ModelEvaluation_PBConstraint.h"
 
 #include "../../../core/logging.h"
 
@@ -139,6 +140,10 @@ namespace model {
 				} else {
 					CARL_LOG_WARN("carl.model.evaluation", "Could not evaluate " << f.uequality() << " as some variables are missing from the model.");
 				}
+				break;
+			}
+			case FormulaType::PBCONSTRAINT: {
+				PBConstraint pbc = substitute(f.pbConstraint(), m);
 				break;
 			}
 		}

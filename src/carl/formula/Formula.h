@@ -20,6 +20,7 @@
 #include "uninterpreted/UFManager.h"
 #include "bitvector/BVConstraintPool.h"
 #include "bitvector/BVConstraint.h"
+#include "pseudoboolean/PBConstraint.h"
 #include "VariableComparison.h"
 
 #include "FormulaContent.h"
@@ -561,6 +562,20 @@ namespace carl
                 return *mpContent->mpUIEqualityVS;
 #else
 				return mpContent->mUIEquality;
+#endif
+            }
+			
+			/**
+             * @return A constant reference to the pseudoboolean constraint represented by this formula. Note, that
+             *          this formula has to be of type PBCONSTRAINT, if you invoke this method.
+             */
+            const PBConstraint& pbConstraint() const
+            {
+                assert( mpContent->mType == FormulaType::PBCONSTRAINT );
+#ifdef __VS
+                return *mpContent->mpPBConstraintVS;
+#else
+				return mpContent->mPBConstraint;
 #endif
             }
 

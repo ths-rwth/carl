@@ -228,6 +228,7 @@ namespace carl
                         assert(false); break;
                     case BITVECTOR:
                     case UEQ:
+					case PBCONSTRAINT:
                         assert(false); break;
                 }
                 return nullptr;
@@ -272,6 +273,8 @@ namespace carl
                     case BITVECTOR:
                     // Uninterpreted Theory
                     case UEQ:
+					// Pseudoboolean
+					case PBCONSTRAINT:
                         assert(false); break;
                 }
                 return nullptr;

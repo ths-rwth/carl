@@ -1,6 +1,10 @@
 #include "gtest/gtest.h"
 
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/core/VariablePool.h>
+#include <carl/formula/model/Model.h>
 #include <carl/formula/pseudoboolean/PBConstraint.h>
+#include <carl/numbers/numbers.h>
 
 TEST(PBConstraint, Basic)
 {
@@ -22,14 +26,13 @@ TEST(PBConstraint, Basic)
 	m.emplace(x, true);
 	m.emplace(z, false);
 	
-	pbc.substituteIn(m);
+	pbc = carl::model::substitute(pbc, m);
 	EXPECT_TRUE(pbc.getLHS().size() == 1);
 	EXPECT_TRUE(pbc.getLHS()[0].first == y);
 	EXPECT_TRUE(pbc.getLHS()[0].second == 5);
 	EXPECT_TRUE(pbc.getRHS() == 4);
 	
 	m.emplace(y, true);
-	carl::ModelValue<Rational,Poly> res;
-	pbc.evaluate(res, m);
+	auto res = carl::model::evaluate(pbc, m);
 	EXPECT_TRUE(res.isBool() && res.asBool());
 }

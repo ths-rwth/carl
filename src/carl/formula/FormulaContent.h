@@ -45,7 +45,10 @@ namespace carl {
 		BITVECTOR,
 		
 		// Uninterpreted Theory
-		UEQ
+		UEQ,
+		
+		// Pseudoboolean
+		PBCONSTRAINT
     };
 	
 	
@@ -72,6 +75,7 @@ namespace carl {
 			case FormulaType::VARCOMPARE: return "varcompare";
 			case FormulaType::BITVECTOR: return "bv";
 			case FormulaType::UEQ: return "ueq";
+			case FormulaType::PBCONSTRAINT: return "pbconstraint";
 			default:
 				CARL_LOG_ERROR("carl.formula", "Unknown formula type " << unsigned(_type));
 				return "???";
@@ -169,6 +173,8 @@ namespace carl {
                 BVConstraint* mpBVConstraintVS;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
                 UEquality* mpUIEqualityVS;
+				/// The pseudoboolean constraint.
+				PBConstraint* mpPBConstraintVS;
                 /// The only sub-formula, in case this formula is an negation.
                 Formula<Pol>* mpSubformulaVS;
                 /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
@@ -190,6 +196,8 @@ namespace carl {
 				BVConstraint mBVConstraint;
 				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
 				UEquality mUIEquality;
+				/// The pseudoboolean constraint.
+				PBConstraint mPBConstraint;
 				/// The only sub-formula, in case this formula is an negation.
 				Formula<Pol> mSubformula;
 				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
@@ -251,6 +259,12 @@ namespace carl {
              * @param _ueq The pointer to the constraint.
              */
             FormulaContent(UEquality&& _ueq);
+			
+			/**
+             * Constructs a formula being an pseudoboolean constraint.
+             * @param _pbc The pointer to the constraint.
+             */
+            FormulaContent(PBConstraint&& _pbc);
 
             /**
              * Constructs a formula of the given type with a single subformula. This is usually a negation.
@@ -328,6 +342,7 @@ namespace carl {
 					case FormulaType::VARCOMPARE: { mVariableComparison.~VariableComparison(); break; }
 					case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
 					case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
+					case FormulaType::PBCONSTRAINT: { mPBConstraint.~PBConstraint(); break; }
 #endif
                 }
 
@@ -358,6 +373,7 @@ namespace carl {
 					case FormulaType::VARCOMPARE: return false;
                     case FormulaType::BITVECTOR: return false;
                     case FormulaType::UEQ: return false;
+					case FormulaType::PBCONSTRAINT: return false;
                 }
                 return false;
             }

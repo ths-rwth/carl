@@ -118,6 +118,22 @@ namespace carl {
 #endif
 	}
 
+	template<typename Pol>
+	FormulaContent<Pol>::FormulaContent( PBConstraint&& _pbc ):
+        mHash( std::hash<PBConstraint>()( _pbc ) ),
+#ifdef __VS
+        mType( FormulaType::PBCONSTRAINT )
+    {
+		mpPBConstraintVS = new PBConstraint(std::move(_pbc));
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mPBConstraintVS);
+#else
+		mType(FormulaType::PBCONSTRAINT),
+		mPBConstraint(std::move(_pbc))
+	{
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mPBConstraint);
+#endif
+	}
+
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(FormulaType _type, Formula<Pol>&& _subformula):
         mHash( ((size_t)NOT << 5) ^ _subformula.getHash() ),
@@ -217,6 +233,8 @@ namespace carl {
 				return *mpBVConstraintVS == *_content.mpBVConstraintVS;
 			case FormulaType::UEQ:
 				return *mpUIEqualityVS == *_content.mpUIEqualityVS;
+			case FormulaType::PBCONSTRAINT:
+				return *mpPBConstraintVS == *_content.mpPBConstraintVS;
 			case FormulaType::EXISTS:
 				return (*mpQuantifierContentVS == *_content.mpQuantifierContentVS);
 			case FormulaType::FORALL:
@@ -232,6 +250,8 @@ namespace carl {
 				return mBVConstraint == _content.mBVConstraint;
 			case FormulaType::UEQ:
 				return mUIEquality == _content.mUIEquality;
+			case FormulaType::PBCONSTRAINT:
+				return mPBConstraint == _content.mPBConstraint;
 			case FormulaType::EXISTS:
 				return (mQuantifierContent == _content.mQuantifierContent);
 			case FormulaType::FORALL:
@@ -268,6 +288,10 @@ namespace carl {
         {
             return (_init + mpUIEqualityVS->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         }
+		else if (mType == FormulaType::PBCONSTRAINT)
+		{
+			return (_init + mpPBConstraintVS->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+		}
 #else
 		if (mType == FormulaType::BOOL)
 		{
@@ -283,6 +307,10 @@ namespace carl {
 		else if (mType == FormulaType::UEQ)
 		{
 			return (_init + mUIEquality.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
+		}
+		else if (mType == FormulaType::PBCONSTRAINT)
+		{
+			return (_init + mPBConstraint.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
 		}
 #endif
         else if( mType == FormulaType::FALSE || mType == FormulaType::TRUE )
