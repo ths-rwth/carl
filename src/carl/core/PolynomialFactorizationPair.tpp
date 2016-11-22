@@ -82,6 +82,7 @@ namespace carl
     template<typename P>
     PolynomialFactorizationPair<P>::PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial ):
         mHash( 0 ),
+		mMutex(),
         mFactorization( std::move( _factorization ) ),
         mpPolynomial( _polynomial ),
         mIrreducible( -1 )

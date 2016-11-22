@@ -7,9 +7,11 @@
 
 namespace carl
 {
-    BVTermPool::BVTermPool() : Singleton<BVTermPool> (), Pool<BVTermContent> ()
+    BVTermPool::BVTermPool():
+		Singleton<BVTermPool>(),
+		Pool<BVTermContent>(),
+		mpInvalid(add(new Term))
     {
-        this->mpInvalid = this->add(new Term);
     }
 
     BVTermPool::ConstTermPtr BVTermPool::create()

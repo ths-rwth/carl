@@ -33,7 +33,10 @@ namespace carl
 			 * Default constructor.
 			 * The resulting object will not be a valid variable, but a dummy object.
              */
-            UVariable(): mVar(Variable::NO_VARIABLE) {
+            UVariable():
+				mVar(Variable::NO_VARIABLE),
+				mDomain()
+			{
 			}
 
 			explicit UVariable(Variable::Arg var):

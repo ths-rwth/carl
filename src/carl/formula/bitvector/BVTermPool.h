@@ -25,6 +25,8 @@ namespace carl
 	public:
 
 		BVTermPool();
+		BVTermPool(const BVTermPool&) = delete;
+		BVTermPool& operator=(const BVTermPool&) = delete;
 
 		ConstTermPtr create();
 

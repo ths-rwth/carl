@@ -84,7 +84,7 @@ Term<C> gcd(const MultivariatePolynomial<C,O,P>& a, const Term<C>& b)
 
 
 template<typename C, typename O, typename P>
-std::shared_ptr<const Monomial> gcd(const MultivariatePolynomial<C,O,P>& a, std::shared_ptr<const Monomial> b)
+Monomial::Arg gcd(const MultivariatePolynomial<C,O,P>& a, const Monomial::Arg& b)
 {
     if( !b )
         return nullptr;

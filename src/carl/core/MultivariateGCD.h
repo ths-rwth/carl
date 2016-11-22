@@ -47,10 +47,10 @@ Term<C> gcd(const Term<C>& a, const MultivariatePolynomial<C,O,P>& b)
 }
 
 template<typename C, typename O, typename P>
-std::shared_ptr<const Monomial> gcd(const MultivariatePolynomial<C,O,P>& a, std::shared_ptr<const Monomial> b);
+Monomial::Arg gcd(const MultivariatePolynomial<C,O,P>& a, const Monomial::Arg& b);
 
 template<typename C, typename O, typename P>
-std::shared_ptr<const Monomial> gcd(std::shared_ptr<const Monomial> a, const MultivariatePolynomial<C,O,P>& b)
+Monomial::Arg gcd(const Monomial::Arg& a, const MultivariatePolynomial<C,O,P>& b)
 {
 	return gcd(b, a);
 }
@@ -158,4 +158,3 @@ class MultivariateGCD : GCDCalculation
 #include "PrimitiveEuclideanAlgorithm.h"
 #include "MultivariateGCD.tpp"
 #include "PrimitiveEuclideanAlgorithm.tpp"	
-

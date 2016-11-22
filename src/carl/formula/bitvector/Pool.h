@@ -45,7 +45,8 @@ namespace carl
 		 */
 		explicit Pool(unsigned _capacity = 10000) :
 			mIdAllocator(1),
-			mPool()
+			mPool(),
+			mMutexPool()
 		{
 			mPool.reserve(_capacity);
 

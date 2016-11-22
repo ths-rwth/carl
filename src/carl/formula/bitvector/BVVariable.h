@@ -21,12 +21,13 @@ namespace carl
 
 	public:
 
-		BVVariable() : mVar(Variable::NO_VARIABLE)
+		BVVariable():
+			mVar(Variable::NO_VARIABLE), mSort(), mWidth(0)
 		{
 		}
 
-		BVVariable(Variable::Arg _variable, const Sort& _sort) :
-		mVar(_variable), mSort(_sort)
+		BVVariable(Variable::Arg _variable, const Sort& _sort):
+			mVar(_variable), mSort(_sort), mWidth(0)
 		{
 			assert(SortManager::getInstance().getType(_sort) == VariableType::VT_BITVECTOR);
 

@@ -70,6 +70,7 @@ class UFContent
 		
 		explicit UFContent( const std::string& _name, const Sort& _codomain ):
             mName( _name ),
+			mDomain(),
             mCodomain( _codomain )
         {}
 

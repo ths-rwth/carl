@@ -151,11 +151,15 @@ namespace carl
 	{
 		std::map<uint, CoeffType> mCoeffs;
 	public:
-		VariableInformation() :  VariableInformation<false, CoeffType>()
+		VariableInformation():
+			VariableInformation<false, CoeffType>(),
+			mCoeffs()
 		{
 		}
         
-		VariableInformation(uint degreeOfOccurence) :  VariableInformation<false, CoeffType>(degreeOfOccurence)
+		VariableInformation(uint degreeOfOccurence):
+			VariableInformation<false, CoeffType>(degreeOfOccurence),
+			mCoeffs()
 		{
 		}
         
@@ -165,7 +169,9 @@ namespace carl
         {
         }
         
-		VariableInformation(const VariableInformation<false, CoeffType>& varInfo) :  VariableInformation<false, CoeffType>(varInfo)
+		VariableInformation(const VariableInformation<false, CoeffType>& varInfo):
+			VariableInformation<false, CoeffType>(varInfo),
+			mCoeffs()
         {
         }
         

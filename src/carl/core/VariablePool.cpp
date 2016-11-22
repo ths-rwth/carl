@@ -15,6 +15,8 @@ namespace carl
 VariablePool::VariablePool():
     Singleton(),
     mNextIDs(),
+	freshVarMutex(),
+	setNameMutex(),
     mVariableNames(),
     mVariablePrefix()
 {

@@ -88,6 +88,8 @@ class SortManager : public Singleton<SortManager>
 				delete indices;
 			}
 			
+			SortContent& operator=(const SortContent& sc) = delete;
+			
 			/**
 			 * @param _sc The sort content to compare with.
 			 * @return true, if this sort content is less than the given one.
@@ -141,9 +143,12 @@ class SortManager : public Singleton<SortManager>
 		 */
 		SortManager():
 			mSorts(),
+			mSortTypes(),
+			mSortMap(),
 			mDeclarations(),
 			mDefinitions(),
-			mIndexable()
+			mIndexable(),
+			mInterpreted()
 		{
 			mSorts.emplace_back(nullptr); // default value
 			mSortTypes.emplace_back(VariableType::VT_UNINTERPRETED);

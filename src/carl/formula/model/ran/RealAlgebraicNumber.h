@@ -45,11 +45,15 @@ private:
 public:
 	RealAlgebraicNumber():
 		mValue(carl::constant_zero<Number>::get()),
-		mIsRoot(true)
+		mIsRoot(true),
+		mIR(),
+		mTE()
 	{}
 	explicit RealAlgebraicNumber(const Number& n, bool isRoot = true):
 		mValue(n),
-		mIsRoot(isRoot)
+		mIsRoot(isRoot),
+		mIR(),
+		mTE()
 	{}
 	explicit RealAlgebraicNumber(Variable::Arg var, bool isRoot = true):
 		mValue(carl::constant_zero<Number>::get()),

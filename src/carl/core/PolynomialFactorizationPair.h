@@ -195,6 +195,8 @@ namespace carl
         PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial = nullptr );
         PolynomialFactorizationPair( const PolynomialFactorizationPair& ) = delete; // no implementation
         ~PolynomialFactorizationPair();
+		
+		PolynomialFactorizationPair& operator=(const PolynomialFactorizationPair& pfp) = default;
         
         /**
          * @return The hash of this polynomial factorization pair.
