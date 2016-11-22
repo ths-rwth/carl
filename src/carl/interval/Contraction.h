@@ -278,7 +278,7 @@ namespace carl {
             #endif
             mDerivatives(std::move(_contraction.mDerivatives)),
             mVarSolutionFormulas(std::move(_contraction.mVarSolutionFormulas)),
-			mHornerSchemes(std::move(_contration.mHornerSchemes))
+			mHornerSchemes(std::move(_contraction.mHornerSchemes))
         {
             _contraction.mpOriginal = nullptr;
         }
