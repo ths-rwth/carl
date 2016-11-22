@@ -132,9 +132,9 @@ namespace carl
 		 * @param _double Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		explicit FLOAT_T<FloatType>(double _double, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(double _double, CARL_RND /*unused*/ = CARL_RND::N):
+			mValue(carl::convert<double, FloatType>(_double))
 		{
-			mValue = carl::convert<double, FloatType>(_double);
 		}
 
 		/**
@@ -143,14 +143,14 @@ namespace carl
 		 * @param _int Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		explicit FLOAT_T<FloatType>(sint _int, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(sint _int, CARL_RND /*unused*/ = CARL_RND::N):
+			mValue(FloatType(_int))
 		{
-			mValue = FloatType(_int);
 		}
 
-		explicit FLOAT_T<FloatType>(int _int, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(int _int, CARL_RND /*unused*/ = CARL_RND::N):
+			mValue(FloatType(_int))
 		{
-			mValue = FloatType(_int);
 		}
 
 		/**
@@ -159,9 +159,9 @@ namespace carl
 		 * @param _int Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		explicit FLOAT_T<FloatType>(unsigned _int, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(unsigned _int, CARL_RND /*unused*/ = CARL_RND::N):
+			mValue(FloatType(_int))
 		{
-			mValue = FloatType(_int);
 		}
 
 		/**
@@ -184,21 +184,21 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 */
 		template<typename F = FloatType, DisableIf< std::is_same<F, double> > = dummy>
-		explicit FLOAT_T<FloatType>(const FloatType& val, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const FloatType& val, CARL_RND /*unused*/ = CARL_RND::N):
+			mValue(val)
 		{
-			mValue = val;
 		}
 
 		template<typename F = FloatType, EnableIf< carl::is_rational<F> > = dummy>
-		explicit FLOAT_T<FloatType>(const std::string& _string, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const std::string& _string, CARL_RND /*unused*/ = CARL_RND::N):
+			mValue(carl::rationalize<FloatType>(_string))
 		{
-			mValue = carl::rationalize<FloatType>(_string);
 		}
 
 		template<typename F = FloatType, EnableIf< std::is_same<F, double> > = dummy>
-		explicit FLOAT_T<FloatType>(const std::string& _string, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const std::string& _string, CARL_RND /*unused*/ = CARL_RND::N):
+			mValue(std::stod(_string))
 		{
-			mValue = std::stod(_string);
 		}
 
 		/**
