@@ -11,6 +11,7 @@ template<typename Iterator>
 struct ComparisonOperator {
 	typedef void result_type;
 	Iterator it1, it2;
+	ComparisonOperator(): it1(), it2() {}
 	void set(const Iterator& i1, const Iterator& i2) {
 		it1 = i1;
 		it2 = i2;
