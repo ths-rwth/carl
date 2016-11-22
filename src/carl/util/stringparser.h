@@ -75,6 +75,14 @@ namespace carl
 		std::map<std::string, Variable> mVars;
 		
 	public:
+		StringParser():
+			mSingleSymbVariables(false),
+			mImplicitMultiplicationMode(false),
+			mSumOfTermsForm(true),
+			mVars()
+		{
+		}
+
 		const std::map<std::string, Variable>& variables() const {
 			return mVars;
 		}

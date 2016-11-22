@@ -45,6 +45,7 @@ namespace carl
             typedef typename Configuration::Entry Entry;
 
             Heap( const Configuration& configuration ):
+				_tree(),
                 _conf( configuration )
             {}
             Configuration& getConfiguration()

@@ -19,9 +19,9 @@ namespace carl
 	
     class BitVector {
 	public:
-		BitVector() {}
+		BitVector(): mBits() {}
 		
-		explicit BitVector(unsigned pos) {
+		explicit BitVector(unsigned pos): mBits() {
 			setBit(pos);
 		}
 		
@@ -135,9 +135,8 @@ namespace carl
 		class forward_iterator {
 		public:
 			forward_iterator(const std::vector<unsigned>::const_iterator it, const std::vector<unsigned>::const_iterator vectorEnd) :
-			posInVec(0), vecIter(it), vecEnd(vectorEnd)
+			posInVec(0), vecIter(it), vecEnd(vectorEnd), curVecElem(vecIter == vecEnd ? 0 : *vecIter)
 			{
-				curVecElem = (vecIter) == vecEnd ? 0 : *vecIter ;
 			}
 		protected:
 			unsigned posInVec;
@@ -161,10 +160,11 @@ namespace carl
 			
 			friend bool operator==(const forward_iterator& fi1, const forward_iterator& fi2);
 			
-			void operator++(int i) {
+			forward_iterator operator++(int i) {
 				if(i == 0) {
 					next();
 				}
+				return *this;
 			}
 			
 			bool isEnd() {
