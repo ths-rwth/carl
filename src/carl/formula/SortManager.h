@@ -262,12 +262,6 @@ class SortManager : public Singleton<SortManager>
 		bool define(const std::string& name, const std::vector<std::string>& params, const Sort& sort);
 
 		/**
-		 * @param _name The name of the sort declaration or sort template definition.
-		 * @return The aritiy of the given sort declaration or sort template definition.
-		 */
-		//std::size_t arity(const std::string& name) const;
-		
-		/**
 		 * @param _sort The sort to get the arity for.
 		 * @return The arity of the given sort.
 		 */
@@ -289,46 +283,14 @@ class SortManager : public Singleton<SortManager>
 		void makeSortIndexable(const Sort& sort, std::size_t indices, VariableType type);
 
 		/**
-		 * Adds an interpreted sort.
-		 * @param _name The name of the sort to add.
-		 * @param type The carl variable type of the sort to add.
-		 * @return The resulting sort.
-		 */
-		//Sort interpretedSort( const std::string& _name, VariableType type );
-
-		/**
-		 * Retrieves an interpreted sort.
-		 * Asserts, that the sort was already registered via interpretedSort(std::string, VariableType).
-		 * @param vt VariableType.
-		 * @return Sort corresponding to vt.
-		 */
-		/*const Sort& interpretedSort( VariableType vt ) const
-		{
-			auto it = mInterpretedSorts.find(vt);
-			assert(it != mInterpretedSorts.end());
-			return it->second;
-		}*/
-
-		/**
 		 * @param _sort A sort.
 		 * @return true, if the given sort is interpreted.
 		 */
 		bool isInterpreted(const Sort& sort) const {
 			return getType(sort) != VariableType::VT_UNINTERPRETED;
 		}
-		
-		//Sort instantiate(const std::string& name, const std::vector<Sort>& params);
-		
-		Sort index(const Sort& sort, const std::vector<std::size_t>& indices);
-		
 
-		/**
-		* Tries to add the given sort content to the so far stored sort contents. If it has already been stored,
-		* if will be deleted and the id of the already existing sort content will be used to create the returned sort.
-		* @param _sc The sort content to store.
-		* @return The sort corresponding to the given sort content.
-		*/
-		//Sort getSort( const SortContent* _sc );
+		Sort index(const Sort& sort, const std::vector<std::size_t>& indices);
 
 		/**
 		 * Gets the sort with arity zero (thus it is maybe interpreted) corresponding the given name.
@@ -359,12 +321,5 @@ template<typename... Args>
 inline Sort getSort(Args&&... args) {
 	return SortManager::getInstance().getSort(std::forward<Args>(args)...);
 }
-
-/*inline Sort getSort( const std::string& _name ) {
-	return SortManager::getInstance().getSort(_name);
-}
-inline Sort getSort( const std::string& _name, const std::vector<Sort>& _params ) {
-	return SortManager::getInstance().getSort(_name, _params);
-}*/
 
 }
