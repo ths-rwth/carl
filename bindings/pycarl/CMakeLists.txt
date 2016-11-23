@@ -31,17 +31,17 @@ if (PYTHONINTERP_FOUND)
 
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.cfg.in ${CMAKE_CURRENT_SOURCE_DIR}/setup.cfg)
 	add_custom_target(PythonBindingsBuild
-		COMMAND ${PYTHON_EXECUTABLE} setup.py build
+		COMMAND CC=${CMAKE_CXX_COMPILER} ${PYTHON_EXECUTABLE} setup.py build
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		DEPENDS lib_carl
 	)
 	add_custom_target(PythonBindingsDevelop
-		COMMAND ${PYTHON_EXECUTABLE} setup.py develop
+		COMMAND CC=${CMAKE_CXX_COMPILER} ${PYTHON_EXECUTABLE} setup.py develop
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		DEPENDS lib_carl
 	)
 	add_custom_target(PythonBindingsInstall
-		COMMAND ${PYTHON_EXECUTABLE} setup.py install --user
+		COMMAND CC=${CMAKE_CXX_COMPILER} ${PYTHON_EXECUTABLE} setup.py install --user
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		DEPENDS lib_carl
 	)
