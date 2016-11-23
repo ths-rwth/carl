@@ -9,11 +9,12 @@
 using namespace carl;
 
 class StringParserTest : public ::testing::Test {
- protected:
-  virtual void SetUp() {
-     spSingleSymbExplicit.setImplicitMultiplicationMode(false);
-     spSingleSymbExplicit.setVariables({"x", "y", "z"});
-  }
+protected:
+	StringParserTest(): spSingleSymbExplicit() {}
+	virtual void SetUp() {
+		spSingleSymbExplicit.setImplicitMultiplicationMode(false);
+		spSingleSymbExplicit.setVariables({"x", "y", "z"});
+	}
 
   // virtual void TearDown() {}
 
@@ -67,4 +68,3 @@ TEST_F(StringParserTest, rationalFunctionsWithExplicitMultiplication)
     
 }
 	
-

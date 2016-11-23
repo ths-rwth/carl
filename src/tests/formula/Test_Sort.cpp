@@ -12,8 +12,8 @@ TEST(Sort, DefaultConstruction)
 	carl::Sort s;
 	EXPECT_TRUE(s.id() == 0);
 	EXPECT_TRUE(std::hash<carl::Sort>()(s) == 0);
-	EXPECT_DEATH(s.arity(), ".*Assertion.*");
-	EXPECT_DEATH(std::cout << s, ".*Assertion.*");
+	EXPECT_DEATH(s.arity(), ".*");
+	EXPECT_DEATH(std::cout << s, ".*");
 	
 	carl::Sort s2;
 	EXPECT_TRUE(s == s2);
