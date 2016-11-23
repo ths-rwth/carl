@@ -126,6 +126,14 @@ public:
 		}
 		return res;
 	}
+	Poly squareFreePart(const Poly& p) const {
+		auto finfo = CoCoA::SqFreeFactor(convert(p));
+		Poly res(1);
+		for (const auto& f: finfo.myFactors()) {
+			res *= convert(f);
+		}
+		return res;
+	}
 };
 
 }
