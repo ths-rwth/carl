@@ -31,7 +31,6 @@ elif [[ ${TASK} == "coverage" ]]; then
 	/usr/bin/time make -j1 || return 1
 	/usr/bin/time make -j1 coverage-collect || return 1
 	
-	lcov --list coverage.info
 	coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
 else
 	/usr/bin/time make resources -j1 || return 1
