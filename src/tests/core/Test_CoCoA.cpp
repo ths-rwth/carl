@@ -141,7 +141,7 @@ TEST(CoCoA, Benchmark)
 		auto res = conv.gcd(std::get<0>(i), std::get<1>(i));
 		EXPECT_EQ(res, std::get<2>(i));
 	}
-	std::cout << "Passed: " << (double(timer.passed()) / count) << "ms per instance" << std::endl;
+	std::cout << "Passed: " << (double(timer.passed()) / double(count)) << "ms per instance" << std::endl;
 }
 
 #endif
