@@ -42,13 +42,13 @@ class SortValueManager : public Singleton<SortValueManager>
         {}
 
     public:
-        
-        /**
-         * Creates a new value for the given sort.
-         * @param _sort The sort to create a new value for.
-         * @return The resulting sort value.
-         */
-        SortValue newSortValue( const Sort& _sort );
+
+    /**
+     * Creates a new value for the given sort.
+     * @param _sort The sort to create a new value for.
+     * @return The resulting sort value.
+     */
+    SortValue newSortValue( const Sort& _sort );
 	/**
 	 * Returns the default value for the given sort.
 	 * @param _sort The sort to return the default value for.
