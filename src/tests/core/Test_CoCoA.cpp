@@ -86,9 +86,6 @@ TEST(CoCoA, SquareFreePart)
 	Variable x = freshRealVariable("x");
 	Variable y = freshRealVariable("y");
 	
-	std::function<void()> f;
-	f();
-	
 	CoCoAAdaptor<Poly> c({Poly(x*y)});
 	{
 		Poly p = (x*x - mpq_class(1)) * (x*x - mpq_class(1)) * (x+mpq_class(1)) * (x-mpq_class(2));
