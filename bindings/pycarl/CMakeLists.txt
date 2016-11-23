@@ -46,5 +46,5 @@ if (PYTHONINTERP_FOUND)
 		DEPENDS lib_carl
 	)
 else()
-	status(WARNING "Did not find a python interpreter, disabling pycarl tests.")
+	message(WARNING "Did not find a python interpreter, disabling pycarl tests.")
 endif()
