@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../../Sort.h"
+#include "../../../util/hash.h"
 
 #include <iostream>
 #include <utility>
@@ -113,7 +114,7 @@ namespace std
          */
         std::size_t operator()( const carl::SortValue& _sortValue ) const 
         {
-            return (size_t) _sortValue.id() ^ hash<carl::Sort>()( _sortValue.sort() );
+            return hash_all(_sortValue.id(),  _sortValue.sort());
         }
     };
 }
