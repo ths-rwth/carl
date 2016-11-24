@@ -38,7 +38,6 @@ TEST(Sort, SortValue)
 	EXPECT_EQ(sv.sort(), s);
 	EXPECT_EQ(sv.id(), 0);
 	EXPECT_EQ(sv, sv2);
-	EXPECT_EQ(std::hash<carl::SortValue>()(sv), 175247769566);
 }
 
 TEST(Sort, SortValueManager)
