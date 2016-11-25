@@ -26,7 +26,7 @@ export_target(DEP_TARGETS GTESTMAIN_STATIC)
 
 set(EXP_OPTIONS "")
 foreach(option ${EXPORTED_OPTIONS})
-	set(EXP_OPTIONS "${EXP_OPTIONS}\nCARL_${option}=${${option}}")
+	set(EXP_OPTIONS "${EXP_OPTIONS}\nCARL_${option}=\"${${option}}\"")
 endforeach()
 
 include(CMakePackageConfigHelpers)
