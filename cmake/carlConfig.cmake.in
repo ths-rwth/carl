@@ -3,6 +3,8 @@ set(carl_VERSION @carl_VERSION@)
 get_filename_component(carl_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 @DEP_TARGETS@
+
+@EXP_OPTIONS@
  
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET lib_carl AND NOT carl_BINARY_DIR)
