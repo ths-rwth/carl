@@ -5,8 +5,6 @@ project(pycarl)
 find_package(carl REQUIRED)
 add_subdirectory(resources/pybind11)
 
-set(PYCARL_USE_CLN CARL_USE_CLN_NUMBERS)
-
 file(GLOB_RECURSE PYCARL_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.cpp)
 
 pybind11_add_module(pycarl.core ${CMAKE_CURRENT_SOURCE_DIR}/src/mod_core.cpp ${PYCARL_CORE_SOURCES})
