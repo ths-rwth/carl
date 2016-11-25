@@ -315,7 +315,7 @@ class SortManager : public Singleton<SortManager>
 
 /**
  * Gets the sort specified by the arguments.
- * Forwards to SortManager::newSort().
+ * Forwards to SortManager::getSort().
  */
 template<typename... Args>
 inline Sort getSort(Args&&... args) {
