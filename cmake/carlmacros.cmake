@@ -25,6 +25,10 @@ macro(add_imported_library name type lib include)
 	endif()
 endmacro(add_imported_library)
 
+macro(export_option name)
+	list(APPEND EXPORTED_OPTIONS "${name}")
+endmacro(export_option)
+
 macro(export_target output TARGET)
 	get_target_property(TYPE ${TARGET} TYPE)
 	if(TYPE STREQUAL "SHARED_LIBRARY")

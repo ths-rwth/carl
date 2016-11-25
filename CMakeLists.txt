@@ -34,6 +34,9 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # for cmake 2.8.7
 include(FindPackageHandleStandardArgs)
 
+# Include own macros.
+include( carlmacros )
+
 # # # # # # # # # # # # # # # # # # # # # #
 # B. Options
 # # # # # # # # # # # # # # # # # # # # # #
@@ -42,18 +45,26 @@ include(FindPackageHandleStandardArgs)
 option( DEVELOPER "Compile with extra warnings" OFF )
 option( ALLWARNINGS "Compile with even more warnings" OFF )
 option( LOGGING "Enable logging within the carl library" OFF )
+export_option(LOGGING)
 option( LOGGING_CARL "Compile with the logging facility of the carl library" OFF )
 option( LOGGING_DISABLE_INEFFICIENT "Disable log messages about inefficient methods" OFF )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
+export_option(FORCE_SHIPPED_RESOURCES)
 option( USE_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
+export_option(USE_GINAC)
 option( COMPARE_WITH_Z3 "Compile benchmarks that compare to z3" OFF )
 option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )
+export_option(USE_CLN_NUMBERS)
 option( USE_COCOA "Use CoCoALib" OFF )
+export_option(USE_COCOA)
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
+export_option(USE_MPFR_FLOAT)
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
+export_option(BUILD_STATIC)
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
+export_option(THREAD_SAFE)
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
 option( COVERAGE "Enable collection of coverage statistics" OFF )
@@ -64,9 +75,6 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type")
 endif()
-
-# Include own macros.
-include( carlmacros )
 
 set(CARL_LIBRARIES_DIR "${PROJECT_BINARY_DIR}/lib")
 
