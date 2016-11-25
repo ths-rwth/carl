@@ -1,6 +1,34 @@
-find_package(PythonInterp)
+cmake_minimum_required(VERSION 3.0.0)
+project(pycarl)
 
-if (PYTHONINTERP_FOUND)
+
+find_package(carl REQUIRED)
+add_subdirectory(resources/pybind11)
+
+file(GLOB_RECURSE PYCARL_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.cpp)
+
+pybind11_add_module(pycarl.core ${CMAKE_CURRENT_SOURCE_DIR}/src/mod_core.cpp ${PYCARL_CORE_SOURCES})
+target_include_directories(pycarl.core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(pycarl.core PRIVATE lib_carl)
+
+
+file(GLOB_RECURSE PYCARL_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/formula/*.cpp)
+
+pybind11_add_module(pycarl.formula ${CMAKE_CURRENT_SOURCE_DIR}/src/mod_formula.cpp ${PYCARL_FORMULA_SOURCES})
+target_include_directories(pycarl.formula PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(pycarl.formula PRIVATE lib_carl)
+
+
+file(GLOB_RECURSE PYCARL_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/*.cpp)
+
+pybind11_add_module(pycarl.parse ${CMAKE_CURRENT_SOURCE_DIR}/src/mod_parse.cpp ${PYCARL_PARSE_SOURCES})
+target_include_directories(pycarl.parse PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(pycarl.parse PRIVATE lib_carl)
+
+
+
+
+if (FALSE)
 
 	# Collect include directories
 	set(PYCARL_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src)
@@ -45,6 +73,4 @@ if (PYTHONINTERP_FOUND)
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		DEPENDS lib_carl
 	)
-else()
-	message(WARNING "Did not find a python interpreter, disabling pycarl tests.")
 endif()

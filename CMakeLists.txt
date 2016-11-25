@@ -58,7 +58,6 @@ option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
 option( COVERAGE "Enable collection of coverage statistics" OFF )
 option( EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
-option( BINDINGS_PYTHON "Build python bindings" OFF )
 
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 
@@ -195,6 +194,9 @@ endif()
 #install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
 #		DESTINATION ${CMAKE_INSTALL_DIR} )
 
+
+	
+
 # Install the export set for use with the install-tree
 #install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
 
@@ -202,6 +204,3 @@ endif()
 # G. CPack
 # # # # # # # # # # # # # # # # # # # # # #
 
-if (BINDINGS_PYTHON)
-	add_subdirectory(bindings/pycarl)
-endif()
