@@ -40,6 +40,7 @@ namespace carl {
 		// Arithmetic Theory
 		CONSTRAINT,
 		VARCOMPARE,
+		VARASSIGN,
 		
 		// Bitvector Theory
 		BITVECTOR,
@@ -73,6 +74,7 @@ namespace carl {
             case FormulaType::IFF: return "=";
 			case FormulaType::CONSTRAINT: return "constraint";
 			case FormulaType::VARCOMPARE: return "varcompare";
+			case FormulaType::VARASSIGN: return "varassign";
 			case FormulaType::BITVECTOR: return "bv";
 			case FormulaType::UEQ: return "ueq";
 			case FormulaType::PBCONSTRAINT: return "pbconstraint";
@@ -169,6 +171,8 @@ namespace carl {
                 Constraint<Pol>* mpConstraintVS;
 				/// A constraint comparing a single variable with a value. 
 				VariableComparison<Pol>* mpVariableComparisonVS;
+				/// A constraint assigning a single variable to a value. 
+				VariableAssignment<Pol>* mpVariableAssignmentVS;
                 /// The bitvector constraint.
                 BVConstraint* mpBVConstraintVS;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
@@ -192,6 +196,8 @@ namespace carl {
 				Constraint<Pol> mConstraint;
 				/// A constraint comparing a single variable with a value. 
 				VariableComparison<Pol> mVariableComparison;
+				/// A constraint assigning a single variable to a value. 
+				VariableAssignment<Pol> mVariableAssignment;
 				/// The bitvector constraint.
 				BVConstraint mBVConstraint;
 				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
@@ -247,6 +253,8 @@ namespace carl {
             FormulaContent(Constraint<Pol>&& _constraint);
 			
 			FormulaContent(VariableComparison<Pol>&& _variableComparison);
+			
+			FormulaContent(VariableAssignment<Pol>&& _variableAssignment);
             
             /**
              * Constructs a formula being a bitvector constraint.
@@ -340,6 +348,7 @@ namespace carl {
 					case FormulaType::FORALL: { mQuantifierContent.~QuantifierContent(); break; }
 					case FormulaType::CONSTRAINT: { mConstraint.~Constraint(); break; }
 					case FormulaType::VARCOMPARE: { mVariableComparison.~VariableComparison(); break; }
+					case FormulaType::VARASSIGN: { mVariableAssignment.~VariableAssignment(); break; }
 					case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
 					case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
 					case FormulaType::PBCONSTRAINT: { mPBConstraint.~PBConstraint(); break; }
@@ -371,6 +380,7 @@ namespace carl {
                     case FormulaType::FORALL: return false;
                     case FormulaType::CONSTRAINT: return false;
 					case FormulaType::VARCOMPARE: return false;
+					case FormulaType::VARASSIGN: return false;
                     case FormulaType::BITVECTOR: return false;
                     case FormulaType::UEQ: return false;
 					case FormulaType::PBCONSTRAINT: return false;

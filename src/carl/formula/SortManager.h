@@ -150,8 +150,7 @@ class SortManager : public Singleton<SortManager>
 			mIndexable(),
 			mInterpreted()
 		{
-			mSorts.emplace_back(nullptr); // default value
-			mSortTypes.emplace_back(VariableType::VT_UNINTERPRETED);
+			clear();
 		}
 		
 		const SortContent& getContent(const Sort& sort) const {
@@ -198,6 +197,19 @@ class SortManager : public Singleton<SortManager>
 		~SortManager() override {
 			for (auto& s: mSorts) delete s;
 			mSorts.clear();
+		}
+		
+		void clear() {
+			for (auto& s: mSorts) delete s;
+			mSorts.clear();
+			mSortTypes.clear();
+			mSortMap.clear();
+			mDeclarations.clear();
+			mDefinitions.clear();
+			mIndexable.clear();
+			mInterpreted.clear();
+			mSorts.emplace_back(nullptr); // default value
+			mSortTypes.emplace_back(VariableType::VT_UNINTERPRETED);
 		}
 		
 		/**

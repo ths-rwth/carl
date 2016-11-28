@@ -8,6 +8,7 @@
 TEST(BVVariable, Basics)
 {
 	carl::SortManager& sm = carl::SortManager::getInstance();
+	sm.clear();
 	carl::Sort bvSort = sm.addSort("BitVec", carl::VariableType::VT_UNINTERPRETED);
 	sm.makeSortIndexable(bvSort, 1, carl::VariableType::VT_BITVECTOR);
 	
