@@ -85,6 +85,9 @@ namespace carl
 			case FormulaType::VARCOMPARE:
 				variableComparison().collectVariables(_vars);
 				break;
+			case FormulaType::VARASSIGN:
+				variableAssignment().collectVariables(_vars);
+				break;
             case FormulaType::BITVECTOR:
                 if( _bitvectorVars ) 
                 {
@@ -273,6 +276,10 @@ namespace carl
                 break;
             }
 			case FormulaType::VARCOMPARE:
+			{
+				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
+			}
+			case FormulaType::VARASSIGN:
 			{
 				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
 			}
@@ -599,6 +606,10 @@ namespace carl
             }
 			case FormulaType::VARCOMPARE: {
 				return Formula<Pol>(subformula().variableComparison().negation());
+			}
+			case FormulaType::VARCOMPARE: {
+				assert(false);
+				return Formula<Pol>();
 			}
             case FormulaType::BITVECTOR: {
                 BVCompareRelation rel = inverse(subformula().bvConstraint().relation());
@@ -1801,6 +1812,7 @@ namespace carl
 		case BOOL:
 		case CONSTRAINT:
 		case VARCOMPARE:
+		case VARASSIGN:
 		case BITVECTOR:
 		case TRUE:
 		case FALSE:
@@ -1863,6 +1875,7 @@ namespace carl
 		case BOOL:
 		case CONSTRAINT:
 		case VARCOMPARE:
+		case VARASSIGN:
 		case BITVECTOR:
 		case TRUE:
 		case FALSE:

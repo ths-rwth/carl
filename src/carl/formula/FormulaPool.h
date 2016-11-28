@@ -179,6 +179,12 @@ namespace carl
 				if (val) return create(*val);
                 return create(std::move(VariableComparison<Pol>(_variableComparison)));
             }
+			const FormulaContent<Pol>* create(VariableAssignment<Pol>&& _variableAssignment) {
+                return add(new FormulaContent<Pol>(std::move(_variableAssignment)));
+            }
+            const FormulaContent<Pol>* create(const VariableAssignment<Pol>& _variableAssignment) {
+				return create(std::move(VariableAssignment<Pol>(_variableAssignment)));
+            }
             
             const FormulaContent<Pol>* create(BVConstraint&& _constraint) {
                 #ifdef SIMPLIFY_FORMULA
@@ -228,6 +234,7 @@ namespace carl
                     case CONSTRAINT:
                         assert(false); break;
 					case VARCOMPARE:
+					case VARASSIGN:
                         assert(false); break;
                     case BITVECTOR:
                     case UEQ:
@@ -272,6 +279,7 @@ namespace carl
                     case CONSTRAINT:
 					// VarCompare
 					case VARCOMPARE:
+					case VARASSIGN:
                     // Bitvector Theory
                     case BITVECTOR:
                     // Uninterpreted Theory
