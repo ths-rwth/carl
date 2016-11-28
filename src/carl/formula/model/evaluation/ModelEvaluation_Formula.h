@@ -65,6 +65,20 @@ namespace model {
 		if (vc.negated()) f = f.negated();
 	}
 	
+	template<typename Rational, typename Poly>
+	void evaluateVarAssign(Formula<Poly>& f, const Model<Rational,Poly>& m) {
+		assert(f.getType() == FormulaType::VARASSIGN);
+		const auto& va = f.variableAssignment();
+		auto it = m.find(va.var());
+		if (it == m.end()) return;
+		const auto& value = m.evaluated(va.var());
+		if (value == va.value()) {
+			f = Formula<Poly>(FormulaType::TRUE);
+		} else {
+			f = Formula<Poly>(FormulaType::FALSE);
+		}
+	}
+	
 	/**
 	 * Substitutes all variables from a model within a formula.
 	 * May fail to substitute some variables, for example if the values are RANs or SqrtEx.
@@ -121,6 +135,10 @@ namespace model {
 			}
 			case FormulaType::VARCOMPARE: {
 				evaluateVarCompare(f, m);
+				break;
+			}
+			case FormulaType::VARASSIGN: {
+				evaluateVarAssign(f, m);
 				break;
 			}
 			case FormulaType::BITVECTOR: {

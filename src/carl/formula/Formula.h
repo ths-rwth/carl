@@ -21,6 +21,7 @@
 #include "bitvector/BVConstraintPool.h"
 #include "bitvector/BVConstraint.h"
 #include "pseudoboolean/PBConstraint.h"
+#include "VariableAssignment.h"
 #include "VariableComparison.h"
 
 #include "FormulaContent.h"
@@ -109,6 +110,10 @@ namespace carl
 
 			explicit Formula( const VariableComparison<Pol>& _variableComparison ):
 				Formula( FormulaPool<Pol>::getInstance().create( _variableComparison ) )
+			{}
+				
+			explicit Formula( const VariableAssignment<Pol>& _variableAssignment ):
+				Formula( FormulaPool<Pol>::getInstance().create( _variableAssignment ) )
 			{}
             
             explicit Formula( const BVConstraint& _constraint ):
@@ -534,7 +539,16 @@ namespace carl
 				return mpContent->mVariableComparison;
 #endif
 			}
-            
+			
+			const VariableAssignment<Pol>& variableAssignment() const {
+				assert(mpContent->mType == FormulaType::VARCOMPARE);
+#ifdef __VS
+				return *mpContent->mpVariableAssignmentVS;
+#else
+				return mpContent->mVariableAssignment;
+#endif
+			}
+
             const BVConstraint& bvConstraint() const
             {
                 assert( mpContent->mType == FormulaType::BITVECTOR );
@@ -710,7 +724,8 @@ namespace carl
              */
             bool isAtom() const
             {
-                return (mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::VARCOMPARE || mpContent->mType == FormulaType::BOOL 
+                return (mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::BOOL 
+						|| mpContent->mType == FormulaType::VARCOMPARE || mpContent->mType == FormulaType::VARASSIGN
                         || mpContent->mType == FormulaType::UEQ || mpContent->mType == FormulaType::BITVECTOR
                         || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::TRUE);
             }
