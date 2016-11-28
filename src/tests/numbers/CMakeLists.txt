@@ -10,10 +10,11 @@ add_executable( runNumbersTests
     Test_GF.cpp
     Test_DoubleFloat.cpp
     Test_MpfrFloat.cpp
-    Test_typetraits.cpp
 	Test_operations_division.cpp
 	Test_operations_properties.cpp
 	Test_operations_rounding.cpp
+	Test_stdhash.cpp
+	Test_typetraits.cpp
 )
 cotire(runNumbersTests)
 target_link_libraries(runNumbersTests TestCommon)
