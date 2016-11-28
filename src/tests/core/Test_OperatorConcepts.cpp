@@ -11,12 +11,6 @@
 
 using namespace carl;
 
-template<typename T, typename TT>
-void require_type(const TT& tt) {
-	T t = tt;
-	(void)(t);
-}
-
 template<typename T1, typename T2>
 struct Comparison {
 private:
