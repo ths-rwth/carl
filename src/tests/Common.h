@@ -46,9 +46,17 @@ using IntervalTypes = testing::Types<
 	carl::Interval<double>
 >;
 
+/// Helper to check the result of operator<<().
 template<typename T>
 std::string getOutput(const T& t) {
 	std::stringstream ss;
 	ss << t;
 	return ss.str();
+}
+
+/// Helper to work with boost::concept_check.
+template<typename T, typename TT>
+void require_type(const TT& tt) {
+	T t = tt;
+	(void)(t);
 }
