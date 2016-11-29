@@ -18,8 +18,8 @@ namespace carl {
 	private:
 		Base mComparison;
 	public:	
-		VariableAssignment(Variable::Arg v, const RAN& value): mComparison(v, value, Relation::EQ) {}
-		VariableAssignment(Variable::Arg v, const Number& value): mComparison(v, RAN(value), Relation::EQ) {}
+		VariableAssignment(Variable::Arg v, const RAN& value, bool negated = false): mComparison(v, value, Relation::EQ, negated) {}
+		VariableAssignment(Variable::Arg v, const Number& value, bool negated = false): mComparison(v, RAN(value), Relation::EQ, negated) {}
 		
 		Variable var() const {
 			return mComparison.var();
@@ -29,8 +29,14 @@ namespace carl {
 			assert(boost::get<RAN>(&val) != nullptr);
 			return boost::get<RAN>(val);
 		}
-		VariableComparison<Poly> negation() const {
-			return mComparison.negation();
+		bool negated() const {
+			return mComparison.negated();
+		}
+		VariableAssignment negation() const {
+			return VariableAssignment(var(), value(), !negated());
+		}
+		operator const VariableComparison<Poly>&() const {
+			return mComparison;
 		}
 		void collectVariables(Variables& vars) const {
 			mComparison.collectVariables(vars);
@@ -38,7 +44,7 @@ namespace carl {
 		
 		std::string toString(unsigned = 0, bool = false, bool = true) const {
 			std::stringstream ss;
-			ss << "(" << var() << " -> " << value() << ")";
+			ss << "(" << var() << (negated() ? " -!> " : " -> ") << value() << ")";
 			return ss.str();
 		}
 		
