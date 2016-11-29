@@ -82,7 +82,7 @@ namespace carl
         {}
 		
 		template<typename ...Args>
-		ModelValue(const boost::variant<Args...>& variant): Super(variant_extend<ModelValue<Rational,Poly>>::extend(variant)) {}
+		ModelValue(const boost::variant<Args...>& variant): Super(variant_extend<Super>::extend(variant_extend<ModelValue<Rational,Poly>>::extend(variant))) {}
 		
 		ModelValue(const MultivariateRoot<Poly>& mr): Super(createSubstitution<Rational,Poly>(mr).asSubstitution()) {}
 		
@@ -98,7 +98,7 @@ namespace carl
         }
 		template<typename ...Args>
         ModelValue& operator=(const boost::variant<Args...>& variant) {
-            Super::operator=(variant_extend<ModelValue<Rational,Poly>>::extend(variant));
+            Super::operator=(variant_extend<Super>::extend(variant_extend<ModelValue<Rational,Poly>>::extend(variant)));
             return *this;
         }
 
