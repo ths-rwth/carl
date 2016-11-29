@@ -27,7 +27,7 @@ namespace model {
 		const auto& value = m.evaluated(vc.var());
 		assert(value.isRational() || value.isRAN());
 		RealAlgebraicNumber<Rational> reference = value.isRational() ? RealAlgebraicNumber<Rational>(value.asRational()) : value.asRAN();
-		auto cmp = vc.value();
+		ModelValue<Rational,Poly> cmp = vc.value();
 		if (cmp.isSubstitution()) {
 			// If assigned directly, the shared_ptr<Substitution> goes out of scope before the result is copied into cmp.
 			// Therefore, we start by copying the data and overwriting it afterwards.
@@ -176,7 +176,7 @@ namespace model {
 		substituteIn(f, m);
 		if (f.isTrue()) res = true;
 		else if (f.isFalse()) res = false;
-		else res = ModelSubstitution<Rational,Poly>::template create<ModelFormulaSubstitution<Rational,Poly>>(f);
+		else res = createSubstitution<Rational,Poly,ModelFormulaSubstitution<Rational,Poly>>(f);
 	}
 }
 }

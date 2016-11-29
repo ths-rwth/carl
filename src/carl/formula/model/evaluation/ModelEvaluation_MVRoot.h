@@ -56,7 +56,7 @@ namespace model {
 				return;
 			}
 		}
-		res = ModelSubstitution<Rational,Poly>::template create<ModelMVRootSubstitution<Rational,Poly>>(mvr);
+		res = createSubstitution<Rational,Poly,ModelMVRootSubstitution<Rational,Poly>>(mvr);
 	}
 }
 }

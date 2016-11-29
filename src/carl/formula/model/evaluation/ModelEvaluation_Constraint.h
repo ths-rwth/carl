@@ -31,7 +31,7 @@ namespace model {
 		} else if (res.isRAN()) {
 			res = evaluate(res.asRAN().sgn(), c.relation());
 		} else {
-			res = ModelSubstitution<Rational,Poly>::template create<ModelFormulaSubstitution<Rational,Poly>>(Formula<Poly>(Constraint<Poly>(p, c.relation())));
+			res = createSubstitution<Rational,Poly,ModelFormulaSubstitution<Rational,Poly>>(Formula<Poly>(Constraint<Poly>(p, c.relation())));
 		}
 	}
 }

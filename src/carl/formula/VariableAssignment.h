@@ -18,23 +18,28 @@ namespace carl {
 	private:
 		Base mComparison;
 	public:	
-		VariableAssignment(Variable::Arg v, const RAN& value): mComparison(v, value, Relation::EQ, false) {}
+		VariableAssignment(Variable::Arg v, const RAN& value): mComparison(v, value, Relation::EQ) {}
+		VariableAssignment(Variable::Arg v, const Number& value): mComparison(v, RAN(value), Relation::EQ) {}
 		
 		Variable var() const {
 			return mComparison.var();
 		}
-		RAN value() const {
-			auto mv = mComparison.value();
-			assert(mv.isRational() || mv.isRAN());
-			if (mv.isRational()) return RAN(mv.asRational());
-			else return mv.asRAN();
+		const RAN& value() const {
+			const auto& val = mComparison.value();
+			assert(boost::get<RAN>(&val) != nullptr);
+			return boost::get<RAN>(val);
+		}
+		VariableComparison<Poly> negation() const {
+			return mComparison.negation();
 		}
 		void collectVariables(Variables& vars) const {
 			mComparison.collectVariables(vars);
 		}
 		
 		std::string toString(unsigned = 0, bool = false, bool = true) const {
-			return mComparison.toString();
+			std::stringstream ss;
+			ss << "(" << var() << " -> " << value() << ")";
+			return ss.str();
 		}
 		
 		bool operator==(const VariableAssignment& va) const {
