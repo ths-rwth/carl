@@ -39,9 +39,8 @@ namespace carl {
 				return Variables();
 			}
 		};
-	protected:
-		VariableComparison(Variable::Arg v, const boost::variant<MR, RAN>& value, Relation rel, bool neg): mVar(v), mValue(value), mRelation(rel), mNegated(neg) {}
 	public:	
+		VariableComparison(Variable::Arg v, const boost::variant<MR, RAN>& value, Relation rel, bool neg): mVar(v), mValue(value), mRelation(rel), mNegated(neg) {}
 		VariableComparison(Variable::Arg v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {
 			if (value.isUnivariate()) {
 				auto res = value.evaluate({});
