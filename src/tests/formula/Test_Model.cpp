@@ -38,7 +38,7 @@ TYPED_TEST(Model, ModelSubstitution)
 	carl::MultivariatePolynomial<TypeParam> p(TypeParam(2) * x*x);
 	carl::Model<TypeParam,Poly> m;
 	m.emplace(carl::ModelVariable(x), TypeParam(3));
-	m.emplace(carl::ModelVariable(y), ModelSubs::template create<ModelPolySubs>(p));
+	m.emplace(carl::ModelVariable(y), carl::createSubstitution<Rational,Poly,ModelPolySubs>(p));
 	
 	EXPECT_TRUE(m.at(x).isRational());
 	EXPECT_TRUE(m.at(x).asRational() == TypeParam(3));
