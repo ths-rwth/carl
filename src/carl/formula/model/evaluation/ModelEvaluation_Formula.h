@@ -77,6 +77,7 @@ namespace model {
 		} else {
 			f = Formula<Poly>(FormulaType::FALSE);
 		}
+		if (va.negated()) f = f.negated();
 	}
 	
 	/**
