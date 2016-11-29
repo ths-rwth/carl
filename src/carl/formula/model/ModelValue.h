@@ -92,9 +92,13 @@ namespace carl
          * @return *this.
          */
         template<typename T>
-        ModelValue& operator=( const T& _t )
-        {
+        ModelValue& operator=(const T& _t) {
             Super::operator=(_t);
+            return *this;
+        }
+		template<typename ...Args>
+        ModelValue& operator=(const boost::variant<Args...>& variant) {
+            Super::operator=(variant_extend<ModelValue<Rational,Poly>>::extend(variant));
             return *this;
         }
 
