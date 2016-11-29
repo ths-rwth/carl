@@ -541,7 +541,7 @@ namespace carl
 			}
 			
 			const VariableAssignment<Pol>& variableAssignment() const {
-				assert(mpContent->mType == FormulaType::VARCOMPARE);
+				assert(mpContent->mType == FormulaType::VARASSIGN);
 #ifdef __VS
 				return *mpContent->mpVariableAssignmentVS;
 #else

@@ -607,7 +607,7 @@ namespace carl
 			case FormulaType::VARCOMPARE: {
 				return Formula<Pol>(subformula().variableComparison().negation());
 			}
-			case FormulaType::VARCOMPARE: {
+			case FormulaType::VARASSIGN: {
 				assert(false);
 				return Formula<Pol>();
 			}
