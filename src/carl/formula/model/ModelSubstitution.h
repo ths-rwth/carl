@@ -63,14 +63,6 @@ namespace carl {
             }
             return mv;
         }
-		
-		template<typename Substitution, typename... Args>
-		static ModelValue<Rational,Poly> create(Args&&... args) {
-			return ModelValue<Rational,Poly>(std::make_shared<Substitution>(std::forward<Args>(args)...));
-		}
-		static ModelValue<Rational,Poly> create(const MultivariateRoot<Poly>& mr) {
-			return create<ModelMVRootSubstitution<Rational,Poly>>(mr);
-		}
 	};
 	template<typename Rational, typename Poly>
 	inline std::ostream& operator<<(std::ostream& os, const ModelSubstitution<Rational,Poly>& ms) {
@@ -81,6 +73,16 @@ namespace carl {
 	inline std::ostream& operator<<(std::ostream& os, const std::shared_ptr<ModelSubstitution<Rational,Poly>>& ms) {
 		ms->print(os);
 		return os;
+	}
+	
+	
+	template<typename Rational, typename Poly, typename Substitution, typename... Args>
+	inline ModelValue<Rational,Poly> createSubstitution(Args&&... args) {
+		return ModelValue<Rational,Poly>(std::make_shared<Substitution>(std::forward<Args>(args)...));
+	}
+	template<typename Rational, typename Poly>
+	inline ModelValue<Rational,Poly> createSubstitution(const MultivariateRoot<Poly>& mr) {
+		return createSubstitution<Rational,Poly,ModelMVRootSubstitution<Rational,Poly>>(mr);
 	}
 }
 

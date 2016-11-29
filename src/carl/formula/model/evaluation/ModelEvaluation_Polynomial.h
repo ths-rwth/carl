@@ -63,7 +63,7 @@ namespace model {
             res = RealAlgebraicNumberEvaluation::evaluate(p, map);
 			return;
 		}
-		res = ModelSubstitution<Rational,Poly>::template create<ModelPolynomialSubstitution<Rational,Poly>>(p);
+		res = createSubstitution<Rational,Poly,ModelPolynomialSubstitution<Rational,Poly>>(p);
 	}
 	
 	template<typename Rational, typename Poly>

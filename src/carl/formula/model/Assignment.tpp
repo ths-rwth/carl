@@ -425,11 +425,11 @@ namespace carl
 			else return Formula<Poly>(FormulaType::NOT, Formula<Poly>(mv.asVariable()));
 		} else if (val.isRational()) {
 			assert(mv.isVariable());
-			return Formula<Poly>(mv.asVariable() - val.asRational(), Relation::EQ);
+			return Formula<Poly>(VariableAssignment<Poly>(mv.asVariable(), val.asRational()));
 		} else if (val.isSqrtEx()) {
 			assert(false);
 		} else if (val.isRAN()) {
-			return Formula<Poly>(VariableComparison<Poly>(mv.asVariable(), val.asRAN(), Relation::EQ));
+			return Formula<Poly>(VariableAssignment<Poly>(mv.asVariable(), val.asRAN()));
 		} else if (val.isBVValue()) {
 			assert(false);
 		} else if (val.isSortValue()) {

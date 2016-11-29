@@ -16,9 +16,17 @@
 namespace carl
 {
 	template<typename Rational, typename Poly>
+	class ModelValue;
+	template<typename Rational, typename Poly>
 	class ModelSubstitution;
 	template<typename Rational, typename Poly>
+	class ModelMVRootSubstitution;
+	template<typename Rational, typename Poly>
 	using ModelSubstitutionPtr = std::shared_ptr<ModelSubstitution<Rational,Poly>>;
+	template<typename Rational, typename Poly, typename Substitution, typename... Args>
+	inline ModelValue<Rational,Poly> createSubstitution(Args&&... args);
+	template<typename Rational, typename Poly>
+	inline ModelValue<Rational,Poly> createSubstitution(const MultivariateRoot<Poly>& mr);
 
 	/**
 	 * This class represents infinity or minus infinity, depending on its flag positive.
@@ -73,8 +81,11 @@ namespace carl
         ModelValue(const T& _t): Super(_t)
         {}
 		
-		ModelValue(const MultivariateRoot<Poly>& mr): Super(ModelSubstitution<Rational,Poly>::create(mr).asSubstitution()) {}
-
+		template<typename ...Args>
+		ModelValue(const boost::variant<Args...>& variant): Super(variant_extend<ModelValue<Rational,Poly>>::extend(variant)) {}
+		
+		ModelValue(const MultivariateRoot<Poly>& mr): Super(createSubstitution<Rational,Poly>(mr).asSubstitution()) {}
+		
         /**
          * Assign some value to the underlying variant.
          * @param t Some value.

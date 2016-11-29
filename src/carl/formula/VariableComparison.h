@@ -2,7 +2,7 @@
 
 #include "model/mvroot/MultivariateRoot.h"
 #include "model/ran/RealAlgebraicNumber.h"
-#include "model/ModelValue.h"
+//#include "model/ModelValue.h"
 #include "../core/MultivariatePolynomial.h"
 #include "../core/Relation.h"
 #include "../core/Variable.h"
@@ -23,14 +23,14 @@ namespace carl {
 		boost::variant<MR, RAN> mValue;
 		Relation mRelation;
 		bool mNegated;
-		struct ValueToModelValue: public boost::static_visitor<ModelValue<Number,Poly>> {
-			ModelValue<Number,Poly> operator()(const MR& mr) const {
-				return mr;
-			}
-			ModelValue<Number,Poly> operator()(const RAN& ran) const {
-				return ran;
-			}
-		};
+		//struct ValueToModelValue: public boost::static_visitor<ModelValue<Number,Poly>> {
+		//	ModelValue<Number,Poly> operator()(const MR& mr) const {
+		//		return mr;
+		//	}
+		//	ModelValue<Number,Poly> operator()(const RAN& ran) const {
+		//		return ran;
+		//	}
+		//};
 		struct VariableCollector: public boost::static_visitor<Variables> {
 			Variables operator()(const MR& mr) const {
 				return mr.gatherVariables();
@@ -62,16 +62,15 @@ namespace carl {
 		bool negated() const {
 			return mNegated;
 		}
-		ModelValue<Number,Poly> value() const {
-			return boost::apply_visitor(ValueToModelValue(), mValue);
+		const boost::variant<MR, RAN>& value() const {
+			return mValue;
 		}
 		bool isEquality() const {
 			return negated() ? relation() == Relation::NEQ : relation() == Relation::EQ;
 		}
 		boost::optional<Constraint<Poly>> asConstraint() const {
 			Relation rel = negated() ? inverse(mRelation) : mRelation;
-			auto v = value();
-			if (!v.isRAN()) {
+			if (boost::get<RAN>(&mValue) == nullptr) {
 				const MR& mr = boost::get<MR>(mValue);
 				if (mr.poly().degree(mr.var()) != 1) return boost::none;
 				auto lcoeff = mr.poly().coeff(mr.var(), 1);
@@ -79,8 +78,8 @@ namespace carl {
 				auto ccoeff = mr.poly().coeff(mr.var(), 0);
 				return Constraint<Poly>(Poly(mVar) + ccoeff / lcoeff, rel);
 			}
-			if (!v.asRAN().isNumeric()) return boost::none;
-			return Constraint<Poly>(Poly(mVar) - Poly(v.asRAN().value()), rel);
+			if (!boost::get<RAN>(mValue).isNumeric()) return boost::none;
+			return Constraint<Poly>(Poly(mVar) - Poly(boost::get<RAN>(mValue).value()), rel);
 		}
 		VariableComparison negation() const {
 			return VariableComparison(mVar, mValue, mRelation, !mNegated);
