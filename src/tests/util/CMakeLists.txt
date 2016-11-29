@@ -5,6 +5,7 @@ add_executable( runUtilTests
 				Test_Parser.cpp
 				Test_hash.cpp
 				Test_Timer.cpp
+				Test_vector_util.cpp
 				 )
 cotire(runUtilTests)
 target_link_libraries(runUtilTests TestCommon)
