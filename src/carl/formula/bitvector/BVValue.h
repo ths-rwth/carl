@@ -448,7 +448,7 @@ namespace std
     /**
      * Implements std::hash for bit vector values.
      * TODO: Make more efficient (currently uses dynamic_bitset<> conversion to string).
-     * See also: https://stackoverflow.com/q/3896357
+     * See also: https://stackoverflow.com/q/3896357, https://svn.boost.org/trac/boost/ticket/2841
      */
     template <>
     struct hash<carl::BVValue>
