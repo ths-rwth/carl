@@ -3,6 +3,7 @@ add_executable(runFormulaTests
 	Test_BVConstraint.cpp
 	Test_BVTerm.cpp
 	Test_BVTermType.cpp
+	Test_BVValue.cpp
 	Test_BVVariable.cpp
 	Test_Formula.cpp
 	Test_Model.cpp
