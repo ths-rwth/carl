@@ -24,8 +24,10 @@ namespace carl
 {
     class BVValue
     {
+	public:
+		using Base = boost::dynamic_bitset<>;
     private:
-        boost::dynamic_bitset<> mValue;
+        Base mValue;
 
         explicit BVValue(boost::dynamic_bitset<>&& value): mValue(std::move(value))
         {
@@ -105,7 +107,7 @@ namespace carl
         {
         }
 
-        const boost::dynamic_bitset<>& operator()() const
+        operator const Base&() const
         {
             return mValue;
         }
@@ -124,7 +126,7 @@ namespace carl
 
         bool isZero() const
         {
-            return (*this)().none();
+            return mValue.none();
         }
 
         BVValue operator-() const
@@ -134,13 +136,13 @@ namespace carl
 
         BVValue operator~() const
         {
-            return BVValue(~(*this)());
+            return BVValue(~mValue);
         }
 
         BVValue rotateLeft(std::size_t _n) const
         {
-            boost::dynamic_bitset<> lowerPart((*this)());
-            boost::dynamic_bitset<> upperPart((*this)());
+            boost::dynamic_bitset<> lowerPart(mValue);
+            boost::dynamic_bitset<> upperPart(mValue);
 
             lowerPart <<= _n % width();
             upperPart >>= width() - (_n % width());
@@ -166,14 +168,14 @@ namespace carl
 
         BVValue extendUnsignedBy(std::size_t _n) const
         {
-            boost::dynamic_bitset<> copy((*this)());
+            boost::dynamic_bitset<> copy(mValue);
             copy.resize(width() + _n);
             return BVValue(std::move(copy));
         }
 
         BVValue extendSignedBy(std::size_t _n) const
         {
-            boost::dynamic_bitset<> copy((*this)());
+            boost::dynamic_bitset<> copy(mValue);
             copy.resize(width() + _n, (*this)[width()-1]);
             return BVValue(std::move(copy));
         }
@@ -229,27 +231,27 @@ namespace carl
         BVValue operator&(const BVValue& _other) const
         {
             assert(_other.width() == width());
-            return BVValue((*this)() & _other());
+            return BVValue(mValue & Base(_other));
         }
 
         BVValue operator|(const BVValue& _other) const
         {
             assert(_other.width() == width());
-            return BVValue((*this)() | _other());
+            return BVValue(mValue | Base(_other));
         }
 
         BVValue operator^(const BVValue& _other) const
         {
             assert(_other.width() == width());
-            return BVValue((*this)() ^ _other());
+            return BVValue(mValue ^ Base(_other));
         }
 
         BVValue concat(const BVValue& _other) const
         {
-            boost::dynamic_bitset<> concatenation((*this)());
+            boost::dynamic_bitset<> concatenation(mValue);
             concatenation.resize(width() + _other.width());
             concatenation <<= _other.width();
-            boost::dynamic_bitset<> otherResized(_other());
+            boost::dynamic_bitset<> otherResized = _other;
             otherResized.resize(concatenation.size());
             concatenation |= otherResized;
             return BVValue(std::move(concatenation));
@@ -258,7 +260,7 @@ namespace carl
         BVValue operator*(const BVValue& _other) const
         {
             BVValue product(width());
-            boost::dynamic_bitset<> summand((*this)());
+            boost::dynamic_bitset<> summand(mValue);
 
             for(std::size_t i=0;i<width();++i) {
                 if(_other[i]) {
@@ -386,7 +388,7 @@ namespace carl
                 }
             }
 
-            boost::dynamic_bitset<> shifted(fillWithOnes ? ~(*this)() : (*this)());
+            boost::dynamic_bitset<> shifted(fillWithOnes ? ~mValue : mValue);
             std::size_t shiftBy = 1;
 
             for(std::size_t i=0;i<=highestRelevantPos && i < _other.width();++i) {
@@ -406,12 +408,12 @@ namespace carl
         BVValue divideUnsigned(const BVValue& _other, bool _returnRemainder = false) const
         {
             assert(width() == _other.width());
-            assert(_other() != boost::dynamic_bitset<>(_other.width(), 0));
+            assert(Base(_other) != boost::dynamic_bitset<>(_other.width(), 0));
 
             boost::dynamic_bitset<> quotient(width());
             std::size_t quotientIndex = 0;
-            boost::dynamic_bitset<> divisor(_other());
-            boost::dynamic_bitset<> remainder((*this)());
+            boost::dynamic_bitset<> divisor = _other;
+            boost::dynamic_bitset<> remainder(mValue);
 
             while(! divisor[divisor.size()-1] && remainder > divisor) {
                 ++quotientIndex;
