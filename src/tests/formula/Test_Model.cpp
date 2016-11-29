@@ -30,7 +30,6 @@ TYPED_TEST(Model, ModelValue)
 TYPED_TEST(Model, ModelSubstitution)
 {
 	using Poly = carl::MultivariatePolynomial<TypeParam>;
-	using ModelSubs = carl::ModelSubstitution<TypeParam,Poly>;
 	using ModelPolySubs = carl::ModelPolynomialSubstitution<TypeParam,Poly>;
 
 	carl::Variable x = carl::freshRealVariable("x");
