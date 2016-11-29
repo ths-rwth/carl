@@ -22,4 +22,16 @@ struct variant_is_type: boost::static_visitor<bool> {
 	}
 };
 
+template<typename Target>
+struct variant_extend: boost::static_visitor<Target> {
+	template<typename T>
+	Target operator()(const T& t) const {
+		return Target(t);
+	}
+	template<typename ...Args>
+	static Target extend(const boost::variant<Args...>& variant) {
+		return boost::apply_visitor(variant_extend(), variant);
+	}
+};
+
 }
