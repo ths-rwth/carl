@@ -152,7 +152,7 @@ namespace carl
 
         BVValue rotateRight(std::size_t _n) const
         {
-            return rotateLeft(_n - (_n % width()));
+            return rotateLeft(width() - (_n % width()));
         }
 
         BVValue repeat(std::size_t _n) const
