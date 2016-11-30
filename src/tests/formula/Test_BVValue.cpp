@@ -44,8 +44,11 @@ TYPED_TEST(BVValueTest, width)
 TYPED_TEST(BVValueTest, toString)
 {
 	EXPECT_EQ("#b00000000000000000000000000000000", this->bv32_0.toString());
+	EXPECT_EQ("#b00000000000000000000000000000000", getOutput(this->bv32_0));
 	EXPECT_EQ("#b00000000000000000000000000000001", this->bv32_1.toString());
+	EXPECT_EQ("#b00000000000000000000000000000001", getOutput(this->bv32_1));
 	EXPECT_EQ("#b00111111111111111111111111111111", this->bv32_e30.toString());
+	EXPECT_EQ("#b00111111111111111111111111111111", getOutput(this->bv32_e30));
 }
 
 TYPED_TEST(BVValueTest, isZero)
@@ -87,4 +90,40 @@ TYPED_TEST(BVValueTest, rotateRight)
 	EXPECT_EQ(carl::BVValue(32, 134217728), this->bv32_1.rotateRight(5));
 	EXPECT_EQ(carl::BVValue(32, 2684354559), this->bv32_e30.rotateRight(1));
 	EXPECT_EQ(carl::BVValue(32, 4194303999), this->bv32_e30.rotateRight(5));
+}
+
+TYPED_TEST(BVValueTest, repeat)
+{
+	EXPECT_EQ(this->bv32_0, this->bv32_0.repeat(1));
+	EXPECT_EQ(carl::BVValue(64, 0), this->bv32_0.repeat(2));
+	EXPECT_EQ(this->bv32_1, this->bv32_1.repeat(1));
+	EXPECT_EQ(carl::BVValue(64, 4294967297), this->bv32_1.repeat(2));
+	EXPECT_EQ(this->bv32_e30, this->bv32_e30.repeat(1));
+	EXPECT_EQ(carl::BVValue(64, 4611686015206162431), this->bv32_e30.repeat(2));
+}
+
+TYPED_TEST(BVValueTest, extendUnsignedBy)
+{
+	EXPECT_EQ(this->bv32_0, this->bv32_0.extendUnsignedBy(0));
+	EXPECT_EQ(carl::BVValue(34, 0), this->bv32_0.extendUnsignedBy(2));
+	EXPECT_EQ(this->bv32_1, this->bv32_1.extendUnsignedBy(0));
+	EXPECT_EQ(carl::BVValue(34, 1), this->bv32_1.extendUnsignedBy(2));
+	EXPECT_EQ(this->bv32_e30, this->bv32_e30.extendUnsignedBy(0));
+	EXPECT_EQ(carl::BVValue(34, 1073741823), this->bv32_e30.extendUnsignedBy(2));
+}
+
+TYPED_TEST(BVValueTest, extendSignedBy)
+{
+	EXPECT_EQ(this->bv32_0, this->bv32_0.extendSignedBy(0));
+	EXPECT_EQ(carl::BVValue(34, 0), this->bv32_0.extendSignedBy(2));
+	EXPECT_EQ(this->bv32_1, this->bv32_1.extendSignedBy(0));
+	EXPECT_EQ(carl::BVValue(34, 1), this->bv32_1.extendSignedBy(2));
+	EXPECT_EQ(this->bv32_e30, this->bv32_e30.extendSignedBy(0));
+	EXPECT_EQ(carl::BVValue(34, 1073741823), this->bv32_e30.extendSignedBy(2));
+}
+
+TYPED_TEST(BVValueTest, Comparison)
+{
+	checkEqual({this->bv32_0, this->bv32_1, this->bv32_e30});
+	checkLess({this->bv32_0, this->bv32_1, this->bv32_e30});
 }

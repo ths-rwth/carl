@@ -64,3 +64,31 @@ void expectRightOrder(const List& list, const Less& less) {
 		}
 	}
 }
+
+template<typename List>
+void checkEqual(const List& list) {
+	for (auto it1 = list.begin(); it1 != list.end(); it1++) {
+		for (auto it2 = list.begin(); it2 != list.end(); it2++) {
+			EXPECT_EQ(it1 == it2, *it1 == *it2) << *it1 << " == " << *it2;
+		}
+	}
+}
+
+template<typename T>
+void checkEqual(const std::initializer_list<T>& list) {
+	checkEqual(std::vector<T>(list));
+}
+
+template<typename List>
+void checkLess(const List& list) {
+	for (auto it1 = list.begin(); it1 != list.end(); it1++) {
+		for (auto it2 = list.begin(); it2 != list.end(); it2++) {
+			EXPECT_EQ(it1 < it2, *it1 < *it2) << *it1 << " < " << *it2;
+		}
+	}
+}
+
+template<typename T>
+void checkLess(const std::initializer_list<T>& list) {
+	checkLess(std::vector<T>(list));
+}
