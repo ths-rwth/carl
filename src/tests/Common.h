@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util.h"
+
 #include <carl/interval/Interval.h>
 #include <carl/numbers/numbers.h>
 

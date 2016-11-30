@@ -6,7 +6,6 @@
 #include "carl/util/platform.h"
 
 #include "../Common.h"
-#include "../core/Util.h"
 
 using namespace carl;
 

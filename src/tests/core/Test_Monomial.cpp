@@ -1,8 +1,7 @@
-#include "gtest/gtest.h"
-#include "carl/core/Variable.h"
-#include "carl/core/Monomial.h"
-#include "carl/core/MonomialPool.h"
-#include "Util.h"
+#include <gtest/gtest.h>
+#include <carl/core/Variable.h>
+#include <carl/core/Monomial.h>
+#include <carl/core/MonomialPool.h>
 #include <list>
 #include <boost/variant.hpp>
 

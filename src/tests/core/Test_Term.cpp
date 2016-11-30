@@ -3,7 +3,6 @@
 #include <carl/core/VariablePool.h>
 #include <carl/core/Monomial.h>
 #include <carl/core/Term.h>
-#include "Util.h"
 #include <list>
 
 #include "../Common.h"
