@@ -127,3 +127,94 @@ TYPED_TEST(BVValueTest, Comparison)
 	checkEqual({this->bv32_0, this->bv32_1, this->bv32_e30});
 	checkLess({this->bv32_0, this->bv32_1, this->bv32_e30});
 }
+
+TYPED_TEST(BVValueTest, Addition)
+{
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 + this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_0 + this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_0 + this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_1 + this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 2), this->bv32_1 + this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1073741824), this->bv32_1 + this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_e30 + this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1073741824), this->bv32_e30 + this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 2147483646), this->bv32_e30 + this->bv32_e30);
+}
+
+TYPED_TEST(BVValueTest, Subtraction)
+{
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 - this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, -1), this->bv32_0 - this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, -1073741823), this->bv32_0 - this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_1 - this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_1 - this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, -1073741822), this->bv32_1 - this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_e30 - this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1073741822), this->bv32_e30 - this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_e30 - this->bv32_e30);
+}
+
+TYPED_TEST(BVValueTest, BitwiseAnd)
+{
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 & this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 & this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 & this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_1 & this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_1 & this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_1 & this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_e30 & this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_e30 & this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_e30 & this->bv32_e30);
+}
+
+TYPED_TEST(BVValueTest, BitwiseOr)
+{
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 | this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_0 | this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_0 | this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_1 | this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_1 | this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_1 | this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_e30 | this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_e30 | this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_e30 | this->bv32_e30);
+}
+
+TYPED_TEST(BVValueTest, BitwiseXor)
+{
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 ^ this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_0 ^ this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_0 ^ this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_1 ^ this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_1 ^ this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1073741822), this->bv32_1 ^ this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_e30 ^ this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1073741822), this->bv32_e30 ^ this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_e30 ^ this->bv32_e30);
+}
+
+TYPED_TEST(BVValueTest, concat)
+{
+	EXPECT_EQ(carl::BVValue(64, 0), this->bv32_0.concat(this->bv32_0));
+	EXPECT_EQ(carl::BVValue(64, 1), this->bv32_0.concat(this->bv32_1));
+	EXPECT_EQ(carl::BVValue(64, 1073741823), this->bv32_0.concat(this->bv32_e30));
+	EXPECT_EQ(carl::BVValue(64, 4294967296), this->bv32_1.concat(this->bv32_0));
+	EXPECT_EQ(carl::BVValue(64, 4294967297), this->bv32_1.concat(this->bv32_1));
+	EXPECT_EQ(carl::BVValue(64, 5368709119), this->bv32_1.concat(this->bv32_e30));
+	EXPECT_EQ(carl::BVValue(64, 4611686014132420608), this->bv32_e30.concat(this->bv32_0));
+	EXPECT_EQ(carl::BVValue(64, 4611686014132420609), this->bv32_e30.concat(this->bv32_1));
+	EXPECT_EQ(carl::BVValue(64, 4611686015206162431), this->bv32_e30.concat(this->bv32_e30));
+}
+
+TYPED_TEST(BVValueTest, Multiplication)
+{
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 * this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 * this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_0 * this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_1 * this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1), this->bv32_1 * this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_1 * this->bv32_e30);
+	EXPECT_EQ(carl::BVValue(32, 0), this->bv32_e30 * this->bv32_0);
+	EXPECT_EQ(carl::BVValue(32, 1073741823), this->bv32_e30 * this->bv32_1);
+	EXPECT_EQ(carl::BVValue(32, 2147483649), this->bv32_e30 * this->bv32_e30);
+}
