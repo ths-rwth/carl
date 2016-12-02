@@ -2,7 +2,7 @@
 
 mkdir build || return 1
 cd build/ || return 1
-cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_COCOA=ON ../ || return 1
+cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
 
 if [[ ${TASK} == "doxygen" ]]; then
 	make doc || return 1
@@ -24,7 +24,7 @@ if [[ ${TASK} == "doxygen" ]]; then
 
 elif [[ ${TASK} == "coverage" ]]; then
 	gem install coveralls-lcov
-	cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_COCOA=ON -D COVERAGE=ON ../ || return 1
+	cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON -D COVERAGE=ON ../ || return 1
 	
 	/usr/bin/time make resources -j1 || return 1
 	/usr/bin/time make -j1 lib_carl || return 1
