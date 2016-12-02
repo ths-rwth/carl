@@ -6,8 +6,8 @@
 #pragma once
 
 #include "carl/numbers/numbers.h"
+#include "ginac.h"
 #ifdef USE_GINAC
-#include <ginac/ginac.h>
 
 namespace carl {
 
