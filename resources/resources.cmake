@@ -91,7 +91,7 @@ endif()
 ##### GiNaC
 if(USE_GINAC)
 	if(NOT FORCE_SHIPPED_RESOURCES)
-		load_library(carl GINAC 1.7.1)
+		load_library(carl GINAC 1.6.2)
 	endif()
 	if(GINAC_FOUND)
 		message(STATUS "Use system version of GiNaC ${GINAC_VERSION}")
