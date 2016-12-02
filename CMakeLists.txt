@@ -185,9 +185,7 @@ add_subdirectory(src)
 # F. Export Compile Information
 # # # # # # # # # # # # # # # # # # # # # #
 
-if(EXPORT_TO_CMAKE)
-	include(export)
-endif()
+include(export)
 
 #write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
 #	 VERSION 0.1.0
