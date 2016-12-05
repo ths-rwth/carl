@@ -95,7 +95,7 @@ namespace carl
             /**
              * @return The string representation of this uninterpreted variable.
              */
-            std::string toString( bool _friendlyNames ) const
+            std::string toString( bool _friendlyNames = true ) const
             {
 				return VariablePool::getInstance().getName(mVar, _friendlyNames);
             }
