@@ -15,8 +15,8 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(CLN INSTALL_DIR)
 
-add_imported_library(CLN SHARED "${INSTALL_DIR}/lib/libcln.${DYNAMIC_EXT}" "${INSTALL_DIR}/include")
-add_imported_library(CLN STATIC "${INSTALL_DIR}/lib/libcln.${STATIC_EXT}" "${INSTALL_DIR}/include")
+add_imported_library(CLN SHARED "${INSTALL_DIR}/lib/libcln${DYNAMIC_EXT}" "${INSTALL_DIR}/include")
+add_imported_library(CLN STATIC "${INSTALL_DIR}/lib/libcln${STATIC_EXT}" "${INSTALL_DIR}/include")
 
 add_dependencies(CLN_SHARED CLN)
 add_dependencies(CLN_STATIC CLN)
