@@ -40,6 +40,7 @@ addons:
       - clang-3.8
       - clang-3.9
       - time
+      - texinfo
       - texlive
 
 matrix:
