@@ -9,8 +9,8 @@ ExternalProject_Add(
 ExternalProject_Get_Property(GTest_EP source_dir)
 ExternalProject_Get_Property(GTest_EP binary_dir)
 
-add_imported_library(GTESTCORE STATIC "${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a" "${source_dir}/include")
-add_imported_library(GTESTMAIN STATIC "${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a" "${source_dir}/include")
+add_imported_library(GTESTCORE STATIC "${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.${STATIC_EXT}" "${source_dir}/include")
+add_imported_library(GTESTMAIN STATIC "${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.${STATIC_EXT}" "${source_dir}/include")
 
 set(GTEST_LIBRARIES GTESTCORE_STATIC GTESTMAIN_STATIC pthread dl)
 
