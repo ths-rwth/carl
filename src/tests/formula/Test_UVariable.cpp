@@ -23,7 +23,9 @@ TEST(UVariable, Basics)
 	EXPECT_TRUE(v3 < v4);
 	EXPECT_EQ(v2(), a);
 	EXPECT_EQ(v4(), b);
+	EXPECT_EQ(v2.toString(), "a");
 	EXPECT_EQ(getOutput(v2), "a");
+	EXPECT_EQ(v4.toString(), "b");
 	EXPECT_EQ(getOutput(v4), "b");
 	EXPECT_EQ(std::hash<carl::UVariable>()(v2), std::hash<carl::UVariable>()(v3));
 }
