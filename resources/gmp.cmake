@@ -14,10 +14,10 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(GMP_EP INSTALL_DIR)
 
-add_imported_library(GMP SHARED "${INSTALL_DIR}/lib/libgmp.so" "${INSTALL_DIR}")
-add_imported_library(GMP STATIC "${INSTALL_DIR}/lib/libgmp.a" "${INSTALL_DIR}")
-add_imported_library(GMPXX SHARED "${INSTALL_DIR}/lib/libgmpxx.so" "${INSTALL_DIR}")
-add_imported_library(GMPXX STATIC "${INSTALL_DIR}/lib/libgmpxx.a" "${INSTALL_DIR}")
+add_imported_library(GMP SHARED "${INSTALL_DIR}/lib/libgmp.${DYNAMIC_EXT}" "${INSTALL_DIR}")
+add_imported_library(GMP STATIC "${INSTALL_DIR}/lib/libgmp.${STATIC_EXT}" "${INSTALL_DIR}")
+add_imported_library(GMPXX SHARED "${INSTALL_DIR}/lib/libgmpxx.${DYNAMIC_EXT}" "${INSTALL_DIR}")
+add_imported_library(GMPXX STATIC "${INSTALL_DIR}/lib/libgmpxx.${STATIC_EXT}" "${INSTALL_DIR}")
 
 add_dependencies(GMP_SHARED GMP_EP)
 add_dependencies(GMP_STATIC GMP_EP)
