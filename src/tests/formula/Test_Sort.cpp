@@ -25,6 +25,7 @@ TEST(Sort, DefaultConstruction)
 TEST(Sort, SortManager)
 {
 	carl::SortManager& sm = carl::SortManager::getInstance();
+	sm.clear();
 	carl::Sort s = sm.addSort("S");
 	carl::Sort s2 = carl::getSort("S");
 	EXPECT_EQ(s, s2);
