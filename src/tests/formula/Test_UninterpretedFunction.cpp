@@ -30,4 +30,8 @@ TEST(UninterpretedFunction, Manager)
 	EXPECT_EQ("f", uf.name());
 	EXPECT_TRUE(uf.domain().empty());
 	EXPECT_EQ(sort, uf.codomain());
+	EXPECT_EQ("f() S", getOutput(uf));
+	
+	auto uf2 = carl::newUninterpretedFunction("f", {}, sort);
+	EXPECT_EQ(uf, uf2);
 }
