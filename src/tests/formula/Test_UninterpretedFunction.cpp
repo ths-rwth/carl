@@ -15,6 +15,8 @@ TEST(UninterpretedFunction, Basics)
 	EXPECT_EQ(uf, uf2);
 	EXPECT_FALSE(uf < uf2);
 	EXPECT_FALSE(uf2 < uf);
+	std::hash<carl::UninterpretedFunction> h;
+	EXPECT_EQ(h(uf), h(uf2));
 }
 
 TEST(UninterpretedFunction, Manager)
