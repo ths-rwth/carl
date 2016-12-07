@@ -10,19 +10,27 @@ find_library(GMP_LIBRARY
 	PATHS /usr/local/lib
 )
 
+# Version
+function(GetVersionPart OUTPUT FILENAME DESC)
+	file(STRINGS ${FILENAME} RES REGEX "^#define __GNU_MP_${DESC}[ \\t]+.*")
+	string(REGEX MATCH "[0-9]+" RES "${RES}")
+	set(${OUTPUT} "${RES}" PARENT_SCOPE)
+endfunction()
+function(GetVersion OUTPUT FILENAME)
+	GetVersionPart(MAJOR "${FILENAME}" "VERSION")
+	GetVersionPart(MINOR "${FILENAME}" "VERSION_MINOR")
+	GetVersionPart(PATCH "${FILENAME}" "VERSION_PATCHLEVEL")
+	set(OUTPUT "${MAJOR}.${MINOR}.${PATCH}")
+endfunction()
+
 if(GMP_INCLUDE_DIR AND GMP_LIBRARY)
 	set(GMP_FOUND TRUE)
 
-	# Version
-	function(GetVersionPart OUTPUT FILENAME DESC)
-		file(STRINGS ${FILENAME} RES REGEX "^#define __GNU_MP_${DESC}[ \\t]+.*")
-		string(REGEX MATCH "[0-9]+" RES "${RES}")
-		set(${OUTPUT} "${RES}" PARENT_SCOPE)
-	endfunction()
-	GetVersionPart(MAJOR "${GMP_INCLUDE_DIR}/gmp.h" "VERSION")
-	GetVersionPart(MINOR "${GMP_INCLUDE_DIR}/gmp.h" "VERSION_MINOR")
-	GetVersionPart(PATCH "${GMP_INCLUDE_DIR}/gmp.h" "VERSION_PATCHLEVEL")
-	set(GMP_VERSION "${MAJOR}.${MINOR}.${PATCH}")
+	if (EXISTS "${GMP_INCLUDE_DIR}/gmp-x86_64.h")
+		GetVersion(GMP_VERSION "${GMP_INCLUDE_DIR}/gmp-x86_64.h")
+	else()
+		GetVersion(GMP_VERSION "${GMP_INCLUDE_DIR}/gmp.h")
+	endif()
 
 	if(GMP_FIND_VERSION VERSION_GREATER GMP_VERSION)
 		message(WARNING "Required GMP ${GMP_FIND_VERSION} but found only GMP ${GMP_VERSION}.")
