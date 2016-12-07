@@ -5,7 +5,9 @@ export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
 message(STATUS "Registered with cmake")
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
-export(PACKAGE carl)
+if(EXPORT_TO_CMAKE)
+	export(PACKAGE carl)
+endif()
 
 set(DEP_TARGETS "")
 if(USE_CLN_NUMBERS)
