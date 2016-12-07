@@ -104,9 +104,9 @@ endif()
 
 
 ##### GTest
-if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl GTest 1.6)
-endif()
+#if(NOT FORCE_SHIPPED_RESOURCES)
+#	load_library(carl GTest 1.6)
+#endif()
 if(GTEST_FOUND)
 	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY})
 	message(STATUS "Use system version of GTest")
