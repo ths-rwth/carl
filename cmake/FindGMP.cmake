@@ -20,7 +20,7 @@ function(GetVersion OUTPUT FILENAME)
 	GetVersionPart(MAJOR "${FILENAME}" "VERSION")
 	GetVersionPart(MINOR "${FILENAME}" "VERSION_MINOR")
 	GetVersionPart(PATCH "${FILENAME}" "VERSION_PATCHLEVEL")
-	set(OUTPUT "${MAJOR}.${MINOR}.${PATCH}")
+	set(${OUTPUT} "${MAJOR}.${MINOR}.${PATCH}" PARENT_SCOPE)
 endfunction()
 
 if(GMP_INCLUDE_DIR AND GMP_LIBRARY)
