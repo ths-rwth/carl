@@ -16,6 +16,7 @@
 
 #include <memory>
 
+
 namespace carl
 {
     
@@ -26,8 +27,11 @@ namespace carl
 template<typename Coefficient>
 class Term
 {
+	//this is a hack
+	//using NumberCoefficient = mpq_class;//typename std::conditional<std::is_same<Coefficient, __gmp_expr<__mpq_struct [1], __mpq_struct [1]>>::value, mpq_class, 				typename std::conditional<std::is_same<Coefficient, __gmp_expr<__mpz_struct [1], __mpz_struct [1]>>::value, mpz_class, 	Coefficient>::type>::type;
+
 	private:
-		Coefficient mCoeff = constant_zero<Coefficient>::get();
+		Number<Coefficient> mCoeff = Number<Coefficient>(constant_zero<Coefficient>::get());
 		Monomial::Arg mMonomial;
 
 	public:
@@ -124,7 +128,7 @@ class Term
 		 */
 		inline bool isZero() const
 		{
-			return carl::isZero(mCoeff);
+			return mCoeff.isZero();
 		}
 		
 		/**
@@ -133,7 +137,7 @@ class Term
          */
 		inline bool isOne() const
 		{
-			return (isConstant() && carl::isOne(mCoeff));
+			return (isConstant() && mCoeff.isOne());
 		}
 		/**
 		 * Checks whether the monomial is a constant.
@@ -149,7 +153,7 @@ class Term
          */
         inline bool integerValued() const
         {
-            if(!carl::isInteger(mCoeff)) return false;
+            if(!mCoeff.isInteger()) return false;
             return (!mMonomial || mMonomial->integerValued());
         }
         
@@ -223,7 +227,7 @@ class Term
 		 */
 		bool isSquare() const
 		{
-			return (mCoeff >= Coefficient(0)) && ((!mMonomial) || mMonomial->isSquare());
+			return (mCoeff >= Number<Coefficient>(0)) && ((!mMonomial) || mMonomial->isSquare());
 		}
 		
 		/**
@@ -231,7 +235,7 @@ class Term
 		 */
 		void clear()
 		{
-			mCoeff = carl::constant_zero<Coefficient>().get();
+			mCoeff = Number<Coefficient>(carl::constant_zero<Coefficient>().get());
 			mMonomial = nullptr;
 		}
 

@@ -56,6 +56,9 @@ namespace carl {
 			return mData < carl::constant_zero<T>().get();
 		}
 			
+		operator T&() const {
+			return mData;
+		}
 
 /*
 		N& operator=(const BaseNumber<T,N>& n) {
@@ -115,6 +118,10 @@ namespace carl {
 			return N(this->mData / rhs.mData);
 		}
 
+		N operator-() {
+			return N(-(this->mData));
+		}
+
 /*		TODO: do we want these operators? Or is Number immutable?
 		N operator+=(const BaseNumber<T,N>& rhs) {
 			return N(mData += rhs.mData);
@@ -148,7 +155,7 @@ namespace carl {
 		return os << n.getValue();
 	} 
 
-
+	
 
 		
 }

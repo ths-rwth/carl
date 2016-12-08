@@ -142,10 +142,10 @@ Definiteness Term<Coefficient>::definiteness() const
 	if(mMonomial)
 	{
 		if(mMonomial->isSquare())
-			return (mCoeff < carl::constant_zero<Coefficient>().get() ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
+			return (mCoeff < Number<Coefficient>(0) ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
 	}
-	else if(!carl::isZero(mCoeff))
-		return (mCoeff < carl::constant_zero<Coefficient>().get() ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
+	else if(!mCoeff.isZero())
+		return (mCoeff < Number<Coefficient>(0) ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
 	return Definiteness::NON;
 }
 
@@ -343,14 +343,14 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 		clear();
 		return *this;
 	}
-	assert(carl::isZero(mCoeff) || !carl::isZero(Coefficient(mCoeff * rhs)));
+	assert(mCoeff.isZero() || !(mCoeff * Number(rhs)).isZero());
 	mCoeff *= rhs;
 	return *this;
 }
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 {
-	if(carl::isZero(mCoeff))
+	if(mCoeff.isZero())
 	{
 		return *this;
 	}
@@ -368,7 +368,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial::Arg& rhs)
 {
-	if(carl::isZero(mCoeff)) return *this;
+	if(mCoeff.isZero()) return *this;
 	
 	if(mMonomial)
 	{
@@ -386,8 +386,8 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial::Arg& rhs)
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
 {
-	if(carl::isZero(mCoeff)) return *this;
-	if(carl::isZero(rhs.mCoeff)) 
+	if(mCoeff.isZero()) return *this;
+	if(rhs.mCoeff.isZero()) 
 	{
 		clear();
 		return *this;
@@ -423,11 +423,11 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 { 
 	if(mMonomial)
 	{
-		if(mCoeff != Coefficient(1))
+		if(mCoeff != Number<Coefficient>(1))
 		{
 			std::stringstream s;
 			if(!infix) s << " ";
-			s << carl::toString( mCoeff, infix );
+			s << mCoeff.toString( infix );
 			if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
 			else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
 		}
@@ -440,7 +440,7 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 	else 
 	{
 		std::stringstream s;
-		s << carl::toString( mCoeff, infix );
+		s << mCoeff.toString( infix );
 		return s.str();
 	}
 }
@@ -451,7 +451,7 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 { 
 	if(mMonomial)
 	{
-		if(!carl::isOne(mCoeff))
+		if(!mCoeff.isOne())
 		{
 			std::stringstream s;
 			s << mCoeff;

@@ -220,6 +220,7 @@ TEST(Number,RationalOperations) {
 //mpq
 	carl::Number<mpq_class> q(1);
 
+	EXPECT_FALSE(q.isZero());
 	EXPECT_TRUE(q.isOne());
 	EXPECT_TRUE(q.isPositive());
 	EXPECT_FALSE(q.isNegative());
