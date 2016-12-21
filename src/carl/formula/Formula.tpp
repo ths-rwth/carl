@@ -102,6 +102,13 @@ namespace carl
                     uequality().collectUVariables(*_ueVars);
                 }
                 break;
+			case FormulaType::PBCONSTRAINT:
+				if (_booleanVars) {
+					for (auto var: pbConstraint().gatherVariables()) {
+						_vars.insert(var);
+					}
+				}
+				break;
             case FormulaType::NOT:
                 subformula().collectVariables_( _vars, _bvVars, _ueVars, _booleanVars, _realVars, _integerVars, _uninterpretedVars, _bitvectorVars );
                 break;
