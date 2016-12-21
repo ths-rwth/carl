@@ -13,11 +13,11 @@ namespace carl {
     private:
         Relation relation;
         int rhs;
-        std::vector< std::pair<Variable, int> > lhs;
+        std::vector<std::pair<Variable, int>> lhs;
         
     public:
         PBConstraint() {}
-        PBConstraint(const std::vector< std::pair<Variable, int> >& ls, Relation rel, int rs):
+        PBConstraint(const std::vector<std::pair<Variable, int>>& ls, Relation rel, int rs):
 			relation(rel),
 			rhs(rs),
 		    lhs(ls)
@@ -35,7 +35,7 @@ namespace carl {
 	        PBConstraint negConst(this->lhs, nRel, this->rhs);
 	        return negConst;
 		}
-        void setLHS(const std::vector< std::pair<Variable, int> >& l) {
+        void setLHS(const std::vector<std::pair<Variable, int>>& l) {
 			lhs = l;
 		}
         void setRelation(Relation r) {
@@ -58,6 +58,30 @@ namespace carl {
 			std::stringstream ss;
 			ss << *this;
 			return ss.str();
+		}
+
+		bool isTrue() const {
+			if(relation == Relation::GEQ && rhs <= 0 ){
+				for(auto it = lhs.begin(); it != lhs.end(); it++){
+					if(it->second < 0){
+						return false;
+					}
+				}
+				return true;
+			}
+			return false;
+		}
+
+		bool isFalse() const {
+			if(relation == Relation::GEQ && rhs >= 1){
+				for(auto it = lhs.begin(); it != lhs.end(); it++){
+					if(it->second > 0){
+						return false;
+					}
+				}
+				return true;
+			}
+			return false;
 		}
     };
         
