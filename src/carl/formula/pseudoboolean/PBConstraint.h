@@ -22,7 +22,7 @@ namespace carl {
 			rhs(rs),
 		    lhs(ls)
 	    {}
-        std::vector<Variable> gatherVariables() {
+        std::vector<Variable> gatherVariables() const {
 	        std::vector<Variable> varVector;
 	        const std::vector<std::pair<Variable, int>>& ls = this->lhs;
 	        for(auto it = ls.begin(); it != ls.end(); ++it){
