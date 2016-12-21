@@ -14,6 +14,7 @@ ExternalProject_Add(
     GiNaC
     GIT_REPOSITORY "git://www.ginac.de/ginac.git"
 	GIT_TAG "release_${GINAC_TAG}"
+	UPDATE_COMMAND ""
 	CONFIGURE_COMMAND ${AUTORECONF} -iv <SOURCE_DIR> COMMAND PYTHON=${PYTHON2} <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
 )
 
