@@ -38,7 +38,15 @@ public:
 	
 	Formula<Pol> parse() {
 		auto file = parseOPBFile(mIn);
-		return Formula<Pol>();
+		Formulas<Pol> constraints;
+		for (const auto& cons: file.constraints) {
+			std::vector<std::pair<Variable, int>> lhs;
+			for (const auto& var: std::get<0>(cons)) {
+				lhs.emplace_back(var.second, var.first);
+			}
+			constraints.emplace_back(PBConstraint(lhs, std::get<1>(cons), std::get<2>(cons)));
+		}
+		return Formula<Pol>(FormulaType::AND, std::move(constraints));
 	}
 };
 
