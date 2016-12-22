@@ -186,6 +186,9 @@ template<typename T>
 inline T rationalize(uint n);
 
 template<typename T>
+inline T rationalize(unsigned long long n);
+
+template<typename T>
 inline T rationalize(sint n);
 
 template<typename T>
@@ -213,6 +216,14 @@ inline mpq_class rationalize<mpq_class>(int n) {
 template<>
 inline mpq_class rationalize<mpq_class>(uint n) {
 	return mpq_class(n);
+}
+
+template<>
+inline mpq_class rationalize<mpq_class>(unsigned long long n) {
+	mpz_t z;
+	mpz_init(z);
+	mpz_import(z, 1, -1, sizeof n, 0, 0, &n);
+	return mpq_class(mpz_class(std::move(z)));
 }
 
 template<>
