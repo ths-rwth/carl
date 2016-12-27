@@ -1,14 +1,18 @@
 #pragma once
 
-#include "Number.h"
-#include "NumberMpz.h"
 
+
+#include "Number.h"
 
 
 
 namespace carl {
 
 #ifdef USE_CLN_NUMBERS
+
+
+	template<>
+	class Number<mpz_class>;
 
 	template<>
 	class Number<cln::cl_I> : public BaseNumber<cln::cl_I,Number<cln::cl_I>> {
@@ -23,7 +27,8 @@ namespace carl {
 		Number(int n) : BaseNumber(n) {}
 		Number(long long int n) { mData = cln::cl_I(n); }
 		Number(unsigned long long int n) { mData = cln::cl_I(n);}
-		Number(const Number<mpz_class>& n) : Number(cln::cl_I(n.toString().c_str())) {}
+	 	Number(const Number<mpz_class>& n);
+		
 
 
 		Number<cln::cl_I>& operator=(const Number<cln::cl_I>& n) {

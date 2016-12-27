@@ -1,12 +1,11 @@
 #pragma once
 
+
 #include "Number.h"
 
-#include "NumberMpz.h"
-#include "NumberMpq.h"
+
+
 #include "NumberClI.h"
-
-
 
 
 
@@ -20,6 +19,17 @@ namespace carl {
 	//NOTE: this can only be uncommented once adaption_cln/operations.h is not used anymore (defined twice)
 	//static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 23);
 	//static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
+	
+
+	//template<>
+	//class Number<cln::cl_I> ;
+
+	template<>
+	class Number<mpq_class> ;
+
+	template<>
+	class Number<mpz_class> ;
+	
 
 	template<>
 	class Number<cln::cl_RA> : public BaseNumber<cln::cl_RA,Number<cln::cl_RA>> {
@@ -45,19 +55,15 @@ namespace carl {
 
 		Number(const std::string& s); 
 
-		//constructs a/b:
-		//(this looks hacky.. seems to be the only really functioning way though: take the integers as strings, put the sign at the front and construct
-		//cl_RA from the string "[-]a/b")
-		Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) :
-			 Number(((a.isNegative() xor b.isNegative()) ? "-" : "") + a.abs().toString()+"/"+b.abs().toString()) {}
+		Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b);
 
 	
-		Number(const Number<cln::cl_I>& n) { mData = cln::cl_RA(n.getValue()); }
-		//Number(const cln::cl_I& n) { mData = cln::cl_RA(n); }
+		Number(const Number<cln::cl_I>& n);
 
-		//TODO: Is there a better way? Maybe retrieve "pieces" that fit into the data type and add them together again
-		Number(const Number<mpq_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
-		Number(const Number<mpz_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
+
+		Number(const Number<mpq_class>& n);
+		Number(const Number<mpz_class>& n);
+
 
 
 
@@ -84,29 +90,8 @@ namespace carl {
 		
 
 
-		/**
-		 * Extract the numerator from a fraction.
-		 * @return Numerator.
-		 */
-		inline Number<cln::cl_I> getNum() const {
-			return Number<cln::cl_I>(cln::numerator(mData));
-		}
 
-		/**
-		 * Extract the denominator from a fraction.
-		 * @return Denominator.
-		 */
-		inline Number<cln::cl_I> getDenom() const {
-			return Number<cln::cl_I>(cln::denominator(mData));
-		}
 
-		/**
-		 * Check if a fraction is integral.
-		 * @return true.
-		 */
-		inline bool isInteger() {
-			return this->getDenom().isOne();
-		}
 
 
 		/**
@@ -143,6 +128,22 @@ namespace carl {
 		}
 
 		/**
+		 * Extract the numerator from a fraction.
+		 * @return Numerator.
+		 */
+		inline Number<cln::cl_I> getNum() const {
+			return Number<cln::cl_I>(cln::numerator(mData));
+		}
+
+		/**
+		 * Extract the denominator from a fraction.
+		 * @return Denominator.
+		 */
+		inline Number<cln::cl_I> getDenom() const {
+			return Number<cln::cl_I>(cln::denominator(mData));
+		}
+
+		/**
 		 * Round a fraction to next integer.
 		 * @return The next integer.
 		 */
@@ -169,6 +170,19 @@ namespace carl {
 		inline Number<cln::cl_I> ceil() {
 			return Number<cln::cl_I> (cln::ceiling1(mData));
 		}
+
+
+
+
+
+		/**
+		 * Check if a fraction is integral.
+		 * @return true.
+		 */
+		inline bool isInteger() {
+			return this->getDenom().isOne();
+		}
+
 
 
 
@@ -289,6 +303,7 @@ namespace carl {
 		 * @param n A fraction.
 		 * @return An integer.
 		 */
+
 		template<>
 		inline Number<cln::cl_I> Number<cln::cl_RA>::toInt<Number<cln::cl_I>>() {
 			assert(isInteger());

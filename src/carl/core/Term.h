@@ -9,6 +9,8 @@
 
 #include "../interval/Interval.h"
 #include "../numbers/numbers.h"
+#include "../numbers/NumberMpq.h"
+#include "../numbers/NumberClRA.h"
 #include "../util/pointerOperations.h"
 #include "Definiteness.h"
 #include "Monomial.h"
@@ -27,8 +29,7 @@ namespace carl
 template<typename Coefficient>
 class Term
 {
-	//this is a hack
-	//using NumberCoefficient = mpq_class;//typename std::conditional<std::is_same<Coefficient, __gmp_expr<__mpq_struct [1], __mpq_struct [1]>>::value, mpq_class, 				typename std::conditional<std::is_same<Coefficient, __gmp_expr<__mpz_struct [1], __mpz_struct [1]>>::value, mpz_class, 	Coefficient>::type>::type;
+
 
 	private:
 		Number<Coefficient> mCoeff = Number<Coefficient>(constant_zero<Coefficient>::get());

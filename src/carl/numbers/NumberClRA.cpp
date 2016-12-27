@@ -1,7 +1,9 @@
-#include "numbers.h"
+#include "Number.h"
 #include "NumberClRA.h"
 
 
+#include "NumberMpq.h"
+#include "NumberMpz.h"
 
 #include <limits>
 #include <boost/numeric/interval/interval.hpp>
@@ -12,6 +14,26 @@
 namespace carl {
 
 #ifdef USE_CLN_NUMBERS
+
+
+		//constructs a/b:
+		//(this looks hacky.. seems to be the only really functioning way though: take the integers as strings, put the sign at the front and construct
+		//cl_RA from the string "[-]a/b")
+		Number<cln::cl_RA>::Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) :
+			 Number(((a.isNegative() xor b.isNegative()) ? "-" : "") + a.abs().toString()+"/"+b.abs().toString()) {}
+
+	
+		Number<cln::cl_RA>::Number(const Number<cln::cl_I>& n) { mData = cln::cl_RA(n.getValue()); }
+		//Number(const cln::cl_I& n) { mData = cln::cl_RA(n); }
+
+
+		Number<cln::cl_RA>::Number(const Number<mpq_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
+		Number<cln::cl_RA>::Number(const Number<mpz_class>& n) : Number(cln::cl_RA(n.toString().c_str())) {} 
+
+
+
+
+
 
 
 		//this can maybe be done such that it's the same as for mpq_class

@@ -3,6 +3,7 @@
 
 
 #include "Number.h"
+//#include "numbers.h"
 
 
 
@@ -13,6 +14,8 @@ namespace carl {
 	template<>
 	class Number<cln::cl_I> ;
 #endif
+
+
 
 	template<>
 	class Number<mpz_class> : public BaseNumber<mpz_class,Number<mpz_class>> {

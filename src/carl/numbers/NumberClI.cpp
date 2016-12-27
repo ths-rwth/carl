@@ -1,10 +1,16 @@
-#include "NumberClI.h"
+
+#include "Number.h"
 #include "NumberClRA.h"
+#include "NumberClI.h"
+#include "NumberMpz.h"
+
 
 
 namespace carl {
 
 #ifdef USE_CLN_NUMBERS
+
+	Number<cln::cl_I>::Number(const Number<mpz_class>& n) : Number(cln::cl_I(n.toString().c_str())) {}
 
 //TODO: why not use the standard output of cln here?! Surely that works?
     	std::string Number<cln::cl_I>::toString(bool _infix) const

@@ -1,11 +1,14 @@
 #pragma once
 
+
 #include "Number.h"
 #include "NumberMpz.h"
 
 
 
 namespace carl {
+
+
 
 
 #ifdef USE_CLN_NUMBERS
@@ -15,6 +18,11 @@ namespace carl {
 	template<>
 	class Number<cln::cl_RA> ;
 #endif
+
+
+
+	template<>
+	class Number<mpz_class> ;
 
 	template<>
 	class Number<mpq_class> : public BaseNumber<mpq_class,Number<mpq_class>> {
@@ -38,11 +46,11 @@ namespace carl {
 		explicit Number(const std::string& s);
 
 		//constructs a/b:
-		Number(const Number<mpz_class>& a,const Number<mpz_class>& b) { mData = mpq_class(a.getValue(),b.getValue()); }
+		Number(const Number<mpz_class>& a,const Number<mpz_class>& b);
 
 	
-		Number(const Number<mpz_class>& n) { mData = mpq_class(n.getValue()); }
-		Number(const mpz_class& n) { mData = mpq_class(n); }
+		Number(const Number<mpz_class>& n);
+		Number(const mpz_class& n);
 
 #ifdef USE_CLN_NUMBERS
 		Number(const Number<cln::cl_RA>& n);
@@ -74,12 +82,6 @@ namespace carl {
 
 
 
-		
-
-
-
-
-
 		inline Number<mpz_class> getNum() const {
 			return Number<mpz_class>(mData.get_num());
 		}
@@ -89,51 +91,8 @@ namespace carl {
 		}
 
 
-		inline bool isInteger() {
-			 return 0 != mpz_divisible_p(mData.get_num_mpz_t(), mData.get_den_mpz_t());
-		}
 
 
-
-		/**
-		 * Get the bit size of the representation of a fraction.
-		 * @param n A fraction.
-		 * @return Bit size of n.
-		 */
-		inline std::size_t bitsize() {
-			return mpz_sizeinbase(mData.get_num().__get_mp(),2) + mpz_sizeinbase(mData.get_den().__get_mp(),2);
-		}
-
-		/**
-		 * Conversion functions
-		 *
-		 * The following function convert types to other types.
-		 */
-
-		//this is the same as for mpz
-		inline double toDouble() {
-			return mData.get_d();
-		}
-
-
-
-		template<typename Integer>
-		inline Integer toInt();
-
-
-
-		/**
-		 * Basic Operators
-		 *
-		 * The following functions implement simple operations on the given numbers.
-		 */
-
-
-		inline Number<mpq_class> abs() const {
-			mpq_class res;
-			mpq_abs(res.get_mpq_t(), mData.get_mpq_t());
-			return Number(res);
-		}
 
 		inline Number<mpz_class> round() {
 			if (Number(mpz_class(mData.get_num_mpz_t())).isZero()) return Number<mpz_class>(carl::constant_zero<mpz_class>::get());
@@ -192,17 +151,6 @@ namespace carl {
 			return Number(res);
 		}
 
-		inline Number<mpq_class> log() {
-			return Number(std::log(this->toDouble()));
-		}
-
-		inline Number<mpq_class> sin() {
-			return Number(std::sin(this->toDouble()));
-		}
-
-		inline Number<mpq_class> cos() {
-			return Number(std::cos(this->toDouble()));
-		}
 
 
 		inline Number<mpq_class> pow(std::size_t e) {
@@ -220,6 +168,74 @@ namespace carl {
 			mpq_div(res.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
 			return Number(res);
 		}
+
+
+
+
+
+
+
+		inline bool isInteger() {
+			 return 0 != mpz_divisible_p(mData.get_num_mpz_t(), mData.get_den_mpz_t());
+		}
+
+
+
+		/**
+		 * Get the bit size of the representation of a fraction.
+		 * @param n A fraction.
+		 * @return Bit size of n.
+		 */
+		inline std::size_t bitsize() {
+			return mpz_sizeinbase(mData.get_num().__get_mp(),2) + mpz_sizeinbase(mData.get_den().__get_mp(),2);
+		}
+
+		/**
+		 * Conversion functions
+		 *
+		 * The following function convert types to other types.
+		 */
+
+		//this is the same as for mpz
+		inline double toDouble() {
+			return mData.get_d();
+		}
+
+
+
+		template<typename Integer>
+		inline Integer toInt();
+
+
+
+		/**
+		 * Basic Operators
+		 *
+		 * The following functions implement simple operations on the given numbers.
+		 */
+
+
+		inline Number<mpq_class> abs() const {
+			mpq_class res;
+			mpq_abs(res.get_mpq_t(), mData.get_mpq_t());
+			return Number(res);
+		}
+
+
+
+		inline Number<mpq_class> log() {
+			return Number(std::log(this->toDouble()));
+		}
+
+		inline Number<mpq_class> sin() {
+			return Number(std::sin(this->toDouble()));
+		}
+
+		inline Number<mpq_class> cos() {
+			return Number(std::cos(this->toDouble()));
+		}
+
+
 
 		/**
 		 * Calculate the square root of a fraction if possible.
@@ -272,9 +288,7 @@ namespace carl {
 
 	};
 
-	
 	//template specializations of template member-functions of Number<mpq_class>
-
 
 	template<>
 	inline Number<mpz_class> Number<mpq_class>::toInt<Number<mpz_class>>() {
@@ -291,6 +305,13 @@ namespace carl {
 	inline uint Number<mpq_class>::toInt<uint>() {
 		return this->toInt<Number<mpz_class>>().toInt<uint>();
 	}
+
+
+	
+
+
+
+
 
 
 	

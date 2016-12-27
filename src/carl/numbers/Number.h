@@ -26,23 +26,23 @@ namespace carl {
 		explicit BaseNumber(T&& t): mData(std::move(t)) {}
 		BaseNumber(const BaseNumber<T,N>& n): mData(n.mData) {}
 		BaseNumber(BaseNumber<T,N>&& n) noexcept : mData(std::move(n.mData)) {}
-		//TODO: is this really the best way? one could also create an mpz_class, multiply it by 10^whatever and add the rest...
 		BaseNumber(long long int n) { std::string s = std::to_string(n); mData = T(s); }
 		BaseNumber(unsigned long long int n) { std::string s = std::to_string(n); mData= T(s); }
 		BaseNumber(int i) : mData(i) {}
 		BaseNumber(const std::string& s) : mData(s) {}
+
 
 		const T& getValue() const {
 			return mData;
 		}
 
 
-		inline bool isZero() {
+		inline bool isZero() const {
 			return constant_zero<T>::get() == mData;
 		}
 
 
-		inline bool isOne() {
+		inline bool isOne() const {
 			return mData  == carl::constant_one<T>().get();
 		}
 
@@ -56,7 +56,11 @@ namespace carl {
 			return mData < carl::constant_zero<T>().get();
 		}
 			
-		operator T&() const {
+		operator const T&() const {
+			return mData;
+		}
+
+		operator T&() {
 			return mData;
 		}
 
@@ -85,44 +89,44 @@ namespace carl {
 			return this->mData != rhs.mData;
 		}
 
-		bool operator<(const BaseNumber<T,N>& rhs) {
+		bool operator<(const BaseNumber<T,N>& rhs) const {
 			return this->mData < rhs.mData;;
 		}
 
-		bool operator<=(const BaseNumber<T,N>& rhs) {
+		bool operator<=(const BaseNumber<T,N>& rhs) const {
 			return this->mData <= rhs.mData;
 		}
 
-		bool operator>=(const BaseNumber<T,N>& rhs) {
+		bool operator>=(const BaseNumber<T,N>& rhs) const {
 			return this->mData >= rhs.mData;
 		}
 
-		bool operator>(const BaseNumber<T,N>& rhs) {
+		bool operator>(const BaseNumber<T,N>& rhs) const {
 			return this->mData > rhs.mData;
 		}
 
 
-		N operator+(const BaseNumber<T,N>& rhs) {
+		N operator+(const BaseNumber<T,N>& rhs) const {
 			return N(this->mData + rhs.mData);
 		}
 
-		N operator-(const BaseNumber<T,N>& rhs) {
+		N operator-(const BaseNumber<T,N>& rhs) const {
 			return N(this->mData - rhs.mData);
 		}
 
-		N operator*(const BaseNumber<T,N>& rhs) {
+		N operator*(const BaseNumber<T,N>& rhs) const {
 			return N(this->mData * rhs.mData);
 		}
 
-		N operator/(const BaseNumber<T,N>& rhs) {
+		N operator/(const BaseNumber<T,N>& rhs) const {
 			return N(this->mData / rhs.mData);
 		}
 
-		N operator-() {
+		N operator-() const {
 			return N(-(this->mData));
 		}
 
-/*		TODO: do we want these operators? Or is Number immutable?
+		//TODO: do we want these operators? Or is Number immutable?
 		N operator+=(const BaseNumber<T,N>& rhs) {
 			return N(mData += rhs.mData);
 		} 
@@ -139,7 +143,7 @@ namespace carl {
 
 		N operator/=(const BaseNumber<T,N>& rhs) {
 			return N(mData /= rhs.mData);
-		} */
+		} 
 
 
 

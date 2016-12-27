@@ -1,7 +1,8 @@
-
+#include "Number.h"
 #include "NumberMpq.h"
 #include "NumberClI.h"
 #include "NumberClRA.h"
+#include "NumberMpz.h"
 
 
 
@@ -34,6 +35,22 @@ namespace carl {
 		}
 		mData = result;
 	}
+
+	//constructs a/b:
+	Number<mpq_class>::Number(const Number<mpz_class>& a,const Number<mpz_class>& b) { mData = mpq_class(a.getValue(),b.getValue()); }
+
+
+	Number<mpq_class>::Number(const Number<mpz_class>& n) { mData = mpq_class(n.getValue()); }
+	Number<mpq_class>::Number(const mpz_class& n) { mData = mpq_class(n); }
+
+
+
+	
+
+
+
+
+
    
 
 	//TODO: doesn't mpq_class have a standard "output" as well?

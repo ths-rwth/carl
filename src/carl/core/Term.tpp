@@ -344,7 +344,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 		return *this;
 	}
 	assert(mCoeff.isZero() || !(mCoeff * Number(rhs)).isZero());
-	mCoeff *= rhs;
+	mCoeff *= Number<Coefficient>(rhs);
 	return *this;
 }
 template<typename Coefficient>

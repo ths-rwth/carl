@@ -35,10 +35,19 @@ namespace carl {
 #include "adaption_gmpxx/operations.h"
 #include "adaption_gmpxx/typetraits.h"
 
+//#include "Number.h"
+
+
+//#include "NumberMpq.h"
+//#include "NumberMpz.h"
+
+
 #ifdef USE_CLN_NUMBERS
 #include "adaption_cln/hash.h"
 #include "adaption_cln/operations.h"
 #include "adaption_cln/typetraits.h"
+//#include "NumberClRA.h"
+//#include "NumberClI.h"
 #endif
 
 #ifdef USE_MPFR_FLOAT
@@ -61,4 +70,4 @@ namespace carl {
 
 #include "conversion/conversion.h"
 
-#include "Number.h"
+
