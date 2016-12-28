@@ -11,6 +11,8 @@
 #include "../numbers/numbers.h"
 #include "../numbers/NumberMpq.h"
 #include "../numbers/NumberClRA.h"
+#include "../numbers/NumberInterval.h"
+#include "../numbers/NumberInt.h"
 #include "../util/pointerOperations.h"
 #include "Definiteness.h"
 #include "Monomial.h"

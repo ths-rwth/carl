@@ -133,7 +133,7 @@ Term<Coefficient> Term<Coefficient>::derivative(Variable::Arg v) const
 		return std::move(Term<Coefficient>(carl::constant_zero<Coefficient>().get()));
 	}
 	auto derivative = mMonomial->derivative(v);
-	return Term<Coefficient>(mCoeff * derivative.first, derivative.second);
+	return Term<Coefficient>(((Coefficient)mCoeff) * derivative.first, derivative.second);
 }
 
 template<typename Coefficient>
@@ -174,7 +174,7 @@ template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
 {
 	if (mMonomial) {
-		return mCoeff * mMonomial->substitute(substitutions);
+		return ((Coefficient)mCoeff) * mMonomial->substitute(substitutions);
 	} else {
 		return Term<Coefficient>(mCoeff);
 	}
