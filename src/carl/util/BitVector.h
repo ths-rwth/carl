@@ -7,10 +7,10 @@
  */
 #pragma once
 
-#include <vector>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include <iostream>
-#include <assert.h>
+#include <vector>
 
 namespace carl
 {
