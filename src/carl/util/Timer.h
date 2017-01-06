@@ -21,22 +21,22 @@ struct Timer {
 	/// The duration type used here.
 	using duration = std::chrono::duration<std::size_t,std::milli>;
 	/// Start of this timer.
-	clock::time_point start;
-	Timer(): start(clock::now()) {}
+	clock::time_point mStart;
+	Timer() noexcept: mStart(clock::now()) {}
 	/**
 	 * Calculated the number of milliseconds since this object has been created.
      * @return Milliseconds passed.
      */
-	std::size_t passed() const {
-		clock::duration d(clock::now() - start);
+	std::size_t passed() const noexcept {
+		clock::duration d(clock::now() - mStart);
 		return std::chrono::duration_cast<duration>(d).count();
 	}
 	
 	/**
 	 * Reset the start point to now.
      */
-	void reset() {
-		start = clock::now();
+	void reset() noexcept {
+		mStart = clock::now();
 	}
 	/**
 	 * Streaming operator for a Timer.

@@ -52,7 +52,7 @@ namespace carl {
 		char** symbols = backtrace_symbols(frames, cnt);
 	
 		std::stringstream out;
-		Dl_info info;
+		Dl_info info = {};
 		if (dladdr(frames[2], &info) != 0 && info.dli_sname != nullptr) {
 			out << demangle(info.dli_sname) << std::endl;
 		} else {

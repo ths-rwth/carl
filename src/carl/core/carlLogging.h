@@ -173,13 +173,13 @@ struct FileSink: public Sink {
  */
 struct Filter {
 	/// Mapping from channels to (minimal) log levels.
-	std::map<std::string, LogLevel> data;
+	std::map<std::string, LogLevel> mData;
 	
 	/**
 	 * Constructor.
 	 * @param level Default minimal log level.
 	 */
-	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT): data() {
+	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT): mData() {
 		(*this)("", level);
 	}
 	/**
@@ -190,7 +190,7 @@ struct Filter {
 	 * @return This object.
      */
 	Filter& operator()(const std::string& channel, LogLevel level) {
-		data[channel] = level;
+		mData[channel] = level;
 		return *this;
 	}
 	/**
@@ -201,13 +201,13 @@ struct Filter {
      */
 	bool check(const std::string& channel, LogLevel level) {
 		std::string curChan = channel;
-		auto it = data.find(curChan);
-		while (!curChan.empty() && it == data.end()) {
+		auto it = mData.find(curChan);
+		while (!curChan.empty() && it == mData.end()) {
 			auto n = curChan.rfind('.');
 			curChan = (n == std::string::npos) ? "" : curChan.substr(0, n);
-			it = data.find(curChan);
+			it = mData.find(curChan);
 		}
-		assert(it != data.end());
+		assert(it != mData.end());
 		return level >= it->second;
 	}
 	/**
@@ -219,7 +219,7 @@ struct Filter {
 	 */
 	friend std::ostream& operator<<(std::ostream& os, const Filter& f) {
 		os << "Filter:" << std::endl;
-		for (auto it: f.data) os << "\t\"" << it.first << "\" -> " << it.second << std::endl;
+		for (auto it: f.mData) os << "\t\"" << it.first << "\" -> " << it.second << std::endl;
 		return os;
 	}
 };
@@ -259,7 +259,7 @@ struct Formatter {
      * @param f Filter.
      */
 	virtual void configure(const Filter& f) {
-		for (auto t: f.data) {
+		for (auto t: f.mData) {
 			if (t.first.size() > channelwidth) channelwidth = t.first.size();
 		}
 	}
@@ -302,7 +302,7 @@ struct Formatter {
 class Logger: public carl::Singleton<Logger> {
 	friend carl::Singleton<Logger>;
 	/// Mapping from channels to associated logging classes.
-	std::map<std::string, std::tuple<std::shared_ptr<Sink>, Filter, std::shared_ptr<Formatter>>> data;
+	std::map<std::string, std::tuple<std::shared_ptr<Sink>, Filter, std::shared_ptr<Formatter>>> mData;
 	/// Logging mutex to ensure thread-safe logging.
 	std::mutex mutex;
 	/// Timer to track program runtime.
@@ -311,13 +311,13 @@ class Logger: public carl::Singleton<Logger> {
 	/**
 	 * Default constructor.
      */
-	Logger(): data(), mutex(), timer() {}
+	Logger() noexcept: mData(), mutex(), timer() {}
 public:
 	/**
 	 * Desctructor.
      */
 	~Logger() override {
-		data.clear();
+		mData.clear();
 	}
 	/**
 	 * Check if a Sink with the given id has been installed.
@@ -325,7 +325,7 @@ public:
      * @return If a Sink with this id is present.
      */
 	bool has(const std::string& id) const {
-		return data.find(id) != data.end();
+		return mData.find(id) != mData.end();
 	}
 	/**
 	 * Installs the given sink.
@@ -335,7 +335,7 @@ public:
      */
 	void configure(const std::string& id, std::shared_ptr<Sink> sink) {
 		std::lock_guard<std::mutex> lock(mutex);
-		this->data[id] = std::make_tuple(sink, Filter(), std::make_shared<Formatter>());
+		mData[id] = std::make_tuple(sink, Filter(), std::make_shared<Formatter>());
 	}
 	/**
 	 * Installs a FileSink.
@@ -359,8 +359,8 @@ public:
      * @return Filter.
      */
 	Filter& filter(const std::string& id) {
-		auto it = data.find(id);
-		assert(it != data.end());
+		auto it = mData.find(id);
+		assert(it != mData.end());
 		return std::get<1>(it->second);
 	}
 	/**
@@ -369,8 +369,8 @@ public:
      * @return Formatter.
      */
 	std::shared_ptr<Formatter> formatter(const std::string& id) {
-		auto it = data.find(id);
-		assert(it != data.end());
+		auto it = mData.find(id);
+		assert(it != mData.end());
 		return std::get<2>(it->second);
 	}
 	/**
@@ -379,8 +379,8 @@ public:
      * @param fmt New Formatter.
      */
 	void formatter(const std::string& id, std::shared_ptr<Formatter> fmt) {
-		auto it = data.find(id);
-		assert(it != data.end());
+		auto it = mData.find(id);
+		assert(it != mData.end());
 		std::get<2>(it->second) = std::move(fmt);
 		std::get<2>(it->second)->configure(std::get<1>(it->second));
 	}
@@ -389,7 +389,7 @@ public:
 	 * This should be done once after all configuration is finished.
      */
 	void resetFormatter() {
-		for (auto& t: data) {
+		for (auto& t: mData) {
 			std::get<2>(t.second)->configure(std::get<1>(t.second));
 		}
 	}
@@ -402,7 +402,7 @@ public:
      */
 	void log(LogLevel level, const std::string& channel, const std::stringstream& ss, const RecordInfo& info) {
 		std::lock_guard<std::mutex> lock(mutex);
-		for (auto t: data) {
+		for (auto t: mData) {
 			if (!std::get<1>(t.second).check(channel, level)) continue;
 			std::get<2>(t.second)->prefix(std::get<0>(t.second)->log(), timer, channel, level, info);
 			std::get<0>(t.second)->log() << ss.str();

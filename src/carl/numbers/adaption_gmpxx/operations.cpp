@@ -115,10 +115,10 @@ namespace carl
     }
 
     template<>
-    mpq_class rationalize<mpq_class>(const std::string& inputstring)
+    mpq_class rationalize<mpq_class>(const std::string& n)
     {
         std::vector<std::string> strs;
-        boost::split(strs, inputstring, boost::is_any_of("."));
+        boost::split(strs, n, boost::is_any_of("."));
 
         if(strs.size() > 2)
         {

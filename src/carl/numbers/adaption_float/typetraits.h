@@ -20,9 +20,9 @@ namespace carl
     struct IntegralType<carl::FLOAT_T<F> >
     {
         #ifdef USE_CLN_NUMBERS
-        typedef cln::cl_I type;
+        using type = cln::cl_I;
         #else
-        typedef mpz_class type;
+        using type = mpz_class;
         #endif
     };
 

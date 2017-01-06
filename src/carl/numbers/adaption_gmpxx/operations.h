@@ -20,9 +20,9 @@ CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include <boost/algorithm/string.hpp>
 CLANG_WARNING_RESET
 
+#include <climits>
 #include <cstddef>
 #include <iostream>
-#include <limits.h>
 #include <sstream>
 #include <vector>
 

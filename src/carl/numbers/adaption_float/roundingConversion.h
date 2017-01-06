@@ -16,7 +16,7 @@ CLANG_WARNING_DISABLE("-Wsign-conversion")
 #endif
 CLANG_WARNING_RESET
 
-#include <assert.h>
+#include <cassert>
 
 namespace carl {
 	
