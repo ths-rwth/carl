@@ -63,7 +63,7 @@ namespace carl {
 	}
 #endif
 
-std::string last_assertion_string = "";
+std::string last_assertion_string;
 int last_assertion_code = 23;
 
 #ifndef NDEBUG
@@ -77,7 +77,7 @@ __declspec(noreturn) static void handle_signal(int signal) {
 #endif
 	//printStacktrace(false);
 	std::cerr << std::endl << "Catched SIGABRT " << signal << ", exiting with " << (last_assertion_code%256) << std::endl;
-	if (last_assertion_string.size() != 0) {
+	if (!last_assertion_string.empty()) {
 		std::cerr << "Last Assertion catched is: " << last_assertion_string << std::endl;
 		std::cerr << "Please check if this is the assertion that is actually thrown." << std::endl;
 	}
