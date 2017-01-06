@@ -14,13 +14,13 @@
 
 #include <cassert>
 #include <chrono>
+#include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <map>
 #include <mutex>
 #include <sstream>
-#include <string.h>
 #ifdef THREAD_SAFE
 #include <thread>
 #endif
@@ -202,7 +202,7 @@ struct Filter {
 	bool check(const std::string& channel, LogLevel level) {
 		std::string curChan = channel;
 		auto it = data.find(curChan);
-		while (curChan.size() > 0 && it == data.end()) {
+		while (!curChan.empty() && it == data.end()) {
 			auto n = curChan.rfind('.');
 			curChan = (n == std::string::npos) ? "" : curChan.substr(0, n);
 			it = data.find(curChan);
@@ -240,8 +240,8 @@ struct RecordInfo {
      * @param func Function name.
      * @param line Line number.
      */
-	RecordInfo(const std::string& _filename, const std::string& _func, std::size_t _line): 
-		filename(_filename), func(_func), line(_line) {}
+	RecordInfo(std::string _filename, std::string _func, std::size_t _line): 
+		filename(std::move(_filename)), func(std::move(_func)), line(_line) {}
 };
 
 /**
@@ -381,7 +381,7 @@ public:
 	void formatter(const std::string& id, std::shared_ptr<Formatter> fmt) {
 		auto it = data.find(id);
 		assert(it != data.end());
-		std::get<2>(it->second) = fmt;
+		std::get<2>(it->second) = std::move(fmt);
 		std::get<2>(it->second)->configure(std::get<1>(it->second));
 	}
 	/**

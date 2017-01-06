@@ -65,7 +65,7 @@ template <bool Condition>
 using EnableIfBool = typename std::enable_if<Condition, dtl::enabled>::type;
 #endif
 
-template<typename> struct Void { typedef void type; };
+template<typename> struct Void { using type = void; };
 
 #ifdef __VS
 #define has_method_struct(methodname) \

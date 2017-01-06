@@ -32,7 +32,7 @@ std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p);
 template<typename T, typename C>
 std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s);
 template<std::size_t I, typename... T, typename std::enable_if<I == sizeof...(T), void>::type*>
-std::ostream& operator<<(std::ostream& os, const std::tuple<T...>&);
+std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t);
 template<std::size_t I, typename... T, typename std::enable_if<I < sizeof...(T), void>::type*>
 std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t);
 template<typename Key, typename Value, typename H, typename E, typename A>

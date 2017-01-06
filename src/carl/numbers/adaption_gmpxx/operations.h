@@ -223,7 +223,7 @@ inline mpq_class rationalize<mpq_class>(unsigned long long n) {
 	mpz_t z;
 	mpz_init(z);
 	mpz_import(z, 1, -1, sizeof n, 0, 0, &n);
-	return mpq_class(mpz_class(std::move(z)));
+	return mpq_class(mpz_class(z));
 }
 
 template<>
