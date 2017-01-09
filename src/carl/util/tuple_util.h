@@ -78,4 +78,23 @@ public:
 	}
 };
 
+namespace detail {
+	/**
+	 * Helper method for carl::tuple_apply that actually performs the call.
+	 */
+	template<typename F, typename Tuple, std::size_t... I>
+	auto tuple_apply_impl(F&& f, Tuple&& t, std::index_sequence<I...>) {
+		return (std::forward<F>(f))(std::get<I>(std::forward<Tuple>(t))...);
+	}
+}
+
+/**
+ * Invokes a callable object f on a tuple of arguments.
+ * This is basically std::apply (available with C++17).
+ */
+template<typename F, typename Tuple>
+auto tuple_apply(F&& f, Tuple&& t) {
+	return detail::tuple_apply_impl(std::forward<F>(f), std::forward<Tuple>(t), std::make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type>::value>{});
+}
+
 }
