@@ -263,17 +263,6 @@ class UFManager : public Singleton<UFManager>
  * @param _codomain The codomain of the uninterpreted function of the uninterpreted function to get.
  * @return The resulting uninterpreted function.
  */
-inline UninterpretedFunction newUninterpretedFunction(std::string&& _name, std::vector<Sort>&& _domain, Sort _codomain) {
-    return UFManager::getInstance().newUninterpretedFunction(std::move(_name), std::move(_domain), _codomain);
-}
-
-/**
- * Gets the uninterpreted function with the given name, domain, arguments and codomain.
- * @param _name The name of the uninterpreted function of the uninterpreted function to get.
- * @param _domain The domain of the uninterpreted function of the uninterpreted function to get.
- * @param _codomain The codomain of the uninterpreted function of the uninterpreted function to get.
- * @return The resulting uninterpreted function.
- */
 inline UninterpretedFunction newUninterpretedFunction(std::string _name, std::vector<Sort> _domain, Sort _codomain) {
     return UFManager::getInstance().newUninterpretedFunction(std::move(_name), std::move(_domain), _codomain);
 }
