@@ -70,7 +70,7 @@ namespace carl
 			unsigned mask = unsigned(1);
 			mask <<= (pos & unsigned(31));
 			if(vecElem >=  mBits.size()) {
-				mBits.resize(vecElem + 1, 0);
+				mBits.resize(std::size_t(vecElem) + 1, 0);
 			} 
 			if(!val) {
 				mask = ~mask;

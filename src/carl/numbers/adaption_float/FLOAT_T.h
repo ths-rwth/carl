@@ -1530,29 +1530,29 @@ namespace carl
 	}
 
 	template<>
-	inline FLOAT_T<double> rationalize<FLOAT_T<double>>(double _in)
+	inline FLOAT_T<double> rationalize<FLOAT_T<double>>(double n)
 	{
-		return FLOAT_T<double>(_in);
+		return FLOAT_T<double>(n);
 	}
 
 	template<>
-	inline FLOAT_T<float> rationalize<FLOAT_T<float>>(float _in)
+	inline FLOAT_T<float> rationalize<FLOAT_T<float>>(float n)
 	{
-		return FLOAT_T<float>(_in);
+		return FLOAT_T<float>(n);
 	}
 
 	template<>
-	inline FLOAT_T<mpq_class> rationalize<FLOAT_T<mpq_class>>(double _in)
+	inline FLOAT_T<mpq_class> rationalize<FLOAT_T<mpq_class>>(double n)
 	{
-		return FLOAT_T<mpq_class>(carl::rationalize<mpq_class>(_in));
+		return FLOAT_T<mpq_class>(carl::rationalize<mpq_class>(n));
 	}
 
 	#ifdef USE_CLN_NUMBERS
 
 	template<>
-	inline FLOAT_T<cln::cl_RA> rationalize<FLOAT_T<cln::cl_RA>>(double _in)
+	inline FLOAT_T<cln::cl_RA> rationalize<FLOAT_T<cln::cl_RA>>(double n)
 	{
-		return FLOAT_T<cln::cl_RA>(carl::rationalize<cln::cl_RA>(_in));
+		return FLOAT_T<cln::cl_RA>(carl::rationalize<cln::cl_RA>(n));
 	}
 
 	/**

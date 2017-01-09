@@ -52,10 +52,10 @@ class UFContent
          * @param _domain The domain of the uninterpreted function to construct.
          * @param _codomain The codomain of the uninterpreted function to construct.
          */
-        explicit UFContent(std::string&& _name, std::vector<Sort>&& _domain, Sort&& _codomain):
+        explicit UFContent(std::string&& _name, std::vector<Sort>&& _domain, Sort _codomain):
             mName(std::move(_name)),
             mDomain(std::move(_domain)),
-            mCodomain(std::move(_codomain))
+            mCodomain(_codomain)
         {}
     public:
         
@@ -249,9 +249,9 @@ class UFManager : public Singleton<UFManager>
          * @param _codomain The codomain of the uninterpreted function of the uninterpreted function to get.
          * @return The resulting uninterpreted function.
          */
-        UninterpretedFunction newUninterpretedFunction(std::string&& _name, std::vector<Sort>&& _domain, Sort&& _codomain)
+        UninterpretedFunction newUninterpretedFunction(std::string&& _name, std::vector<Sort>&& _domain, Sort _codomain)
         {
-            auto result = new UFContent(std::move(_name), std::move(_domain), std::move(_codomain));
+            auto result = new UFContent(std::move(_name), std::move(_domain), _codomain);
             return newUF(result);
         }
 };
@@ -263,8 +263,8 @@ class UFManager : public Singleton<UFManager>
  * @param _codomain The codomain of the uninterpreted function of the uninterpreted function to get.
  * @return The resulting uninterpreted function.
  */
-inline UninterpretedFunction newUninterpretedFunction(std::string&& _name, std::vector<Sort>&& _domain, Sort&& _codomain) {
-    return UFManager::getInstance().newUninterpretedFunction(std::move(_name), std::move(_domain), std::move(_codomain));
+inline UninterpretedFunction newUninterpretedFunction(std::string&& _name, std::vector<Sort>&& _domain, Sort _codomain) {
+    return UFManager::getInstance().newUninterpretedFunction(std::move(_name), std::move(_domain), _codomain);
 }
 
 /**
@@ -275,7 +275,7 @@ inline UninterpretedFunction newUninterpretedFunction(std::string&& _name, std::
  * @return The resulting uninterpreted function.
  */
 inline UninterpretedFunction newUninterpretedFunction(std::string _name, std::vector<Sort> _domain, Sort _codomain) {
-    return UFManager::getInstance().newUninterpretedFunction(std::move(_name), std::move(_domain), std::move(_codomain));
+    return UFManager::getInstance().newUninterpretedFunction(std::move(_name), std::move(_domain), _codomain);
 }
 
 }

@@ -9,7 +9,7 @@
 #pragma once
 
 #include <iostream>
-
+#include <type_traits>
 #include <utility>
 
 namespace carl
@@ -82,6 +82,7 @@ class Sort
          */
         bool operator<( const Sort& _sort ) const;
 };
+static_assert(std::is_trivially_copyable<Sort>::value, "Sort should be trivially copyable.");
 
 } // end namespace carl
 

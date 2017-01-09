@@ -18,7 +18,7 @@
 
 namespace carl
 {
-    typedef long int ContentType;
+    using ContentType = long int;
     const ContentType HIGHTEST_INTEGER_VALUE = (std::numeric_limits<ContentType>::max() >> ((std::numeric_limits<ContentType>::digits/2)+1))+1;
     
     template<typename T>
@@ -237,7 +237,7 @@ namespace carl
     
     template<typename T>
     struct IntegralType<Numeric<T>> {
-        typedef typename carl::IntegralType<T>::type type;
+        using type = typename carl::IntegralType<T>::type;
     };
     
     template<typename Integer, typename T>
