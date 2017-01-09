@@ -199,13 +199,13 @@ template<typename T>
 inline T rationalize(const PreventConversion<mpq_class>&);
 
 template<>
-inline mpq_class rationalize<mpq_class>(float f) {
-	return mpq_class(f);
+inline mpq_class rationalize<mpq_class>(float n) {
+	return mpq_class(n);
 }
 
 template<>
-inline mpq_class rationalize<mpq_class>(double d) {
-	return mpq_class(d);
+inline mpq_class rationalize<mpq_class>(double n) {
+	return mpq_class(n);
 }
 
 template<>
@@ -232,7 +232,7 @@ inline mpq_class rationalize<mpq_class>(sint n) {
 }
 
 template<>
-mpq_class rationalize<mpq_class>(const std::string& inputstring);
+mpq_class rationalize<mpq_class>(const std::string& n);
 
 template<>
 inline mpq_class rationalize<mpq_class>(const PreventConversion<mpq_class>& n) {
@@ -376,13 +376,13 @@ inline mpz_class pow(const mpz_class& basis, std::size_t exp) {
 }
 
 template<>
-inline mpq_class pow(const mpq_class& b, std::size_t e) {
-	mpz_class den = b.get_den();
+inline mpq_class pow(const mpq_class& basis, std::size_t exp) {
+	mpz_class den = basis.get_den();
 	mpz_class powDen;
-	mpz_pow_ui(powDen.get_mpz_t(), den.get_mpz_t(), e);
-	mpz_class num = b.get_num();
+	mpz_pow_ui(powDen.get_mpz_t(), den.get_mpz_t(), exp);
+	mpz_class num = basis.get_num();
 	mpz_class powNum;
-	mpz_pow_ui(powNum.get_mpz_t(), num.get_mpz_t(), e);
+	mpz_pow_ui(powNum.get_mpz_t(), num.get_mpz_t(), exp);
 	mpq_class resNum;
 	mpq_set_z(resNum.get_mpq_t(), powNum.get_mpz_t());
 	mpq_class resDen;
