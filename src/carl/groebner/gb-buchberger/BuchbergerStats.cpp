@@ -30,11 +30,11 @@
 
 namespace carl
 {
-BuchbergerStats* BuchbergerStats::instance = 0;
+BuchbergerStats* BuchbergerStats::instance = nullptr;
 
 BuchbergerStats* BuchbergerStats::getInstance( )
 {
-    if( instance == 0 )
+    if( instance == nullptr )
         instance = new BuchbergerStats( );
     return instance;
 }

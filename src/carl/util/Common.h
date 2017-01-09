@@ -12,10 +12,10 @@
 #include "../numbers/numbers.h"
 #include "pointerOperations.h"
 
+#include <cstring>
 #include <map>
 #include <memory>
 #include <set>
-#include <string.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>

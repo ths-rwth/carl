@@ -51,7 +51,7 @@ template<typename T, typename U =
 		>::type
 	>::type
 > struct remove_all : remove_all<U> {};
-template<typename T> struct remove_all<T, T> { typedef T type; };
+template<typename T> struct remove_all<T, T> { using type = T; };
 
 /**
  * This template is designed to provide types that are related to other types.

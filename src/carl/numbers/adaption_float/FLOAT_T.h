@@ -28,7 +28,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 
 namespace carl
 {
-	typedef std::size_t precision_t;
+	using precision_t = std::size_t;
 
 	template<typename Number>
     class Interval;
@@ -205,7 +205,7 @@ namespace carl
 		 * Destructor. Note that for some specializations memory management has to
 		 * be included here.
 		 */
-		~FLOAT_T() { }
+		~FLOAT_T() = default;
 
 		/**
 		 * Getter for the raw value contained.

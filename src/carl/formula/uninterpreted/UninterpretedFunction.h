@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../Sort.h"
 #include "../../util/hash.h"
+#include "../Sort.h"
 
 #include <iostream>
 #include <utility>
@@ -24,7 +24,7 @@ namespace carl
 		public:
 			friend class UFManager;
 			/// A unique id to identify this uninterpreted function in it's manager.
-			typedef std::size_t IDType;
+			using IDType = std::size_t;
 		
 		private:
 		

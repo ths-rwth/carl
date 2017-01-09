@@ -204,7 +204,7 @@ inline cln::cl_RA rationalize<cln::cl_RA>(sint n) {
 }
 
 template<>
-cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring);
+cln::cl_RA rationalize<cln::cl_RA>(const std::string& n);
 
 /**
  * Get absolute value of an integer.
@@ -360,8 +360,8 @@ inline cln::cl_RA lcm(const cln::cl_RA& a, const cln::cl_RA& b) {
  * @return \f$n^e\f$
  */
 template<>
-inline cln::cl_RA pow(const cln::cl_RA& n, std::size_t e) {
-	return cln::expt(n, int(e));
+inline cln::cl_RA pow(const cln::cl_RA& basis, std::size_t exp) {
+	return cln::expt(basis, int(exp));
 }
 
 inline cln::cl_RA log(const cln::cl_RA& n) {

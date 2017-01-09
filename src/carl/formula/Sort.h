@@ -22,7 +22,7 @@ class Sort
 {
     public:
         /// The type if the unique id to identify a sort in the sort manager.
-        typedef std::size_t IDType;
+        using IDType = std::size_t;
     
         friend class SortManager;
 
