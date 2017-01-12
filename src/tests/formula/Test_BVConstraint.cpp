@@ -17,6 +17,7 @@ TEST(BVConstraint, Construction)
     Variable a = freshBitvectorVariable("a");
     Variable b = freshBitvectorVariable("b");
 
+	carl::SortManager::getInstance().clear();
     Sort bvSort = SortManager::getInstance().addSort("BitVec");
     SortManager::getInstance().makeSortIndexable(bvSort, 1, VariableType::VT_BITVECTOR);
     Sort bv16Sort = SortManager::getInstance().index(bvSort, {16});
