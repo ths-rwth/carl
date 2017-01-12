@@ -39,7 +39,7 @@ namespace carl
 			{
 			}
 
-			explicit UVariable(Variable::Arg var):
+			explicit UVariable(Variable var):
                 mVar(var),
 				mDomain(SortManager::getInstance().getInterpreted(var.getType()))
             {
@@ -50,9 +50,9 @@ namespace carl
              * @param _var The variable of the uninterpreted variable to construct.
              * @param _domain The domain of the uninterpreted variable to construct.
              */
-            UVariable( Variable::Arg _var, Sort _domain ):
-                mVar( _var ),
-                mDomain( _domain )
+            UVariable(Variable _var, Sort _domain):
+                mVar(_var),
+                mDomain(_domain)
             {}
             
             /**

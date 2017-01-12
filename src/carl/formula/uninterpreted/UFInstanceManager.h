@@ -190,7 +190,7 @@ class UFInstanceManager : public Singleton<UFInstanceManager>
          * @param _sc The uninterpreted function instance's content to store.
          * @return The uninterpreted function instance corresponding to the given content.
          */
-        UFInstance newUFInstance( const UFInstanceContent* _sc );
+        UFInstance newUFInstance( const UFInstanceContent* _ufic );
 
     public:
         
@@ -234,7 +234,7 @@ class UFInstanceManager : public Singleton<UFInstanceManager>
          */
         UFInstance newUFInstance( const UninterpretedFunction& _uf, std::vector<UVariable>&& _args )
         {
-            UFInstanceContent* result = new UFInstanceContent( _uf, std::move( _args ) );
+            auto result = new UFInstanceContent( _uf, std::move( _args ) );
             assert( argsCorrect( *result ) );
             return newUFInstance( result );
         }
@@ -247,7 +247,7 @@ class UFInstanceManager : public Singleton<UFInstanceManager>
          */
         UFInstance newUFInstance( const UninterpretedFunction& _uf, const std::vector<UVariable>& _args )
         {
-            UFInstanceContent* result = new UFInstanceContent( _uf, _args );
+            auto result = new UFInstanceContent( _uf, _args );
             assert( argsCorrect( *result ) );
             return newUFInstance( result );
         }

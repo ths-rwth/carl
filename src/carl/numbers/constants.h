@@ -10,7 +10,6 @@
 static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
-// TODO: Why is this not declared in the namespace carl?
 #define constant_zero_declaration_type(type, zero_decl) \
 template<> \
 	struct constant_zero<type> { \
