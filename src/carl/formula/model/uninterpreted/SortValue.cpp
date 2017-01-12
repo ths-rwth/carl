@@ -10,13 +10,13 @@
 
 namespace carl
 {   
-    bool SortValue::operator==( const SortValue& _sortValue ) const
+    bool SortValue::operator==( const SortValue& _sortValue ) const noexcept
     {
         assert( mSort == _sortValue.sort() );
         return mId == _sortValue.id();
     }
 
-    bool SortValue::operator<( const SortValue& _sortValue ) const
+    bool SortValue::operator<( const SortValue& _sortValue ) const noexcept
     {
         assert( mSort == _sortValue.sort() );
         return mId < _sortValue.id();

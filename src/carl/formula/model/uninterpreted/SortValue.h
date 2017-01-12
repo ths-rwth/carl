@@ -22,9 +22,6 @@ namespace carl
 class SortValue
 {
     public:
-        /// The type if the unique id to identify a sort in the sort manager.
-        using IDType = std::size_t;
-    
         friend class SortValueManager;
 
     private:
@@ -33,37 +30,37 @@ class SortValue
         /// The sort defining the domain in which this value is.
         carl::Sort mSort;
         /// A unique id to identify this sort in the sort value manager.
-        IDType mId;
+        std::size_t mId;
         
         /**
          * Constructs a sort value.
          * @param _id The id of the sort value to construct.
          */
-        explicit SortValue(Sort _sort, IDType _id):
+        explicit SortValue(Sort _sort, std::size_t _id):
             mSort(std::move(_sort)),
-            mId( _id )
+            mId(_id)
         {}
 
     public:
 
-        SortValue():
+        SortValue() noexcept:
             mSort(),
-            mId( 0 )
+            mId(0)
         {}
         
         /**
          * Constructs a sort value by copying the given sort value.
          * @param _sortValue The sort value to copy.
          */
-        SortValue( const SortValue& _sortValue ):
-            mSort( _sortValue.sort() ),
-            mId( _sortValue.id() )
+        SortValue(const SortValue& _sortValue) noexcept:
+            mSort(_sortValue.sort()),
+            mId(_sortValue.id())
         {}
 
         /**
          * @return The sort of this value.
          */
-        const carl::Sort& sort() const
+        const carl::Sort& sort() const noexcept
         {
             return mSort;
         }
@@ -71,7 +68,7 @@ class SortValue
         /**
          * @return The id of this sort value.
          */
-        IDType id() const
+        std::size_t id() const noexcept
         {
             return mId;
         }
@@ -88,13 +85,13 @@ class SortValue
          * @param _sortValue The sort value to compare with.
          * @return true, if this sort value equals the given one.
          */
-        bool operator==( const SortValue& _sortValue ) const;
+        bool operator==( const SortValue& _sortValue ) const noexcept;
 
         /**
          * @param _sortValue The sort value to compare with.
          * @return true, if this sort value is less than the given one.
          */
-        bool operator<( const SortValue& _sortValue ) const;
+        bool operator<( const SortValue& _sortValue ) const noexcept;
 };
 
 }

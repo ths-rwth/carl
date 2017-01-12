@@ -32,7 +32,7 @@ class SortValueManager : public Singleton<SortValueManager>
         // Members.
 
         /// Stores for each sort the latest instantiated sort value.
-        carl::FastMap<Sort, SortValue::IDType> mSortValueIDMap;
+        carl::FastMap<Sort, std::size_t> mSortValueIDMap;
 
         /**
          * Constructs a sort value manager.
@@ -48,13 +48,13 @@ class SortValueManager : public Singleton<SortValueManager>
      * @param _sort The sort to create a new value for.
      * @return The resulting sort value.
      */
-    SortValue newSortValue( const Sort& _sort );
+    SortValue newSortValue(const Sort& _sort);
 	/**
 	 * Returns the default value for the given sort.
 	 * @param _sort The sort to return the default value for.
 	 * @return The resulting sort value.
 	 */
-	SortValue defaultSortValue( const Sort& _sort );
+	SortValue defaultSortValue(const Sort& _sort);
 };
 
 /**
@@ -62,13 +62,16 @@ class SortValueManager : public Singleton<SortValueManager>
  * @param _sort The sort to create a new value for.
  * @return The resulting sort value.
  */
-inline SortValue newSortValue( const Sort& _sort )
-{
-    return SortValueManager::getInstance().newSortValue( _sort );
+inline SortValue newSortValue(const Sort& _sort) {
+    return SortValueManager::getInstance().newSortValue(_sort);
 }
-inline SortValue defaultSortValue( const Sort& _sort )
-{
-    return SortValueManager::getInstance().defaultSortValue( _sort );
+/**
+ * Returns the default value for the given sort.
+ * @param _sort The sort to return the default value for.
+ * @return The resulting sort value.
+ */
+inline SortValue defaultSortValue(const Sort& _sort) {
+    return SortValueManager::getInstance().defaultSortValue(_sort);
 }
 
 }

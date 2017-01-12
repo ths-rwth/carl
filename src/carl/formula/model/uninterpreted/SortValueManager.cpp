@@ -9,17 +9,14 @@
 
 namespace carl {
 
-    SortValue SortValueManager::newSortValue( const carl::Sort& _sort )
-    {
-        auto res = mSortValueIDMap.emplace( _sort, SortValue::IDType( 1 ) );
-        if( !res.second )
-        {
+    SortValue SortValueManager::newSortValue(const carl::Sort& _sort) {
+        auto res = mSortValueIDMap.emplace(_sort, 1);
+        if (!res.second) {
             ++res.first->second;
         }
-        return SortValue( _sort, res.first->second );
+        return SortValue(_sort, res.first->second);
     }
-	SortValue SortValueManager::defaultSortValue( const Sort& _sort )
-	{
-		return SortValue( _sort, 0 );
+	SortValue SortValueManager::defaultSortValue(const Sort& _sort) {
+		return SortValue(_sort, 0);
 	}
 }
