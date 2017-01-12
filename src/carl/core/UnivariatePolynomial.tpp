@@ -148,7 +148,7 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 
 template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
-void UnivariatePolynomial<Coeff>::substituteIn(Variable::Arg var, const Coeff& value) {
+void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value) {
 	if (this->isZero()) return;
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
@@ -160,7 +160,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(Variable::Arg var, const Coeff& v
 
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
-void UnivariatePolynomial<Coeff>::substituteIn(Variable::Arg var, const Coeff& value) {
+void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value) {
 	if (this->isZero()) return;
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
@@ -183,7 +183,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(Variable::Arg var, const Coeff& v
 
 template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable::Arg var, const Coeff& value) const {
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable var, const Coeff& value) const {
 	if (var == this->mainVar()) {
 		return UnivariatePolynomial<Coeff>(this->mainVar(), this->evaluate(value));
 	}
@@ -192,7 +192,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable::Ar
 
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable::Arg var, const Coeff& value) const {
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable var, const Coeff& value) const {
 	if (var == this->mainVar()) {
 		UnivariatePolynomial<Coeff> res(this->mainVar());
 		for (const auto& c: mCoefficients) {
@@ -505,7 +505,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 	assert(!b.isZero());
 	
 	CARL_LOG_DEBUG("carl.core", "UnivEEA: a=" << a << ", b=" << b );
-	Variable::Arg x = a.mMainVar;
+	Variable x = a.mMainVar;
 	UnivariatePolynomial<Coeff> c(a);
 	UnivariatePolynomial<Coeff> d(b);
 	c.normalizeCoefficients();
@@ -1963,7 +1963,7 @@ UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& r
 
 template<typename Coefficient>
 template<typename C, EnableIf<is_number<C>>>
-UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(Variable::Arg rhs) {
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(Variable rhs) {
 	if (rhs == this->mMainVar) {
 		this->mCoefficients.insert(this->mCoefficients.begin(), Coefficient(0));
 		return *this;
@@ -1973,7 +1973,7 @@ UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=
 }
 template<typename Coefficient>
 template<typename C, DisableIf<is_number<C>>>
-UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(Variable::Arg rhs) {
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(Variable rhs) {
 	if (rhs == this->mMainVar) {
 		this->mCoefficients.insert(this->mCoefficients.begin(), Coefficient(0));
 		return *this;
@@ -2060,11 +2060,11 @@ UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const Univ
 }
 
 template<typename C>
-UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, Variable::Arg rhs) {
+UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, Variable rhs) {
 	return std::move(UnivariatePolynomial<C>(lhs) *= rhs);
 }
 template<typename C>
-UnivariatePolynomial<C> operator*(Variable::Arg lhs, const UnivariatePolynomial<C>& rhs) {
+UnivariatePolynomial<C> operator*(Variable lhs, const UnivariatePolynomial<C>& rhs) {
 	return std::move(UnivariatePolynomial<C>(rhs) *= lhs);
 }
 

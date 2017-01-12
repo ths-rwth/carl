@@ -84,7 +84,7 @@ private:
 	 * In order to keep a variable object small, this is the only data member.
 	 * All other data (like names or alike) are stored in the VariablePool.
 	 */
-	std::size_t mContent;
+	std::size_t mContent = 0;
 
 public:
 	
@@ -92,7 +92,7 @@ public:
 	 * Default constructor, constructing a variable, which is considered as not an actual variable.
 	 * Such an invalid variable is stored in NO_VARIABLE, so use this if you need a default value for a variable.
 	 */
-	explicit Variable() noexcept : mContent(0) {} 
+	Variable() = default;
 	
 	/**
 	 * Although we recommend access through the VariablePool, we allow public construction of variables for local purposes.
@@ -113,7 +113,7 @@ public:
 	 * Retrieves the id of the variable.
 	 * @return Variable id.
 	 */
-	std::size_t getId() const noexcept {
+	constexpr std::size_t getId() const noexcept {
 		return (mContent >> RESERVED_FOR_TYPE) % (std::size_t(1) << AVAILABLE);
 	}
 	
@@ -121,7 +121,7 @@ public:
 	 * Retrieves the type of the variable.
 	 * @return Variable type.
 	 */
-	VariableType getType() const noexcept {
+	constexpr VariableType getType() const noexcept {
 		return VariableType(mContent % (std::size_t(1) << RESERVED_FOR_TYPE));
 	}
 	
@@ -135,7 +135,7 @@ public:
 	 * Retrieves the rank of the variable.
 	 * @return Variable rank.
 	 */
-	std::size_t getRank() const noexcept {
+	constexpr std::size_t getRank() const noexcept {
 		return mContent >> (AVAILABLE + RESERVED_FOR_TYPE);
 	}
 	
@@ -202,6 +202,7 @@ public:
 	static const Variable NO_VARIABLE;
 };
 static_assert(std::is_trivially_copyable<Variable>::value, "Variable should be trivially copyable.");
+static_assert(std::is_literal_type<Variable>::value, "Variable should be a literal type.");
 
 } // namespace carl
 
