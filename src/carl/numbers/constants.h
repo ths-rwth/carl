@@ -41,7 +41,7 @@ namespace carl
 	struct constant_zero {
 		static const T& get() 
 		{
-			static T t(0);
+			static T t(0); // NOLINT
 			return t;
 		}
 	};
@@ -50,7 +50,7 @@ namespace carl
 	struct constant_one {
 		static const T& get() 
 		{
-			static T t(1);
+			static T t(1); // NOLINT
 			return t;
 		}
 	};

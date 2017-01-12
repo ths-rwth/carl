@@ -12,10 +12,6 @@
 //#define NDEBUG
 #define CONSTRAINT_WITH_FACTORIZATION
 
-#include <iostream>
-#include <cstring>
-#include <sstream>
-#include <assert.h>
 #include "../core/Relation.h"
 #include "../config.h"
 #include "../core/VariableInformation.h"
@@ -26,6 +22,11 @@
 #include "../core/VariableInformation.h"
 #include "../core/VariablesInformation.h"
 #include "config.h"
+
+#include <cassert>
+#include <cstring>
+#include <iostream>
+#include <sstream>
 
 
 namespace carl

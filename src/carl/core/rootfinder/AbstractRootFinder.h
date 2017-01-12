@@ -80,8 +80,7 @@ public:
 		bool tryTrivialSolver = true
 	);
 	
-	virtual ~AbstractRootFinder() {
-	}
+	virtual ~AbstractRootFinder() = default;
 	
 	/**
 	 * Returns the polynomial that is currently processed.

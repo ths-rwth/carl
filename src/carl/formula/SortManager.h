@@ -118,7 +118,7 @@ class SortManager : public Singleton<SortManager>
 		};
 		
 		/// The type of a sort template, define by define-sort.
-		typedef std::pair<std::vector<std::string>, Sort> SortTemplate;
+		using SortTemplate = std::pair<std::vector<std::string>, Sort>;
 		
 	private:
 		// Members.

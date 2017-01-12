@@ -55,21 +55,6 @@ Monomial::Arg gcd(const Monomial::Arg& a, const MultivariatePolynomial<C,O,P>& b
 	return gcd(b, a);
 }
 
-
-/**
- * The result of a gcd calculation, as with the extended gcd.
- * @ingroup gcd
- */	
-template<typename Coeff, typename Ordering, typename Policies>
-struct GCDResult
-{
-	typedef MultivariatePolynomial<Coeff,Ordering,Policies> Polynomial;
-
-	Polynomial AdivG;
-	Polynomial BdivG;
-	Polynomial gcd;
-};
-	
 /**
  * A general object for gcd calculation of multivariate gcds.
  * @ingroup gcd
@@ -83,7 +68,6 @@ class MultivariateGCD : GCDCalculation
     friend MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
     
     private:
-	typedef GCDResult<Coeff,Ordering,Policies> Result;
 	typedef MultivariatePolynomial<Coeff,Ordering,Policies> Polynomial;
 	typedef UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policies>> UnivReprPol;
 	typedef UnivariatePolynomial<Coeff> UnivPol;

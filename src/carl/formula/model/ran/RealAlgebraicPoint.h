@@ -31,7 +31,7 @@ public:
 	/**
 	 * Creates an empty Point of dimension 0.
 	 */
-	RealAlgebraicPoint():
+	RealAlgebraicPoint() noexcept:
 		numbers()
 	{}
 
@@ -39,7 +39,7 @@ public:
 	 * Creates a real algebraic point with the specified components.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(const std::vector<RealAlgebraicNumber<Number>>& v):
+	explicit RealAlgebraicPoint(const std::vector<RealAlgebraicNumber<Number>>& v):
 		numbers(v)
 	{}
 
@@ -47,7 +47,7 @@ public:
 	 * Creates a real algebraic point with the specified components.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(std::vector<RealAlgebraicNumber<Number>>&& v):
+	explicit RealAlgebraicPoint(std::vector<RealAlgebraicNumber<Number>>&& v):
 		numbers(std::move(v))
 	{}
 
@@ -55,7 +55,7 @@ public:
 	 * Creates a real algebraic point with the specified components from a list.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(const std::list<RealAlgebraicNumber<Number>>& v):
+	explicit RealAlgebraicPoint(const std::list<RealAlgebraicNumber<Number>>& v):
 		numbers(v.begin(), v.end())
 	{}
 
@@ -63,7 +63,7 @@ public:
 	 * Creates a real algebraic point with the specified components from a list.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumber<Number>>& v):
+	explicit RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumber<Number>>& v):
 		numbers(v.begin(), v.end())
 	{}
 

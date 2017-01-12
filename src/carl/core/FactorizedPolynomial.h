@@ -26,25 +26,25 @@ namespace carl
         friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, bool& _pfPairARefined, bool& _pfPairBRefined );
         
         /// The ordering of the terms.
-        typedef typename P::OrderedBy OrderedBy;
+        using OrderedBy = typename P::OrderedBy;
         /// Type of the coefficients.
-        typedef typename P::CoeffType CoeffType;
+        using CoeffType = typename P::CoeffType;
         /// Type of the terms.
-        typedef typename P::TermType TermType;
+        using TermType = typename P::TermType;
         /// Type of the monomials within the terms.
-        typedef typename P::MonomType MonomType;
+        using MonomType = typename P::MonomType;
         /// Policies for this monomial.
-        typedef typename P::Policy Policy;
+        using Policy = typename P::Policy;
         /// Number type within the coefficients.
-        typedef typename UnderlyingNumberType<CoeffType>::type NumberType;
+        using NumberType = typename UnderlyingNumberType<CoeffType>::type;
         /// Integer type associated with the number type.
-        typedef typename IntegralType<NumberType>::type IntNumberType;
+        using IntNumberType = typename IntegralType<NumberType>::type;
         ///
-        typedef P PolyType;
+        using PolyType = P;
         ///
-        typedef typename P::TermsType TermsType;
+        using TermsType = typename P::TermsType;
         ///
-        typedef Cache<PolynomialFactorizationPair<P>> CACHE;
+        using CACHE = Cache<PolynomialFactorizationPair<P>>;
     
         enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
 

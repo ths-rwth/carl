@@ -9,14 +9,14 @@
 
 #include <list>
 #include <mutex>
-#include <unordered_map>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
 
 #include "../config.h"
-#include "pointerOperations.h"
 #include "../core/Term.h"
 #include "../io/streamingOperators.h"
+#include "pointerOperations.h"
 
 namespace carl
 {
@@ -24,20 +24,20 @@ namespace carl
 template<typename Polynomial, typename Ordering>
 class TermAdditionManager {
 public:
-	typedef unsigned IDType;
-	typedef typename Polynomial::CoeffType Coeff;
-	typedef Term<Coeff> TermType;
-	typedef TermType TermPtr;
-	typedef std::vector<IDType> TermIDs;
-	typedef std::vector<TermPtr> Terms;
+	using IDType = unsigned;
+	using Coeff = typename Polynomial::CoeffType;
+	using TermType = Term<Coeff>;
+	using TermPtr = TermType;
+	using TermIDs = std::vector<IDType>;
+	using Terms = std::vector<TermPtr>;
 	/* 0: Maps global IDs to local IDs.
 	 * 1: Actual terms by local IDs.
 	 * 2: Flag if this entry is currently used.
 	 * 3: Constant part.
 	 * 4: Next free local ID.
 	 */
-	typedef std::tuple<TermIDs,Terms,bool,Coeff,IDType> Tuple;
-	typedef typename std::list<Tuple>::iterator TAMId;
+	using Tuple = std::tuple<TermIDs,Terms,bool,Coeff,IDType>;
+	using TAMId = typename std::list<Tuple>::iterator;
 private:
 	std::list<Tuple> mData;
 	TAMId mNextId;

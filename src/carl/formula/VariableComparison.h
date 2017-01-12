@@ -40,8 +40,8 @@ namespace carl {
 			}
 		};
 	public:	
-		VariableComparison(Variable::Arg v, const boost::variant<MR, RAN>& value, Relation rel, bool neg): mVar(v), mValue(value), mRelation(rel), mNegated(neg) {}
-		VariableComparison(Variable::Arg v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {
+		VariableComparison(Variable v, const boost::variant<MR, RAN>& value, Relation rel, bool neg): mVar(v), mValue(value), mRelation(rel), mNegated(neg) {}
+		VariableComparison(Variable v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {
 			if (value.isUnivariate()) {
 				auto res = value.evaluate({});
 				if (res) {
@@ -50,7 +50,7 @@ namespace carl {
 				}
 			}
 		}
-		VariableComparison(Variable::Arg v, const RAN& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {}
+		VariableComparison(Variable v, const RAN& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {}
 		
 		Variable var() const {
 			return mVar;

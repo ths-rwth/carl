@@ -41,17 +41,17 @@ namespace carl
              * Constructs a square root expression from a polynomial p leading to (p + 0 * sqrt( 0 )) / 1
              * @param _poly The polynomial to construct a square root expression for.
              */
-            SqrtEx( Poly&& _poly );
-            SqrtEx( const Poly& _poly ) : 
+            explicit SqrtEx( Poly&& _poly );
+            explicit SqrtEx( const Poly& _poly ) : 
                 SqrtEx::SqrtEx( Poly( _poly ) )
             {}
             
-            SqrtEx( Variable::Arg _var ) : 
+            explicit SqrtEx( Variable::Arg _var ) : 
                 SqrtEx( makePolynomial<Poly>( _var ) )
             {}
             
             template<typename P = Poly, typename = typename std::enable_if<needs_cache<P>::value>::type>
-            SqrtEx( typename P::PolyType&& _poly ) : SqrtEx( std::move( makePolynomial<P>( std::move(_poly) ) ) )
+            explicit SqrtEx( typename P::PolyType&& _poly ) : SqrtEx( std::move( makePolynomial<P>( std::move(_poly) ) ) )
             {}
             
             /**

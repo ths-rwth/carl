@@ -250,8 +250,7 @@ public:
 	/**
 	 * Desctructor.
 	 */
-	virtual ~IncrementalRootFinder() {
-	}
+	virtual ~IncrementalRootFinder() = default;
 
 	const UnivariatePolynomial<Number>& getPolynomial() const {
 		return this->polynomial;

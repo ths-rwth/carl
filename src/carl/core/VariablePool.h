@@ -139,7 +139,7 @@ public:
      * @param prefix Prefix for anonymous variable names.
      */
 	void setPrefix(const std::string& prefix = "_") {
-		this->mVariablePrefix = prefix;
+		mVariablePrefix = prefix;
 	}
    
 	/**

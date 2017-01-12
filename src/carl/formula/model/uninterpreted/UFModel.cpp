@@ -76,32 +76,32 @@ namespace carl
         return iterA == end() && iterB != _ufm.end();
     }
     
-    std::ostream& operator<<( std::ostream& _out, const UFModel& _ufm )
+    std::ostream& operator<<( std::ostream& _os, const UFModel& _ufm )
     {   
 		assert(!_ufm.empty());
-        _out << "(define-fun " << _ufm.uf.name() << " (";
+        _os << "(define-fun " << _ufm.uf.name() << " (";
 		// Print function signature
 		std::size_t id = 1;
 		for (const auto& arg: _ufm.uf.domain()) {
-			if (id > 1) _out << " ";
-			_out << "(x!" << id << " " << arg << ")";
+			if (id > 1) _os << " ";
+			_os << "(x!" << id << " " << arg << ")";
 			id++;
 		}
-		_out << ") " << _ufm.uf.codomain() << " ";
+		_os << ") " << _ufm.uf.codomain() << " ";
 		// Print implementation
 		for (const auto& instance: _ufm) {
-			_out << "(ite (and ";
+			_os << "(ite (and ";
 			std::size_t id = 1;
 			for (const auto& param: instance.first) {
-				if (id > 0) _out << " ";
-				_out << "(= x!" << id << " " << param << ")";
+				if (id > 0) _os << " ";
+				_os << "(= x!" << id << " " << param << ")";
 				id++;
 			}
-			_out << ") " << instance.second << " ";
+			_os << ") " << instance.second << " ";
 		}
-		_out << _ufm.begin()->second;
-		for (std::size_t i = 0; i < _ufm.size(); i++) _out << ")";
-		_out << ")";
-		return _out;
+		_os << _ufm.begin()->second;
+		for (std::size_t i = 0; i < _ufm.size(); i++) _os << ")";
+		_os << ")";
+		return _os;
     }
 }

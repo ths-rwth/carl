@@ -76,15 +76,15 @@ public:
 	/**
 	 * The number type that is ultimately used for the coefficients.
 	 */
-	typedef typename UnderlyingNumberType<Coefficient>::type NumberType;
+	using NumberType = typename UnderlyingNumberType<Coefficient>::type;
 	/**
 	 * The integral type that belongs to the number type.
 	 */
-	typedef typename IntegralType<NumberType>::type IntNumberType;
+	using IntNumberType = typename IntegralType<NumberType>::type;
 	
-	typedef void CACHE;
-	typedef Coefficient CoeffType;
-	typedef UnivariatePolynomial<Coefficient> PolyType;
+	using CACHE = void;
+	using CoeffType = Coefficient;
+	using PolyType = UnivariatePolynomial<Coefficient>;
 
 	// Rule of five
 	/**
@@ -112,21 +112,21 @@ public:
 	 * Construct a zero polynomial with the given main variable.
 	 * @param mainVar New main variable.
 	 */
-	explicit UnivariatePolynomial(Variable::Arg mainVar);
+	explicit UnivariatePolynomial(Variable mainVar);
 	/**
 	 * Construct \f$ coeff \cdot mainVar^{degree} \f$.
 	 * @param mainVar New main variable.
 	 * @param coeff Leading coefficient.
 	 * @param degree Degree.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, std::size_t degree = 0);
+	UnivariatePolynomial(Variable mainVar, const Coefficient& coeff, std::size_t degree = 0);
 
 	/**
 	 * Construct polynomial with the given coefficients.
 	 * @param mainVar New main variable.
 	 * @param coefficients List of coefficients.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
+	UnivariatePolynomial(Variable mainVar, std::initializer_list<Coefficient> coefficients);
 
 	/**
 	 * Construct polynomial with the given coefficients from the underlying number type of the coefficient type.
@@ -134,26 +134,26 @@ public:
 	 * @param coefficients List of coefficients.
 	 */
 	template<typename C = Coefficient, DisableIf<std::is_same<C, typename UnderlyingNumberType<C>::type>> = dummy>
-	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<typename UnderlyingNumberType<C>::type> coefficients);
+	UnivariatePolynomial(Variable mainVar, std::initializer_list<typename UnderlyingNumberType<C>::type> coefficients);
 
 	/**
 	 * Construct polynomial with the given coefficients.
 	 * @param mainVar New main variable.
 	 * @param coefficients Vector of coefficients.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
+	UnivariatePolynomial(Variable mainVar, const std::vector<Coefficient>& coefficients);
 	/**
 	 * Construct polynomial with the given coefficients, moving the coefficients.
 	 * @param mainVar New main variable.
 	 * @param coefficients Vector of coefficients.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
+	UnivariatePolynomial(Variable mainVar, std::vector<Coefficient>&& coefficients);
 	/**
 	 * Construct polynomial with the given coefficients.
 	 * @param mainVar New main variable.
 	 * @param coefficients Assignment of degree to coefficients.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, const std::map<uint, Coefficient>& coefficients);
+	UnivariatePolynomial(Variable mainVar, const std::map<uint, Coefficient>& coefficients);
 
 	/**
 	 * Destructor.
@@ -167,7 +167,7 @@ public:
 	 * @see Polynomial#isUnivariateRepresented
 	 * @return true.
 	 */
-	virtual bool isUnivariateRepresented() const override
+	bool isUnivariateRepresented() const override
 	{
 		return true;
 	}
@@ -177,7 +177,7 @@ public:
 	 * @see Polynomial#isMultivariateRepresented
 	 * @return false.
 	 */
-	virtual bool isMultivariateRepresented() const override
+	bool isMultivariateRepresented() const override
 	{
 		return false;
 	}
@@ -197,7 +197,7 @@ public:
 	 */
 	bool isOne() const
 	{
-		return mCoefficients.size() == 1 && mCoefficients.back() == (Coefficient)1;
+		return mCoefficients.size() == 1 && mCoefficients.back() == Coefficient(1);
 	}
 	
 	/**
@@ -218,7 +218,7 @@ public:
 	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
 	UnivariatePolynomial one() const
 	{
-		return UnivariatePolynomial(mMainVar, (C)1);
+		return UnivariatePolynomial(mMainVar, C(1));
 	}
 	
 	/**
@@ -961,21 +961,21 @@ public:
 	static const std::list<UnivariatePolynomial> subresultants(
 			const UnivariatePolynomial& p,
 			const UnivariatePolynomial& q,
-			const SubresultantStrategy strategy = SubresultantStrategy::Default
+			SubresultantStrategy strategy = SubresultantStrategy::Default
 	);
 
 	static const std::vector<UnivariatePolynomial> principalSubresultantsCoefficients(
 			const UnivariatePolynomial& p,
 			const UnivariatePolynomial& q,
-			const SubresultantStrategy strategy = SubresultantStrategy::Default
+			SubresultantStrategy strategy = SubresultantStrategy::Default
 	);
 
 	UnivariatePolynomial<Coefficient> resultant(
 			const UnivariatePolynomial<Coefficient>& p,
-			const SubresultantStrategy strategy = SubresultantStrategy::Default
+			SubresultantStrategy strategy = SubresultantStrategy::Default
 	) const;
 
-	UnivariatePolynomial<Coefficient> discriminant(const SubresultantStrategy strategy = SubresultantStrategy::Default) const;
+	UnivariatePolynomial<Coefficient> discriminant(SubresultantStrategy strategy = SubresultantStrategy::Default) const;
 
 	/// @name Equality comparison operators
 	/// @{

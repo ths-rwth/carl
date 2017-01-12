@@ -4,18 +4,17 @@
 #include <vector>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
-#include <boost/fusion/include/std_pair.hpp>
 #include <boost/fusion/adapted/std_tuple.hpp>
-#include <boost/spirit/include/qi.hpp>
+#include <boost/fusion/include/std_pair.hpp>
 #include <boost/spirit/include/phoenix.hpp>
+#include <boost/spirit/include/qi.hpp>
 
 namespace carl {
-	namespace spirit = boost::spirit;
 	namespace qi = boost::spirit::qi;
 	namespace px = boost::phoenix;
 
-	typedef boost::spirit::istream_iterator Iterator;
-	typedef boost::spirit::qi::space_type Skipper;
+	using Iterator = boost::spirit::istream_iterator;
+	using Skipper = boost::spirit::qi::space_type;
 	
 	struct OPBParser: public qi::grammar<Iterator, OPBFile(), Skipper> {
 		OPBParser(): OPBParser::base_type(mMain, "OPBFile") {

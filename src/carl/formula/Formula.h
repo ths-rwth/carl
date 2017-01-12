@@ -9,8 +9,8 @@
 
 #pragma once
 
+#include <cstring>
 #include <functional>
-#include <string.h>
 #include <string>
 #include <set>
 #include <boost/dynamic_bitset.hpp>

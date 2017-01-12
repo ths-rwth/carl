@@ -23,7 +23,7 @@ class SortValue
 {
     public:
         /// The type if the unique id to identify a sort in the sort manager.
-        typedef size_t IDType;
+        using IDType = std::size_t;
     
         friend class SortValueManager;
 
@@ -39,8 +39,8 @@ class SortValue
          * Constructs a sort value.
          * @param _id The id of the sort value to construct.
          */
-        explicit SortValue( const carl::Sort& _sort, IDType _id ):
-            mSort( _sort ),
+        explicit SortValue(Sort _sort, IDType _id):
+            mSort(std::move(_sort)),
             mId( _id )
         {}
 

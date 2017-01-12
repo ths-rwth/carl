@@ -54,13 +54,13 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(UnivariatePo
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar)
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar)
 : mMainVar(mainVar), mCoefficients()
 {
 	assert(this->isConsistent());
 }
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const Coeff& c, std::size_t e) :
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const Coeff& c, std::size_t e) :
 mMainVar(mainVar),
 mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not always constructable (some methods need more parameter)
 {
@@ -77,7 +77,7 @@ mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not 
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coeff> coefficients)
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, std::initializer_list<Coeff> coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
 	this->stripLeadingZeroes();
@@ -86,7 +86,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::in
 
 template<typename Coeff>
 template<typename C, DisableIf<std::is_same<C, typename UnderlyingNumberType<C>::type>>>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<typename UnderlyingNumberType<C>::type> coefficients)
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, std::initializer_list<typename UnderlyingNumberType<C>::type> coefficients)
 : mMainVar(mainVar), mCoefficients()
 {
 	for (auto c: coefficients) {
@@ -97,7 +97,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::in
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coeff>& coefficients)
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const std::vector<Coeff>& coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
 	this->stripLeadingZeroes();
@@ -105,7 +105,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coeff>&& coefficients)
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, std::vector<Coeff>&& coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
 	this->stripLeadingZeroes();
@@ -113,7 +113,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::ve
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const std::map<uint, Coeff>& coefficients)
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const std::map<uint, Coeff>& coefficients)
 : mMainVar(mainVar)
 {
 	mCoefficients.reserve(coefficients.rbegin()->first);

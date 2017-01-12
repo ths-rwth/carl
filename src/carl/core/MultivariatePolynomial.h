@@ -7,17 +7,18 @@
 
 #pragma once
 
-#include "Polynomial.h"
-#include "Term.h"
+#include <memory>
+#include <type_traits>
+#include <vector>
+
 #include "DivisionResult.h"
 #include "MultivariatePolynomialPolicy.h"
+#include "Polynomial.h"
+#include "Term.h"
 #include "VariableInformation.h"
 #include "../numbers/numbers.h"
 #include "../util/TermAdditionManager.h"
 
-#include <memory>
-#include <type_traits>
-#include <vector>
 
 namespace carl
 {
@@ -44,25 +45,25 @@ class MultivariatePolynomial : public Polynomial, public Policies
     friend class TermAdditionManager;
 public:
 	/// The ordering of the terms.
-	typedef Ordering OrderedBy;
+	using OrderedBy = Ordering;
 	/// Type of the terms.
-	typedef Term<Coeff> TermType;
+	using TermType = Term<Coeff>;
 	/// Type of the monomials within the terms.
-	typedef Monomial MonomType;
+	using MonomType = Monomial;
 	/// Type of the coefficients. 	
-	typedef Coeff CoeffType;
+	using CoeffType = Coeff;
 	/// Policies for this monomial.
-	typedef Policies Policy;
+	using Policy = Policies;
 	/// Number type within the coefficients.
-	typedef typename UnderlyingNumberType<Coeff>::type NumberType;
+	using NumberType = typename UnderlyingNumberType<Coeff>::type;
 	/// Integer type associated with the number type.
-	typedef typename IntegralType<NumberType>::type IntNumberType;
+	using IntNumberType = typename IntegralType<NumberType>::type;
     ///
-    typedef MultivariatePolynomial<Coeff, Ordering, Policies> PolyType;
+    using PolyType = MultivariatePolynomial<Coeff, Ordering, Policies>;
     /// The type of the cache. Multivariate polynomials do not need a cache, we set it to something.
-    typedef std::vector<int> CACHE;
+    using CACHE = std::vector<int>;
 	/// Type our terms vector.f
-	typedef std::vector<Term<Coeff>> TermsType;
+	using TermsType = std::vector<Term<Coeff>>;
 	
 	template<typename C, typename T>
 	using EnableIfNotSame = typename std::enable_if<!std::is_same<C,T>::value,T>::type;
