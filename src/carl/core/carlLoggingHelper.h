@@ -23,7 +23,7 @@ template<typename T>
 std::string binary(const T& a, const bool& spacing = true)
 {
 	std::stringstream ss;
-    const std::uint8_t* begin = reinterpret_cast<const std::uint8_t*>(&a);
+    const std::uint8_t* begin = reinterpret_cast<const std::uint8_t*>(&a); // NOLINT
 	const std::uint8_t* end = begin + sizeof(T);
 	while (begin != end) {
 		end--;
