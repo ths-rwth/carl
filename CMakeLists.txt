@@ -66,7 +66,6 @@ export_option(BUILD_STATIC)
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
-option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
 option( COVERAGE "Enable collection of coverage statistics" OFF )
 option( EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
 
@@ -209,4 +208,3 @@ include(export)
 # # # # # # # # # # # # # # # # # # # # # #
 # G. CPack
 # # # # # # # # # # # # # # # # # # # # # #
-
