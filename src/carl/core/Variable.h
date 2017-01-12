@@ -201,6 +201,7 @@ public:
 	/// Instance of an invalid variable.
 	static const Variable NO_VARIABLE;
 };
+static_assert(std::is_trivially_copyable<Variable>::value, "Variable should be trivially copyable.");
 
 } // namespace carl
 
