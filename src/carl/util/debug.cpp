@@ -33,7 +33,7 @@ namespace carl {
 		std::stringstream cmd;
 		cmd << "gdb --pid=" << getpid() << " -ex bt";
 		if (!interaction) cmd << " --batch --quiet";
-		system(cmd.str().c_str());
+		system(cmd.str().c_str()); // NOLINT
 	}
 
 	inline std::string demangle(const char* name) {
