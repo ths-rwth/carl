@@ -31,10 +31,11 @@ namespace carl
 template<typename Coefficient>
 class Term
 {
-
+	
 
 	private:
-		Number<Coefficient> mCoeff = Number<Coefficient>(constant_zero<Coefficient>::get());
+		typedef Coefficient CoefficientType;
+		CoefficientType mCoeff = CoefficientType(constant_zero<Coefficient>::get());
 		Monomial::Arg mMonomial;
 
 	public:
@@ -131,7 +132,7 @@ class Term
 		 */
 		inline bool isZero() const
 		{
-			return mCoeff.isZero();
+			return carl::isZero(mCoeff); //change this to mCoeff.isZero() at some point
 		}
 		
 		/**
@@ -140,7 +141,7 @@ class Term
          */
 		inline bool isOne() const
 		{
-			return (isConstant() && mCoeff.isOne());
+			return (isConstant() && carl::isOne(mCoeff)); //change this to mCoeff.isOne() at some point
 		}
 		/**
 		 * Checks whether the monomial is a constant.
@@ -230,7 +231,7 @@ class Term
 		 */
 		bool isSquare() const
 		{
-			return (mCoeff >= Number<Coefficient>(0)) && ((!mMonomial) || mMonomial->isSquare());
+			return (mCoeff >= CoefficientType(0)) && ((!mMonomial) || mMonomial->isSquare());
 		}
 		
 		/**
@@ -238,7 +239,7 @@ class Term
 		 */
 		void clear()
 		{
-			mCoeff = Number<Coefficient>(carl::constant_zero<Coefficient>().get());
+			mCoeff = CoefficientType(carl::constant_zero<Coefficient>().get());
 			mMonomial = nullptr;
 		}
 
