@@ -9,12 +9,17 @@
 
 #include "../interval/Interval.h"
 #include "../numbers/numbers.h"
+#include "../numbers/NumberMpq.h"
+#include "../numbers/NumberClRA.h"
+#include "../numbers/NumberInterval.h"
+#include "../numbers/NumberInt.h"
 #include "../util/pointerOperations.h"
 #include "Definiteness.h"
 #include "Monomial.h"
 #include "VariablesInformation.h"
 
 #include <memory>
+
 
 namespace carl
 {
@@ -26,8 +31,11 @@ namespace carl
 template<typename Coefficient>
 class Term
 {
+	
+
 	private:
-		Coefficient mCoeff = constant_zero<Coefficient>::get();
+		typedef Coefficient CoefficientType;
+		CoefficientType mCoeff = CoefficientType(constant_zero<Coefficient>::get());
 		Monomial::Arg mMonomial;
 
 	public:
@@ -124,7 +132,7 @@ class Term
 		 */
 		inline bool isZero() const
 		{
-			return carl::isZero(mCoeff);
+			return carl::isZero(mCoeff); //change this to mCoeff.isZero() at some point
 		}
 		
 		/**
@@ -133,7 +141,7 @@ class Term
          */
 		inline bool isOne() const
 		{
-			return (isConstant() && carl::isOne(mCoeff));
+			return (isConstant() && carl::isOne(mCoeff)); //change this to mCoeff.isOne() at some point
 		}
 		/**
 		 * Checks whether the monomial is a constant.
@@ -149,7 +157,7 @@ class Term
          */
         inline bool integerValued() const
         {
-            if(!carl::isInteger(mCoeff)) return false;
+            if(!mCoeff.isInteger()) return false;
             return (!mMonomial || mMonomial->integerValued());
         }
         
@@ -223,7 +231,7 @@ class Term
 		 */
 		bool isSquare() const
 		{
-			return (mCoeff >= Coefficient(0)) && ((!mMonomial) || mMonomial->isSquare());
+			return (mCoeff >= CoefficientType(0)) && ((!mMonomial) || mMonomial->isSquare());
 		}
 		
 		/**
@@ -231,7 +239,7 @@ class Term
 		 */
 		void clear()
 		{
-			mCoeff = carl::constant_zero<Coefficient>().get();
+			mCoeff = CoefficientType(carl::constant_zero<Coefficient>().get());
 			mMonomial = nullptr;
 		}
 
