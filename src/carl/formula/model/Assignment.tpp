@@ -249,8 +249,8 @@ namespace carl
             case carl::FormulaType::UEQ:
             {
                 const carl::UEquality& eq = _formula.uequality();
-                SortValue::IDType lhsResult = 0;
-                SortValue::IDType rhsResult = 0;
+                std::size_t lhsResult = 0;
+                std::size_t rhsResult = 0;
                 // get sortvalue for lhs and rhs
                 if( eq.lhsIsUV() )
                 {
