@@ -11,10 +11,10 @@
 
 #include "../../formula/model/ran/RealAlgebraicNumber.h"
 #include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
-#include "../UnivariatePolynomial.h"
-#include "../Sign.h"
-#include "../logging.h"
 #include "../../interval/Interval.h"
+#include "../logging.h"
+#include "../Sign.h"
+#include "../UnivariatePolynomial.h"
 #include "IncrementalRootFinder.h"
 
 namespace carl {

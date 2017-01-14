@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "logging.h"
-#include "Sign.h"
-
 #include <cassert>
 #include <iostream>
 #include <memory>
 #include <sstream>
+
+#include "logging.h"
+#include "Sign.h"
 
 namespace carl {
 

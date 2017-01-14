@@ -174,7 +174,7 @@ namespace carl
 		FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, CARL_RND /*unused*/ = CARL_RND::N) : mValue(_float.mValue)
 		{}
 
-		explicit FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, CARL_RND /*unused*/ = CARL_RND::N) noexcept : mValue(_float.value())
+		FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, CARL_RND /*unused*/ = CARL_RND::N) noexcept : mValue(std::move(_float.value()))
 		{}
 
 		/**
@@ -184,8 +184,8 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 */
 		template<typename F = FloatType, DisableIf< std::is_same<F, double> > = dummy>
-		explicit FLOAT_T<FloatType>(const FloatType& val, CARL_RND /*unused*/ = CARL_RND::N):
-			mValue(val)
+		explicit FLOAT_T<FloatType>(FloatType val, CARL_RND /*unused*/ = CARL_RND::N):
+			mValue(std::move(val))
 		{
 		}
 

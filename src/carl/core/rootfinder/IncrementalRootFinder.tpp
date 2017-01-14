@@ -6,10 +6,10 @@
 
 #pragma once
 
+#include "../../util/debug.h"
+#include "../logging.h"
 #include "AbstractRootFinder.h"
 #include "RootFinder.h"
-#include "../logging.h"
-#include "../../util/debug.h"
 
 #ifdef __VS
 	#include <Eigen/Dense>
