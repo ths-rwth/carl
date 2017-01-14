@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "../../interval/Interval.h"
 #include "../../formula/model/ran/RealAlgebraicNumber.h"
+#include "../../interval/Interval.h"
 #include "../UnivariatePolynomial.h"
 
 namespace carl {
@@ -74,7 +74,7 @@ public:
      * @param interval Interval bounding the range of the roots we are looking for.
 	 * @param tryTrivialSolver Flag indicating if the trivialSolve() method should be used.
      */
-	AbstractRootFinder(
+	explicit AbstractRootFinder(
 		const UnivariatePolynomial<Number>& _polynomial,
 		const Interval<Number>& _interval = Interval<Number>(),
 		bool tryTrivialSolver = true

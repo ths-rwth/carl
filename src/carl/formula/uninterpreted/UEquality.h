@@ -24,7 +24,7 @@ namespace carl
     {
         public:
             /// The type of the left and right-hand side of an uninterpreted equality.
-            typedef boost::variant<UVariable, UFInstance> Arg;
+            using Arg = boost::variant<UVariable, UFInstance>;
 
             /**
              * Checks whether the given argument is an uninterpreted variable.
@@ -109,10 +109,10 @@ namespace carl
              * @param _uvarA An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
              * @param _uvarB An uninterpreted variable, which is going to be the right-hand side of this uninterpreted equality.
              */
-            UEquality( const Arg& _uvarA, const Arg& _uvarB, bool _negated ):
-                mNegated( _negated ),
-				mLhs( _uvarA ),
-				mRhs( _uvarB )
+            UEquality(Arg _uvarA, Arg _uvarB, bool _negated):
+                mNegated(_negated),
+				mLhs(std::move(_uvarA)),
+				mRhs(std::move(_uvarB))
 			{
 				if( lhsIsUV() && rhsIsUV() )
                 {

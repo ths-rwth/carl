@@ -6,6 +6,11 @@
 
 #pragma once
 
+#include "AbstractRootFinder.h"
+#include "RootFinder.h"
+#include "../logging.h"
+#include "../../util/debug.h"
+
 #ifdef __VS
 	#include <Eigen/Dense>
 	#include <Eigen/Eigenvalues>
@@ -13,11 +18,6 @@
 	#include <eigen3/Eigen/Dense>
 	#include <eigen3/Eigen/Eigenvalues>
 #endif
-
-#include "AbstractRootFinder.h"
-#include "RootFinder.h"
-#include "../logging.h"
-#include "../../util/debug.h"
 
 namespace carl {
 namespace rootfinder {
@@ -131,9 +131,9 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 	auto uniqueIt = std::unique(doubleRoots.begin(), doubleRoots.end());
 	doubleRoots.resize(size_t(std::distance(doubleRoots.begin(), uniqueIt)));
 	std::vector<Number> roots;
-	for (auto it = doubleRoots.begin(); it != doubleRoots.end(); it++) {
-		if (!isNumber(*it)) continue;
-		Number n = carl::rationalize<Number>(*it);
+	for (const auto& droot: doubleRoots) {
+		if (!isNumber(droot)) continue;
+		Number n = carl::rationalize<Number>(droot);
 		if (!interval.contains(n)) continue;
 		if (roots.size() > 0 && n - roots.back() < 1) continue;
 		roots.push_back(n);

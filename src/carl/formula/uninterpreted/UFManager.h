@@ -8,9 +8,9 @@
 #pragma once
 
 
-#include "../../util/Singleton.h"
 #include "../../util/Common.h"
 #include "../../util/hash.h"
+#include "../../util/Singleton.h"
 #include "../Sort.h"
 #include "UninterpretedFunction.h"
 
