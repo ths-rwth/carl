@@ -87,7 +87,7 @@ public:
 	{}
 		
 	RealAlgebraicNumber(const RealAlgebraicNumber& ran) = default;
-	RealAlgebraicNumber(RealAlgebraicNumber&& ran) noexcept = default;
+	RealAlgebraicNumber(RealAlgebraicNumber&& ran) = default;
 		
 	RealAlgebraicNumber& operator=(const RealAlgebraicNumber& n) = default;
 	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) noexcept = default;
