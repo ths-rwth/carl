@@ -56,7 +56,7 @@ std::string VariablePool::getName(Variable::Arg v, bool variableName) const {
 	if (v.getId() == 0) return "NO_VARIABLE";
 	if (variableName) {
         SETNAME_LOCK_GUARD
-		std::map<Variable, std::string>::const_iterator it = mVariableNames.find(v);
+		auto it = mVariableNames.find(v);
 		if (it != mVariableNames.end()) {
 			return it->second;
 		}

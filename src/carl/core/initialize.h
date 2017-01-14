@@ -41,7 +41,7 @@ namespace carl
     inline int initialize( void )
     {
         static int initvariable = init();
-        do { (void)(initvariable); } while( 0 );
+        do { (void)(initvariable); } while (false);
         return 0;
     }
 
