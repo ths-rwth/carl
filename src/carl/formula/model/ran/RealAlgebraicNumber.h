@@ -90,7 +90,7 @@ public:
 	RealAlgebraicNumber(RealAlgebraicNumber&& ran) = default;
 		
 	RealAlgebraicNumber& operator=(const RealAlgebraicNumber& n) = default;
-	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) noexcept = default;
+	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) = default;
 	
 	std::size_t size() const {
 		if (isNumeric()) return carl::bitsize(mValue);
