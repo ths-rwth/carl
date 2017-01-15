@@ -101,8 +101,8 @@ void AbstractRootFinder<Number>::addRoot(const RealAlgebraicNumber<Number>& root
 }
 
 template<typename Number>
-void AbstractRootFinder<Number>::addRoot(const Interval<Number>& _interval) {
-	this->addRoot(RealAlgebraicNumber<Number>(this->polynomial, _interval));
+void AbstractRootFinder<Number>::addRoot(const Interval<Number>& interval) {
+	this->addRoot(RealAlgebraicNumber<Number>(this->polynomial, interval));
 }
 
 template<typename Number>

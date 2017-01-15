@@ -23,17 +23,15 @@
 
 #pragma once
 
+#include "../core/Sign.h"
+#include "../core/Variable.h"
+#include "../core/Sign.h"
+#include "../numbers/numbers.h"
 #include "../util/platform.h"
-#include <map>
-#include <cassert>
-#include <list>
-#include <sstream>
-#include <limits>
+#include "../util/SFINAE.h"
 #include "BoundType.h"
 #include "checking.h"
 #include "rounding.h"
-#include "../numbers/numbers.h"
-#include "../core/Sign.h"
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
 CLANG_WARNING_DISABLE("-Wunused-local-typedef")
@@ -41,14 +39,14 @@ CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include <boost/numeric/interval/interval.hpp>
 #include <boost/functional/hash.hpp>
 CLANG_WARNING_RESET
+
+#include <cassert>
 #include <cmath>
+#include <limits>
+#include <list>
+#include <map>
+#include <sstream>
 
-#include "../core/Variable.h"
-#include "../core/Sign.h"
-#include "../util/SFINAE.h"
-
-// Todo: Check if here is the appropriate place to be for the FLOAT_T include
-#include "../numbers/numbers.h"
 
 namespace carl
 {

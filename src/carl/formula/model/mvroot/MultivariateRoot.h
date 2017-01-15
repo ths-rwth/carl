@@ -25,19 +25,19 @@ private:
 	std::size_t mK;
 	Variable mVar;
 public:
-	MultivariateRoot(const Poly& p, std::size_t k, Variable::Arg v):
+	MultivariateRoot(const Poly& p, std::size_t k, Variable v):
 		mPoly(p), mK(k), mVar(v)
 	{
 		assert(mK > 0);
 	}
 	
-	const Poly& poly() const {
+	const Poly& poly() const noexcept {
 		return mPoly;
 	}
-	std::size_t k() const {
+	std::size_t k() const noexcept {
 		return mK;
 	}
-	Variable::Arg var() const {
+	Variable var() const noexcept {
 		return mVar;
 	}
 	bool isUnivariate() const {

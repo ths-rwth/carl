@@ -232,7 +232,7 @@ bool CAD<Number>::prepareElimination() {
 
 		// (1)
 		/// @todo make this more efficient
-		std::vector<cad::EliminationSet<Number>> sets(mVariables.size(), cad::EliminationSet<Number>(&this->polynomials, this->setting.order, this->setting.order));
+		std::vector<cad::EliminationSet<Number>> sets(mVariables.size(), cad::EliminationSet<Number>(&this->polynomials, typename cad::EliminationSet<Number>::PolynomialComparator(this->setting.order), typename cad::EliminationSet<Number>::PolynomialComparator(this->setting.order)));
 		for (long unsigned i = newVariableCount; i < sets.size(); i++) {
 			std::swap(sets[i], this->eliminationSets[i - newVariableCount]);
 		}
@@ -900,7 +900,7 @@ void CAD<Number>::alterSetting(const cad::CADSettings& _setting) {
 	if (_setting.order != this->setting.order) {
 		// switch the order relation in all elimination sets
 		for (auto& i: this->eliminationSets) {
-			i.setLiftingOrder(_setting.order);
+			i.setLiftingOrder(typename cad::EliminationSet<Number>::PolynomialComparator(_setting.order));
 		}
 	}
 	if (!this->setting.simplifyByRootcounting && _setting.simplifyByRootcounting) {

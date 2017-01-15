@@ -31,7 +31,7 @@ namespace carl{
 				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h), monomial() {
 					assert(monomial.expired());
 				}
-				PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)), monomial() {
+				explicit PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)), monomial() {
 					assert(monomial.expired());
 				}
 			};
@@ -44,7 +44,7 @@ namespace carl{
 				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h), monomial() {
 					assert(monomial.expired());
 				}
-				PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)), monomial() {
+				explicit PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)), monomial() {
 					assert(monomial.expired());
 				}
 			};

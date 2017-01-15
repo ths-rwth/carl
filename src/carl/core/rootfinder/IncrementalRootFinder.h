@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include <queue>
 #include "../logging.h"
+
+#include <queue>
 
 namespace carl {
 namespace rootfinder {
@@ -78,7 +79,7 @@ inline std::ostream& operator<<(std::ostream& os, const SplittingStrategy& s) {
 template<typename Number>
 class RootFinder {
 public:
-	virtual ~RootFinder() {}
+	virtual ~RootFinder() = default;
 	/**
 	 * Retrieves the polynomial that is processed.
 	 * @return Polynomial.
@@ -210,7 +211,7 @@ public:
 	/**
 	 * Type of a queue item, consisting of an interval to be searched and the strategy to be used.
 	 */
-	typedef std::tuple<Interval<Number>, SplittingStrategy> QueueItem;
+	using QueueItem = std::tuple<Interval<Number>, SplittingStrategy>;
 
 private:
 	/**
@@ -240,7 +241,7 @@ public:
 	 * @param splittingStrategy Strategy.
 	 * @param tryTrivialSolver Flag is the trivial solver shall be used.
 	 */
-	IncrementalRootFinder(
+	explicit IncrementalRootFinder(
 			const UnivariatePolynomial<Number>& polynomial,
 			const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 			SplittingStrategy splittingStrategy = SplittingStrategy::DEFAULT,
@@ -252,7 +253,7 @@ public:
 	 */
 	virtual ~IncrementalRootFinder() = default;
 
-	const UnivariatePolynomial<Number>& getPolynomial() const {
+	const UnivariatePolynomial<Number>& getPolynomial() const noexcept {
 		return this->polynomial;
 	}
 

@@ -23,8 +23,8 @@ private:
 	using IntervalContent = ran::IntervalContent<Number>;
 	using Polynomial = typename IntervalContent::Polynomial;
 	
-	mutable Number mValue;
-	bool mIsRoot;
+	mutable Number mValue = carl::constant_zero<Number>::get();
+	bool mIsRoot = true;
 	mutable std::shared_ptr<IntervalContent> mIR;
 	std::shared_ptr<ThomEncoding<Number>> mTE;
 	
@@ -55,7 +55,7 @@ public:
 		mIR(),
 		mTE()
 	{}
-	explicit RealAlgebraicNumber(Variable::Arg var, bool isRoot = true):
+	explicit RealAlgebraicNumber(Variable var, bool isRoot = true):
 		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(Polynomial(var), Interval<Number>::zeroInterval())),
@@ -86,33 +86,11 @@ public:
 		mTE(std::make_shared<ThomEncoding<Number>>(te))
 	{}
 		
-	RealAlgebraicNumber(const RealAlgebraicNumber& ran):
-		mValue(ran.mValue),
-		mIsRoot(ran.mIsRoot),
-		mIR(ran.mIR),
-		mTE(ran.mTE)
-	{}
-	RealAlgebraicNumber(RealAlgebraicNumber&& ran):
-		mValue(std::move(ran.mValue)),
-		mIsRoot(ran.mIsRoot),
-		mIR(std::move(ran.mIR)),
-		mTE(std::move(ran.mTE))
-	{}
+	RealAlgebraicNumber(const RealAlgebraicNumber& ran) = default;
+	RealAlgebraicNumber(RealAlgebraicNumber&& ran) = default;
 		
-	RealAlgebraicNumber& operator=(const RealAlgebraicNumber& n) {
-		mValue = n.mValue;
-		mIsRoot = n.mIsRoot;
-		mIR = n.mIR;
-		mTE = n.mTE;
-		return *this;
-	}
-	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) {
-		mValue = std::move(n.mValue);
-		mIsRoot = n.mIsRoot;
-		mIR = std::move(n.mIR);
-		mTE = std::move(n.mTE);
-		return *this;
-	}
+	RealAlgebraicNumber& operator=(const RealAlgebraicNumber& n) = default;
+	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) = default;
 	
 	std::size_t size() const {
 		if (isNumeric()) return carl::bitsize(mValue);
@@ -131,7 +109,7 @@ public:
 	 * Set the flag marking whether the real algebraic number stems from a root computation or not.
 	 * @param isRoot
 	 */
-	void setIsRoot(bool isRoot) {
+	void setIsRoot(bool isRoot) noexcept {
 		mIsRoot = isRoot;
 	}
 	
@@ -150,7 +128,7 @@ public:
 		checkForSimplification();
 		return bool(mIR);
 	}
-	bool isThom() const {
+	bool isThom() const noexcept {
 		return bool(mTE);
 	}
 	const ThomEncoding<Number>& getThomEncoding() const {
@@ -172,7 +150,7 @@ public:
 		return mIR->interval.sample();
 	}
 	
-	const Number& value() const {
+	const Number& value() const noexcept {
 		assert(isNumeric());
 		return mValue;
 	}

@@ -35,7 +35,7 @@ public:
 	ThomEncoding(
 		const SignCondition& sc,
 		const Polynomial& p,
-		Variable::Arg mainVar,
+		Variable mainVar,
 		std::shared_ptr<ThomEncoding<Number>> point, 
 		std::shared_ptr<SignDetermination<Number>> sd,
 		uint mRelevant
@@ -43,17 +43,17 @@ public:
 		mSc(sc),
 		mP(p),
 		mMainVar(mainVar),
-		mPoint(point),
-		mSd(sd),
+		mPoint(std::move(point)),
+		mSd(std::move(sd)),
 		mRelevant(mRelevant)
 	{}
 		
 	ThomEncoding(
 		const Number& n,
-		Variable::Arg mainVar,
+		Variable mainVar,
 		std::shared_ptr<ThomEncoding<Number>> point = nullptr
 	):
-		mSc(), mP(), mMainVar(mainVar), mPoint(point), mSd(), mRelevant()
+		mSc(), mP(), mMainVar(mainVar), mPoint(std::move(point)), mSd(), mRelevant()
 	{
 		Polynomial p = Polynomial(mainVar) - n;
 		std::list<ThomEncoding<Number>> roots = realRootsThom(p, mainVar, point);

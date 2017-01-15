@@ -37,7 +37,7 @@ class SortValue
          * @param _id The id of the sort value to construct.
          */
         explicit SortValue(Sort _sort, std::size_t _id):
-            mSort(std::move(_sort)),
+            mSort(_sort),
             mId(_id)
         {}
 

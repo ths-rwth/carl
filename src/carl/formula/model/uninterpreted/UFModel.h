@@ -28,16 +28,8 @@ class UFModel : private std::map<std::vector<SortValue>,SortValue>
 		UninterpretedFunction uf;
     public:
         
-        UFModel(const UninterpretedFunction& uf):
+        explicit UFModel(const UninterpretedFunction& uf):
             std::map<std::vector<SortValue>, SortValue>(), uf(uf)
-        {}
-        
-        /**
-         * Constructs a model of an uninterpreted function by copying the given one.
-         * @param _sortValue The mode of an uninterpreted function to copy.
-         */
-        UFModel( const UFModel& _ufm ):
-            std::map<std::vector<SortValue>, SortValue>( _ufm ), uf(_ufm.uf)
         {}
 
         bool extend( const std::vector<SortValue>& _args, const SortValue& _value );
