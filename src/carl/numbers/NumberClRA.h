@@ -34,7 +34,7 @@ namespace carl {
 	template<>
 	class Number<cln::cl_RA> : public BaseNumber<cln::cl_RA,Number<cln::cl_RA>> {
 	private:
-	cln::cl_RA scaleByPowerOfTwo(const cln::cl_RA& a, int exp); //auxiliary function 
+	cln::cl_RA scaleByPowerOfTwo(const cln::cl_RA& a, int exp) const; //auxiliary function 
 	public:
 
 		Number(): BaseNumber() {}
@@ -99,7 +99,7 @@ namespace carl {
 		 * @param n A fraction.
 		 * @return Bit size of n.
 		 */
-		inline std::size_t bitsize() {
+		inline std::size_t bitsize() const {
 			return cln::integer_length(cln::numerator(mData)) + cln::integer_length(cln::denominator(mData));
 		}
 
@@ -108,14 +108,14 @@ namespace carl {
 		 * @param n A fraction.
 		 * @return Double.
 		 */
-		inline double toDouble() {
+		inline double toDouble() const {
 			return cln::double_approx(mData);
 		}
 
 
 
 		template<typename Integer>
-		inline Integer toInt();
+		inline Integer toInt() const;
 
 
 
@@ -147,7 +147,7 @@ namespace carl {
 		 * Round a fraction to next integer.
 		 * @return The next integer.
 		 */
-		inline Number<cln::cl_I> round() {
+		inline Number<cln::cl_I> round() const {
 			return Number<cln::cl_I> (cln::round1(mData));
 		}
 
@@ -157,7 +157,7 @@ namespace carl {
 		 * Round down a fraction.
 		 * @return \f$\lfloor n \rfloor\f$.
 		 */
-		inline Number<cln::cl_I> floor() {
+		inline Number<cln::cl_I> floor() const {
 			return Number<cln::cl_I> (cln::floor1(mData));
 		}
 
@@ -167,7 +167,7 @@ namespace carl {
 		 * Round up a fraction.
 		 * @return \f$\lceil n \rceil\f$.
 		 */
-		inline Number<cln::cl_I> ceil() {
+		inline Number<cln::cl_I> ceil() const {
 			return Number<cln::cl_I> (cln::ceiling1(mData));
 		}
 
@@ -179,7 +179,7 @@ namespace carl {
 		 * Check if a fraction is integral.
 		 * @return true.
 		 */
-		inline bool isInteger() {
+		inline bool isInteger() const {
 			return this->getDenom().isOne();
 		}
 
@@ -194,7 +194,7 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return Gcd of a and b.
 		 */
-		inline Number<cln::cl_RA> gcd(const Number<cln::cl_RA>& b) {
+		inline Number<cln::cl_RA> gcd(const Number<cln::cl_RA>& b) const {
 			return Number(cln::gcd(cln::numerator(mData),cln::numerator(b.mData)) / cln::lcm(cln::denominator(mData),cln::denominator(b.mData)));
 		}
 
@@ -205,7 +205,7 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return Lcm of a and b.
 		 */
-		inline Number<cln::cl_RA> lcm(const Number<cln::cl_RA>& b) {
+		inline Number<cln::cl_RA> lcm(const Number<cln::cl_RA>& b) const {
 		    assert( this->isInteger());
 		    assert( b.isInteger() );
 			return Number(cln::lcm(cln::numerator(mData),cln::numerator(b.mData)));
@@ -216,20 +216,20 @@ namespace carl {
 		 * @param e Exponent.
 		 * @return \f$n^e\f$
 		 */
-		inline Number<cln::cl_RA> pow(std::size_t e) {
+		inline Number<cln::cl_RA> pow(std::size_t e) const {
 			return Number(cln::expt(mData, int(e)));
 		}
 
-		inline Number<cln::cl_RA> log() {
+		inline Number<cln::cl_RA> log() const {
 			return Number(cln::rationalize(cln::realpart(cln::log(mData))));
 		}
 
 		//Note that with std::cos, std::sin the result is more precise than with cln::sin, cln::cos!!
-		inline Number<cln::cl_RA> sin() {
+		inline Number<cln::cl_RA> sin() const {
 			return Number(std::sin(toDouble()));
 		}
 
-		inline Number<cln::cl_RA> cos() {
+		inline Number<cln::cl_RA> cos() const {
 			return Number(std::cos(toDouble()));
 		}
 
@@ -240,9 +240,9 @@ namespace carl {
 		 * @return true, if the number to calculate the square root for is a square;
 		 *         false, otherwise.
 		 */
-		bool sqrt_exact(Number<cln::cl_RA>& b);
+		bool sqrt_exact(Number<cln::cl_RA>& b) const;
 
-		Number<cln::cl_RA> sqrt();
+		Number<cln::cl_RA> sqrt() const;
 
 		/**
 		 * Calculate the square root of a fraction.
@@ -252,7 +252,7 @@ namespace carl {
 		 * Note that we try to find bounds that are very close to the actual square root. If a small representation is more important than a small interval, sqrt_fast should be used.
 		 * @return Interval containing the square root of a.
 		 */
-		std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> sqrt_safe();
+		std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> sqrt_safe() const;
 
 		/**
 		 * Compute square root in a fast but less precise way.
@@ -261,7 +261,7 @@ namespace carl {
 		 * @param a Some number.
 		 * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z.
 		 */
-		std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> sqrt_fast();
+		std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> sqrt_fast() const;
 
 
 
@@ -270,7 +270,7 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return \f$ this / b \f$.
 		 */
-		inline Number<cln::cl_RA> div(const Number<cln::cl_RA>& b) {
+		inline Number<cln::cl_RA> div(const Number<cln::cl_RA>& b) const {
 			return Number(mData / b.mData);
 		}
 
@@ -281,13 +281,13 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return \f$ this / b \f$.
 		 */
-		inline Number<cln::cl_RA> quotient(const Number<cln::cl_RA>& b)
+		inline Number<cln::cl_RA> quotient(const Number<cln::cl_RA>& b) const
 		{
 			return Number(mData / b.mData);
 		}
 
 
-		inline Number<cln::cl_RA> reciprocal() {
+		inline Number<cln::cl_RA> reciprocal()  const{
 			return Number(cln::recip(mData));
 		}
 
@@ -305,17 +305,17 @@ namespace carl {
 		 */
 
 		template<>
-		inline Number<cln::cl_I> Number<cln::cl_RA>::toInt<Number<cln::cl_I>>() {
+		inline Number<cln::cl_I> Number<cln::cl_RA>::toInt<Number<cln::cl_I>>() const {
 			assert(isInteger());
 			return Number<cln::cl_I>(getNum());
 		}
 	
 		template<>
-		inline sint Number<cln::cl_RA>::toInt<sint>() {
+		inline sint Number<cln::cl_RA>::toInt<sint>() const {
 			return toInt<Number<cln::cl_I>>().toInt<sint>();
 		}
 		template<>
-		inline uint Number<cln::cl_RA>::toInt<uint>() {
+		inline uint Number<cln::cl_RA>::toInt<uint>() const {
 		    return toInt<Number<cln::cl_I>>().toInt<uint>();
 		}
 

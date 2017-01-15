@@ -78,7 +78,7 @@ namespace carl {
 	}
 
 
-	 bool Number<mpq_class>::sqrt_exact(Number<mpq_class>& b)
+	 bool Number<mpq_class>::sqrt_exact(Number<mpq_class>& b) const
 	    {
 		if( mpq_sgn(mData.__get_mp()) < 0 ) return false;
 		mpz_class den = mData.get_den();
@@ -107,12 +107,12 @@ namespace carl {
 		return true;
 	    } 
 
-	    Number<mpq_class> Number<mpq_class>::sqrt() {
+	    Number<mpq_class> Number<mpq_class>::sqrt() const {
 		std::pair<Number<mpq_class>,Number<mpq_class>> r = this->sqrt_safe();
 		return (r.first + r.second) / 2;
 	    }
 
-	    std::pair<Number<mpq_class>,Number<mpq_class>> Number<mpq_class>::sqrt_safe()
+	    std::pair<Number<mpq_class>,Number<mpq_class>> Number<mpq_class>::sqrt_safe() const
 	    {
 		assert( mpq_sgn(mData.__get_mp()) > 0 );
 		mpz_class den = mData.get_den();
@@ -144,7 +144,7 @@ namespace carl {
 		return std::make_pair(Number(lower),Number(upper));
 	    }
 
-	    std::pair<Number<mpq_class>, Number<mpq_class>> Number<mpq_class>::sqrt_fast()
+	    std::pair<Number<mpq_class>, Number<mpq_class>> Number<mpq_class>::sqrt_fast() const
 	    {
 		assert(mData >= 0);
 	#if 1

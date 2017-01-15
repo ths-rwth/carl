@@ -67,7 +67,7 @@ namespace carl {
 		 */
 
 		//this is the same as for mpz
-		inline bool isInteger()  {
+		inline bool isInteger() const  {
 			return true;
 		}
 
@@ -77,7 +77,7 @@ namespace carl {
 		 * @param n An integer.
 		 * @return Bit size of n.
 		 */
-		inline std::size_t bitsize()  {
+		inline std::size_t bitsize() const {
 			return std::numeric_limits<long long int>::digits;
 		}
 
@@ -87,7 +87,7 @@ namespace carl {
 		 * @param n An integer.
 		 * @return Double.
 		 */
-		inline double toDouble()  {
+		inline double toDouble() const {
 			return mData;
 		}
 

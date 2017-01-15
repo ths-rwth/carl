@@ -66,7 +66,7 @@ namespace carl {
 		 */
 
 		//this is the same as for mpz
-		inline bool isInteger()  {
+		inline bool isInteger() const  {
 			return true;
 		}
 
@@ -76,7 +76,7 @@ namespace carl {
 		 * @param n An integer.
 		 * @return Bit size of n.
 		 */
-		inline std::size_t bitsize()  {
+		inline std::size_t bitsize() const  {
 			return cln::integer_length(mData);
 		}
 
@@ -86,12 +86,12 @@ namespace carl {
 		 * @param n An integer.
 		 * @return Double.
 		 */
-		inline double toDouble()  {
+		inline double toDouble() const  {
 			return cln::double_approx(mData);
 		}
 
 		template<typename Integer>
-		inline Integer toInt() ;
+		inline Integer toInt() const;
 
 		/**
 		 * Get absolute value of an integer.
@@ -108,7 +108,7 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return Gcd of a and b.
 		 */
-		inline Number<cln::cl_I> gcd(const Number<cln::cl_I>& b)  {
+		inline Number<cln::cl_I> gcd(const Number<cln::cl_I>& b) const  {
 			return Number(cln::gcd(mData,b.mData));
 		}
 
@@ -119,7 +119,7 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return Lcm of a and b.
 		 */
-		inline Number<cln::cl_I> lcm(const Number<cln::cl_I>& b)  {
+		inline Number<cln::cl_I> lcm(const Number<cln::cl_I>& b) const {
 			return Number(cln::lcm(mData,b.mData));
 		}
 
@@ -133,7 +133,7 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return \f$a \% b\f$.
 		 */
-		inline Number<cln::cl_I> mod(const Number<cln::cl_I>& b) {
+		inline Number<cln::cl_I> mod(const Number<cln::cl_I>& b) const {
 			return Number(cln::rem(mData, b.mData));
 		}
 
@@ -145,7 +145,7 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return \f$ a / b \f$.
 		 */
-		inline Number<cln::cl_I> div(const Number<cln::cl_I>& b) {
+		inline Number<cln::cl_I> div(const Number<cln::cl_I>& b) const {
 			assert(cln::mod(mData, b.mData) == 0);
 			return Number(cln::exquo(mData, b.mData));
 		}
@@ -160,7 +160,7 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return \f$ a / b \f$.
 		 */
-		inline Number<cln::cl_I> quotient(const Number<cln::cl_I>& b)
+		inline Number<cln::cl_I> quotient(const Number<cln::cl_I>& b) const
 		{
 			return Number(cln::exquo(mData - cln::rem(mData, b.mData), b.mData));
 		}
@@ -172,7 +172,7 @@ namespace carl {
 		 * @param b Second argument.
 		 * @return \f$a \% b\f$.
 		 */
-		inline Number<cln::cl_I> remainder(const Number<cln::cl_I>& b) {
+		inline Number<cln::cl_I> remainder(const Number<cln::cl_I>& b) const {
 			return Number(cln::rem(mData, b.mData));
 		}
 
@@ -182,13 +182,13 @@ namespace carl {
 
 	//template specializations of member-functions of Number<cln::cl_I>
 	template<>
-	inline sint Number<cln::cl_I>::toInt<sint>() {
+	inline sint Number<cln::cl_I>::toInt<sint>() const {
 	    assert(mData <= std::numeric_limits<sint>::max());
 	    assert(mData >= std::numeric_limits<sint>::min());
 	    return cln::cl_I_to_long(mData);
 	}
 	template<>
-	inline uint Number<cln::cl_I>::toInt<uint>() {
+	inline uint Number<cln::cl_I>::toInt<uint>() const {
 	    assert(mData <= std::numeric_limits<uint>::max());
 	    assert(mData >= std::numeric_limits<uint>::min());
 	    return uint(cln::cl_I_to_long(mData));

@@ -133,7 +133,7 @@ namespace carl {
 
 
 
-	 bool Number<cln::cl_RA>::sqrt_exact(Number<cln::cl_RA>& b)
+	 bool Number<cln::cl_RA>::sqrt_exact(Number<cln::cl_RA>& b) const
 	 {
 		if( mData < 0 ) return false;
 		cln::cl_RA result;
@@ -144,14 +144,14 @@ namespace carl {
 
 	
 	//this is the same as for mpq_class	
-	 Number<cln::cl_RA> Number<cln::cl_RA>::sqrt()
+	 Number<cln::cl_RA> Number<cln::cl_RA>::sqrt() const
 	 {
 		std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> r = this->sqrt_safe();
 		return Number((r.first.getValue() + r.second.getValue()) / 2); //TODO: remove the getValue once operators are implemented!!
 	 }
 	
 
-	cln::cl_RA Number<cln::cl_RA>::scaleByPowerOfTwo(const cln::cl_RA& a, int exp) {
+	cln::cl_RA Number<cln::cl_RA>::scaleByPowerOfTwo(const cln::cl_RA& a, int exp) const {
 		if (exp > 0) {
 			return cln::cl_RA(cln::numerator(a) << exp) / cln::denominator(a);
 		} else if (exp < 0) {
@@ -160,7 +160,7 @@ namespace carl {
 		return a;
 	} 
 
-	    std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> Number<cln::cl_RA>::sqrt_safe()
+	    std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> Number<cln::cl_RA>::sqrt_safe() const
 	    {
 		assert( mData >= 0 );
 		cln::cl_RA exact_root;
@@ -195,7 +195,7 @@ namespace carl {
 		}
 	    }
 
-	    std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> Number<cln::cl_RA>::sqrt_fast()
+	    std::pair<Number<cln::cl_RA>, Number<cln::cl_RA>> Number<cln::cl_RA>::sqrt_fast() const
 	    {
 			assert(mData >= 0);
 			cln::cl_RA exact_root;

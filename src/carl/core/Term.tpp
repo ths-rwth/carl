@@ -343,7 +343,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 		clear();
 		return *this;
 	}
-	assert(carl::isZero(mCoeff) || !carl::isZero(mCoeff * rhs)); //change this to mCoeff.isZero() and mCoeff * Number(rhs) at some point
+	assert(carl::isZero(mCoeff) || !carl::isZero(Coefficient(mCoeff * rhs))); //change this to mCoeff.isZero() and mCoeff * Number(rhs) at some point
 	mCoeff *= CoefficientType(rhs);
 	return *this;
 }

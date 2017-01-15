@@ -94,7 +94,7 @@ namespace carl {
 
 
 
-		inline Number<mpz_class> round() {
+		inline Number<mpz_class> round() const {
 			if (Number(mpz_class(mData.get_num_mpz_t())).isZero()) return Number<mpz_class>(carl::constant_zero<mpz_class>::get());
 			mpz_class res;
 			mpz_class rem;
@@ -104,7 +104,7 @@ namespace carl {
 			return Number<mpz_class>(res);
 		}
 
-		inline Number<mpz_class> floor() {
+		inline Number<mpz_class> floor() const {
 			if (Number(mpz_class(mData.get_num_mpz_t())).isZero()) return Number<mpz_class>(carl::constant_zero<mpz_class>::get());
 			mpz_class res;
 			mpz_fdiv_q(res.get_mpz_t(), mData.get_num_mpz_t(), mData.get_den_mpz_t());
@@ -112,7 +112,7 @@ namespace carl {
 		}
 
 
-		inline Number<mpz_class> ceil() {
+		inline Number<mpz_class> ceil() const {
 			if (Number(mpz_class(mData.get_num_mpz_t())).isZero()) return Number<mpz_class>(carl::constant_zero<mpz_class>::get());
 			mpz_class res;
 			mpz_cdiv_q(res.get_mpz_t(), mData.get_num_mpz_t(), mData.get_den_mpz_t());
@@ -121,7 +121,7 @@ namespace carl {
 
 
 
-		inline Number<mpq_class> gcd(const Number<mpq_class>& b) {
+		inline Number<mpq_class> gcd(const Number<mpq_class>& b) const {
 		    	mpz_class resNum;
 			mpz_gcd(resNum.get_mpz_t(), mData.get_num().get_mpz_t(), b.mData.get_num().get_mpz_t());
 			mpz_class resDen;
@@ -137,7 +137,7 @@ namespace carl {
 
 
 
-		inline Number<mpq_class> lcm(const Number<mpq_class>& b) {
+		inline Number<mpq_class> lcm(const Number<mpq_class>& b) const {
 		    	mpz_class resNum;
 			mpz_lcm(resNum.get_mpz_t(), mData.get_num().get_mpz_t(), b.mData.get_num().get_mpz_t());
 			mpz_class resDen;
@@ -153,7 +153,7 @@ namespace carl {
 
 
 
-		inline Number<mpq_class> pow(std::size_t e) {
+		inline Number<mpq_class> pow(std::size_t e) const {
 			mpz_class den = mData.get_den();
 			mpz_class powDen;
 			mpz_pow_ui(powDen.get_mpz_t(), den.get_mpz_t(), e);
@@ -175,7 +175,7 @@ namespace carl {
 
 
 
-		inline bool isInteger() {
+		inline bool isInteger() const {
 			 return 0 != mpz_divisible_p(mData.get_num_mpz_t(), mData.get_den_mpz_t());
 		}
 
@@ -186,7 +186,7 @@ namespace carl {
 		 * @param n A fraction.
 		 * @return Bit size of n.
 		 */
-		inline std::size_t bitsize() {
+		inline std::size_t bitsize() const {
 			return mpz_sizeinbase(mData.get_num().__get_mp(),2) + mpz_sizeinbase(mData.get_den().__get_mp(),2);
 		}
 
@@ -197,14 +197,14 @@ namespace carl {
 		 */
 
 		//this is the same as for mpz
-		inline double toDouble() {
+		inline double toDouble() const {
 			return mData.get_d();
 		}
 
 
 
 		template<typename Integer>
-		inline Integer toInt();
+		inline Integer toInt() const;
 
 
 
@@ -223,15 +223,15 @@ namespace carl {
 
 
 
-		inline Number<mpq_class> log() {
+		inline Number<mpq_class> log() const {
 			return Number(std::log(this->toDouble()));
 		}
 
-		inline Number<mpq_class> sin() {
+		inline Number<mpq_class> sin() const {
 			return Number(std::sin(this->toDouble()));
 		}
 
-		inline Number<mpq_class> cos() {
+		inline Number<mpq_class> cos() const {
 			return Number(std::cos(this->toDouble()));
 		}
 
@@ -244,11 +244,11 @@ namespace carl {
 		 * @return true, if the number to calculate the square root for is a square;
 		 *         false, otherwise.
 		 */
-		bool sqrt_exact(Number<mpq_class>& b);
+		bool sqrt_exact(Number<mpq_class>& b) const;
 
-		Number<mpq_class> sqrt();
+		Number<mpq_class> sqrt() const;
 
-		std::pair<Number<mpq_class>,Number<mpq_class>> sqrt_safe();
+		std::pair<Number<mpq_class>,Number<mpq_class>> sqrt_safe() const;
 
 		/**
 		 * Compute square root in a fast but less precise way.
@@ -257,11 +257,11 @@ namespace carl {
 		 * @param a Some number.
 		 * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z.
 		 */
-		std::pair<Number<mpq_class>,Number<mpq_class>> sqrt_fast();
+		std::pair<Number<mpq_class>,Number<mpq_class>> sqrt_fast() const;
 
 
 
-		inline Number<mpq_class> quotient(const Number<mpq_class>& d)
+		inline Number<mpq_class> quotient(const Number<mpq_class>& d) const
 		{
 			mpq_class res;
 			mpq_div(res.get_mpq_t(), mData.get_mpq_t(), d.mData.get_mpq_t());
@@ -271,14 +271,14 @@ namespace carl {
 
 
 
-		inline Number<mpq_class> div(const Number<mpq_class>& b) {
+		inline Number<mpq_class> div(const Number<mpq_class>& b) const {
 			return this->quotient(b);
 		}
 
 
 
 
-		inline Number<mpq_class> reciprocal() {
+		inline Number<mpq_class> reciprocal() const {
 			mpq_class res;
 			mpq_inv(res.get_mpq_t(), mData.get_mpq_t());
 			return Number(res);
@@ -291,18 +291,18 @@ namespace carl {
 	//template specializations of template member-functions of Number<mpq_class>
 
 	template<>
-	inline Number<mpz_class> Number<mpq_class>::toInt<Number<mpz_class>>() {
+	inline Number<mpz_class> Number<mpq_class>::toInt<Number<mpz_class>>() const {
 		assert(this->isInteger());
 		return this->getNum();
 	}
 
 
 	template<>
-	inline sint Number<mpq_class>::toInt<sint>() {
+	inline sint Number<mpq_class>::toInt<sint>() const {
 	    return this->toInt<Number<mpz_class>>().toInt<sint>();
 	}
 	template<>
-	inline uint Number<mpq_class>::toInt<uint>() {
+	inline uint Number<mpq_class>::toInt<uint>() const {
 		return this->toInt<Number<mpz_class>>().toInt<uint>();
 	}
 

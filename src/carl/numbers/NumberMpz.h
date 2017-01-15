@@ -82,7 +82,7 @@ namespace carl {
 
 		//specializations of this are below, outside the class
 		template<typename Integer>
-		Integer toInt();
+		Integer toInt() const;
 		
 
 		/**
@@ -175,13 +175,13 @@ namespace carl {
 
 	//template specializations of member-functions have to be outside the class:
 	template<>
-	inline sint Number<mpz_class>::toInt<sint>() {
+	inline sint Number<mpz_class>::toInt<sint>() const {
 	    assert(mData <= std::numeric_limits<sint>::max());
 	    assert(mData >= std::numeric_limits<sint>::min());
 	    return mpz_get_si(mData.get_mpz_t());
 	}
 	template<>
-	inline uint Number<mpz_class>::toInt<uint>() {
+	inline uint Number<mpz_class>::toInt<uint>() const {
 	    assert(mData <= std::numeric_limits<uint>::max());
 	    assert(mData >= std::numeric_limits<uint>::min());
 	    return mpz_get_ui(mData.get_mpz_t());
