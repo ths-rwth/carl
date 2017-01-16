@@ -1,10 +1,10 @@
 #include "gtest/gtest.h"
 #include "../../carl/numbers/numbers.h"
 
-#include "../../carl/numbers/NumberMpz.h"
-#include "../../carl/numbers/NumberMpq.h"
-#include "../../carl/numbers/NumberClI.h"
-#include "../../carl/numbers/NumberClRA.h"
+#include "../../carl/numbers/number/NumberMpz.h"
+#include "../../carl/numbers/number/NumberMpq.h"
+#include "../../carl/numbers/number/NumberClI.h"
+#include "../../carl/numbers/number/NumberClRA.h"
 
 TEST(Number, Constructor)
 {
