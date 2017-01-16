@@ -71,8 +71,7 @@ TEST(Number, Constructor)
 
 
 //cln::cl_I
-
-
+#ifdef USE_CLN_NUMBERS
 	cln::cl_I clI(2);	
 	carl::Number<cln::cl_I> i1, i2, i3, i4, i5, i6, i7, i8, i9, i10;
 	ASSERT_NO_THROW(i1 = carl::Number<cln::cl_I>());
@@ -154,7 +153,7 @@ TEST(Number, Constructor)
 
 	EXPECT_EQ(q15.getValue(),mpq_class(0));
 	EXPECT_EQ(q16.getValue(),mpq_class(0));
-		
+#endif
 }
 
 
@@ -188,6 +187,7 @@ TEST(Number,IntegerOperations) {
 
 
 //clI
+#ifdef USE_CLN_NUMBERS
 	carl::Number<cln::cl_I> i(1);
 	EXPECT_FALSE(i.isZero());
 	EXPECT_TRUE(i.isOne());
@@ -212,6 +212,7 @@ TEST(Number,IntegerOperations) {
 	EXPECT_EQ(i.toInt<carl::uint>(),1);
 
 	EXPECT_EQ(i.toString(),"1");
+#endif
 }
 
 
@@ -267,7 +268,7 @@ TEST(Number,RationalOperations) {
 	EXPECT_EQ(q.toString(),"1");
 
 // clRA:
-
+#ifdef USE_CLN_NUMBERS
 	carl::Number<cln::cl_RA> r(1);
 
 	EXPECT_TRUE(r.isOne());
@@ -317,8 +318,7 @@ TEST(Number,RationalOperations) {
 	EXPECT_EQ(r.toInt<carl::uint>(),1);
 
 	EXPECT_EQ(r.toString(),"1");
-
-	
+#endif
 }
 
 
@@ -384,6 +384,3 @@ TEST(Number,BinaryOperators) {
 
 
 }
-
-
-
