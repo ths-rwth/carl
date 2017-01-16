@@ -37,6 +37,7 @@ addons:
       - clang-3.7
       - clang-3.8
       - clang-3.9
+      - openjdk-7-jdk
       - time
       - texinfo
       - texlive
