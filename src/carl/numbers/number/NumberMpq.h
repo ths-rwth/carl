@@ -1,15 +1,9 @@
 #pragma once
 
-
 #include "Number.h"
 #include "NumberMpz.h"
 
-
-
 namespace carl {
-
-
-
 
 #ifdef USE_CLN_NUMBERS
 	template<>
@@ -19,8 +13,6 @@ namespace carl {
 	class Number<cln::cl_RA> ;
 #endif
 
-
-
 	template<>
 	class Number<mpz_class> ;
 
@@ -28,11 +20,12 @@ namespace carl {
 	class Number<mpq_class> : public BaseNumber<mpq_class,Number<mpq_class>> {
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
+		Number(const Number<mpq_class>& n) = default;
+		Number(Number<mpq_class>&& n) = default;
+
 		explicit Number(const mpq_class& t): BaseNumber(t) {}
 		explicit Number(mpq_class&& t): BaseNumber(t) {}
-		Number(const Number<mpq_class>& n): BaseNumber(n) {}
-		Number(Number<mpq_class>&& n) noexcept : BaseNumber(n) {}
 		Number(int i) : BaseNumber(i) {}
 		Number(long long int n) : BaseNumber(n) {}
 		Number(unsigned long long int n): BaseNumber(n) {}
@@ -318,4 +311,3 @@ namespace carl {
 
 
 }
-

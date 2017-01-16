@@ -1,10 +1,6 @@
 #pragma once
 
-
-
 #include "Number.h"
-
-
 
 namespace carl {
 
@@ -18,19 +14,18 @@ namespace carl {
 	class Number<cln::cl_I> : public BaseNumber<cln::cl_I,Number<cln::cl_I>> {
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
+		Number(const Number<cln::cl_I>& n) = default;
+		Number(Number<cln::cl_I>&& n) = default;
+
 		explicit Number(const cln::cl_I& t): BaseNumber(t) {}
 		explicit Number(cln::cl_I&& t): BaseNumber(t) {}
-		Number(const Number<cln::cl_I>& n): BaseNumber(n) {}
-		Number(Number<cln::cl_I>&& n) noexcept : BaseNumber(n) {}
 		explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		Number(int n) : BaseNumber(n) {}
 		Number(long long int n) { mData = cln::cl_I(n); }
 		Number(unsigned long long int n) { mData = cln::cl_I(n);}
 	 	Number(const Number<mpz_class>& n);
 		
-
-
 		Number<cln::cl_I>& operator=(const Number<cln::cl_I>& n) {
 			this->mData = n.mData;
 			return *this;

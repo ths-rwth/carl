@@ -1,15 +1,9 @@
 #pragma once
 
-
 #include "Number.h"
-
 #include "NumberClI.h"
 
-
-
 namespace carl {
-
-
 
 #ifdef USE_CLN_NUMBERS
 
@@ -35,11 +29,12 @@ namespace carl {
 	cln::cl_RA scaleByPowerOfTwo(const cln::cl_RA& a, int exp) const; //auxiliary function 
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
+		Number(const Number<cln::cl_RA>& n) = default;
+		Number(Number<cln::cl_RA>&& n) = default;
+
 		explicit Number(const cln::cl_RA& t): BaseNumber(t) {}
 		explicit Number(cln::cl_RA&& t): BaseNumber(t) {}
-		Number(const Number<cln::cl_RA>& n): BaseNumber(n) {}
-		Number(Number<cln::cl_RA>&& n) noexcept : BaseNumber(n) {}
 		explicit Number(int n) : BaseNumber(n) {}
 		explicit Number(long long int n) { mData = cln::cl_RA(n); }
 		explicit Number(unsigned long long int n) { mData = cln::cl_RA(n); }

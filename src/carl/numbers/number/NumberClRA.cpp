@@ -1,4 +1,3 @@
-#include "Number.h"
 #include "NumberClRA.h"
 
 #include "NumberMpq.h"
@@ -59,7 +58,7 @@ namespace carl {
 			}
 			mData = cln::cl_RA(result);
 		} else { //the case where we have a fraction as input
-			cln::cl_read_flags flags = {cln::syntax_rational, cln::lsyntax_all, 10, cln::default_float_format, cln::default_float_format, false}; 
+			cln::cl_read_flags flags = {cln::syntax_rational, cln::lsyntax_all, 10, {cln::default_float_format, cln::default_float_format, false}}; 
 			std::istringstream istr(s);
 			mData = cln::cl_RA(cln::read_rational(istr,flags));
 		}

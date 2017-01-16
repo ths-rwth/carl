@@ -16,59 +16,53 @@ namespace carl {
 	template<typename T, typename N>
 	class BaseNumber {
 	protected:
-		T mData;
+		T mData = carl::constant_zero<T>::get();
 	public:
-
-		//TODO: which constructors explicit?
-		//TODO: possibly implement setValue(T) as well
-		BaseNumber(): mData(carl::constant_zero<T>::get()) {}
+		BaseNumber() = default;
+		BaseNumber(const BaseNumber<T,N>& n) = default;
+		BaseNumber(BaseNumber<T,N>&& n) = default;
+		BaseNumber<T,N>& operator=(const BaseNumber<T,N>& n) = default;
+		BaseNumber<T,N>& operator=(BaseNumber<T,N>&& n) = default;
+		~BaseNumber() = default;
+				
 		explicit BaseNumber(const T& t): mData(t) {}
 		explicit BaseNumber(T&& t): mData(std::move(t)) {}
-		BaseNumber(const BaseNumber<T,N>& n): mData(n.mData) {}
-		BaseNumber(BaseNumber<T,N>&& n) noexcept : mData(std::move(n.mData)) {}
 		BaseNumber(long long int n) { std::string s = std::to_string(n); mData = T(s); }
 		BaseNumber(unsigned long long int n) { std::string s = std::to_string(n); mData= T(s); }
 		BaseNumber(int i) : mData(i) {}
 		BaseNumber(const std::string& s) : mData(s) {}
 
 
-		const T& getValue() const {
+		const T& getValue() const noexcept {
 			return mData;
 		}
 
-
 		inline bool isZero() const {
-			return constant_zero<T>::get() == mData;
+			return mData == constant_zero<T>::get();
 		}
 
-
 		inline bool isOne() const {
-			return mData  == carl::constant_one<T>().get();
+			return mData  == constant_one<T>().get();
 		}
 
 
 		inline bool isPositive() const {
-			return mData > carl::constant_zero<T>().get();
+			return mData > constant_zero<T>().get();
 		}
-
 
 		inline bool isNegative() const {
-			return mData < carl::constant_zero<T>().get();
+			return mData < constant_zero<T>().get();
 		}
 			
-		operator const T&() const {
+		operator const T&() const noexcept {
 			return mData;
 		}
 
-		operator T&() {
+		operator T&() noexcept {
 			return mData;
 		}
 
-/*
-		N& operator=(const BaseNumber<T,N>& n) {
-			mData = n.mData;
-			return *this;
-		}
+
 
 		template<typename Other>
 		N& operator=(const Other& n) {
@@ -76,10 +70,6 @@ namespace carl {
 			return *this;
 		}
 
-		N& operator=(BaseNumber<T,N>&& n) noexcept {
-			mData = std::move(n.mData);
-			return *this;
-		} */
 
 		bool operator==(const BaseNumber<T,N>& rhs) const {
 			return this->mData == rhs.mData;
@@ -150,7 +140,7 @@ namespace carl {
 	};
 
 	template<typename T>
-	class Number : public BaseNumber<T,Number<T>> {};	
+	class Number: public BaseNumber<T,Number<T>> {};	
 
 
 

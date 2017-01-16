@@ -1,12 +1,6 @@
 #pragma once
 
-
-
 #include "Number.h"
-//#include "numbers.h"
-
-
-
 
 namespace carl {
 
@@ -15,32 +9,28 @@ namespace carl {
 	class Number<cln::cl_I> ;
 #endif
 
-
-
 	template<>
 	class Number<mpz_class> : public BaseNumber<mpz_class,Number<mpz_class>> {
 	public:
 	
-
-		Number(): BaseNumber() {}
+		Number() = default;
+		Number(const Number<mpz_class>& n) = default;
+		Number(Number<mpz_class>&& n) = default;
+		Number<mpz_class>& operator=(const Number<mpz_class>& n) = default;
+		Number<mpz_class>& operator=(Number<mpz_class>&& n) = default;
+		
 		explicit Number(const mpz_class& t): BaseNumber(t) {}
 		explicit Number(mpz_class&& t): BaseNumber(t) {}
-		Number(const Number<mpz_class>& n): BaseNumber(n) {}
-		Number(Number<mpz_class>&& n) noexcept : BaseNumber(n) {}
 		Number(int n) : BaseNumber(n) {}
 		Number(long long int n) : BaseNumber(n) {}
 		Number(unsigned long long int n): BaseNumber(n) {}
 		explicit Number(const std::string& s) : BaseNumber(s) {}
 #ifdef USE_CLN_NUMBERS
-		Number(const Number<cln::cl_I>& n);
+		explicit Number(const Number<cln::cl_I>& n);
 #endif
 
 
 
-		Number<mpz_class>& operator=(const Number<mpz_class>& n) {
-			this->mData = n.mData;
-			return *this;
-		}
 
 		template<typename Other>
 		Number<mpz_class>& operator=(const Other& n) {
@@ -48,10 +38,6 @@ namespace carl {
 			return *this;
 		}
 
-		Number<mpz_class>& operator=(Number<mpz_class>&& n) noexcept {
-			this->mData = std::move(n.mData);
-			return *this;
-		}
 
 
 
