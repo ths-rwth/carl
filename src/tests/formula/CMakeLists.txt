@@ -1,4 +1,3 @@
-# Add test cpp file
 file(GLOB_RECURSE test_sources "*.cpp")
 
 add_executable(runFormulaTests ${test_sources})
