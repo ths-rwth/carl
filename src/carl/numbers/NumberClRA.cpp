@@ -1,15 +1,15 @@
 #include "Number.h"
 #include "NumberClRA.h"
 
-
 #include "NumberMpq.h"
 #include "NumberMpz.h"
 
-#include <limits>
 #include <boost/numeric/interval/interval.hpp>
 #include <boost/numeric/interval/policies.hpp>
 #include <boost/numeric/interval/arith2.hpp>
 #include <boost/numeric/interval/checking.hpp>
+
+#include <limits>
 
 namespace carl {
 
@@ -20,7 +20,7 @@ namespace carl {
 		//(this looks hacky.. seems to be the only really functioning way though: take the integers as strings, put the sign at the front and construct
 		//cl_RA from the string "[-]a/b")
 		Number<cln::cl_RA>::Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) :
-			 Number(((a.isNegative() xor b.isNegative()) ? "-" : "") + a.abs().toString()+"/"+b.abs().toString()) {}
+			 Number(((a.isNegative() != b.isNegative()) ? "-" : "") + a.abs().toString()+"/"+b.abs().toString()) {}
 
 	
 		Number<cln::cl_RA>::Number(const Number<cln::cl_I>& n) { mData = cln::cl_RA(n.getValue()); }
@@ -219,4 +219,3 @@ namespace carl {
 #endif
 
 }
-

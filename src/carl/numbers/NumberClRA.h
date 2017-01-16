@@ -3,8 +3,6 @@
 
 #include "Number.h"
 
-
-
 #include "NumberClI.h"
 
 
@@ -323,4 +321,3 @@ namespace carl {
 #endif
 
 }
-
