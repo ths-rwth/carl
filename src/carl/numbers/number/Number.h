@@ -5,7 +5,7 @@
 #endif
 
 #include <string>
-#include "numbers.h"
+#include "../numbers.h"
 
 namespace carl {
 
