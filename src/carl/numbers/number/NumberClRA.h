@@ -46,16 +46,16 @@ namespace carl {
 		explicit Number(float f) { mData = cln::rationalize(f); } 
 
 
-		Number(const std::string& s); 
+		explicit Number(const std::string& s);
 
-		Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b);
+		Number(const Number<cln::cl_I>& a, const Number<cln::cl_I>& b);
 
 	
-		Number(const Number<cln::cl_I>& n);
+		explicit Number(const Number<cln::cl_I>& n);
 
 
-		Number(const Number<mpq_class>& n);
-		Number(const Number<mpz_class>& n);
+		explicit Number(const Number<mpq_class>& n);
+		explicit Number(const Number<mpz_class>& n);
 
 
 

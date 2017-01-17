@@ -1,7 +1,6 @@
-
-#include "Number.h"
-#include "NumberClRA.h"
 #include "NumberClI.h"
+
+#include "NumberClRA.h"
 #include "NumberMpz.h"
 
 

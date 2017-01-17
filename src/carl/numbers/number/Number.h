@@ -30,7 +30,7 @@ namespace carl {
 		BaseNumber(long long int n) { std::string s = std::to_string(n); mData = T(s); }
 		BaseNumber(unsigned long long int n) { std::string s = std::to_string(n); mData= T(s); }
 		BaseNumber(int i) : mData(i) {}
-		BaseNumber(const std::string& s) : mData(s) {}
+		explicit BaseNumber(const std::string& s) : mData(s) {}
 
 
 		const T& getValue() const noexcept {

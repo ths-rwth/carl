@@ -1,5 +1,5 @@
-#include "Number.h"
 #include "NumberMpq.h"
+
 #include "NumberClI.h"
 #include "NumberClRA.h"
 #include "NumberMpz.h"
@@ -169,4 +169,3 @@ namespace carl {
 
 
 }
-

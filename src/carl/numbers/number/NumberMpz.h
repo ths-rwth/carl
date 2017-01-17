@@ -29,22 +29,11 @@ namespace carl {
 		explicit Number(const Number<cln::cl_I>& n);
 #endif
 
-
-
-
 		template<typename Other>
 		Number<mpz_class>& operator=(const Other& n) {
 			this->mData = n;
 			return *this;
 		}
-
-
-
-
-
-	
-		
-
 		
 		//getNum, getDenom removed (they don't make sense here, but could be implemented)
 		

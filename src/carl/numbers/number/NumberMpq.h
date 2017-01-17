@@ -33,21 +33,21 @@ namespace carl {
 		
 		//The following constructors can maybe be grouped together in a Rational-superclass	
 		//TODO: explicit or not?
-		Number(float f) { mData = mpq_class(f); }
-		Number(double d) { mData = mpq_class(d); }
+		explicit Number(float f) { mData = mpq_class(f); }
+		explicit Number(double d) { mData = mpq_class(d); }
 
 		explicit Number(const std::string& s);
 
 		//constructs a/b:
-		Number(const Number<mpz_class>& a,const Number<mpz_class>& b);
+		Number(const Number<mpz_class>& a, const Number<mpz_class>& b);
 
 	
-		Number(const Number<mpz_class>& n);
-		Number(const mpz_class& n);
+		explicit Number(const Number<mpz_class>& n);
+		explicit Number(const mpz_class& n);
 
 #ifdef USE_CLN_NUMBERS
-		Number(const Number<cln::cl_RA>& n);
-		Number(const Number<cln::cl_I>& n);
+		explicit Number(const Number<cln::cl_RA>& n);
+		explicit Number(const Number<cln::cl_I>& n);
 #endif
 
 		std::string toString(bool _infix=true) const;

@@ -24,7 +24,7 @@ namespace carl {
 		Number(int n) : BaseNumber(n) {}
 		Number(long long int n) { mData = cln::cl_I(n); }
 		Number(unsigned long long int n) { mData = cln::cl_I(n);}
-	 	Number(const Number<mpz_class>& n);
+		explicit Number(const Number<mpz_class>& n);
 		
 		Number<cln::cl_I>& operator=(const Number<cln::cl_I>& n) {
 			this->mData = n.mData;
