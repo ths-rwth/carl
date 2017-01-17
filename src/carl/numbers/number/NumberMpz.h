@@ -17,13 +17,13 @@ namespace carl {
 		Number(const Number<mpz_class>& n) = default;
 		Number(Number<mpz_class>&& n) = default;
 		Number<mpz_class>& operator=(const Number<mpz_class>& n) = default;
-		Number<mpz_class>& operator=(Number<mpz_class>&& n) = default;
+		Number<mpz_class>& operator=(Number<mpz_class>&& n) = default; // NOLINT
 		
 		explicit Number(const mpz_class& t): BaseNumber(t) {}
 		explicit Number(mpz_class&& t): BaseNumber(t) {}
-		Number(int n) : BaseNumber(n) {}
-		Number(long long int n) : BaseNumber(n) {}
-		Number(unsigned long long int n): BaseNumber(n) {}
+		Number(int n) : BaseNumber(n) {} // NOLINT
+		Number(long long int n) : BaseNumber(n) {} // NOLINT
+		Number(unsigned long long int n): BaseNumber(n) {} // NOLINT
 		explicit Number(const std::string& s) : BaseNumber(s) {}
 #ifdef USE_CLN_NUMBERS
 		explicit Number(const Number<cln::cl_I>& n);

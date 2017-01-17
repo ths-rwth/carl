@@ -244,7 +244,7 @@ namespace carl
                 return create( makePolynomial<Pol>( _lhs ), _rel );
             }
             
-            void free( const ConstraintContent<Pol>* _cc )
+            void free( const ConstraintContent<Pol>* _cc ) noexcept
             {
                 CONSTRAINT_POOL_LOCK_GUARD
                 assert( _cc->mUsages > 0 );

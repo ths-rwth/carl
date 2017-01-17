@@ -12,8 +12,8 @@
 #include "../../../core/Variable.h"
 #include "../../../numbers/numbers.h"
 
+#include <cassert>
 #include <iostream>
-#include <assert.h>
 
 namespace carl
 {

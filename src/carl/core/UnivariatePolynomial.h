@@ -6,20 +6,19 @@
 
 #pragma once
 
-#include <functional>
-#include <list>
-#include <map>
-#include <memory>
-#include <vector>
-
+#include "../interval/Interval.h"
+#include "../numbers/numbers.h"
+#include "../util/SFINAE.h"
 #include "Polynomial.h"
 #include "Sign.h"
 #include "Variable.h"
 #include "VariableInformation.h"
 
-#include "../interval/Interval.h"
-#include "../numbers/numbers.h"
-#include "../util/SFINAE.h"
+#include <functional>
+#include <list>
+#include <map>
+#include <memory>
+#include <vector>
 
 namespace carl {
 //
@@ -98,7 +97,7 @@ public:
 	/**
 	 * Move constructor.
 	 */
-	UnivariatePolynomial(UnivariatePolynomial&& p);
+	UnivariatePolynomial(UnivariatePolynomial&& p) noexcept;
 	/**
 	 * Copy assignment operator.
 	 */
@@ -106,7 +105,7 @@ public:
 	/**
 	 * Move assignment operator.
 	 */
-	UnivariatePolynomial& operator=(UnivariatePolynomial&& p);
+	UnivariatePolynomial& operator=(UnivariatePolynomial&& p) noexcept;
 
 	/**
 	 * Construct a zero polynomial with the given main variable.
@@ -158,7 +157,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	virtual ~UnivariatePolynomial();
+	~UnivariatePolynomial() override = default;
 
 	//Polynomial interface implementations.
 
@@ -897,7 +896,7 @@ public:
 	template<typename Integer>
 	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& poly, FactorMap<Coefficient>& linearFactors, const Integer& maxInt = 0 );
 
-	Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
+	Coefficient syntheticDivision(const Coefficient& zeroOfDivisor);
 	std::map<uint, UnivariatePolynomial> squareFreeFactorization() const;
 
 	/**
@@ -959,8 +958,8 @@ public:
 	 * @return Subresultants of p and q.
 	 */
 	static const std::list<UnivariatePolynomial> subresultants(
-			const UnivariatePolynomial& p,
-			const UnivariatePolynomial& q,
+			const UnivariatePolynomial& pol1,
+			const UnivariatePolynomial& pol2,
 			SubresultantStrategy strategy = SubresultantStrategy::Default
 	);
 
@@ -1201,7 +1200,7 @@ private:
 	 * @return 
 	 */
 	UnivariatePolynomial remainder_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
-	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
+	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
 	void stripLeadingZeroes() 
 	{
 		while(!isZero() && lcoeff() == Coefficient(0))

@@ -8,9 +8,8 @@
 #pragma once
 
 #include <eigen3/Eigen/Dense>
-#include <vector>
 #include <cmath>
-
+#include <vector>
 
 namespace carl {
 

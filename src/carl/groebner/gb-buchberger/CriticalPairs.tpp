@@ -43,8 +43,8 @@ namespace carl
 
             for( ++ps; ps != it.get( )->getPairsEnd( ); )
             {
-                std::unordered_map<size_t, SPolPair>::const_iterator spp1( newpairs.find( ps->mP1 ) );
-                std::unordered_map<size_t, SPolPair>::const_iterator spp2( newpairs.find( ps->mP2 ) );
+                auto spp1 = newpairs.find(ps->mP1);
+                auto spp2 = newpairs.find(ps->mP2);
 
                 if( spp1 == newpairs.end( ) )
                 {

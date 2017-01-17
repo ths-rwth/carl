@@ -781,7 +781,7 @@ namespace carl
         /**
          * Destructor
          */
-        ~Interval() { }
+        ~Interval() = default;
 
         /***********************************************************************
          * Getter & Setter

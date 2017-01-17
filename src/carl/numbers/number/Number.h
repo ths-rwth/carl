@@ -19,17 +19,17 @@ namespace carl {
 		T mData = carl::constant_zero<T>::get();
 	public:
 		BaseNumber() = default;
-		BaseNumber(const BaseNumber<T,N>& n) = default;
-		BaseNumber(BaseNumber<T,N>&& n) = default;
-		BaseNumber<T,N>& operator=(const BaseNumber<T,N>& n) = default;
-		BaseNumber<T,N>& operator=(BaseNumber<T,N>&& n) = default;
+		BaseNumber(const BaseNumber& n) = default;
+		BaseNumber(BaseNumber&& n) = default; // NOLINT
+		BaseNumber& operator=(const BaseNumber& n) = default;
+		BaseNumber& operator=(BaseNumber&& n) = default; // NOLINT
 		~BaseNumber() = default;
 				
 		explicit BaseNumber(const T& t): mData(t) {}
 		explicit BaseNumber(T&& t): mData(std::move(t)) {}
-		BaseNumber(long long int n) { std::string s = std::to_string(n); mData = T(s); }
-		BaseNumber(unsigned long long int n) { std::string s = std::to_string(n); mData= T(s); }
-		BaseNumber(int i) : mData(i) {}
+		BaseNumber(long long int n) { std::string s = std::to_string(n); mData = T(s); } // NOLINT
+		BaseNumber(unsigned long long int n) { std::string s = std::to_string(n); mData = T(s); } // NOLINT
+		BaseNumber(int i) : mData(i) {} // NOLINT
 		explicit BaseNumber(const std::string& s) : mData(s) {}
 
 
@@ -62,16 +62,14 @@ namespace carl {
 			return mData;
 		}
 
-
-
 		template<typename Other>
-		N& operator=(const Other& n) {
+		BaseNumber& operator=(const Other& n) {
 			mData = n;
 			return *this;
 		}
 
 
-		bool operator==(const BaseNumber<T,N>& rhs) const {
+		bool operator==(const BaseNumber& rhs) const {
 			return this->mData == rhs.mData;
 		}
 

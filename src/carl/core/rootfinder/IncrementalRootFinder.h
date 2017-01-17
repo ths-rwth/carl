@@ -244,12 +244,12 @@ public:
 	explicit IncrementalRootFinder(
 			const UnivariatePolynomial<Number>& polynomial,
 			const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
-			SplittingStrategy splittingStrategy = SplittingStrategy::DEFAULT,
+			SplittingStrategy strategy = SplittingStrategy::DEFAULT,
 			bool tryTrivialSolver = true
 			);
 
 	/**
-	 * Desctructor.
+	 * Destructor.
 	 */
 	virtual ~IncrementalRootFinder() = default;
 

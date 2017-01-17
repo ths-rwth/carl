@@ -27,9 +27,10 @@
  */
 #pragma once
 
-#include <list>
-#include "SPolPair.h"
 #include "../../core/Monomial.h"
+#include "SPolPair.h"
+
+#include <list>
 
 namespace carl
 {
@@ -48,73 +49,67 @@ public:
 	 * Saves the list of pairs and sorts them according the configured ordering.
      * @param pairs
      */
-    CriticalPairsEntry( const std::list<SPolPair>& pairs ) : mPairs( pairs )
+    CriticalPairsEntry(std::list<SPolPair> pairs) : mPairs(std::move(pairs))
     {
-        mPairs.sort( SPolPairCompare<Compare > ( ) );
+        mPairs.sort(SPolPairCompare<Compare>());
     }
 
 	/**
 	 * Get the LCM of the first element.
      * @return 
      */
-    const Monomial::Arg& getSortedFirstLCM( ) const
+    const Monomial::Arg& getSortedFirstLCM() const
     {
-        return mPairs.front( ).mLcm;
+        return mPairs.front().mLcm;
     }
 
 	/**
 	 * Get the front of the list.
      * @return 
      */
-    const SPolPair getFirst( ) const
-    {
-        return mPairs.front( );
+    const SPolPair& getFirst() const {
+        return mPairs.front();
     }
 
     /**
      * Removes the first element.
      * @return empty()
      */
-    bool update( )
-    {
-        mPairs.pop_front( );
-        return mPairs.empty( );
+    bool update() {
+        mPairs.pop_front();
+        return mPairs.empty();
     }
 
 	/**
 	 * The const iterator to the begin
      * @return begin of list
      */
-    std::list<SPolPair>::const_iterator getPairsBegin( ) const
-    {
-        return mPairs.begin( );
+    std::list<SPolPair>::const_iterator getPairsBegin() const noexcept {
+        return mPairs.begin();
     }
 
 	/**
 	 * The const iterator to the end()
      * @return end of list
      */
-    std::list<SPolPair>::const_iterator getPairsEnd( ) const
-    {
-        return mPairs.end( );
+    std::list<SPolPair>::const_iterator getPairsEnd() const noexcept {
+        return mPairs.end();
     }
 
     /**
 	 * The iterator to the end()
      * @return begin of list
      */
-	std::list<SPolPair>::iterator getPairsBegin( )
-    {
-        return mPairs.begin( );
+	std::list<SPolPair>::iterator getPairsBegin() noexcept {
+        return mPairs.begin();
     }
 
 	/**
 	 * The iterator to the end()
      * @return end of list
      */
-    std::list<SPolPair>::iterator getPairsEnd( )
-    {
-        return mPairs.end( );
+    std::list<SPolPair>::iterator getPairsEnd() noexcept {
+        return mPairs.end();
     }
 
 	/**
@@ -122,17 +117,15 @@ public:
      * @param it The iterator to the element to be erased.
      * @return The next element.
      */
-    std::list<SPolPair>::iterator erase( std::list<SPolPair>::iterator it )
-    {
-        return mPairs.erase( it );
+    std::list<SPolPair>::iterator erase(std::list<SPolPair>::iterator it) {
+        return mPairs.erase(it);
     }
 
     void print( std::ostream& os = std::cout )
     {
-        for( std::list<SPolPair>::const_iterator it = mPairs.begin( ); it != mPairs.end( ); ++it )
-        {
-            it->print( os );
-        }
+		for (const auto& p: mPairs) {
+			p.print(os);
+		}
     }
 private:
     std::list<SPolPair> mPairs;

@@ -5,13 +5,12 @@
 
 #pragma once
 
-#include "config.h"
-
 #include <cassert>
 #include <climits>
-
 #include <iostream>
 #include <type_traits>
+
+#include "config.h"
 
 namespace carl {
 	

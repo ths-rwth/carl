@@ -78,9 +78,9 @@ public:
 	
 	MultiplicationTable() : mTable(), mBase(), mGb() {}
 	
-	MultiplicationTable(const GroebnerBase<Number>& gb) : mGb(gb){
+	explicit MultiplicationTable(const GroebnerBase<Number>& gb) : mGb(gb){
 		CARL_LOG_ASSERT("carl.thom.tarski.table", gb.hasFiniteMon(), "tried to set up a multiplication table on infinite basis");
-		this->init(gb);
+		init(gb);
 		CARL_LOG_TRACE("carl.thom.tarski.table", "done setting up multiplication table:\n" << *this);
 	}
 	
@@ -94,7 +94,7 @@ public:
 		return mTable.find(m) != mTable.end();
 	}
 	
-	const std::vector<Monomial>& getBase() const {
+	const std::vector<Monomial>& getBase() const noexcept {
 		return mBase;
 	}
 	

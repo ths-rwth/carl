@@ -13,9 +13,9 @@
 
 #include <eigen3/Eigen/Dense>
 #include <cmath>
+#include <iterator>
 #include <list>
 #include <queue>
-#include <iterator>
 
 
 namespace carl {
@@ -73,7 +73,7 @@ public:
 	uint sizeOfZeroSet() const {
 		TaQResType res = mTaQ(Number(1));
 		CARL_LOG_ASSERT("carl.thom.sing", res >= 0, "");
-		return (uint)res;
+		return uint(res);
 	}
 	
 	const auto& processedPolynomials() const { return mP; }
@@ -109,7 +109,7 @@ private:
 		long j = 0;
 		for (const auto& alpha : ada) {
 			for (const auto& sigma : signs) {
-				res(i, j) = (float)sigmaToTheAlpha(alpha, sigma);
+				res(i, j) = float(sigmaToTheAlpha(alpha, sigma));
 				j++;
 			}
 			j = 0;
@@ -192,7 +192,7 @@ private:
 				row++;
 			}
 			Eigen::FullPivLU<Eigen::MatrixXf> dec(linesMat);
-			if (dec.rank() == (int)n) break;
+			if (dec.rank() == int(n)) break;
 
 		}
 		while(std::prev_permutation(lines.begin(), lines.end()));
@@ -337,7 +337,7 @@ private:
 		Eigen::VectorXf dprime(long(products.size()));
 		long index = 0;
 		for (const auto& prod : products) {
-			dprime(index) = (float)mTaQ(prod);
+			dprime(index) = float(mTaQ(prod));
 			index++;
 		}
 		

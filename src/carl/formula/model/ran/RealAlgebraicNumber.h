@@ -87,10 +87,10 @@ public:
 	{}
 		
 	RealAlgebraicNumber(const RealAlgebraicNumber& ran) = default;
-	RealAlgebraicNumber(RealAlgebraicNumber&& ran) = default;
+	RealAlgebraicNumber(RealAlgebraicNumber&& ran) noexcept = default;
 		
 	RealAlgebraicNumber& operator=(const RealAlgebraicNumber& n) = default;
-	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) = default;
+	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) noexcept = default;
 	
 	std::size_t size() const {
 		if (isNumeric()) return carl::bitsize(mValue);

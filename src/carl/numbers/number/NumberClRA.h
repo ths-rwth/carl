@@ -35,9 +35,9 @@ namespace carl {
 
 		explicit Number(const cln::cl_RA& t): BaseNumber(t) {}
 		explicit Number(cln::cl_RA&& t): BaseNumber(t) {}
-		explicit Number(int n) : BaseNumber(n) {}
-		explicit Number(long long int n) { mData = cln::cl_RA(n); }
-		explicit Number(unsigned long long int n) { mData = cln::cl_RA(n); }
+		Number(int n) : BaseNumber(n) {} // NOLINT
+		Number(long long int n) { mData = cln::cl_RA(n); } // NOLINT
+		Number(unsigned long long int n) { mData = cln::cl_RA(n); } // NOLINT
 
 
 		//The following constructors can maybe be grouped together in a Rational-superclass	

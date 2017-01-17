@@ -263,13 +263,13 @@ namespace carl
     }
 
     template<typename Pol>
-    bool ConstraintContent<Pol>::operator==( const ConstraintContent& _cc ) const
+    bool ConstraintContent<Pol>::operator==( const ConstraintContent& _constraint ) const
     {
-        if( mID == 0 || _cc.mID == 0 )
+        if( mID == 0 || _constraint.mID == 0 )
         {
-            return mRelation == _cc.mRelation && mLhs == _cc.mLhs;
+            return mRelation == _constraint.mRelation && mLhs == _constraint.mLhs;
         }
-        return mID == _cc.mID;
+        return mID == _constraint.mID;
     }
 
     template<typename Pol>
@@ -366,7 +366,7 @@ namespace carl
     }
     
     template<typename Pol>
-    Constraint<Pol>::Constraint( Constraint<Pol>&& _constraint ):
+    Constraint<Pol>::Constraint( Constraint<Pol>&& _constraint ) noexcept:
         mpContent( _constraint.mpContent )
     {
         _constraint.mpContent = nullptr;
@@ -392,7 +392,7 @@ namespace carl
     }
     
     template<typename Pol>
-    Constraint<Pol>& Constraint<Pol>::operator=( Constraint<Pol>&& _constraint )
+    Constraint<Pol>& Constraint<Pol>::operator=( Constraint<Pol>&& _constraint ) noexcept
     {
         if( mpContent != nullptr ) 
             ConstraintPool<Pol>::getInstance().free( mpContent );

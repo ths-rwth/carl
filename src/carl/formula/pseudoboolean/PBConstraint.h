@@ -1,10 +1,11 @@
 #pragma once
 
-#include <vector>
-#include <utility>
 #include "../../core/Relation.h"
 #include "../../core/Variable.h"
 #include "../../util/hash.h"
+
+#include <utility>
+#include <vector>
 
 namespace carl {
    
@@ -16,17 +17,16 @@ namespace carl {
         std::vector<std::pair<Variable, int>> lhs;
         
     public:
-        PBConstraint() {}
-        PBConstraint(const std::vector<std::pair<Variable, int>>& ls, Relation rel, int rs):
+        PBConstraint() = default;
+        PBConstraint(std::vector<std::pair<Variable, int>> ls, Relation rel, int rs):
 			relation(rel),
 			rhs(rs),
-		    lhs(ls)
+		    lhs(std::move(ls))
 	    {}
         std::vector<Variable> gatherVariables() const {
 	        std::vector<Variable> varVector;
-	        const std::vector<std::pair<Variable, int>>& ls = this->lhs;
-	        for(auto it = ls.begin(); it != ls.end(); ++it){
-	            varVector.push_back(it->first);
+            for (const auto& ls: lhs) {
+	            varVector.push_back(ls.first);
 	        }
 	        return varVector;
 	    }
@@ -61,11 +61,9 @@ namespace carl {
 		}
 
 		bool isTrue() const {
-			if(relation == Relation::GEQ && rhs <= 0 ){
-				for(auto it = lhs.begin(); it != lhs.end(); it++){
-					if(it->second < 0){
-						return false;
-					}
+			if (relation == Relation::GEQ && rhs <= 0){
+				for (const auto& lh: lhs) {
+					if(lh.second < 0) return false;
 				}
 				return true;
 			}
@@ -73,11 +71,9 @@ namespace carl {
 		}
 
 		bool isFalse() const {
-			if(relation == Relation::GEQ && rhs >= 1){
-				for(auto it = lhs.begin(); it != lhs.end(); it++){
-					if(it->second > 0){
-						return false;
-					}
+			if (relation == Relation::GEQ && rhs >= 1){
+				for (const auto& lh: lhs) {
+					if (lh.second > 0) return false;
 				}
 				return true;
 			}

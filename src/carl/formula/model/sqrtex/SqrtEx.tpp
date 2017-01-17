@@ -5,8 +5,6 @@
  * @version 2013-10-07
  */
 
-#include "SqrtEx.h"
-
 namespace carl
 {
     using namespace std;

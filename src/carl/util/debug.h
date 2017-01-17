@@ -7,16 +7,17 @@
 #pragma once
 
 #include <csignal>
+#include <forward_list>
 #include <iostream>
 #include <list>
-#include <forward_list>
 #include <map>
 #include <set>
+#include <sstream>
 #include <unordered_map>
 #include <vector>
-#include <sstream>
 
 #include "platform.h"
+
 #ifndef __VS
 #include <unistd.h>
 #endif

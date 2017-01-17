@@ -21,9 +21,9 @@ namespace carl {
 		explicit Number(const cln::cl_I& t): BaseNumber(t) {}
 		explicit Number(cln::cl_I&& t): BaseNumber(t) {}
 		explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
-		Number(int n) : BaseNumber(n) {}
-		Number(long long int n) { mData = cln::cl_I(n); }
-		Number(unsigned long long int n) { mData = cln::cl_I(n);}
+		Number(int n) : BaseNumber(n) {} // NOLINT
+		Number(long long int n) { mData = cln::cl_I(n); } // NOLINT
+		Number(unsigned long long int n) { mData = cln::cl_I(n);} // NOLINT
 		explicit Number(const Number<mpz_class>& n);
 		
 		Number<cln::cl_I>& operator=(const Number<cln::cl_I>& n) {

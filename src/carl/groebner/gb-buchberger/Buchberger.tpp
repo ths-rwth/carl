@@ -177,7 +177,7 @@ void Buchberger<Polynomial, AddingPolicy>::removeBuchbergerTriples(std::unordere
 {
 	std::unordered_map<size_t, SPolPair>::iterator it = spairs.begin();
 
-	if(primelist.size() != 0)
+	if(!primelist.empty())
 	{
 		std::vector<size_t>::const_iterator primes = primelist.begin();
 		while(it != spairs.end())

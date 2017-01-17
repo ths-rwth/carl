@@ -7,14 +7,14 @@
 
 #pragma once
 
-#include <cassert>
-#include <vector>
-#include <unordered_set>
-
-#include "PolynomialSorts.h"
 #include "../../core/Term.h"
 #include "../../core/VariablePool.h"
 #include "../DivisionLookupResult.h"
+#include "PolynomialSorts.h"
+
+#include <cassert>
+#include <unordered_set>
+#include <vector>
 
 namespace carl
 {
@@ -36,9 +36,7 @@ public:
 
     }
 
-    virtual ~IdealDatastructureVector()
-    {
-    }
+    virtual ~IdealDatastructureVector() = default;
 
     /**
      * Should be called whenever an generator is added
@@ -59,7 +57,7 @@ public:
      */
     DivisionLookupResult<Polynomial> getDivisor(const Term<typename Polynomial::CoeffType>& t) const
     {
-        for(typename std::vector<size_t>::iterator it = mDivList.begin(); it != mDivList.end();)
+        for(auto it = mDivList.begin(); it != mDivList.end();)
         {
             // First, we check whether the possible divisor is still in the ideal.
             // TODO As this mostly yields false, maybe, we should move it.

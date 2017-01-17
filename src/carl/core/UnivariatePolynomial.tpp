@@ -7,17 +7,17 @@
 
 #pragma once
 
+#include "../converter/OldGinacConverter.h"
+#include "../util/debug.h"
+#include "../util/platform.h"
+#include "../util/SFINAE.h"
+#include "logging.h"
+#include "MultivariateGCD.h"
+#include "MultivariatePolynomial.h"
+#include "Sign.h"
+
 #include <algorithm>
 #include <iomanip>
-#include "../util/SFINAE.h"
-#include "../util/platform.h"
-#include "../util/debug.h"
-#include "logging.h"
-#include "Sign.h"
-#include "UnivariatePolynomial.h"
-#include "MultivariatePolynomial.h"
-#include "MultivariateGCD.h"
-#include "../converter/OldGinacConverter.h"
 
 namespace carl
 {
@@ -30,26 +30,26 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(const UnivariatePolynomial& p)
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(UnivariatePolynomial&& p):
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(UnivariatePolynomial&& p) noexcept:
 	mMainVar(p.mMainVar), mCoefficients()
 {
-	std::swap(mCoefficients, p.mCoefficients);
-	assert(this->isConsistent());
+	mCoefficients = std::move(p.mCoefficients);
+	assert(isConsistent());
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(const UnivariatePolynomial& p) {
-	this->mMainVar = p.mMainVar;
-	this->mCoefficients = p.mCoefficients;
-	assert(this->isConsistent());
+	mMainVar = p.mMainVar;
+	mCoefficients = p.mCoefficients;
+	assert(isConsistent());
 	return *this;
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(UnivariatePolynomial&& p) {
-	std::swap(this->mMainVar, p.mMainVar);
-	std::swap(this->mCoefficients, p.mCoefficients);
-	assert(this->isConsistent());
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(UnivariatePolynomial&& p) noexcept {
+	mMainVar = p.mMainVar;
+	mCoefficients = std::move(p.mCoefficients);
+	assert(isConsistent());
 	return *this;
 }
 
@@ -60,20 +60,20 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar)
 	assert(this->isConsistent());
 }
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const Coeff& c, std::size_t e) :
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const Coeff& coeff, std::size_t degree) :
 mMainVar(mainVar),
-mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not always constructable (some methods need more parameter)
+mCoefficients(degree+1, Coeff(0)) // We would like to use 0 here, but Coeff(0) is not always constructable (some methods need more parameter)
 {
-	if(c != Coeff(0))
+	if(coeff != Coeff(0))
 	{
-		mCoefficients[e] = c;
+		mCoefficients[degree] = coeff;
 	}
 	else
 	{
 		mCoefficients.clear();
 	}
-	this->stripLeadingZeroes();
- 	assert(this->isConsistent());
+	stripLeadingZeroes();
+ 	assert(isConsistent());
 }
 
 template<typename Coeff>
@@ -127,10 +127,6 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const std::m
 	}
 	this->stripLeadingZeroes();
 	assert(this->isConsistent());
-}
-
-template<typename Coeff>
-UnivariatePolynomial<Coeff>::~UnivariatePolynomial() {
 }
 
 template<typename Coeff>

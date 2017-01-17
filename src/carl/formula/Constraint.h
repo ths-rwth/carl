@@ -12,15 +12,14 @@
 //#define NDEBUG
 #define CONSTRAINT_WITH_FACTORIZATION
 
-#include "../core/Relation.h"
 #include "../config.h"
-#include "../core/VariableInformation.h"
-#include "../interval/Interval.h"
-#include "../interval/IntervalEvaluation.h"
 #include "../core/Definiteness.h"
-#include "../util/Common.h"
+#include "../core/Relation.h"
 #include "../core/VariableInformation.h"
 #include "../core/VariablesInformation.h"
+#include "../interval/Interval.h"
+#include "../interval/IntervalEvaluation.h"
+#include "../util/Common.h"
 #include "config.h"
 
 #include <cassert>
@@ -385,7 +384,7 @@ namespace carl
             /// The content of this constraint.
             const ConstraintContent<Pol>* mpContent;
             
-            Constraint( const ConstraintContent<Pol>* _content );
+            explicit Constraint( const ConstraintContent<Pol>* _content );
             
             #ifdef THREAD_SAFE
             #define VARINFOMAP_LOCK_GUARD std::lock_guard<std::mutex> lock1( mpContent->mVarInfoMapMutex );
@@ -401,7 +400,7 @@ namespace carl
             
         public:
             
-            Constraint( bool _valid = true );
+            explicit Constraint( bool _valid = true );
             
             explicit Constraint( carl::Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound = constant_zero<typename Pol::NumberType>::get() );
             
@@ -412,13 +411,13 @@ namespace carl
             
             Constraint( const Constraint& _constraint );
             
-            Constraint( Constraint&& _constraint );
+            Constraint( Constraint&& _constraint ) noexcept;
             
             ~Constraint();
             
             Constraint& operator=( const Constraint& _constraint );
             
-            Constraint& operator=( Constraint&& _constraint );
+            Constraint& operator=( Constraint&& _constraint ) noexcept;
             
             /**
              * @return The considered polynomial being the left-hand side of this constraint.

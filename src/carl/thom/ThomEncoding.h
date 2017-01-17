@@ -33,14 +33,14 @@ class ThomEncoding {
 public:
 	
 	ThomEncoding(
-		const SignCondition& sc,
+		SignCondition sc,
 		const Polynomial& p,
 		Variable mainVar,
 		std::shared_ptr<ThomEncoding<Number>> point, 
 		std::shared_ptr<SignDetermination<Number>> sd,
 		uint mRelevant
 	):
-		mSc(sc),
+		mSc(std::move(sc)),
 		mP(p),
 		mMainVar(mainVar),
 		mPoint(std::move(point)),

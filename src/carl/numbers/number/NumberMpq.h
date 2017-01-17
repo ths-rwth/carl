@@ -26,9 +26,9 @@ namespace carl {
 
 		explicit Number(const mpq_class& t): BaseNumber(t) {}
 		explicit Number(mpq_class&& t): BaseNumber(t) {}
-		Number(int i) : BaseNumber(i) {}
-		Number(long long int n) : BaseNumber(n) {}
-		Number(unsigned long long int n): BaseNumber(n) {}
+		Number(int i) : BaseNumber(i) {} // NOLINT
+		Number(long long int n) : BaseNumber(n) {} // NOLINT
+		Number(unsigned long long int n): BaseNumber(n) {} // NOLINT
 
 		
 		//The following constructors can maybe be grouped together in a Rational-superclass	

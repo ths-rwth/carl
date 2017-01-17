@@ -7,11 +7,9 @@
 
 #pragma once
 
-
 #include "../formula/model/ran/RealAlgebraicNumber.h"
 
 namespace carl {
-        
 
 /*
  * returns the sign (NOT the actual evaluation) of p on the point defined by m as an RAN
@@ -54,17 +52,17 @@ RealAlgebraicNumber<Number> evaluateTE(const MultivariatePolynomial<Number>& p, 
         CARL_LOG_ASSERT("carl.thom.evaluation", p.gatherVariables().size() == mTE.size(), "p = " << p << ", mTE = " << mTE);
         
         if(mTE.size() == 1) {
-                int sgn = (int)mTE.begin()->second.signOnPolynomial(p);
+                int sgn = int(mTE.begin()->second.signOnPolynomial(p));
                 CARL_LOG_TRACE("carl.thom.evaluation", "sign of evaluated polynomial is " << sgn);
-                return RealAlgebraicNumber<Number>((Number)sgn, false);
+                return RealAlgebraicNumber<Number>(Number(sgn), false);
         }
         
         CARL_LOG_TRACE("carl.thom.evaluation", "mTE = " << mTE);
         
         ThomEncoding<Number> point = ThomEncoding<Number>::analyzeTEMap(mTE);
-        int sgn = (int)point.signOnPolynomial(p);
+        int sgn = int(point.signOnPolynomial(p));
         CARL_LOG_TRACE("carl.thom.", "sign of evaluated polynomial is " << sgn);
-        return RealAlgebraicNumber<Number>((Number)sgn, false);
+        return RealAlgebraicNumber<Number>(Number(sgn), false);
         
 //        std::list<Polynomial> polynomials;
 //        std::list<Polynomial> derivatives;
@@ -130,4 +128,3 @@ RealAlgebraicNumber<Number> evaluateTE(const MultivariatePolynomial<Number>& p, 
 }       */
 
 } // namespace carl;
-

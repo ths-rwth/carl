@@ -26,15 +26,15 @@ template<typename Number, typename C>
 IncrementalRootFinder<Number, C>::IncrementalRootFinder(
 		const UnivariatePolynomial<Number>& polynomial,
 		const Interval<Number>& interval,
-		SplittingStrategy _splittingStrategy,
+		SplittingStrategy strategy,
 		bool tryTrivialSolver
 		) :
 		AbstractRootFinder<Number>(polynomial, interval, tryTrivialSolver),
-		splittingStrategy(_splittingStrategy),
+		splittingStrategy(strategy),
 		nextRoot(this->roots.end())
 {
 	if (!this->interval.isEmpty()) {
-		this->addQueue(this->interval, this->splittingStrategy);
+		this->addQueue(this->interval, splittingStrategy);
 	}
 }
 
