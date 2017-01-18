@@ -9,7 +9,7 @@
 namespace carl {
 
 
-
+#ifdef USE_CLN_NUMBERS
 
 	template<>
 	class Number<Interval<cln::cl_I>> : public BaseNumber<Interval<cln::cl_I>,Number<Interval<cln::cl_I>>> {
@@ -121,6 +121,8 @@ namespace carl {
 			return mData.isNegative();
 		}
 	};
+
+#endif
 
 	template<>
 	class Number<Interval<mpq_class>> : public BaseNumber<Interval<mpq_class>,Number<Interval<mpq_class>>> {

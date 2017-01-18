@@ -353,6 +353,7 @@ TEST(Number,BinaryOperators) {
 	EXPECT_EQ(q1*q2, carl::Number<mpq_class>(2));
 	EXPECT_EQ(q1/q2, carl::Number<mpq_class>(0.5));
 
+#ifdef USE_CLN_NUMBERS
 //clI
 	carl::Number<cln::cl_I> i1(1), i2(2);
 	EXPECT_TRUE(i1 != i2);
@@ -381,6 +382,6 @@ TEST(Number,BinaryOperators) {
 	EXPECT_EQ(r1-r2, carl::Number<cln::cl_RA>(-1));
 	EXPECT_EQ(r1*r2, carl::Number<cln::cl_RA>(2));
 	EXPECT_EQ(r1/r2, carl::Number<cln::cl_RA>(0.5));
-
+#endif
 
 }
