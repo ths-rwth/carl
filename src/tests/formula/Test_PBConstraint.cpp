@@ -15,10 +15,10 @@ TEST(PBConstraint, Basic)
 	auto y = carl::freshBooleanVariable("y");
 	auto z = carl::freshBooleanVariable("z");
 	carl::PBConstraint pbc;
-	std::vector<std::pair<carl::Variable, int>> lhs;
-	lhs.emplace_back(x, 2);
-	lhs.emplace_back(y, 5);
-	lhs.emplace_back(z, 4);
+	std::vector<std::pair<int, carl::Variable>> lhs;
+	lhs.emplace_back(2, x);
+	lhs.emplace_back(5, y);
+	lhs.emplace_back(4, z);
 	pbc.setLHS(lhs);
 	pbc.setRHS(6);
 	pbc.setRelation(carl::Relation::GREATER);
@@ -29,8 +29,8 @@ TEST(PBConstraint, Basic)
 	
 	pbc = carl::model::substitute(pbc, m);
 	EXPECT_TRUE(pbc.getLHS().size() == 1);
-	EXPECT_TRUE(pbc.getLHS()[0].first == y);
-	EXPECT_TRUE(pbc.getLHS()[0].second == 5);
+	EXPECT_TRUE(pbc.getLHS()[0].first == 5);
+	EXPECT_TRUE(pbc.getLHS()[0].second == y);
 	EXPECT_TRUE(pbc.getRHS() == 4);
 	
 	m.emplace(y, true);
@@ -46,10 +46,10 @@ TEST(PBConstraint, Formula)
 	auto y = carl::freshBooleanVariable("y");
 	auto z = carl::freshBooleanVariable("z");
 	carl::PBConstraint pbc;
-	std::vector<std::pair<carl::Variable, int>> lhs;
-	lhs.emplace_back(x, 2);
-	lhs.emplace_back(y, 5);
-	lhs.emplace_back(z, 4);
+	std::vector<std::pair<int,carl::Variable>> lhs;
+	lhs.emplace_back(2, x);
+	lhs.emplace_back(5, y);
+	lhs.emplace_back(4, z);
 	pbc.setLHS(lhs);
 	pbc.setRHS(6);
 	pbc.setRelation(carl::Relation::GREATER);

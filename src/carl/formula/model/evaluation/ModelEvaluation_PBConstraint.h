@@ -12,13 +12,13 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void substituteIn(PBConstraint& c, const Model<Rational,Poly>& m) {
-	    std::vector<std::pair<Variable, int>> newLHS;
+	    std::vector<std::pair<int,Variable>> newLHS;
 	    for(auto it = c.getLHS().begin(); it != c.getLHS().end(); it++){
-			auto element = m.find(it->first);
+			auto element = m.find(it->second);
 	        if(element != m.end()) {
 				assert(element->second.isBool());
 	            if(element->second.asBool() == true){
-	                c.setRHS(c.getRHS() - it->second);
+	                c.setRHS(c.getRHS() - it->first);
 	            }
 	        } else {
 	            newLHS.push_back(*it);

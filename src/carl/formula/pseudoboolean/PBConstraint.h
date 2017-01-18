@@ -14,11 +14,15 @@ namespace carl {
     private:
         Relation relation;
         int rhs;
-        std::vector<std::pair<Variable, int>> lhs;
-        
+        std::vector<std::pair<int,Variable>> lhs;
     public:
         PBConstraint() = default;
-        PBConstraint(std::vector<std::pair<Variable, int>> ls, Relation rel, int rs):
+        PBConstraint(std::vector<std::pair<int,Variable>> ls, Relation rel, int rs):
+			relation(rel),
+			rhs(rs),
+		    lhs(std::move(ls))
+	    {}
+		PBConstraint(std::vector<std::pair<int,Variable>>&& ls, Relation rel, int rs):
 			relation(rel),
 			rhs(rs),
 		    lhs(std::move(ls))
@@ -26,7 +30,7 @@ namespace carl {
         std::vector<Variable> gatherVariables() const {
 	        std::vector<Variable> varVector;
             for (const auto& ls: lhs) {
-	            varVector.push_back(ls.first);
+	            varVector.push_back(ls.second);
 	        }
 	        return varVector;
 	    }
@@ -35,7 +39,7 @@ namespace carl {
 	        PBConstraint negConst(this->lhs, nRel, this->rhs);
 	        return negConst;
 		}
-        void setLHS(const std::vector<std::pair<Variable, int>>& l) {
+        void setLHS(const std::vector<std::pair<int, Variable>>& l) {
 			lhs = l;
 		}
         void setRelation(Relation r) {
@@ -44,7 +48,7 @@ namespace carl {
         void setRHS(int r) {
 			rhs = r;
 		}
-        const std::vector<std::pair<Variable, int>>& getLHS() const {
+        const std::vector<std::pair<int, Variable>>& getLHS() const {
 			return lhs;
 		}
         Relation getRelation() const {
@@ -63,7 +67,7 @@ namespace carl {
 		bool isTrue() const {
 			if (relation == Relation::GEQ && rhs <= 0){
 				for (const auto& lh: lhs) {
-					if(lh.second < 0) return false;
+					if(lh.first < 0) return false;
 				}
 				return true;
 			}
@@ -73,7 +77,7 @@ namespace carl {
 		bool isFalse() const {
 			if (relation == Relation::GEQ && rhs >= 1){
 				for (const auto& lh: lhs) {
-					if (lh.second > 0) return false;
+					if (lh.first > 0) return false;
 				}
 				return true;
 			}
@@ -106,7 +110,11 @@ namespace std {
          * @return The hash of the given constraint.
          */
         std::size_t operator()(const carl::PBConstraint& _pbc) const {
-            return carl::hash_all(_pbc.getRelation(), _pbc.getRHS());
+			std::size_t seed = 0;
+			for (const auto& l: _pbc.getLHS()) {
+				carl::hash_add(seed, l.first, l.second);
+			}
+            return carl::hash_all(seed, _pbc.getRelation(), _pbc.getRHS());
         }
     };
 }
