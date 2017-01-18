@@ -17,12 +17,12 @@
 #include <cassert>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <set>
 #include <utility>
 #include <vector>
 
-namespace carl
-{
+namespace carl {
 
 /**
  * Implements a manager for sorts, containing the actual contents of these sort and allocating their ids.
@@ -40,9 +40,9 @@ class SortManager : public Singleton<SortManager>
 			/// The sort's name.
 			std::string name;
 			/// The sort's argument types. It is nullptr, if the sort's arity is zero.
-			std::vector<Sort>* parameters;
+			std::unique_ptr<std::vector<Sort>> parameters;
 			/// The sort's indices. A sort can be indexed with the "_" operator. It is nullptr, if no indices are present.
-			std::vector<std::size_t>* indices;
+			std::unique_ptr<std::vector<std::size_t>> indices;
 			
 			SortContent() = delete; // The default constructor is disabled.
 			
@@ -51,10 +51,10 @@ class SortManager : public Singleton<SortManager>
 			 * @param _name The name of the sort content to construct.
 			 * @param _type The carl variable type of the sort content to construct.
 			 */
-			explicit SortContent(std::string _name):
+			explicit SortContent(std::string _name) noexcept:
 				name(std::move(_name)),
-				parameters(nullptr),
-				indices(nullptr)
+				parameters(),
+				indices()
 			{}
 			
 			/**
@@ -64,29 +64,26 @@ class SortManager : public Singleton<SortManager>
 			 */
 			 explicit SortContent(std::string _name, const std::vector<Sort>& _parameters):
 				name(std::move(_name)),
-				parameters(new std::vector<Sort>(_parameters)),
-				indices(nullptr)
+				parameters(std::make_unique<std::vector<Sort>>(_parameters)),
+				indices()
 			{}
 			explicit SortContent(std::string _name, std::vector<Sort>&& _parameters):
 				name(std::move(_name)),
-				parameters(new std::vector<Sort>(std::move(_parameters))),
-				indices(nullptr)
+				parameters(std::make_unique<std::vector<Sort>>(std::move(_parameters))),
+				indices()
 			{}
 			
 			SortContent(const SortContent& sc):
 				name(sc.name),
-				parameters(nullptr),
-				indices(nullptr)
+				parameters(),
+				indices()
 			{
-				if (sc.parameters != nullptr) parameters = new std::vector<Sort>(*sc.parameters);
-				if (sc.indices != nullptr) indices = new std::vector<std::size_t>(*sc.indices);
+				if (sc.parameters) parameters = std::make_unique<std::vector<Sort>>(*sc.parameters);
+				if (sc.indices) indices = std::make_unique<std::vector<std::size_t>>(*sc.indices);
 			}
 			
 			/// Destructs a sort content.
-			~SortContent() {
-				delete parameters;
-				delete indices;
-			}
+			~SortContent() = default;
 			
 			SortContent& operator=(const SortContent& sc) = delete;
 			
@@ -220,10 +217,10 @@ class SortManager : public Singleton<SortManager>
 			return getContent(sort).name;
 		}
 		const std::vector<Sort>* getParameters(const Sort& sort) const {
-			return getContent(sort).parameters;
+			return getContent(sort).parameters.get();
 		}
 		const std::vector<std::size_t>* getIndices(const Sort& sort) const {
-			return getContent(sort).indices;
+			return getContent(sort).indices.get();
 		}
 		VariableType getType(const Sort& sort) const {
 			assert(sort.id() > 0);

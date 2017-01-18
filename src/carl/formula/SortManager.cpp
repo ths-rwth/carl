@@ -84,7 +84,7 @@ namespace carl
 		if (indices.empty()) return sort;
 		const SortContent& sc = getContent(sort);
 		SortContent* newsc = new SortContent(sc);
-		if (newsc->indices == nullptr) newsc->indices = new std::vector<std::size_t>(indices);
+		if (newsc->indices == nullptr) newsc->indices = std::make_unique<std::vector<std::size_t>>(indices);
 		else newsc->indices->insert(newsc->indices->end(), indices.begin(), indices.end());
 		return getSort(newsc, checkIndices(sc.getUnindexed(), newsc->indices->size()));
 	}
