@@ -27,10 +27,11 @@
  */
 #pragma once
 
-#include "CriticalPairsEntry.h"
-#include "../../util/Heap.h"
 #include "../../core/CompareResult.h"
 #include "../../core/MonomialOrdering.h"
+#include "../../util/Heap.h"
+#include "CriticalPairsEntry.h"
+
 #include <unordered_map>
 
 namespace carl
@@ -40,8 +41,8 @@ template< class Compare>
 class CriticalPairConfiguration
 {
 public:
-    typedef CriticalPairsEntry<Compare>* Entry;
-    typedef carl::CompareResult CompareResult;
+    using Entry = CriticalPairsEntry<Compare>*;
+    using CompareResult = carl::CompareResult;
 
     static CompareResult compare( Entry e1, Entry e2 )
     {
@@ -59,7 +60,7 @@ public:
         return res == CompareResult::EQUAL;
     }
 
-    typedef Compare Order;
+    using Order = Compare;
     static const bool fastIndex = true;
 };
 
@@ -84,7 +85,7 @@ public:
     void push( std::list<SPolPair> pairs )
     {
         if( pairs.empty( ) ) return;
-        mDatastruct.push( new CriticalPairsEntry<typename Configuration::Order > ( pairs ) );
+        mDatastruct.push( new CriticalPairsEntry<typename Configuration::Order > ( std::move(pairs) ) );
     }
 
 	/**

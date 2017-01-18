@@ -9,8 +9,8 @@
 #include "ideal-ds/IdealDSVector.h"
 #include "ideal-ds/PolynomialSorts.h"
 
-#include "../core/Term.h"
 #include "../core/MultivariatePolynomial.h"
+#include "../core/Term.h"
 #include <unordered_set>
 
 namespace carl
@@ -52,10 +52,7 @@ public:
 	
 	
 
-    virtual ~Ideal()
-    {
-
-    }
+    virtual ~Ideal() = default;
 	
 	Ideal(const Ideal& rhs) : 
 	mGenerators(rhs.mGenerators), 

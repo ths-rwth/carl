@@ -24,12 +24,12 @@ template<typename Number>
 class SignDetermination {
 	
 private:
-	typedef MultivariatePolynomial<Number> Polynomial;
-	typedef typename TarskiQueryManager<Number>::QueryResultType TaQResType;
+	using Polynomial = MultivariatePolynomial<Number>;
+	using TaQResType = typename TarskiQueryManager<Number>::QueryResultType;
 	
 	// an alpha is a mapping from a set of polynomials to the set
 	// {0,1,2} in order to perform sign determination
-	typedef std::list<uint> Alpha;
+	using Alpha = std::list<uint>;
 	
 	std::list<Polynomial> mP;
 	TarskiQueryManager<Number> mTaQ;
@@ -315,9 +315,9 @@ private:
 		int cpos = (taq1 + taq2) / 2; // ensured to be an exact division
 		int cneg = (taq2 - taq1) / 2;
 		// the order in which elements are added to currSigns is important
-		if(czer != 0) currSigns.push_back({Sign::ZERO});
-		if(cpos != 0) currSigns.push_back({Sign::POSITIVE});
-		if(cneg != 0) currSigns.push_back({Sign::NEGATIVE});
+		if(czer != 0) currSigns.emplace_back(1, Sign::ZERO);
+		if(cpos != 0) currSigns.emplace_back(1, Sign::POSITIVE);
+		if(cneg != 0) currSigns.emplace_back(1, Sign::NEGATIVE);
 		currAda = {{0}, {1}, {2}};
 		currAda.resize(currSigns.size());
 		currProducts.resize(currSigns.size());     

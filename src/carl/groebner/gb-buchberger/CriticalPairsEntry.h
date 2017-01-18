@@ -49,7 +49,7 @@ public:
 	 * Saves the list of pairs and sorts them according the configured ordering.
      * @param pairs
      */
-    CriticalPairsEntry(std::list<SPolPair> pairs) : mPairs(std::move(pairs))
+    explicit CriticalPairsEntry(std::list<SPolPair>&& pairs) : mPairs(std::move(pairs))
     {
         mPairs.sort(SPolPairCompare<Compare>());
     }

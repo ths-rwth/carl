@@ -94,7 +94,7 @@ namespace carl
 		// Find an instantiation of the given sort template.
 		auto it = mSortMap.find(sc);
 		if(it == mSortMap.end()) {
-			std::cerr << "The sort " << name << " has not been declared or defined." << std::endl;
+			CARL_LOG_ERROR("carl.formula", "The sort " << name << " has not been declared or defined.");
 			delete sc;
 			return Sort(0);
 		}

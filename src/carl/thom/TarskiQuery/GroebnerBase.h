@@ -21,10 +21,10 @@ template<typename Number>
 class GroebnerBase {
         
 public:
-        typedef Term<Number> Monomial;
+        using Monomial = Term<Number>;
         
 private:        
-        typedef MultivariatePolynomial<Number> Polynomial;
+        using Polynomial = MultivariatePolynomial<Number>;
         
         std::shared_ptr<Ideal<Polynomial>> mBase;
         
@@ -70,6 +70,3 @@ public:
 }
 
 #include "GroebnerBase.tpp"
-
-
-

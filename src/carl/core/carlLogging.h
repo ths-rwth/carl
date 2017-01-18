@@ -295,17 +295,13 @@ class Logger: public carl::Singleton<Logger> {
 	/// Mapping from channels to associated logging classes.
 	std::map<std::string, std::tuple<std::shared_ptr<Sink>, Filter, std::shared_ptr<Formatter>>> mData;
 	/// Logging mutex to ensure thread-safe logging.
-	std::mutex mutex;
+	std::mutex mMutex;
 	/// Timer to track program runtime.
-	carl::Timer timer;
+	carl::Timer mTimer;
 
-	/**
-	 * Default constructor.
-     */
-	Logger() noexcept = default;
 public:
 	/**
-	 * Desctructor.
+	 * Destructor.
      */
 	~Logger() override = default;
 	/**
@@ -323,7 +319,7 @@ public:
      * @param sink Sink.
      */
 	void configure(const std::string& id, std::shared_ptr<Sink> sink) {
-		std::lock_guard<std::mutex> lock(mutex);
+		std::lock_guard<std::mutex> lock(mMutex);
 		mData[id] = std::make_tuple(std::move(sink), Filter(), std::make_shared<Formatter>());
 	}
 	/**
@@ -390,10 +386,10 @@ public:
      * @param info Auxiliary information.
      */
 	void log(LogLevel level, const std::string& channel, const std::stringstream& ss, const RecordInfo& info) {
-		std::lock_guard<std::mutex> lock(mutex);
+		std::lock_guard<std::mutex> lock(mMutex);
 		for (auto t: mData) {
 			if (!std::get<1>(t.second).check(channel, level)) continue;
-			std::get<2>(t.second)->prefix(std::get<0>(t.second)->log(), timer, channel, level, info);
+			std::get<2>(t.second)->prefix(std::get<0>(t.second)->log(), mTimer, channel, level, info);
 			std::get<0>(t.second)->log() << ss.str();
 			std::get<2>(t.second)->suffix(std::get<0>(t.second)->log());
 		}

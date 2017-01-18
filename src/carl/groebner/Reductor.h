@@ -24,9 +24,9 @@ class ReductorConfiguration
 {
 public:
 
-	typedef ReductorEntry<Polynomial> EntryType;
-	typedef EntryType* Entry;
-	typedef carl::CompareResult CompareResult;
+	using EntryType = ReductorEntry<Polynomial>;
+	using Entry = EntryType*;
+	using CompareResult = carl::CompareResult;
 
 	static CompareResult compare(Entry e1, Entry e2)
 	{
@@ -69,9 +69,9 @@ class Reductor
 {
 	
 protected:
-	typedef typename InputPolynomial::OrderedBy Order;
-	typedef typename Configuration<InputPolynomial>::EntryType EntryType;
-	typedef typename InputPolynomial::CoeffType Coeff;
+	using Order = typename InputPolynomial::OrderedBy;
+	using EntryType = typename Configuration<InputPolynomial>::EntryType;
+	using Coeff = typename InputPolynomial::CoeffType;
 private:
 	const Ideal<PolynomialInIdeal>& mIdeal;
 	Datastructure<Configuration<InputPolynomial>> mDatastruct;
@@ -96,7 +96,7 @@ public:
 		insert(f);
 	}
 
-	virtual ~Reductor()	{}
+	virtual ~Reductor()	= default;
 
 	/**
 	 * The basic reduce routine on a priority queue.

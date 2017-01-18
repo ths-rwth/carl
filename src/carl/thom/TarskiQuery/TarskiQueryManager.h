@@ -24,10 +24,10 @@ template<typename Number>
 class TarskiQueryManager {
 
 public:
-        typedef int QueryResultType;
+        using QueryResultType = int;
         
 private:
-        typedef MultivariatePolynomial<Number> Polynomial;
+        using Polynomial = MultivariatePolynomial<Number>;
         
         // for the univariate case
         UnivariatePolynomial<Number> mZ;

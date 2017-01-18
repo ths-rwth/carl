@@ -19,7 +19,7 @@ namespace carl {
 template<typename Number>
 class ThomEncoding {
 	
-	typedef MultivariatePolynomial<Number> Polynomial;
+	using Polynomial = MultivariatePolynomial<Number>;
 	
 	mutable SignCondition mSc; // this can grow when comparing
 	Polynomial mP;

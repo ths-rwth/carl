@@ -18,9 +18,9 @@ namespace carl {
  */
 template<typename Number>
 struct BaseRepresentation : public std::map<uint, Number> {
-	typedef Term<Number> Monomial;
+	using Monomial = Term<Number>;
 	
-	BaseRepresentation() : std::map<uint, Number>() {}
+	BaseRepresentation() = default;
 	
 	BaseRepresentation(const std::vector<Monomial>& base, const MultivariatePolynomial<Number>& p) {
 		CARL_LOG_ASSERT("carl.thom.tarski", base.size() >= p.size(), "p is not in <base>");
@@ -56,8 +56,8 @@ class MultiplicationTable {
 	
 public:
 	
-	typedef std::forward_list<std::pair<uint, uint>> IndexPairs;
-	typedef Term<Number> Monomial;
+	using IndexPairs = std::forward_list<std::pair<uint, uint>>;
+	using Monomial = Term<Number>;
 	
 	struct TableContent {
 		BaseRepresentation<Number> br;

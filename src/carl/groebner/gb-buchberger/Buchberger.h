@@ -30,15 +30,14 @@
 #pragma once
 //#define BUCHBERGER_STATISTICS
 
-#include <list>
-#include <unordered_map>
 
+#include "../GBUpdateProcedures.h"
 #include "../Ideal.h"
 #include "../Reductor.h"
-#include "../GBUpdateProcedures.h"
 #include "CriticalPairs.h"
 
-//#include "BuchbergerStats.h"
+#include <list>
+#include <unordered_map>
 
 namespace carl
 {
@@ -53,10 +52,10 @@ struct UpdateFnct : UpdateFnc
 private:
 	BuchbergerProc* procedure;
 public:
-	UpdateFnct(BuchbergerProc* proc) : procedure(proc) {}
-	virtual ~UpdateFnct() = default;
+	explicit UpdateFnct(BuchbergerProc* proc) : procedure(proc) {}
+	~UpdateFnct() override = default;
 	
-	void operator()(size_t index)
+	void operator()(std::size_t index) override
 	{
 		procedure->update(index);
 	}
