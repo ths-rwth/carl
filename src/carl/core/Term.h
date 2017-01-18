@@ -157,7 +157,7 @@ class Term
          */
         inline bool integerValued() const
         {
-            if(!mCoeff.isInteger()) return false;
+            if(!carl::isInteger(mCoeff)) return false;
             return (!mMonomial || mMonomial->integerValued());
         }
         
