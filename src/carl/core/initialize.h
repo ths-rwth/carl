@@ -38,7 +38,7 @@ namespace carl
      * Method to ensure that upon inclusion, init() is called exactly once.
      * TODO prevent outside access.
      */
-    inline int initialize( void )
+    inline int initialize()
     {
         static int initvariable = init();
         do { (void)(initvariable); } while (false);

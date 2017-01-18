@@ -152,7 +152,7 @@ namespace carl
 		Content newExps;
 		for (auto& it: mExponents)
 		{
-			newExps.push_back( std::make_pair( it.first, 1 ) );
+			newExps.emplace_back( it.first, 1 );
 		}
 		return MonomialPool::getInstance().create( std::move(newExps), uint(mExponents.size()) );
 	}

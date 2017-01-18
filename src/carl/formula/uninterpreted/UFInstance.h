@@ -24,21 +24,16 @@ namespace carl
     {
         public:
             friend class UFInstanceManager;
-            /// A unique id to identify this uninterpreted function instance in it's manager.
-            typedef std::size_t IDType;
-        
         private:
         
             /// A unique id.
-            IDType mId;
+            std::size_t mId;
             
             /**
              * Constructs an uninterpreted function instance.
              * @param _id
              */
-            explicit UFInstance( IDType _id ):
-                mId( _id )
-            {}
+            explicit UFInstance(std::size_t id) noexcept: mId(id) {}
             
         public:
             
@@ -52,7 +47,7 @@ namespace carl
             /**
              * @return The unique id of this uninterpreted function instance.
              */
-            IDType id() const
+            std::size_t id() const
             {
                 return mId;
             }

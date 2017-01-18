@@ -142,7 +142,7 @@ namespace carl {
 
 
 
-		virtual std::string toString(bool _infix=true) const;
+		std::string toString(bool _infix = true) const;
 
 
 	};

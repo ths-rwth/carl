@@ -68,8 +68,8 @@ namespace carl
 		/// Cached hash.
 		mutable std::size_t mHash = 0;
 
-		typedef Content::iterator exponents_it;
-		typedef Content::const_iterator exponents_cIt;
+		using exponents_it = Content::iterator ;
+		using exponents_cIt = Content::const_iterator;
 
 		/**
 		 * Default constructor.

@@ -164,7 +164,7 @@ class UFInstanceManager : public Singleton<UFInstanceManager>
         // Members.
 
         /// Stores all instantiated uninterpreted function instance's contents and maps them to their unique id.
-        FastPointerMap<UFInstanceContent, UFInstance::IDType> mUFInstanceIdMap;
+        FastPointerMap<UFInstanceContent, std::size_t> mUFInstanceIdMap;
         /// Maps the unique ids to the instantiated uninterpreted function instance's content.
         std::vector<const UFInstanceContent*> mUFInstances;
 

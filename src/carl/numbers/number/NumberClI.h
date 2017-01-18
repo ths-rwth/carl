@@ -27,31 +27,22 @@ namespace carl {
 		explicit Number(const Number<mpz_class>& n);
 		
 		Number<cln::cl_I>& operator=(const Number<cln::cl_I>& n) {
-			this->mData = n.mData;
+			mData = n.mData;
 			return *this;
 		}
 
 		template<typename Other>
 		Number<cln::cl_I>& operator=(const Other& n) {
-			this->mData = n;
+			mData = n;
 			return *this;
 		}
 
 		Number<cln::cl_I>& operator=(Number<cln::cl_I>&& n) noexcept {
-			this->mData = std::move(n.mData);
+			mData = std::move(n.mData);
 			return *this;
 		}
 
-
-
-
 		std::string toString(bool _infix = true) const;
-
-	
-
-
-
-
 
 		/**
 		 * Check if a number is integral.
