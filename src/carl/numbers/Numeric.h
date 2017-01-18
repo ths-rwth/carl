@@ -40,7 +40,7 @@ namespace carl
          */
         Numeric();
         Numeric( const T& /*unused*/ );
-        Numeric( ContentType /*unused*/, bool /*unused*/ = false );
+        Numeric( ContentType /*unused*/, bool /*unused*/ = false ); // NOLINT
         Numeric( const Numeric<T>& /*unused*/ );
         ~Numeric();
         

@@ -54,8 +54,8 @@ namespace carl {
 #include <mpfr.h>
 #endif
 
-#include "adaption_float/typetraits.h"
 #include "adaption_float/FLOAT_T.h"
+#include "adaption_float/typetraits.h"
 
 #ifdef USE_Z3_NUMBERS
 #include "adaption_z3/z3_include.h"
@@ -69,5 +69,3 @@ namespace carl {
 #include "Numeric.h"
 
 #include "conversion/conversion.h"
-
-

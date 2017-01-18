@@ -174,7 +174,7 @@ namespace carl
 		FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, CARL_RND /*unused*/ = CARL_RND::N) : mValue(_float.mValue)
 		{}
 
-		FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, CARL_RND /*unused*/ = CARL_RND::N) noexcept : mValue(std::move(_float.value()))
+		FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, CARL_RND /*unused*/ = CARL_RND::N) noexcept : mValue(std::move(_float.value())) // NOLINT
 		{}
 
 		/**
@@ -241,13 +241,9 @@ namespace carl
 		 * @param _rhs Righthand side of the assignment.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& operator =(const FLOAT_T<FloatType>& _rhs)
-		{
-			mValue = _rhs.mValue;
-			return *this;
-		}
+		FLOAT_T& operator =(const FLOAT_T& _rhs) = default;
 
-		FLOAT_T<FloatType>& operator =(const FloatType& _rhs)
+		FLOAT_T& operator =(const FloatType& _rhs)
 		{
 			mValue = _rhs;
 			return *this;

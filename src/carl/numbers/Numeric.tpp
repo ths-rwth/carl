@@ -133,7 +133,7 @@ namespace carl
                 this->rRational() = _value;
             }
         }
-        return *this;
+        return *this; // NOLINT
     }
 
     /**
@@ -161,7 +161,7 @@ namespace carl
             else
                 this->rRational() = T( _value );
         }
-        return *this;
+        return *this; // NOLINT
     }
 
     /**
@@ -189,7 +189,7 @@ namespace carl
             else
                 this->rRational() = _value.rational();
         }
-        return *this;
+        return *this; // NOLINT
     }
 
     /**
