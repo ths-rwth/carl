@@ -78,7 +78,7 @@ protected:
 	/**
 	 * Private default constructor.
 	 */
-	VariablePool();
+	VariablePool() noexcept;
 
 	/**
 	 * Get a variable which was not used before.
@@ -138,8 +138,8 @@ public:
 	 * The default is "_", hence they look like "_x_5".
      * @param prefix Prefix for anonymous variable names.
      */
-	void setPrefix(const std::string& prefix = "_") {
-		mVariablePrefix = prefix;
+	void setPrefix(std::string prefix = "_") noexcept {
+		mVariablePrefix = std::move(prefix);
 	}
    
 	/**

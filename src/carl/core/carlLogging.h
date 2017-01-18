@@ -135,7 +135,7 @@ struct Sink {
 	 * The intended usage is to write any log output to the output stream returned by this function.
      * @return Output stream.
      */
-	virtual std::ostream& log() = 0;
+	virtual std::ostream& log() noexcept = 0;
 };
 /**
  * Logging sink that wraps an arbitrary `std::ostream`.
@@ -150,7 +150,7 @@ struct StreamSink: public Sink {
      */
 	explicit StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
 	~StreamSink() override = default;
-	std::ostream& log() override { return os; }
+	std::ostream& log() noexcept override { return os; }
 };
 /**
  * Logging sink for file output.
@@ -164,8 +164,8 @@ struct FileSink: public Sink {
      * @param filename
      */
 	explicit FileSink(const std::string& filename): os(filename, std::ios::out) {}
-	~FileSink() override { os.close(); }
-	std::ostream& log() override { return os; }
+	~FileSink() override = default;
+	std::ostream& log() noexcept override { return os; }
 };
 
 /**
@@ -199,13 +199,12 @@ struct Filter {
      * @param level LogLevel.
      * @return If the message shall be forwarded.
      */
-	bool check(const std::string& channel, LogLevel level) {
-		std::string curChan = channel;
-		auto it = mData.find(curChan);
-		while (!curChan.empty() && it == mData.end()) {
-			auto n = curChan.rfind('.');
-			curChan = (n == std::string::npos) ? "" : curChan.substr(0, n);
-			it = mData.find(curChan);
+	bool check(std::string channel, LogLevel level) noexcept {
+		auto it = mData.find(channel);
+		while (!channel.empty() && it == mData.end()) {
+			auto n = channel.rfind('.');
+			channel = (n == std::string::npos) ? "" : channel.substr(0, n);
+			it = mData.find(channel);
 		}
 		assert(it != mData.end());
 		return level >= it->second;
@@ -234,14 +233,6 @@ struct RecordInfo {
 	std::string func;
 	/// Line number.
 	std::size_t line;
-	/**
-	 * Constructor.
-     * @param filename File name.
-     * @param func Function name.
-     * @param line Line number.
-     */
-	RecordInfo(std::string _filename, std::string _func, std::size_t _line): 
-		filename(std::move(_filename)), func(std::move(_func)), line(_line) {}
 };
 
 /**
@@ -258,8 +249,8 @@ struct Formatter {
 	 * Extracts the maximum width of a channel to optimize the formatting.
      * @param f Filter.
      */
-	virtual void configure(const Filter& f) {
-		for (auto t: f.mData) {
+	virtual void configure(const Filter& f) noexcept {
+		for (const auto& t: f.mData) {
 			if (t.first.size() > channelwidth) channelwidth = t.first.size();
 		}
 	}
@@ -311,20 +302,18 @@ class Logger: public carl::Singleton<Logger> {
 	/**
 	 * Default constructor.
      */
-	Logger() noexcept: mData(), mutex(), timer() {}
+	Logger() noexcept = default;
 public:
 	/**
 	 * Desctructor.
      */
-	~Logger() override {
-		mData.clear();
-	}
+	~Logger() override = default;
 	/**
 	 * Check if a Sink with the given id has been installed.
      * @param id Sink identifier.
      * @return If a Sink with this id is present.
      */
-	bool has(const std::string& id) const {
+	bool has(const std::string& id) const noexcept {
 		return mData.find(id) != mData.end();
 	}
 	/**
@@ -335,7 +324,7 @@ public:
      */
 	void configure(const std::string& id, std::shared_ptr<Sink> sink) {
 		std::lock_guard<std::mutex> lock(mutex);
-		mData[id] = std::make_tuple(sink, Filter(), std::make_shared<Formatter>());
+		mData[id] = std::make_tuple(std::move(sink), Filter(), std::make_shared<Formatter>());
 	}
 	/**
 	 * Installs a FileSink.
@@ -358,7 +347,7 @@ public:
      * @param id Sink identifier.
      * @return Filter.
      */
-	Filter& filter(const std::string& id) {
+	Filter& filter(const std::string& id) noexcept {
 		auto it = mData.find(id);
 		assert(it != mData.end());
 		return std::get<1>(it->second);
@@ -368,7 +357,7 @@ public:
      * @param id Sink identifier.
      * @return Formatter.
      */
-	std::shared_ptr<Formatter> formatter(const std::string& id) {
+	const std::shared_ptr<Formatter>& formatter(const std::string& id) noexcept {
 		auto it = mData.find(id);
 		assert(it != mData.end());
 		return std::get<2>(it->second);
@@ -378,7 +367,7 @@ public:
      * @param id Sink identifier.
      * @param fmt New Formatter.
      */
-	void formatter(const std::string& id, std::shared_ptr<Formatter> fmt) {
+	void formatter(const std::string& id, std::shared_ptr<Formatter> fmt) noexcept {
 		auto it = mData.find(id);
 		assert(it != mData.end());
 		std::get<2>(it->second) = std::move(fmt);
@@ -388,7 +377,7 @@ public:
 	 * Reconfigures all Formatter objects.
 	 * This should be done once after all configuration is finished.
      */
-	void resetFormatter() {
+	void resetFormatter() noexcept {
 		for (auto& t: mData) {
 			std::get<2>(t.second)->configure(std::get<1>(t.second));
 		}
@@ -426,9 +415,9 @@ inline Logger& logger() {
 #endif
 
 /// Create a record info.
-#define __CARL_LOG_RECORD ::carl::logging::RecordInfo(__FILE__, __func__, __LINE__)
+#define __CARL_LOG_RECORD ::carl::logging::RecordInfo{__FILE__, __func__, __LINE__}
 /// Create a record info without function name.
-#define __CARL_LOG_RECORD_NOFUNC ::carl::logging::RecordInfo(__FILE__, "", __LINE__)
+#define __CARL_LOG_RECORD_NOFUNC ::carl::logging::RecordInfo{__FILE__, "", __LINE__}
 /// Basic logging macro.
 #define __CARL_LOG(level, channel, expr) { std::stringstream __ss; __ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, __ss, __CARL_LOG_RECORD); }
 /// Basic logging macro without function name.
