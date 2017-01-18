@@ -61,8 +61,8 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
 template<typename Coeff, typename Number>
 std::list<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
-		const std::list<Variable> variables,
-		const std::list<RealAlgebraicNumber<Number>> values,
+		const std::list<Variable>& variables,
+		const std::list<RealAlgebraicNumber<Number>>& values,
 		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
