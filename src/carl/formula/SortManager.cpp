@@ -83,7 +83,7 @@ namespace carl
 	Sort SortManager::index(const Sort& sort, const std::vector<std::size_t>& indices) {
 		if (indices.empty()) return sort;
 		const SortContent& sc = getContent(sort);
-		SortContent* newsc = new SortContent(sc);
+		auto newsc = new SortContent(sc);
 		if (newsc->indices == nullptr) newsc->indices = std::make_unique<std::vector<std::size_t>>(indices);
 		else newsc->indices->insert(newsc->indices->end(), indices.begin(), indices.end());
 		return getSort(newsc, checkIndices(sc.getUnindexed(), newsc->indices->size()));
@@ -103,7 +103,7 @@ namespace carl
 	}
 	
 	Sort SortManager::getSort(const std::string& name, const std::vector<Sort>& params) {
-		assert(params.size() > 0);
+		assert(!params.empty());
 		auto decl = mDeclarations.find(name);
 		if (decl != mDeclarations.end()) {
 			std::size_t arity = decl->second;
