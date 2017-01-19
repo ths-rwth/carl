@@ -47,7 +47,7 @@ std::vector<T> solveLinearDiophantine(MultivariatePolynomial<T>& equation) {
     // initialize coefficient vector
     std::vector<carl::Term<T>> terms = equation.getTerms();
     std::vector<T> coeffs = std::vector<T>();
-    for(int i = 1; i < terms.size(); i++ ) { // terms[0] is the constant part
+    for(std::size_t i = 1; i < terms.size(); i++ ) { // terms[0] is the constant part
         coeffs.push_back(terms[i].coeff());
     }
     
@@ -60,7 +60,7 @@ std::vector<T> solveLinearDiophantine(MultivariatePolynomial<T>& equation) {
         res[0] = -carl::div(const_part, coeffs[0]);
         return res;
     }
-    for(int i = 1; i < coeffs.size(); i++) {
+    for(std::size_t i = 1; i < coeffs.size(); i++) {
         T s;
         T t;
         currGcd = extended_gcd_integer(currGcd, coeffs[i], s, t);
@@ -73,8 +73,8 @@ std::vector<T> solveLinearDiophantine(MultivariatePolynomial<T>& equation) {
             for(auto& r : fromExtendedGcd) {
                 r *= factor;
             }
-            int diff = coeffs.size() - fromExtendedGcd.size();
-            for(int j = 0; j < diff; j++) {
+            std::size_t diff = coeffs.size() - fromExtendedGcd.size();
+            for(std::size_t j = 0; j < diff; j++) {
                 fromExtendedGcd.push_back(0);
             }
             assert(fromExtendedGcd.size() == coeffs.size());

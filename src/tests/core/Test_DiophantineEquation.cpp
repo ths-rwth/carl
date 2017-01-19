@@ -70,8 +70,8 @@ cln::cl_I evaluatePolynomial(MultivariatePolynomial<cln::cl_I>& p, std::vector<c
     std::map<carl::Variable, cln::cl_I> varMap;
     // the ordering of the values in res is like the ordering of the terms
     std::vector<carl::Term<cln::cl_I>> terms = p.getTerms();
-    int start = p.hasConstantTerm() ? 1 : 0; // terms[0] is the constant part if there is one
-    for(int i = start; i < terms.size(); i++ ) {
+    std::size_t start = p.hasConstantTerm() ? 1 : 0; // terms[0] is the constant part if there is one
+    for(std::size_t i = start; i < terms.size(); i++ ) {
         varMap[terms[i].getSingleVariable()] = res[i - start];
     }
     std::cout << varMap << std::endl << std::endl;
@@ -79,12 +79,10 @@ cln::cl_I evaluatePolynomial(MultivariatePolynomial<cln::cl_I>& p, std::vector<c
 }
 
 TEST(DiophantineEquation, solve_linear) {
-    VariablePool& vpool = VariablePool::getInstance();
-    vpool.clear();
-    Variable x = vpool.getFreshVariable();
-    Variable y = vpool.getFreshVariable();
-    Variable z = vpool.getFreshVariable();
-    Variable w = vpool.getFreshVariable();
+    Variable x = carl::freshRealVariable();
+    Variable y = carl::freshRealVariable();
+    Variable z = carl::freshRealVariable();
+    Variable w = carl::freshRealVariable();
     std::vector<cln::cl_I> res;
     MultivariatePolynomial<cln::cl_I> p;
     

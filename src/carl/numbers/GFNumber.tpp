@@ -26,23 +26,10 @@ GFNumber<IntegerT> GFNumber<IntegerT>::inverse() const
 template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {	
-	if(lhs.isZero() && rhs.isZero()) return true;
-	if(lhs.isUnit() && rhs.isUnit()) return true;
-	if(rhs.mGf == nullptr)
-	{
-		if(rhs.isZero())
-		{
-			if(lhs.mGf->modulo(lhs.mN) == 0) 
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-	// same field AND same number after normalization.
+	if (lhs.isZero() && rhs.isZero()) return true;
+	if (lhs.isUnit() && rhs.isUnit()) return true;
+	if (lhs.mN == rhs.mN) return true;
+	if (!lhs.mGf || !rhs.mGf) return false;
 	assert(lhs.mGf != nullptr);
 	assert(rhs.mGf != nullptr);
 	return  (lhs.mGf == rhs.mGf || *(lhs.mGf) == *(rhs.mGf)) && (lhs.mGf->modulo(lhs.mN - rhs.mN) == 0);

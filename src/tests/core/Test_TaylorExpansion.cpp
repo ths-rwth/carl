@@ -26,7 +26,7 @@ TEST(TaylorExpansion, ideal_adic_coefficient) {
 
     MultivariatePolynomial<GFNumber<cln::cl_I>> p({a1 * x_1, a2 * x_2 * x_2, a1 * x_1 * x_2});
 
-    std::cout << TaylorExpansion<cln::cl_I>::ideal_adic_coeff(p, x_2, a1, 2) << std::endl;
+    //std::cout << TaylorExpansion<cln::cl_I>::ideal_adic_coeff(p, x_2, a1, 2) << std::endl;
 
 }
 
