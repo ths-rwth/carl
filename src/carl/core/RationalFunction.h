@@ -17,8 +17,9 @@ namespace carl
     {
     public:
         
-        typedef Pol PolyType;
-        typedef typename Pol::CoeffType CoeffType;
+        using PolyType = Pol;
+        using CoeffType = typename Pol::CoeffType;
+		using NumberType = typename Pol::NumberType;
         
     private:
         

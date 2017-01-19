@@ -1,12 +1,9 @@
 #include "gtest/gtest.h"
-#include "../numbers/config.h"
+#include <carl/numbers/numbers.h>
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/Interval.h"
-#include <cln/cln.h>
-#include <gmpxx.h>
-#include "Util.cpp"
 #include <list>
 #include "carl/converter/OldGinacConverter.h"
 #include "carl/util/stringparser.h"
@@ -16,6 +13,7 @@
 using namespace carl;
 
 
+#ifdef USE_CLN_NUMBERS
 
 TEST(DiophantineEquation, extended_gcd_integer) {
     cln::cl_I s, t, a, b;
@@ -181,8 +179,4 @@ TEST(DiophantineEquation, solve_linear) {
     
     
 }
-
-
-
-
-
+#endif

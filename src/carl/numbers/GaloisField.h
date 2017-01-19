@@ -7,19 +7,20 @@
 
 #pragma once
 
+#include "../numbers/numbers.h"
+#include "../util/Singleton.h"
+
 #include <map>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 namespace carl
 {
 
 template<typename IntegerType>
-class IntegerPairCompare
-{
-	public:
-	bool operator()(const std::pair<IntegerType, IntegerType>& p1,const std::pair<IntegerType, IntegerType>& p2) const
-	{
+struct IntegerPairCompare {
+	bool operator()(const std::pair<IntegerType, IntegerType>& p1,const std::pair<IntegerType, IntegerType>& p2) const {
 		return (p1.first < p2.first) || (p1.first == p2.first && p1.second < p2.second);
 	}
 };
@@ -28,12 +29,15 @@ class IntegerPairCompare
  * A finite field.
  */
 template<typename IntegerType>
-class GaloisField
-{
-	const unsigned mP;
-	const unsigned mK;
-	const IntegerType mPK;
-	const IntegerType symmetricModuloOperationOffset;
+class GaloisField {
+public:
+	using BaseIntType = unsigned;
+private:
+	const BaseIntType mP;
+	const BaseIntType mK;
+	const IntegerType mPK; // = mP ^ mK
+	const IntegerType mMaxValue; // = (mPK-1) / 2
+	const IntegerType mModulus; // = (mPK+1) / 2 = mMaxValue + 1
 	
 	public:
 	/**
@@ -42,8 +46,11 @@ class GaloisField
      * @param k A exponent
 	 * @see GaloisFieldManager where the overhead of creating several GFs is prevented by storing them.
      */
-	explicit GaloisField(unsigned p, unsigned k = 1):
-		mP(p), mK(k), mPK(pow(IntegerType(p),k)), symmetricModuloOperationOffset( (mPK-1)/2 )
+	explicit GaloisField(BaseIntType p, BaseIntType k = 1):
+		mP(p), mK(k),
+		mPK(pow(p,k)),
+		mMaxValue((mPK-1)/2),
+		mModulus(mMaxValue+1)
 	{ 
 	}
 	
@@ -51,8 +58,7 @@ class GaloisField
 	 * Returns the p from Z_{p^k}
      * @return a prime
      */
-	unsigned p() const
-	{
+	BaseIntType p() const noexcept {
 		return mP;
 	}
 	
@@ -60,83 +66,57 @@ class GaloisField
 	 * Returns the k from Z_{p^k}
      * @return A positive integer
      */
-	unsigned k() const
-	{
+	BaseIntType k() const noexcept {
 		return mK;
 	}
 	
-	const IntegerType& size() const
-	{
+	const IntegerType& size() const noexcept {
 		return mPK;
 	}
 	
-	IntegerType modulo(const IntegerType& n) const
-	{
+	IntegerType modulo(const IntegerType& n) const {
 		return symmetricModulo(n);
 	}
 	
-	IntegerType symmetricModulo(const IntegerType& n) const
-	{
-		return n > (mPK-1)/2 ? carl::mod(IntegerType(n-(mPK+1)/2), mPK) - (mPK-1)/2 : carl::mod(n, mPK);
+	IntegerType symmetricModulo(const IntegerType& n) const	{
+		if (n > mMaxValue) {
+			return carl::mod(IntegerType(n-mModulus), mPK) - mMaxValue;
+		} else {
+			return carl::mod(n, mPK);
+		}
 	}
 	
-	friend bool operator==(const GaloisField& lhs, const GaloisField& rhs)
-	{
+	friend bool operator==(const GaloisField& lhs, const GaloisField& rhs) {
 		return lhs.mPK == rhs.mPK;
 	}
 	
-	friend std::ostream& operator<<(std::ostream& os, const GaloisField& rhs)
-	{
+	friend std::ostream& operator<<(std::ostream& os, const GaloisField& rhs) {
 		return os << "GF(" << rhs.mP << "^" << rhs.mK << ")";
 	}
 };
 
 template<typename IntegerType>
-class GaloisFieldManager
-{
-	static std::unique_ptr<GaloisFieldManager> mInstance;
-    /**
-	 * Notice that for fully c++11 compliant compilers, this is redundant.
-	 */
-	static std::once_flag mOnceFlag;
-	std::map<std::pair<unsigned, unsigned>, const GaloisField<IntegerType>*, IntegerPairCompare<unsigned>> mGaloisFields;
+class GaloisFieldManager: public Singleton<GaloisFieldManager<IntegerType>> {
+public:
+	using BaseIntType = typename GaloisField<IntegerType>::BaseIntType;
+private:
+	std::map<std::pair<BaseIntType,BaseIntType>, std::unique_ptr<GaloisField<IntegerType>>, IntegerPairCompare<unsigned>> mGaloisFields;
+public:
 	
-	GaloisFieldManager(): mGaloisFields() {}
-	
-	public:
-	static GaloisFieldManager& getInstance();
-	
-	const GaloisField<IntegerType>* getField(unsigned p, unsigned k=1)
+	const GaloisField<IntegerType>* getField(BaseIntType p, BaseIntType k = 1)
 	{
 		auto it = mGaloisFields.find(std::make_pair(p,k));
-		if(it == mGaloisFields.end())
-		{	
-			return mGaloisFields.insert(std::make_pair(std::make_pair(p,k),new GaloisField<IntegerType>(p,k))).first->second;
-		}
-		else
-		{
-			return it->second;
+		if (it == mGaloisFields.end()) {	
+			auto newit = mGaloisFields.emplace(
+				std::make_pair(p,k),
+				std::make_unique<GaloisField<IntegerType>>(p, k)
+			);
+			assert(newit.second);
+			return newit.first->second.get();
+		} else {
+			return it->second.get();
 		}
 	}
-		
-	
 };
-
-
-template<typename IntegerType>
-std::unique_ptr<GaloisFieldManager<IntegerType>> GaloisFieldManager<IntegerType>::mInstance;
-template<typename IntegerType>
-std::once_flag GaloisFieldManager<IntegerType>::mOnceFlag;
-
-
-template<typename IntegerType>
-GaloisFieldManager<IntegerType>& GaloisFieldManager<IntegerType>::getInstance()
-{
-	std::call_once(mOnceFlag,
-		[]  {
-			mInstance.reset(new GaloisFieldManager());
-	});
-	return *mInstance.get();
-}
 
 }

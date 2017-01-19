@@ -83,7 +83,7 @@ std::vector<T> solveLinearDiophantine(MultivariatePolynomial<T>& equation) {
     }
     // no solution exists
     CARL_LOG_NOTIMPLEMENTED(); 
-    return std::vector<cln::cl_I>(coeffs.size(), 0);
+    return std::vector<T>(coeffs.size(), 0);
     
 }
 

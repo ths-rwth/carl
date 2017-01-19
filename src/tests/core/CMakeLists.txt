@@ -1,28 +1,6 @@
-# Add test cpp file
-add_executable(runCoreTests
-        #Test_DiophantineEquation.cpp
-        Test_CoCoA.cpp
-		Test_OperatorConcepts.cpp
-        Test_Variable.cpp
-        Test_VariablePool.cpp
-        Test_Monomial.cpp
-        Test_Term.cpp
-        Test_MultivariatePolynomial.cpp
-        Test_UnivariatePolynomial.cpp
-        Test_MultivariateHensel.cpp
-        Test_MultivariateGCD.cpp
-        Test_RealAlgebraicNumber.cpp
-        Test_RootFinder.cpp
-		Test_Resultant.cpp
-        Test_Sign.cpp
-        Test_FactorizedPolynomial.cpp
-		Test_MultivariateRoot.cpp
-		Test_RationalFunction.cpp
-		Test_SMTLIBStream.cpp
-        #Test_TaylorExpansion.cpp
-        #Test_Constraint.cpp
-)
-cotire(runCoreTests)
+file(GLOB_RECURSE test_sources "*.cpp")
+
+add_executable(runCoreTests ${test_sources})
 
 if (COMPARE_WITH_Z3)
     include_directories(${Z3_INCLUDE_DIRS})
@@ -31,6 +9,4 @@ endif()
 
 target_link_libraries(runCoreTests TestCommon)
 
-cotire(runCoreTests)
-
-add_test( NAME core COMMAND runCoreTests )
+add_test(NAME core COMMAND runCoreTests)

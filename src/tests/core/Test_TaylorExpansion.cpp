@@ -1,10 +1,11 @@
 #include "gtest/gtest.h"
 #include "carl/core/TaylorExpansion.h"
-#include <cln/cln.h>
 
 #include "../Common.h"
 
 using namespace carl;
+
+#ifdef USE_CLN_NUMBERS
 
 TEST(TaylorExpansion, ideal_adic_coefficient) {
 
@@ -20,12 +21,13 @@ TEST(TaylorExpansion, ideal_adic_coefficient) {
     GFNumber<cln::cl_I> a4(4, gf5);
 
 
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x_1 = vpool.getFreshVariable("x_1");
-    Variable x_2 = vpool.getFreshVariable("x_2");
+    Variable x_1 = carl::freshIntegerVariable("x_1");
+    Variable x_2 = carl::freshIntegerVariable("x_2");
 
     MultivariatePolynomial<GFNumber<cln::cl_I>> p({a1 * x_1, a2 * x_2 * x_2, a1 * x_1 * x_2});
 
     std::cout << TaylorExpansion<cln::cl_I>::ideal_adic_coeff(p, x_2, a1, 2) << std::endl;
 
 }
+
+#endif
