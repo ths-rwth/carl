@@ -25,7 +25,7 @@ namespace carl {
 		BaseNumber& operator=(BaseNumber&& n) = default; // NOLINT
 		~BaseNumber() = default;
 				
-		explicit BaseNumber(const T& t): mData(t) {}
+		explicit BaseNumber(const T& t): mData(t) {} // NOLINT
 		explicit BaseNumber(T&& t): mData(std::move(t)) {}
 		BaseNumber(long long int n) { std::string s = std::to_string(n); mData = T(s); } // NOLINT
 		BaseNumber(unsigned long long int n) { std::string s = std::to_string(n); mData = T(s); } // NOLINT

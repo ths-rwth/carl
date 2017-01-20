@@ -18,7 +18,7 @@ template<typename Polynomial>
 class AbstractGBProcedure 
 {
 	public:
-	virtual ~AbstractGBProcedure() {};
+	virtual ~AbstractGBProcedure() = default;
 	virtual void addPolynomial(const Polynomial& p) = 0;
 	virtual void reset()= 0;
 	virtual void calculate()= 0;
@@ -77,9 +77,7 @@ public:
 		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 	}
 	
-	virtual ~GBProcedure() {
-		
-	}
+	virtual ~GBProcedure() = default;
 
 	GBProcedure& operator=(const GBProcedure& rhs)
 	{

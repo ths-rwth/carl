@@ -39,7 +39,7 @@ namespace carl
          * Default constructor.
          */
         Numeric();
-        Numeric( const T& /*unused*/ );
+        Numeric( const T& /*unused*/ ); // NOLINT
         Numeric( ContentType /*unused*/, bool /*unused*/ = false ); // NOLINT
         Numeric( const Numeric<T>& /*unused*/ );
         ~Numeric();

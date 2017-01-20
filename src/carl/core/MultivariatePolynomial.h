@@ -383,7 +383,7 @@ public:
      * For terms with exactly one variable, get this variable.
      * @return The only variable occuring in the term.
      */
-    Variable::Arg getSingleVariable() const
+    Variable getSingleVariable() const
     {
         assert( !isConstant() );
         return lterm().getSingleVariable();

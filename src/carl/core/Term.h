@@ -8,11 +8,11 @@
 #pragma once
 
 #include "../interval/Interval.h"
-#include "../numbers/numbers.h"
 #include "../numbers/number/NumberMpq.h"
 #include "../numbers/number/NumberClRA.h"
 #include "../numbers/number/NumberInterval.h"
 #include "../numbers/number/NumberInt.h"
+#include "../numbers/numbers.h"
 #include "../util/pointerOperations.h"
 #include "Definiteness.h"
 #include "Monomial.h"
@@ -45,21 +45,13 @@ class Term
 		Term();
 		
 		Term(const Term& t): mCoeff(t.mCoeff), mMonomial(t.mMonomial) {
-			assert(this->isConsistent());
+			assert(isConsistent());
 		}
 		Term(Term&& t): mCoeff(std::move(t.mCoeff)), mMonomial(std::move(t.mMonomial)) {
-			assert(this->isConsistent());
+			assert(isConsistent());
 		}
-		Term& operator=(const Term& t) {
-			mCoeff = t.mCoeff;
-			mMonomial = t.mMonomial;
-			return *this;
-		}
-		Term& operator=(Term&& t) {
-			mCoeff = std::move(t.mCoeff);
-			mMonomial = std::move(t.mMonomial);
-			return *this;
-		}
+		Term& operator=(const Term& t) = default;
+		Term& operator=(Term&& t) = default;
 		/**
 		 * Constructs a term of value \f$ c \f$.
 		 * @param c Coefficient.
@@ -69,7 +61,7 @@ class Term
 		 * Constructs a term of value \f$ v \f$.
 		 * @param v Variable.
 		 */
-		explicit Term(Variable::Arg v);
+		explicit Term(Variable v);
 		/**
 		 * Constructs a term of value \f$ m \f$.
 		 * @param m Monomial pointer.
@@ -95,7 +87,7 @@ class Term
 		 * @param v Variable.
 		 * @param e Exponent.
 		 */
-		Term(const Coefficient& c, Variable::Arg v, uint e);
+		Term(const Coefficient& c, Variable v, uint e);
 		
 		/**
 		 * Get the coefficient.
@@ -193,7 +185,7 @@ class Term
 		 * @param v The variable to check for its occurrence.
 		 * @return true, if the variable occurs in this term.
 		 */
-		inline bool has(Variable::Arg v) const
+		inline bool has(Variable v) const
 		{
 			if (!mMonomial) return false;
 			return mMonomial->has(v);
@@ -204,7 +196,7 @@ class Term
 		 * @param v The variable which may occur.
 		 * @return true if no variable occurs, or just v occurs. 
 		 */
-		bool hasNoOtherVariable(Variable::Arg v) const
+		bool hasNoOtherVariable(Variable v) const
 		{
 			if(!mMonomial) return true;
 			return mMonomial->hasNoOtherVariable(v);
@@ -219,7 +211,7 @@ class Term
 		 * For terms with exactly one variable, get this variable.
 		 * @return The only variable occuring in the term.
 		 */
-		Variable::Arg getSingleVariable() const
+		Variable getSingleVariable() const
 		{
 			assert(getNrVariables() == 1);
 			return mMonomial->getSingleVariable();
@@ -259,11 +251,11 @@ class Term
 		Term divide(const Coefficient& c) const;
 		bool divide(const Coefficient& c, Term& res) const;
 		
-		bool divide(Variable::Arg v, Term& res) const;
+		bool divide(Variable v, Term& res) const;
 		
 		bool divide(const Monomial::Arg& m, Term& res) const;
 		
-		bool divide(const Term&, Term& res) const;
+		bool divide(const Term& t, Term& res) const;
 		
 		Term calcLcmAndDivideBy(const Monomial::Arg& m) const;
         
@@ -278,11 +270,11 @@ class Term
 		bool sqrt(Term& res) const;
 		
 		template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
-		bool divisible(const Term&) const;
+		bool divisible(const Term& t) const;
 		template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
-		bool divisible(const Term&) const;
+		bool divisible(const Term& t) const;
 		
-		Term derivative(Variable::Arg) const;
+		Term derivative(Variable v) const;
 		
 		Definiteness definiteness() const;
 		
@@ -292,7 +284,7 @@ class Term
 		
 		
 		template<bool gatherCoeff, typename CoeffType>
-		void gatherVarInfo(Variable::Arg var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
+		void gatherVarInfo(Variable var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
 		
 		template<bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const;
@@ -336,7 +328,7 @@ class Term
 		 * @return Changed term.
 		 */
 		Term& operator*=(const Coefficient& rhs);
-		Term& operator*=(Variable::Arg rhs);
+		Term& operator*=(Variable rhs);
 		Term& operator*=(const Monomial::Arg& rhs);
 		Term& operator*=(const Term& rhs);
 		/// @}
@@ -420,7 +412,7 @@ class Term
 	template<typename Coeff>
 	inline bool operator==(const Term<Coeff>& lhs, const Monomial& rhs);
 	template<typename Coeff>
-	inline bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs);
+	inline bool operator==(const Term<Coeff>& lhs, Variable rhs);
 	template<typename Coeff>
 	inline bool operator==(const Term<Coeff>& lhs, const Coeff& rhs);
 	template<typename Coeff>
@@ -428,7 +420,7 @@ class Term
 		return rhs == lhs;
 	}
 	template<typename Coeff>
-	inline bool operator==(Variable::Arg lhs, const Term<Coeff>& rhs) {
+	inline bool operator==(Variable lhs, const Term<Coeff>& rhs) {
 		return rhs == lhs;
 	}
 	template<typename Coeff>
@@ -445,7 +437,7 @@ class Term
 		return !(lhs == rhs);
 	}
 	template<typename Coeff>
-	inline bool operator!=(const Term<Coeff>& lhs, Variable::Arg rhs) {
+	inline bool operator!=(const Term<Coeff>& lhs, Variable rhs) {
 		return !(lhs == rhs);
 	}
 	template<typename Coeff>
@@ -457,7 +449,7 @@ class Term
 		return !(lhs == rhs);
 	}
 	template<typename Coeff>
-	inline bool operator!=(Variable::Arg lhs, const Term<Coeff>& rhs) {
+	inline bool operator!=(Variable lhs, const Term<Coeff>& rhs) {
 		return !(lhs == rhs);
 	}
 	template<typename Coeff>
@@ -470,13 +462,13 @@ class Term
 	template<typename Coeff>
 	bool operator<(const Term<Coeff>& lhs, const Monomial::Arg& rhs);
 	template<typename Coeff>
-	bool operator<(const Term<Coeff>& lhs, Variable::Arg rhs);
+	bool operator<(const Term<Coeff>& lhs, Variable rhs);
 	template<typename Coeff>
 	bool operator<(const Term<Coeff>& lhs, const Coeff& rhs);
 	template<typename Coeff>
 	bool operator<(const Monomial::Arg& lhs, const Term<Coeff>& rhs);
 	template<typename Coeff>
-	bool operator<(Variable::Arg lhs, const Term<Coeff>& rhs);
+	bool operator<(Variable lhs, const Term<Coeff>& rhs);
 	template<typename Coeff>
 	bool operator<(const Coeff& lhs, const Term<Coeff>& rhs);
 
@@ -489,7 +481,7 @@ class Term
 		return !(rhs < lhs);
 	}
 	template<typename Coeff>
-	inline bool operator<=(const Term<Coeff>& lhs, Variable::Arg rhs) {
+	inline bool operator<=(const Term<Coeff>& lhs, Variable rhs) {
 		return !(rhs < lhs);
 	}
 	template<typename Coeff>
@@ -501,7 +493,7 @@ class Term
 		return !(rhs < lhs);
 	}
 	template<typename Coeff>
-	inline bool operator<=(Variable::Arg lhs, const Term<Coeff>& rhs) {
+	inline bool operator<=(Variable lhs, const Term<Coeff>& rhs) {
 		return !(rhs < lhs);
 	}
 	template<typename Coeff>
@@ -518,7 +510,7 @@ class Term
 		return rhs < lhs;
 	}
 	template<typename Coeff>
-	inline bool operator>(const Term<Coeff>& lhs, Variable::Arg rhs) {
+	inline bool operator>(const Term<Coeff>& lhs, Variable rhs) {
 		return rhs < lhs;
 	}
 	template<typename Coeff>
@@ -530,7 +522,7 @@ class Term
 		return rhs < lhs;
 	}
 	template<typename Coeff>
-	inline bool operator>(Variable::Arg lhs, const Term<Coeff>& rhs) {
+	inline bool operator>(Variable lhs, const Term<Coeff>& rhs) {
 		return rhs < lhs;
 	}
 	template<typename Coeff>
@@ -547,7 +539,7 @@ class Term
 		return rhs <= lhs;
 	}
 	template<typename Coeff>
-	inline bool operator>=(const Term<Coeff>& lhs, Variable::Arg rhs) {
+	inline bool operator>=(const Term<Coeff>& lhs, Variable rhs) {
 		return rhs <= lhs;
 	}
 	template<typename Coeff>
@@ -559,7 +551,7 @@ class Term
 		return rhs <= lhs;
 	}
 	template<typename Coeff>
-	inline bool operator>=(Variable::Arg lhs, const Term<Coeff>& rhs) {
+	inline bool operator>=(Variable lhs, const Term<Coeff>& rhs) {
 		return rhs <= lhs;
 	}
 	template<typename Coeff>
@@ -585,7 +577,7 @@ class Term
 		return std::move(Term<Coeff>(lhs) *= rhs);
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Term<Coeff>& lhs, Variable::Arg rhs) {
+	inline Term<Coeff> operator*(const Term<Coeff>& lhs, Variable rhs) {
 		return std::move(Term<Coeff>(lhs) *= rhs);
 	}
 	template<typename Coeff>
@@ -601,11 +593,11 @@ class Term
 		return std::move(Term<Coeff>(rhs, lhs));
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(Variable::Arg lhs, const Term<Coeff>& rhs) {
+	inline Term<Coeff> operator*(Variable lhs, const Term<Coeff>& rhs) {
 		return std::move(rhs * lhs);
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(Variable::Arg lhs, const Coeff& rhs) {
+	inline Term<Coeff> operator*(Variable lhs, const Coeff& rhs) {
 		return std::move(Term<Coeff>(rhs, lhs, 1));
 	}
 	template<typename Coeff>
@@ -617,7 +609,7 @@ class Term
 		return std::move(rhs * lhs);
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Coeff& lhs, Variable::Arg rhs) {
+	inline Term<Coeff> operator*(const Coeff& lhs, Variable rhs) {
 		return std::move(rhs * lhs);
 	}
     template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
@@ -629,7 +621,7 @@ class Term
         return std::move(lhs * reciprocal(rhs));
     }
     template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
-    inline Term<Coeff> operator/(Variable::Arg& lhs, const Coeff& rhs) {
+    inline Term<Coeff> operator/(Variable& lhs, const Coeff& rhs) {
         return std::move(lhs * reciprocal(rhs));
     }
 	/// @}

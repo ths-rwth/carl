@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <memory>
-#include <cassert>
-
 #include "../core/Term.h"
+
+#include <cassert>
+#include <memory>
 
 namespace carl
 {
@@ -24,10 +24,10 @@ template <class Polynomial>
 class ReductorEntry
 {
 protected:
-    typedef typename Polynomial::CoeffType   Coeff;
-    Polynomial                         mTail;
-    Term<Coeff>    mLead;
-    Term<Coeff>    mMultiple;
+    using Coeff = typename Polynomial::CoeffType ;
+    Polynomial mTail;
+    Term<Coeff> mLead;
+    Term<Coeff> mMultiple;
 
 public:
     /**
@@ -46,7 +46,7 @@ public:
      * Constructor with implicit factor = 1
      * @param pol
      */
-    ReductorEntry(const Term<Coeff>& pol)
+    explicit ReductorEntry(const Term<Coeff>& pol)
     : mTail(), mLead(pol), mMultiple(Term<Coeff>(Coeff(1)))
     {
     }
@@ -153,4 +153,3 @@ std::ostream& operator <<(std::ostream& os, const ReductorEntry<C> rhs)
 	return os;
 }
 }
-

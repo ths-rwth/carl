@@ -25,7 +25,7 @@ Term<Coefficient>::Term(const Coefficient& c) :
 	assert(this->isConsistent());
 }
 template<typename Coefficient>
-Term<Coefficient>::Term(Variable::Arg v) :
+Term<Coefficient>::Term(Variable v) :
 	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(createMonomial(v, uint(1)))
 {
 	assert(this->isConsistent());
@@ -53,7 +53,7 @@ Term<Coefficient>::Term(Coefficient&& c, const Monomial::Arg& m) :
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, uint e): 
+Term<Coefficient>::Term(const Coefficient& c, Variable v, uint e): 
 	mCoeff(c),
 	mMonomial(createMonomial(v,e))
 {
@@ -77,7 +77,7 @@ bool Term<Coefficient>::divide(const Coefficient& c, Term& res) const
 }
 
 template<typename Coefficient>
-bool Term<Coefficient>::divide(Variable::Arg v, Term& res) const
+bool Term<Coefficient>::divide(Variable v, Term& res) const
 {
 	if(mMonomial) {
 		if(mMonomial->divide(v, res.mMonomial)) {
@@ -125,7 +125,7 @@ bool Term<Coefficient>::divide(const Term& t, Term& res) const
 }
 
 template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::derivative(Variable::Arg v) const
+Term<Coefficient> Term<Coefficient>::derivative(Variable v) const
 {
 	if(!mMonomial)
 	{
@@ -239,7 +239,7 @@ bool Term<Coefficient>::divisible(const Term& t) const {
 
 template<typename Coefficient>
 template<bool gatherCoeff, typename CoeffType>
-void Term<Coefficient>::gatherVarInfo(Variable::Arg var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
+void Term<Coefficient>::gatherVarInfo(Variable var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
 {
 	if(mMonomial)
 	{
@@ -277,7 +277,7 @@ bool operator==(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
 	return carl::isOne(lhs.coeff());
 }
 template<typename Coeff>
-bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs) {
+bool operator==(const Term<Coeff>& lhs, Variable rhs) {
 	if (lhs.monomial() != rhs) return false;
 	return carl::isOne(lhs.coeff());
 }
@@ -300,7 +300,7 @@ bool operator<(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
 }
 
 template<typename Coeff>
-bool operator<(const Term<Coeff>& lhs, Variable::Arg rhs) {
+bool operator<(const Term<Coeff>& lhs, Variable rhs) {
 	if (lhs.monomial() == rhs) return lhs.coeff() < carl::constant_one<Coeff>().get();
 	return lhs.monomial() < rhs;
 }
@@ -318,7 +318,7 @@ bool operator<(const Monomial::Arg& lhs, const Term<Coeff>& rhs) {
 }
 
 template<typename Coeff>
-bool operator<(Variable::Arg lhs, const Term<Coeff>& rhs) {
+bool operator<(Variable lhs, const Term<Coeff>& rhs) {
 	if (lhs == rhs.monomial()) return carl::constant_one<Coeff>().get() < rhs.coeff();
 	return lhs < rhs.monomial();
 }
@@ -348,7 +348,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 	return *this;
 }
 template<typename Coefficient>
-Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
+Term<Coefficient>& Term<Coefficient>::operator*=(Variable rhs)
 {
 	if(carl::isZero(mCoeff)) //change this to mCoeff.isZero() at some point
 	{
