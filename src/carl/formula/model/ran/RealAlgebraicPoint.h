@@ -63,7 +63,7 @@ public:
 	 * Creates a real algebraic point with the specified components from a list.
 	 * @param v pointers to real algebraic numbers
 	 */
-	explicit RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumber<Number>>& v):
+	RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumber<Number>>& v):
 		numbers(v.begin(), v.end())
 	{}
 

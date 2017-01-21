@@ -11,8 +11,8 @@
 #include <memory>
 #include <sstream>
 
-#include "logging.h"
 #include "Sign.h"
+#include "logging.h"
 
 namespace carl {
 

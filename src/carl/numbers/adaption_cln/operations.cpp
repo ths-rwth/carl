@@ -130,10 +130,10 @@ namespace carl
     }
 
     template<>
-    cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring)
+    cln::cl_RA rationalize<cln::cl_RA>(const std::string& n)
     {
 	std::vector<std::string> strs;
-        boost::split(strs, inputstring, boost::is_any_of("."));
+        boost::split(strs, n, boost::is_any_of("."));
 
         if(strs.size() > 2)
         {

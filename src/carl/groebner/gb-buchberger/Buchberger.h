@@ -102,9 +102,7 @@ public:
 		
 	}
 	
-	virtual ~Buchberger()
-	{
-	}
+	virtual ~Buchberger() = default;
 	
 	Buchberger(const Buchberger& rhs):
 		pGb(new Ideal<Polynomial>(*rhs.pGb)),

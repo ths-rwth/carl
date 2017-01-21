@@ -640,11 +640,12 @@ namespace std {
 		 * @param term Term.
 		 * @return Hash of term.
 		 */
-		size_t operator()(const carl::Term<Coefficient>& term) const {
-			if(term.isConstant())
-				return hash<Coefficient>()(term.coeff()) | (size_t)1;
-			else
-				return hash<Coefficient>()(term.coeff()) ^ term.monomial()->hash();
+		std::size_t operator()(const carl::Term<Coefficient>& term) const {
+            if (term.isConstant()) {
+                return carl::hash_all(term.coeff());
+            } else {
+                return carl::hash_all(term.coeff(), *term.monomial());
+            }
 		}
 	};
 } // namespace std

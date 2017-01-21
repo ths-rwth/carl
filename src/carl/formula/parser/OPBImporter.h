@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../Formula.h"
-
 #include "../../core/logging.h"
 #include "../../core/Relation.h"
+#include "../Formula.h"
 
 #include <iostream>
 #include <map>
@@ -19,9 +18,9 @@ struct OPBFile {
 	OPBPolynomial objective;
 	std::vector<OPBConstraint> constraints;
 	
-	OPBFile() {}
-	OPBFile(const OPBPolynomial& obj): objective(obj) {}
-	OPBFile(const OPBPolynomial& obj, const std::vector<OPBConstraint>& cons): objective(obj), constraints(cons) {}
+	OPBFile() = default;
+	explicit OPBFile(OPBPolynomial obj): objective(std::move(obj)) {}
+	OPBFile(OPBPolynomial obj, std::vector<OPBConstraint> cons): objective(std::move(obj)), constraints(std::move(cons)) {}
 };
 
 OPBFile parseOPBFile(std::ifstream& in);
@@ -32,7 +31,7 @@ private:
 	std::ifstream mIn;
 
 public:
-	OPBImporter(const std::string& filename):
+	explicit OPBImporter(const std::string& filename):
 		mIn(filename)
 	{}
 	
