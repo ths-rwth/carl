@@ -9,8 +9,6 @@
 
 #include "FormulaPool.h"
 
-using namespace std;
-
 namespace carl
 {
     template<typename Pol>
@@ -69,7 +67,7 @@ namespace carl
             _element->mId = mIdAllocator; 
             Formula<Pol>::init( *_element );
             ++mIdAllocator;
-            FormulaContent<Pol>* negation = new FormulaContent<Pol>(NOT, std::move( Formula<Pol>( *iterBoolPair.first ) ) );
+            auto negation = new FormulaContent<Pol>(NOT, std::move( Formula<Pol>( *iterBoolPair.first ) ) );
             _element->mNegation = negation;
             negation->mId = mIdAllocator; 
             negation->mNegation = _element;
@@ -85,9 +83,7 @@ namespace carl
         if( _subformulaA.mpContent == mpTrue && _subformulaB.mpContent == mpFalse )
             return true;
         assert( !( _subformulaA.getType() == FormulaType::NOT && _subformulaA.subformula() == _subformulaB ) );
-        if( _subformulaB.getType() == FormulaType::NOT && _subformulaB.subformula() == _subformulaA )
-            return true;
-        return false;
+        return _subformulaB.getType() == FormulaType::NOT && _subformulaB.subformula() == _subformulaA;
     }
     
     template<typename Pol>

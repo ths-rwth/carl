@@ -9,9 +9,10 @@
 #pragma once
 
 #include "CompactTree.h"
-#include <vector>
+
 #include <ostream>
 #include <string>
+#include <vector>
 
 namespace carl
 {
@@ -44,7 +45,7 @@ namespace carl
             typedef C                             Configuration;
             typedef typename Configuration::Entry Entry;
 
-            Heap( const Configuration& configuration ):
+            explicit Heap( const Configuration& configuration ):
 				_tree(),
                 _conf( configuration )
             {}
@@ -126,7 +127,7 @@ namespace carl
             class c_iterator
             {
                 public:
-                    c_iterator( const Tree& tree ):
+                    explicit c_iterator( const Tree& tree ):
                         mTree( tree ),
 						pos()
                     {}
@@ -178,7 +179,7 @@ namespace carl
 
             };
 
-            typedef c_iterator const_iterator;
+            using const_iterator = c_iterator;
     };
 
     template<class C>

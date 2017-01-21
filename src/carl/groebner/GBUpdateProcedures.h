@@ -9,9 +9,8 @@
 namespace carl
 {
 
-struct UpdateFnc
-{
-	virtual void operator()(size_t index) = 0;
+struct UpdateFnc {
+	virtual void operator()(std::size_t index) = 0;
 	virtual ~UpdateFnc() = default;
 };
 
@@ -19,13 +18,8 @@ struct UpdateFnc
 template<typename Polynomial>
 struct StdAdding
 {
-private:
-	
 public:
-	virtual ~StdAdding()
-	{
-		
-	}
+	virtual ~StdAdding() = default;
 	
 	bool addToGb(const Polynomial& p, std::shared_ptr<Ideal<Polynomial>> gb, UpdateFnc* update)
 	{

@@ -377,8 +377,7 @@ class Term
 		static bool monomialLess(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
 		{
 			if (lhs && rhs) return monomialLess(*lhs, *rhs);
-			if (lhs) return false;
-			return true;
+            return !lhs;
 		}
 		/**
 		 * Calculates the gcd of (t1, t2).
