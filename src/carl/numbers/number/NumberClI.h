@@ -26,10 +26,8 @@ namespace carl {
 		Number(unsigned long long int n) { mData = cln::cl_I(n);} // NOLINT
 		explicit Number(const Number<mpz_class>& n);
 		
-		Number<cln::cl_I>& operator=(const Number<cln::cl_I>& n) {
-			mData = n.mData;
-			return *this;
-		}
+		Number<cln::cl_I>& operator=(const Number<cln::cl_I>& n) = default;
+		Number<cln::cl_I>& operator=(Number<cln::cl_I>&& n) = default;
 
 		template<typename Other>
 		Number<cln::cl_I>& operator=(const Other& n) {
@@ -37,10 +35,6 @@ namespace carl {
 			return *this;
 		}
 
-		Number<cln::cl_I>& operator=(Number<cln::cl_I>&& n) noexcept {
-			mData = std::move(n.mData);
-			return *this;
-		}
 
 		std::string toString(bool _infix = true) const;
 
