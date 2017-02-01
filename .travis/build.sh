@@ -4,7 +4,17 @@ mkdir build || return 1
 cd build/ || return 1
 cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
 
-if [[ ${TASK} == "doxygen" ]]; then
+if [[ ${TASK} == "coverage" ]]; then
+	gem install coveralls-lcov
+	cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON -D COVERAGE=ON ../ || return 1
+	
+	/usr/bin/time make resources -j1 || return 1
+	/usr/bin/time make -j1 lib_carl || return 1
+	/usr/bin/time make -j1 || return 1
+	/usr/bin/time make -j1 coverage-collect || return 1
+	
+	coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
+elif [[ ${TASK} == "doxygen" ]]; then
 	make doc || return 1
 	
 	git config --global user.email "gereon.kremer@cs.rwth-aachen.de"
@@ -22,16 +32,6 @@ if [[ ${TASK} == "doxygen" ]]; then
 	git commit -m "Updated documentation for carl" || return 1
 	git push origin master || return 1
 
-elif [[ ${TASK} == "coverage" ]]; then
-	gem install coveralls-lcov
-	cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON -D COVERAGE=ON ../ || return 1
-	
-	/usr/bin/time make resources -j1 || return 1
-	/usr/bin/time make -j1 lib_carl || return 1
-	/usr/bin/time make -j1 || return 1
-	/usr/bin/time make -j1 coverage-collect || return 1
-	
-	coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
 elif [[ ${TASK} == "pycarl" ]]; then
 	/usr/bin/time make resources -j1 || return 1
 	/usr/bin/time make -j1 lib_carl || return 1
