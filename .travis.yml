@@ -58,8 +58,6 @@ matrix:
       env: USE=clang++-3.9
     - os: linux
       env: USE=clang++-3.6 TASK=doxygen
-#    - os: linux
-#      env: USE=clang++-3.8 TASK=coverage
     - os: linux
       env: USE=g++-6 TASK=coverage
     - os: linux
@@ -71,10 +69,10 @@ matrix:
       osx_image: xcode8.2
       env: USE=clang++-8.0
   allow_failures:
-#    - os: linux
-#      env: USE=clang++-3.8 TASK=coverage
     - os: linux
       env: USE=g++-6 TASK=coverage
+    - os: linux
+      env: USE=g++-6 TASK=pycarl
 
 
 before_install:
