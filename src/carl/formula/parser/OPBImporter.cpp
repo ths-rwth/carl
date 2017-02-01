@@ -1,5 +1,7 @@
 #include "OPBImporter.h"
 
+#include "SpiritHelper.h"
+
 #include <tuple>
 #include <vector>
 
@@ -8,13 +10,25 @@
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi_parse.hpp>
+#include <boost/spirit/include/support_line_pos_iterator.hpp>
 
 namespace carl {
+	namespace spirit = boost::spirit;
 	namespace qi = boost::spirit::qi;
 	namespace px = boost::phoenix;
 
-	using Iterator = boost::spirit::istream_iterator;
-	using Skipper = boost::spirit::qi::space_type;
+	using BaseIteratorType = spirit::istream_iterator;
+	using PositionIteratorType = spirit::line_pos_iterator<BaseIteratorType>;
+	using Iterator = PositionIteratorType;
+	using ErrorHandler = carl::parser::ErrorHandler;
+	
+	struct Skipper: public qi::grammar<Iterator> {
+		Skipper(): Skipper::base_type(main, "skipper") {
+			main = (qi::space | (qi::lit("*") > *(qi::char_ - qi::eol) > qi::eol));
+		};
+		qi::rule<Iterator> main;
+	};
 	
 	struct OPBParser: public qi::grammar<Iterator, OPBFile(), Skipper> {
 		OPBParser(): OPBParser::base_type(mMain, "OPBFile") {
@@ -28,21 +42,25 @@ namespace carl {
 			;
 			mVarname = qi::lexeme[ qi::alpha > *(qi::alnum | qi::char_("_"))];
 			mNewVarWrapper = mVarname[qi::_val = px::bind(&OPBParser::addVariable, px::ref(*this), qi::_1)];
-			mTerm = qi::int_ >> ((mVariables >> qi::space) | mNewVarWrapper);
+			mTerm = qi::int_ >> (mVariables | mNewVarWrapper);
 			mPolynomial = +mTerm;
 			mConstraint = mPolynomial >> mRelation >> qi::int_;
-			mMain = ("min:" >> mPolynomial >> ";" >> *(mConstraint >> ";"))[qi::_val = px::bind(&OPBParser::createFile, px::ref(*this), qi::_1, qi::_2)];
+			mMain = (qi::lit("min:") >> mPolynomial >> qi::lit(";") >> *(mConstraint >> ";"))[qi::_val = px::bind(&OPBParser::createFile, px::ref(*this), qi::_1, qi::_2)] >> qi::eoi;
+			qi::on_error<qi::fail>(mMain, errorHandler(qi::_1, qi::_2, qi::_3, qi::_4));
 		}
 		OPBFile parse(std::istream& in) {
+			in.unsetf(std::ios::skipws);
 			Skipper skipper;
-			Iterator begin(in);
+			BaseIteratorType basebegin(in);
+			Iterator begin(basebegin);
 			Iterator end;
 			OPBFile res;
 			if (qi::phrase_parse(begin, end, *this, skipper, res)) {
+				assert(begin == end);
 				return res;
 			} else {
-				std::cout << "Remaining to parse:" << std::endl;
-				std::cout << std::string(begin, end) << std::endl;
+				std::cout << "Failed to parse:" << std::endl;
+				std::cout << "\"" << std::string(begin, end) << "\"" << std::endl;
 				return res;
 			}
 		}
@@ -65,6 +83,7 @@ namespace carl {
 		qi::rule<Iterator, OPBPolynomial(), Skipper> mPolynomial;
 		qi::rule<Iterator, OPBConstraint(), Skipper> mConstraint;
 		qi::rule<Iterator, OPBFile(), Skipper> mMain;
+		px::function<ErrorHandler> errorHandler;
 	};
 
 	OPBFile parseOPBFile(std::ifstream& in) {
