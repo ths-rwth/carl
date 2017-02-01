@@ -32,6 +32,21 @@ elif [[ ${TASK} == "coverage" ]]; then
 	/usr/bin/time make -j1 coverage-collect || return 1
 	
 	coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
+elif [[ ${TASK} == "pycarl" ]]; then
+	/usr/bin/time make resources -j1 || return 1
+	/usr/bin/time make -j1 lib_carl || return 1
+	
+	# Clone pycarl
+	git clone https://github.com/moves-rwth/pycarl.git
+	cd pycarl/ || return 1
+	# Create a python virtual environment for local installation
+	pyenv pycarl-env
+	source pycarl-env/bin/activate
+	# Build bindings
+	python3 setup.py develop || return 1
+	# Run tests
+	py.test tests/ || return 1
+	
 else
 	/usr/bin/time make resources -j1 || return 1
 	/usr/bin/time make -j1 lib_carl || return 1
