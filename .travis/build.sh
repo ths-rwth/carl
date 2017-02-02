@@ -40,8 +40,8 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	git clone https://github.com/moves-rwth/pycarl.git
 	cd pycarl/ || return 1
 	# Create a python virtual environment for local installation
-	pyenv pycarl-env
-	source pycarl-env/bin/activate
+	#pyenv pycarl-env
+	#source pycarl-env/bin/activate
 	# Build bindings
 	python3 setup.py develop || return 1
 	# Run tests
