@@ -42,10 +42,10 @@ namespace carl {
 			;
 			mVarname = qi::lexeme[ qi::alpha > *(qi::alnum | qi::char_("_"))];
 			mNewVarWrapper = mVarname[qi::_val = px::bind(&OPBParser::addVariable, px::ref(*this), qi::_1)];
-			mTerm = qi::int_ >> (mVariables | mNewVarWrapper);
+			mTerm = qi::int_ >> (mVariables >> qi::space | mNewVarWrapper);
 			mPolynomial = +mTerm;
-			mConstraint = mPolynomial >> mRelation >> qi::int_;
-			mMain = (qi::lit("min:") >> mPolynomial >> qi::lit(";") >> *(mConstraint >> ";"))[qi::_val = px::bind(&OPBParser::createFile, px::ref(*this), qi::_1, qi::_2)] >> qi::eoi;
+			mConstraint = mPolynomial > mRelation > qi::int_;
+			mMain = (qi::lit("min:") > mPolynomial > qi::lit(";") >> *(mConstraint > ";"))[qi::_val = px::bind(&OPBParser::createFile, px::ref(*this), qi::_1, qi::_2)];
 			qi::on_error<qi::fail>(mMain, errorHandler(qi::_1, qi::_2, qi::_3, qi::_4));
 		}
 		OPBFile parse(std::istream& in) {
@@ -56,7 +56,10 @@ namespace carl {
 			Iterator end;
 			OPBFile res;
 			if (qi::phrase_parse(begin, end, *this, skipper, res)) {
-				assert(begin == end);
+				if (begin != end) {
+					std::cout << "Failed to parse:" << std::endl;
+					std::cout << "\"" << std::string(begin, end) << "\"" << std::endl;
+				}
 				return res;
 			} else {
 				std::cout << "Failed to parse:" << std::endl;
