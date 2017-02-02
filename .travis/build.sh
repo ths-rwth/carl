@@ -46,7 +46,7 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	#pyenv pycarl-env
 	#source pycarl-env/bin/activate
 	# Build bindings
-	python3 setup.py develop || return 1
+	python setup.py develop || return 1
 	# Run tests
 	py.test tests/ || return 1
 	
