@@ -33,6 +33,9 @@ elif [[ ${TASK} == "doxygen" ]]; then
 	git push origin master || return 1
 
 elif [[ ${TASK} == "pycarl" ]]; then
+	
+	pip install setuptools
+	
 	/usr/bin/time make resources -j1 || return 1
 	/usr/bin/time make -j1 lib_carl || return 1
 	
