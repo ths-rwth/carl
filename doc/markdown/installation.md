@@ -41,18 +41,9 @@ Supported platforms
 --------------------------------------------
 We have tested carl successfully on the following platforms:
 
-- @if Gereon @endif     Arch Linux (Kernel 4.7.2) with Clang 3.8.1 and GCC 6.1.1
-@if Travis @endif
-- Ubuntu 14.04 LTS with GCC 4.9.4 (Travis)
-- Ubuntu 14.04 LTS with GCC 5.4.1 (Travis)
-- Ubuntu 14.04 LTS with GCC 6.2.0 (Travis)
-- Ubuntu 14.04 LTS with Clang 3.6.2 (Travis)
-- Ubuntu 14.04 LTS with Clang 3.7.1 (Travis)
-- Ubuntu 14.04 LTS with Clang 3.8.0 (Travis)
-- Ubuntu 14.04 LTS with Clang 3.9.1 (Travis)
-- OS X 10.10 with Xcode 6.4 / Clang 3.8.1 (Travis)
-- OS X 10.11 with Xcode 7.3 / Clang 3.8.1 (Travis)
-- OS X 10.11 with Xcode 8 / Clang 3.8.1 (Travis)
+- Arch Linux with Clang 3.9.1 and GCC 6.2.1
+- Ubuntu 14.04 LTS with several compilers on [Travis CI](https://travis-ci.org/smtrat/carl)
+- OS X 10.11 with several compilers on [Travis CI](https://travis-ci.org/smtrat/carl)
 
 Advanced building topics
 --------------------------------------------

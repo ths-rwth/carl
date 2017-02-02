@@ -15,13 +15,12 @@ Optional dependencies
 - `doxygen` to build the documentation.
 - `gtest` to build the test cases.
 
-To simplify the installation process, `gtest` and `Eigen3` are shipped with CArL in the `resources` folder.
-You can build them with
+To simplify the installation process, most libraries (currently all except `boost`) can be built by CArL automatically.
+If a library is not available on your system it is built automatically, or you can build them explicitly with
 @code
 make resources
 @endcode
 
 When installing the dependencies, make sure that you meet the following version requirements:
-- `g++` >= 4.8
-- `clang` >= 3.4
-
+- `g++` >= 5
+- `clang` >= 3.6

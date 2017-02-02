@@ -15,7 +15,7 @@ We assume that you start with a fresh installation and know how to install softw
 
 - Checkout CArL:
 @code
-git clone https://<user>@srv-i2.informatik.rwth-aachen.de:8443/git/carl.git
+git clone https://github.com/smtrat/carl.git
 @endcode
 
 - Create `build` folder:
@@ -39,7 +39,6 @@ This builds the shared library `build/libcarl.so`.
 
 - Build and run tests:
 @code
-make googletest
 make
 make test
 @endcode
