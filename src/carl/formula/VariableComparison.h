@@ -2,7 +2,6 @@
 
 #include "model/mvroot/MultivariateRoot.h"
 #include "model/ran/RealAlgebraicNumber.h"
-//#include "model/ModelValue.h"
 #include "../core/MultivariatePolynomial.h"
 #include "../core/Relation.h"
 #include "../core/Variable.h"
