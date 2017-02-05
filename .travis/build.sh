@@ -34,9 +34,9 @@ elif [[ ${TASK} == "doxygen" ]]; then
 
 elif [[ ${TASK} == "pycarl" ]]; then
 	
-	pip install setuptools virtualenv
+	#pip install --user setuptools virtualenv
 	# Create a python virtual environment for local installation
-	pyvenv pycarl-env
+	virtualenv pycarl-env
 	source pycarl-env/bin/activate
 	
 	/usr/bin/time make resources -j1 || return 1
