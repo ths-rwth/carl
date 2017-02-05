@@ -34,7 +34,10 @@ elif [[ ${TASK} == "doxygen" ]]; then
 
 elif [[ ${TASK} == "pycarl" ]]; then
 	
-	pip install setuptools
+	pip install setuptools virtualenv
+	# Create a python virtual environment for local installation
+	pyvenv pycarl-env
+	source pycarl-env/bin/activate
 	
 	/usr/bin/time make resources -j1 || return 1
 	/usr/bin/time make -j1 lib_carl || return 1
@@ -42,9 +45,6 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	# Clone pycarl
 	git clone https://github.com/moves-rwth/pycarl.git
 	cd pycarl/ || return 1
-	# Create a python virtual environment for local installation
-	#pyenv pycarl-env
-	#source pycarl-env/bin/activate
 	# Build bindings
 	python setup.py develop || return 1
 	# Run tests
