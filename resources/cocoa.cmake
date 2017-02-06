@@ -17,7 +17,7 @@ ExternalProject_Add(
 #		COMMAND patch --forward configuration/gmp-version.sh ${CMAKE_SOURCE_DIR}/resources/cocoa/configuration/gmp-version.sh.patch
 #		COMMAND cp ${CMAKE_SOURCE_DIR}/resources/cocoa/configuration/fpic-ldflag.sh configuration/
 	CONFIGURE_COMMAND ./configure --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations
-	BUILD_COMMAND make cocoalib
+	BUILD_COMMAND make cocoalib > /dev/null
 	INSTALL_COMMAND ""
 )
 
