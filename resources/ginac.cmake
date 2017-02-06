@@ -17,6 +17,7 @@ ExternalProject_Add(
 	UPDATE_COMMAND ""
 	CONFIGURE_COMMAND ${AUTORECONF} -iv <SOURCE_DIR> 
 		COMMAND PYTHON=${PYTHON2} <SOURCE_DIR>/configure --quiet --prefix=<INSTALL_DIR>
+	BUILD_COMMAND make > /dev/null
 )
 
 ExternalProject_Get_Property(GiNaC INSTALL_DIR)
