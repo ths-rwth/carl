@@ -35,14 +35,19 @@ public:
 		mIn(filename)
 	{}
 	
-	Formula<Pol> parse() {
+	std::pair<Formula<Pol>,Pol> parse() {
 		auto file = parseOPBFile(mIn);
 		Formulas<Pol> constraints;
 		for (const auto& cons: file.constraints) {
 			PBConstraint pbc(std::move(std::get<0>(cons)), std::get<1>(cons), std::get<2>(cons));
 			constraints.emplace_back(std::move(pbc));
 		}
-		return Formula<Pol>(FormulaType::AND, std::move(constraints));
+		Formula<Pol> resC(FormulaType::AND, std::move(constraints));
+		Pol objective;
+		for (const auto& term: file.objective) {
+			objective += typename Pol::CoeffType(term.first) * term.second;
+		}
+		return std::make_pair(std::move(resC), std::move(objective));
 	}
 };
 
