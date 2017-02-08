@@ -5,7 +5,30 @@
 
 #pragma once
 
+#include <tuple>
+
 namespace carl {
+
+	
+namespace detail {
+	/**
+	 * Helper method for carl::tuple_apply that actually performs the call.
+	 */
+	template<typename Tuple1, typename Tuple2, std::size_t... I1, std::size_t... I2>
+	auto tuple_cat_impl(Tuple1&& t1, Tuple2&& t2, std::index_sequence<I1...>, std::index_sequence<I2...>) {
+		return std::make_tuple(std::get<I1>(std::forward<Tuple1>(t1))..., std::get<I2>(std::forward<Tuple2>(t2))...);
+	}
+}
+template<typename Tuple1, typename Tuple2>
+auto tuple_cat(Tuple1&& t1, Tuple2&& t2) {
+	return detail::tuple_cat_impl(
+		std::forward<Tuple1>(t1),
+		std::forward<Tuple2>(t2),
+		std::make_index_sequence<std::tuple_size<typename std::decay<Tuple1>::type>::value>{},
+		std::make_index_sequence<std::tuple_size<typename std::decay<Tuple2>::type>::value>{}
+	);
+}
+
 
 /**
  * This functor actually implements the functionality of tail.
