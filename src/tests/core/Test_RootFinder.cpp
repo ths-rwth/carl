@@ -58,8 +58,9 @@ TEST(RootFinder, realRoots)
 		m.emplace(y, carl::RealAlgebraicNumber<Rational>(Rational(-1)));
 		std::cout << "Map = " << m << std::endl;
 		auto roots = carl::rootfinder::realRoots(p, m);
-		EXPECT_TRUE(roots.size() == 2);
-		EXPECT_TRUE(represents(roots.front(), (Rational)-1));
-		EXPECT_TRUE(represents(roots.back(), (Rational)1));
+		EXPECT_TRUE(bool(roots));
+		EXPECT_TRUE(roots->size() == 2);
+		EXPECT_TRUE(represents(roots->front(), (Rational)-1));
+		EXPECT_TRUE(represents(roots->back(), (Rational)1));
 	}
 }
