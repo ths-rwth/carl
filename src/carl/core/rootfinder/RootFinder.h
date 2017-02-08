@@ -6,9 +6,6 @@
 
 #pragma once
 
-#include <list>
-#include <map>
-
 #include "../../formula/model/ran/RealAlgebraicNumber.h"
 #include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
 #include "../../interval/Interval.h"
@@ -16,6 +13,11 @@
 #include "../Sign.h"
 #include "../UnivariatePolynomial.h"
 #include "IncrementalRootFinder.h"
+
+#include <boost/optional.hpp>
+
+#include <list>
+#include <map>
 
 namespace carl {
 namespace rootfinder {
@@ -91,6 +93,7 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
  *   <li>the main variable of p is not in m</li>
  *   <li>all variables from the coefficients of p are in m</li>
  * </ul>
+ * If the return value is boost::none, the polynomial evaluated to zero.
  * @param p
  * @param m
  * @param interval
@@ -98,7 +101,7 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
  * @return
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-std::list<RealAlgebraicNumber<Number>> realRoots(
+boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
@@ -106,7 +109,7 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
 );
 
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-std::list<RealAlgebraicNumber<Number>> realRoots(
+boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable>& variables,
 		const std::list<RealAlgebraicNumber<Number>>& values,
