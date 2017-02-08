@@ -187,11 +187,10 @@ template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	//os << endl << cad.getSetting() << endl;
 	os << "Variables: " << cad.mVariables << std::endl;
-	os << "Polynomials: " << cad.polynomials << std::endl;
 	os << "Elimination sets:" << std::endl;
 	unsigned level = 0;
 	for (const auto& i: cad.getEliminationSets()) {
-		os << "\tLevel " << level++ << ": " << i << std::endl;
+		os << level++ << ":\tP: " << i << std::endl;
 	}
 	os << "Sample tree:" << std::endl;
 	os << cad.sampleTree << std::endl;
@@ -329,6 +328,7 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 			while (! this->eliminationSets[l-1].emptySingleEliminationQueue()) {
 				// the polynomial can be analyzed for zeros
 				auto p = this->eliminationSets[l-1].popNextSingleEliminationPosition();
+				CARL_LOG_DEBUG("carl.cad", "Checking whether " << *p << " vanishes in " << bounds);
 				if (!this->vanishesInBox(p, bounds, l-1)) {
 					this->eliminationSets[l-1].erase(p);
 				}
@@ -471,7 +471,7 @@ cad::Answer CAD<Number>::check(
 					std::size_t sampleID = conflictGraph.newSample();
 					std::size_t constraintID = conflictGraph.getConstraint(constraint);
 					conflictGraph.set(constraintID, sampleID, true);
-					CARL_LOG_DEBUG("smtrat.cad", "Conflicting for itself: " << constraint);
+					CARL_LOG_DEBUG("carl.cad", "Conflicting for itself: " << constraint);
 					return cad::Answer::False;
 				}
 				// else: no additional check is needed!
@@ -840,14 +840,26 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		valit++;
 	}
 	CARL_LOG_FUNC("carl.cad", *p << " on " << m);
-	return this->samples(
-		openVariableCount,
-		carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy),
-        //carl::realRootsThom(*p, m, bounds),
-		currentSamples,
-		replacedSamples,
-		bounds
-	);
+	auto roots = carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy);
+	if (roots) {
+		return this->samples(
+			openVariableCount,
+	        //carl::realRootsThom(*p, m, bounds),
+			*roots,
+			currentSamples,
+			replacedSamples,
+			bounds
+		);
+	} else {
+		return this->samples(
+			openVariableCount,
+	        //carl::realRootsThom(*p, m, bounds),
+			{ RealAlgebraicNumber<Number>(0) },
+			currentSamples,
+			replacedSamples,
+			bounds
+		);
+	}
 }
 
 template<typename Number>
@@ -1366,7 +1378,8 @@ cad::Answer CAD<Number>::liftCheck(
 		return cad::Answer::True;
 	}
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
-	CARL_LOG_DEBUG("carl.cad", "Lifting " << std::vector<RealAlgebraicNumber<Number>>(sampleTree.begin_path(node), sampleTree.end_path()) << " on " << std::endl << sampleTree);
+	CARL_LOG_DEBUG("carl.cad", "Lifting " << std::vector<RealAlgebraicNumber<Number>>(sampleTree.begin_path(node), sampleTree.end_path()));
+	CARL_LOG_DEBUG("carl.cad", "Current state:" << std::endl << *this);
 	assert(this->sampleTree.is_valid(node));
 
 	if (checkBounds && boundsActive && (!node.isRoot())) {
@@ -1436,7 +1449,7 @@ cad::Answer CAD<Number>::liftCheck(
 	// the current list of samples at this position in the sample tree
 	cad::SampleSet<Number> currentSamples(setting.sampleOrdering);
 	currentSamples.insert(this->sampleTree.begin_children(node), this->sampleTree.end_children(node));
-	CARL_LOG_TRACE("carl.cad", "Getting old sample points: " << currentSamples);
+	CARL_LOG_DEBUG("carl.cad", "Getting old sample points: " << currentSamples);
 	// the current samples queue for this lifting process
 	cad::SampleSet<Number> sampleSetIncrement(setting.sampleOrdering);
 	std::forward_list<RealAlgebraicNumber<Number>> replacedSamples;
@@ -1459,7 +1472,7 @@ cad::Answer CAD<Number>::liftCheck(
 	} else {
 		sampleSetIncrement.insert(this->samples(openVariableCount, {RealAlgebraicNumber<Number>(0, true)}, currentSamples, replacedSamples));
 	}
-	CARL_LOG_TRACE("carl.cad", "Adding new samples " << sampleSetIncrement);
+	CARL_LOG_DEBUG("carl.cad", "Adding new samples " << sampleSetIncrement);
 
 	while (true) {
 		if (this->anAnswerFound()) break;
@@ -1646,6 +1659,7 @@ int CAD<Number>::eliminate(std::size_t level, const BoundMap& bounds, bool bound
 				while (!this->eliminationSets[l-1].emptySingleEliminationQueue()) {
 					// the polynomial can be analyzed for zeros
 					const UPolynomial* p = this->eliminationSets[l-1].nextSingleEliminationPosition();
+					CARL_LOG_DEBUG("carl.cad", "Checking whether " << *p << " vanishes in " << bounds);
 					if (this->vanishesInBox(p, bounds, l-1)) break;
 					// delete polynomial and try the next one
 					this->eliminationSets[l-1].erase(p);
@@ -1671,6 +1685,7 @@ int CAD<Number>::eliminate(std::size_t level, const BoundMap& bounds, bool bound
 				while (!this->eliminationSets.back().emptySingleEliminationQueue()) {
 					// the polynomial can be analyzed for zeros (use paired-elimination queue because the single is always empty)
 					const UPolynomial* p = this->eliminationSets.back().nextSingleEliminationPosition();
+					CARL_LOG_DEBUG("carl.cad", "Checking whether " << *p << " vanishes in " << bounds);
 					if (this->vanishesInBox(p, bounds, (unsigned)this->eliminationSets.size()-1)) break;
 					// delete polynomial and try the next one
 					this->eliminationSets.back().erase(p);
