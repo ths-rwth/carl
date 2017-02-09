@@ -1,4 +1,7 @@
 #include "../numbers.h"
+
+#include "parser.h"
+
 #include <limits>
 
 #include <boost/numeric/interval.hpp>
@@ -132,23 +135,10 @@ namespace carl
     template<>
     cln::cl_RA rationalize<cln::cl_RA>(const std::string& n)
     {
-	std::vector<std::string> strs;
-        boost::split(strs, n, boost::is_any_of("."));
-
-        if(strs.size() > 2)
-        {
-            throw std::invalid_argument("More than one delimiter in the string.");
-        }
-        cln::cl_RA result(0);
-        if(!strs.front().empty())
-        {
-            result += cln::cl_RA(strs.front().c_str());
-        }
-        if(strs.size() > 1)
-        {
-            result += (cln::cl_RA(strs.back().c_str())/carl::pow(cln::cl_RA(10),static_cast<unsigned>(strs.back().size())));
-        }
-        return result;
+        cln::cl_RA res;
+        bool success = parser::parseRational(n, res);
+        assert(success);
+        return res;
     }
 
     std::string toString(const cln::cl_RA& _number, bool _infix)

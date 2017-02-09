@@ -11,4 +11,7 @@ TEST(GMP, Rationalize)
 {
     EXPECT_TRUE( carl::rationalize<mpq_class>(carl::toDouble(mpq_class(1)/mpq_class(3))) != mpq_class(1)/mpq_class(3) );
     EXPECT_TRUE( carl::rationalize<mpq_class>(carl::toDouble(mpq_class(1)/mpq_class(20))) != mpq_class(1)/mpq_class(20) );
+	
+	EXPECT_TRUE(carl::rationalize<mpq_class>("123") == mpq_class(123));
+    EXPECT_TRUE(carl::rationalize<mpq_class>("1e3") == mpq_class(1000));
 }

@@ -1,6 +1,8 @@
 #include "../numbers.h"
 #include <limits>
 
+#include "parser.h"
+
 namespace carl
 {
 
@@ -117,24 +119,10 @@ namespace carl
     template<>
     mpq_class rationalize<mpq_class>(const std::string& n)
     {
-        std::vector<std::string> strs;
-        boost::split(strs, n, boost::is_any_of("."));
-
-        if(strs.size() > 2)
-        {
-            throw std::invalid_argument("More than one delimiter in the string.");
-        }
-        mpq_class result;
-        if(!strs.front().empty())
-        {
-            result += mpq_class(strs.front());
-        }
-        if(strs.size() > 1)
-        {
-            //if(strs.back().size() > )
-            result += (mpq_class(strs.back())/carl::pow(mpz_class(10),static_cast<unsigned>(strs.back().size())));
-        }
-        return result;
+        mpq_class res;
+        bool success = parser::parseRational(n, res);
+        assert(success);
+        return res;
     }
 
     std::string toString(const mpq_class& _number, bool _infix)
