@@ -2,25 +2,25 @@ Dependencies {#dependencies}
 ==========
 
 To build and use CArL, you need the following other software:
-
 - `git` to checkout the git repository.
 - `cmake` to generate the make files.
-- `cln` and `gmp` for calculations with large numbers.
-- `Eigen3` for numerical computations.
 - `g++` or `clang` to compile.
-- `boost` for several additional libraries.
 
 Optional dependencies
 - `ccmake` to set cmake flags.
 - `doxygen` to build the documentation.
 - `gtest` to build the test cases.
 
-To simplify the installation process, most libraries (currently all except `boost`) can be built by CArL automatically.
-If a library is not available on your system it is built automatically, or you can build them explicitly with
+Additionally, CArL requires a few external libraries:
+- `gmp` for calculations with large numbers.
+- `Eigen3` for numerical computations.
+- `boost` for several additional libraries.
+
+To simplify the installation process, all these libraries can be built by CArL automatically if it is not available on your system. You can do this manually by running
 @code
 make resources
 @endcode
 
-When installing the dependencies, make sure that you meet the following version requirements:
+CArL tries to make use of recent C++ language features. Therefore, the following compiler versions are required:
 - `g++` >= 5
 - `clang` >= 3.6

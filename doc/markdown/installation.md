@@ -7,7 +7,7 @@ We mirror our master branch to github.com. If you want to use the newest bleedin
 Although we try to keep the master branch stable, there is a chance that the current revision is broken.
 You can check [here](https://travis-ci.org/smtrat/carl/builds) if the current revision compiles and all the unit tests work.
 
-You can download specific versions we tagged at https://github.com/smtrat/carl/releases.
+We regularly tag reasonably stable versions. You can find them at https://github.com/smtrat/carl/releases.
 
 Quick installation guide
 --------------------------------------------
@@ -16,10 +16,6 @@ Quick installation guide
 - Prepare the build.
 @code{.sh}
 $ mkdir build && cd build && cmake ../
-@endcode
-- Build shipped dependencies if necessary.
-@code{.sh}
-$ make resources
 @endcode
 - Build carl (with tests and documentation).
 @code{.sh}
