@@ -135,6 +135,19 @@ namespace carl
     template<>
     cln::cl_RA rationalize<cln::cl_RA>(const std::string& n)
     {
+        return parse<cln::cl_RA>(n);
+    }
+    
+    template<>
+    cln::cl_I parse<cln::cl_I>(const std::string& n) {
+        cln::cl_I res;
+        bool success = parser::parseDecimal(n, res);
+        assert(success);
+        return res;
+    }
+
+    template<>
+    cln::cl_RA parse<cln::cl_RA>(const std::string& n) {
         cln::cl_RA res;
         bool success = parser::parseRational(n, res);
         assert(success);

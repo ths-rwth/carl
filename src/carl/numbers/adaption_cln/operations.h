@@ -203,8 +203,15 @@ inline cln::cl_RA rationalize<cln::cl_RA>(sint n) {
 	return cln::cl_RA(n);
 }
 
-template<>
+template<> [[deprecated("use parse() instead.")]]
 cln::cl_RA rationalize<cln::cl_RA>(const std::string& n);
+
+
+template<>
+cln::cl_I parse<cln::cl_I>(const std::string& n);
+
+template<>
+cln::cl_RA parse<cln::cl_RA>(const std::string& n);
 
 /**
  * Get absolute value of an integer.

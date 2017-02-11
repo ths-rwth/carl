@@ -231,13 +231,19 @@ inline mpq_class rationalize<mpq_class>(sint n) {
 	return mpq_class(n);
 }
 
-template<>
+template<> [[deprecated("use parse() instead.")]]
 mpq_class rationalize<mpq_class>(const std::string& n);
 
 template<>
 inline mpq_class rationalize<mpq_class>(const PreventConversion<mpq_class>& n) {
 	return n;
 }
+
+template<>
+mpz_class parse<mpz_class>(const std::string& n);
+
+template<>
+mpq_class parse<mpq_class>(const std::string& n);
 
 /**
  * Basic Operators

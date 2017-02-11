@@ -35,4 +35,7 @@ namespace carl {
 
 	template<typename Number>
 	inline int toInt(const Number& n);
+	
+	template<typename T>
+	inline T parse(const std::string& n);
 }

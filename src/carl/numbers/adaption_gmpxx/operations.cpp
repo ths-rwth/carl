@@ -117,8 +117,20 @@ namespace carl
     }
 
     template<>
-    mpq_class rationalize<mpq_class>(const std::string& n)
-    {
+    mpq_class rationalize<mpq_class>(const std::string& n) {
+        return parse<mpq_class>(n);
+    }
+
+    template<>
+    mpz_class parse<mpz_class>(const std::string& n) {
+        mpz_class res;
+        bool success = parser::parseDecimal(n, res);
+        assert(success);
+        return res;
+    }
+
+    template<>
+    mpq_class parse<mpq_class>(const std::string& n) {
         mpq_class res;
         bool success = parser::parseRational(n, res);
         assert(success);

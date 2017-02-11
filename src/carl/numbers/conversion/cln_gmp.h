@@ -23,7 +23,7 @@ namespace carl {
         }
         std::stringstream s;
         s << n;
-        mpq_class result = rationalize<mpq_class>(s.str());
+        mpq_class result = parse<mpq_class>(s.str());
         return result;
     }
 	
@@ -45,7 +45,7 @@ namespace carl {
         }
         std::stringstream s;
         s << n;
-        cln::cl_RA result = rationalize<cln::cl_RA>(s.str());
+        cln::cl_RA result = parse<cln::cl_RA>(s.str());
         return result;
     }
 	
