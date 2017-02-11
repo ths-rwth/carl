@@ -67,6 +67,7 @@ namespace parser {
 		if (res) {
 			return it == input.end();
 		}
+		return false;
 	}
 }
 }
