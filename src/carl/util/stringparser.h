@@ -278,7 +278,7 @@ namespace carl
             }
 			try
 			{
-				return rationalize<C>(inputStringCopy);
+				return parse<C>(inputStringCopy);
 			}
 			catch(std::exception& e)
 			{

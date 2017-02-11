@@ -15,7 +15,7 @@ namespace parser {
 	namespace qi = boost::spirit::qi;
 	namespace px = boost::phoenix;
 
-	using Skipper = decltype(qi::space);
+	using Skipper = qi::space_type;
 
 	/**
 	 * Specialization of qi::real_policies for our rational types.
@@ -61,7 +61,7 @@ namespace parser {
 	}
 	template<typename T>
 	bool parseRational(const std::string& input, T& output) {
-		Skipper s{};
+		Skipper s;
 		auto it = input.begin();
 		bool res = phrase_parse(it, input.end(), RationalParser<T>(), s, output);
 		if (res) {
