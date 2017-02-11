@@ -5,7 +5,7 @@
 
 namespace boost { namespace spirit { namespace traits {
 #if BOOST_VERSION >= 105900
-    template<> inline void scale(int exp, cln::cl_I& r, cln::cl_I rin) {
+    template<> inline bool scale(int exp, cln::cl_I& r, cln::cl_I rin) {
         assert(exp >= 0);
         r = rin * carl::pow(cln::cl_I(10), (unsigned)exp);
     }
