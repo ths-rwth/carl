@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../parser/parser.h"
+#include "operations.h"
 
 namespace boost { namespace spirit { namespace traits {
 #if BOOST_VERSION >= 105900
