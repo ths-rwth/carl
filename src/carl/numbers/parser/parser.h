@@ -61,7 +61,7 @@ namespace parser {
 	}
 	template<typename T>
 	bool parseRational(const std::string& input, T& output) {
-		Skipper s;
+		Skipper s{};
 		auto it = input.begin();
 		bool res = phrase_parse(it, input.end(), RationalParser<T>(), s, output);
 		if (res) {
