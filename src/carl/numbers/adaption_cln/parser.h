@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../config.h"
+
+#ifdef USE_CLN_NUMBERS
+
 #include "../parser/parser.h"
 #include "operations.h"
 
@@ -8,6 +12,7 @@ namespace boost { namespace spirit { namespace traits {
     template<> inline bool scale(int exp, cln::cl_I& r, cln::cl_I rin) {
         assert(exp >= 0);
         r = rin * carl::pow(cln::cl_I(10), (unsigned)exp);
+		return true;
     }
     template<> inline bool scale(int exp, cln::cl_RA& r, cln::cl_RA rin) {
         if (exp >= 0)
@@ -35,3 +40,5 @@ namespace boost { namespace spirit { namespace traits {
         return carl::isOne(value);
     }
 }}}
+
+#endif

@@ -8,6 +8,7 @@ namespace boost { namespace spirit { namespace traits {
     template<> inline bool scale(int exp, mpz_class& r, mpz_class rin) {
         assert(exp >= 0);
         r = rin * carl::pow(mpz_class(10), (unsigned)exp);
+		return true;
     }
     template<> inline bool scale(int exp, mpq_class& r, mpq_class rin) {
         if (exp >= 0)
