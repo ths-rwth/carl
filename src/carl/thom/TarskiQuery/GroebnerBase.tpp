@@ -65,7 +65,7 @@ bool nextTuple(std::vector<carl::uint>& tuple, const std::vector<carl::uint>& ma
         else {
                 assert(tuple[0] == maxTuple[0]);
                 bool succes = false;
-                for(uint i = 1; i < tuple.size(); i++) {
+                for(carl::uint i = 1; i < tuple.size(); i++) {
                         if(tuple[i] < maxTuple[i]) {
                                 for(carl::uint j = 0; j < i; j++) tuple[j] = 0;
                                 tuple[i]++;
