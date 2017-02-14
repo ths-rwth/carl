@@ -13,10 +13,10 @@ TEST(Monomial, Constructor)
 {
 	Variable x = freshRealVariable("x");
 	
-	Monomial m(x, 3);
-	EXPECT_TRUE(m.exponents().size() == 1);
-	EXPECT_TRUE(m.exponents().front().first == x);
-	EXPECT_TRUE(m.exponents().front().second == 3);
+	auto m = createMonomial(x, 3);
+	EXPECT_TRUE(m->exponents().size() == 1);
+	EXPECT_TRUE(m->exponents().front().first == x);
+	EXPECT_TRUE(m->exponents().front().second == 3);
 }
 
 TEST(Monomial, TotalDegree)

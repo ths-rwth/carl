@@ -82,7 +82,7 @@ namespace carl
 		void calcHash() {
 			mHash = Monomial::hashContent(mExponents);
 		}
-	public:
+
 		/**
 		 * Generate a monomial from a variable and an exponent.
 		 * @param v The variable.

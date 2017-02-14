@@ -68,7 +68,7 @@ namespace carl
 	{
 		CARL_LOG_FUNC("carl.core.monomial", *this << ", " << m);
 		if (!m) {
-			res = std::make_shared<const Monomial>(mHash, mExponents, mTotalDegree);
+			res = carl::createMonomial(Content(mExponents), mTotalDegree);
 			return true;
 		}
 		if(m->mTotalDegree > mTotalDegree || m->mExponents.size() > mExponents.size())
