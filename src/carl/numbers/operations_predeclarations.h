@@ -38,4 +38,7 @@ namespace carl {
 	
 	template<typename T>
 	inline T parse(const std::string& n);
+
+	template<typename T>
+	inline bool try_parse(const std::string& n, T& res);
 }
