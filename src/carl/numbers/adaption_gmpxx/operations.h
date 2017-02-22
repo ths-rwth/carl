@@ -243,7 +243,13 @@ template<>
 mpz_class parse<mpz_class>(const std::string& n);
 
 template<>
+bool try_parse<mpz_class>(const std::string& n, mpz_class& res);
+
+template<>
 mpq_class parse<mpq_class>(const std::string& n);
+
+template<>
+bool try_parse<mpq_class>(const std::string& n, mpq_class& res);
 
 /**
  * Basic Operators

@@ -145,6 +145,11 @@ namespace carl
         assert(success);
         return res;
     }
+	
+	template<>
+	bool try_parse<cln::cl_I>(const std::string& n, cln::cl_I& res) {
+		return parser::parseDecimal(n, res);
+	}
 
     template<>
     cln::cl_RA parse<cln::cl_RA>(const std::string& n) {
@@ -153,6 +158,11 @@ namespace carl
         assert(success);
         return res;
     }
+	
+	template<>
+	bool try_parse<cln::cl_RA>(const std::string& n, cln::cl_RA& res) {
+		return parser::parseRational(n, res);
+	}
 
     std::string toString(const cln::cl_RA& _number, bool _infix)
     {

@@ -128,6 +128,11 @@ namespace carl
         assert(success);
         return res;
     }
+	
+	template<>
+	bool try_parse<mpz_class>(const std::string& n, mpz_class& res) {
+		return parser::parseDecimal(n, res);
+	}
 
     template<>
     mpq_class parse<mpq_class>(const std::string& n) {
@@ -136,6 +141,11 @@ namespace carl
         assert(success);
         return res;
     }
+	
+	template<>
+	bool try_parse<mpq_class>(const std::string& n, mpq_class& res) {
+		return parser::parseDecimal(n, res);
+	}
 
     std::string toString(const mpq_class& _number, bool _infix)
     {

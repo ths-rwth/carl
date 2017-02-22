@@ -211,7 +211,13 @@ template<>
 cln::cl_I parse<cln::cl_I>(const std::string& n);
 
 template<>
+bool try_parse<cln::cl_I>(const std::string& n, cln::cl_I& res);
+
+template<>
 cln::cl_RA parse<cln::cl_RA>(const std::string& n);
+
+template<>
+bool try_parse<cln::cl_RA>(const std::string& n, cln::cl_RA& res);
 
 /**
  * Get absolute value of an integer.
