@@ -7,6 +7,8 @@
 #include "../core/UnivariatePolynomial.h"
 #include "../core/Variable.h"
 #include "../formula/Constraint.h"
+#include "../formula/Formula.h"
+#include "../formula/Logic.h"
 #include "../formula/Sort.h"
 
 #include <iostream>
@@ -19,16 +21,75 @@ class SMTLIBStream {
 private:
 	std::stringstream mStream;
 	
-	void declare(const Sort& s) {
+	void declare(Logic l) {
+		*this << "(set-logic " << l << ")" << std::endl;
+	}
+	void declare(Sort s) {
 		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
 	}
-	void declare(const Variable& v) {
+	void declare(Variable v) {
 		*this << "(declare-fun " << v << " () " << v.getType() << ")" << std::endl;
 	}
 
 	template<typename Pol>
 	void write(const Constraint<Pol>& c) {
 		*this << "(" << c.relation() << " " << c.lhs() << " 0)";
+	}
+	
+	template<typename Pol>
+	void write(const Formula<Pol>& f, bool withAssert = true) {
+		if (withAssert) *this << "(assert ";
+		switch (f.getType()) {
+			case FormulaType::AND:
+			case FormulaType::OR:
+			case FormulaType::IFF:
+			case FormulaType::XOR:
+			case FormulaType::IMPLIES:
+			case FormulaType::ITE:
+			{
+				*this << "(" << f.getType();
+				for (const auto& cur: f.subformulas()) {
+					write(cur, false);
+				}
+				*this << ")";
+				break;
+			}
+			case FormulaType::NOT:
+				*this << "(" << f.getType();
+				write(f.subformula(), false);
+				*this << ")";
+				break;
+			case FormulaType::BOOL:
+				*this << f.boolean();
+				break;
+			case FormulaType::CONSTRAINT:
+				*this << f.constraint();
+				break;
+			case FormulaType::VARCOMPARE:
+				*this << f.variableComparison();
+				break;
+			case FormulaType::VARASSIGN:
+				*this << f.variableAssignment();
+				break;
+			case FormulaType::BITVECTOR:
+				*this << f.bvConstraint();
+				break;
+			case FormulaType::TRUE:
+			case FormulaType::FALSE:
+				*this << f.getType();
+				break;
+			case FormulaType::UEQ:
+				*this << f.uequality();
+				break;
+			case FormulaType::PBCONSTRAINT:
+				*this << f.pbConstraint();
+				break;
+			case FormulaType::EXISTS:
+			case FormulaType::FORALL:
+				CARL_LOG_ERROR("carl.smtlibstream", "Printing exists or forall is not implemented yet.");
+				break;
+		}
+		if (withAssert) *this << ")" << std::endl;
 	}
 
 	void write(const Monomial::Arg& m) {
@@ -127,6 +188,26 @@ private:
 public:
 	SMTLIBStream(): mStream() {
 	}
+
+	void initialize(Logic l, const Variables& vars) {
+		declare(l);
+		for (auto v: vars) {
+			declare(v);
+		}
+	}
+	
+	template<typename Pol>
+	void initialize(Logic l, std::initializer_list<Formula<Pol>> formulas) {
+		Variables vars;
+		for (const auto& f: formulas) {
+			f.collectVariables(vars, true, true, true, true, true);
+		}
+		initialize(l, vars);
+	}
+	
+	void checkSat() {
+		*this << "(check-sat)" << std::endl;
+	}
 	
 	template<typename T>
 	SMTLIBStream& operator<<(T&& t) {
@@ -146,6 +227,30 @@ public:
 
 std::ostream& operator<<(std::ostream& os, const SMTLIBStream& ss) {
 	return os << ss.content();
+}
+
+namespace detail {
+
+template<typename Pol>
+struct SMTLIBContainer {
+	Logic mLogic;
+	std::initializer_list<Formula<Pol>> mFormulas;
+	SMTLIBContainer(Logic l, std::initializer_list<Formula<Pol>> f): mLogic(l), mFormulas(f) {}
+};
+template<typename Pol>
+std::ostream& operator<<(std::ostream& os, const SMTLIBContainer<Pol>& sc) {
+	SMTLIBStream sls;
+	sls.initialize(sc.mLogic, sc.mFormulas);
+	for (const auto& f: sc.mFormulas) sls << f;
+	sls.checkSat();
+	return os << sls;
+}
+
+}
+
+template<typename Pol, typename... Args>
+detail::SMTLIBContainer<Pol> outputSMTLIB(Logic l, std::initializer_list<Formula<Pol>> formulas, Args&&... args) {
+	return detail::SMTLIBContainer<Pol>(l, formulas, std::forward<Args>(args)...);
 }
 
 }
