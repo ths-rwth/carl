@@ -46,9 +46,10 @@ namespace parser {
 		static constexpr bool expect_dot = false;
 		
 		template <typename It>
-	    static bool parse_dot(It& first, const It& last) {
+		static bool parse_dot(It& first, const It& last) {
 			return qi::real_policies<T>::parse_dot(first, last);
 		}
+#if BOOST_VERSION >= 105900
 		template <typename It, typename Attr>
 		static bool parse_frac_n(It& first, const It& last, Attr& attr, int& frac_digits) {
 			It save = first;
@@ -57,17 +58,32 @@ namespace parser {
 				int local_frac_digits;
 				bool res = qi::real_policies<T>::parse_frac_n(first, last, local_attr, local_frac_digits);
 				if (!res) return false;
-				assert(frac_digits >= 0);
 				if (!isZero(local_attr)) {
 					first = save;
 					return false;
 				}
-				frac_digits = 0;
 				return true;
 			}
 			return qi::real_policies<T>::parse_frac_n(first, last, attr, frac_digits);
 		}
-	    template <typename It, typename Attr>
+#else
+		template <typename It, typename Attr>
+		static bool parse_frac_n(It& first, const It& last, Attr& attr) {
+			It save = first;
+			if (T_is_int) {
+				Attr local_attr;
+				bool res = qi::real_policies<T>::parse_frac_n(first, last, local_attr);
+				if (!res) return false;
+				if (!isZero(local_attr)) {
+					first = save;
+					return false;
+				}
+				return true;
+			}
+			return qi::real_policies<T>::parse_frac_n(first, last, attr);
+		}
+#endif
+		template <typename It, typename Attr>
 		static bool parse_exp_n(It& first, const It& last, Attr& attr_) {
 			bool res = qi::real_policies<T>::parse_exp_n(first, last, attr_);
 			if (!res) return false;
@@ -75,11 +91,11 @@ namespace parser {
 			return true;
 		}
 		template <typename It, typename Attr>
-	    static bool parse_nan(It&, const It&, Attr&) {
+		static bool parse_nan(It&, const It&, Attr&) {
 			return false;
 		}
-	    template <typename It, typename Attr>
-	    static bool parse_inf(It&, const It&, Attr&) {
+		template <typename It, typename Attr>
+		static bool parse_inf(It&, const It&, Attr&) {
 			return false;
 		}
 	};
