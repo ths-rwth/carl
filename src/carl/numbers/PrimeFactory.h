@@ -33,9 +33,10 @@ std::vector<T> PrimeFactory<T>::mPrimes = {
 	2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41,
 	43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
 };
+#ifdef THREAD_SAFE
 template<typename T>
 std::mutex PrimeFactory<T>::mPrimeMutex;
-
+#endif
 
 namespace detail {
 	inline uint next_prime(const uint& n, const PrimeFactory<uint>& pf) {
