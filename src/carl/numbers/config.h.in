@@ -2,9 +2,11 @@
  * Auto generated file config.h from config.h.in.
  */
 
- #ifndef INCLUDED_FROM_NUMBERS_H
- static_assert(false, "This file may only be included indirectly by numbers.h");
- #endif
+#include "../config.h"
+
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
 
 #cmakedefine USE_MPFR_FLOAT
 #cmakedefine USE_CLN_NUMBERS

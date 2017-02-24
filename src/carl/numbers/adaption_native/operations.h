@@ -201,9 +201,5 @@ inline Number highestPower(const Number& n) {
 	return res;
 }
 
-inline uint next_prime(const uint&) {
-	assert(false);
-}
-
 
 }

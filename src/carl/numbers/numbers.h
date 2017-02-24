@@ -9,8 +9,6 @@
 
 #define INCLUDED_FROM_NUMBERS_H true
 
-
-
 #include <cstdint>
 #include <type_traits>
 
