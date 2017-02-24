@@ -45,7 +45,8 @@ namespace carl {
 			mTerm = qi::int_ >> (mVariables >> qi::space | mNewVarWrapper);
 			mPolynomial = +mTerm;
 			mConstraint = mPolynomial > mRelation > qi::int_;
-			mMain = (qi::lit("min:") > mPolynomial > qi::lit(";") >> *(mConstraint > ";"))[qi::_val = px::bind(&OPBParser::createFile, px::ref(*this), qi::_1, qi::_2)];
+			mObjective = -(qi::lit("min:") > mPolynomial > qi::lit(";"));
+			mMain = (mObjective >> *(mConstraint > ";"))[qi::_val = px::bind(&OPBParser::createFile, px::ref(*this), qi::_1, qi::_2)];
 			qi::on_error<qi::fail>(mMain, errorHandler(qi::_1, qi::_2, qi::_3, qi::_4));
 		}
 		OPBFile parse(std::istream& in) {
@@ -85,6 +86,7 @@ namespace carl {
 		qi::rule<Iterator, std::pair<int,Variable>(), Skipper> mTerm;
 		qi::rule<Iterator, OPBPolynomial(), Skipper> mPolynomial;
 		qi::rule<Iterator, OPBConstraint(), Skipper> mConstraint;
+		qi::rule<Iterator, OPBPolynomial(), Skipper> mObjective;
 		qi::rule<Iterator, OPBFile(), Skipper> mMain;
 		px::function<ErrorHandler> errorHandler;
 	};
