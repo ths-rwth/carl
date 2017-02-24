@@ -532,6 +532,10 @@ inline cln::cl_RA reciprocal(const cln::cl_RA& a) {
 	return cln::recip(a);
 }
 
+inline cln::cl_I next_prime(const cln::cl_I& n) {
+	return cln::nextprobprime(n);
+}
+
 std::string toString(const cln::cl_RA& _number, bool _infix=true);
 
 std::string toString(const cln::cl_I& _number, bool _infix=true);

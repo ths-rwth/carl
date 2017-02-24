@@ -1,39 +1,30 @@
-/** 
- * @file:   PrimeFactory.h
- * @author: Sebastian Junges
- *
- * @since September 6, 2013
- */
-
 #pragma once
-#include <cassert>
 
+#include "numbers.h"
 
+namespace carl {
 
-namespace carl
-{
-
-template<typename NumberType>
+template<typename T>
 class PrimeFactory
 {
-	static constexpr std::size_t nrPrimes = 12;
-	static const NumberType PRIMES[nrPrimes];
-	std::size_t nextPrimeNr = 0;
-	public:
-	NumberType nextPrime();
+	static std::vector<T> mPrimes;
+	std::size_t mNext = 0;
+public:
+	const T& nextPrime();
 };
 
-template<typename NumberType>
-const NumberType PrimeFactory<NumberType>::PRIMES[nrPrimes] = { (NumberType)2, (NumberType)3, (NumberType)5, 
-                                      (NumberType)7, (NumberType)11, (NumberType)13,
-                                      (NumberType)17, (NumberType)19, (NumberType)23,
-                                      (NumberType)29, (NumberType)31, (NumberType)37 };
+template<typename T>
+std::vector<T> PrimeFactory<T>::mPrimes = {
+	2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41,
+	43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
+};
 
-template<typename NumberType>
-NumberType PrimeFactory<NumberType>::nextPrime()
-{
-    assert(nextPrimeNr < nrPrimes);
-    return PRIMES[nextPrimeNr++];
+template<typename T>
+const T& PrimeFactory<T>::nextPrime() {
+	if (mNext == mPrimes.size()) {
+		mPrimes.emplace_back(carl::next_prime(mPrimes.back()));
+	}
+    return mPrimes[mNext++];
 }
 
 }

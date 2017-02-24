@@ -522,6 +522,12 @@ inline mpq_class reciprocal(const mpq_class& a) {
 	return res;
 }
 
+inline mpz_class next_prime(const mpz_class& n) {
+	mpz_class res;
+	mpz_nextprime(res.get_mpz_t(), n.get_mpz_t());
+	return res;
+}
+
 inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
 {
 	mpq_class res;
