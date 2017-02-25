@@ -73,12 +73,11 @@ namespace parser {
 			if (T_is_int) {
 				Attr local_attr;
 				bool res = qi::real_policies<T>::parse_frac_n(first, last, local_attr);
+				first = save;
 				if (!res) return false;
 				if (!isZero(local_attr)) {
-					first = save;
 					return false;
 				}
-				return true;
 			}
 			return qi::real_policies<T>::parse_frac_n(first, last, attr);
 		}
