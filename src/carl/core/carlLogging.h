@@ -301,10 +301,6 @@ class Logger: public carl::Singleton<Logger> {
 
 public:
 	/**
-	 * Destructor.
-     */
-	~Logger() override = default;
-	/**
 	 * Check if a Sink with the given id has been installed.
      * @param id Sink identifier.
      * @return If a Sink with this id is present.
