@@ -9,7 +9,7 @@ namespace boost { namespace spirit { namespace traits {
 		if (exp >= 0)
 			r = rin * carl::pow(mpz_class(10), (unsigned)exp);
 		else
-			r = carl::div(rin, carl::pow(mpz_class(10), (unsigned)exp));
+			r = carl::div(rin, carl::pow(mpz_class(10), (unsigned)(-exp)));
 		return true;
 	}
 	template<> inline bool scale(int exp, mpq_class& r, mpq_class rin) {
@@ -24,7 +24,7 @@ namespace boost { namespace spirit { namespace traits {
 		if (exp >= 0)
 			r *= carl::pow(mpz_class(10), (unsigned)exp);
 		else
-			r = carl::div(r, carl::pow(mpz_class(10), (unsigned)exp));
+			r = carl::div(r, carl::pow(mpz_class(10), (unsigned)(-exp)));
 	}
 	template<> inline void scale(int exp, mpq_class& r) {
 		if (exp >= 0)
