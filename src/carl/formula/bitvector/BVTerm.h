@@ -59,8 +59,6 @@ namespace carl
 			case BVTermType::EXT_S: return "sign_extend";
 			case BVTermType::REPEAT: return "repeat";
 		}
-		assert(false);
-		return "";
 	}
 	inline std::ostream& operator<<(std::ostream& os, BVTermType type) {
 		return os << toString(type);
