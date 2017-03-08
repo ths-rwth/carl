@@ -4,6 +4,8 @@
 #include "../../core/Relation.h"
 #include "../Formula.h"
 
+#include <boost/optional.hpp>
+
 #include <iostream>
 #include <map>
 #include <tuple>
@@ -23,7 +25,7 @@ struct OPBFile {
 	OPBFile(OPBPolynomial obj, std::vector<OPBConstraint> cons): objective(std::move(obj)), constraints(std::move(cons)) {}
 };
 
-OPBFile parseOPBFile(std::ifstream& in);
+boost::optional<OPBFile> parseOPBFile(std::ifstream& in);
 
 template<typename Pol>
 class OPBImporter {
@@ -35,16 +37,17 @@ public:
 		mIn(filename)
 	{}
 	
-	std::pair<Formula<Pol>,Pol> parse() {
+	boost::optional<std::pair<Formula<Pol>,Pol>> parse() {
 		auto file = parseOPBFile(mIn);
+		if (!file) return boost::none;
 		Formulas<Pol> constraints;
-		for (const auto& cons: file.constraints) {
+		for (const auto& cons: file->constraints) {
 			PBConstraint pbc(std::move(std::get<0>(cons)), std::get<1>(cons), std::get<2>(cons));
 			constraints.emplace_back(std::move(pbc));
 		}
 		Formula<Pol> resC(FormulaType::AND, std::move(constraints));
 		Pol objective;
-		for (const auto& term: file.objective) {
+		for (const auto& term: file->objective) {
 			objective += typename Pol::CoeffType(term.first) * term.second;
 		}
 		return std::make_pair(std::move(resC), std::move(objective));
