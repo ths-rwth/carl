@@ -6,9 +6,9 @@
 
 TEST(VariableType, SpecialValues)
 {
-	EXPECT_EQ(0, carl::VariableType::MIN_TYPE);
-	EXPECT_EQ(4, carl::VariableType::MAX_TYPE);
-	EXPECT_EQ(5, carl::VariableType::TYPE_SIZE);
+	EXPECT_EQ(0, int(carl::VariableType::MIN_TYPE));
+	EXPECT_EQ(4, int(carl::VariableType::MAX_TYPE));
+	EXPECT_EQ(5, int(carl::VariableType::TYPE_SIZE));
 }
 
 TEST(VariableType, Output)
