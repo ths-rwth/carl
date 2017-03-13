@@ -42,7 +42,7 @@ namespace carl {
 			;
 			mVarname = qi::lexeme[ qi::alpha > *(qi::alnum | qi::char_("_"))];
 			mNewVarWrapper = mVarname[qi::_val = px::bind(&OPBParser::addVariable, px::ref(*this), qi::_1)];
-			mTerm = qi::int_ >> (mVariables >> qi::space | mNewVarWrapper);
+			mTerm = qi::int_ >> (qi::lexeme[mVariables >> !(qi::alnum | qi::char_("_"))] | mNewVarWrapper);
 			mPolynomial = +mTerm;
 			mConstraint = mPolynomial > mRelation > qi::int_;
 			mObjective = -(qi::lit("min:") > mPolynomial > qi::lit(";"));
