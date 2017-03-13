@@ -33,12 +33,15 @@ private:
 
 	template<typename Pol>
 	void write(const Constraint<Pol>& c) {
-		*this << "(" << c.relation() << " " << c.lhs() << " 0)";
+		if (c.relation() == carl::Relation::NEQ) {
+			*this << Formula<Pol>(FormulaType::NOT, Formula<Pol>(Constraint<Pol>(c.lhs(), carl::Relation::EQ)));
+		} else {
+			*this << "(" << c.relation() << " " << c.lhs() << " 0)";
+		}
 	}
 	
 	template<typename Pol>
-	void write(const Formula<Pol>& f, bool withAssert = true) {
-		if (withAssert) *this << "(assert ";
+	void write(const Formula<Pol>& f) {
 		switch (f.getType()) {
 			case FormulaType::AND:
 			case FormulaType::OR:
@@ -49,15 +52,13 @@ private:
 			{
 				*this << "(" << f.getType();
 				for (const auto& cur: f.subformulas()) {
-					write(cur, false);
+					*this << " " << cur;
 				}
 				*this << ")";
 				break;
 			}
 			case FormulaType::NOT:
-				*this << "(" << f.getType();
-				write(f.subformula(), false);
-				*this << ")";
+				*this << "(" << f.getType() << " " << f.subformula() << ")";
 				break;
 			case FormulaType::BOOL:
 				*this << f.boolean();
@@ -89,7 +90,6 @@ private:
 				CARL_LOG_ERROR("carl.smtlibstream", "Printing exists or forall is not implemented yet.");
 				break;
 		}
-		if (withAssert) *this << ")" << std::endl;
 	}
 
 	void write(const Monomial::Arg& m) {
@@ -205,6 +205,11 @@ public:
 		initialize(l, vars);
 	}
 	
+	template<typename Pol>
+	void assertFormula(const Formula<Pol>& formula) {
+		*this << "(assert " << formula << ")";
+	}
+	
 	void checkSat() {
 		*this << "(check-sat)" << std::endl;
 	}
@@ -241,7 +246,7 @@ template<typename Pol>
 std::ostream& operator<<(std::ostream& os, const SMTLIBContainer<Pol>& sc) {
 	SMTLIBStream sls;
 	sls.initialize(sc.mLogic, sc.mFormulas);
-	for (const auto& f: sc.mFormulas) sls << f;
+	for (const auto& f: sc.mFormulas) sls.assertFormula(f);
 	sls.checkSat();
 	return os << sls;
 }
