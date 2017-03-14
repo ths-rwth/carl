@@ -91,6 +91,11 @@ namespace carl {
 		auto num_blocks() const {
 			return mData.num_blocks();
 		}
+		auto is_subset_of(const Bitset& rhs) const {
+			if (mDefault && !rhs.mDefault) return false;
+			alignSize(*this, rhs);
+			return mData.is_subset_of(rhs.mData);
+		}
 		auto find_first() const {
 			return mData.find_first();
 		}
