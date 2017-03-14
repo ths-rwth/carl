@@ -49,7 +49,7 @@ namespace carl {
 
 
 
-		std::string toString(bool infix) const {
+		std::string toString(bool) const {
 			return std::to_string(mData);
 		}
 
@@ -88,7 +88,7 @@ namespace carl {
 		 * @return Double.
 		 */
 		inline double toDouble() const {
-			return mData;
+			return static_cast<double>(mData);
 		}
 
 
