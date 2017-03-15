@@ -1,39 +1,17 @@
 include_directories(${CMAKE_SOURCE_DIR}/src ${include_dirs})
 
-# Write config.h
 configure_file( ${CMAKE_SOURCE_DIR}/src/examples/config.h.in
-                ${CMAKE_SOURCE_DIR}/src/examples/config.h
+			   ${CMAKE_SOURCE_DIR}/src/examples/config.h
 )
 
-add_executable( IntervalContractionExample
-		IntervalContractionExample.cpp	  )
-add_executable( FloatExample
-		FloatExample.cpp	)
-add_executable( GroebnerExample
-		GroebnerExample.cpp )
-add_executable( IntervalCoefficientExample
-		IntervalCoefficientExample.cpp		)
-add_executable( IntervalExample
-		IntervalExample.cpp		)
-add_executable( HornerTest
-		HornerTest.cpp		)
-add_executable( MpqIntervalExample
-		MpqIntervalExample.cpp		)
-add_executable( MpfrTest
-		MpfrTest.cpp		)
-add_executable( example_smt2
-		smt2example.cpp
-)
+add_custom_target(example-all)
 
+file(GLOB_RECURSE example_sources LIST_DIRECTORIES false RELATIVE ${CMAKE_SOURCE_DIR}/src/examples/ "*.cpp")
 
-target_link_libraries(IntervalContractionExample lib_carl ${libraries} )
-target_link_libraries(FloatExample lib_carl ${libraries} )
-target_link_libraries(HornerTest lib_carl ${libraries} )
-target_link_libraries(GroebnerExample lib_carl ${libraries} )
-target_link_libraries(IntervalExample lib_carl ${libraries} )
-target_link_libraries(IntervalCoefficientExample lib_carl ${libraries} )
-target_link_libraries(MpqIntervalExample lib_carl ${libraries} )
-target_link_libraries(example_smt2 lib_carl ${libraries} )
-target_link_libraries(MpfrTest lib_carl ${libraries} )
-
-add_subdirectory(tutorial EXCLUDE_FROM_ALL)
+foreach(src ${example_sources})
+	string(REGEX REPLACE ".cpp$" "" name ${src})
+	string(REGEX REPLACE "/" "-" name "example-${name}")
+	add_executable(${name} ${src})
+	target_link_libraries(${name} lib_carl)
+	add_dependencies(example-all ${name})
+endforeach()
