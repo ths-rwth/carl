@@ -117,7 +117,6 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
 		case LogLevel::LVL_ERROR:	return os << "ERROR";
 		case LogLevel::LVL_FATAL:	return os << "FATAL";
 		case LogLevel::LVL_OFF:		return os << "OFF  ";
-		default:					return os << "???  ";
 	}
 }
 
@@ -128,13 +127,13 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
 struct Sink {
 	/**
 	 * Default destructor.
-     */
+	 */
 	virtual ~Sink() = default;
 	/**
 	 * Abstract logging interface.
 	 * The intended usage is to write any log output to the output stream returned by this function.
-     * @return Output stream.
-     */
+	 * @return Output stream.
+	 */
 	virtual std::ostream& log() noexcept = 0;
 };
 /**
@@ -146,8 +145,8 @@ struct StreamSink: public Sink {
 	std::ostream os;
 	/**
 	 * Create a StreamSink from some output stream.
-     * @param os Output stream.
-     */
+	 * @param os Output stream.
+	 */
 	explicit StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
 	~StreamSink() override = default;
 	std::ostream& log() noexcept override { return os; }
@@ -161,8 +160,8 @@ struct FileSink: public Sink {
 	/**
 	 * Create a FileSink that logs to the specified file.
 	 * The file is truncated upon construction.
-     * @param filename
-     */
+	 * @param filename
+	 */
 	explicit FileSink(const std::string& filename): os(filename, std::ios::out) {}
 	~FileSink() override = default;
 	std::ostream& log() noexcept override { return os; }
@@ -185,20 +184,20 @@ struct Filter {
 	/**
 	 * Set the minimum log level for some channel.
 	 * Returns `*this`, hence calls to this method can be chained arbitrarily.
-     * @param channel Channel name.
-     * @param level LogLevel.
+	 * @param channel Channel name.
+	 * @param level LogLevel.
 	 * @return This object.
-     */
+	 */
 	Filter& operator()(const std::string& channel, LogLevel level) {
 		mData[channel] = level;
 		return *this;
 	}
 	/**
 	 * Checks if the given log level is sufficient for the log message to be forwarded.
-     * @param channel Channel name.
-     * @param level LogLevel.
-     * @return If the message shall be forwarded.
-     */
+	 * @param channel Channel name.
+	 * @param level LogLevel.
+	 * @return If the message shall be forwarded.
+	 */
 	bool check(std::string channel, LogLevel level) noexcept {
 		auto it = mData.find(channel);
 		while (!channel.empty() && it == mData.end()) {
@@ -247,8 +246,8 @@ struct Formatter {
 	virtual ~Formatter() = default;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
-     * @param f Filter.
-     */
+	 * @param f Filter.
+	 */
 	virtual void configure(const Filter& f) noexcept {
 		for (const auto& t: f.mData) {
 			if (t.first.size() > channelwidth) channelwidth = t.first.size();
@@ -256,12 +255,12 @@ struct Formatter {
 	}
 	/**
 	 * Prints the prefix of a log message, i.e. everything that goes before the message given by the user, to the output stream.
-     * @param os Output stream.
-     * @param timer Timer holding program execution time.
-     * @param channel Channel name.
-     * @param level LogLevel.
-     * @param info Auxiliary information.
-     */
+	 * @param os Output stream.
+	 * @param timer Timer holding program execution time.
+	 * @param channel Channel name.
+	 * @param level LogLevel.
+	 * @param info Auxiliary information.
+	 */
 	virtual void prefix(std::ostream& os, const Timer& /*timer*/, const std::string& channel, LogLevel level, const RecordInfo& info) {
 		if (!printInformation) return;
 		os.fill(' ');
@@ -280,8 +279,8 @@ struct Formatter {
 	/**
 	 * Prints the suffix of a log message, i.e. everything that goes after the message given by the user, to the output stream.
 	 * Usually, this is only a newline.
-     * @param os Output stream.
-     */
+	 * @param os Output stream.
+	 */
 	virtual void suffix(std::ostream& os) {
 		os << std::endl;
 	}
@@ -302,43 +301,43 @@ class Logger: public carl::Singleton<Logger> {
 public:
 	/**
 	 * Check if a Sink with the given id has been installed.
-     * @param id Sink identifier.
-     * @return If a Sink with this id is present.
-     */
+	 * @param id Sink identifier.
+	 * @return If a Sink with this id is present.
+	 */
 	bool has(const std::string& id) const noexcept {
 		return mData.find(id) != mData.end();
 	}
 	/**
 	 * Installs the given sink.
 	 * If a Sink with this name is already present, it is overwritten.
-     * @param id Sink identifier.
-     * @param sink Sink.
-     */
+	 * @param id Sink identifier.
+	 * @param sink Sink.
+	 */
 	void configure(const std::string& id, std::shared_ptr<Sink> sink) {
 		std::lock_guard<std::mutex> lock(mMutex);
 		mData[id] = std::make_tuple(std::move(sink), Filter(), std::make_shared<Formatter>());
 	}
 	/**
 	 * Installs a FileSink.
-     * @param id Sink identifier.
-     * @param filename Filename passed to the FileSink.
-     */
+	 * @param id Sink identifier.
+	 * @param filename Filename passed to the FileSink.
+	 */
 	void configure(const std::string& id, const std::string& filename) {
 		configure(id, std::make_shared<FileSink>(filename));
 	}
 	/**
 	 * Installs a StreamSink.
-     * @param id Sink identifier.
-     * @param os Output stream passed to the StreamSink.
-     */
+	 * @param id Sink identifier.
+	 * @param os Output stream passed to the StreamSink.
+	 */
 	void configure(const std::string& id, std::ostream& os) {
 		configure(id, std::make_shared<StreamSink>(os));
 	}
 	/**
 	 * Retrieves the Filter for some Sink.
-     * @param id Sink identifier.
-     * @return Filter.
-     */
+	 * @param id Sink identifier.
+	 * @return Filter.
+	 */
 	Filter& filter(const std::string& id) noexcept {
 		auto it = mData.find(id);
 		assert(it != mData.end());
@@ -346,9 +345,9 @@ public:
 	}
 	/**
 	 * Retrieves the Formatter for some Sink.
-     * @param id Sink identifier.
-     * @return Formatter.
-     */
+	 * @param id Sink identifier.
+	 * @return Formatter.
+	 */
 	const std::shared_ptr<Formatter>& formatter(const std::string& id) noexcept {
 		auto it = mData.find(id);
 		assert(it != mData.end());
@@ -356,9 +355,9 @@ public:
 	}
 	/**
 	 * Overwrites the Formatter for some Sink.
-     * @param id Sink identifier.
-     * @param fmt New Formatter.
-     */
+	 * @param id Sink identifier.
+	 * @param fmt New Formatter.
+	 */
 	void formatter(const std::string& id, std::shared_ptr<Formatter> fmt) noexcept {
 		auto it = mData.find(id);
 		assert(it != mData.end());
@@ -368,7 +367,7 @@ public:
 	/**
 	 * Reconfigures all Formatter objects.
 	 * This should be done once after all configuration is finished.
-     */
+	 */
 	void resetFormatter() noexcept {
 		for (auto& t: mData) {
 			std::get<2>(t.second)->configure(std::get<1>(t.second));
@@ -376,11 +375,11 @@ public:
 	}
 	/**
 	 * Logs a message.
-     * @param level LogLevel.
-     * @param channel Channel name.
-     * @param ss Message to be logged.
-     * @param info Auxiliary information.
-     */
+	 * @param level LogLevel.
+	 * @param channel Channel name.
+	 * @param ss Message to be logged.
+	 * @param info Auxiliary information.
+	 */
 	void log(LogLevel level, const std::string& channel, const std::stringstream& ss, const RecordInfo& info) {
 		std::lock_guard<std::mutex> lock(mMutex);
 		for (auto t: mData) {
