@@ -130,17 +130,9 @@ TYPED_TEST(RationalNumbers, Squareroot_exact) {
   EXPECT_EQ(false, carl::sqrt_exact(TypeParam(2), res));
 }
 
-TYPED_TEST(RationalNumbers, Rationalize) {
-  EXPECT_EQ(TypeParam(0), carl::rationalize<TypeParam>("0"));
-  EXPECT_EQ(TypeParam(1)/TypeParam(10), carl::rationalize<TypeParam>("0.1"));
-  EXPECT_EQ(TypeParam(1)/TypeParam(10), carl::rationalize<TypeParam>(".1"));
-  EXPECT_EQ(TypeParam(3)/TypeParam(2), carl::rationalize<TypeParam>("1.5"));
-  EXPECT_EQ(TypeParam(1234567890), carl::rationalize<TypeParam>("1234567890"));
-}
-
 TYPED_TEST(RationalNumbers, Operations) {
-  EXPECT_EQ(TypeParam(1), carl::floor(carl::rationalize<TypeParam>("1.5")));
-  EXPECT_EQ(TypeParam(2), carl::ceil(carl::rationalize<TypeParam>("1.5")));
+  EXPECT_EQ(TypeParam(1), carl::floor(carl::parse<TypeParam>("1.5")));
+  EXPECT_EQ(TypeParam(2), carl::ceil(carl::parse<TypeParam>("1.5")));
 
   EXPECT_EQ(TypeParam(5), carl::gcd(TypeParam(15), TypeParam(20)));
   EXPECT_EQ(TypeParam(72), carl::lcm(TypeParam(24),TypeParam(36)));
