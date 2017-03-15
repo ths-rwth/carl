@@ -28,3 +28,15 @@ TEST(Logging, Filter)
 {
 	carl::logging::Filter filter;
 }
+
+TEST(Logging, Formatter)
+{
+	carl::logging::Filter filter;
+	carl::logging::Formatter formatter;
+	formatter.configure(filter);
+}
+
+TEST(Logging, Logger)
+{
+	auto& logger = carl::logging::logger();
+}
