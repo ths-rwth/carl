@@ -12,7 +12,7 @@
 #include "Monomial.h"
 #include "config.h"
 
-#include <memory.h>
+#include <memory>
 #include <unordered_set>
 
 namespace carl{
