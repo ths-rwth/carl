@@ -122,13 +122,18 @@ TEST(Monomial, division)
     Monomial::Arg m0y = v0 * v0 * v1 * v1;
     Monomial::Arg m0z = v0 * v1;
 	Monomial::Arg tmp;
+	Monomial::Arg one;
+	EXPECT_TRUE(m0->divide(one, tmp));
+    EXPECT_EQ(m0, tmp);
+	EXPECT_TRUE(m1->divide(one, tmp));
+    EXPECT_EQ(m1, tmp);
     EXPECT_FALSE(m0->divide(m1, tmp));
     EXPECT_FALSE(m1->divide(m0, tmp));
-	m0->divide(v1, tmp);
+	EXPECT_TRUE(m0->divide(v1, tmp));
     EXPECT_EQ(m0x, tmp);
-	m0->divide(v2, tmp);
-    EXPECT_EQ(m0y, tmp);
-	m0->divide(m2, tmp);
+	EXPECT_TRUE(m0->divide(v2, tmp));
+	EXPECT_EQ(m0y, tmp);
+	EXPECT_TRUE(m0->divide(m2, tmp));
     EXPECT_EQ(v1, tmp);
 }
 
@@ -189,11 +194,32 @@ TEST(Monomial, OtherComparison)
     expectRightOrder(list);
 }
 
+TEST(Monomial, sqrt)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Monomial::Arg m1 = x*x*y*y*y*y;
+	Monomial::Arg m2 = x*y*y;
+	EXPECT_EQ(m2, m1->sqrt());
+}
+
+TEST(Monomial, pow)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Monomial::Arg one;
+	Monomial::Arg m1 = x*y*y;
+	Monomial::Arg m2 = x*x*y*y*y*y;
+	EXPECT_EQ(one, m1->pow(0));
+	EXPECT_EQ(m1, m1->pow(1));
+	EXPECT_EQ(m2, m1->pow(2));
+}
+
 TEST(Monomial, CalcLCM)
 {
 	Variable x = freshRealVariable("x");
 	Variable y = freshRealVariable("y");
 	Monomial::Arg m1 = y*y;
 	Monomial::Arg m2 = x*x*y;
-	assert(Monomial::calcLcmAndDivideBy(m1, m2) == y);
+	EXPECT_EQ(y, Monomial::calcLcmAndDivideBy(m1, m2));
 }
