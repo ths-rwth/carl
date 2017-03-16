@@ -118,6 +118,7 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
 		case LogLevel::LVL_FATAL:	return os << "FATAL";
 		case LogLevel::LVL_OFF:		return os << "OFF  ";
 	}
+	return os;
 }
 
 
