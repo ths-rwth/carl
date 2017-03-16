@@ -1,6 +1,7 @@
 #include "../Common.h"
 
 #include <carl/core/carlLogging.h>
+#include <carl/core/carlLoggingHelper.h>
 #include <gtest/gtest.h>
 
 #include <sstream>
@@ -39,4 +40,15 @@ TEST(Logging, Formatter)
 TEST(Logging, Logger)
 {
 	auto& logger = carl::logging::logger();
+}
+
+TEST(LoggingHelper, binary)
+{
+	EXPECT_EQ("00000000 00000000 00110000 00111001", carl::binary(int(12345)));
+	EXPECT_EQ("00111111 11110100 00000000 00000000 00000000 00000000 00000000 00000000", carl::binary(double(1.25)));
+}
+
+TEST(LoggingHelper, basename)
+{
+	EXPECT_EQ("abc.de", carl::basename("/foo/bar/abc.de"));
 }
