@@ -17,10 +17,11 @@
 namespace carl {
 
 enum class Relation { EQ = 0, NEQ = 1, LESS = 2, LEQ = 4, GREATER = 3, GEQ = 5 };
+
 inline std::ostream& operator<<(std::ostream& os, const Relation& r) {
 	switch (r) {
 		case Relation::EQ:	os << "="; break;
-		case Relation::NEQ:	os << "<>"; break;
+		case Relation::NEQ:	os << "!="; break;
 		case Relation::LESS:	os << "<"; break;
 		case Relation::LEQ:	os << "<="; break;
 		case Relation::GREATER:	os << ">"; break;
@@ -49,8 +50,11 @@ inline std::string toString(Relation r) {
 	return ss.str();
 }
 
-inline bool relationIsStrict(Relation r) {
+inline bool isStrict(Relation r) {
 	return r == Relation::LESS || r == Relation::GREATER || r == Relation::NEQ;
+}
+inline bool isWeak(Relation r) {
+	return !isStrict(r);
 }
 
 inline bool evaluate(Sign s, Relation r) {
