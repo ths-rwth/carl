@@ -19,7 +19,7 @@ TEST(Monomial, Constructor)
 	EXPECT_TRUE(m->exponents().front().second == 3);
 }
 
-TEST(Monomial, TotalDegree)
+TEST(Monomial, tdeg)
 {
 	Variable x = freshRealVariable("x");
 	Variable y = freshRealVariable("y");
@@ -37,13 +37,40 @@ TEST(Monomial, degreeCategories)
 	Variable x = freshRealVariable("x");
 	
 	Monomial::Arg m1 = createMonomial(x, exponent(1));
+	EXPECT_FALSE(m1->isConstant());
 	EXPECT_TRUE(m1->isLinear());
 	EXPECT_TRUE(m1->isAtMostLinear());
-	EXPECT_TRUE(!m1->isSquare());
+	EXPECT_FALSE(m1->isSquare());
 	Monomial::Arg m2 = createMonomial(x, exponent(2));
-	EXPECT_TRUE(!m2->isLinear());
-	EXPECT_TRUE(!m2->isAtMostLinear());
+	EXPECT_FALSE(m2->isConstant());
+	EXPECT_FALSE(m2->isLinear());
+	EXPECT_FALSE(m2->isAtMostLinear());
 	EXPECT_TRUE(m2->isSquare());
+}
+
+TEST(Monomial, hasNoOtherVariable)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Monomial::Arg m1 = carl::createMonomial(x, 1);
+	Monomial::Arg m2 = x*x;
+	Monomial::Arg m3 = x*x*y;
+	Monomial::Arg m4 = carl::createMonomial(y, 1);
+	Monomial::Arg m5 = y*y;
+	Monomial::Arg m6 = y*y*x;
+	
+	EXPECT_TRUE(m1->hasNoOtherVariable(x));
+	EXPECT_FALSE(m1->hasNoOtherVariable(y));
+	EXPECT_TRUE(m2->hasNoOtherVariable(x));
+	EXPECT_FALSE(m2->hasNoOtherVariable(y));
+	EXPECT_FALSE(m3->hasNoOtherVariable(x));
+	EXPECT_FALSE(m3->hasNoOtherVariable(y));
+	EXPECT_FALSE(m4->hasNoOtherVariable(x));
+	EXPECT_TRUE(m4->hasNoOtherVariable(y));
+	EXPECT_FALSE(m5->hasNoOtherVariable(x));
+	EXPECT_TRUE(m5->hasNoOtherVariable(y));
+	EXPECT_FALSE(m6->hasNoOtherVariable(x));
+	EXPECT_FALSE(m6->hasNoOtherVariable(y));
 }
 
 TEST(Monomial, Operators)
