@@ -556,22 +556,12 @@ namespace carl
                 }
                 return varInfo->second;
             }
-
-            /**
-             * @param _rel The relation to check whether it is strict.
-             * @return true, if the given relation is strict;
-             *          false, otherwise.
-             */
-            static bool constraintRelationIsStrict( Relation _rel )
-            {
-                return (_rel == Relation::NEQ || _rel == Relation::LESS || _rel == Relation::GREATER);
-            }
 			
 			bool relationIsStrict() const {
-				return constraintRelationIsStrict(mpContent->mRelation);
+                return isStrict(mpContent->mRelation);
 			}
 			bool relationIsWeak() const {
-				return !constraintRelationIsStrict(mpContent->mRelation);
+				return isWeak(mpContent->mRelation);
 			}
             
             /**

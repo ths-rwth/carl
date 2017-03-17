@@ -26,7 +26,7 @@ class SimpleConstraint
 			{
 				auto cp = mLhs.constantPart();
 				if(cp == 0) {
-					return !relationIsStrict(mRelation);
+					return isWeak(mRelation);
 				} else if(cp > 0) {
 					return mRelation == Relation::GEQ || mRelation == Relation::GREATER || mRelation == Relation::NEQ;
 				} else {
@@ -42,7 +42,7 @@ class SimpleConstraint
 			{
 				auto cp = mLhs.constantPart();
 				if(cp == 0) {
-					return relationIsStrict(mRelation);
+					return isStrict(mRelation);
 				} else if(cp > 0) {
 					return mRelation == Relation::LEQ || mRelation == Relation::LESS || mRelation == Relation::EQ;
 				} else {
