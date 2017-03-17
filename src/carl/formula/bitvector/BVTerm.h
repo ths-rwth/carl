@@ -58,6 +58,9 @@ namespace carl
 			case BVTermType::EXT_U: return "zero_extend";
 			case BVTermType::EXT_S: return "sign_extend";
 			case BVTermType::REPEAT: return "repeat";
+			default:
+				CARL_LOG_ERROR("carl.formula.bv", "Tried to print an unknown value for BVTermType: " << unsigned(_type));
+				return "unknown";
 		}
 	}
 	inline std::ostream& operator<<(std::ostream& os, BVTermType type) {
