@@ -235,6 +235,8 @@ struct is_number {
 	/// Default value of this trait.
 	static const bool value = is_subset_of_rationals<T>::value || is_subset_of_integers<T>::value || is_float<T>::value;
 };
+template<typename T>
+constexpr bool is_number<T>::value;
 
 /**
  * @ingroup typetraits_is_number
@@ -284,8 +286,10 @@ struct is_interval : std::false_type {};
 template<typename T>
 struct is_subset_of_rationals {
 	/// Default value of this trait.
-	static const bool value = is_rational<T>::value;
+	static constexpr bool value = is_rational<T>::value;
 };
+template<typename T>
+constexpr bool is_subset_of_rationals<T>::value;
 
 template<typename T>
 struct is_polynomial: std::false_type {};
