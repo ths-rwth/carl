@@ -3,6 +3,7 @@
  */ 
 #pragma once
 
+#define CARL_BUILD_${CMAKE_BUILD_TYPE}
 #cmakedefine LOGGING
 #cmakedefine LOGGING_CARL
 #cmakedefine LOGGING_DISABLE_INEFFICIENT

@@ -2,6 +2,7 @@
 
 #include "util.h"
 
+#include <carl/config.h>
 #include <carl/interval/Interval.h>
 #include <carl/numbers/numbers.h>
 
