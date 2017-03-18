@@ -102,10 +102,6 @@ endforeach()
 # path to put in the executables after building.
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for built executables")
 
-if (NOT WIN32)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
-endif()
-
 include(compiler-options)
 
 set(DYNAMIC_EXT ".so")
