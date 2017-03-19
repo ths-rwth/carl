@@ -16,7 +16,7 @@ CITE_BIB_FILES = @CMAKE_SOURCE_DIR@/doc/literature.bib
 # Project related configuration options
 #---------------------------------------------------------------------------
 
-CLANG_ASSISTED_PARSING = YES
+#CLANG_ASSISTED_PARSING = YES
 
 # This tag specifies the encoding used for all characters in the config file
 # that follow. The default is UTF-8 which is also the encoding used for all
