@@ -72,9 +72,9 @@ inline bool evaluate(Sign s, Relation r) {
 			return r == Relation::NEQ || r == Relation::GREATER || r == Relation::GEQ;
 		default:
 			CARL_LOG_ERROR("carl.relation", "Evaluating unsupported sign " << s);
-			assert(false);
-			return false;
+			assert(false && "Invalid sign");
 	}
+	return false;
 }
 
 template<typename T>

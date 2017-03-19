@@ -61,26 +61,32 @@ TEST(Relation, isWeak)
 TEST(Relation, evaluate)
 {
 	EXPECT_FALSE(carl::evaluate(carl::Sign::POSITIVE, carl::Relation::EQ));
-	EXPECT_TRUE(carl::evaluate(carl::Sign::ZERO, carl::Relation::EQ));
-	EXPECT_FALSE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::EQ));
-	
 	EXPECT_TRUE(carl::evaluate(carl::Sign::POSITIVE, carl::Relation::NEQ));
-	EXPECT_FALSE(carl::evaluate(carl::Sign::ZERO, carl::Relation::NEQ));
-	EXPECT_TRUE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::NEQ));
-	
 	EXPECT_FALSE(carl::evaluate(carl::Sign::POSITIVE, carl::Relation::LESS));
-	EXPECT_FALSE(carl::evaluate(carl::Sign::ZERO, carl::Relation::LESS));
-	EXPECT_TRUE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::LESS));
-	
 	EXPECT_TRUE(carl::evaluate(carl::Sign::POSITIVE, carl::Relation::GREATER));
-	EXPECT_FALSE(carl::evaluate(carl::Sign::ZERO, carl::Relation::GREATER));
-	EXPECT_FALSE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::GREATER));
-	
 	EXPECT_FALSE(carl::evaluate(carl::Sign::POSITIVE, carl::Relation::LEQ));
-	EXPECT_TRUE(carl::evaluate(carl::Sign::ZERO, carl::Relation::LEQ));
-	EXPECT_TRUE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::LEQ));
-	
 	EXPECT_TRUE(carl::evaluate(carl::Sign::POSITIVE, carl::Relation::GEQ));
+	
+	EXPECT_TRUE(carl::evaluate(carl::Sign::ZERO, carl::Relation::EQ));
+	EXPECT_FALSE(carl::evaluate(carl::Sign::ZERO, carl::Relation::NEQ));
+	EXPECT_FALSE(carl::evaluate(carl::Sign::ZERO, carl::Relation::LESS));
+	EXPECT_FALSE(carl::evaluate(carl::Sign::ZERO, carl::Relation::GREATER));
+	EXPECT_TRUE(carl::evaluate(carl::Sign::ZERO, carl::Relation::LEQ));
 	EXPECT_TRUE(carl::evaluate(carl::Sign::ZERO, carl::Relation::GEQ));
+	
+	EXPECT_FALSE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::EQ));
+	EXPECT_TRUE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::NEQ));
+	EXPECT_TRUE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::LESS));
+	EXPECT_FALSE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::GREATER));
+	EXPECT_TRUE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::LEQ));
 	EXPECT_FALSE(carl::evaluate(carl::Sign::NEGATIVE, carl::Relation::GEQ));
+
+#ifdef CARL_BUILD_DEBUG
+	EXPECT_DEATH(carl::evaluate(invalid_value<carl::Sign>(), carl::Relation::EQ), "Invalid sign");
+	EXPECT_DEATH(carl::evaluate(invalid_value<carl::Sign>(), carl::Relation::NEQ), "Invalid sign");
+	EXPECT_DEATH(carl::evaluate(invalid_value<carl::Sign>(), carl::Relation::LESS), "Invalid sign");
+	EXPECT_DEATH(carl::evaluate(invalid_value<carl::Sign>(), carl::Relation::GREATER), "Invalid sign");
+	EXPECT_DEATH(carl::evaluate(invalid_value<carl::Sign>(), carl::Relation::LEQ), "Invalid sign");
+	EXPECT_DEATH(carl::evaluate(invalid_value<carl::Sign>(), carl::Relation::GEQ), "Invalid sign");
+#endif
 }
