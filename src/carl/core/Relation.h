@@ -6,13 +6,13 @@
 
 #pragma once
 
+#include "logging.h"
+#include "Sign.h"
+
 #include <cassert>
 #include <iostream>
 #include <memory>
 #include <sstream>
-
-#include "Sign.h"
-#include "logging.h"
 
 namespace carl {
 
@@ -71,7 +71,7 @@ inline bool evaluate(Sign s, Relation r) {
 		case Sign::POSITIVE:
 			return r == Relation::NEQ || r == Relation::GREATER || r == Relation::GEQ;
 		default:
-			CARL_LOG_ERROR("carl.relation", "Evaluating unsupported sign " << s);
+			CARL_LOG_ERROR("carl.relation", "Evaluating invalid sign " << std::underlying_type_t<Sign>(s));
 			assert(false && "Invalid sign");
 	}
 	return false;

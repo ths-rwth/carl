@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "logging.h"
+
 #include <functional>
 #include <iostream>
 
@@ -25,9 +27,12 @@ enum class Sign: int {
 
 inline std::ostream& operator<<(std::ostream& os, const Sign& sign) {
 	switch (sign) {
-		case Sign::NEGATIVE: os << "NEGATIVE"; break;
-		case Sign::ZERO: os << "ZERO"; break;
-		case Sign::POSITIVE: os << "POSITIVE"; break;
+		case Sign::NEGATIVE:	os << "NEGATIVE"; break;
+		case Sign::ZERO:		os << "ZERO"; break;
+		case Sign::POSITIVE:	os << "POSITIVE"; break;
+		default:
+			CARL_LOG_ERROR("carl.sign", "Invalid sign " << std::underlying_type_t<Sign>(s));
+			assert(false && "Invalid sign");
 	}
 	return os;
 }

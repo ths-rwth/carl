@@ -17,6 +17,9 @@ TEST(Sign, Output)
 	EXPECT_EQ("NEGATIVE", getOutput(Sign::NEGATIVE));
 	EXPECT_EQ("ZERO", getOutput(Sign::ZERO));
 	EXPECT_EQ("POSITIVE", getOutput(Sign::POSITIVE));
+#ifdef CARL_BUILD_DEBUG
+	EXPECT_DEATH(getOutput(invalid_value<carl::Sign>()), "Invalid sign");
+#endif
 }
 
 TEST(Sign, sgn)
