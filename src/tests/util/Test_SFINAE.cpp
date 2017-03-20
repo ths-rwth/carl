@@ -1,6 +1,7 @@
-#include "gtest/gtest.h"
-#include "carl/numbers/numbers.h"
-#include "carl/util/SFINAE.h"
+#include "../Common.h"
+
+#include <carl/numbers/numbers.h>
+#include <carl/util/SFINAE.h>
 
 #include <type_traits>
 #include <typeinfo>

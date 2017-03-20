@@ -1,8 +1,9 @@
 #pragma once
 
+#include <boost/variant.hpp>
+
 #include <list>
 #include <vector>
-#include <boost/variant.hpp>
 
 template<typename... T>
 using ComparisonList = std::vector<boost::variant<T...>>;
@@ -32,7 +33,7 @@ struct SingleComparisonOperator {
 	typedef void result_type;
 	Iterator it1, it2;
 	const Less& less;
-	SingleComparisonOperator(const Less& l): less(l) {}
+	explicit SingleComparisonOperator(const Less& l): less(l) {}
 	void set(const Iterator& i1, const Iterator& i2) {
 		it1 = i1;
 		it2 = i2;

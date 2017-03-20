@@ -1,8 +1,7 @@
-#include "gtest/gtest.h"
+#include "../Common.h"
+
 #include <carl/numbers/PrimeFactory.h>
 #include <carl/numbers/numbers.h>
-
-#include "../Common.h"
 
 template<typename T>
 class PrimeFactory: public testing::Test {};
