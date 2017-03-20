@@ -5,18 +5,19 @@
 
 #pragma once
 
-#include "carl/numbers/numbers.h"
-#include <boost/version.hpp>
 #include "Common.h"
+
+#include <boost/version.hpp>
+#include <carl/numbers/numbers.h>
 
 #if BOOST_VERSION >= 105900
 #ifdef USE_CLN_NUMBERS
 namespace boost { namespace spirit { namespace traits {
     template<> inline bool scale(int exp, cln::cl_RA& r, cln::cl_RA acc) {
         if (exp >= 0)
-            r = acc * carl::pow(cln::cl_RA(10), (unsigned)exp);
+            r = acc * carl::pow(cln::cl_RA(10), unsigned(exp));
         else
-            r = acc / carl::pow(cln::cl_RA(10), (unsigned)(-exp));
+            r = acc / carl::pow(cln::cl_RA(10), unsigned(-exp));
 		return true;
     }
     template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
@@ -27,9 +28,9 @@ namespace boost { namespace spirit { namespace traits {
 namespace boost { namespace spirit { namespace traits {
     template<> inline bool scale(int exp, mpq_class& r, mpq_class acc) {
         if (exp >= 0)
-            r = acc * carl::pow(mpq_class(10), (unsigned)exp);
+            r = acc * carl::pow(mpq_class(10), unsigned(exp));
         else
-            r = acc / carl::pow(mpq_class(10), (unsigned)(-exp));
+            r = acc / carl::pow(mpq_class(10), unsigned(-exp));
 		return true;
     }
     template<> inline bool is_equal_to_one(const mpq_class& value) {
@@ -42,11 +43,11 @@ namespace boost { namespace spirit { namespace traits {
 #else
 #ifdef USE_CLN_NUMBERS
 namespace boost { namespace spirit { namespace traits {
-    template<> inline void scale(int exp, cln::cl_RA& r) {
+    template<> inline void scale(int exp, cln::cl_RA& n) {
         if (exp >= 0)
-            r *= carl::pow(cln::cl_RA(10), (unsigned)exp);
+            r *= carl::pow(cln::cl_RA(10), unsigned(exp));
         else
-            r /= carl::pow(cln::cl_RA(10), (unsigned)(-exp));
+            r /= carl::pow(cln::cl_RA(10), unsigned(-exp));
     }
     template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
         return value == 1;
@@ -54,11 +55,11 @@ namespace boost { namespace spirit { namespace traits {
 }}}
 #endif
 namespace boost { namespace spirit { namespace traits {
-    template<> inline void scale(int exp, mpq_class& r) {
+    template<> inline void scale(int exp, mpq_class& n) {
         if (exp >= 0)
-            r *= carl::pow(mpq_class(10), (unsigned)exp);
+            r *= carl::pow(mpq_class(10), unsigned(exp));
         else
-            r /= carl::pow(mpq_class(10), (unsigned)(-exp));
+            r /= carl::pow(mpq_class(10), unsigned(-exp));
     }
     template<> inline bool is_equal_to_one(const mpq_class& value) {
         return value == 1;
