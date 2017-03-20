@@ -30,6 +30,6 @@ public:
 	/**
 	 * Destructor.
      */
-	virtual ~Polynomial() {}
+	virtual ~Polynomial() = default;
 };
 }

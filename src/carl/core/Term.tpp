@@ -289,8 +289,7 @@ bool operator==(const Term<Coeff>& lhs, const Coeff& rhs) {
 template<typename Coeff>
 bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 	if (lhs.monomial() == rhs.monomial()) return lhs.coeff() < rhs.coeff();
-	if (lhs.monomial() < rhs.monomial()) return true;
-	return false;
+	return lhs.monomial() < rhs.monomial();
 }
 
 template<typename Coeff>

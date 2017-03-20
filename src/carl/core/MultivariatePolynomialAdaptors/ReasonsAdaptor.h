@@ -16,7 +16,7 @@ struct NoReasons
 	void setReason(unsigned index);
 	BitVector getReasons() const { return BitVector(0); }
 	void setReasons(const BitVector&) const {}
-	virtual ~NoReasons() {};
+	virtual ~NoReasons() = default;
 };
 
 struct BVReasons
