@@ -31,7 +31,7 @@ inline std::ostream& operator<<(std::ostream& os, const Sign& sign) {
 		case Sign::ZERO:		os << "ZERO"; break;
 		case Sign::POSITIVE:	os << "POSITIVE"; break;
 		default:
-			CARL_LOG_ERROR("carl.sign", "Invalid sign " << std::underlying_type_t<Sign>(s));
+			CARL_LOG_ERROR("carl.sign", "Invalid sign " << std::underlying_type_t<Sign>(sign));
 			assert(false && "Invalid sign");
 	}
 	return os;
