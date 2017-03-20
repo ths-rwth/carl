@@ -73,10 +73,18 @@ namespace model {
 		return carl::rootfinder::realRoots(tmp.toUnivariatePolynomial(v), map);
 	}
 	template<typename Rational, typename Poly>
-	std::list<RealAlgebraicNumber<Rational>> realRoots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
+	boost::optional<std::list<RealAlgebraicNumber<Rational>>> realRoots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
 		UnivariatePolynomial<Poly> tmp = substitute(p, m);
 		auto map = collectRANIR(tmp.gatherVariables(), m);
 		return carl::rootfinder::realRoots(tmp, map);
+	}
+	
+	template<typename Rational, typename Poly>
+	boost::optional<std::list<RealAlgebraicNumber<Rational>>> tryRealRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
+		Poly tmp = substitute(p, m);
+		auto map = collectRANIR(tmp.gatherVariables(), m);
+		if (map.size() + 1 != tmp.gatherVariables().size()) return boost::none;
+		return carl::rootfinder::realRoots(tmp.toUnivariatePolynomial(v), map);
 	}
 }
 }
