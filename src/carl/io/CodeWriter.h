@@ -95,7 +95,7 @@ private:
 	
 	struct less {
 		template<typename IT>
-		bool operator()(const IT& l, const IT& r) {
+		bool operator()(const IT& l, const IT& r) const {
 			return (&*l) < (&*r);
 		}
 	};
