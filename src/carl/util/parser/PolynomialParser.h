@@ -45,9 +45,9 @@ namespace boost { namespace spirit { namespace traits {
 namespace boost { namespace spirit { namespace traits {
     template<> inline void scale(int exp, cln::cl_RA& n) {
         if (exp >= 0)
-            r *= carl::pow(cln::cl_RA(10), unsigned(exp));
+            n *= carl::pow(cln::cl_RA(10), unsigned(exp));
         else
-            r /= carl::pow(cln::cl_RA(10), unsigned(-exp));
+            n /= carl::pow(cln::cl_RA(10), unsigned(-exp));
     }
     template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
         return value == 1;
@@ -57,9 +57,9 @@ namespace boost { namespace spirit { namespace traits {
 namespace boost { namespace spirit { namespace traits {
     template<> inline void scale(int exp, mpq_class& n) {
         if (exp >= 0)
-            r *= carl::pow(mpq_class(10), unsigned(exp));
+            n *= carl::pow(mpq_class(10), unsigned(exp));
         else
-            r /= carl::pow(mpq_class(10), unsigned(-exp));
+            n /= carl::pow(mpq_class(10), unsigned(-exp));
     }
     template<> inline bool is_equal_to_one(const mpq_class& value) {
         return value == 1;

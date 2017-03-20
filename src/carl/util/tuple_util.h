@@ -29,51 +29,23 @@ auto tuple_cat(Tuple1&& t1, Tuple2&& t2) {
 	);
 }
 
-
-/**
- * This functor actually implements the functionality of tail.
- * This is the recursive version for larger tuples.
- */
-template<std::size_t S, typename Tuple, typename First, typename... Tail>
-struct tuple_tail_impl {
-	tuple_tail_impl<S-1,Tuple,Tail...> tail;
-	std::tuple<Tail...> operator()(const Tuple& t) {
-		return std::tuple_cat(std::make_tuple(std::get<std::tuple_size<Tuple>::value-S>(t)), tail(t));
-	}
-};
-
-/**
- * This functor actually implements the functionality of tail.
- * This is the base version for tuples of size one.
- */
-template<typename Tuple, typename First, typename... Tail>
-struct tuple_tail_impl<1, Tuple, First, Tail...> {
-	std::tuple<Tail...> operator()(const Tuple& t) {
-		return std::make_tuple(std::get<std::tuple_size<Tuple>::value-1>(t));
-	}
-};
-
-/**
- * Functor that returns the tail of a tuple.
- * The tail of a tuple are all but the first element.
- */
-template<typename First, typename... Tail>
-struct tuple_tail {
-private:
-	/// Recursive implementation.
-	tuple_tail_impl<sizeof...(Tail), std::tuple<First, Tail...>, First, Tail...> tail;
-public:
+namespace detail {
 	/**
-	 * Returns the tail of the given tuple.
-     * @param t Tuple.
-     * @return Tail of t.
-     */
-	std::tuple<Tail...> operator()(const std::tuple<First, Tail...>& t) {
-		return tail(t);
+	 * Helper method for carl::tuple_tail that actually performs the call.
+	 */
+	template<typename Tuple, std::size_t... I>
+	auto tuple_tail_impl(Tuple&& t, std::index_sequence<I...>) {
+		return std::make_tuple(std::get<I+1>(std::forward<Tuple>(t))...);
 	}
-};
+}
 
-
+/**
+ * Returns a new tuple containing everything but the first element.
+ */
+template<typename Tuple>
+auto tuple_tail(Tuple&& t) {
+	return detail::tuple_tail_impl(std::forward<Tuple>(t), std::make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type>::value-1>{});
+}
 
 template<typename Converter, typename Information, typename FOut, typename... TOut>
 struct tuple_convert {
@@ -82,10 +54,9 @@ private:
 	tuple_convert<Converter, Information, TOut...> conv;
 public:
 	tuple_convert(const Information& i): i(i), conv(i) {}
-	template<typename First, typename... Tail>
-	std::tuple<FOut, TOut...> operator()(const std::tuple<First, Tail...>& in) {
-		tuple_tail<First,Tail...> tail;
-		return std::tuple_cat(std::make_tuple(Converter::template convert<FOut>(std::get<0>(in), i)), conv(tail(in)));
+	template<typename Tuple>
+	std::tuple<FOut, TOut...> operator()(const Tuple& in) {
+		return std::tuple_cat(std::make_tuple(Converter::template convert<FOut>(std::get<0>(in), i)), conv(tuple_tail(in)));
 	}
 };
 

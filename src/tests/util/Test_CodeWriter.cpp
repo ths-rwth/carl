@@ -1,9 +1,10 @@
-#include "gtest/gtest.h"
-#include "carl/io/CodeWriter.h"
+#include "../Common.h"
+
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/io/CodeWriter.h>
 
 #include <fstream>
 
-#include "../Common.h"
 
 using namespace carl;
 
@@ -16,9 +17,9 @@ TEST(CodeWriter, Basic)
 	carl::Variable y(2);
 	carl::Variable z(3);
 
-	carl::MultivariatePolynomial<Rational> p1({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
-	carl::MultivariatePolynomial<Rational> p2({(Rational)1*x, (Rational)-1*y*z, (Rational)3*x*z*z});
-	carl::MultivariatePolynomial<Rational> p3({(Rational)1*z, (Rational)-1*x*x, (Rational)3*y*x*x});
+	carl::MultivariatePolynomial<Rational> p1({Rational(1)*x, Rational(-1)*x*x, Rational(3)*x*x*x});
+	carl::MultivariatePolynomial<Rational> p2({Rational(1)*x, Rational(-1)*y*z, Rational(3)*x*z*z});
+	carl::MultivariatePolynomial<Rational> p3({Rational(1)*z, Rational(-1)*x*x, Rational(3)*y*x*x});
 
 
 	gw.addCall(p1*p2, p2*p3);

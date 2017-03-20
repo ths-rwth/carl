@@ -33,11 +33,16 @@ std::string typeString() {
 }
 
 struct ConstructorPrinter {
-    #ifdef USE_CLN_NUMBERS
-	void operator()(std::ostream& os, const cln::cl_RA& n) {
-		os << "(cln::cl_RA)(" << carl::getNum(n) << ")";
+	void operator()(std::ostream& os, const mpq_class& n) {
+		os << "mpq_class(" << carl::getNum(n) << ")";
 		os << "/";
-		os << "(cln::cl_RA)(" << carl::getDenom(n) << ")";
+		os << "mpq_class(" << carl::getDenom(n) << ")";
+	}
+	#ifdef USE_CLN_NUMBERS
+	void operator()(std::ostream& os, const cln::cl_RA& n) {
+		os << "cln::cl_RA(" << carl::getNum(n) << ")";
+		os << "/";
+		os << "cln::cl_RA(" << carl::getDenom(n) << ")";
 	}
     #endif
 	void operator()(std::ostream& os, const Variable& v) {
