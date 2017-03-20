@@ -34,7 +34,7 @@ namespace carl {
 		Number(Number<cln::cl_RA>&& n) = default;
 
 		explicit Number(const cln::cl_RA& t): BaseNumber(t) {}
-		explicit Number(cln::cl_RA&& t): BaseNumber(t) {}
+		explicit Number(cln::cl_RA&& t): BaseNumber(std::move(t)) {}
 		Number(int n) : BaseNumber(n) {} // NOLINT
 		Number(long long int n) { mData = cln::cl_RA(n); } // NOLINT
 		Number(unsigned long long int n) { mData = cln::cl_RA(n); } // NOLINT

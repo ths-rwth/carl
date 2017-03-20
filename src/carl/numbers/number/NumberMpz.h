@@ -20,7 +20,7 @@ namespace carl {
 		Number<mpz_class>& operator=(Number<mpz_class>&& n) = default; // NOLINT
 		
 		explicit Number(const mpz_class& t): BaseNumber(t) {}
-		explicit Number(mpz_class&& t): BaseNumber(t) {}
+		explicit Number(mpz_class&& t): BaseNumber(std::move(t)) {}
 		Number(int n) : BaseNumber(n) {} // NOLINT
 		Number(long long int n) : BaseNumber(n) {} // NOLINT
 		Number(unsigned long long int n): BaseNumber(n) {} // NOLINT

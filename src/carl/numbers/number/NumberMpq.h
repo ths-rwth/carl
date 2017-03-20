@@ -25,7 +25,7 @@ namespace carl {
 		Number(Number<mpq_class>&& n) = default;
 
 		explicit Number(const mpq_class& t): BaseNumber(t) {}
-		explicit Number(mpq_class&& t): BaseNumber(t) {}
+		explicit Number(mpq_class&& t): BaseNumber(std::move(t)) {}
 		Number(int i) : BaseNumber(i) {} // NOLINT
 		Number(long long int n) : BaseNumber(n) {} // NOLINT
 		Number(unsigned long long int n): BaseNumber(n) {} // NOLINT

@@ -98,7 +98,7 @@ public:
 	MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>&);
 	MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>&&);
 	MultivariatePolynomial& operator=(const MultivariatePolynomial& p);
-	MultivariatePolynomial& operator=(MultivariatePolynomial&& p);
+	MultivariatePolynomial& operator=(MultivariatePolynomial&& p) noexcept;
 	explicit MultivariatePolynomial(int c): MultivariatePolynomial(sint(c)) {}
 	template<typename C = Coeff>
 	explicit MultivariatePolynomial(EnableIfNotSame<C,sint> c);

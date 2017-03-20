@@ -624,7 +624,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::pow(std::size_t exp) co
 	UnivariatePolynomial<Coeff> res(mMainVar, constant_one<Coeff>::get());
 	UnivariatePolynomial<Coeff> mult(*this);
 	while(exp > 0) {
-		if (exp & 1) res *= mult;
+		if ((exp & 1) != 0) res *= mult;
 		exp /= 2;
 		if(exp > 0) mult = mult * mult;
 	}
@@ -1036,8 +1036,8 @@ FactorMap<Coeff> UnivariatePolynomial<Coeff>::factorization() const
 	else
 	{
 		// Store the rational factor and make the polynomial's coefficients coprime.
-		CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), ((Coeff) 1) / factor) << ")^" << 1 );
-		result.emplace(UnivariatePolynomial<Coeff>(mainVar(), ((Coeff) 1) / factor), 1);
+		CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), constant_one<Coeff>::get() / factor) << ")^" << 1 );
+		result.emplace(UnivariatePolynomial<Coeff>(mainVar(), constant_one<Coeff>::get() / factor), 1);
 		remainingPoly.mCoefficients.reserve(mCoefficients.size());
 		for(const Coeff& coeff : mCoefficients)
 		{
@@ -1275,14 +1275,13 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 					if(tcFactor == tcFactors.end())
 					{
 						Coeff factor = result.coprimeFactor();
-						if(factor != (Coeff) 1)
-						{
+						if (!carl::isOne(factor)) {
 							result *= factor;
 							CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), std::initializer_list<Coeff>({(Coeff)1/factor})) << ")^" << 1 );
 							// Add the constant factor to the factors.
 							if( linearFactors.begin()->first.isConstant() )
 							{
-								factor = (Coeff)1 / factor;
+								factor = Coeff(1) / factor;
 								factor *= linearFactors.begin()->first.lcoeff();
 								linearFactors.erase(linearFactors.begin());
 							}

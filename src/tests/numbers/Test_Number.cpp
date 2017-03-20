@@ -1,25 +1,27 @@
-#include "gtest/gtest.h"
-#include "../../carl/numbers/numbers.h"
+#include "../Common.h"
 
-#include "../../carl/numbers/number/NumberMpz.h"
-#include "../../carl/numbers/number/NumberMpq.h"
-#include "../../carl/numbers/number/NumberClI.h"
-#include "../../carl/numbers/number/NumberClRA.h"
+#include <carl/numbers/numbers.h>
+#include <carl/numbers/number/NumberMpz.h>
+#include <carl/numbers/number/NumberMpq.h>
+#include <carl/numbers/number/NumberClI.h>
+#include <carl/numbers/number/NumberClRA.h>
 
 TEST(Number, Constructor)
 {
 //mpz
-	mpz_class mpz(2);	
+	mpz_class mpz(2);
+	mpz_class mpz_moved(2);
 	carl::Number<mpz_class> z1, z2, z3, z4, z5, z6, z7, z8, z9, z10;
 	ASSERT_NO_THROW(z1 = carl::Number<mpz_class>());
+	carl::Number<mpz_class> z1_moved = z1;
 	ASSERT_NO_THROW(z2 = carl::Number<mpz_class>(mpz));
-	ASSERT_NO_THROW(z3 = carl::Number<mpz_class>(std::move(mpz)));
+	ASSERT_NO_THROW(z3 = carl::Number<mpz_class>(std::move(mpz_moved)));
 	ASSERT_NO_THROW(z4 = carl::Number<mpz_class>(z1));
 	ASSERT_NO_THROW(z5 = carl::Number<mpz_class>(3ll));
 	ASSERT_NO_THROW(z6 = carl::Number<mpz_class>(4ull));
 	ASSERT_NO_THROW(z7 = carl::Number<mpz_class>("-30"));
 	ASSERT_NO_THROW(z8 = carl::Number<mpz_class>(3));
-	ASSERT_NO_THROW(z9 = carl::Number<mpz_class>(std::move(z1)));
+	ASSERT_NO_THROW(z9 = carl::Number<mpz_class>(std::move(z1_moved)));
 
 
 	EXPECT_EQ(z1.getValue(),mpz_class(0));
@@ -34,9 +36,11 @@ TEST(Number, Constructor)
 	
 
 //mpq class
-	mpq_class mpq(2);	
+	mpq_class mpq(2);
+	mpq_class mpq_moved(2);
 	carl::Number<mpq_class> q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16;
 	ASSERT_NO_THROW(q1 = carl::Number<mpq_class>());
+	carl::Number<mpq_class> q1_moved = q1;
 	ASSERT_NO_THROW(q2 = carl::Number<mpq_class>(mpq));
 	ASSERT_NO_THROW(q3 = carl::Number<mpq_class>(std::move(mpq)));
 	ASSERT_NO_THROW(q4 = carl::Number<mpq_class>(q1));
@@ -50,7 +54,7 @@ TEST(Number, Constructor)
 	ASSERT_NO_THROW(q11 = carl::Number<mpq_class>(z8,z7));
 	ASSERT_NO_THROW(q12 = carl::Number<mpq_class>(z8));
 	ASSERT_NO_THROW(q13 = carl::Number<mpq_class>(mpz));
-	ASSERT_NO_THROW(q14 = carl::Number<mpq_class>(std::move(q1)));
+	ASSERT_NO_THROW(q14 = carl::Number<mpq_class>(std::move(q1_moved)));
 
 
 	EXPECT_EQ(q1.getValue(),mpq_class(0));
@@ -74,16 +78,16 @@ TEST(Number, Constructor)
 #ifdef USE_CLN_NUMBERS
 	cln::cl_I clI(2);	
 	carl::Number<cln::cl_I> i1, i2, i3, i4, i5, i6, i7, i8, i9, i10;
-	ASSERT_NO_THROW(i1 = carl::Number<cln::cl_I>());
-	ASSERT_NO_THROW(i2 = carl::Number<cln::cl_I>(clI));
-	ASSERT_NO_THROW(i3 = carl::Number<cln::cl_I>(std::move(clI)));
-	ASSERT_NO_THROW(i4 = carl::Number<cln::cl_I>(z1));
-	ASSERT_NO_THROW(i5 = carl::Number<cln::cl_I>(3ll));
-	ASSERT_NO_THROW(i6 = carl::Number<cln::cl_I>(4ull));
-	ASSERT_NO_THROW(i7 = carl::Number<cln::cl_I>((std::string)"-30"));
-	ASSERT_NO_THROW(i8 = carl::Number<cln::cl_I>(3));
-	ASSERT_NO_THROW(i9 = carl::Number<cln::cl_I>(std::move(i1)));
-	ASSERT_NO_THROW(i10 = carl::Number<cln::cl_I>(z1));
+	EXPECT_NO_THROW(i1 = carl::Number<cln::cl_I>());
+	EXPECT_NO_THROW(i2 = carl::Number<cln::cl_I>(clI));
+	EXPECT_NO_THROW(i3 = carl::Number<cln::cl_I>(std::move(clI)));
+	EXPECT_NO_THROW(i4 = carl::Number<cln::cl_I>(z1));
+	EXPECT_NO_THROW(i5 = carl::Number<cln::cl_I>(3ll));
+	EXPECT_NO_THROW(i6 = carl::Number<cln::cl_I>(4ull));
+	EXPECT_NO_THROW(i7 = carl::Number<cln::cl_I>((std::string)"-30"));
+	EXPECT_NO_THROW(i8 = carl::Number<cln::cl_I>(3));
+	EXPECT_NO_THROW(i9 = carl::Number<cln::cl_I>(std::move(i1)));
+	EXPECT_NO_THROW(i10 = carl::Number<cln::cl_I>(z1));
 
 
 	EXPECT_EQ(i1.getValue(),cln::cl_I(0));

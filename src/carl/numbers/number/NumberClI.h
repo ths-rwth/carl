@@ -19,7 +19,7 @@ namespace carl {
 		Number(Number<cln::cl_I>&& n) = default;
 
 		explicit Number(const cln::cl_I& t): BaseNumber(t) {}
-		explicit Number(cln::cl_I&& t): BaseNumber(t) {}
+		explicit Number(cln::cl_I&& t): BaseNumber(std::move(t)) {}
 		explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		Number(int n) : BaseNumber(n) {} // NOLINT
 		Number(long long int n) { mData = cln::cl_I(n); } // NOLINT
