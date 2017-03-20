@@ -549,7 +549,7 @@ const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator[](u
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::tail(bool makeFullOrdered) const
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::tail(bool makeFullyOrdered) const
 {
 	assert(!mTerms.empty());
 	assert(this->isConsistent());
@@ -564,7 +564,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	else
 	{
 		tail.mOrdered = false;
-		if(makeFullOrdered)
+		if(makeFullyOrdered)
 		{
 			tail.makeOrdered();
 		}
@@ -1188,14 +1188,14 @@ MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, 
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename SubstitutionType>
-SubstitutionType MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& map) const
+SubstitutionType MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& substitutions) const
 {
 	if(isZero()) {
 		return constant_zero<SubstitutionType>::get();
 	} else {
-		SubstitutionType result(mTerms[0].evaluate(map)); 
+		SubstitutionType result(mTerms[0].evaluate(substitutions)); 
 		for (unsigned i = 1; i < mTerms.size(); ++i) {
-			result += mTerms[i].evaluate(map);
+			result += mTerms[i].evaluate(substitutions);
 		}
 		return result;
 	};
@@ -1425,14 +1425,14 @@ std::set<Variable> MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariab
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<bool gatherCoeff>
-VariableInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::getVarInfo(Variable::Arg var) const
+VariableInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::getVarInfo(Variable::Arg v) const
 {
 	VariableInformation<gatherCoeff, MultivariatePolynomial> varinfomap;
 	// We iterate over all terms.
 	for(const auto& term : mTerms)
 	{
 		// And gather information from the terms and meanwhile up
-		term.gatherVarInfo(var, varinfomap);
+		term.gatherVarInfo(v, varinfomap);
 	}
 	return varinfomap;
 }

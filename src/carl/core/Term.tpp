@@ -32,22 +32,29 @@ Term<Coefficient>::Term(Variable v) :
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Monomial::Arg& m) :
-	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(m)
+Term<Coefficient>::Term(Monomial::Arg m) :
+	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(std::move(m))
 {
 	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, const Monomial::Arg& m) :
-	mCoeff(c), mMonomial(m)
+Term<Coefficient>::Term(Monomial::Arg&& m) :
+	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(std::move(m))
 {
 	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(Coefficient&& c, const Monomial::Arg& m) :
-	mCoeff(std::move(c)), mMonomial(m)
+Term<Coefficient>::Term(const Coefficient& c, Monomial::Arg m) :
+	mCoeff(c), mMonomial(std::move(m))
+{
+	assert(this->isConsistent());
+}
+
+template<typename Coefficient>
+Term<Coefficient>::Term(Coefficient&& c, Monomial::Arg&& m) :
+	mCoeff(std::move(c)), mMonomial(std::move(m))
 {
 	assert(this->isConsistent());
 }

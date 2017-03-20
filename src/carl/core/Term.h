@@ -66,21 +66,26 @@ class Term
 		 * Constructs a term of value \f$ m \f$.
 		 * @param m Monomial pointer.
 		 */
-		explicit Term(const Monomial::Arg& m);
+		explicit Term(Monomial::Arg m);
+		/**
+		 * Constructs a term of value \f$ m \f$.
+		 * @param m Monomial pointer.
+		 */
+		explicit Term(Monomial::Arg&& m);
+
+		/**
+		 * Constructs a term of value \f$ c \cdot m \f$.
+		 * @param c Coefficient.
+		 * @param m Monomial pointer.
+		 */
+		Term(const Coefficient& c, Monomial::Arg m);
         
 		/**
 		 * Constructs a term of value \f$ c \cdot m \f$.
 		 * @param c Coefficient.
 		 * @param m Monomial pointer.
 		 */
-		Term(const Coefficient& c, const Monomial::Arg& m);
-        
-		/**
-		 * Constructs a term of value \f$ c \cdot m \f$.
-		 * @param c Coefficient.
-		 * @param m Monomial pointer.
-		 */
-		Term(Coefficient&& c, const Monomial::Arg& m);
+		Term(Coefficient&& c, Monomial::Arg&& m);
 		/**
 		 * Constructs a term of value \f$ c \cdot v^e \f$.
 		 * @param c Coefficient.
