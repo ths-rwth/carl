@@ -155,7 +155,7 @@ namespace carl
         {
         }
         
-		explicit VariableInformation(const VariableInformation<false, CoeffType>& varInfo):
+		VariableInformation(const VariableInformation<false, CoeffType>& varInfo):
 			VariableInformation<false, CoeffType>(varInfo),
 			mCoeffs()
         {
