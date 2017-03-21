@@ -222,6 +222,16 @@ public:
 			return *this;
 		}
 		virtual ~PreorderIterator() = default;
+		
+		PreorderIterator& skipChildren() {
+			assert(this->current != MAXINT);
+			while (this->mTree->nodes[this->current].nextSibling == MAXINT) {
+				this->current = this->mTree->nodes[this->current].parent;
+				if (this->current == MAXINT) return *this;
+			}
+			this->current = this->mTree->nodes[this->current].nextSibling;
+			return *this;
+		}
 	};
 	static_assert(std::is_copy_constructible<PreorderIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<PreorderIterator<false>>::value, "");
