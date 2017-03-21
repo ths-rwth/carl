@@ -7,10 +7,10 @@
 TEST(VectorUtil, concat)
 {
 	std::vector<std::vector<std::size_t>> v;
-	v.push_back({1,2,3});
-	v.push_back({4,5});
-	v.push_back({6});
-	v.push_back({});
+	v.emplace_back(std::initializer_list<std::size_t>({1,2,3}));
+	v.emplace_back(std::initializer_list<std::size_t>({4,5}));
+	v.emplace_back(std::initializer_list<std::size_t>({6}));
+	v.emplace_back(std::initializer_list<std::size_t>({}));
 
 	std::vector<std::size_t> res1;
 	carl::vector_concat(res1, v);

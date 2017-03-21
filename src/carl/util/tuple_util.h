@@ -15,7 +15,7 @@ namespace detail {
 	 * Helper method for carl::tuple_apply that actually performs the call.
 	 */
 	template<typename Tuple1, typename Tuple2, std::size_t... I1, std::size_t... I2>
-	auto tuple_cat_impl(Tuple1&& t1, Tuple2&& t2, std::index_sequence<I1...>, std::index_sequence<I2...>) {
+	auto tuple_cat_impl(Tuple1&& t1, Tuple2&& t2, std::index_sequence<I1...> /*unused*/, std::index_sequence<I2...> /*unused*/) {
 		return std::make_tuple(std::get<I1>(std::forward<Tuple1>(t1))..., std::get<I2>(std::forward<Tuple2>(t2))...);
 	}
 }
@@ -34,7 +34,7 @@ namespace detail {
 	 * Helper method for carl::tuple_tail that actually performs the call.
 	 */
 	template<typename Tuple, std::size_t... I>
-	auto tuple_tail_impl(Tuple&& t, std::index_sequence<I...>) {
+	auto tuple_tail_impl(Tuple&& t, std::index_sequence<I...> /*unused*/) {
 		return std::make_tuple(std::get<I+1>(std::forward<Tuple>(t))...);
 	}
 }
@@ -53,7 +53,7 @@ private:
 	Information i;
 	tuple_convert<Converter, Information, TOut...> conv;
 public:
-	tuple_convert(const Information& i): i(i), conv(i) {}
+	explicit tuple_convert(const Information& i): i(i), conv(i) {}
 	template<typename Tuple>
 	std::tuple<FOut, TOut...> operator()(const Tuple& in) {
 		return std::tuple_cat(std::make_tuple(Converter::template convert<FOut>(std::get<0>(in), i)), conv(tuple_tail(in)));
@@ -65,7 +65,7 @@ struct tuple_convert<Converter, Information, Out> {
 private:
 	Information i;
 public:
-	tuple_convert(const Information& i): i(i) {}
+	explicit tuple_convert(const Information& i): i(i) {}
 	template<typename In>
 	std::tuple<Out> operator()(const std::tuple<In>& in) {
 		return std::make_tuple(Converter::template convert<Out>(std::get<0>(in), i));
@@ -77,7 +77,7 @@ namespace detail {
 	 * Helper method for carl::tuple_apply that actually performs the call.
 	 */
 	template<typename F, typename Tuple, std::size_t... I>
-	auto tuple_apply_impl(F&& f, Tuple&& t, std::index_sequence<I...>) {
+	auto tuple_apply_impl(F&& f, Tuple&& t, std::index_sequence<I...> /*unused*/) {
 		return (std::forward<F>(f))(std::get<I>(std::forward<Tuple>(t))...);
 	}
 }

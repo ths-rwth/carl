@@ -5,8 +5,6 @@
 #include <chrono>
 #include <thread>
 
-using namespace carl;
-
 TEST(Timer, Basics)
 {
 	carl::Timer t;

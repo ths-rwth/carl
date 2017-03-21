@@ -29,12 +29,9 @@ namespace carl
  * @ingroup multirp
  */
 template<typename Coefficient>
-class Term
-{
-	
-
+class Term {
 	private:
-		typedef Coefficient CoefficientType;
+		using CoefficientType = Coefficient;
 		CoefficientType mCoeff = CoefficientType(constant_zero<Coefficient>::get());
 		Monomial::Arg mMonomial;
 

@@ -10,9 +10,10 @@
  */
 
 #pragma once
-#include "../numbers/numbers.h"
-#include <assert.h>
 
+#include "../numbers/numbers.h"
+
+#include <cassert>
 
 namespace carl
 {
@@ -32,7 +33,7 @@ namespace carl
             assert(false);
 			return Number(0);
         }
-        static bool is_nan(const Number&)
+        static bool is_nan(const Number& /*unused*/)
         {
             return false;
         }

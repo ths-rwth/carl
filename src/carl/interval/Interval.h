@@ -35,9 +35,9 @@
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
 CLANG_WARNING_DISABLE("-Wunused-local-typedef")
+#include <boost/functional/hash.hpp>
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
-#include <boost/functional/hash.hpp>
 CLANG_WARNING_RESET
 
 #include <cassert>
@@ -90,8 +90,8 @@ namespace carl
     template<typename Number>
     struct policies
     {
-        typedef carl::rounding<Number> roundingP;
-        typedef carl::checking<Number> checkingP;
+        using roundingP = carl::rounding<Number>;
+        using checkingP = carl::checking<Number>;
     };
 
     /**
@@ -101,8 +101,8 @@ namespace carl
     template<>
     struct policies<double>
     {
-        typedef boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_transc_std<double> > roundingP; // TODO: change it to boost::numeric::interval_lib::rounded_transc_opp, if new boost release patches the bug with clang
-        typedef boost::numeric::interval_lib::checking_no_nan<double, boost::numeric::interval_lib::checking_no_nan<double> > checkingP;
+        using roundingP = boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_transc_std<double> >; // TODO: change it to boost::numeric::interval_lib::rounded_transc_opp, if new boost release patches the bug with clang
+        using checkingP = boost::numeric::interval_lib::checking_no_nan<double, boost::numeric::interval_lib::checking_no_nan<double> >;
     };
 
     /**
@@ -131,9 +131,9 @@ namespace carl
          */
         //typedef typename policies<Number>::checking checking;
         //typedef typename policies<Number>::rounding rounding;
-        typedef boost::numeric::interval_lib::policies< typename policies<Number>::roundingP, typename policies<Number>::checkingP > BoostIntervalPolicies;
-        typedef boost::numeric::interval< Number, BoostIntervalPolicies > BoostInterval;
-        typedef std::map<Variable, Interval<Number> > evalintervalmap;
+        using BoostIntervalPolicies = boost::numeric::interval_lib::policies< typename policies<Number>::roundingP, typename policies<Number>::checkingP >;
+        using BoostInterval = boost::numeric::interval< Number, BoostIntervalPolicies >;
+        using evalintervalmap = std::map<Variable, Interval<Number> >;
 
         /// Macro to perform a quick check on the passed interval bounds.
 #define BOUNDS_OK( lower, lowerBoundType, upper, upperBoundType )\
@@ -215,7 +215,7 @@ namespace carl
          * @param lowerBoundType The desired lower bound type, defaults to WEAK.
          * @param upperBoundType The desired upper bound type, defaults to WEAK.
          */
-        Interval(const BoostInterval& content, BoundType lowerBoundType = BoundType::WEAK, BoundType upperBoundType = BoundType::WEAK):
+        explicit Interval(const BoostInterval& content, BoundType lowerBoundType = BoundType::WEAK, BoundType upperBoundType = BoundType::WEAK):
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             if (BOUNDS_OK(content.lower(), lowerBoundType, content.upper(), upperBoundType))
@@ -395,7 +395,7 @@ namespace carl
          * @param n The passed double.
          */
         template<typename N = Number, DisableIf<std::is_same<N, int >> = dummy >
-        Interval(const int& n) :
+        explicit Interval(const int& n) :
         mContent(carl::Interval<Number>::BoostInterval(n, n)),
         mLowerBoundType(BoundType::WEAK),
         mUpperBoundType(BoundType::WEAK) { }
@@ -1264,7 +1264,7 @@ namespace carl
          * @param val Value to be checked.
          * @return True if val is fully contained in this.
          */
-        bool meets(const Number& val) const;
+        bool meets(const Number& n) const;
 
         /**
          * Checks if the given interval is a subset of the calling interval.
@@ -2009,10 +2009,10 @@ namespace carl
     }
 
 
-        template<typename Number>
-    inline bool isInteger(const Interval<Number>&) {
-	return false;
-    }
+	template<typename Number>
+	inline bool isInteger(const Interval<Number>& n) {
+		return n.isPointInterval() && carl::isInteger(n.lower());
+	}
 
     /**
      * Implements the division which assumes that there is no remainder.

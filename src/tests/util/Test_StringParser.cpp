@@ -1,24 +1,22 @@
-#include "gtest/gtest.h"
-#include "carl/util/stringparser.h"
-#include "carl/core/MultivariatePolynomial.h"
-#include "carl/numbers/numbers.h"
+#include "../Common.h"
+
+#include <carl/util/stringparser.h>
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/numbers/numbers.h>
 
 #include <type_traits>
 #include <typeinfo>
 
 using namespace carl;
 
-class StringParserTest : public ::testing::Test {
+class StringParserTest: public ::testing::Test {
 protected:
 	StringParserTest(): spSingleSymbExplicit() {}
-	virtual void SetUp() {
+	void SetUp() override {
 		spSingleSymbExplicit.setImplicitMultiplicationMode(false);
 		spSingleSymbExplicit.setVariables({"x", "y", "z"});
 	}
-
-  // virtual void TearDown() {}
-
-  StringParser spSingleSymbExplicit;
+	StringParser spSingleSymbExplicit;
 };
 
 TEST_F(StringParserTest, termsWithExplicitMultiplication)
