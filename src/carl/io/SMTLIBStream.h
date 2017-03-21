@@ -210,8 +210,17 @@ public:
 		*this << "(assert " << formula << ")";
 	}
 	
+	template<typename Pol>
+	void minimize(const Pol& objective) {
+		*this << "(minimize " << objective << ")" << std::endl;
+	}
+	
 	void checkSat() {
 		*this << "(check-sat)" << std::endl;
+	}
+	
+	void getModel() {
+		*this << "(get-model)" << std::endl;
 	}
 	
 	template<typename T>
@@ -240,14 +249,19 @@ template<typename Pol>
 struct SMTLIBContainer {
 	Logic mLogic;
 	std::initializer_list<Formula<Pol>> mFormulas;
-	SMTLIBContainer(Logic l, std::initializer_list<Formula<Pol>> f): mLogic(l), mFormulas(f) {}
+	bool mGetModel;
+	Pol mObjective;
+	SMTLIBContainer(Logic l, std::initializer_list<Formula<Pol>> f, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel) {}
+	SMTLIBContainer(Logic l, std::initializer_list<Formula<Pol>> f, const Pol& objective, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel), mObjective(objective) {}
 };
 template<typename Pol>
 std::ostream& operator<<(std::ostream& os, const SMTLIBContainer<Pol>& sc) {
 	SMTLIBStream sls;
 	sls.initialize(sc.mLogic, sc.mFormulas);
 	for (const auto& f: sc.mFormulas) sls.assertFormula(f);
+	if (!sc.mObjective.isZero()) sls.minimize(sc.mObjective);
 	sls.checkSat();
+	if (sc.mGetModel) sls.getModel();
 	return os << sls;
 }
 
