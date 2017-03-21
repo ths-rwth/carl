@@ -2122,7 +2122,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	}
 	TermsType newTerms;
 	newTerms.reserve(mTerms.size());
-	for(auto term : mTerms)
+	for(const auto& term : mTerms)
 	{
 		newTerms.push_back(term * rhs);
 	}
@@ -2184,7 +2184,7 @@ std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool inf
 	///@todo sort for this?
 	if(mTerms.empty()) return "0";
 	if(mTerms.size() == 1) return this->mTerms.front().toString(infix, friendlyVarNames);
-	std::string result = "";
+	std::string result;
 	if( !infix ) result += "(+";
 	for (auto term = mTerms.rbegin(); term != mTerms.rend(); term++)
 	{

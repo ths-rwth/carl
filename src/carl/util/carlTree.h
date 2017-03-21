@@ -88,20 +88,12 @@ protected:
 		BaseIterator(const tree<T>* t, std::size_t root): mTree(t), current(root) {}
 	public:
 		std::size_t current;
-		BaseIterator(const BaseIterator& ii): mTree(ii.mTree), current(ii.current) {}
-		BaseIterator(BaseIterator&& ii): mTree(ii.mTree), current(ii.current) {}
+		BaseIterator(const BaseIterator& ii) = default;
+		BaseIterator(BaseIterator&& ii) noexcept = default;
 		template<typename It, bool r>
 		BaseIterator(const BaseIterator<It,r>& ii): mTree(ii.mTree), current(ii.current) {}
-		BaseIterator& operator=(const BaseIterator& ii) {
-			this->mTree = ii.mTree;
-			this->current = ii.current;
-			return *this;
-		}
-		BaseIterator& operator=(BaseIterator&& ii) {
-			this->mTree = ii.mTree;
-			this->current = ii.current;
-			return *this;
-		}
+		BaseIterator& operator=(const BaseIterator& ii) = default;
+		BaseIterator& operator=(BaseIterator&& ii) noexcept = default;
 		std::size_t depth() const {
 			assert(current != MAXINT);
 			return mTree->nodes[current].depth;
@@ -229,7 +221,7 @@ public:
 			Base::operator=(it);
 			return *this;
 		}
-		virtual ~PreorderIterator() {}
+		virtual ~PreorderIterator() = default;
 	};
 	static_assert(std::is_copy_constructible<PreorderIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<PreorderIterator<false>>::value, "");
@@ -295,7 +287,7 @@ public:
 			Base::operator=(it);
 			return *this;
 		}
-		virtual ~PostorderIterator() {}
+		virtual ~PostorderIterator() = default;
 	};
 	static_assert(std::is_copy_constructible<PostorderIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<PostorderIterator<false>>::value, "");
@@ -356,7 +348,7 @@ public:
 			Base::operator=(it);
 			return *this;
 		}
-		virtual ~LeafIterator() {}
+		virtual ~LeafIterator() = default;
 	};
 	static_assert(std::is_copy_constructible<LeafIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<LeafIterator<false>>::value, "");
@@ -443,7 +435,7 @@ public:
 			depth = it.depth;
 			return *this;
 		}
-		virtual ~DepthIterator() {}
+		virtual ~DepthIterator() = default;
 	};
 	static_assert(std::is_copy_constructible<DepthIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<DepthIterator<false>>::value, "");
@@ -505,12 +497,12 @@ public:
 			parent = it.parent;
 			return *this;
 		}
-		ChildrenIterator& operator=(ChildrenIterator&& it) {
+		ChildrenIterator& operator=(ChildrenIterator&& it) noexcept {
 			Base::operator=(it);
 			parent = it.parent;
 			return *this;
 		}
-		virtual ~ChildrenIterator() {}
+		virtual ~ChildrenIterator() = default;
 	};
 	static_assert(std::is_copy_constructible<ChildrenIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<ChildrenIterator<false>>::value, "");
@@ -545,11 +537,11 @@ public:
 			Base::operator=(it);
 			return *this;
 		}
-		PathIterator& operator=(PathIterator&& it) {
+		PathIterator& operator=(PathIterator&& it) noexcept {
 			Base::operator=(it);
 			return *this;
 		}
-		virtual ~PathIterator() {}
+		virtual ~PathIterator() = default;
 	};
 	static_assert(std::is_copy_constructible<PathIterator>::value, "");
 	static_assert(std::is_move_constructible<PathIterator>::value, "");
@@ -557,19 +549,11 @@ public:
 
 	using iterator = PreorderIterator<false>;
 
-	tree() {}
-	tree(const tree& t): nodes(t.nodes), emptyNodes(t.emptyNodes) {}
-	tree(tree&& t): nodes(std::move(t.nodes)), emptyNodes(t.emptyNodes) {}
-	tree& operator=(const tree& t) {
-		nodes = t.nodes;
-		emptyNodes = t.emptyNodes;
-		return *this;
-	}
-	tree& operator=(tree&& t) {
-		nodes = std::move(t.nodes);
-		emptyNodes = t.emptyNodes;
-		return *this;
-	}
+	tree() = default;
+	tree(const tree& t) = default;
+	tree(tree&& t) noexcept = default;
+	tree& operator=(const tree& t) = default;
+	tree& operator=(tree&& t) noexcept = default;
 
 	void debug() const {
 		std::cout << "emptyNodes: " << emptyNodes << std::endl;

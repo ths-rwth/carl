@@ -120,7 +120,7 @@ public:
     explicit MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands);
 	/// @}
 	
-	virtual ~MultivariatePolynomial() = default;
+	~MultivariatePolynomial() override = default;
 	
 	//Polynomial interface implementations.
 	/**
