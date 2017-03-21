@@ -26,8 +26,8 @@ class VariablesInformation : public VariablesInformationInterface
 	std::map<Variable, VariableInformation<collectCoeff, CoeffType>> mVariableInfo;
 	
 public:
-    VariablesInformation(): mVariableInfo() {}
-    VariablesInformation(std::map<Variable, VariableInformation<collectCoeff, CoeffType>>&& _varInfos): mVariableInfo(_varInfos) {}
+    VariablesInformation() = default;
+    explicit VariablesInformation(std::map<Variable, VariableInformation<collectCoeff, CoeffType>>&& _varInfos): mVariableInfo(std::move(_varInfos)) {}
 	~VariablesInformation() override = default;
 
 	bool hasCoeff() const override

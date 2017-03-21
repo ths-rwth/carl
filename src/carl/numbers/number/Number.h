@@ -1,11 +1,8 @@
 #pragma once
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-#endif
+#include "../numbers.h"
 
 #include <string>
-#include "../numbers.h"
 
 namespace carl {
 

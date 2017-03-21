@@ -68,9 +68,9 @@ class MultivariateGCD : GCDCalculation
     friend MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
     
     private:
-	typedef MultivariatePolynomial<Coeff,Ordering,Policies> Polynomial;
-	typedef UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policies>> UnivReprPol;
-	typedef UnivariatePolynomial<Coeff> UnivPol;
+	using Polynomial = MultivariatePolynomial<Coeff,Ordering,Policies>;
+	using UnivReprPol = UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policies>>;
+	using UnivPol = UnivariatePolynomial<Coeff>;
 	
 	const Polynomial& mp1;
 	const Polynomial& mp2;

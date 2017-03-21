@@ -7,34 +7,29 @@
 
 #pragma once
 
-#include <vector>
-#include <stack>
-#include <unordered_set>
-#include <cassert>
-#include <mutex>
-#include <limits>
 #include "Common.h"
 
+#include <cassert>
+#include <limits>
+#include <mutex>
+#include <stack>
+#include <unordered_set>
+#include <vector>
 
-namespace carl
-{   
+namespace carl {   
     template<typename T, class I>
     using TypeInfoPair = std::pair<T*,I>;
     
     template<typename T, class I>
-    bool operator==( const TypeInfoPair<T,I>& _tipA, const TypeInfoPair<T,I>& _tipB )
-    {
+    bool operator==(const TypeInfoPair<T,I>& _tipA, const TypeInfoPair<T,I>& _tipB) {
         return *_tipA.first == *_tipB.first;
     }
 }
 
-namespace std
-{
+namespace std {
     template<typename T, class I>
-    struct hash<carl::TypeInfoPair<T,I>>
-    {
-        size_t operator()( const carl::TypeInfoPair<T,I>& _tip ) const 
-        {
+    struct hash<carl::TypeInfoPair<T,I>> {
+        std::size_t operator()(const carl::TypeInfoPair<T,I>& _tip) const {
             return _tip.first->getHash();
         }
     };
@@ -43,25 +38,23 @@ namespace std
 namespace carl
 {   
     template<typename T>
-    bool returnFalse( const T&, const T& ) { return false; }
+    bool returnFalse( const T& /*unused*/, const T& /*unused*/) { return false; }
     
     template<typename T>
-    void doNothing( T&, T& ) {}
+    void doNothing( const T& /*unused*/, const T& /*unused*/) {}
    
     template<typename T>
-    class Cache
-    {
+    class Cache {
         
     public:
         // The type of the reference of an entry in the cache.
-        typedef size_t Ref;
+        using Ref = std::size_t;
         
-        struct Info
-        {
+        struct Info {
             /**
              * Store the number of usages of the entry in the cache for which this information hold by external objects.
              */
-            size_t usageCount;
+            std::size_t usageCount;
             
             /**
              * Stores the reference of the entry in the cache for which this information hold.
@@ -74,14 +67,14 @@ namespace carl
              */
             double activity;
 
-            Info( double _activity ):
-                usageCount( 0 ),
+            explicit Info( double _activity ):
+                usageCount(0),
                 refStoragePositions(),
-                activity( _activity )
+                activity(_activity)
             {}
         };
         
-        typedef std::unordered_set<TypeInfoPair<T,Info>*, pointerHash<TypeInfoPair<T,Info>>, pointerEqual<TypeInfoPair<T,Info>>> Container;
+        using Container = std::unordered_set<TypeInfoPair<T,Info>*, pointerHash<TypeInfoPair<T,Info>>, pointerEqual<TypeInfoPair<T,Info>>>;
         
     private:
         // Members
@@ -89,12 +82,12 @@ namespace carl
         /**
          * The threshold for the cache's size which should not be exceeded, except more of the cache entries are still in use.
          */
-        size_t mMaxCacheSize;
+        std::size_t mMaxCacheSize;
         
         /**
          * The current number of entries in the cache, which are not used.
          */
-        size_t mNumOfUnusedEntries;
+        std::size_t mNumOfUnusedEntries;
         
         /**
          * The percentage of the cache, which shall be removed at best, if the cache size exceeds the threshold. (NOT YET USED)
@@ -152,7 +145,7 @@ namespace carl
         static const Ref NO_REF;
 
         // The constructor.
-        Cache( size_t _maxCacheSize = 10000, double _cacheReductionAmount = 0.2, double _decay = 0.98 );
+        explicit Cache( size_t _maxCacheSize = 10000, double _cacheReductionAmount = 0.2, double _decay = 0.98 );
         Cache( const Cache& ) = delete; // no implementation
         Cache& operator=( const Cache& ) = delete; // no implementation
 
@@ -167,7 +160,7 @@ namespace carl
          *                After this function has been applied, the corresponding entry in the cache will be reinserted in it after been rehashed.
          * @return The reference of the entry, which can be used outside this class to access the entry.
          */
-        std::pair<Ref,bool> cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ) = &returnFalse<T>, void (*_update)( T&, T& ) = &doNothing<T> );
+        std::pair<Ref,bool> cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ) = &returnFalse<T>, void (*_update)( const T&, const T& ) = &doNothing<T> );
         
         /**
          * Registers the entry to the given reference. It mainly increases the usage counter of this entry in the cache.
@@ -229,7 +222,7 @@ namespace carl
          * @param _toRemove The position to the entry to remove from the cache.
          * @return 
          */
-        size_t erase( TypeInfoPair<T,Info>* _toRemove )
+        std::size_t erase( TypeInfoPair<T,Info>* _toRemove )
         {
             assert( checkNumOfUnusedEntries() );
             std::lock_guard<std::recursive_mutex> lock( mMutex );
@@ -282,10 +275,8 @@ namespace carl
         bool hasDuplicates(const std::vector<Ref>& _vec) const
         {
             std::set<Ref> vecEntries;
-            for( const Ref& r : _vec )
-            {
-                if( !vecEntries.insert( r ).second )
-                {
+            for (const Ref& r: _vec) {
+                if (!vecEntries.insert(r).second) {
                     return true;
                 }
             }
@@ -294,7 +285,7 @@ namespace carl
         
         bool checkNumOfUnusedEntries() const
         {
-            size_t actualNumOfUnusedEntries = 0;
+            std::size_t actualNumOfUnusedEntries = 0;
             for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
             {
                 if( (*iter)->second.usageCount == 0 )
@@ -307,7 +298,7 @@ namespace carl
         
         size_t sumOfAllUsageCounts() const
         {
-            size_t result = 0;
+            std::size_t result = 0;
             for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
             {
                 result += (*iter)->second.usageCount;
