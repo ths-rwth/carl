@@ -10,7 +10,7 @@ using ComparisonList = std::vector<boost::variant<T...>>;
 
 template<typename Iterator>
 struct ComparisonOperator {
-	typedef void result_type;
+	using result_type = void;
 	Iterator it1, it2;
 	ComparisonOperator(): it1(), it2() {}
 	void set(const Iterator& i1, const Iterator& i2) {
@@ -30,7 +30,7 @@ struct ComparisonOperator {
 
 template<typename Iterator, typename Less>
 struct SingleComparisonOperator {
-	typedef void result_type;
+	using result_type = void;
 	Iterator it1, it2;
 	const Less& less;
 	explicit SingleComparisonOperator(const Less& l): less(l) {}
