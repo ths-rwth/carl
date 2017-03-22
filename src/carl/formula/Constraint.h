@@ -247,7 +247,7 @@ namespace carl
             {
                 VariablesInformation<false,Pol> varinfos = mLhs.template getVarInfo<false>();
                 for( auto varInfo = varinfos.begin(); varInfo != varinfos.end(); ++varInfo )
-                    mVarInfoMap.emplace_hint( mVarInfoMap.end(), VarInfo<Pol>(*varInfo) );
+                    mVarInfoMap.emplace_hint( mVarInfoMap.end(), varInfo->first, varInfo->second );
             }
                
             /**
