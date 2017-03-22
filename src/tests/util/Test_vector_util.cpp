@@ -20,3 +20,22 @@ TEST(VectorUtil, concat)
 		EXPECT_EQ(i, res1[i-1]);
 	}
 }
+
+TEST(VectorUtil, vector_zip)
+{
+	std::vector<int> v1({1,2,3});
+	std::vector<int> v2({4,5,6});
+	std::vector<std::pair<int,int>> res({{1,4},{2,5},{3,6}});
+	EXPECT_EQ(res, carl::vector_zip(v1, v2));
+}
+
+TEST(VectorUtil, vector_zip_tuple)
+{
+	std::vector<int> v1({1,2,3});
+	std::vector<int> v2({4,5,6});
+	std::vector<int> v3({7,8,9});
+	std::vector<std::tuple<int,int,int>> res({{1,4,7},{2,5,8},{3,6,9}});
+	std::vector<std::tuple<int,int,int>> res2;
+	carl::vector_zip_tuple(res2, v1, v2, v3);
+	EXPECT_EQ(res, res2);
+}
