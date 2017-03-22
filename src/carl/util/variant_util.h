@@ -7,20 +7,16 @@
 namespace carl {
 
 template<typename T>
-struct variant_is_type: boost::static_visitor<bool> {
+struct variant_is_type_visitor: public boost::static_visitor<bool> {
 	template<typename TT>
-	typename std::enable_if<std::is_same<T,TT>::value, bool>::type operator()(const TT& /*unused*/) const {
-		return true;
-	}
-	template<typename TT>
-	typename std::enable_if<!std::is_same<T,TT>::value, bool>::type operator()(const TT& /*unused*/) const {
-		return false;
-	}
-	template<typename V>
-	static bool check(const V& variant) {
-		return boost::apply_visitor(variant_is_type(), variant);
+	constexpr bool operator()(const TT& /*unused*/) const noexcept {
+		return std::is_same<T,TT>::value;
 	}
 };
+template<typename T, typename Variant>
+bool variant_is_type(const Variant& variant) noexcept {
+	return boost::apply_visitor(variant_is_type_visitor<T>(), variant);
+}
 
 template<typename Target>
 struct variant_extend: boost::static_visitor<Target> {
