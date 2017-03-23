@@ -15,6 +15,9 @@ namespace detail {
 		}
 	};
 }
+/**
+ * Checks whether a variant contains a value of a fiven type
+ */
 template<typename T, typename Variant>
 bool variant_is_type(const Variant& variant) noexcept {
 	return boost::apply_visitor(detail::variant_is_type_visitor<T>(), variant);
