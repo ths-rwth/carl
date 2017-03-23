@@ -34,7 +34,10 @@ TEST(VectorUtil, vector_zip_tuple)
 	std::vector<int> v1({1,2,3});
 	std::vector<int> v2({4,5,6});
 	std::vector<int> v3({7,8,9});
-	std::vector<std::tuple<int,int,int>> res({{1,4,7},{2,5,8},{3,6,9}});
+	std::vector<std::tuple<int,int,int>> res;
+	res.push_back({1,4,7});
+	res.push_back({2,5,8});
+	res.push_back({3,6,9});
 	std::vector<std::tuple<int,int,int>> res2;
 	carl::vector_zip_tuple(res2, v1, v2, v3);
 	EXPECT_EQ(res, res2);
