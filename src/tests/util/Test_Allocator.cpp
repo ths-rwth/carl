@@ -6,10 +6,10 @@ using namespace carl;
 
 TEST(Allocator, Basic)
 {
-	carl::Tree<int> t;
-	auto i1 = t.insert(1);
-	auto i2 = t.insert(2);
-	auto i3 = t.insert(3);
+	carl::tree<int> t;
+	auto i1 = t.append(1);
+	auto i2 = t.append(2);
+	auto i3 = t.append(3);
 	t.insert(i1, 4);
 	t.insert(i1, 5);
 	t.insert(i2, 6);

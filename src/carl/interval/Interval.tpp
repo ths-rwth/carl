@@ -9,7 +9,9 @@
  */
 #pragma once
 #include "Interval.h"
+
 #include "../numbers/numbers.h"
+
 #include <iostream>
 
 namespace carl
@@ -105,8 +107,7 @@ bool Interval<Number>::containsInteger() const
 			case BoundType::WEAK:
 				if (carl::isInteger(mContent.upper())) return true;
 		}
-		if (carl::ceil(mContent.lower()) < mContent.upper()) return true;
-		return false;
+		return carl::ceil(mContent.lower()) < mContent.upper();
 	}
 
 
@@ -909,7 +910,7 @@ Interval<Number> Interval<Number>::pow(uint exp) const
                 }
                 else
                 {
-                    return Interval<Number>( boost::numeric::pow( mContent, (int)exp ), mUpperBoundType, BoundType::INFTY );
+                    return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), mUpperBoundType, BoundType::INFTY );
                 }
             }
             else if( mUpperBoundType == BoundType::INFTY )
@@ -920,7 +921,7 @@ Interval<Number> Interval<Number>::pow(uint exp) const
                 }
                 else
                 {
-                    return Interval<Number>( boost::numeric::pow( mContent, (int)exp ), mLowerBoundType, BoundType::INFTY );
+                    return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), mLowerBoundType, BoundType::INFTY );
                 }
             }
             else
@@ -934,17 +935,17 @@ Interval<Number> Interval<Number>::pow(uint exp) const
                 }
                 if( contains( carl::constant_zero<Number>().get() ) )
                 {
-                    return Interval<Number>( boost::numeric::pow( mContent, (int)exp ), BoundType::WEAK, rType );
+                    return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), BoundType::WEAK, rType );
                 }
                 else
                 {
-                    return Interval<Number>( boost::numeric::pow( mContent, (int)exp ), lType, rType );
+                    return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), lType, rType );
                 }
             }
         }
         else
         {
-            return Interval<Number>( boost::numeric::pow( mContent, (int)exp ), mLowerBoundType, mUpperBoundType );
+            return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), mLowerBoundType, mUpperBoundType );
         }
 
 	}

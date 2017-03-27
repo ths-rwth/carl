@@ -54,7 +54,13 @@ namespace carl
         mVarInfoMap(),
         mLhsDefinitess( Definiteness::NON )
     {
-        
+        if (mRelation == Relation::GREATER) {
+            mLhs *= -1;
+            mRelation = Relation::LESS;
+        } else if (mRelation == Relation::GEQ) {
+            mLhs *= -1;
+            mRelation = Relation::LEQ;
+        }
         initLazy(); // TODO: this must unfortunately be done here and basically collects the variables. The reason is that without the variables, we cannot do the integer normalization.
         if( hasIntegerValuedVariable() && !hasRealValuedVariable() )
         {

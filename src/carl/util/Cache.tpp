@@ -51,14 +51,14 @@ namespace carl
     }
     
     template<typename T>
-    std::pair<typename Cache<T>::Ref,bool> Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
+    std::pair<typename Cache<T>::Ref,bool> Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( const T&, const T& ) )
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mCache.size() >= mMaxCacheSize ) // Clean, if the number of elements in the cache exceeds the threshold.
         {
             clean();
         }
-        TypeInfoPair<T,Info>* newElement = new TypeInfoPair<T,Info>( _toCache, Info( mMaxActivity ) );
+        auto newElement = new TypeInfoPair<T,Info>(_toCache, Info(mMaxActivity));
         auto ret = mCache.insert( newElement );
         
         if( !ret.second ) // There is already an equal object in the cache.
@@ -221,7 +221,7 @@ namespace carl
                     limit += (*iter)->second.activity;
                 }
             }
-            limit = limit / (double) noUsageEntries.size();
+            limit = limit / double(noUsageEntries.size());
             // Remove all entries in the cache with no usage, which have an activity below the calculated median.
             for( auto iter = noUsageEntries.begin(); iter != noUsageEntries.end(); ++iter )
             {

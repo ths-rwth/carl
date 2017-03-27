@@ -74,7 +74,7 @@ public:
 		CARL_LOG_ASSERT("carl.thom", te.mPoint == nullptr, "");
 		CARL_LOG_ASSERT("carl.thom", point != nullptr, "");
 		std::list<ThomEncoding<Number>> roots = realRootsThom(te.mP, te.mMainVar, point);
-		for(const auto r : roots) {
+		for(const auto& r : roots) {
 			if(te.relevantSignCondition() == r.mSc) {
 				mSc = r.mSc;
 				mP = r.mP;
@@ -162,7 +162,7 @@ public:
 		assert(mMainVar != pol_mainVar);
 		UnivariatePolynomial<Polynomial> pol_univ = pol.toUnivariatePolynomial(pol_mainVar);
 		// maybe check first if pol_univ has some constant coefficient...
-		for(const auto t : pol_univ.coefficients()) {
+		for(const auto& t : pol_univ.coefficients()) {
 			assert(this->dimension() >= t.gatherVariables().size());
 			if(this->signOnPolynomial(t) != Sign::ZERO) return false;
 		}

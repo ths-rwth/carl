@@ -19,7 +19,7 @@ namespace carl {
 		explicit Number(const Interval<cln::cl_I>& t): BaseNumber(t) {}
 		explicit Number(Interval<cln::cl_I>&& t): BaseNumber(t) {}
 		Number(const Number<Interval<cln::cl_I>>& n): BaseNumber(n) {}
-		Number(Number<Interval<cln::cl_I>>&& n) noexcept : BaseNumber(n) {}
+		Number(Number<Interval<cln::cl_I>>&& n) noexcept : BaseNumber(std::move(n)) {}
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
@@ -75,7 +75,7 @@ namespace carl {
 		explicit Number(const Interval<cln::cl_RA>& t): BaseNumber(t) {}
 		explicit Number(Interval<cln::cl_RA>&& t): BaseNumber(t) {}
 		Number(const Number<Interval<cln::cl_RA>>& n): BaseNumber(n) {}
-		Number(Number<Interval<cln::cl_RA>>&& n) noexcept : BaseNumber(n) {}
+		Number(Number<Interval<cln::cl_RA>>&& n) noexcept : BaseNumber(std::move(n)) {}
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
@@ -131,8 +131,8 @@ namespace carl {
 		Number(): BaseNumber() {}
 		explicit Number(const Interval<mpq_class>& t): BaseNumber(t) {}
 		explicit Number(Interval<mpq_class>&& t): BaseNumber(t) {}
-		Number(const Number<Interval<mpq_class>>& n): BaseNumber(n) {}
-		Number(Number<Interval<mpq_class>>&& n) noexcept : BaseNumber(n) {}
+		Number(const Number<Interval<mpq_class>>& n) = default;
+		Number(Number<Interval<mpq_class>>&& n) noexcept : BaseNumber(std::move(n)) {}
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
@@ -186,8 +186,8 @@ namespace carl {
 		Number(): BaseNumber() {}
 		explicit Number(const Interval<mpz_class>& t): BaseNumber(t) {}
 		explicit Number(Interval<mpz_class>&& t): BaseNumber(t) {}
-		Number(const Number<Interval<mpz_class>>& n): BaseNumber(n) {}
-		Number(Number<Interval<mpz_class>>&& n) noexcept : BaseNumber(n) {}
+		Number(const Number<Interval<mpz_class>>& n) = default;
+		Number(Number<Interval<mpz_class>>&& n) noexcept : BaseNumber(std::move(n)) {}
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
@@ -241,8 +241,8 @@ namespace carl {
 		Number(): BaseNumber() {}
 		explicit Number(const Interval<double>& t): BaseNumber(t) {}
 		explicit Number(Interval<double>&& t): BaseNumber(t) {}
-		Number(const Number<Interval<double>>& n): BaseNumber(n) {}
-		Number(Number<Interval<double>>&& n) noexcept : BaseNumber(n) {}
+		Number(const Number<Interval<double>>& n) = default;
+		Number(Number<Interval<double>>&& n) noexcept : BaseNumber(std::move(n)) {}
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
@@ -296,8 +296,8 @@ namespace carl {
 		Number(): BaseNumber() {}
 		explicit Number(const Interval<int>& t): BaseNumber(t) {}
 		explicit Number(Interval<int>&& t): BaseNumber(t) {}
-		Number(const Number<Interval<int>>& n): BaseNumber(n) {}
-		Number(Number<Interval<int>>&& n) noexcept : BaseNumber(n) {}
+		Number(const Number<Interval<int>>& n) = default;
+		Number(Number<Interval<int>>&& n) noexcept : BaseNumber(std::move(n)) {}
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }

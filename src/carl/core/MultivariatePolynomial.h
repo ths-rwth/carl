@@ -98,7 +98,7 @@ public:
 	MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>&);
 	MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>&&);
 	MultivariatePolynomial& operator=(const MultivariatePolynomial& p);
-	MultivariatePolynomial& operator=(MultivariatePolynomial&& p);
+	MultivariatePolynomial& operator=(MultivariatePolynomial&& p) noexcept;
 	explicit MultivariatePolynomial(int c): MultivariatePolynomial(sint(c)) {}
 	template<typename C = Coeff>
 	explicit MultivariatePolynomial(EnableIfNotSame<C,sint> c);
@@ -109,34 +109,32 @@ public:
 	explicit MultivariatePolynomial(const Term<Coeff>& t);
 	explicit MultivariatePolynomial(const std::shared_ptr<const Monomial>& m);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
-	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
+	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& p);
 	template<class OtherPolicies, DisableIf<std::is_same<Policies,OtherPolicies>> = dummy>
 	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicies>&);
 	explicit MultivariatePolynomial(TermsType&& terms, bool duplicates = true, bool ordered = false);
 	explicit MultivariatePolynomial(const TermsType& terms, bool duplicates = true, bool ordered = false);
-	explicit MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
-	explicit MultivariatePolynomial(const std::initializer_list<Variable>& terms);
+	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
+	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	explicit MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p);
     explicit MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands);
 	/// @}
 	
-	virtual ~MultivariatePolynomial() {}
+	~MultivariatePolynomial() override = default;
 	
 	//Polynomial interface implementations.
 	/**
 	 * @see class Polynomial
 	 * @return 
 	 */
-	virtual bool isUnivariateRepresented() const override
-	{
+	bool isUnivariateRepresented() const override {
 		return false;
 	}
 	/**
 	 * @see class Polynomial
 	 * @return 
 	 */
-	virtual bool isMultivariateRepresented() const override
-	{
+	bool isMultivariateRepresented() const override	{
 		return true;
 	}
 	
@@ -362,7 +360,7 @@ public:
 	 * The function assumes the polynomial to be nonzero, otherwise, lt(p) is not defined.
 	 * @return A new polynomial p - lt(p).
 	 */
-	MultivariatePolynomial tail(bool fullOrdered = false) const;
+	MultivariatePolynomial tail(bool makeFullyOrdered = false) const;
 	/**
 	 * Drops the leading term.
 	 * The function assumes the polynomial to be nonzero, otherwise the leading term is not defined.

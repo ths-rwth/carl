@@ -1,8 +1,6 @@
-#include "gtest/gtest.h"
+#include "../Common.h"
 
-#include "carl/util/hash.h"
-
-using namespace carl;
+#include <carl/util/hash.h>
 
 TEST(Hash, hash_add)
 {

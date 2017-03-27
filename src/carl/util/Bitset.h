@@ -63,6 +63,11 @@ namespace carl {
 			mData.set(n, value);
 			return *this;
 		}
+		Bitset& set_interval(std::size_t start, std::size_t end, bool value = true) {
+			ensureSize(end);
+			for (; start <= end; start++) mData.set(start, value);
+			return *this;
+		}
 		Bitset& reset(std::size_t n) {
 			ensureSize(n);
 			mData.reset(n);

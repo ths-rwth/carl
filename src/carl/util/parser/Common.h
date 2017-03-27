@@ -30,8 +30,8 @@ namespace parser {
 
 using carl::operator<<;
 
-typedef std::string::const_iterator Iterator;
-typedef boost::spirit::qi::space_type Skipper;
+using Iterator = std::string::const_iterator;
+using Skipper = boost::spirit::qi::space_type;
 
 template<typename Pol>
 using RatFun = RationalFunction<Pol>;

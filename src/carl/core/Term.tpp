@@ -32,22 +32,29 @@ Term<Coefficient>::Term(Variable v) :
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Monomial::Arg& m) :
-	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(m)
+Term<Coefficient>::Term(Monomial::Arg m) :
+	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(std::move(m))
 {
 	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, const Monomial::Arg& m) :
-	mCoeff(c), mMonomial(m)
+Term<Coefficient>::Term(Monomial::Arg&& m) :
+	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(std::move(m))
 {
 	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(Coefficient&& c, const Monomial::Arg& m) :
-	mCoeff(std::move(c)), mMonomial(m)
+Term<Coefficient>::Term(const Coefficient& c, Monomial::Arg m) :
+	mCoeff(c), mMonomial(std::move(m))
+{
+	assert(this->isConsistent());
+}
+
+template<typename Coefficient>
+Term<Coefficient>::Term(Coefficient&& c, Monomial::Arg&& m) :
+	mCoeff(std::move(c)), mMonomial(std::move(m))
 {
 	assert(this->isConsistent());
 }
@@ -133,7 +140,7 @@ Term<Coefficient> Term<Coefficient>::derivative(Variable v) const
 		return std::move(Term<Coefficient>(carl::constant_zero<Coefficient>().get()));
 	}
 	auto derivative = mMonomial->derivative(v);
-	return Term<Coefficient>(((Coefficient)mCoeff) * derivative.first, derivative.second);
+	return Term<Coefficient>(Coefficient(mCoeff) * derivative.first, derivative.second);
 }
 
 template<typename Coefficient>
@@ -174,7 +181,7 @@ template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
 {
 	if (mMonomial) {
-		return ((Coefficient)mCoeff) * mMonomial->substitute(substitutions);
+		return Coefficient(mCoeff) * mMonomial->substitute(substitutions);
 	} else {
 		return Term<Coefficient>(mCoeff);
 	}
@@ -289,8 +296,7 @@ bool operator==(const Term<Coeff>& lhs, const Coeff& rhs) {
 template<typename Coeff>
 bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 	if (lhs.monomial() == rhs.monomial()) return lhs.coeff() < rhs.coeff();
-	if (lhs.monomial() < rhs.monomial()) return true;
-	return false;
+	return lhs.monomial() < rhs.monomial();
 }
 
 template<typename Coeff>

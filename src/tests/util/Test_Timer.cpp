@@ -1,11 +1,9 @@
-#include "gtest/gtest.h"
+#include "../Common.h"
 
-#include "carl/util/Timer.h"
+#include <carl/util/Timer.h>
 
 #include <chrono>
 #include <thread>
-
-using namespace carl;
 
 TEST(Timer, Basics)
 {

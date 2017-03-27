@@ -32,7 +32,7 @@ namespace carl
 		
 		//typedef typename ReasonsAdaptor::ReasonsType ReasonsType;
 		
-		virtual ~StdMultivariatePolynomialPolicies() {}
+		virtual ~StdMultivariatePolynomialPolicies() = default;
     };
 	
 }

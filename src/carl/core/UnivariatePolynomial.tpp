@@ -624,7 +624,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::pow(std::size_t exp) co
 	UnivariatePolynomial<Coeff> res(mMainVar, constant_one<Coeff>::get());
 	UnivariatePolynomial<Coeff> mult(*this);
 	while(exp > 0) {
-		if (exp & 1) res *= mult;
+		if ((exp & 1) != 0) res *= mult;
 		exp /= 2;
 		if(exp > 0) mult = mult * mult;
 	}
@@ -1036,8 +1036,8 @@ FactorMap<Coeff> UnivariatePolynomial<Coeff>::factorization() const
 	else
 	{
 		// Store the rational factor and make the polynomial's coefficients coprime.
-		CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), ((Coeff) 1) / factor) << ")^" << 1 );
-		result.emplace(UnivariatePolynomial<Coeff>(mainVar(), ((Coeff) 1) / factor), 1);
+		CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), constant_one<Coeff>::get() / factor) << ")^" << 1 );
+		result.emplace(UnivariatePolynomial<Coeff>(mainVar(), constant_one<Coeff>::get() / factor), 1);
 		remainingPoly.mCoefficients.reserve(mCoefficients.size());
 		for(const Coeff& coeff : mCoefficients)
 		{
@@ -1061,7 +1061,7 @@ FactorMap<Coeff> UnivariatePolynomial<Coeff>::factorization() const
 //				factor *= pow(expFactorPair->second.coprimeFactor(), expFactorPair->first);
 //				expFactorPair->second /= cpf;
 //			}
-			if(!expFactorPair->second.isConstant() || expFactorPair->second.lcoeff() != (Coeff) 1)
+			if(!expFactorPair->second.isConstant() || !carl::isOne(expFactorPair->second.lcoeff()))
 			{
 				auto retVal = result.emplace(expFactorPair->second, expFactorPair->first);
 				CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << expFactorPair->second << ")^" << expFactorPair->first );
@@ -1104,7 +1104,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 			++k;
 		}
 		// Take x^k as a factor.
-		auto retVal = linearFactors.emplace(UnivariatePolynomial<Coeff>(poly.mainVar(), {(Coeff)0, (Coeff)1}), k);
+		auto retVal = linearFactors.emplace(UnivariatePolynomial<Coeff>(poly.mainVar(), {Coeff(0), Coeff(1)}), k);
 		CARL_LOG_TRACE("carl.core", "UnivELF: add the factor (" << retVal.first->first << ")^" << k );
 		if(!retVal.second)
 		{
@@ -1181,12 +1181,10 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 				Coeff posRatZero = positive ? (Coeff(*tcFactor) / Coeff(*lcFactor)) : Coeff(-(Coeff(*tcFactor) / Coeff(*lcFactor)));
 				CARL_LOG_TRACE("carl.core", "UnivELF: consider possible non zero rational factor  " << posRatZero);
 				Coeff image = result.syntheticDivision(posRatZero);
-				if(image == 0)
-				{
+				if (carl::isZero(image)) {
 					// Remove all linear factor with the found zero from result.
-					UnivariatePolynomial<Coeff> linearFactor(result.mainVar(), {-posRatZero, (Coeff)1});
-					while(image == 0)
-					{
+					UnivariatePolynomial<Coeff> linearFactor(result.mainVar(), {-posRatZero, Coeff(1)});
+					while (carl::isZero(image)) {
 						auto retVal = linearFactors.emplace(linearFactor, 1);
 						CARL_LOG_TRACE("carl.core", "UnivELF: add the factor (" << linearFactor << ")^" << 1 );
 						if(!retVal.second)
@@ -1277,14 +1275,13 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 					if(tcFactor == tcFactors.end())
 					{
 						Coeff factor = result.coprimeFactor();
-						if(factor != (Coeff) 1)
-						{
+						if (!carl::isOne(factor)) {
 							result *= factor;
 							CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), std::initializer_list<Coeff>({(Coeff)1/factor})) << ")^" << 1 );
 							// Add the constant factor to the factors.
 							if( linearFactors.begin()->first.isConstant() )
 							{
-								factor = (Coeff)1 / factor;
+								factor = Coeff(1) / factor;
 								factor *= linearFactors.begin()->first.lcoeff();
 								linearFactors.erase(linearFactors.begin());
 							}
@@ -1300,8 +1297,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 	}
 LinearFactorRemains:
 	Coeff factor = result.lcoeff();
-	if(factor != (Coeff) 1)
-	{
+	if (!carl::isOne(factor)) {
 		result /= factor;
 		CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), factor) << ")^" << 1 );
 		// Add the constant factor to the factors.
@@ -1321,7 +1317,7 @@ LinearFactorRemains:
 	{
 		++retVal.first->second;
 	}
-	return UnivariatePolynomial<Coeff>(result.mainVar(), (Coeff)1);
+	return UnivariatePolynomial<Coeff>(result.mainVar(), Coeff(1));
 }
 
 template<typename Coeff>
@@ -1383,7 +1379,7 @@ CLANG_WARNING_RESET
 		typename IntegralType<Coeff>::type numOfCpf = getNum(c.coprimeFactor());
 		if(numOfCpf != 1) // TODO: is this maybe only necessary because the extended_gcd returns a polynomial with non-integer coefficients but it shouldn't?
 		{
-			c *= (Coeff) numOfCpf;
+			c *= Coeff(numOfCpf);
 		}
 		CARL_LOG_TRACE("carl.core", "UnivSSF: c = " << c);
 		if(c.isZero())
@@ -1407,7 +1403,7 @@ CLANG_WARNING_RESET
 				numOfCpf = getNum(g.coprimeFactor());
 				if(numOfCpf != 1) // TODO: is this maybe only necessary because the extended_gcd returns a polynomial with non-integer coefficients but it shouldn't?
 				{
-					g *= (Coeff) numOfCpf;
+					g *= Coeff(numOfCpf);
 				}
 				CARL_LOG_TRACE("carl.core", "UnivSSF: g = " << g);
 				assert(result.find(i) == result.end());
@@ -1518,8 +1514,8 @@ int UnivariatePolynomial<Coeff>::countRealRoots(const Interval<Coeff>& interval)
 template<typename Coeff>
 template<typename C, typename Number>
 int UnivariatePolynomial<Coeff>::countRealRoots(const std::list<UnivariatePolynomial<Coeff>>& seq, const Interval<Number>& interval) {
-	int l = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.lower()); });
-	int r = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.upper()); });
+	int l = int(carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.lower()); }));
+	int r = int(carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.upper()); }));
 	return l - r;
 }
 
@@ -2163,8 +2159,7 @@ bool operator==(const UnivariatePolynomial<C>& lhs, const C& rhs)
 	{
 		return rhs == C(0);
 	}
-	if(lhs.isConstant() && lhs.lcoeff() == rhs) return true;
-	return false;
+	return lhs.isConstant() && lhs.lcoeff() == rhs;
 }
 
 template<typename C>

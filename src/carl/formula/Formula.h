@@ -47,11 +47,11 @@ namespace carl
         
         public:
             /// A constant iterator to a sub-formula of a formula.
-            typedef typename Formulas<Pol>::const_iterator const_iterator;
+            using const_iterator = typename Formulas<Pol>::const_iterator;
             /// A constant reverse iterator to a sub-formula of a formula.
-            typedef typename Formulas<Pol>::const_reverse_iterator const_reverse_iterator;
+            using const_reverse_iterator = typename Formulas<Pol>::const_reverse_iterator;
 			/// A typedef for the template argument.
-			typedef Pol PolynomialType;
+			using PolynomialType = Pol;
             
             /**
              * Adds the propositions of the given constraint to the propositions of this formula.

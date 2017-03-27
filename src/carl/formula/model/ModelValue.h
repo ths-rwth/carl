@@ -71,8 +71,11 @@ namespace carl
         /**
          * Default constructor.
          */
-        ModelValue(): Super()
-        {}
+        ModelValue() = default;
+		ModelValue(const ModelValue& mv) = default;
+		ModelValue(ModelValue&& mv) = default;
+		ModelValue& operator=(const ModelValue& mv) = default;
+		ModelValue& operator=(ModelValue&& mv) = default;
 
         /**
          * Initializes the Assignment from some valid type of the underlying variant.
@@ -82,7 +85,7 @@ namespace carl
         {}
 		
 		template<typename ...Args>
-		ModelValue(const boost::variant<Args...>& variant): Super(variant_extend<Super>::extend(variant_extend<ModelValue<Rational,Poly>>::extend(variant))) {}
+		ModelValue(const boost::variant<Args...>& variant): Super(variant_extend<Super>(variant_extend<ModelValue>(variant))) {}
 		
 		ModelValue(const MultivariateRoot<Poly>& mr): Super(createSubstitution<Rational,Poly>(mr).asSubstitution()) {}
 		
@@ -98,7 +101,7 @@ namespace carl
         }
 		template<typename ...Args>
         ModelValue& operator=(const boost::variant<Args...>& variant) {
-            Super::operator=(variant_extend<Super>::extend(variant_extend<ModelValue<Rational,Poly>>::extend(variant)));
+            Super::operator=(variant_extend<Super>(variant_extend<ModelValue>(variant)));
             return *this;
         }
 
@@ -149,66 +152,66 @@ namespace carl
          * @return true, if the stored value is a bool.
          */
         bool isBool() const {
-			return variant_is_type<bool>::check(*this);
+			return variant_is_type<bool>(*this);
         }
         
         /**
          * @return true, if the stored value is a rational.
          */
         bool isRational() const {
-			return variant_is_type<Rational>::check(*this);
+			return variant_is_type<Rational>(*this);
         }
         
         /**
          * @return true, if the stored value is a square root expression.
          */
         bool isSqrtEx() const {
-			return variant_is_type<SqrtEx<Poly>>::check(*this);
+			return variant_is_type<SqrtEx<Poly>>(*this);
         }
         
         /**
          * @return true, if the stored value is a real algebraic number.
          */
         bool isRAN() const {
-			return variant_is_type<RealAlgebraicNumber<Rational>>::check(*this);
+			return variant_is_type<RealAlgebraicNumber<Rational>>(*this);
         }
         
         /**
          * @return true, if the stored value is a bitvector literal.
          */
         bool isBVValue() const {
-			return variant_is_type<BVValue>::check(*this);
+			return variant_is_type<BVValue>(*this);
         }
 
         /**
          * @return true, if the stored value is a sort value.
          */
         bool isSortValue() const {
-			return variant_is_type<SortValue>::check(*this);
+			return variant_is_type<SortValue>(*this);
         }
         
         /**
          * @return true, if the stored value is a uninterpreted function model.
          */
         bool isUFModel() const {
-			return variant_is_type<UFModel>::check(*this);
+			return variant_is_type<UFModel>(*this);
         }
 		
 		/**
          * @return true, if the stored value is +infinity.
          */
         bool isPlusInfinity() const {
-			return variant_is_type<InfinityValue>::check(*this) && boost::get<InfinityValue>(*this).positive;
+			return variant_is_type<InfinityValue>(*this) && boost::get<InfinityValue>(*this).positive;
         }
 		/**
          * @return true, if the stored value is -infinity.
          */
         bool isMinusInfinity() const {
-			return variant_is_type<InfinityValue>::check(*this) && !boost::get<InfinityValue>(*this).positive;
+			return variant_is_type<InfinityValue>(*this) && !boost::get<InfinityValue>(*this).positive;
         }
 		
 		bool isSubstitution() const {
-			return variant_is_type<ModelSubstitutionPtr<Rational,Poly>>::check(*this);
+			return variant_is_type<ModelSubstitutionPtr<Rational,Poly>>(*this);
 		}
 
         /**

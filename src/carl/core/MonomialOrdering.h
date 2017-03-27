@@ -11,7 +11,7 @@
 namespace carl 
 {
 
-typedef CompareResult( *MonomialOrderingFunction )(const Monomial::Arg&, const Monomial::Arg&);
+using MonomialOrderingFunction = CompareResult(*)(const Monomial::Arg&, const Monomial::Arg&);
 
 /**
  * A class for term orderings.
@@ -59,7 +59,7 @@ struct MonomialComparator
 };
 
 
-typedef MonomialComparator<Monomial::compareLexical, false > LexOrdering;
-typedef MonomialComparator<Monomial::compareGradedLexical, true > GrLexOrdering;
-//typedef MonomialComparator<Monomial::GrRevLexCompare, true > GrRevLexOrdering;
+using LexOrdering = MonomialComparator<Monomial::compareLexical, false >;
+using GrLexOrdering = MonomialComparator<Monomial::compareGradedLexical, true >;
+//using GrRevLexOrdering = MonomialComparator<Monomial::GrRevLexCompare, true >;
 }

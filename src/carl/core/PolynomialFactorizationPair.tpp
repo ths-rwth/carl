@@ -8,8 +8,9 @@
 #pragma once
 
 #include "PolynomialFactorizationPair.h"
-#include "logging.h"
+
 #include "FactorizedPolynomial.h"
+#include "logging.h"
 
 namespace carl
 {
@@ -22,7 +23,7 @@ namespace carl
         }
         else
         {
-            std::string result = "";
+            std::string result;
             if( _infix )
             {
                 for( auto polyExpPair = _factorization.begin(); polyExpPair != _factorization.end(); ++polyExpPair )

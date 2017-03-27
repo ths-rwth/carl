@@ -6,14 +6,16 @@
  */
 
 #pragma once
-#include <map>
-#include <vector>
-#include <memory>
-#include <algorithm>
 
-#include "Variable.h"
 #include "MonomialPool.h"
+#include "Variable.h"
 #include "../numbers/numbers.h"
+
+#include <algorithm>
+#include <map>
+#include <memory>
+#include <vector>
+
 namespace carl
 {
 
@@ -28,43 +30,27 @@ namespace carl
 	{
 		
 		/// Maximal degree variable occurs with.
-		uint mMaxDegree;
+		uint mMaxDegree = 0;
 		/// Minimal non-zero degree variable occurs with.
-		uint mMinDegree;
+		uint mMinDegree = 0;
 		/// Number of terms a variable occurs in.
-		uint mOccurence;
+		uint mOccurence = 0;
 	public:
-		VariableInformation()
-		:	mMaxDegree(0), 
-			mMinDegree(0), 
-			mOccurence(0)
-		{
-			
-		}
+		VariableInformation() = default;
         
-		VariableInformation(uint degreeOfOccurence)
-		:	mMaxDegree(degreeOfOccurence), 
+		explicit VariableInformation(uint degreeOfOccurence):
+			mMaxDegree(degreeOfOccurence), 
 			mMinDegree(degreeOfOccurence), 
 			mOccurence(1)
-		{
-			
-		}
+		{}
         
-		VariableInformation(uint maxDegree, uint minDegree, uint occurence)
-		:	mMaxDegree(maxDegree), 
+		VariableInformation(uint maxDegree, uint minDegree, uint occurence):
+			mMaxDegree(maxDegree), 
 			mMinDegree(minDegree), 
 			mOccurence(occurence)
-		{
-			
-		}
+		{}
         
-		VariableInformation(const VariableInformation<false, CoeffType>& varInfo)
-		:	mMaxDegree(varInfo.mMaxDegree), 
-			mMinDegree(varInfo.mMinDegree), 
-			mOccurence(varInfo.mOccurence)
-		{
-			
-		}
+		VariableInformation(const VariableInformation& varInfo) = default;
         
         bool hasCoeff() const
         {
@@ -157,7 +143,7 @@ namespace carl
 		{
 		}
         
-		VariableInformation(uint degreeOfOccurence):
+		explicit VariableInformation(uint degreeOfOccurence):
 			VariableInformation<false, CoeffType>(degreeOfOccurence),
 			mCoeffs()
 		{

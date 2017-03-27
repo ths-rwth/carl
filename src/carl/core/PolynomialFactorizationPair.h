@@ -21,7 +21,7 @@ namespace carl
     class Factorization: public std::map<FactorizedPolynomial<P>, carl::exponent>
     {
         private:
-            typedef std::map<FactorizedPolynomial<P>, carl::exponent> super;
+            using super = std::map<FactorizedPolynomial<P>, carl::exponent>;
             
             bool checkFactorization() const
             {
@@ -192,7 +192,7 @@ namespace carl
          * @param _factorization The factorization. Every factor must be not constant.
          * @param _polynomial Polynomial with Polynomial = Factorization * Coefficient
          */
-        PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial = nullptr );
+        explicit PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial = nullptr );
         PolynomialFactorizationPair( const PolynomialFactorizationPair& ) = delete; // no implementation
         ~PolynomialFactorizationPair();
 		
@@ -289,7 +289,7 @@ namespace carl
      * @return The polynomial.
      */
     template<typename P>
-    P computePolynomial( const PolynomialFactorizationPair<P>& _fpPair );
+    P computePolynomial( const PolynomialFactorizationPair<P>& _pfPair );
 } // namespace carl
 
 namespace std

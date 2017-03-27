@@ -25,8 +25,8 @@ struct Timer {
 	Timer() noexcept: mStart(clock::now()) {}
 	/**
 	 * Calculated the number of milliseconds since this object has been created.
-     * @return Milliseconds passed.
-     */
+	 * @return Milliseconds passed.
+	 */
 	std::size_t passed() const noexcept {
 		clock::duration d(clock::now() - mStart);
 		return std::chrono::duration_cast<duration>(d).count();
@@ -34,7 +34,7 @@ struct Timer {
 	
 	/**
 	 * Reset the start point to now.
-     */
+	 */
 	void reset() noexcept {
 		mStart = clock::now();
 	}

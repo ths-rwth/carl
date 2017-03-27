@@ -17,10 +17,14 @@ namespace carl
 	class Model {
 	public:
 		//using Map = std::unordered_map<ModelVariable,ModelValue>;
-		using Map = std::map<ModelVariable,ModelValue<Rational,Poly>>;
+		using key_type = ModelVariable;
+		using mapped_type = ModelValue<Rational,Poly>;
+		using Map = std::map<key_type,mapped_type>;
+		static_assert(std::is_same<key_type, typename Map::key_type>::value, "Should be the same type");
+		static_assert(std::is_same<mapped_type, typename Map::mapped_type>::value, "Should be the same type");
 	private:
 		Map mData;
-		std::map<ModelVariable, std::size_t> mUsedInSubstitution;
+		std::map<key_type, std::size_t> mUsedInSubstitution;
 		void resetCaches() const {
 			for (const auto& d: mData) {
 				if (d.second.isSubstitution()) {
@@ -30,7 +34,7 @@ namespace carl
 		}
 	public:
 		// Element access
-		const auto& at(const typename Map::key_type& key) const {
+		const auto& at(const key_type& key) const {
 			return mData.at(key);
 		}
 		
@@ -63,12 +67,12 @@ namespace carl
 			return mData.insert(it, pair);
 		}
 		template<typename... Args>
-		auto emplace(const typename Map::key_type& key, Args&& ...args) {
+		auto emplace(const key_type& key, Args&& ...args) {
 			resetCaches();
 			return mData.emplace(key,std::forward<Args>(args)...);
 		}
 		template<typename... Args>
-		auto emplace_hint(typename Map::const_iterator it, const typename Map::key_type& key, Args&& ...args) {
+		auto emplace_hint(typename Map::const_iterator it, const key_type& key, Args&& ...args) {
 			resetCaches();
 			return mData.emplace_hint(it, key,std::forward<Args>(args)...);
 		}
