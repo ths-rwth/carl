@@ -3,9 +3,9 @@ ExternalProject_Add(
 	GIT_REPOSITORY https://github.com/google/googletest.git
 	GIT_TAG "release-${GTEST_VERSION}"
 	UPDATE_COMMAND ""
-	BUILD_COMMAND make gtest gtest_main
+	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} gtest gtest_main
 	INSTALL_COMMAND ""
-	BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/resources/src/GTest_EP-build/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a ${CMAKE_BINARY_DIR}/resources/src/GTest_EP-build/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a
+	BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/resources/src/GTest_EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${STATIC_EXT} ${CMAKE_BINARY_DIR}/resources/src/GTest_EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${STATIC_EXT}
 )
 
 ExternalProject_Get_Property(GTest_EP source_dir)
