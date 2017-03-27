@@ -18,13 +18,21 @@ class PrimeFactory
 #endif
 	std::size_t mNext = 0;
 public:
+	/// Returns the number of already computed primes.
 	std::size_t size() const {
 		return mPrimes.size();
 	}
+	/// Provides const access to the computed primes. Asserts that id is smaller than size().
 	const T& operator[](std::size_t id) const {
-		assert(id < size());
+		assert(id < mPrimes.size());
 		return mPrimes[id];
 	}
+	/// Provides access to the computed primes. If id is at least size(), the missing primes are computed on-the-fly.
+	const T& operator[](std::size_t id) {
+		while (id >= mPrimes.size()) nextPrime();
+		return mPrimes[id];
+	}
+	/// Computed the next prime and returns it.
 	const T& nextPrime();
 };
 
