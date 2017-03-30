@@ -239,7 +239,7 @@ public:
 	}
 };
 
-std::ostream& operator<<(std::ostream& os, const SMTLIBStream& ss) {
+inline std::ostream& operator<<(std::ostream& os, const SMTLIBStream& ss) {
 	return os << ss.content();
 }
 
