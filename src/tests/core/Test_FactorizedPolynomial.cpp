@@ -584,3 +584,27 @@ TEST(FactorizedPolynomial, Evaluation)
     EXPECT_EQ( Rational(54), result );
 }
 
+TEST(FactorizedPolynomial, Derivation)
+{
+    carl::VariablePool::getInstance().clear();
+    Variable x = freshRealVariable("x");
+    
+    FPol c(3);
+    FPol der = c.derivative(x);
+    EXPECT_EQ( der, FPol({Rational(0)}) );
+
+    Pol p1({(Rational)6*x});
+    Pol p2({x});
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+    FPol fp3 = (fp1*fp2) * (fp2 + fp1);
+
+    FPol derivation = fp3.derivative(x, 1);
+
+    Pol p3({(Rational)126*x*x});
+    FPol fp4( p3, pCache );
+    EXPECT_EQ( fp4, derivation );
+}
+

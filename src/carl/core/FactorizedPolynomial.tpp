@@ -526,6 +526,9 @@ namespace carl
     FactorizedPolynomial<P> FactorizedPolynomial<P>::derivative( const carl::Variable& _var, unsigned _nth ) const
     {
 		assert(_nth == 1);
+		if (this->isConstant()) {
+			return FactorizedPolynomial<P>( constant_zero<CoeffType>::get() );
+		}
 		// TODO VERY NAIVE
         FactorizedPolynomial<P> result(polynomial().derivative(_var), mpCache);
         result *= coefficient();
