@@ -38,11 +38,14 @@ TYPED_TEST(Rationals, parse) {
 	EXPECT_EQ(TypeParam(1)/TypeParam(10), carl::parse<TypeParam>("0.1"));
     EXPECT_EQ(TypeParam(1)/TypeParam(10), carl::parse<TypeParam>(".1"));
     EXPECT_EQ(TypeParam(3)/TypeParam(2), carl::parse<TypeParam>("1.5"));
-	
+    EXPECT_EQ(TypeParam(1)/TypeParam(2), carl::parse<TypeParam>("1/2"));
+	EXPECT_EQ(TypeParam(1090843549285935)/TypeParam(1125899906842624), carl::parse<TypeParam>("1090843549285935/1125899906842624"));
+
 	// Scientific notation
 	EXPECT_EQ(TypeParam(1000), carl::parse<TypeParam>("1e3"));
 	EXPECT_EQ(TypeParam(1)/TypeParam(1000), carl::parse<TypeParam>("1e-3"));
 	EXPECT_EQ(TypeParam(1000)/TypeParam(25), carl::parse<TypeParam>("1e3/2.5E1"));
+
 }
 
 TYPED_TEST(Rationals, try_parse) {
