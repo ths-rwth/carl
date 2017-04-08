@@ -53,6 +53,8 @@ if(BUILD_STATIC)
 		ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/src"
 	)
+        set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_END_STATIC TRUE )
+        set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_START_STATIC TRUE )
 
 	target_link_libraries(lib_carl_static PUBLIC EIGEN3 GMP_STATIC GMPXX_STATIC dl)
 	if(USE_CLN_NUMBERS)
