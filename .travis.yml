@@ -62,6 +62,12 @@ matrix:
     - os: osx
       osx_image: xcode8.2
       env: USE=clang++-8.0
+    - os: osx
+      osx_image: xcode8.2
+      env: USE=g++-5
+    - os: osx
+      osx_image: xcode8.2
+      env: USE=g++-6
     - os: linux
       env: USE=g++-6 TASK=coverage
     - os: linux
