@@ -132,6 +132,44 @@ namespace carl
             }
             
         private:
+            bool isBaseFormula(const Constraint<Pol>& c) const {
+                return carl::isStrict(c.relation());
+            }
+
+            const FormulaContent<Pol>* getBaseFormula(const FormulaContent<Pol>* f) const {
+                if (f->mType == FormulaType::NOT) {
+                    CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
+                    return f->mNegation;
+                }
+                if (f->mType == FormulaType::CONSTRAINT) {
+#ifdef __VS
+                    if (isBaseFormula(*f->mpConstraintVS)) {
+#else
+                    if (isBaseFormula(f->mConstraint)) {
+#endif
+                        CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
+                        return f;
+                    } else {
+                        CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
+                        return f->mNegation;
+                    }
+                }
+                CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
+                return f;
+            }
+
+            FormulaContent<Pol>* createNegatedContent(const FormulaContent<Pol>* f) const {
+                if (true && f->mType == FormulaType::CONSTRAINT) {
+#ifdef __VS
+                    return new FormulaContent<Pol>(f->mpConstraintVS.negation());
+#else
+                    return new FormulaContent<Pol>(f->mConstraint.negation());
+#endif
+                } else {
+                    return new FormulaContent<Pol>(NOT, std::move(Formula<Pol>(f)));
+                }
+            }
+
             // ##### Core Theory
 
             /**
