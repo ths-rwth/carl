@@ -14,6 +14,8 @@
 #include "config.h"
 #include "logging.h"
 
+#include "../converter/CoCoAAdaptor.h"
+
 #include <iomanip>
 #include <iostream>
 
@@ -30,6 +32,10 @@ namespace carl
         logging::configureLogging();
         // initialize anything else here!
 		MonomialPool::getInstance();
+
+#ifdef USE_COCOA
+        static CoCoA::GlobalManager CoCoAFoundations;
+#endif
 
         return 0;
     }
