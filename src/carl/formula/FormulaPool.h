@@ -84,9 +84,8 @@ namespace carl
             void print() const
             {
                 std::cout << "Formula pool contains:" << std::endl;
-                for( const auto& ele : mPool )
-                {
-                    std::cout << "id " << ele->mId << "[usages=" << ele->mUsages << "]:  " << *ele << std::endl;
+                for (const auto& ele: mPool) {
+                    std::cout << ele->mId << " @ " << static_cast<const void*>(ele) << " [usages=" << ele->mUsages << "]: " << *ele << ", negation " << static_cast<const void*>(ele->mNegation) << std::endl;
                 }
                 std::cout << "Tseitin variables:" << std::endl;
                 for( const auto& tvVar : mTseitinVars )
