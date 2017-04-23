@@ -61,6 +61,25 @@ public:
 		}
 		return GiNaC::expand(res);
 	}
+        /**
+         * Compute all carl variables mapped in this converter whose GiNaC variables are also in the given variable vector.
+         * The returned vector respects the order of the given variables.
+         * @param cadVariables
+         * @return carl variables corresponding to given GiNaC variables respecting the given order
+         */
+        std::vector<carl::Variable> variables(const std::vector<GiNaC::symbol>& cadVariables) {
+            std::vector<carl::Variable> v = std::vector<carl::Variable>(cadVariables.size());
+            for(std::vector<GiNaC::symbol>::const_iterator g_it; g_it != cadVariables.end(); ++g_it)
+            {
+                for(std::map<carl::Variable, GiNaC::symbol>::const_iterator it; it != vars.end(); ++it)
+                {
+                    if(*g_it == it->second)
+                        v.push_back(it->first);
+                }
+            }
+            assert(cadVariables.size() == v.size());
+            return v;
+	}
 };
 
 }
