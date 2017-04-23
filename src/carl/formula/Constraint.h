@@ -820,6 +820,11 @@ namespace carl
              */
             Pol coefficient( const Variable& _var, uint _degree ) const;
             
+            Constraint negation() const {
+                CARL_LOG_TRACE("carl.formula", "negation of " << *this << " is " << Constraint(lhs(), carl::invertRelation(relation())));
+                return Constraint(lhs(), carl::invertRelation(relation()));
+            }
+
             /**
              * If this constraint represents a substitution (equation, where at least one variable occurs only linearly),
              * this method detects a (there could be various possibilities) corresponding substitution variable and term.

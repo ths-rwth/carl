@@ -74,6 +74,8 @@ namespace logging {
 #ifdef LOGGING_DISABLE_INEFFICIENT
 	#undef CARL_LOG_INEFFICIENT
 	#define CARL_LOG_INEFFICIENT()
+	#undef CARL_LOG_NOTIMPLEMENTED
+	#define CARL_LOG_NOTIMPLEMENTED()
 #endif
 
 void setInitialLogLevel();

@@ -67,7 +67,8 @@ namespace carl
             _element->mId = mIdAllocator; 
             Formula<Pol>::init( *_element );
             ++mIdAllocator;
-            auto negation = new FormulaContent<Pol>(NOT, std::move( Formula<Pol>( *iterBoolPair.first ) ) );
+            auto negation = createNegatedContent(*iterBoolPair.first);
+            //auto negation = new FormulaContent<Pol>(NOT, std::move( Formula<Pol>( *iterBoolPair.first ) ) );
             _element->mNegation = negation;
             negation->mId = mIdAllocator; 
             negation->mNegation = _element;

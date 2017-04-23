@@ -15,8 +15,6 @@ using namespace carl;
 
 TEST(CoCoA, Basic)
 {
-	CoCoA::GlobalManager CoCoAFoundations;
-	
 	auto xv = CoCoA::symbol("x");
 	auto yv = CoCoA::symbol("y");
 	CoCoA::ring Q = CoCoA::RingQQ();
@@ -34,7 +32,6 @@ TEST(CoCoA, Basic)
 TEST(CoCoA, GCD)
 {
 	using Poly = MultivariatePolynomial<mpq_class>;
-	CoCoA::GlobalManager CoCoAFoundations;
 	Variable x = freshRealVariable("x");
 	
 	Poly p1 = x*x - mpq_class(1);
@@ -49,7 +46,6 @@ TEST(CoCoA, GCD)
 TEST(CoCoA, Factorize)
 {
 	using Poly = MultivariatePolynomial<mpq_class>;
-	CoCoA::GlobalManager CoCoAFoundations;
 	Variable x = freshRealVariable("x");
 	
 	Poly p1 = x*x - mpq_class(1);
@@ -82,7 +78,6 @@ TEST(CoCoA, Factorize)
 TEST(CoCoA, SquareFreePart)
 {
 	using Poly = MultivariatePolynomial<mpq_class>;
-	CoCoA::GlobalManager CoCoAFoundations;
 	Variable x = freshRealVariable("x");
 	Variable y = freshRealVariable("y");
 	
@@ -121,7 +116,6 @@ MultivariatePolynomial<mpq_class> randomPoly(const std::initializer_list<Variabl
 TEST(CoCoA, Benchmark)
 {
 	using Poly = MultivariatePolynomial<mpq_class>;
-	CoCoA::GlobalManager CoCoAFoundations;
 	Variable x = freshRealVariable("x");
 	Variable y = freshRealVariable("y");
 	

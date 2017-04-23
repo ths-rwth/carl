@@ -344,3 +344,20 @@ TEST(Formula, ConstraintConstruction)
     EXPECT_EQ( Constr( Rational(3)*pi+Rational(6)*pj, carl::Relation::GREATER ), Constr( pi+Rational(2)*pj-Rational(1), carl::Relation::GEQ ) );
     EXPECT_EQ( Constr( Rational(3)*pi+Rational(6)*pj-Rational(3), carl::Relation::LESS ), Constr( pi+Rational(2)*pj, carl::Relation::LEQ ) );
 }
+
+TEST(Formula, ConstraintSimplication)
+{
+    Variable x = freshRealVariable("x");
+    {
+        FormulaT ref(Pol(x), Relation::LESS);
+        EXPECT_EQ(ref, FormulaT(-Pol(x), Relation::GREATER));
+        EXPECT_EQ(ref, FormulaT(FormulaType::NOT, FormulaT(Pol(x), Relation::GEQ)));
+        EXPECT_EQ(ref, FormulaT(FormulaType::NOT, FormulaT(-Pol(x), Relation::LEQ)));
+    }
+    {
+        FormulaT ref(-Pol(x), Relation::LEQ);
+        EXPECT_EQ(ref, FormulaT(Pol(x), Relation::GEQ));
+        EXPECT_EQ(ref, FormulaT(FormulaType::NOT, FormulaT(Pol(x), Relation::LESS)));
+        EXPECT_EQ(ref, FormulaT(FormulaType::NOT, FormulaT(-Pol(x), Relation::GREATER)));
+    }
+}

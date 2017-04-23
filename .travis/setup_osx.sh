@@ -14,9 +14,14 @@ if [[ ${USE} == "g++-4.8" ]]; then
 	echo "g++-4.8 is not supported"
 	#install gcc-4.8 g++-4.8
 	#defCXX gcc-4.8 g++-4.8
-elif [[ ${USE} == "g++-4.9" ]]; then
-	install gcc
-	defCXX gcc-4.9 g++-4.9
+elif [[ ${USE} == "g++-5" ]]; then
+	install gcc@5
+	brew link --overwrite gcc@5
+	defCXX gcc-5 g++-5
+elif [[ ${USE} == "g++-6" ]]; then
+	install gcc@6
+	brew link --overwrite gcc@6
+	defCXX gcc-6 g++-6
 elif [[ ${USE} == "clang++-3.4" ]]; then
 	echo "clang++-3.4 is not supported"
 	#install clang-3.4

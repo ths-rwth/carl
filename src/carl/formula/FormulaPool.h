@@ -84,9 +84,8 @@ namespace carl
             void print() const
             {
                 std::cout << "Formula pool contains:" << std::endl;
-                for( const auto& ele : mPool )
-                {
-                    std::cout << "id " << ele->mId << "[usages=" << ele->mUsages << "]:  " << *ele << std::endl;
+                for (const auto& ele: mPool) {
+                    std::cout << ele->mId << " @ " << static_cast<const void*>(ele) << " [usages=" << ele->mUsages << "]: " << *ele << ", negation " << static_cast<const void*>(ele->mNegation) << std::endl;
                 }
                 std::cout << "Tseitin variables:" << std::endl;
                 for( const auto& tvVar : mTseitinVars )
@@ -133,6 +132,44 @@ namespace carl
             }
             
         private:
+            bool isBaseFormula(const Constraint<Pol>& c) const {
+                return carl::isStrict(c.relation());
+            }
+
+            const FormulaContent<Pol>* getBaseFormula(const FormulaContent<Pol>* f) const {
+                if (f->mType == FormulaType::NOT) {
+                    CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
+                    return f->mNegation;
+                }
+                if (f->mType == FormulaType::CONSTRAINT) {
+#ifdef __VS
+                    if (isBaseFormula(*f->mpConstraintVS)) {
+#else
+                    if (isBaseFormula(f->mConstraint)) {
+#endif
+                        CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
+                        return f;
+                    } else {
+                        CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
+                        return f->mNegation;
+                    }
+                }
+                CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
+                return f;
+            }
+
+            FormulaContent<Pol>* createNegatedContent(const FormulaContent<Pol>* f) const {
+                if (f->mType == FormulaType::CONSTRAINT) {
+#ifdef __VS
+                    return new FormulaContent<Pol>(f->mpConstraintVS.negation());
+#else
+                    return new FormulaContent<Pol>(f->mConstraint.negation());
+#endif
+                } else {
+                    return new FormulaContent<Pol>(NOT, std::move(Formula<Pol>(f)));
+                }
+            }
+
             // ##### Core Theory
 
             /**
@@ -166,7 +203,11 @@ namespace carl
                     default: ;
                 }
                 #endif
-                return add(new FormulaContent<Pol>(std::move(_constraint)));
+                if (isBaseFormula(_constraint)) {
+                    return add(new FormulaContent<Pol>(std::move(_constraint)));
+                } else {
+                    return add(new FormulaContent<Pol>(_constraint.negation()))->mNegation;
+                }
             }
             const FormulaContent<Pol>* create(const Constraint<Pol>& _constraint) {
                 return create(std::move(Constraint<Pol>(_constraint)));
@@ -410,7 +451,8 @@ namespace carl
             void free( const FormulaContent<Pol>* _elem )
             {
                 FORMULA_POOL_LOCK_GUARD
-                const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
+                const FormulaContent<Pol>* tmp = getBaseFormula(_elem);
+                //const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
                 assert( tmp->mUsages > 0 );
                 --tmp->mUsages;
                 if( tmp->mUsages == 1 )
@@ -460,7 +502,8 @@ namespace carl
                         if( fcont->mUsages == 1 )
                         {
                             // the formula variable is not used -> delete it
-                            const FormulaContent<Pol>* tmp = fcont->mType == FormulaType::NOT ? fcont->mNegation : fcont;
+                            const FormulaContent<Pol>* tmp = getBaseFormula(fcont);
+                            //const FormulaContent<Pol>* tmp = fcont->mType == FormulaType::NOT ? fcont->mNegation : fcont;
                             mTseitinVars.erase( tmpTVIter->second );
                             mTseitinVarToFormula.erase( tmpTVIter );
                             mPool.erase( tmp );
@@ -477,10 +520,14 @@ namespace carl
             void reg( const FormulaContent<Pol>* _elem ) const
             {
                 FORMULA_POOL_LOCK_GUARD
-                const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
+                const FormulaContent<Pol>* tmp = getBaseFormula(_elem);
+                //const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
                 assert( tmp != nullptr );
                 assert( tmp->mUsages < std::numeric_limits<size_t>::max() );
                 ++tmp->mUsages;
+                if (tmp->mUsages == 1 && _elem->mType == FormulaType::CONSTRAINT) {
+                    ++tmp->mUsages;
+                }
             }
             
         public:

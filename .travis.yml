@@ -45,10 +45,6 @@ addons:
 matrix:
   include:
     - os: linux
-      env: USE=g++-5
-    - os: linux
-      env: USE=g++-6
-    - os: linux
       env: USE=clang++-3.6
     - os: linux
       env: USE=clang++-3.7
@@ -56,12 +52,22 @@ matrix:
       env: USE=clang++-3.8
     - os: linux
       env: USE=clang++-3.9
+    - os: linux
+      env: USE=g++-5
+    - os: linux
+      env: USE=g++-6
     - os: osx
       osx_image: xcode7.3
       env: USE=clang++-7.4
     - os: osx
       osx_image: xcode8.2
       env: USE=clang++-8.0
+    - os: osx
+      osx_image: xcode8.2
+      env: USE=g++-5
+    - os: osx
+      osx_image: xcode8.2
+      env: USE=g++-6
     - os: linux
       env: USE=g++-6 TASK=coverage
     - os: linux
@@ -69,6 +75,12 @@ matrix:
     - os: linux
       env: USE=g++-6 TASK=pycarl
   allow_failures:
+    - os: osx
+      osx_image: xcode8.2
+      env: USE=g++-5
+    - os: osx
+      osx_image: xcode8.2
+      env: USE=g++-6
     - os: linux
       env: USE=g++-6 TASK=coverage
     - os: linux
