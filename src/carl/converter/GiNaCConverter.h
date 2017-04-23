@@ -71,7 +71,7 @@ public:
             std::vector<carl::Variable> v = std::vector<carl::Variable>(cadVariables.size());
             for(std::vector<GiNaC::symbol>::const_iterator g_it; g_it != cadVariables.end(); ++g_it)
             {
-                for(std::map<carl::Variable, GiNaC::symbol>::const_iterator it; it != vars.end(); ++it)
+                for(std::map<carl::Variable, GiNaC::symbol>::const_iterator it = vars.begin(); it != vars.end(); ++it)
                 {
                     if(*g_it == it->second)
                         v.push_back(it->first);
