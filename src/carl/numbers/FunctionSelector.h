@@ -62,7 +62,7 @@ namespace function_selector {
 		auto operator()(Args&&... args) const {
 			using T = typename TypeSelector::template type<Args...>;
 			using it = typename boost::mpl::find<TypeVector,T>::type;
-			static_assert(it != boost::mpl::end<TypeVector>::value, "Obtained type T was not found in TypeVector.");
+			static_assert(!std::is_same<it, typename boost::mpl::end<TypeVector>>::value, "Obtained type T was not found in TypeVector.");
 			return std::get<it::pos::value>(mFunctions)(std::forward<Args>(args)...);
 		}
 	};
