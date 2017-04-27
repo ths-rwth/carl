@@ -68,8 +68,8 @@ public:
          * @return carl variables corresponding to given GiNaC variables respecting the given order
          */
         std::vector<carl::Variable> variables(const std::vector<GiNaC::symbol>& cadVariables) {
-            std::vector<carl::Variable> v = std::vector<carl::Variable>(cadVariables.size());
-            for(std::vector<GiNaC::symbol>::const_iterator g_it; g_it != cadVariables.end(); ++g_it)
+            std::vector<carl::Variable> v = std::vector<carl::Variable>();
+            for(std::vector<GiNaC::symbol>::const_iterator g_it = cadVariables.begin(); g_it != cadVariables.end(); ++g_it)
             {
                 for(std::map<carl::Variable, GiNaC::symbol>::const_iterator it = vars.begin(); it != vars.end(); ++it)
                 {
