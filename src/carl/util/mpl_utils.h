@@ -1,4 +1,11 @@
 #pragma once
+/**
+ * @file mpl_utils.h
+ * This file provides two helpers to mangle with type sequences using boost::mpl.
+ * `mpl_unique` makes a `mpl::vector<>` almost unique. (If two types have the same size, this may fail)
+ * `mpl_concatenate` concatenates an arbitrary number of `mpl::vector<>` types.
+ * `mpl_variant_of` constructs a variant from a `mpl::vector<>` making the types unique.
+ */
 
 #include <type_traits>
 #include <boost/mpl/sort.hpp>
@@ -6,13 +13,6 @@
 #include <boost/mpl/vector.hpp>
 
 namespace carl {
-	
-/**
- * This file provides two helpers to mangle with type sequences using boost::mpl.
- * `mpl_unique` makes a `mpl::vector<>` almost unique. (If two types have the same size, this may fail)
- * `mpl_concatenate` concatenates an arbitrary number of `mpl::vector<>` types.
- * `mpl_variant_of` constructs a variant from a `mpl::vector<>` making the types unique.
- */
 
 template<typename T>
 struct mpl_unique {

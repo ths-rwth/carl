@@ -4,7 +4,9 @@
 
 #include "../core/MultivariatePolynomial.h"
 
+#include <boost/mpl/begin_end.hpp>
 #include <boost/mpl/find.hpp>
+#include <boost/mpl/size.hpp>
 #include <boost/mpl/vector.hpp>
 
 namespace carl {
@@ -17,7 +19,7 @@ namespace function_selector {
 	template<template<typename> class Trait>
 	struct NaryTypeSelectorWrapper {
 		template<typename T, typename... Others>
-		using type = Trait<T>;
+		using type = typename Trait<T>::type;
 	};
 	
 	/**
@@ -53,15 +55,17 @@ namespace function_selector {
 	template<typename TypeSelector, typename TypeVector, typename... Functions>
 	class FunctionSelector {
 		friend auto createFunctionSelector<TypeSelector, TypeVector, Functions...>(Functions&&...);
+		static_assert(sizeof...(Functions) == boost::mpl::size<TypeVector>::value, "Functions and TypeVector must have the same size.");
 	private:
 		std::tuple<Functions...> mFunctions;
 		FunctionSelector(Functions&&... f): mFunctions(std::forward<Functions>(f)...) {}
 	public:
 		template<typename... Args>
 		auto operator()(Args&&... args) const {
-			using T = typename TypeSelector::template type<Args...>::type;
-			using pos = typename boost::mpl::find<TypeVector,T>::type::pos;
-			return std::get<pos::value>(mFunctions)(std::forward<Args>(args)...);
+			using T = typename TypeSelector::template type<Args...>;
+			using it = typename boost::mpl::find<TypeVector,T>::type;
+			static_assert(!std::is_same<it, typename boost::mpl::end<TypeVector>>::value, "Obtained type T was not found in TypeVector.");
+			return std::get<it::pos::value>(mFunctions)(std::forward<Args>(args)...);
 		}
 	};
 	

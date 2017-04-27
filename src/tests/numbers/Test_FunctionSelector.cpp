@@ -2,6 +2,17 @@
 
 #include <carl/numbers/FunctionSelector.h>
 
+TEST(FunctionSelector, TypeSelector)
+{
+	static_assert(std::is_same<carl::UnderlyingNumberType<mpq_class>::type, mpq_class>::value, "Test1");
+	static_assert(std::is_same<carl::UnderlyingNumberType<carl::MultivariatePolynomial<mpq_class>>::type, mpq_class>::value, "Test2");
+	
+	using TypeSelector = carl::function_selector::NaryTypeSelector;
+	
+	static_assert(std::is_same<TypeSelector::template type<mpq_class>, mpq_class>::value, "Test1");
+	static_assert(std::is_same<TypeSelector::template type<carl::MultivariatePolynomial<mpq_class>>, mpq_class>::value, "Test2");
+}
+
 TEST(FunctionSelector, basic)
 {
 	using types = carl::function_selector::wrap_types<mpz_class,mpq_class>;
