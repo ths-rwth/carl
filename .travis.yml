@@ -82,7 +82,7 @@ matrix:
       addons:
         apt:
           sources: [*sources_base, *sources_gcc6]
-          packages: [*packages_base, &packages_gcc6]
+          packages: [*packages_base, *packages_gcc6]
     - os: osx
       osx_image: xcode7.3
       env: USE=clang++-7.4
@@ -100,19 +100,19 @@ matrix:
       addons:
         apt:
           sources: [*sources_base, *sources_gcc6]
-          packages: [*packages_base, &packages_gcc6, lcov]
+          packages: [*packages_base, *packages_gcc6, lcov]
     - os: linux
       env: USE=g++-6 TASK=doxygen
       addons:
         apt:
           sources: [*sources_base, *sources_gcc6]
-          packages: [*packages_base, &packages_gcc6, doxygen, texinfo, texlive]
+          packages: [*packages_base, *packages_gcc6, doxygen, texinfo, texlive]
     - os: linux
       env: USE=g++-6 TASK=pycarl
       addons:
         apt:
           sources: [*sources_base, *sources_gcc6]
-          packages: [*packages_base, &packages_gcc6]
+          packages: [*packages_base, *packages_gcc6]
   allow_failures:
     - os: osx
       osx_image: xcode8.2
