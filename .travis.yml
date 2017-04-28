@@ -102,6 +102,10 @@ matrix:
           packages: [*packages_base, &packages_gcc6, doxygen, texinfo, texlive]
     - os: linux
       env: USE=g++-6 TASK=pycarl
+      addons:
+        apt:
+          sources: [*sources_base, *sources_gcc6]
+          packages: [*packages_base, &packages_gcc6]
   allow_failures:
     - os: osx
       osx_image: xcode8.2
