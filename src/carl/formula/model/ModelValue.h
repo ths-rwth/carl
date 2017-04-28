@@ -60,12 +60,14 @@ namespace carl
      * Possible value types are bool, vs::SqrtEx and carl::RealAlgebraicNumberPtr.
      */
 	template<typename Rational, typename Poly>
-    class ModelValue : public boost::variant<bool, Rational, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>
+    class ModelValue // : public boost::variant<bool, Rational, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>
     {
         /**
          * Base type we are deriving from.
          */
         using Super = boost::variant<bool, Rational, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>;
+		
+		Super mData;
         
     public:
         /**
@@ -81,13 +83,13 @@ namespace carl
          * Initializes the Assignment from some valid type of the underlying variant.
          */
         template<typename T>
-        ModelValue(const T& _t): Super(_t)
+        ModelValue(const T& _t): mData(_t)
         {}
 		
 		template<typename ...Args>
-		ModelValue(const boost::variant<Args...>& variant): Super(variant_extend<Super>(variant_extend<ModelValue>(variant))) {}
+		ModelValue(const boost::variant<Args...>& variant): mData(variant_extend<Super>(variant)) {}
 		
-		ModelValue(const MultivariateRoot<Poly>& mr): Super(createSubstitution<Rational,Poly>(mr).asSubstitution()) {}
+		ModelValue(const MultivariateRoot<Poly>& mr): mData(createSubstitution<Rational,Poly>(mr).asSubstitution()) {}
 		
         /**
          * Assign some value to the underlying variant.
@@ -96,12 +98,12 @@ namespace carl
          */
         template<typename T>
         ModelValue& operator=(const T& _t) {
-            Super::operator=(_t);
+			mData = _t;
             return *this;
         }
 		template<typename ...Args>
         ModelValue& operator=(const boost::variant<Args...>& variant) {
-            Super::operator=(variant_extend<Super>(variant_extend<ModelValue>(variant)));
+			mData = variant_extend<Super>(variant_extend<ModelValue>(variant));
             return *this;
         }
 
@@ -152,66 +154,66 @@ namespace carl
          * @return true, if the stored value is a bool.
          */
         bool isBool() const {
-			return variant_is_type<bool>(*this);
+			return variant_is_type<bool>(mData);
         }
         
         /**
          * @return true, if the stored value is a rational.
          */
         bool isRational() const {
-			return variant_is_type<Rational>(*this);
+			return variant_is_type<Rational>(mData);
         }
         
         /**
          * @return true, if the stored value is a square root expression.
          */
         bool isSqrtEx() const {
-			return variant_is_type<SqrtEx<Poly>>(*this);
+			return variant_is_type<SqrtEx<Poly>>(mData);
         }
         
         /**
          * @return true, if the stored value is a real algebraic number.
          */
         bool isRAN() const {
-			return variant_is_type<RealAlgebraicNumber<Rational>>(*this);
+			return variant_is_type<RealAlgebraicNumber<Rational>>(mData);
         }
         
         /**
          * @return true, if the stored value is a bitvector literal.
          */
         bool isBVValue() const {
-			return variant_is_type<BVValue>(*this);
+			return variant_is_type<BVValue>(mData);
         }
 
         /**
          * @return true, if the stored value is a sort value.
          */
         bool isSortValue() const {
-			return variant_is_type<SortValue>(*this);
+			return variant_is_type<SortValue>(mData);
         }
         
         /**
          * @return true, if the stored value is a uninterpreted function model.
          */
         bool isUFModel() const {
-			return variant_is_type<UFModel>(*this);
+			return variant_is_type<UFModel>(mData);
         }
 		
 		/**
          * @return true, if the stored value is +infinity.
          */
         bool isPlusInfinity() const {
-			return variant_is_type<InfinityValue>(*this) && boost::get<InfinityValue>(*this).positive;
+			return variant_is_type<InfinityValue>(mData) && boost::get<InfinityValue>(mData).positive;
         }
 		/**
          * @return true, if the stored value is -infinity.
          */
         bool isMinusInfinity() const {
-			return variant_is_type<InfinityValue>(*this) && !boost::get<InfinityValue>(*this).positive;
+			return variant_is_type<InfinityValue>(mData) && !boost::get<InfinityValue>(mData).positive;
         }
 		
 		bool isSubstitution() const {
-			return variant_is_type<ModelSubstitutionPtr<Rational,Poly>>(*this);
+			return variant_is_type<ModelSubstitutionPtr<Rational,Poly>>(mData);
 		}
 
         /**
@@ -220,7 +222,7 @@ namespace carl
         bool asBool() const
         {
             assert( isBool() );
-            return boost::get<bool>(*this);
+            return boost::get<bool>(mData);
         }
         
         /**
@@ -229,7 +231,7 @@ namespace carl
         const Rational& asRational() const
         {
             assert( isRational() );
-            return boost::get<Rational>(*this);
+            return boost::get<Rational>(mData);
         }
         
         /**
@@ -238,7 +240,7 @@ namespace carl
         const SqrtEx<Poly>& asSqrtEx() const
         {
             assert( isSqrtEx() );
-            return boost::get<SqrtEx<Poly>>(*this);
+            return boost::get<SqrtEx<Poly>>(mData);
         }
         
         /**
@@ -247,7 +249,7 @@ namespace carl
         RealAlgebraicNumber<Rational> asRAN() const
         {
             assert( isRAN() );
-            return boost::get<RealAlgebraicNumber<Rational>>(*this);
+            return boost::get<RealAlgebraicNumber<Rational>>(mData);
         }
         
         /**
@@ -256,7 +258,7 @@ namespace carl
         const carl::BVValue& asBVValue() const
         {
             assert( isBVValue() );
-            return boost::get<carl::BVValue>(*this);
+            return boost::get<carl::BVValue>(mData);
         }
 
         /**
@@ -265,7 +267,7 @@ namespace carl
         const SortValue& asSortValue() const
         {
             assert( isSortValue() );
-            return boost::get<SortValue>(*this);
+            return boost::get<SortValue>(mData);
         }
         
         /**
@@ -274,7 +276,7 @@ namespace carl
         const UFModel& asUFModel() const
         {
             assert( isUFModel() );
-            return boost::get<UFModel>(*this);
+            return boost::get<UFModel>(mData);
         }
 		/**
          * @return The stored value as a infinity value.
@@ -282,16 +284,16 @@ namespace carl
         const InfinityValue& asInfinity() const
         {
             assert( isPlusInfinity() || isMinusInfinity() );
-            return boost::get<InfinityValue>(*this);
+            return boost::get<InfinityValue>(mData);
         }
 		
 		const ModelSubstitutionPtr<Rational,Poly>& asSubstitution() const {
 			assert(isSubstitution());
-			return boost::get<ModelSubstitutionPtr<Rational,Poly>>(*this);
+			return boost::get<ModelSubstitutionPtr<Rational,Poly>>(mData);
 		}
 		ModelSubstitutionPtr<Rational,Poly>& asSubstitution() {
 			assert(isSubstitution());
-			return boost::get<ModelSubstitutionPtr<Rational,Poly>>(*this);
+			return boost::get<ModelSubstitutionPtr<Rational,Poly>>(mData);
 		}
         
     };
