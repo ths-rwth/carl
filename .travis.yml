@@ -18,8 +18,6 @@ addons:
       - llvm-toolchain-precise-3.6
       - llvm-toolchain-precise-3.7
       - llvm-toolchain-precise-3.8
-      - llvm-toolchain-trusty-3.9
-      - llvm-toolchain-trusty-4.0
       - ubuntu-toolchain-r-test
     packages: &packages_base
       - cmake
@@ -35,8 +33,6 @@ addons:
       - clang-3.6
       - clang-3.7
       - clang-3.8
-      - clang-3.9
-      - clang-4.0
       - openjdk-7-jdk
       - time
 
@@ -50,8 +46,20 @@ matrix:
       env: USE=clang++-3.8
     - os: linux
       env: USE=clang++-3.9
+      addons:
+        apt:
+          sources: [*sources_base, llvm-toolchain-trusty-3.9]
+          packages: [*packages_base, clang-3.9]
     - os: linux
       env: USE=clang++-4.0
+      addons:
+        apt:
+          sources:
+            - *sources_base
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - *packages_base
+            - clang-4.0
     - os: linux
       env: USE=g++-5
     - os: linux
