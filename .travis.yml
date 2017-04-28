@@ -21,7 +21,7 @@ addons:
       - llvm-toolchain-trusty-3.9
       - llvm-toolchain-trusty-4.0
       - ubuntu-toolchain-r-test
-    packages:
+    packages: &packages_base
       - cmake
       - cmake-data
       - doxygen
@@ -74,6 +74,7 @@ matrix:
         apt:
           <<: *apt_base
           packages:
+            - *packages_base
             - lcov
     - os: linux
       env: USE=g++-6 TASK=doxygen
@@ -81,6 +82,7 @@ matrix:
         apt:
           <<: *apt_base
           packages:
+            - *packages_base
             - texinfo
             - texlive
     - os: linux
