@@ -29,6 +29,7 @@ addons:
     packages: &packages_base
       - *packages_boost
       - *packages_cmake
+      - g++-6
       - libcln-dev
       - libeigen3-dev
       - libgmp-dev
@@ -72,14 +73,10 @@ matrix:
       env: USE=g++-5
       addons:
         apt:
-          sources: [*sources_base, ubuntu-toolchain-r-test]
+          sources: [*sources_base]
           packages: [*packages_base, g++-5]
     - os: linux
       env: USE=g++-6
-      addons:
-        apt:
-          sources: [*sources_base]
-          packages: [*packages_base, g++-6]
     - os: osx
       osx_image: xcode7.3
       env: USE=clang++-7.4
@@ -97,19 +94,15 @@ matrix:
       addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, g++-6, lcov]
+          packages: [*packages_base, lcov]
     - os: linux
       env: USE=g++-6 TASK=doxygen
       addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, g++-6, doxygen, texinfo, texlive]
+          packages: [*packages_base, doxygen, texinfo, texlive]
     - os: linux
       env: USE=g++-6 TASK=pycarl
-      addons:
-        apt:
-          sources: [*sources_base]
-          packages: [*packages_base, g++-6]
   allow_failures:
     - os: osx
       osx_image: xcode8.2
