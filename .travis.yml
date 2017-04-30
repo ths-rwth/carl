@@ -34,6 +34,7 @@ addons:
       - libgmp-dev
       - libgtest-dev
       - openjdk-7-jdk
+      - texinfo
       - time
 
 matrix:
