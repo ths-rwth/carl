@@ -16,8 +16,8 @@ ExternalProject_Add(
 	GIT_TAG "release_${GINAC_TAG}"
 	UPDATE_COMMAND ""
 	CONFIGURE_COMMAND ${AUTORECONF} -iv <SOURCE_DIR> 
-		COMMAND PYTHON=${PYTHON2} <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
-	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM}
+		COMMAND PYTHON=${PYTHON2} <SOURCE_DIR>/configure --quiet --prefix=<INSTALL_DIR>
+	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} -C ginac > /dev/null
 )
 
 ExternalProject_Get_Property(GiNaC INSTALL_DIR)
