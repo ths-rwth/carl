@@ -27,7 +27,7 @@ set_target_properties( lib_carl PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 	INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/src"
 )
-target_link_libraries(lib_carl PUBLIC EIGEN3 GMP_SHARED GMPXX_SHARED pthread dl)
+target_link_libraries(lib_carl PUBLIC EIGEN3 GMPXX_SHARED GMP_SHARED pthread dl)
 if(USE_CLN_NUMBERS)
 	target_link_libraries(lib_carl PUBLIC CLN_SHARED)
 endif()
@@ -56,7 +56,7 @@ if(BUILD_STATIC)
         set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_END_STATIC TRUE )
         set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_START_STATIC TRUE )
 
-	target_link_libraries(lib_carl_static PUBLIC EIGEN3 GMP_STATIC GMPXX_STATIC dl)
+	target_link_libraries(lib_carl_static PUBLIC EIGEN3 GMPXX_STATIC GMP_STATIC dl)
 	if(USE_CLN_NUMBERS)
 		target_link_libraries(lib_carl_static PUBLIC CLN_STATIC)
 	endif()
