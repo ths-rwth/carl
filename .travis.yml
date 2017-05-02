@@ -84,6 +84,9 @@ matrix:
       osx_image: xcode8.2
       env: USE=clang++-8.0
     - os: osx
+      osx_image: xcode8.3
+      env: USE=clang++-8.0
+    - os: osx
       osx_image: xcode8.2
       env: USE=g++-5
     - os: osx
