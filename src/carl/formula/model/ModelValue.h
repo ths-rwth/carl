@@ -60,14 +60,23 @@ namespace carl
      * Possible value types are bool, vs::SqrtEx and carl::RealAlgebraicNumberPtr.
      */
 	template<typename Rational, typename Poly>
-    class ModelValue // : public boost::variant<bool, Rational, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>
-    {
+    class ModelValue {
         /**
          * Base type we are deriving from.
          */
         using Super = boost::variant<bool, Rational, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>;
 		
 		Super mData;
+		
+		struct VariantExtractor: boost::static_visitor<Super> {
+			template<typename T>
+			Super operator()(const T& t) const {
+				return Super(t);
+			}
+			Super operator()(const MultivariateRoot<Poly>& mr) const {
+				return Super(createSubstitution<Rational,Poly>(mr).asSubstitution());
+			}
+		};
         
     public:
         /**
@@ -83,11 +92,10 @@ namespace carl
          * Initializes the Assignment from some valid type of the underlying variant.
          */
         template<typename T>
-        ModelValue(const T& _t): mData(_t)
-        {}
+        ModelValue(const T& _t): mData(_t) {}
 		
 		template<typename ...Args>
-		ModelValue(const boost::variant<Args...>& variant): mData(variant_extend<Super>(variant)) {}
+		ModelValue(const boost::variant<Args...>& variant): mData(boost::apply_visitor(VariantExtractor(), variant)) {}
 		
 		ModelValue(const MultivariateRoot<Poly>& mr): mData(createSubstitution<Rational,Poly>(mr).asSubstitution()) {}
 		
@@ -103,9 +111,13 @@ namespace carl
         }
 		template<typename ...Args>
         ModelValue& operator=(const boost::variant<Args...>& variant) {
-			mData = variant_extend<Super>(variant_extend<ModelValue>(variant));
+			mData = boost::apply_visitor(VariantExtractor(), variant);
             return *this;
         }
+		ModelValue& operator=(const MultivariateRoot<Poly>& mr) {
+			mData = createSubstitution<Rational,Poly>(mr).asSubstitution();
+			return *this;
+		}
 
         /**
          * Check if two Assignments are equal.
