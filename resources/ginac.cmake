@@ -17,7 +17,8 @@ ExternalProject_Add(
 	UPDATE_COMMAND ""
 	CONFIGURE_COMMAND ${AUTORECONF} -iv <SOURCE_DIR> 
 		COMMAND PYTHON=${PYTHON2} <SOURCE_DIR>/configure --quiet --prefix=<INSTALL_DIR>
-	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} > /dev/null
+	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} -C ginac > /dev/null
+	INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} -C ginac install
 )
 
 ExternalProject_Get_Property(GiNaC INSTALL_DIR)

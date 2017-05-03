@@ -133,20 +133,28 @@ namespace carl
             
         private:
             bool isBaseFormula(const Constraint<Pol>& c) const {
-                return carl::isStrict(c.relation());
+                return c < c.negation();
+            }
+            bool isBaseFormula(const FormulaContent<Pol>* f) const {
+                assert(f->mType == FormulaType::CONSTRAINT);
+#ifdef __VS
+                const auto& a = *f->mpConstraintVS;
+                const auto& b = *f->mNegation->mpConstraintVS;
+#else
+                const auto& a = f->mConstraint;
+                const auto& b = f->mNegation->mConstraint;
+#endif
+                return a < b;
             }
 
             const FormulaContent<Pol>* getBaseFormula(const FormulaContent<Pol>* f) const {
+                assert(f != nullptr);
                 if (f->mType == FormulaType::NOT) {
                     CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
                     return f->mNegation;
                 }
                 if (f->mType == FormulaType::CONSTRAINT) {
-#ifdef __VS
-                    if (isBaseFormula(*f->mpConstraintVS)) {
-#else
-                    if (isBaseFormula(f->mConstraint)) {
-#endif
+                    if (isBaseFormula(f)) {
                         CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
                         return f;
                     } else {
@@ -453,6 +461,7 @@ namespace carl
                 FORMULA_POOL_LOCK_GUARD
                 const FormulaContent<Pol>* tmp = getBaseFormula(_elem);
                 //const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
+                CARL_LOG_DEBUG("carl.formula", "Freeing " << static_cast<const void*>(tmp) << ", current usage: " << tmp->mUsages);
                 assert( tmp->mUsages > 0 );
                 --tmp->mUsages;
                 if( tmp->mUsages == 1 )
@@ -524,8 +533,10 @@ namespace carl
                 //const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
                 assert( tmp != nullptr );
                 assert( tmp->mUsages < std::numeric_limits<size_t>::max() );
+                CARL_LOG_DEBUG("carl.formula", "Registering " << static_cast<const void*>(tmp) << ", current usage: " << tmp->mUsages);
                 ++tmp->mUsages;
                 if (tmp->mUsages == 1 && _elem->mType == FormulaType::CONSTRAINT) {
+                    CARL_LOG_DEBUG("carl.formula", "Is a constraint, increasing again");
                     ++tmp->mUsages;
                 }
             }
