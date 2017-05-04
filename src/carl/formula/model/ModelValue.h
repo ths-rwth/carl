@@ -59,7 +59,8 @@ namespace carl
 	 */
 	template<typename Rational, typename Poly>
 	class ModelValue {
-		friend std::ostream& operator<<(std::ostream& os, const ModelValue<Rational,Poly>& mv);
+		template<typename R, typename P>
+		friend std::ostream& operator<<(std::ostream& os, const ModelValue<R,P>& mv);
 		/**
 		 * Base type we are deriving from.
 		 */
