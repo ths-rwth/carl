@@ -59,6 +59,7 @@ namespace carl
 	 */
 	template<typename Rational, typename Poly>
 	class ModelValue {
+		friend std::ostream& operator<<(std::ostream& os, const ModelValue<Rational,Poly>& mv);
 		/**
 		 * Base type we are deriving from.
 		 */
@@ -288,10 +289,10 @@ namespace carl
 			return boost::get<ModelSubstitutionPtr<Rational,Poly>>(mData);
 		}
 		
-		template<typename R, typename P>
-		friend std::ostream& operator<<(std::ostream& os, const ModelValue<R,P>& mv) {
-			return os << mv.mData;
-		}
-		
 	};
+	
+	template<typename R, typename P>
+	inline std::ostream& operator<<(std::ostream& os, const ModelValue<R,P>& mv) {
+		return os << mv.mData;
+	}
 }
