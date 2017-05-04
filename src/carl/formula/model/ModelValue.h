@@ -267,6 +267,10 @@ namespace carl
 			assert(isUFModel());
 			return boost::get<UFModel>(mData);
 		}
+		UFModel& asUFModel() {
+			assert(isUFModel());
+			return boost::get<UFModel>(mData);
+		}
 		/**
 		 * @return The stored value as a infinity value.
 		 */
@@ -282,6 +286,11 @@ namespace carl
 		ModelSubstitutionPtr<Rational,Poly>& asSubstitution() {
 			assert(isSubstitution());
 			return boost::get<ModelSubstitutionPtr<Rational,Poly>>(mData);
+		}
+		
+		template<typename R, typename P>
+		friend std::ostream& operator<<(std::ostream& os, const ModelValue<R,P>& mv) {
+			return os << mv.mData;
 		}
 		
 	};
