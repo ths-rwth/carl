@@ -33,8 +33,8 @@ private:
 
 	template<typename Pol>
 	void write(const Constraint<Pol>& c) {
-		if (c.relation() == carl::Relation::NEQ) {
-			*this << Formula<Pol>(FormulaType::NOT, Formula<Pol>(Constraint<Pol>(c.lhs(), carl::Relation::EQ)));
+		if (c.relation() == Relation::NEQ) {
+			*this << "(not (= " << c.lhs() << " 0))";
 		} else {
 			*this << "(" << c.relation() << " " << c.lhs() << " 0)";
 		}
