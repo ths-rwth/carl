@@ -27,10 +27,8 @@ namespace carl {
 /**
  * Implements a manager for sorts, containing the actual contents of these sort and allocating their ids.
  */
-class SortManager : public Singleton<SortManager>
-{
-	
-		friend Singleton<SortManager>;
+class SortManager : public Singleton<SortManager> {
+	friend Singleton<SortManager>;
 
 	public:
 		
@@ -49,7 +47,6 @@ class SortManager : public Singleton<SortManager>
 			/**
 			 * Constructs a sort content.
 			 * @param _name The name of the sort content to construct.
-			 * @param _type The carl variable type of the sort content to construct.
 			 */
 			explicit SortContent(std::string _name) noexcept:
 				name(std::move(_name)),
@@ -210,7 +207,7 @@ class SortManager : public Singleton<SortManager>
 		}
 		
 		/**
-		 * @param _sort A sort.
+		 * @param sort A sort.
 		 * @return The name if the given sort.
 		 */
 		const std::string& getName(const Sort& sort) const {
@@ -230,8 +227,8 @@ class SortManager : public Singleton<SortManager>
 		
 		/**
 		 * Prints the given sort on the given output stream.
-		 * @param _out The output stream to print the given sort on.
-		 * @param _sort The sort to print.
+		 * @param os The output stream to print the given sort on.
+		 * @param sort The sort to print.
 		 * @return The output stream after printing the given sort on it.
 		 */
 		std::ostream& print(std::ostream& os, const Sort& sort) const;
@@ -253,8 +250,8 @@ class SortManager : public Singleton<SortManager>
 
 		/**
 		 * Adds a sort declaration.
-		 * @param _name The name of the declared sort.
-		 * @param _arity The arity of the declared sort.
+		 * @param name The name of the declared sort.
+		 * @param arity The arity of the declared sort.
 		 * @return true, if the given sort declaration has not been added before;
 		 *		 false, otherwise.
 		 */
@@ -262,16 +259,16 @@ class SortManager : public Singleton<SortManager>
 
 		/**
 		 * Adds a sort template definitions.
-		 * @param _name The name of the defined sort template.
-		 * @param _params The template parameter of the defined sort.
-		 * @param _sort The sort to instantiate into.
+		 * @param name The name of the defined sort template.
+		 * @param params The template parameter of the defined sort.
+		 * @param sort The sort to instantiate into.
 		 * @return true, if the given sort template definition has not been added before;
 		 *		 false, otherwise.
 		 */
 		bool define(const std::string& name, const std::vector<std::string>& params, const Sort& sort);
 
 		/**
-		 * @param _sort The sort to get the arity for.
+		 * @param sort The sort to get the arity for.
 		 * @return The arity of the given sort.
 		 */
 		std::size_t getArity(const Sort& sort) const;
@@ -292,7 +289,7 @@ class SortManager : public Singleton<SortManager>
 		void makeSortIndexable(const Sort& sort, std::size_t indices, VariableType type);
 
 		/**
-		 * @param _sort A sort.
+		 * @param sort A sort.
 		 * @return true, if the given sort is interpreted.
 		 */
 		bool isInterpreted(const Sort& sort) const {
@@ -303,7 +300,7 @@ class SortManager : public Singleton<SortManager>
 
 		/**
 		 * Gets the sort with arity zero (thus it is maybe interpreted) corresponding the given name.
-		 * @param _name The name of the sort to get.
+		 * @param name The name of the sort to get.
 		 * @return The resulting sort.
 		 */
 		Sort getSort(const std::string& name);
@@ -311,8 +308,8 @@ class SortManager : public Singleton<SortManager>
 		/**
 		 * Gets the sort with arity greater than zero corresponding the given name and having the arguments
 		 * of the given sorts.
-		 * @param _name The name of the sort to get.
-		 * @param _params The sort of the arguments of the sort to get.
+		 * @param name The name of the sort to get.
+		 * @param params The sort of the arguments of the sort to get.
 		 * @return The resulting sort.
 		 */
 		Sort getSort(const std::string& name, const std::vector<Sort>& params);
