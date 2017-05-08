@@ -146,7 +146,7 @@ struct StreamSink: public Sink {
 	std::ostream os;
 	/**
 	 * Create a StreamSink from some output stream.
-	 * @param os Output stream.
+	 * @param _os Output stream.
 	 */
 	explicit StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
 	~StreamSink() override = default;

@@ -1,5 +1,5 @@
 /**
- * @file Common.h
+ * @file parser/Common.h
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 

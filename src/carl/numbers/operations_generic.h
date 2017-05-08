@@ -1,5 +1,5 @@
 /** 
- * @file:   numbers/operations.h
+ * @file:   operations_generic.h
  * @author: Sebastian Junges
  *
  * @since November 6, 2014
