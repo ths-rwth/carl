@@ -87,6 +87,34 @@ TYPED_TEST(IntervalRationalTest, integralPart) {
 		Interval i = Interval::emptyInterval();
 		EXPECT_EQ(i, i.integralPart());
 	}
+	{
+		Interval i = Interval(-5, BoundType::STRICT, 5, BoundType::STRICT).integralPart();
+		EXPECT_EQ(BoundType::WEAK, i.lowerBoundType());
+		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
+		EXPECT_EQ(-4, i.lower());
+		EXPECT_EQ(4, i.upper());
+	}
+	{
+		Interval i = Interval(-5, BoundType::STRICT, 5, BoundType::WEAK).integralPart();
+		EXPECT_EQ(BoundType::WEAK, i.lowerBoundType());
+		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
+		EXPECT_EQ(-4, i.lower());
+		EXPECT_EQ(5, i.upper());
+	}
+	{
+		Interval i = Interval(-5, BoundType::WEAK, 5, BoundType::STRICT).integralPart();
+		EXPECT_EQ(BoundType::WEAK, i.lowerBoundType());
+		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
+		EXPECT_EQ(-5, i.lower());
+		EXPECT_EQ(4, i.upper());
+	}
+	{
+		Interval i = Interval(-5, BoundType::WEAK, 5, BoundType::WEAK).integralPart();
+		EXPECT_EQ(BoundType::WEAK, i.lowerBoundType());
+		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
+		EXPECT_EQ(-5, i.lower());
+		EXPECT_EQ(5, i.upper());
+	}
 }
 
 TYPED_TEST(IntervalRationalTest, center) {
