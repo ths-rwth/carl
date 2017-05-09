@@ -9,6 +9,10 @@ typedef Interval<Rational> clRA_Interval;
 template<typename T>
 class IntervalRationalTest: public testing::Test {};
 
+#define ZERO TypeParam(0)
+#define HALF TypeParam(1)/TypeParam(2)
+#define ONE TypeParam(1)
+
 TYPED_TEST_CASE(IntervalRationalTest, RationalTypes);
 
 TYPED_TEST(IntervalRationalTest, Constructor) {
@@ -114,6 +118,85 @@ TYPED_TEST(IntervalRationalTest, integralPart) {
 		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
 		EXPECT_EQ(-5, i.lower());
 		EXPECT_EQ(5, i.upper());
+	}
+}
+
+TYPED_TEST(IntervalRationalTest, containsInteger) {
+	using Interval = Interval<TypeParam>;
+	// For every bound type combination: [int/non-int] * [int/non-int] * [yes/no]
+	{ // strict / strict
+		Interval i1(0, BoundType::STRICT, 2, BoundType::STRICT);
+		Interval i2(0, BoundType::STRICT, 1, BoundType::STRICT);
+		Interval i3(0, BoundType::STRICT, 1 + HALF, BoundType::STRICT);
+		Interval i4(0, BoundType::STRICT, HALF, BoundType::STRICT);
+		Interval i5(HALF, BoundType::STRICT, 2, BoundType::STRICT);
+		Interval i6(HALF, BoundType::STRICT, 1, BoundType::STRICT);
+		Interval i7(HALF, BoundType::STRICT, 1 + HALF, BoundType::STRICT);
+		Interval i8(HALF, BoundType::STRICT, HALF, BoundType::STRICT);
+		EXPECT_TRUE(i1.containsInteger());
+		EXPECT_FALSE(i2.containsInteger());
+		EXPECT_TRUE(i3.containsInteger());
+		EXPECT_FALSE(i4.containsInteger());
+		EXPECT_TRUE(i5.containsInteger());
+		EXPECT_FALSE(i6.containsInteger());
+		EXPECT_TRUE(i7.containsInteger());
+		EXPECT_FALSE(i8.containsInteger());
+	}
+	{ // strict / weak
+		Interval i1(0, BoundType::STRICT, 1, BoundType::WEAK);
+		Interval i3(0, BoundType::STRICT, 1 + HALF, BoundType::WEAK);
+		Interval i4(0, BoundType::STRICT, HALF, BoundType::WEAK);
+		Interval i5(HALF, BoundType::STRICT, 1, BoundType::WEAK);
+		Interval i7(HALF, BoundType::STRICT, 1 + HALF, BoundType::WEAK);
+		Interval i8(HALF, BoundType::STRICT, HALF, BoundType::WEAK);
+		EXPECT_TRUE(i1.containsInteger());
+		EXPECT_TRUE(i3.containsInteger());
+		EXPECT_FALSE(i4.containsInteger());
+		EXPECT_TRUE(i5.containsInteger());
+		EXPECT_TRUE(i7.containsInteger());
+		EXPECT_FALSE(i8.containsInteger());
+	}
+	{ // strict / infty
+		Interval i1(0, BoundType::STRICT, 0, BoundType::INFTY);
+		Interval i2(HALF, BoundType::STRICT, 0, BoundType::INFTY);
+		EXPECT_TRUE(i1.containsInteger());
+		EXPECT_TRUE(i2.containsInteger());
+	}
+	{ // weak / strict
+		Interval i1(0, BoundType::WEAK, 1, BoundType::STRICT);
+		Interval i3(0, BoundType::WEAK, HALF, BoundType::STRICT);
+		Interval i5(HALF, BoundType::WEAK, 2, BoundType::STRICT);
+		Interval i6(HALF, BoundType::WEAK, 1, BoundType::STRICT);
+		Interval i7(HALF, BoundType::WEAK, 1 + HALF, BoundType::STRICT);
+		Interval i8(HALF, BoundType::WEAK, HALF, BoundType::STRICT);
+		EXPECT_TRUE(i1.containsInteger());
+		EXPECT_TRUE(i3.containsInteger());
+		EXPECT_TRUE(i5.containsInteger());
+		EXPECT_FALSE(i6.containsInteger());
+		EXPECT_TRUE(i7.containsInteger());
+		EXPECT_FALSE(i8.containsInteger());
+	}
+	{ // weak / weak
+		Interval i1(0, BoundType::WEAK, 1, BoundType::WEAK);
+		Interval i3(0, BoundType::WEAK, HALF, BoundType::WEAK);
+		Interval i5(HALF, BoundType::WEAK, 1, BoundType::WEAK);
+		Interval i7(HALF, BoundType::WEAK, 1 + HALF, BoundType::WEAK);
+		Interval i8(HALF, BoundType::WEAK, HALF, BoundType::WEAK);
+		EXPECT_TRUE(i1.containsInteger());
+		EXPECT_TRUE(i3.containsInteger());
+		EXPECT_TRUE(i5.containsInteger());
+		EXPECT_TRUE(i7.containsInteger());
+		EXPECT_FALSE(i8.containsInteger());
+	}
+	{ // weak / infty
+		Interval i1(0, BoundType::WEAK, 0, BoundType::INFTY);
+		Interval i2(HALF, BoundType::WEAK, 0, BoundType::INFTY);
+		EXPECT_TRUE(i1.containsInteger());
+		EXPECT_TRUE(i2.containsInteger());
+	}
+	{ // infty / infty
+		Interval i1(0, BoundType::INFTY, 0, BoundType::INFTY);
+		EXPECT_TRUE(i1.containsInteger());
 	}
 }
 
