@@ -69,7 +69,7 @@ Interval<Number> Interval<Number>::integralPart() const
 			newUpperBound = floor(mContent.upper());
 			newUpperBoundType = BoundType::WEAK;
 			if(newUpperBound == mContent.upper())
-				newLowerBound -= carl::constant_one<Number>::get();
+				newUpperBound -= carl::constant_one<Number>::get();
 			if(newLowerBoundType == BoundType::INFTY)
 				newLowerBound = newUpperBound;
 			break;
