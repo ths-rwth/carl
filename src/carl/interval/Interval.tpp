@@ -107,7 +107,7 @@ bool Interval<Number>::containsInteger() const
 			case BoundType::WEAK:
 				if (carl::isInteger(mContent.upper())) return true;
 		}
-		return carl::ceil(mContent.lower()) < mContent.upper();
+		return carl::floor(mContent.lower()) + carl::constant_one<Number>::get() < mContent.upper();
 	}
 
 
