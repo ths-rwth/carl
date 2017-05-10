@@ -55,6 +55,7 @@ if(USE_CLN_NUMBERS)
 		include(resources/cln.cmake)
 		message(STATUS "Use shipped version of CLN ${CLN_VERSION}")
 	endif()
+	set_target_properties(CLN_STATIC PROPERTIES LINK_INTERFACE_LIBRARIES "GMP_STATIC")
 endif()
 
 
