@@ -1,13 +1,19 @@
 # Include dir
 find_path(CLN_INCLUDE_DIR
-  NAMES cln/cln.h
-  HINTS ${CLN_PKGCONF_INCLUDE_DIRS}
+	NAMES cln/cln.h
+	HINTS ${CLN_PKGCONF_INCLUDE_DIRS}
+	PATHS
+		/usr/include
+		/usr/local/include
 )
 
 # Library files
 find_library(CLN_LIBRARY
-  NAMES cln
-  HINTS ${CLN_PKGCONF_LIBRARY_DIRS}
+	NAMES cln
+	HINTS ${CLN_PKGCONF_LIBRARY_DIRS}
+	PATHS
+		/usr/lib
+		/usr/local/lib
 )
 
 if(CLN_INCLUDE_DIR AND CLN_LIBRARY)
