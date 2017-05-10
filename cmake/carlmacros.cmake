@@ -43,6 +43,25 @@ macro(export_option name)
 	list(APPEND EXPORTED_OPTIONS "${name}")
 endmacro(export_option)
 
+macro(_export_target_add_lib output TARGET TYPE)
+	set(${output} "${${output}}
+
+add_library(${TARGET} ${TYPE} IMPORTED)")
+endmacro(_export_target_add_lib)
+
+macro(_export_target_set_prop output TARGET PROPERTY)
+	get_target_property(VALUE ${TARGET} ${PROPERTY})
+	set(extra_args ${ARGN})
+	list(GET extra_args 0 NEWPROPERTY)
+	if(NOT NEWPROPERTY)
+		set(NEWPROPERTY ${PROPERTY})
+	endif()
+	if(VALUE)
+		set(${output} "${${output}}
+set_target_properties(${TARGET} PROPERTIES ${NEWPROPERTY} \"${VALUE}\")")
+	endif()
+endmacro(_export_target_set_prop)
+
 macro(export_target output TARGET)
 	get_target_property(TYPE ${TARGET} TYPE)
 	if(TYPE STREQUAL "SHARED_LIBRARY")
