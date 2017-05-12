@@ -51,13 +51,16 @@ public:
 		if (!file) return boost::none;
 		Formulas<Pol> constraints;
 		for (const auto& cons: file->constraints) {
-			PBConstraint<Pol> pbc(convert(std::get<0>(cons)), std::get<1>(cons), std::get<2>(cons));
+			auto pol = convert(std::get<0>(cons));
+			Relation rel = std::get<1>(cons);
+			Number rhs = std::get<2>(cons);
+			PBConstraint<Pol> pbc(pol, rel, rhs);
 			constraints.emplace_back(std::move(pbc));
 		}
 		Formula<Pol> resC(FormulaType::AND, std::move(constraints));
 		Pol objective;
 		for (const auto& term: file->objective) {
-			objective += typename Pol::CoeffType(term.first) * term.second;
+			objective += Number(term.first) * term.second;
 		}
 		return std::make_pair(std::move(resC), std::move(objective));
 	}

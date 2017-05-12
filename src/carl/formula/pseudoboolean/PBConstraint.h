@@ -25,11 +25,6 @@ namespace carl {
 			rhs(rs),
 		    lhs(std::move(ls))
 	    {}
-		PBConstraint(const std::vector<std::pair<Number,Variable>>& ls, Relation rel, Number rs):
-			relation(rel),
-			rhs(rs),
-			lhs(ls)
-		{}
 		PBConstraint(std::vector<std::pair<Number,Variable>>&& ls, Relation rel, Number rs):
 			relation(rel),
 			rhs(rs),
