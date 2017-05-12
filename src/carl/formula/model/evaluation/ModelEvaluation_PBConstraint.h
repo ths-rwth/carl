@@ -11,8 +11,8 @@ namespace model {
 	 * May fail to substitute some variables, for example if the values are RANs or SqrtEx.
 	 */
 	template<typename Rational, typename Poly>
-	void substituteIn(PBConstraint& c, const Model<Rational,Poly>& m) {
-	    std::vector<std::pair<int,Variable>> newLHS;
+	void substituteIn(PBConstraint<Poly>& c, const Model<Rational,Poly>& m) {
+	    std::vector<std::pair<Rational,Variable>> newLHS;
 	    for(auto it = c.getLHS().begin(); it != c.getLHS().end(); it++){
 			auto element = m.find(it->second);
 	        if(element != m.end()) {
@@ -32,7 +32,7 @@ namespace model {
 	 * If evaluation can not be done for some variables, the result may actually be a Constraint again.
 	 */
 	template<typename Rational, typename Poly>
-	void evaluate(ModelValue<Rational,Poly>& res, PBConstraint& c, const Model<Rational,Poly>& m) {
+	void evaluate(ModelValue<Rational,Poly>& res, PBConstraint<Poly>& c, const Model<Rational,Poly>& m) {
 		substituteIn(c, m);
 		res = carl::evaluate(-c.getRHS(), c.getRelation());
 	}

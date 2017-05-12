@@ -162,7 +162,8 @@ namespace model {
 				break;
 			}
 			case FormulaType::PBCONSTRAINT: {
-				PBConstraint pbc = substitute(f.pbConstraint(), m);
+				/// TODO: We should store the substitution.
+				PBConstraint<Poly> pbc = substitute(f.pbConstraint(), m);
 				break;
 			}
 		}
