@@ -42,7 +42,7 @@ public:
 		if (!file) return boost::none;
 		Formulas<Pol> constraints;
 		for (const auto& cons: file->constraints) {
-			PBConstraint pbc(std::move(std::get<0>(cons)), std::get<1>(cons), std::get<2>(cons));
+			PBConstraint<Pol> pbc(std::move(std::get<0>(cons)), std::get<1>(cons), std::get<2>(cons));
 			constraints.emplace_back(std::move(pbc));
 		}
 		Formula<Pol> resC(FormulaType::AND, std::move(constraints));
