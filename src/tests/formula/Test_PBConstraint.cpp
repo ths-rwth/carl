@@ -14,8 +14,8 @@ TEST(PBConstraint, Basic)
 	auto x = carl::freshBooleanVariable("x");
 	auto y = carl::freshBooleanVariable("y");
 	auto z = carl::freshBooleanVariable("z");
-	carl::PBConstraint pbc;
-	std::vector<std::pair<int, carl::Variable>> lhs;
+	carl::PBConstraint<Poly> pbc;
+	std::vector<std::pair<Rational, carl::Variable>> lhs;
 	lhs.emplace_back(2, x);
 	lhs.emplace_back(5, y);
 	lhs.emplace_back(4, z);
@@ -45,8 +45,8 @@ TEST(PBConstraint, Formula)
 	auto x = carl::freshBooleanVariable("x");
 	auto y = carl::freshBooleanVariable("y");
 	auto z = carl::freshBooleanVariable("z");
-	carl::PBConstraint pbc;
-	std::vector<std::pair<int,carl::Variable>> lhs;
+	carl::PBConstraint<Poly> pbc;
+	std::vector<std::pair<Rational,carl::Variable>> lhs;
 	lhs.emplace_back(2, x);
 	lhs.emplace_back(5, y);
 	lhs.emplace_back(4, z);
