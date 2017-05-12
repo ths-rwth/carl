@@ -30,7 +30,16 @@ boost::optional<OPBFile> parseOPBFile(std::ifstream& in);
 template<typename Pol>
 class OPBImporter {
 private:
+	using Number = typename UnderlyingNumberType<Pol>::type;
 	std::ifstream mIn;
+
+	std::vector<std::pair<Number,carl::Variable>> convert(const std::vector<std::pair<int,carl::Variable>>& poly) const {
+		std::vector<std::pair<Number,carl::Variable>> res;
+		for (const auto& term: poly) {
+			res.emplace_back(Number(term.first), term.second);
+		}
+		return res;
+	}
 
 public:
 	explicit OPBImporter(const std::string& filename):
@@ -42,7 +51,7 @@ public:
 		if (!file) return boost::none;
 		Formulas<Pol> constraints;
 		for (const auto& cons: file->constraints) {
-			PBConstraint<Pol> pbc(std::move(std::get<0>(cons)), std::get<1>(cons), std::get<2>(cons));
+			PBConstraint<Pol> pbc(convert(std::get<0>(cons)), std::get<1>(cons), std::get<2>(cons));
 			constraints.emplace_back(std::move(pbc));
 		}
 		Formula<Pol> resC(FormulaType::AND, std::move(constraints));
