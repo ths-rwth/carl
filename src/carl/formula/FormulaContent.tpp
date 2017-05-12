@@ -134,12 +134,12 @@ namespace carl {
 	}
 
 	template<typename Pol>
-	FormulaContent<Pol>::FormulaContent( PBConstraint&& _pbc ):
-        mHash( std::hash<PBConstraint>()( _pbc ) ),
+	FormulaContent<Pol>::FormulaContent( PBConstraint<Pol>&& _pbc ):
+        mHash( std::hash<PBConstraint<Pol>>()( _pbc ) ),
 #ifdef __VS
         mType( FormulaType::PBCONSTRAINT )
     {
-		mpPBConstraintVS = new PBConstraint(std::move(_pbc));
+		mpPBConstraintVS = new PBConstraint<Pol>(std::move(_pbc));
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mPBConstraintVS);
 #else
 		mType(FormulaType::PBCONSTRAINT),
