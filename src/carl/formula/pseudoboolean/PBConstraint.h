@@ -12,7 +12,8 @@ namespace carl {
 	template<typename Pol>
     class PBConstraint{
 		using Number = typename UnderlyingNumberType<Pol>::type;
-		friend std::ostream& operator<<(std::ostream& os, const PBConstraint& pbc);
+		template<typename Poly>
+		friend std::ostream& operator<<(std::ostream& os, const PBConstraint<Poly>& pbc);
     private:
         Relation relation;
         Number rhs;
