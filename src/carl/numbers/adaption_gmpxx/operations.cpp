@@ -144,7 +144,7 @@ namespace carl
 	
 	template<>
 	bool try_parse<mpq_class>(const std::string& n, mpq_class& res) {
-		return parser::parseDecimal(n, res);
+		return parser::parseRational(n, res);
 	}
 
     std::string toString(const mpq_class& _number, bool _infix)
