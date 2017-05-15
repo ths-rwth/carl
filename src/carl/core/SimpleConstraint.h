@@ -76,6 +76,19 @@ std::ostream& operator<<(std::ostream& os, const SimpleConstraint<LhsT>& rhs)
 	return os << rhs.lhs() << " " << rhs.rel() << " 0";
 }
 
+template<typename LhsT>
+std::string to_string(const SimpleConstraint<LhsT>& constraint, bool pretty = false) {
+	if (pretty) {
+		std::stringstream strstr;
+		strstr << constraint.lhs() << " " << constraint.rel() << " 0";
+		return strstr.str();
+	} else {
+		std::stringstream strstr;
+		strstr << constraint.lhs() << "," << constraint.rel();
+		return strstr.str();
+	}
+}
+
 
 }
 
