@@ -443,7 +443,7 @@ namespace carl
     }
     
     template<typename P>
-    Definiteness FactorizedPolynomial<P>::definiteness() const
+    Definiteness FactorizedPolynomial<P>::definiteness( bool _fullEffort ) const
     {
         if( existsFactorization( *this ) )
         {

@@ -511,7 +511,7 @@ namespace carl
          * Retrieves information about the definiteness of the polynomial.
          * @return Definiteness of this.
          */
-        Definiteness definiteness() const;
+        Definiteness definiteness( bool _fullEffort = true ) const;
 		
 		/**
 		 * Derivative of the factorized polynomial wrt variable x
