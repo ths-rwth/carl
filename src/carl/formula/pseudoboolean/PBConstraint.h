@@ -23,12 +23,12 @@ namespace carl {
         PBConstraint(std::vector<std::pair<Number,Variable>> ls, Relation rel, Number rs):
 			relation(rel),
 			rhs(rs),
-		    lhs(std::move(ls))
+			lhs(std::move(preproces(ls)))
 	    {}
 		PBConstraint(std::vector<std::pair<Number,Variable>>&& ls, Relation rel, Number rs):
 			relation(rel),
 			rhs(rs),
-		    lhs(std::move(ls))
+		    lhs(std::move(preproces(ls)))
 	    {}
         std::vector<Variable> gatherVariables() const {
 	        std::vector<Variable> varVector;
@@ -60,6 +60,15 @@ namespace carl {
         Number getRHS() const {
 			return rhs;
 		}
+        
+        const std::vector<std::pair<Number, Variable>>& preproces(std::vector<std::pair<Number,Variable>>& v) const{
+            for(auto i = 0; i < v.size(); i++){
+				auto current = v[i];
+				if(current.first == 0){
+					v.erase(v.begin() + i);
+				}
+			}
+        }
 		
 		std::string toString(bool, bool, bool) const {
 			std::stringstream ss;
