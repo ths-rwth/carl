@@ -9,24 +9,31 @@
 
 namespace carl {
    
+	template<typename Pol>
     class PBConstraint{
-		friend std::ostream& operator<<(std::ostream& os, const PBConstraint& pbc);
+		using Number = typename UnderlyingNumberType<Pol>::type;
+		template<typename Poly>
+		friend std::ostream& operator<<(std::ostream& os, const PBConstraint<Poly>& pbc);
     private:
         Relation relation;
-        int rhs;
-        std::vector<std::pair<int,Variable>> lhs;
+        Number rhs;
+        std::vector<std::pair<Number,Variable>> lhs;
     public:
         PBConstraint() = default;
-        PBConstraint(std::vector<std::pair<int,Variable>> ls, Relation rel, int rs):
+        PBConstraint(std::vector<std::pair<Number,Variable>> ls, Relation rel, Number rs):
+			relation(rel),
+			rhs(rs),
+			lhs(std::move(ls))
+	    {
+            normalize();
+        }
+		PBConstraint(std::vector<std::pair<Number,Variable>>&& ls, Relation rel, Number rs):
 			relation(rel),
 			rhs(rs),
 		    lhs(std::move(ls))
-	    {}
-		PBConstraint(std::vector<std::pair<int,Variable>>&& ls, Relation rel, int rs):
-			relation(rel),
-			rhs(rs),
-		    lhs(std::move(ls))
-	    {}
+	    {
+            normalize();
+        }
         std::vector<Variable> gatherVariables() const {
 	        std::vector<Variable> varVector;
             for (const auto& ls: lhs) {
@@ -39,24 +46,34 @@ namespace carl {
 	        PBConstraint negConst(this->lhs, nRel, this->rhs);
 	        return negConst;
 		}
-        void setLHS(const std::vector<std::pair<int, Variable>>& l) {
+        void setLHS(const std::vector<std::pair<Number, Variable>>& l) {
 			lhs = l;
 		}
         void setRelation(Relation r) {
 			relation = r;
 		}
-        void setRHS(int r) {
+        void setRHS(Number r) {
 			rhs = r;
 		}
-        const std::vector<std::pair<int, Variable>>& getLHS() const {
+        const std::vector<std::pair<Number, Variable>>& getLHS() const {
 			return lhs;
 		}
         Relation getRelation() const {
 			return relation;
 		}
-        int getRHS() const {
+        Number getRHS() const {
 			return rhs;
 		}
+        
+        void normalize() {
+            for (auto it = lhs.begin(); it != lhs.end(); ) {
+                if (it->first == 0) {
+                    it = lhs.erase(it);
+                } else {
+                    it++;
+                }
+            }
+        }
 		
 		std::string toString(bool, bool, bool) const {
 			std::stringstream ss;
@@ -84,17 +101,20 @@ namespace carl {
 			return false;
 		}
     };
-        
-    inline std::ostream& operator<<(std::ostream& os, const PBConstraint& pbc) {
+    
+	template<typename Pol>
+    inline std::ostream& operator<<(std::ostream& os, const PBConstraint<Pol>& pbc) {
 		return os << pbc.getLHS() << pbc.getRelation() << pbc.getRHS();
 	}
 	
-	inline bool operator==(const PBConstraint& lhs, const PBConstraint& rhs) {
+	template<typename Pol>
+	inline bool operator==(const PBConstraint<Pol>& lhs, const PBConstraint<Pol>& rhs) {
 		return lhs.getRelation() == rhs.getRelation() && 
 			lhs.getRHS() == rhs.getRHS() && 
 			lhs.getLHS() == rhs.getLHS();
 	}
-	inline bool operator<(const PBConstraint& lhs, const PBConstraint& rhs) {
+	template<typename Pol>
+	inline bool operator<(const PBConstraint<Pol>& lhs, const PBConstraint<Pol>& rhs) {
 		if (lhs.getRHS() != rhs.getRHS()) return (lhs.getRHS() < rhs.getRHS());
 		if (lhs.getRelation() != rhs.getRelation()) return lhs.getRelation() < rhs.getRelation();
 		return lhs.getLHS() < rhs.getLHS();
@@ -102,14 +122,14 @@ namespace carl {
 }
 
 namespace std {
-	template<>
-    struct hash<carl::PBConstraint> {
+	template<typename Pol>
+    struct hash<carl::PBConstraint<Pol>> {
     public:
         /**
          * @param _pbc The constraint to get the hash for.
          * @return The hash of the given constraint.
          */
-        std::size_t operator()(const carl::PBConstraint& _pbc) const {
+        std::size_t operator()(const carl::PBConstraint<Pol>& _pbc) const {
 			std::size_t seed = 0;
 			for (const auto& l: _pbc.getLHS()) {
 				carl::hash_add(seed, l.first, l.second);

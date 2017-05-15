@@ -120,7 +120,7 @@ namespace carl
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
 			
-			explicit Formula( const PBConstraint& _constraint ):
+			explicit Formula( const PBConstraint<Pol>& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
             
@@ -189,7 +189,7 @@ namespace carl
                 Formula( FormulaPool<Pol>::getInstance().create( std::move( UEquality( _eq ) ) ) )
             {}
 				
-			explicit Formula( PBConstraint&& _pbc ):
+			explicit Formula( PBConstraint<Pol>&& _pbc ):
                 Formula( FormulaPool<Pol>::getInstance().create( std::move( _pbc ) ) )
             {}
             
@@ -591,7 +591,7 @@ namespace carl
              * @return A constant reference to the pseudoboolean constraint represented by this formula. Note, that
              *          this formula has to be of type PBCONSTRAINT, if you invoke this method.
              */
-            const PBConstraint& pbConstraint() const
+            const PBConstraint<Pol>& pbConstraint() const
             {
                 assert( mpContent->mType == FormulaType::PBCONSTRAINT );
 #ifdef __VS

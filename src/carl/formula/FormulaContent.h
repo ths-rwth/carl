@@ -178,7 +178,7 @@ namespace carl {
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
                 UEquality* mpUIEqualityVS;
 				/// The pseudoboolean constraint.
-				PBConstraint* mpPBConstraintVS;
+				PBConstraint<Pol>* mpPBConstraintVS;
                 /// The only sub-formula, in case this formula is an negation.
                 Formula<Pol>* mpSubformulaVS;
                 /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
@@ -203,7 +203,7 @@ namespace carl {
 				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
 				UEquality mUIEquality;
 				/// The pseudoboolean constraint.
-				PBConstraint mPBConstraint;
+				PBConstraint<Pol> mPBConstraint;
 				/// The only sub-formula, in case this formula is an negation.
 				Formula<Pol> mSubformula;
 				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
@@ -272,7 +272,7 @@ namespace carl {
              * Constructs a formula being an pseudoboolean constraint.
              * @param _pbc The pointer to the constraint.
              */
-            FormulaContent(PBConstraint&& _pbc);
+            FormulaContent(PBConstraint<Pol>&& _pbc);
 
             /**
              * Constructs a formula of the given type with a single subformula. This is usually a negation.
