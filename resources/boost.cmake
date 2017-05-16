@@ -77,4 +77,6 @@ ExternalProject_Get_Property(boost INSTALL_DIR)
 add_imported_library(BOOST SHARED "" "${INSTALL_DIR}/include")
 link_directories("${INSTALL_DIR}/lib")
 
+add_imported_library(BOOST STATIC "" "${INSTALL_DIR}/include")
+
 add_dependencies(resources boost)
