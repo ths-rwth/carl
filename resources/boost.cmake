@@ -10,7 +10,7 @@ else()
 endif()
 
 ExternalProject_Add(
-	boost
+	Boost_EP
 	GIT_SUBMODULES 
 		libs/algorithm
 		libs/any
@@ -72,11 +72,22 @@ ExternalProject_Add(
 	INSTALL_COMMAND ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release install
 )
 
-ExternalProject_Get_Property(boost INSTALL_DIR)
+ExternalProject_Get_Property(Boost_EP INSTALL_DIR)
 
-add_imported_library(BOOST SHARED "" "${INSTALL_DIR}/include")
-link_directories("${INSTALL_DIR}/lib")
+set(shared_libs "")
+set(static_libs "")
+foreach(component ${BOOST_COMPONENTS})
+	set(shared_libs "${shared_libs};${INSTALL_DIR}/lib/lib${component}${DYNAMIC_EXT}")
+	set(static_libs "${static_libs};${INSTALL_DIR}/lib/lib${component}${STATIC_EXT}")
+endforeach()
 
-add_imported_library(BOOST STATIC "" "${INSTALL_DIR}/include")
+add_imported_library(Boost SHARED "${shared_libs}" "${INSTALL_DIR}/include")
+add_imported_library(Boost STATIC "${static_libs}" "${INSTALL_DIR}/include")
 
-add_dependencies(resources boost)
+unset(shared_libs)
+unset(static_libs)
+
+add_dependencies(Boost_SHARED Boost_EP)
+add_dependencies(Boost_STATIC Boost_EP)
+
+add_dependencies(resources Boost_SHARED Boost_STATIC)
