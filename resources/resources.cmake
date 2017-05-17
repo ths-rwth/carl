@@ -31,8 +31,9 @@ else()
 endif()
 
 ##### Boost
+set(BOOST_COMPONENTS "system;program_options;regex")
 if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl Boost 1.55 COMPONENTS system program_options regex)
+	load_library(carl Boost 1.55 COMPONENTS ${BOOST_COMPONENTS})
 endif()
 if(Boost_FOUND)
 	message(STATUS "Use system version of Boost ${Boost_VERSION}")
