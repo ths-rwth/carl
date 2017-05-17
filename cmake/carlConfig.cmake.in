@@ -1,4 +1,9 @@
 set(carl_VERSION @carl_VERSION@)
+
+set( carl_MAJORVERSION @carl_MAJORVERSION@)
+set( carl_MINORYEARVERSION @carl_YEARVERSION@)
+set( carl_MINORMONTHVERSION @carl_MONTHVERSION@)
+set( carl_MAINTENANCEVERSION @carl_MAINTENANCEVERSION@)
    
 get_filename_component(carl_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
