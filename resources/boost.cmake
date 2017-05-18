@@ -74,11 +74,11 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(Boost_EP INSTALL_DIR)
 
-set(shared_libs "")
-set(static_libs "")
+set(shared_libs)
+set(static_libs)
 foreach(component ${BOOST_COMPONENTS})
-	set(shared_libs "${shared_libs};${INSTALL_DIR}/lib/lib${component}${DYNAMIC_EXT}")
-	set(static_libs "${static_libs};${INSTALL_DIR}/lib/lib${component}${STATIC_EXT}")
+	list(APPEND shared_libs "${INSTALL_DIR}/lib/lib${component}${DYNAMIC_EXT}")
+	list(APPEND static_libs "${INSTALL_DIR}/lib/lib${component}${STATIC_EXT}")
 endforeach()
 
 add_imported_library(Boost SHARED "${shared_libs}" "${INSTALL_DIR}/include" ${BOOST_COMPONENTS})
