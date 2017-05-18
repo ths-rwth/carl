@@ -30,7 +30,7 @@ function(add_imported_library name type lib include)
 				list(GET lib_list ${index} l)
 				list(GET shortnames ${index} shortname)
 				add_imported_library("${name}_${shortname}" ${type} ${l} ${include})
-				set(libs "${libs};${name}_${shortname}_${type}")
+				list(APPEND libs "${name}_${shortname}_${type}")
 				# only from cmake 3.3 https://github.com/ceph/ceph/pull/7128
 				#add_dependencies(${name}_${type} ${name}_${shortname}_${type})
 			endforeach()
