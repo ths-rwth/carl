@@ -5,12 +5,12 @@
 #
 # This file contains several macros which are used in this project. Notice that several are copied straight from web ressources.
 
-macro(add_imported_library_interface name include)
+function(add_imported_library_interface name include)
 	add_library(${name} INTERFACE IMPORTED)
 	set_target_properties(${name} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${include}")
-endmacro(add_imported_library_interface)
+endfunction(add_imported_library_interface)
 
-macro(add_imported_library name type lib include)
+function(add_imported_library name type lib include)
 	# Workaround from https://cmake.org/Bug/view.php?id=15052
 	file(MAKE_DIRECTORY "${include}")
 	if("${lib}" STREQUAL "")
@@ -38,17 +38,18 @@ macro(add_imported_library name type lib include)
 			set_target_properties(${name}_${type} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${include}")
 		endif()
 	endif()
-endmacro(add_imported_library)
+endfunction(add_imported_library)
 
-macro(export_option name)
+function(export_option name)
 	list(APPEND EXPORTED_OPTIONS "${name}")
-endmacro(export_option)
+	set(EXPORTED_OPTIONS "${EXPORTED_OPTIONS}" PARENT_SCOPE)
+endfunction(export_option)
 
-macro(_export_target_add_lib output TARGET TYPE)
+function(_export_target_add_lib output TARGET TYPE)
 	set(${output} "${${output}}
 
-add_library(${TARGET} ${TYPE} IMPORTED)")
-endmacro(_export_target_add_lib)
+add_library(${TARGET} ${TYPE} IMPORTED)" PARENT_SCOPE)
+endfunction(_export_target_add_lib)
 
 macro(_export_target_set_prop output TARGET PROPERTY)
 	get_target_property(VALUE ${TARGET} ${PROPERTY})
