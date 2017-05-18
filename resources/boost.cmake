@@ -81,8 +81,8 @@ foreach(component ${BOOST_COMPONENTS})
 	set(static_libs "${static_libs};${INSTALL_DIR}/lib/lib${component}${STATIC_EXT}")
 endforeach()
 
-add_imported_library(Boost SHARED "${shared_libs}" "${INSTALL_DIR}/include")
-add_imported_library(Boost STATIC "${static_libs}" "${INSTALL_DIR}/include")
+add_imported_library(Boost SHARED "${shared_libs}" "${INSTALL_DIR}/include" ${BOOST_COMPONENTS})
+add_imported_library(Boost STATIC "${static_libs}" "${INSTALL_DIR}/include" ${BOOST_COMPONENTS})
 
 unset(shared_libs)
 unset(static_libs)
