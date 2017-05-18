@@ -4,6 +4,13 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 add_custom_target(resources)
 
 ###############
+##### Generic resource configuration
+###############
+if("${CMAKE_GENERATOR}" MATCHES "Make")
+	set(CMAKE_MAKE_PROGRAM "$(MAKE)")
+endif()
+
+###############
 ##### Process resource dependencies
 ###############
 if(USE_GINAC)
