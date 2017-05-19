@@ -21,6 +21,7 @@ CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 CLANG_WARNING_RESET
 
 #include <climits>
+#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <sstream>
@@ -200,11 +201,13 @@ inline T rationalize(const PreventConversion<mpq_class>&);
 
 template<>
 inline mpq_class rationalize<mpq_class>(float n) {
+	assert(!std::isinf(n) && !std::isnan(n));
 	return mpq_class(n);
 }
 
 template<>
 inline mpq_class rationalize<mpq_class>(double n) {
+	assert(!std::isinf(n) && !std::isnan(n));
 	return mpq_class(n);
 }
 
