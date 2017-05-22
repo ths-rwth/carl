@@ -54,10 +54,6 @@ Using `[t]`, you can enable the _advanced mode_ that shows all options. Most of 
   Setting *LOGGING* to *OFF* disables all logging output. 
   It is recommended if the performance should be maximized, but notice that this also prevents important warnings and error messages to be generated.
 
-- *LOGGING_CARL* [ON, OFF] <br>
-  Switches between the CArL logging library (*ON*) and simply logging to `std::cout` and `std::cerr` (*OFF*).
-
-
 CMake Targets
 ------------
 
