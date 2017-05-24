@@ -39,6 +39,8 @@ struct equal_to<T*, mayBeNull> {
 		if (mayBeNull) {
 			if (lhs == nullptr || rhs == nullptr) return false;
 		}
+		assert(lhs != nullptr);
+		assert(rhs != nullptr);
 		return std::equal_to<T>()(*lhs, *rhs);
 	}
 };
