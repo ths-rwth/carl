@@ -64,6 +64,24 @@ namespace carl {
         Number getRHS() const {
 			return rhs;
 		}
+		bool hasVariable(Variable v) const {
+			for (const auto& t: lhs) {
+				if (t.second == v) return true;
+			}
+			return false;
+		}
+		const Number& getCoefficient(Variable v) const {
+			for (const auto& t: lhs) {
+				if (t.second == v) return t.first;
+			}
+			return constant_zero<Number>::get();
+		}
+		
+		void collectVariables(Variables& vars) const {
+			for (const auto& term: getLHS()) {
+				vars.insert(term.second);
+			}
+		}
         
         void normalize() {
             for (auto it = lhs.begin(); it != lhs.end(); ) {
