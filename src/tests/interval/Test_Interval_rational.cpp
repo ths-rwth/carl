@@ -17,7 +17,7 @@ TYPED_TEST_CASE(IntervalRationalTest, RationalTypes);
 
 TYPED_TEST(IntervalRationalTest, Constructor) {
 	using Interval = Interval<TypeParam>;
-	
+
 	{ // Interval()
 		Interval i;
 		EXPECT_EQ(BoundType::STRICT, i.lowerBoundType());
@@ -31,7 +31,7 @@ TYPED_TEST(IntervalRationalTest, Constructor) {
 		EXPECT_EQ(BoundType::WEAK, i0.upperBoundType());
 		EXPECT_EQ(0, i0.rContent().lower());
 		EXPECT_EQ(0, i0.rContent().upper());
-		
+
 		Interval i1(TypeParam(1));
 		EXPECT_EQ(BoundType::WEAK, i1.lowerBoundType());
 		EXPECT_EQ(BoundType::WEAK, i1.upperBoundType());
@@ -44,13 +44,13 @@ TYPED_TEST(IntervalRationalTest, Constructor) {
 		EXPECT_EQ(BoundType::WEAK, i0.upperBoundType());
 		EXPECT_EQ(1, i0.rContent().lower());
 		EXPECT_EQ(1, i0.rContent().upper());
-		
+
 		Interval i1(TypeParam(1), TypeParam(2));
 		EXPECT_EQ(BoundType::WEAK, i1.lowerBoundType());
 		EXPECT_EQ(BoundType::WEAK, i1.upperBoundType());
 		EXPECT_EQ(1, i1.rContent().lower());
 		EXPECT_EQ(2, i1.rContent().upper());
-		
+
 		Interval i2(TypeParam(2), TypeParam(1));
 		EXPECT_EQ(BoundType::STRICT, i2.lowerBoundType());
 		EXPECT_EQ(BoundType::STRICT, i2.upperBoundType());
@@ -279,5 +279,24 @@ TYPED_TEST(IntervalRationalTest, center) {
 TYPED_TEST(IntervalRationalTest, abs) {
 	using Interval = Interval<TypeParam>;
 	Interval i(-ONE, -HALF);
-	std::cout << i << " -> " << i.abs() << std::endl;
+	EXPECT_EQ(i.abs().lower(), HALF);
+	EXPECT_EQ(i.abs().upper(), ONE);
+
+	Interval i2(1,2);
+	EXPECT_EQ(i2, i2.abs());
+
+	Interval i3(-1,1);
+	EXPECT_EQ(Interval(0,1), i3.abs());
+
+	Interval i4(-ONE, BoundType::STRICT, -HALF, BoundType::WEAK);
+	EXPECT_EQ(i4.abs().lower(), HALF);
+	EXPECT_EQ(i4.abs().upper(), ONE);
+	EXPECT_EQ(i4.abs().lowerBoundType(), BoundType::WEAK);
+	EXPECT_EQ(i4.abs().upperBoundType(), BoundType::STRICT);
+
+	Interval i5(-ONE, BoundType::STRICT, ONE, BoundType::STRICT);
+	EXPECT_EQ(i5.abs().lower(), 0);
+	EXPECT_EQ(i5.abs().upper(), ONE);
+	EXPECT_EQ(i5.abs().lowerBoundType(), BoundType::WEAK);
+	EXPECT_EQ(i5.abs().upperBoundType(), BoundType::STRICT);
 }

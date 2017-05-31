@@ -802,7 +802,7 @@ void Interval<Number>::inverse_assign()
             }
             else if( mContent.upper() < carl::constant_zero<Number>().get()) // interval is fully negative
             {
-                return Interval<Number>(-mContent.lower(), mLowerBoundType, -mContent.upper(), mUpperBoundType);
+                return Interval<Number>(-mContent.upper(), mUpperBoundType, -mContent.lower(), mLowerBoundType);
             }
             // otherwise inteval is already fully positive
             return *this;
