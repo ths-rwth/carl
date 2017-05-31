@@ -7,6 +7,7 @@
 # include util in library.
 add_subdirectory(util)
 
+include(GNUInstallDirs)
 # Configure all .in files
 file(GLOB_RECURSE carl_lib_tpl "*.in")
 foreach(tpl ${carl_lib_tpl})
@@ -27,6 +28,7 @@ set_target_properties( lib_carl PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 #	INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/src"
 )
+message(STATUS "cmake install include dir: ${CMAKE_INSTALL_INCLUDEDIR}")
 target_include_directories( lib_carl PUBLIC
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/carl>
 	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
