@@ -257,7 +257,14 @@ public:
 	
 	RealAlgebraicNumber<Number> abs() const {
 		if (isNumeric()) return RealAlgebraicNumber<Number>(carl::abs(mValue), mIsRoot);
-		if (isInterval()) return RealAlgebraicNumber<Number>(mIR->polynomial, mIR->interval.abs(), mIsRoot);
+		if (isInterval()) {
+			if (mIR->interval.contains(constant_zero<Number>::get())) {
+				mIR->refineAvoiding(constant_zero<Number>::get());
+				return abs();
+			}
+			if (mIR->interval.isPositive()) return *this;
+			return RealAlgebraicNumber<Number>(mIR->polynomial.negateVariable(), mIR->interval.abs(), mIsRoot);
+		}
 		return RealAlgebraicNumber<Number>();
 	}
 
