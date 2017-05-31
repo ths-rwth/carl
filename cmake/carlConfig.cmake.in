@@ -19,5 +19,5 @@ endif()
    
 set(carl_INCLUDE_DIR "@CONF_INCLUDE_DIRS@")
 
-set(carl_LIBRARIES lib_carl)
+set(carl_LIBRARIES carl)
 check_required_components(carl)
