@@ -90,7 +90,7 @@ set(BIN_INSTALL_DIR lib/ CACHE PATH "Installation directory for executables")
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKE_DIR CMake)
 else()
-  set(DEF_INSTALL_CMAKE_DIR lib/CMake/carl)
+  set(DEF_INSTALL_CMAKE_DIR lib/cmake/carl)
 endif()
 set(CMAKE_INSTALL_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH  "Installation directory for CMake files")
 

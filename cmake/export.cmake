@@ -1,6 +1,6 @@
 
 # Add all targets to the build-tree export set
-export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
+export(EXPORT carl_Targets FILE "${PROJECT_BINARY_DIR}/carlExport/carlTargets.cmake")
 
 message(STATUS "Registered with cmake")
 # Export the package for use from the build-tree
@@ -26,8 +26,6 @@ export_target(DEP_TARGETS GMP_STATIC)
 export_target(DEP_TARGETS GMPXX_SHARED)
 export_target(DEP_TARGETS GMPXX_STATIC GMP_STATIC)
 export_target(DEP_TARGETS EIGEN3)
-export_target(DEP_TARGETS GTESTCORE_STATIC)
-export_target(DEP_TARGETS GTESTMAIN_STATIC)
 
 export_target_recursive(DEP_TARGETS Boost_SHARED INTERFACE_LINK_LIBRARIES)
 export_target_recursive(DEP_TARGETS Boost_STATIC INTERFACE_LINK_LIBRARIES)
@@ -39,10 +37,14 @@ endforeach()
 
 include(CMakePackageConfigHelpers)
 
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")
+file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlExport/carlConfigVersion.cmake
+	 VERSION 0.1.0
+	 COMPATIBILITY SameMajorVersion )
+set(CONF_INCLUDE_DIRS "\${carl_CMAKE_DIR}/${REL_INCLUDE_DIR}")
 configure_package_config_file(
 	cmake/carlConfig.cmake.in
-	${CMAKE_CURRENT_BINARY_DIR}/carlConfig.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/carlExport/carlConfig.cmake
 	INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
 	PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
 )
