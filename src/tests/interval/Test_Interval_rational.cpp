@@ -275,3 +275,9 @@ TYPED_TEST(IntervalRationalTest, center) {
 		EXPECT_TRUE(5 < i5.center() && i5.center() < 10);
 	}
 }
+
+TYPED_TEST(IntervalRationalTest, abs) {
+	using Interval = Interval<TypeParam>;
+	Interval i(-ONE, -HALF);
+	std::cout << i << " -> " << i.abs() << std::endl;
+}
