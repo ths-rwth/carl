@@ -47,7 +47,7 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	git clone https://github.com/moves-rwth/pycarl.git
 	cd pycarl/ || return 1
 	# Build bindings
-	python setup.py -j 1 develop || return 1
+	python setup.py build_ext -j 1 develop || return 1
 	# Run tests
 	py.test tests/ || return 1
 	
