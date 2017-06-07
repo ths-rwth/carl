@@ -37,7 +37,7 @@ elif [[ ${TASK} == "doxygen" ]]; then
 elif [[ ${TASK} == "pycarl" ]]; then
 	
 	# Create a python virtual environment for local installation
-	virtualenv pycarl-env
+	virtualenv -p python3 pycarl-env
 	source pycarl-env/bin/activate
 	
 	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
