@@ -91,6 +91,15 @@ namespace carl {
                     it++;
                 }
             }
+            if(lhs.size() == 0 && rhs != 0){//fasle ==> 0 x = 1
+            	lhs.push_back(std::pair<Number, Variable>(0, freshVariable(carl::VariableType::VT_BOOL)));
+            	rhs = 1;
+            	relation = Relation::EQ;
+            }else if(lhs.size() == 0 && rhs == 0){//true 0 x = 0
+				lhs.push_back(std::pair<Number, Variable>(0, freshVariable(carl::VariableType::VT_BOOL)));
+            	rhs = 0;
+            	relation = Relation::EQ;
+            }
         }
 		
 		std::string toString(bool, bool, bool) const {
