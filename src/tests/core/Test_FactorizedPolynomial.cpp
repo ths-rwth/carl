@@ -425,8 +425,8 @@ TEST(FactorizedPolynomial, LCM)
     EXPECT_EQ( pLCM, computePolynomial( fpLCM ) );
 
     carl::VariablePool::getInstance().clear();
-    Variable y(1);
-    Variable x(2);
+    Variable y = carl::freshRealVariable("y");
+    Variable x = carl::freshRealVariable("x");
     Pol px( x );
     Pol py( y );
     Pol p1( px*py-py+Rational(1) );

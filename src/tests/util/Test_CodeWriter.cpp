@@ -13,9 +13,9 @@ TEST(CodeWriter, Basic)
 
     carl::GeneratorWriter<carl::MultivariatePolynomial<Rational>, carl::MultivariatePolynomial<Rational>> gw("TestAdditionGenerator");
 
-	carl::Variable x(1);
-	carl::Variable y(2);
-	carl::Variable z(3);
+	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable y = carl::freshRealVariable("y");
+	carl::Variable z = carl::freshRealVariable("z");
 
 	carl::MultivariatePolynomial<Rational> p1({Rational(1)*x, Rational(-1)*x*x, Rational(3)*x*x*x});
 	carl::MultivariatePolynomial<Rational> p2({Rational(1)*x, Rational(-1)*y*z, Rational(3)*x*z*z});

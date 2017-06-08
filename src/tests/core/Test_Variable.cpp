@@ -1,6 +1,7 @@
 
 #include "gtest/gtest.h"
 #include <carl/core/Variable.h>
+#include <carl/core/VariablePool.h>
 
 #include "../Common.h"
 
@@ -13,10 +14,9 @@ TEST(Variable, Constructor)
 
 TEST(Variable, Equals)
 {
-    Variable v1(1,VariableType::VT_INT);
-    Variable v2(2,VariableType::VT_REAL);
+    Variable v1 = carl::freshIntegerVariable("v1");
+    Variable v2 = carl::freshRealVariable("v2");
     EXPECT_EQ(VariableType::VT_INT,v1.getType());
-    EXPECT_EQ((unsigned)1,v1.getId());
     EXPECT_EQ(VariableType::VT_REAL,v2.getType());
     EXPECT_TRUE(v1 != v2);
     EXPECT_TRUE(v1 == v1);
@@ -26,9 +26,9 @@ TEST(Variable, Comparison)
 {
     ComparisonList<Variable> list;
 
-    Variable v0(1);
-    Variable v1(2);
-    Variable v2(3);
+    Variable v0 = carl::freshRealVariable("v0");
+    Variable v1 = carl::freshRealVariable("v1");
+    Variable v2 = carl::freshRealVariable("v2");
 
     list.push_back(v2);
     list.push_back(v1);

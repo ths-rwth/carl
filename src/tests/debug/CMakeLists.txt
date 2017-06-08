@@ -1,7 +1,7 @@
-# Add test cpp file
-add_executable( runDebugTests
-    Test_GCC.cpp
-)
+file(GLOB_RECURSE test_sources "*.cpp")
+
+add_executable(runDebugTests ${test_sources})
+
 target_link_libraries(runDebugTests TestCommon)
 
-add_test( NAME debug COMMAND runDebugTests )
+add_test(NAME debug COMMAND runDebugTests)

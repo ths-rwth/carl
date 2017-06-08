@@ -128,8 +128,8 @@ TEST(Monomial, MonomialMultiplication)
 
 TEST(Monomial, derivative)
 {
-	Variable v0((unsigned)1);
-	Variable v1((unsigned)2);
+	Variable v0 = freshRealVariable("x");
+	Variable v1 = freshRealVariable("y");
 	Monomial::Arg m0 = v0 * v1;
 	auto d1 = m0->derivative(v0);
 	EXPECT_EQ(1, d1.first);
@@ -138,9 +138,9 @@ TEST(Monomial, derivative)
 
 TEST(Monomial, division)
 {
-	Variable v0((unsigned)1);
-	Variable v1((unsigned)2);
-	Variable v2((unsigned)3);
+	Variable v0 = freshRealVariable("x");
+	Variable v1 = freshRealVariable("y");
+	Variable v2 = freshRealVariable("z");
 
 	Monomial::Arg m0 = v0 * v0 * v1 * v1 * v2;
 	Monomial::Arg m1 = v0 * v0 * v0;

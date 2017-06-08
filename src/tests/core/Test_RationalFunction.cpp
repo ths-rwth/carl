@@ -126,7 +126,7 @@ TEST(RationalFunction, Multiplication)
 
     //(1/4*PF)/((-1/4)*PF+1) * ((-1/4)*PF+1)/((-1/2)*PF+1)
     carl::VariablePool::getInstance().clear();
-    Variable t(1);
+    Variable t = carl::freshRealVariable("t");
     Pol pf(t);
     Pol nomA( Rational(1)/Rational(4)*pf );
     Pol denA( Rational(-1)/Rational(4)*pf+Rational(1) );

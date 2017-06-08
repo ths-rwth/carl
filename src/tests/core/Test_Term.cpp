@@ -17,14 +17,14 @@ TYPED_TEST_CASE(TermTest, RationalTypes); // TODO should use NumberTypes
 TYPED_TEST(TermTest, Constructor)
 {
     Term<TypeParam> t(1);
-    Variable v0(1);
+    Variable v0 = carl::freshRealVariable("v0");
     Term<TypeParam> t0(v0);
 }
 
 TYPED_TEST(TermTest, Operators)
 {
     Term<TypeParam> t(1);
-    Variable v0(1);
+    Variable v0 = carl::freshRealVariable("v0");
     Term<TypeParam> t0(v0);
     EXPECT_TRUE(t0.isLinear());
     EXPECT_TRUE(t.isLinear());
@@ -34,7 +34,7 @@ TYPED_TEST(TermTest, Operators)
 TYPED_TEST(TermTest, Multiplication)
 {
     Term<TypeParam> t(1);
-    Variable v0(1);
+    Variable v0 = carl::freshRealVariable("v0");
     t *= v0;
     Term<TypeParam> t0(v0);
     EXPECT_EQ(t0,t);
@@ -66,8 +66,8 @@ TYPED_TEST(TermTest, TermMultiplication)
 
 TYPED_TEST(TermTest, Derivative)
 {
-    Variable v0(1);
-    Variable v1(2);
+    Variable v0 = carl::freshRealVariable("v0");
+    Variable v1 = carl::freshRealVariable("v1");
     Term<TypeParam> t(3);
     t *= v0 * v0 * v0 * v1;
     Term<TypeParam> tprime = t.derivative(v0);
@@ -76,8 +76,8 @@ TYPED_TEST(TermTest, Derivative)
 
 TYPED_TEST(TermTest, Substitute)
 {
-    Variable v0(1);
-    Variable v1(2);
+    Variable v0 = carl::freshRealVariable("v0");
+    Variable v1 = carl::freshRealVariable("v1");
     Term<TypeParam> t(3);
     Term<TypeParam> c4(4);
     t *= v0 * v0 * v1;

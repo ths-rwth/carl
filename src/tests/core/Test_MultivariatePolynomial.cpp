@@ -18,7 +18,7 @@ TYPED_TEST_CASE(MultivariatePolynomialTest, NumberTypes);
 
 TYPED_TEST(MultivariatePolynomialTest, Constructor)
 {
-    Variable v0(1);
+	Variable v0 = carl::freshRealVariable("x");
     Term<TypeParam> t0(v0);
     MultivariatePolynomial<TypeParam> p0(t0);
 	
@@ -29,7 +29,7 @@ TYPED_TEST(MultivariatePolynomialTest, Constructor)
 
 TYPED_TEST(MultivariatePolynomialTest, Operators)
 {
-    Variable v0(1);
+	Variable v0 = carl::freshRealVariable("x");
     Term<TypeParam> t0(v0);
     MultivariatePolynomial<TypeParam> p0a(t0);
     MultivariatePolynomial<TypeParam> p0b(v0);
@@ -40,7 +40,7 @@ TYPED_TEST(MultivariatePolynomialTest, Operators)
 
 TYPED_TEST(MultivariatePolynomialTest, getTerms)
 {
-    Variable v0(1);
+	Variable v0 = carl::freshRealVariable("x");
 	MultivariatePolynomial<TypeParam> p;
 	p += TypeParam(1);
 	p += v0;
@@ -55,8 +55,8 @@ TYPED_TEST(MultivariatePolynomialTest, getTerms)
 
 TEST(MultivariatePolynomial, remainder)
 {
-    Variable x(1);
-    Variable y(2);
+	Variable x = carl::freshRealVariable("x");
+	Variable y = carl::freshRealVariable("y");
     MultivariatePolynomial<Rational> px( x );
     MultivariatePolynomial<Rational> py( y );
     MultivariatePolynomial<Rational> p( px - Rational(3) );
@@ -68,8 +68,8 @@ TEST(MultivariatePolynomial, remainder)
 
 TEST(MultivariatePolynomial, toUnivariatePolynomial)
 {
-    Variable x = freshRealVariable();
-	Variable y = freshRealVariable();
+    Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
 	{
 		MultivariatePolynomial<Rational> p({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
 		UnivariatePolynomial<Rational> res(x, {(Rational)0, (Rational)1, (Rational)-1, (Rational)3});
@@ -137,7 +137,7 @@ TYPED_TEST(MultivariatePolynomialTest, Addition)
 
 TYPED_TEST(MultivariatePolynomialTest, Substraction)
 {
-    Variable v0((unsigned)1);
+    Variable v0 = freshRealVariable("v0");
     MultivariatePolynomial<TypeParam> p0(v0);
     p0 -= 3;
     EXPECT_EQ((unsigned)2, p0.nrTerms());
@@ -145,8 +145,8 @@ TYPED_TEST(MultivariatePolynomialTest, Substraction)
     EXPECT_EQ((unsigned)2, p0.nrTerms());
     p0 -= -6;
     EXPECT_EQ((unsigned)1, p0.nrTerms());
-    Variable v1((unsigned)2);
-    Variable v2((unsigned)3);
+    Variable v1 = freshRealVariable("v1");
+    Variable v2 = freshRealVariable("v2");
     p0 -= v1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     p0 -= createMonomial(v2, (exponent) 1);
@@ -165,8 +165,8 @@ TYPED_TEST(MultivariatePolynomialTest, Substraction)
 
 TYPED_TEST(MultivariatePolynomialTest, Multiplication)
 {
-    Variable v0(1);
-    Variable v1(2);
+    Variable v0 = freshRealVariable("v0");
+    Variable v1 = freshRealVariable("v1");
     MultivariatePolynomial<TypeParam> p0(v0);
 
     p0 *= v0;
@@ -209,8 +209,8 @@ TEST(MultivariatePolynomial, Normalize)
 
 TEST(MultivariatePolynomial, Coprime)
 {
-    Variable v0(1);
-    Variable v1(2);
+    Variable v0 = freshRealVariable("v0");
+    Variable v1 = freshRealVariable("v1");
     MultivariatePolynomial<Rational> mp;
     mp += v0;
     MultivariatePolynomial<Rational> mp2 = mp * (Rational)2;
@@ -245,8 +245,8 @@ TEST(MultivariatePolynomial, Coprime)
 
 TEST(MultivariatePolynomial, Substitute)
 {
-    Variable v0(1);
-    Variable v1(2);
+    Variable v0 = freshRealVariable("v0");
+    Variable v1 = freshRealVariable("v1");
 	{
 		MultivariatePolynomial<Rational> p(v0);
 		p.substituteIn(v0, MultivariatePolynomial<Rational>(-1));
