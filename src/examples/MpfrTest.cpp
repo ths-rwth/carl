@@ -9,9 +9,7 @@
 
 #include "../carl/numbers/numbers.h"
 
-#include <mpfr.h>
-#include <gmp.h>
-
+#ifdef USE_MPFR_FLOAT
 
 void compare() {
 	mpfr_t a;
@@ -103,6 +101,8 @@ void toInt(mpz_t intRep, mpfr_t a) {
 	mpz_clear(tmp);
 }
 
+#endif
+
 int main (int argc, char** argv)
 {
 	/*
@@ -124,7 +124,8 @@ int main (int argc, char** argv)
 	mpz_get_str(outStr, 10,b);
 	std::cout << std::string(outStr) << std::endl;
 	*/
-
+#ifdef USE_MPFR_FLOAT
 	compare();
+#endif
 	return 0;
 }
