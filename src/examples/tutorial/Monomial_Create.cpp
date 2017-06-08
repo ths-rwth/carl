@@ -15,15 +15,9 @@ int main() {
 	 * - the total degree, that is the sum of all exponents,
 	 * - the id, a unique identifier managed by the carl::MonomialPool and
 	 * - the hash of the monomial.
-	 *
-	 * A Monomial can either be constructed from a carl::Variable and an
-	 * exponent, or from an appropriate std::vector<> or std::initializer_list<>.
 	 */
 	carl::Variable x = carl::freshRealVariable("x");
 	carl::Variable y = carl::freshRealVariable("y");
-
-	carl::Monomial a(x, 2);
-	carl::Monomial b({std::make_pair(x,3), std::make_pair(y, 2)});
 
 	/*
 	 * However, carl::Monomial objects are managed by a carl::MonomialPool,
@@ -35,11 +29,11 @@ int main() {
 	 * The type of the std::shared_ptr is defined by carl::Monomial::Arg.
 	 */
 	
-	carl::Monomial::Arg c = carl::createMonomial(x, (carl::exponent)2);
-	carl::Monomial::Arg d = carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x,(carl::exponent)3), std::make_pair(y, (carl::exponent)2)}), (carl::exponent)5);
+	auto a = carl::createMonomial(x, (carl::exponent)2);
+	auto b = carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x,(carl::exponent)3), std::make_pair(y, (carl::exponent)2)}), (carl::exponent)5);
 
-	assert(c == x*x);
-	assert(d == x*x*x * y*y);
+	assert(a == x*x);
+	assert(b == x*x*x * y*y);
 
 	/*
 	 * As you see, the creation of monomials with multiple variables is somewhat
@@ -47,9 +41,9 @@ int main() {
 	 * Two variables can be multiplied, resulting in a monomial. Monomials can 
 	 * also be multiplied, resulting in a new monomial.
 	 */
-	carl::Monomial::Arg e = x*x*y;
-	carl::Monomial::Arg f = x*y;
-	carl::Monomial::Arg g = e*f;
+	auto c = x*x*y;
+	auto d = x*y;
+	auto e = c*d;
 
-	assert(g == d);
+	assert(e == b);
 }

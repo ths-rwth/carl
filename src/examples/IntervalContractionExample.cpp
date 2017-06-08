@@ -5,7 +5,7 @@
  * Created on September 11, 2013, 4:56 PM
  */
 
-#include "carl/interval/DoubleInterval.h"
+#include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/interval/IntervalEvaluation.h"
@@ -29,6 +29,8 @@ using namespace carl;
 template<template<typename> class Operator>
 using PolynomialContraction = Contraction<Operator, MultivariatePolynomial<Rational>>;
 
+using DoubleInterval = Interval<double>;
+
 /*
  * 
  */
@@ -40,23 +42,19 @@ int main(int argc, char** argv) {
     DoubleInterval id = DoubleInterval( 0, 2 );
     DoubleInterval resA, resB;
 
-    DoubleInterval::evaldoubleintervalmap map;
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable a = vpool.getFreshVariable();
-    vpool.setVariableName(a, "a");
-    Variable b = vpool.getFreshVariable();
-    vpool.setVariableName(b, "b");
-    Variable c = vpool.getFreshVariable();
-    vpool.setVariableName(c, "c");
-    Variable d = vpool.getFreshVariable();
-    vpool.setVariableName(d, "d");
+    DoubleInterval::evalintervalmap map;
+    
+    Variable a = freshRealVariable("a");
+    Variable b = freshRealVariable("b");
+    Variable c = freshRealVariable("c");
+    Variable d = freshRealVariable("d");
     
     map[a] = ia;
     map[b] = ib;
     map[c] = ic;
     map[d] = id;
 
-    MultivariatePolynomial<Rational> e6({(Rational)12*a,(Rational)3*b, (Rational)1*Monomial(c,2),(Rational)-1*Monomial(d,3)});
+    MultivariatePolynomial<Rational> e6({(Rational)12*a,(Rational)3*b, (Rational)1*createMonomial(c,2),(Rational)-1*createMonomial(d,3)});
     PolynomialContraction<SimpleNewton> contractor(e6);
     
     std::set<Variable> variables = {a,b,c,d};

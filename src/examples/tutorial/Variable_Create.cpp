@@ -50,27 +50,11 @@ int main() {
 	assert(e.getType() == carl::VariableType::VT_REAL);
 	
 	/*
-	 * In short test cases, it may be easier to simply assign ids manually.
-	 * To do this, you can use the carl::Variable constructors directly.
-	 * The default constructor produces a variable of id zero, which is
-	 * considered invalid. To check for such a case, you can compare with the
-	 * staticly stored variable Variable::NO_VARIABLE.
-	 */
-	carl::Variable f;
-	carl::Variable g(1);
-	carl::Variable h(7);
-
-	assert(f == carl::Variable::NO_VARIABLE);
-	assert(g == a);
-	assert(h.getId() == 7);
-
-	/*
 	 * As a variable objects technically consists of a single unsigned, most
 	 * compilers should optimize and avoid the overhead of actually constructing
 	 * objects. In this case, it may make a difference if you have
 	 * - carl::Variable
 	 * - const carl::Variable&
-	 * as a function argument. Use Variable::Arg for function arguments and the
-	 * preprocessor define VARIABLE_PASS_BY_VALUE to change the behavior.
+	 * as a function argument. Usually, carl::Variable should be preferred.
 	 */
 }
