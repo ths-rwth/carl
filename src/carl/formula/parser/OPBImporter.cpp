@@ -72,7 +72,7 @@ namespace carl {
 		
 	private:
 		Variable addVariable(const std::string& s) {
-			carl::Variable var = freshBooleanVariable(s);
+			carl::Variable var = freshIntegerVariable(s);
 			mVariables.add(s, var);
 			return var;
 		}

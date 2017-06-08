@@ -60,7 +60,7 @@ public:
 		Formula<Pol> resC(FormulaType::AND, std::move(constraints));
 		Pol objective;
 		for (const auto& term: file->objective) {
-			objective += Number(term.first) * carl::Variable(term.second.getId(), carl::VariableType::VT_INT);
+			objective += Number(term.first) * term.second;
 		}
 		return std::make_pair(std::move(resC), std::move(objective));
 	}
