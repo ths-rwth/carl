@@ -10,9 +10,10 @@
 #include <set>
 #include <iostream>
 #include <sstream>
-#include "../core/Variable.h"
-#include "../core/Constraint.h"
 #include "../core/MultivariatePolynomial.h"
+#include "../core/RationalFunction.h"
+#include "../core/Variable.h"
+#include "../formula/Constraint.h"
 
 namespace carl
 {
@@ -156,7 +157,7 @@ namespace io
 		WriteTosmt2Stream& operator<<(const Constraint<MultivariatePolynomial<C,O,P>> c)
 		{
 			c.lhs().gatherVariables(mVars);
-			mAssertions.back()->assertion  << "(" << c.rel() << " " << c.lhs().toString(false, true) << " 0)";
+			mAssertions.back()->assertion  << "(" << c.relation() << " " << c.lhs().toString(false, true) << " 0)";
 			if(mAutoLineBreaks) mAssertions.back()->assertion << "\n";
 			return *this;
 		}
