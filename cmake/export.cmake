@@ -37,14 +37,26 @@ endforeach()
 
 include(CMakePackageConfigHelpers)
 
-file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlExport/carlConfigVersion.cmake
 	 VERSION 0.1.0
 	 COMPATIBILITY SameMajorVersion )
-set(CONF_INCLUDE_DIRS "\${carl_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+
+# ... for the build tree
+set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src") # TODO looks not correct, this would be hypro_INCLUDE_DIR
+
 configure_package_config_file(
 	cmake/carlConfig.cmake.in
-	${CMAKE_CURRENT_BINARY_DIR}/carlExport/carlConfig.cmake
+	${PROJECT_BINARY_DIR}/carlExport/carlConfig.cmake
+	INSTALL_DESTINATION ${PROJECT_BINARY_DIR}
+	PATH_VARS PROJECT_SOURCE_DIR #SYSCONFIG_INSTALL_DIR
+)
+ # ... for the install tree
+file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
+set(CONF_INCLUDE_DIRS "\${carl_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+
+configure_package_config_file(
+	cmake/carlConfig.cmake.in
+	${PROJECT_BINARY_DIR}/carlInstall/carlConfig.cmake
 	INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
 	PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
 )
