@@ -19,6 +19,8 @@ namespace carl {
  * BOOL: the Booleans
  * REAL: the reals
  * INT: the integers
+ * UNINTERPRETED: all uninterpreted types
+ * BITVECTOR: bitvectors of any length
  */
 enum class VariableType { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, VT_BITVECTOR = 4, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_BITVECTOR, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
 
@@ -62,6 +64,7 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 	return os << to_string(t);
 }
 
+class VariablePool;
 
 /**
  * A Variable represents an algebraic variable that can be used throughout carl.
@@ -86,7 +89,8 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
  * However, this depends much on the capabilities of the compiler. 
  */
 class Variable
-{	
+{
+	friend VariablePool;
 private:
 	/// Type if a variable is passed by reference.
 	using ByRef = const Variable&;
@@ -108,22 +112,13 @@ private:
 	 * All other data (like names or alike) are stored in the VariablePool.
 	 */
 	std::size_t mContent = 0;
-
-public:
 	
 	/**
-	 * Default constructor, constructing a variable, which is considered as not an actual variable.
-	 * Such an invalid variable is stored in NO_VARIABLE, so use this if you need a default value for a variable.
-	 */
-	Variable() = default;
-	
-	/**
-	 * Although we recommend access through the VariablePool, we allow public construction of variables for local purposes.
-	 * However, please be aware that clashes may occur, as all variables with the same id are considered equal!
-	 * @param id The identifier of the variable.
-	 * @param type The type.
-	 * @param rank The rank.
-	 */
+	* Private constructor to be used by the VariablePool.
+	* @param id The identifier of the variable.
+	* @param type The type.
+	* @param rank The rank.
+	*/
 	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0) noexcept :
 		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | std::size_t(type))
 	{
@@ -131,7 +126,14 @@ public:
 		assert(0 < id && id < (std::size_t(1) << AVAILABLE));
 		assert(VariableType::MIN_TYPE <= type && type <= VariableType::MAX_TYPE);
 	}
-	
+
+public:
+	/**
+	 * Default constructor, constructing a variable, which is considered as not an actual variable.
+	 * Such an invalid variable is stored in NO_VARIABLE, so use this if you need a default value for a variable.
+	 */
+	Variable() = default;
+
 	/**
 	 * Retrieves the id of the variable.
 	 * @return Variable id.
