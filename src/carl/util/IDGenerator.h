@@ -60,6 +60,13 @@ public:
 #endif
 		return mNext;
 	}
+	void clear() {
+#ifdef THREAD_SAFE
+		std::lock_guard<std::mutex> lock(mMutex);
+#endif
+		mNext = 1;
+		mFree = std::priority_queue<std::size_t>();
+	}
 };
 
 #else
@@ -85,6 +92,10 @@ public:
 	}
 	std::size_t nextID() const {
 		return mNext;
+	}
+	void clear() {
+		mNext = 1;
+		mFree.clear();
 	}
 };
 

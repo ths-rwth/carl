@@ -134,6 +134,16 @@ namespace carl{
 				}
 			}
 #endif
+
+
+			/**
+			 * Clears everything already created in this pool.
+			 */
+			void clear() {
+				mPool.clear();
+				mIDs.clear();
+			}
+
 			std::size_t size() const {
 				return mPool.size();
 			}
