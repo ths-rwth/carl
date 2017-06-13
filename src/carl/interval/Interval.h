@@ -191,7 +191,9 @@ namespace carl
 	        mContent(n),
 	        mLowerBoundType(BoundType::WEAK),
 	        mUpperBoundType(BoundType::WEAK)
-		{ }
+		{
+			Policy::sanitize(*this);
+		}
 
         /**
          * Constructor which constructs the weak-bounded interval between lower
@@ -215,6 +217,7 @@ namespace carl
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
+			Policy::sanitize(*this);
         }
 
         /**
@@ -263,6 +266,8 @@ namespace carl
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
+			Policy::sanitize(*this);
+			assert(isConsistent());
         }
 
         /**
@@ -311,6 +316,7 @@ namespace carl
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
+			Policy::sanitize(*this);
         }
 
         /**
@@ -330,7 +336,9 @@ namespace carl
         explicit Interval(const double& n) :
         mContent(carl::Interval<Number>::BoostInterval(n, n)),
         mLowerBoundType(BoundType::WEAK),
-        mUpperBoundType(BoundType::WEAK) { }
+        mUpperBoundType(BoundType::WEAK) { 
+			Policy::sanitize(*this);
+		}
 
         /**
          * Constructor which constructs an interval from the passed double bounds.
@@ -352,6 +360,7 @@ namespace carl
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
+			Policy::sanitize(*this);
         }
 
         /**
@@ -400,6 +409,7 @@ namespace carl
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
+			Policy::sanitize(*this);
         }
 
         /**
@@ -572,6 +582,7 @@ namespace carl
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(n, n);
+			Policy::sanitize(*this);
         }
 
         /**
@@ -585,6 +596,7 @@ namespace carl
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
+			Policy::sanitize(*this);
         }
 
         /**
@@ -628,6 +640,7 @@ namespace carl
             {
                 mContent = BoostInterval(Num(dLeft), Num(dRight));
             }
+			Policy::sanitize(*this);
         }
 
         /**
@@ -640,6 +653,7 @@ namespace carl
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(n, n);
+			Policy::sanitize(*this);
         }
 
         /**
@@ -653,6 +667,7 @@ namespace carl
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
+			Policy::sanitize(*this);
         }
 
         /**
@@ -695,6 +710,7 @@ namespace carl
             {
                 mContent = BoostInterval(left, right);
             }
+			Policy::sanitize(*this);
         }
 
 		/**
@@ -707,6 +723,7 @@ namespace carl
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(n, n);
+			Policy::sanitize(*this);
         }
 
         /**
@@ -720,6 +737,7 @@ namespace carl
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
             *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
+			Policy::sanitize(*this);
         }
 
         /**
@@ -761,6 +779,7 @@ namespace carl
             {
                 mContent = BoostInterval(left, right);
             }
+			Policy::sanitize(*this);
         }
 
         /**
