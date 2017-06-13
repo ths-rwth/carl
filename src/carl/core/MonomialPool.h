@@ -42,10 +42,8 @@ namespace carl{
 				mutable Monomial::Arg monomial;
 				PoolEntry(std::size_t h, const Monomial::Content& c, const Monomial::Arg& m): content(c), hash(h), monomial(m) {}
 				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h), monomial() {
-					assert(monomial.expired());
 				}
 				explicit PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)), monomial() {
-					assert(monomial.expired());
 				}
 			};
 #endif
