@@ -87,22 +87,33 @@ namespace carl
      * Struct which holds the rounding and checking policies required for boost
      * interval.
      */
-    template<typename Number>
+    template<typename Number, typename Interval>
     struct policies
     {
         using roundingP = carl::rounding<Number>;
         using checkingP = carl::checking<Number>;
+		static void sanitize(Interval&) {}
     };
 
     /**
      * Template specialization for rounding and checking policies for native double.
      */
     // TODO: Create struct specialization for all types which are already covered by the standard boost interval policies.
-    template<>
-    struct policies<double>
+    template<typename Interval>
+    struct policies<double, Interval>
     {
         using roundingP = boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_transc_std<double> >; // TODO: change it to boost::numeric::interval_lib::rounded_transc_opp, if new boost release patches the bug with clang
         using checkingP = boost::numeric::interval_lib::checking_no_nan<double, boost::numeric::interval_lib::checking_no_nan<double> >;
+		static void sanitize(Interval& n) {
+			if (std::isinf(n.lower())) {
+				n.setLowerBoundType(BoundType::INFTY);
+			}
+			if (std::isinf(n.upper())) {
+				n.setUpperBoundType(BoundType::INFTY);
+			}
+			assert(!std::isnan(n.lower()));
+			assert(!std::isnan(n.upper()));
+		}
     };
 
     /**
@@ -123,15 +134,16 @@ namespace carl
      * - Operator <<
      */
     template<typename Number>
-    class Interval : public policies<Number>
+    class Interval : public policies<Number, Interval<Number>>
     {
     public:
+		using Policy = policies<Number, Interval<Number>>;
         /*
          * Typedefs
          */
         //typedef typename policies<Number>::checking checking;
         //typedef typename policies<Number>::rounding rounding;
-        using BoostIntervalPolicies = boost::numeric::interval_lib::policies< typename policies<Number>::roundingP, typename policies<Number>::checkingP >;
+        using BoostIntervalPolicies = boost::numeric::interval_lib::policies< typename Policy::roundingP, typename Policy::checkingP >;
         using BoostInterval = boost::numeric::interval< Number, BoostIntervalPolicies >;
         using evalintervalmap = std::map<Variable, Interval<Number> >;
 
