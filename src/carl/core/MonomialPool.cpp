@@ -42,6 +42,7 @@ namespace carl
 			_monomial->mId = mIDs.get();
 			return _monomial;
 		} else {
+			assert(_monomial == iter.first->monomial.lock());
 			return iter.first->monomial.lock();
 		}
 	}
