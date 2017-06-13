@@ -896,7 +896,9 @@ namespace carl
          */
         inline void setLowerBound(const Number& n, BoundType b)
         {
+			/// TODO: Fix this.
         	if(b == BoundType::INFTY) {
+				this->set(mContent.upper(), mContent.upper());
         		mLowerBoundType = b;
         	} else {
         		if(mUpperBoundType == BoundType::INFTY){
@@ -916,7 +918,9 @@ namespace carl
          */
         inline void setUpperBound(const Number& n, BoundType b)
         {
+			/// TODO: Fix this.
             if(b == BoundType::INFTY) {
+				this->set(mContent.lower(), mContent.lower());
         		mUpperBoundType = b;
         	} else {
         		if(mLowerBoundType == BoundType::INFTY){
@@ -936,16 +940,10 @@ namespace carl
          */
         inline void setLowerBoundType(BoundType b)
         {
-            if (b == BoundType::INFTY)
-            {
-                mLowerBoundType = b;
-                mContent = (mUpperBoundType == BoundType::INFTY)
-                        ? BoostInterval(carl::constant_zero<Number>().get())
-                        : BoostInterval(mContent.lower());
-            }
-            else
-            {
-                mLowerBoundType = b;
+			mLowerBoundType = b;
+            if (b == BoundType::INFTY) {
+				//setLower(carl::constant_zero<Number>().get());
+				setLower(upper());
             }
         }
 
@@ -955,16 +953,10 @@ namespace carl
          */
         inline void setUpperBoundType(BoundType b)
         {
-            if (b == BoundType::INFTY)
-            {
-                mUpperBoundType = b;
-                mContent = (mLowerBoundType == BoundType::INFTY)
-                        ? BoostInterval(carl::constant_zero<Number>().get())
-                        : BoostInterval(mContent.upper());
-            }
-            else
-            {
-                mUpperBoundType = b;
+			mUpperBoundType = b;
+            if (b == BoundType::INFTY) {
+				//setUpper(carl::constant_zero<Number>().get());
+				setUpper(lower());
             }
         }
 
@@ -992,7 +984,7 @@ namespace carl
          */
         inline void set(const BoostInterval& content)
         {
-            this->set(content.lower(), content.upper());
+			mContent = content;
         }
 
         /**
@@ -1002,17 +994,7 @@ namespace carl
          */
         inline void set(const Number& lower, const Number& upper)
         {
-			if(isInfinite()) {
-				mContent = BoostInterval(lower, upper);
-				mLowerBoundType = BoundType::WEAK;
-				mUpperBoundType = BoundType::WEAK;
-			} else if(lower <= upper) {
-				mContent = BoostInterval(lower, upper);
-			} else {
-			mContent = BoostInterval(carl::constant_zero<Number>().get());
-			mLowerBoundType = BoundType::STRICT;
-			mUpperBoundType = BoundType::STRICT;
-			}
+			set(BoostInterval(lower, upper));
         }
 
         /**
