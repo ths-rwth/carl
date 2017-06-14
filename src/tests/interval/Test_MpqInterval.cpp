@@ -105,19 +105,6 @@ TEST(MpqInterval, Getters)
     EXPECT_EQ(3, test1.lower());
     EXPECT_EQ(27, test1.upper());
     
-    test2 = MpqInterval();
-    MpqInterval::BoostInterval bi(0, 1);
-    bi = boost::numeric::widen(bi, mpq_class(-3)); // create an invalid interval by this hack
-    test2.set(bi);
-    EXPECT_EQ(0, test2.lower());
-    EXPECT_EQ(0, test2.upper());
-    EXPECT_TRUE(test2.isEmpty());
-    
-    test2 = MpqInterval(bi, BoundType::WEAK, BoundType::WEAK);
-    EXPECT_EQ(0, test2.lower());
-    EXPECT_EQ(0, test2.upper());
-    EXPECT_TRUE(test2.isEmpty());
-	
 	EXPECT_TRUE(test7.isOne());
 	EXPECT_TRUE(isOne(test7));
 	
@@ -1159,7 +1146,6 @@ TEST(MpqInterval, BloatShrink)
     MpqInterval i4(5, BoundType::STRICT, 13, BoundType::STRICT);
     MpqInterval result1(-2, BoundType::WEAK, 12, BoundType::WEAK);
     MpqInterval result2(-10, BoundType::STRICT, -2, BoundType::STRICT);
-    MpqInterval result3(2, BoundType::STRICT, -1, BoundType::STRICT);
     MpqInterval result4(7, BoundType::STRICT, 11, BoundType::STRICT);
     
     // Bloat by adding
@@ -1167,10 +1153,6 @@ TEST(MpqInterval, BloatShrink)
     EXPECT_EQ(result1, i1);
     i2.bloat_by(-3);
     EXPECT_EQ(result2, i2);
-    // Note that here exist inconsistencies
-    // as we can create in valid intervals using this method
-    i3.bloat_by(-2);
-    EXPECT_EQ(result3, i3);
     
     // Shrink by subtracting
     i4.shrink_by(2);
