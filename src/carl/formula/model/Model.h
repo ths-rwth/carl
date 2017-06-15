@@ -177,11 +177,35 @@ namespace carl
 			}
 			os << ")" << std::endl;
 		}
+		void printOneline(std::ostream& os, bool simple = false) const {
+			os << "{";
+			bool first = true;
+			for (const auto& ass: mData) {
+				if (!first) os << ", ";
+				auto value = ass.second;
+				if (simple) value = evaluated(ass.first);
+				
+				if (ass.first.isVariable()) {
+					os << ass.first << " = " << value;
+				} else if (ass.first.isBVVariable()) {
+					os << ass.first << " = " << ass.first.asBVVariable().sort() << "(" << value << ")";
+				} else if (ass.first.isUVariable()) {
+					os << ass.first << " = " << ass.first.asUVariable().domain() << "(" << value << ")";
+				} else if (ass.first.isFunction()) {
+					os << value;
+				} else {
+					CARL_LOG_ERROR("carl.model", "Encountered an unknown type of ModelVariable: " << ass.first);
+					assert(false);
+				}
+				first = false;
+			}
+			os << "}";
+		}
 	};
 
 	template<typename Rational, typename Poly>
 	std::ostream& operator<<(std::ostream& os, const Model<Rational,Poly>& model) {
-		model.print(os);
+		model.printOneline(os);
 		return os;
 	}
 }
