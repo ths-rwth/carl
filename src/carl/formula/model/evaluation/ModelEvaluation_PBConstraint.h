@@ -16,8 +16,10 @@ namespace model {
 	    for(auto it = c.getLHS().begin(); it != c.getLHS().end(); it++){
 			auto element = m.find(it->second);
 	        if(element != m.end()) {
-				assert(element->second.isBool());
-	            if(element->second.asBool() == true){
+				assert(element->second.isRational());
+				const Rational& r = element->second.asRational();
+				assert(isZero(r) || isOne(r));
+	            if (isOne(r)){
 	                c.setRHS(c.getRHS() - it->first);
 	            }
 	        } else {
