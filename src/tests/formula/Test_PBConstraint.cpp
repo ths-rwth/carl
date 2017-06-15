@@ -11,9 +11,9 @@ TEST(PBConstraint, Basic)
 {
 	using Rational = mpq_class;
 	using Poly = carl::MultivariatePolynomial<Rational>;
-	auto x = carl::freshBooleanVariable("x");
-	auto y = carl::freshBooleanVariable("y");
-	auto z = carl::freshBooleanVariable("z");
+	auto x = carl::freshIntegerVariable("x");
+	auto y = carl::freshIntegerVariable("y");
+	auto z = carl::freshIntegerVariable("z");
 	carl::PBConstraint<Poly> pbc;
 	std::vector<std::pair<Rational, carl::Variable>> lhs;
 	lhs.emplace_back(2, x);
@@ -24,16 +24,17 @@ TEST(PBConstraint, Basic)
 	pbc.setRelation(carl::Relation::GREATER);
 	
 	carl::Model<Rational, Poly> m;
-	m.emplace(x, true);
-	m.emplace(z, false);
+	m.emplace(x, Rational(1));
+	m.emplace(z, Rational(0));
 	
 	pbc = carl::model::substitute(pbc, m);
+
 	EXPECT_TRUE(pbc.getLHS().size() == 1);
 	EXPECT_TRUE(pbc.getLHS()[0].first == 5);
 	EXPECT_TRUE(pbc.getLHS()[0].second == y);
 	EXPECT_TRUE(pbc.getRHS() == 4);
 	
-	m.emplace(y, true);
+	m.emplace(y, Rational(1));
 	auto res = carl::model::evaluate(pbc, m);
 	EXPECT_TRUE(res.isBool() && res.asBool());
 }
@@ -42,9 +43,9 @@ TEST(PBConstraint, Formula)
 {
 	using Rational = mpq_class;
 	using Poly = carl::MultivariatePolynomial<Rational>;
-	auto x = carl::freshBooleanVariable("x");
-	auto y = carl::freshBooleanVariable("y");
-	auto z = carl::freshBooleanVariable("z");
+	auto x = carl::freshIntegerVariable("x");
+	auto y = carl::freshIntegerVariable("y");
+	auto z = carl::freshIntegerVariable("z");
 	carl::PBConstraint<Poly> pbc;
 	std::vector<std::pair<Rational,carl::Variable>> lhs;
 	lhs.emplace_back(2, x);
