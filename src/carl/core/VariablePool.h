@@ -26,9 +26,9 @@ namespace carl
  *
  * All methods that modify the pool, that are getInstance(), getFreshVariable() and setName(), are thread-safe.
  */
-class VariablePool : public Singleton<VariablePool>
+class VariablePool : public SingletonInstantiated<VariablePool>
 {
-friend Singleton<VariablePool>;
+friend SingletonInstantiated<VariablePool>;
 private:
 	/**
 	 * Contains the id of the next variable to be created for each type.

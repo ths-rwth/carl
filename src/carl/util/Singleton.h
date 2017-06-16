@@ -45,8 +45,9 @@ protected:
 public:
 	/**
 	 * Virtual destructor.
-     */
+	 */
 	virtual ~Singleton() = default;
+
 	/**
 	 * Returns the single instance of this class by reference.
 	 * If there is no instance yet, a new one is created.
@@ -55,6 +56,44 @@ public:
 		static T t;
 		return t;
 	}
+};
+
+/**
+ * Base class that implements an instantiated singleton.
+ * 
+ * This singleton is instantiated to fix problems with singletons which can occur multiple times in shared libraries.
+ */
+template<typename T>
+class SingletonInstantiated
+{
+private:
+	/**
+	 * There shall be no copy constructor.
+	 */
+	SingletonInstantiated(const SingletonInstantiated&) = delete;
+
+	/**
+	 * There shall be no assignment operator.
+	 */
+	SingletonInstantiated& operator=(const SingletonInstantiated&) = delete;
+
+protected:
+	/**
+	 * Protected default constructor.
+	 */
+	SingletonInstantiated() = default;
+
+public:
+	/**
+	 * Virtual destructor.
+	 */
+	virtual ~SingletonInstantiated() = default;
+
+	/**
+	 * Returns the single instance of this class by reference.
+	 * If there is no instance yet, a new one is created.
+	 */
+	static T& getInstance();
 };
 
 }

@@ -96,4 +96,5 @@ namespace carl
 	{
 		return add(std::move(_exponents));
 	}
+
 } // end namespace carl

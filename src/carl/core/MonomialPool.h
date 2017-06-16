@@ -18,9 +18,9 @@
 namespace carl{
 
 
-	class MonomialPool : public Singleton<MonomialPool>
+	class MonomialPool : public SingletonInstantiated<MonomialPool>
 	{
-		friend class Singleton<MonomialPool>;
+		friend class SingletonInstantiated<MonomialPool>;
 		public:
 #ifdef PRUNE_MONOMIAL_POOL
 			struct PoolEntry {
@@ -95,7 +95,7 @@ namespace carl{
 			 * @param _capacity Expected necessary capacity of the pool.
 			 */
 			explicit MonomialPool( std::size_t _capacity = 10000 ):
-				Singleton<MonomialPool>(),
+				SingletonInstantiated<MonomialPool>(),
 				mIDs(),
 				mPool(_capacity),
 				mMutex()
