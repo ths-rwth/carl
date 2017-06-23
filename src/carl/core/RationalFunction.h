@@ -186,7 +186,7 @@ namespace carl
         }
 
         /**
-         * @return The nominator as a polynomial.
+         * @return The nominator as a number.
          */
         inline const Pol& nominatorAsPolynomial() const
         {
@@ -204,7 +204,7 @@ namespace carl
         }
 
         /**
-         * @return The nominator as a polynomial.
+         * @return The nominator as a number.
          */
         inline CoeffType nominatorAsNumber() const
         {
