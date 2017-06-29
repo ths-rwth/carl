@@ -9,8 +9,11 @@ ExternalProject_Add(
 	URL_MD5 ${COCOA_TGZHASH}
 	BUILD_IN_SOURCE YES
 	CONFIGURE_COMMAND ./configure --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC
-	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} cocoalib > /dev/null
+	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} cocoalib
 	INSTALL_COMMAND ""
+	LOG_DOWNLOAD 1
+	LOG_CONFIGURE 1
+	LOG_BUILD 1
 )
 
 ExternalProject_Get_Property(CoCoALib_EP SOURCE_DIR)
