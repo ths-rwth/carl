@@ -6,7 +6,7 @@
 
 #include "../Common.h"
 
-using BDB = boost::dynamic_bitset<>;
+using BDB = carl::BVValue::Base;
 
 template<typename T>
 class BVValueTest: public testing::Test {
