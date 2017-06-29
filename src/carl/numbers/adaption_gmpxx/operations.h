@@ -214,12 +214,12 @@ inline mpq_class rationalize<mpq_class>(int n) {
 
 template<>
 inline mpq_class rationalize<mpq_class>(uint n) {
-	return mpq_class(n);
+	return mpq_class(static_cast<unsigned long>(n));
 }
 
 template<>
 inline mpq_class rationalize<mpq_class>(sint n) {
-	return mpq_class(n);
+	return mpq_class(static_cast<signed long>(n));
 }
 
 template<> [[deprecated("use parse() instead.")]]

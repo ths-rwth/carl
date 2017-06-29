@@ -19,7 +19,7 @@ namespace carl {
     inline mpz_class convert<cln::cl_I, mpz_class>(const cln::cl_I& n) {
         if( n <= std::numeric_limits<sint>::max() && n >= std::numeric_limits<sint>::min() )
         {
-            return mpz_class(carl::toInt<sint>(n));
+            return mpz_class(static_cast<signed long>(carl::toInt<sint>(n)));
         }
 
         std::stringstream s;
@@ -36,7 +36,7 @@ namespace carl {
             cln::cl_I num = carl::getNum(n);
             if( num <= std::numeric_limits<sint>::max() && num >= std::numeric_limits<sint>::min() )
             {
-                return mpq_class(carl::toInt<sint>(num))/mpq_class(carl::toInt<sint>(den));
+                return mpq_class(static_cast<signed long>(carl::toInt<sint>(num)))/mpq_class(static_cast<signed long>(carl::toInt<sint>(den)));
             }
         }
         std::stringstream s;

@@ -194,11 +194,6 @@ inline cln::cl_RA rationalize<cln::cl_RA>(uint n) {
 }
 
 template<>
-inline cln::cl_RA rationalize<cln::cl_RA>(unsigned long long n) {
-	return cln::cl_RA(n);
-}
-
-template<>
 inline cln::cl_RA rationalize<cln::cl_RA>(sint n) {
 	return cln::cl_RA(n);
 }
