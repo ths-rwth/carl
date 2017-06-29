@@ -13,6 +13,7 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <typeinfo>
 #include <unordered_map>
 #include <vector>
 
@@ -24,15 +25,22 @@
 
 namespace carl {
 
-#ifndef NDEBUG
-
 /**
  * Uses GDB to print a stack trace.
  */
 void printStacktrace(bool interaction = false);
 
+std::string demangle(const char* name);
+
 std::string callingFunction();
 
+template<typename T>
+std::string typeString() {
+	const char* name = typeid(T).name();
+	return demangle(name);
+}
+
+#ifndef NDEBUG
 /**
  * Stores a textual representation of the last assertion that was registered via REGISTER_ASSERT.
  */

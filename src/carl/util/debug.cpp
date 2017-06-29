@@ -18,7 +18,7 @@ namespace carl {
 		//TODO implement for windows
 	}
 
-	inline std::string demangle(const char* name) {
+	std::string demangle(const char* name) {
 		//TODO implement for windows
 		return "Not implemented";
 	}
@@ -36,7 +36,7 @@ namespace carl {
 		system(cmd.str().c_str()); // NOLINT
 	}
 
-	inline std::string demangle(const char* name) {
+	std::string demangle(const char* name) {
 		int status = -4;
 		std::unique_ptr<char, void(*)(void*)> res {
 			abi::__cxa_demangle(name, nullptr, nullptr, &status),
@@ -63,10 +63,11 @@ namespace carl {
 	}
 #endif
 
+#ifndef NDEBUG
+
 std::string last_assertion_string;
 int last_assertion_code = 23;
 
-#ifndef NDEBUG
 /**
  * Actual signal handler.
  */
