@@ -145,6 +145,30 @@ inline uint toInt<uint>(const cln::cl_I& n) {
     return uint(cln::cl_I_to_long(n));
 }
 
+
+template<typename To, typename From>
+inline To fromInt(const From& n);
+
+template<>
+inline cln::cl_I fromInt(const uint& n) {
+	return cln::cl_I(n);
+}
+
+template<>
+inline cln::cl_I fromInt(const sint& n) {
+	return cln::cl_I(n);
+}
+
+template<>
+inline cln::cl_RA fromInt(const uint& n) {
+	return cln::cl_RA(n);
+}
+
+template<>
+inline cln::cl_RA fromInt(const sint& n) {
+	return cln::cl_RA(n);
+}
+
 /**
  * Convert a fraction to an integer.
  * This method assert, that the given fraction is an integer, i.e. that the denominator is one.
