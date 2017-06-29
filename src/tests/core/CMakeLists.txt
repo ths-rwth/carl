@@ -10,3 +10,4 @@ endif()
 target_link_libraries(runCoreTests TestCommon)
 
 add_test(NAME core COMMAND runCoreTests)
+add_dependencies(all-tests runCoreTests)
