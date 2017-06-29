@@ -45,7 +45,7 @@ private:
 		res = convert(r);
 	}
 	
-	static std::vector<Variable> collectVariables(const std::initializer_list<Poly>& polys) {
+	static std::vector<Variable> collectVariables(const std::vector<Poly>& polys) {
 		std::set<Variable> vars;
 		for (const auto& p: polys) p.gatherVariables(vars);
 		return std::vector<Variable>(vars.begin(), vars.end());
@@ -99,7 +99,7 @@ public:
 	}
 	
 public:
-	CoCoAAdaptor(const std::initializer_list<Poly>& polys):
+	CoCoAAdaptor(const std::vector<Poly>& polys):
 		mSymbolBack(collectVariables(polys)),
 		mRing(CoCoA::NewPolyRing(mQ, long(mSymbolBack.size())))
 	{
@@ -109,6 +109,9 @@ public:
 			mSymbolThere.emplace(mSymbolBack[i], indets[i]);
 		}
 	}
+	CoCoAAdaptor(const std::initializer_list<Poly>& polys):
+		CoCoAAdaptor(std::vector<Poly>(polys))
+	{}
 	
 	Poly gcd(const Poly& p1, const Poly& p2) const {
 		return convert(CoCoA::gcd(convert(p1), convert(p2)));
@@ -133,6 +136,13 @@ public:
 			res *= convert(f);
 		}
 		return res;
+	}
+	auto GBasis(const std::vector<Poly>& p) const {
+		std::vector<CoCoA::RingElem> cpolys;
+		for (const auto& poly: p) {
+			cpolys.emplace_back(convert(poly));
+		}
+		return CoCoA::GBasis(CoCoA::ideal(cpolys));
 	}
 };
 
