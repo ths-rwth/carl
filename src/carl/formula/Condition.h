@@ -28,7 +28,7 @@ namespace carl {
             {}
 
             explicit constexpr Condition(std::size_t i):
-                std::bitset<CONDITION_SIZE>(1 << i)
+                std::bitset<CONDITION_SIZE>(std::size_t(1) << i)
             {}
 
             /**
