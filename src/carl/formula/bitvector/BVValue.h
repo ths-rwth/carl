@@ -31,7 +31,7 @@ namespace carl
         explicit BVValue(std::size_t _width, uint _value = 0) :
             mValue(_width, static_cast<unsigned long>(_value))
         {
-			assert(value <= std::numeric_limits<unsigned long>::max());
+			assert(_value <= std::numeric_limits<unsigned long>::max());
         }
 #ifdef USE_CLN_NUMBERS
         explicit BVValue(std::size_t _width, const cln::cl_I _value) :
