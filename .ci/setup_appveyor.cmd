@@ -34,4 +34,4 @@ cmake -G "Visual Studio 14 2015 Win64" -DBUILD_STATIC="ON" -DBOOST_ROOT="%BOOST_
 cmake --build . --config Release --target lib_carl
 cmake --build . --config Release --target lib_carl_static
 cmake --build . --config Release --target all-tests
-cmake --build . --config Release --target test
+cmake --build . --config Release --target RUN_TESTS
