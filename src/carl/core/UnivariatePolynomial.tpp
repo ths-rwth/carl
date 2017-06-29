@@ -236,12 +236,12 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) co
 	else
 	{
 		// here we handle nth > 1.
-		uint c = 1;
-		for (uint k = 2; k <= nth; ++k) {
+		std::size_t c = 1;
+		for (std::size_t k = 2; k <= nth; ++k) {
 			c *= k;
 		}
 		auto it = mCoefficients.begin();
-		uint i = nth;
+		std::size_t i = nth;
 		for(it += sint(nth); it != mCoefficients.end(); ++it)
 		{
 			result.mCoefficients.push_back(Coeff(c) * *it);
