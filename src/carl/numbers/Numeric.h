@@ -18,7 +18,7 @@
 
 namespace carl
 {
-    using ContentType = long int;
+    using ContentType = sint;
     const ContentType HIGHTEST_INTEGER_VALUE = (std::numeric_limits<ContentType>::max() >> ((std::numeric_limits<ContentType>::digits/2)+1))+1;
     
     template<typename T>
