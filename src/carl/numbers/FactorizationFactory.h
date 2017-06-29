@@ -22,17 +22,17 @@ class FactorizationFactory;
  * - factorization(1) = {1}
  */
 template<>
-class FactorizationFactory<std::size_t> {
+class FactorizationFactory<uint> {
 private:
-	PrimeFactory<std::size_t> mPrimes;
-	std::vector<boost::optional<std::vector<std::size_t>>> mCache;
+	PrimeFactory<uint> mPrimes;
+	std::vector<boost::optional<std::vector<uint>>> mCache;
 public:
 	FactorizationFactory() {
-		mCache.emplace_back(std::vector<std::size_t>({}));
-		mCache.emplace_back(std::vector<std::size_t>({1}));
+		mCache.emplace_back(std::vector<uint>({}));
+		mCache.emplace_back(std::vector<uint>({1}));
 	}
 	/// Returns the factorization of n.
-	const std::vector<std::size_t>& operator()(std::size_t n) {
+	const std::vector<uint>& operator()(uint n) {
 		while (mCache.size() <= n) {
 			mCache.emplace_back();
 		}
@@ -41,7 +41,7 @@ public:
 		}
 		assert(n >= 2);
 		mCache[n] = std::vector<std::size_t>();
-		std::size_t cur = n;
+		uint cur = n;
 		for (std::size_t i = 0; ;) {
 			if (cur % mPrimes[i] == 0) {
 				mCache[n]->push_back(mPrimes[i]);
