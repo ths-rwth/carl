@@ -226,13 +226,9 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) co
 	}
 	result.mCoefficients.reserve(mCoefficients.size()-nth);
 	// nth == 1 is most common case and can be implemented more efficient.
-	if(nth == 1)
-	{
-		typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
-		uint i = 0;
-		for(it += sint(nth); it != mCoefficients.end(); ++it)
-		{
-			++i;
+	if (nth == 1) {
+		auto it = std::next(mCoefficients.begin());
+		for (std::size_t i = 0; it != mCoefficients.end(); it++, i++) {
 			result.mCoefficients.push_back(Coeff(i) * *it);
 		}
 		return result;
@@ -241,8 +237,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) co
 	{
 		// here we handle nth > 1.
 		uint c = 1;
-		for(uint k = 2; k <= nth; ++k)
-		{
+		for (uint k = 2; k <= nth; ++k) {
 			c *= k;
 		}
 		auto it = mCoefficients.begin();

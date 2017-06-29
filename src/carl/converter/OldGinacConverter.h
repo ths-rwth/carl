@@ -79,7 +79,7 @@ namespace carl
                     for (auto it: *(term->monomial())) {
                         auto carlToGinacVar = vars.find(it.first);
                         assert(carlToGinacVar != vars.end());
-                        factor *= GiNaC::pow(carlToGinacVar->second, it.second);
+                        factor *= GiNaC::pow(carlToGinacVar->second, static_cast<unsigned long>(it.second));
                     }
                 }
                 result += factor;
