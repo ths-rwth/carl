@@ -29,9 +29,7 @@ namespace carl {
 
             explicit constexpr Condition(std::size_t i):
                 std::bitset<CONDITION_SIZE>(1 << i)
-            {
-                assert(i < CONDITION_SIZE);
-            }
+            {}
 
             /**
              * Check whether the bits of this condition are always set if the corresponding bit
