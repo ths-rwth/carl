@@ -4,7 +4,7 @@
 TEST(GMP, Debug)
 {
 	carl::sint i = 4;
-	mpq_class n(i);
+	mpq_class n(static_cast<signed long>(i));
 }
 
 TEST(GMP, Rationalize)
