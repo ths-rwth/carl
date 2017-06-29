@@ -8,6 +8,7 @@
 #include <cassert>
 #include <climits>
 #include <iostream>
+#include <string>
 #include <type_traits>
 
 #include "config.h"
