@@ -8,4 +8,4 @@ cache:
   - C:\Libraries\mpir-3.0.0\ -> appveyor.xml
 
 build_script:
-  - call ".ci\appveyor.cmd"
+  - call ".ci\setup_appveyor.cmd"
