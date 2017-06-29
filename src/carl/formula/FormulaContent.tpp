@@ -311,7 +311,7 @@ namespace carl {
         }
 		else if (mType == FormulaType::PBCONSTRAINT)
 		{
-			return (_init + mpPBConstraintVS->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+			return (_init + mpPBConstraintVS->toString( _resolveUnequal == 0, _infix, _friendlyNames ) + activity);
 		}
 #else
 		if (mType == FormulaType::BOOL)
