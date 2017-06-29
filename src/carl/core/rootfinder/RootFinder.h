@@ -39,9 +39,9 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 ) {
-	CARL_LOG_FUNC("carl.core.rootfinder", polynomial << ", " << interval);
+	CARL_LOG_DEBUG("carl.core.rootfinder", polynomial << " within " << interval);
 	auto r = Finder(polynomial, interval, pivoting).getAllRoots();
-	CARL_LOG_TRACE("carl.core.rootfinder", "-> " << r);
+	CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
 	return r;
 }
 

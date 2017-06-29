@@ -34,6 +34,7 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 #endif
 	CARL_LOG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial << " with interval " << this->interval);
 	if (this->polynomial.zeroIsRoot()) {
+		CARL_LOG_DEBUG("carl.core.rootfinder", "Detected zero root in " << polynomial);
 		this->addRoot(RealAlgebraicNumber<Number>(0));
 	}
 	if (this->polynomial.isZero()) {
@@ -107,15 +108,18 @@ void AbstractRootFinder<Number>::addRoot(const Interval<Number>& interval) {
 
 template<typename Number>
 bool AbstractRootFinder<Number>::solveTrivial() {
+	CARL_LOG_DEBUG("carl.core.rootfinder", "Trying to trivially solve polynomial " << polynomial);
 	switch (this->polynomial.degree()) {
 		case 0: break;
 		case 1: {
+			CARL_LOG_DEBUG("carl.core.rootfinder", "Trivially solving linear polynomial " << polynomial);
 			Number a = this->polynomial.coefficients()[1], b = this->polynomial.coefficients()[0];
 			assert(a != Number(0));
 			this->addRoot(RealAlgebraicNumber<Number>(-b / a), false);
 			break;
 		}
 		case 2: {
+			CARL_LOG_DEBUG("carl.core.rootfinder", "Trivially solving quadratic polynomial " << polynomial);
 			Number a = this->polynomial.coefficients()[2], b = this->polynomial.coefficients()[1], c = this->polynomial.coefficients()[0];
 			assert(a != Number(0));
 			/* Use this formulation of p-q-formula:
