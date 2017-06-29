@@ -218,8 +218,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable var
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) const
 {
-        if(nth == 0) return *this;
-            
+	if (nth == 0) return *this;
+
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	if (this->isConstant()) {
 		return result;
@@ -228,9 +228,10 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) co
 	// nth == 1 is most common case and can be implemented more efficient.
 	if (nth == 1) {
 		auto it = std::next(mCoefficients.begin());
-		for (std::size_t i = 0; it != mCoefficients.end(); it++, i++) {
+		for (std::size_t i = 1; it != mCoefficients.end(); it++, i++) {
 			result.mCoefficients.push_back(Coeff(i) * *it);
 		}
+		CARL_LOG_DEBUG("carl.core", "1st derivative of " << *this << " = " << result);
 		return result;
 	}
 	else
@@ -249,6 +250,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) co
 			c /= (i - nth);
 			c *= i;
 		}
+		CARL_LOG_DEBUG("carl.core", nth << " derivative of " << *this << " = " << result);
 		return result;
 	}
 }
