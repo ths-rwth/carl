@@ -40,7 +40,7 @@ public:
 			return *mCache[n];
 		}
 		assert(n >= 2);
-		mCache[n] = std::vector<std::size_t>();
+		mCache[n] = std::vector<uint>();
 		uint cur = n;
 		for (std::size_t i = 0; ;) {
 			if (cur % mPrimes[i] == 0) {
