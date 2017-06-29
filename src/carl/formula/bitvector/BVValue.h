@@ -31,7 +31,7 @@ namespace carl
     private:
         Base mValue;
 
-        explicit BVValue(boost::dynamic_bitset<>&& value): mValue(std::move(value))
+        explicit BVValue(Base&& value): mValue(std::move(value))
         {
         }
 
@@ -73,15 +73,15 @@ namespace carl
                 mpz_add_ui(value, value, 1);
             }
 
-            // We export into an array of boost::dynamic_bitset<>::block_type.
+            // We export into an array of Base::block_type.
             // Calculate the number of needed blocks upfront
-            std::size_t bitsPerBlock = sizeof(boost::dynamic_bitset<>::block_type) * CHAR_BIT;
+            std::size_t bitsPerBlock = sizeof(Base::block_type) * CHAR_BIT;
             std::size_t valueBits = mpz_sizeinbase(value, 2);
             std::size_t blockCount = (valueBits + bitsPerBlock - 1) / bitsPerBlock;
 
             // The actual conversion from mpz_t to dynamic_bitset blocks
-            auto bits = new boost::dynamic_bitset<>::block_type[blockCount];
-            mpz_export(&bits[0], &blockCount, -1, sizeof(boost::dynamic_bitset<>::block_type), -1, 0, value);
+            auto bits = new Base::block_type[blockCount];
+            mpz_export(&bits[0], &blockCount, -1, sizeof(Base::block_type), -1, 0, value);
 
             // Import the blocks into mValue, and resize it afterwards to the desired size
             mValue.append(&bits[0], &bits[0] + blockCount);
@@ -143,8 +143,8 @@ namespace carl
 
         BVValue rotateLeft(std::size_t _n) const
         {
-            boost::dynamic_bitset<> lowerPart(mValue);
-            boost::dynamic_bitset<> upperPart(mValue);
+            Base lowerPart(mValue);
+            Base upperPart(mValue);
 
             lowerPart <<= _n % width();
             upperPart >>= width() - (_n % width());
@@ -170,14 +170,14 @@ namespace carl
 
         BVValue extendUnsignedBy(std::size_t _n) const
         {
-            boost::dynamic_bitset<> copy(mValue);
+            Base copy(mValue);
             copy.resize(width() + _n);
             return BVValue(std::move(copy));
         }
 
         BVValue extendSignedBy(std::size_t _n) const
         {
-            boost::dynamic_bitset<> copy(mValue);
+            Base copy(mValue);
             copy.resize(width() + _n, (*this)[width()-1]);
             return BVValue(std::move(copy));
         }
@@ -197,7 +197,7 @@ namespace carl
             return mValue < _other.mValue;
         }
 
-        boost::dynamic_bitset<>::reference operator[](std::size_t _index)
+        Base::reference operator[](std::size_t _index)
         {
             assert(_index < width());
             return mValue[_index];
@@ -214,7 +214,7 @@ namespace carl
             assert(_other.width() == width());
 
             bool carry = false;
-            boost::dynamic_bitset<> sum(width());
+            Base sum(width());
 
             for(std::size_t i=0;i<width();++i) {
                 sum[i] = ((*this)[i] != _other[i]) != carry;
@@ -250,10 +250,10 @@ namespace carl
 
         BVValue concat(const BVValue& _other) const
         {
-            boost::dynamic_bitset<> concatenation(mValue);
+            Base concatenation(mValue);
             concatenation.resize(width() + _other.width());
             concatenation <<= _other.width();
-            boost::dynamic_bitset<> otherResized = _other;
+            Base otherResized = _other;
             otherResized.resize(concatenation.size());
             concatenation |= otherResized;
             return BVValue(std::move(concatenation));
@@ -262,11 +262,11 @@ namespace carl
         BVValue operator*(const BVValue& _other) const
         {
             BVValue product(width());
-            boost::dynamic_bitset<> summand(mValue);
+            Base summand(mValue);
 
             for(std::size_t i=0;i<width();++i) {
                 if(_other[i]) {
-                    product = product + BVValue(boost::dynamic_bitset<>(summand));
+                    product = product + BVValue(Base(summand));
                 }
                 summand <<= 1;
             }
@@ -385,12 +385,12 @@ namespace carl
 
             for(std::size_t i=highestRelevantPos+1;i<_other.width();++i) {
                 if(_other[i]) {
-                    boost::dynamic_bitset<> allZero(width());
+                    Base allZero(width());
                     return BVValue(fillWithOnes ? ~allZero : allZero);
                 }
             }
 
-            boost::dynamic_bitset<> shifted(fillWithOnes ? ~mValue : mValue);
+            Base shifted(fillWithOnes ? ~mValue : mValue);
             std::size_t shiftBy = 1;
 
             for(std::size_t i=0;i<=highestRelevantPos && i < _other.width();++i) {
@@ -410,12 +410,12 @@ namespace carl
         BVValue divideUnsigned(const BVValue& _other, bool _returnRemainder = false) const
         {
             assert(width() == _other.width());
-            assert(Base(_other) != boost::dynamic_bitset<>(_other.width(), 0));
+            assert(Base(_other) != Base(_other.width(), 0));
 
-            boost::dynamic_bitset<> quotient(width());
+            Base quotient(width());
             std::size_t quotientIndex = 0;
-            boost::dynamic_bitset<> divisor = _other;
-            boost::dynamic_bitset<> remainder(mValue);
+            Base divisor = _other;
+            Base remainder(mValue);
 
             while(! divisor[divisor.size()-1] && remainder > divisor) {
                 ++quotientIndex;
