@@ -57,7 +57,9 @@ public:
 		auto poly = mPoly.toUnivariatePolynomial(mVar);
 		std::map<Variable, Interval<Number>> intervalMap;
 		auto unipoly = RealAlgebraicNumberEvaluation::evaluateCoefficients(poly, m, intervalMap);
+		CARL_LOG_TRACE("carl.multivariateroot", "Intermediate polynomial is " << unipoly);
 		auto roots = rootfinder::realRoots(unipoly);
+		CARL_LOG_TRACE("carl.multivariateroot", "Got roots " << roots);
 		if (roots.size() < mK) return boost::none;
 		assert(roots.size() >= mK);
 		auto it = roots.begin();
