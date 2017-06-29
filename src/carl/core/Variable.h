@@ -133,7 +133,7 @@ public:
 	 * Default constructor, constructing a variable, which is considered as not an actual variable.
 	 * Such an invalid variable is stored in NO_VARIABLE, so use this if you need a default value for a variable.
 	 */
-	Variable() = default;
+	constexpr Variable() = default;
 
 	/**
 	 * Retrieves the id of the variable.
