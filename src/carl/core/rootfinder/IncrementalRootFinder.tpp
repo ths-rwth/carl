@@ -11,13 +11,8 @@
 #include "AbstractRootFinder.h"
 #include "RootFinder.h"
 
-#ifdef __VS
-	#include <Eigen/Dense>
-	#include <Eigen/Eigenvalues>
-#else
-	#include <eigen3/Eigen/Dense>
-	#include <eigen3/Eigen/Eigenvalues>
-#endif
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Eigenvalues>
 
 namespace carl {
 namespace rootfinder {
