@@ -88,13 +88,15 @@ endif()
 
 ##### Eigen3
 if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl EIGEN3 3.2)
+	load_library(carl EIGEN3 3.3)
 endif()
 if(EIGEN3_FOUND)
 	message(STATUS "Use system version of Eigen3 ${EIGEN3_VERSION}")
 else()
-	set(EIGEN3_VERSION "3.2.8")
+	set(EIGEN3_VERSION "3.3.4")
+	set(EIGEN3_ZIPHASH "e337acc279874bc6a56da4d973a723fb")
 	include(resources/eigen3.cmake)
+	unset(EIGEN3_ZIPHASH)
 	message(STATUS "Use shipped version of Eigen3 ${EIGEN3_VERSION}")
 endif()
 

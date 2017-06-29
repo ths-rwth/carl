@@ -1,7 +1,7 @@
 ExternalProject_Add(
     EIGEN3_REPO
     URL "https://bitbucket.org/eigen/eigen/get/${EIGEN3_VERSION}.zip"
-	URL_MD5 e368e3dd35e9a5f46a118029cabc494d
+	URL_MD5 ${EIGEN3_ZIPHASH}
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 )
 
