@@ -78,7 +78,7 @@ if(USE_COCOA)
 	else()
 		# Depends on GMP
 		set(COCOA_VERSION "0.99551")
-		set(COCOA_TGZHASH "1ca937ce97647546efade69550e215bc")
+		set(COCOA_TGZHASH "0e75ba96e627f955adbb17c037d5bcdf")
 		include(resources/cocoa.cmake)
 		unset(COCOA_TGZHASH)
 		message(STATUS "Use shipped version of CoCoA ${COCOA_VERSION}")
