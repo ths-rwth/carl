@@ -16,10 +16,6 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #include "../../util/platform.h"
 #include "typetraits.h"
 
-CLANG_WARNING_DISABLE("-Wunused-local-typedef")
-#include <boost/algorithm/string.hpp>
-CLANG_WARNING_RESET
-
 #include <climits>
 #include <cmath>
 #include <cstddef>
@@ -219,14 +215,6 @@ inline mpq_class rationalize<mpq_class>(int n) {
 template<>
 inline mpq_class rationalize<mpq_class>(uint n) {
 	return mpq_class(n);
-}
-
-template<>
-inline mpq_class rationalize<mpq_class>(unsigned long long n) {
-	mpz_t z;
-	mpz_init(z);
-	mpz_import(z, 1, -1, sizeof n, 0, 0, &n);
-	return mpq_class(mpz_class(z));
 }
 
 template<>
