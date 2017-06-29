@@ -2,10 +2,11 @@
 # Add all targets to the build-tree export set
 export(EXPORT carl_Targets FILE "${PROJECT_BINARY_DIR}/carlExport/carlTargets.cmake")
 
-message(STATUS "Registered with cmake")
+
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
 if(EXPORT_TO_CMAKE)
+	message(STATUS "Registered with cmake")
 	export(PACKAGE carl)
 endif()
 
