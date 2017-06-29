@@ -71,11 +71,11 @@ template<typename> struct Void { using type = void; };
 #define has_method_struct(methodname) \
 __if_exists(T::methodname) { \
 template<typename T, typename SFINAE = void> \
-struct has_##methodname : std::false_type {}; \
+struct has_##methodname : std::true_type {}; \
 } \
 __if_not_exists(T::methodname) { \
 template<typename T, typename SFINAE = void> \
-struct has_##methodname : std::true_type {}; \
+struct has_##methodname : std::false_type {}; \
 }
 #else
 #define has_method_struct(methodname) \
