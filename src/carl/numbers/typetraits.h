@@ -329,6 +329,9 @@ struct IntegralType<GFNumber<C>> {
 	using type = C;
 };
 
+template<typename C>
+using IntegralTypeIfDifferent = typename std::enable_if<!std::is_same<C, typename IntegralType<C>::type>::value, typename IntegralType<C>::type>::type;
+
 /**
  * @addtogroup typetraits_UnderlyingNumberType
  * The number type that some type is built upon can be defined with UnderlyingNumberType.
