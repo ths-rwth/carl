@@ -6,28 +6,15 @@
 #pragma once
 
 #include "../../numbers/numbers.h"
-#include "../../util/platform.h"
 
 #include <boost/dynamic_bitset.hpp>
-
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-#endif
-#ifdef __WIN
-#pragma warning(push, 0)
-#include <mpirxx.h>
-#pragma warning(pop)
-#else
-#include <gmpxx.h>
-#endif
-#include <limits.h>
 
 namespace carl
 {
     class BVValue
     {
 	public:
-		using Base = boost::dynamic_bitset<>;
+		using Base = boost::dynamic_bitset<uint>;
     private:
         Base mValue;
 
