@@ -8,6 +8,7 @@
 #include "../../numbers/numbers.h"
 
 #include <boost/dynamic_bitset.hpp>
+#include <limits>
 
 namespace carl
 {
@@ -28,8 +29,9 @@ namespace carl
         }
 
         explicit BVValue(std::size_t _width, uint _value = 0) :
-        	mValue(_width, _value)
+            mValue(_width, static_cast<unsigned long>(_value))
         {
+			assert(value <= std::numeric_limits<unsigned long>::max());
         }
 #ifdef USE_CLN_NUMBERS
         explicit BVValue(std::size_t _width, const cln::cl_I _value) :
