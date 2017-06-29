@@ -39,6 +39,7 @@ endif()
 
 ##### Boost
 set(BOOST_COMPONENTS "system;program_options;regex")
+set(Boost_USE_DEBUG_RUNTIME "OFF")
 if(NOT FORCE_SHIPPED_RESOURCES)
 	load_library(carl Boost 1.55 COMPONENTS ${BOOST_COMPONENTS})
 endif()
