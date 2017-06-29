@@ -1104,9 +1104,9 @@ public:
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const C& rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(const typename IntegralType<C>::type& lhs, const UnivariatePolynomial<C>& rhs);
+	friend UnivariatePolynomial<C> operator*(const IntegralTypeIfDifferent<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralType<C>::type& rhs);
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const IntegralTypeIfDifferent<C>& rhs);
 	template<typename C, typename O, typename P>
 	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& lhs, const C& rhs);
 	template<typename C, typename O, typename P>

@@ -2075,7 +2075,7 @@ UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& r
 }
 
 template<typename C>
-UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralType<C>::type& rhs)
+UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const IntegralTypeIfDifferent<C>& rhs)
 {
 	UnivariatePolynomial<C> res(lhs);
 	res *= rhs;
@@ -2083,7 +2083,7 @@ UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const type
 }
 
 template<typename C>
-UnivariatePolynomial<C> operator*(const typename IntegralType<C>::type& lhs, const UnivariatePolynomial<C>& rhs)
+UnivariatePolynomial<C> operator*(const IntegralTypeIfDifferent<C>& lhs, const UnivariatePolynomial<C>& rhs)
 {
 	return rhs * lhs;
 }
