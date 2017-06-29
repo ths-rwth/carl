@@ -243,9 +243,9 @@ namespace carl {
 			case FormulaType::CONSTRAINT:
 				return *mpConstraintVS == *_content.mpConstraintVS;
 			case FormulaType::VARCOMPARE:
-				return *mpVariableComparison == *_content.mpVariableComparison;
+				return *mpVariableComparisonVS == *_content.mpVariableComparisonVS;
 			case FormulaType::VARASSIGN:
-				return *mpVariableAssignment == *_content.mpVariableAssignment;
+				return *mpVariableAssignmentVS == *_content.mpVariableAssignmentVS;
 			case FormulaType::BITVECTOR:
 				return *mpBVConstraintVS == *_content.mpBVConstraintVS;
 			case FormulaType::UEQ:

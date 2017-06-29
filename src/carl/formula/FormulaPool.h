@@ -169,7 +169,7 @@ namespace carl
             FormulaContent<Pol>* createNegatedContent(const FormulaContent<Pol>* f) const {
                 if (f->mType == FormulaType::CONSTRAINT) {
 #ifdef __VS
-                    return new FormulaContent<Pol>(f->mpConstraintVS.negation());
+                    return new FormulaContent<Pol>(f->mpConstraintVS->negation());
 #else
                     return new FormulaContent<Pol>(f->mConstraint.negation());
 #endif
