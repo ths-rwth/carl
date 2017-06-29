@@ -54,12 +54,11 @@ namespace function_selector {
 	 */
 	template<typename TypeSelector, typename TypeVector, typename... Functions>
 	class FunctionSelector {
-		friend auto createFunctionSelector<TypeSelector, TypeVector, Functions...>(Functions&&...);
 		static_assert(sizeof...(Functions) == boost::mpl::size<TypeVector>::value, "Functions and TypeVector must have the same size.");
 	private:
 		std::tuple<Functions...> mFunctions;
-		FunctionSelector(Functions&&... f): mFunctions(std::forward<Functions>(f)...) {}
 	public:
+		FunctionSelector(Functions&&... f): mFunctions(std::forward<Functions>(f)...) {}
 		template<typename... Args>
 		auto operator()(Args&&... args) const {
 			using T = typename TypeSelector::template type<Args...>;
