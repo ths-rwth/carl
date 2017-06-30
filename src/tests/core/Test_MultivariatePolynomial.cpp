@@ -437,7 +437,7 @@ TEST(MultivariatePolynomial, SPolynomial)
 
     MultivariatePolynomial<Rational> f2({(Rational)1*x*x*x, (Rational)-2*x*y} );
 	MultivariatePolynomial<Rational> g2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
-	MultivariatePolynomial<Rational> s2({(Rational)-1*x*x, (Rational) 0*x*y});
+	MultivariatePolynomial<Rational> s2({(Rational)-1*x*x});
 	EXPECT_EQ(s2, MultivariatePolynomial<Rational>::SPolynomial(f2, g2));
 }
 
