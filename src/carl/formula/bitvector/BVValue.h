@@ -19,9 +19,9 @@ namespace carl
     private:
         Base mValue;
 
-        explicit BVValue(Base&& value): mValue(std::move(value))
-        {
-        }
+		template<std::size_t len>
+		explicit BVValue(const std::array<uint,len>& a): mValue(a.begin(), a.end()) {}
+        explicit BVValue(Base&& value): mValue(std::move(value)) {}
 
     public:
         BVValue() : mValue()
@@ -29,9 +29,9 @@ namespace carl
         }
 
         explicit BVValue(std::size_t _width, uint _value = 0) :
-            mValue(_width, static_cast<unsigned long>(_value))
+            BVValue(std::array<uint,1>({{_value}}))
         {
-			assert(_value <= std::numeric_limits<unsigned long>::max());
+			mValue.resize(_width);
         }
 #ifdef USE_CLN_NUMBERS
         explicit BVValue(std::size_t _width, const cln::cl_I _value) :
