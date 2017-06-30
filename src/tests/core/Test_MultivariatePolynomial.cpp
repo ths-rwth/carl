@@ -461,18 +461,10 @@ TEST(MultivariatePolynomial, Derivative)
 {
     Variable x = freshRealVariable("x");
     Variable y = freshRealVariable("y");
-#ifdef __VS
-    MultivariatePolynomial<Rational> fx({x, 0});
-#else
     MultivariatePolynomial<Rational> fx({x});
-#endif
     EXPECT_EQ((Rational)1, fx.derivative(x));
     EXPECT_EQ((Rational)0, fx.derivative(y));
-#ifdef __VS
-	MultivariatePolynomial<Rational> f2x({ (Rational)2 * x , (Rational)0*x});
-#else
 	MultivariatePolynomial<Rational> f2x({ (Rational)2 * x });
-#endif
 	EXPECT_EQ((Rational)2, f2x.derivative(x));
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     MultivariatePolynomial<Rational> f1dx({(Rational)3*x*x*y*y, (Rational)-2*x*y*y*y, Term<Rational>((Rational)1)});
