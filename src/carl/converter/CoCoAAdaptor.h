@@ -98,6 +98,21 @@ public:
 		return res;
 	}
 	
+	std::vector<CoCoA::RingElem> convert(const std::vector<Poly>& p) const {
+		std::vector<CoCoA::RingElem> res;
+		for (const auto& poly: p) res.emplace_back(convert(poly));
+		return res;
+	}
+	std::vector<Poly> convert(const std::vector<CoCoA::RingElem>& p) const {
+		std::vector<Poly> res;
+		for (const auto& poly: p) res.emplace_back(convert(poly));
+		return res;
+	}
+	
+	const auto& variables() const {
+		return mSymbolBack;
+	}
+	
 public:
 	CoCoAAdaptor(const std::vector<Poly>& polys):
 		mSymbolBack(collectVariables(polys)),
@@ -138,11 +153,7 @@ public:
 		return res;
 	}
 	auto GBasis(const std::vector<Poly>& p) const {
-		std::vector<CoCoA::RingElem> cpolys;
-		for (const auto& poly: p) {
-			cpolys.emplace_back(convert(poly));
-		}
-		return CoCoA::GBasis(CoCoA::ideal(cpolys));
+		return convert(CoCoA::GBasis(CoCoA::ideal(convert(p))));
 	}
 };
 
