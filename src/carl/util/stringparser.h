@@ -229,7 +229,7 @@ namespace carl
 								unsigned exp = boost::lexical_cast<unsigned>(varAndExp.back());
 								varExpPairs.emplace_back(it->second, exp);
 							}
-							catch(const boost::bad_lexical_cast& e)
+							catch(const boost::bad_lexical_cast&)
 							{
 								throw InvalidInputStringException("Exponent is not a number", veStr);
 							}
