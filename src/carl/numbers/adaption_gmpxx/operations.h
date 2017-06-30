@@ -121,14 +121,14 @@ template<typename Integer>
 inline Integer toInt(const mpz_class& n);
 template<>
 inline sint toInt<sint>(const mpz_class& n) {
-    assert(n <= mpz_class(std::numeric_limits<sint>::max()));
-    assert(n >= mpz_class(std::numeric_limits<sint>::min()));
+    assert(n <= std::numeric_limits<signed long>::max());
+    assert(n >= std::numeric_limits<signed long>::min());
     return mpz_get_si(n.get_mpz_t());
 }
 template<>
 inline uint toInt<uint>(const mpz_class& n) {
-    assert(n <= mpz_class(std::numeric_limits<uint>::max()));
-    assert(n >= mpz_class(std::numeric_limits<uint>::min()));
+    assert(n <= std::numeric_limits<unsigned long>::max());
+    assert(n >= std::numeric_limits<unsigned long>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
 
