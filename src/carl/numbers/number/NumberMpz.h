@@ -151,14 +151,14 @@ namespace carl {
 	//template specializations of member-functions have to be outside the class:
 	template<>
 	inline sint Number<mpz_class>::toInt<sint>() const {
-	    assert(mData <= std::numeric_limits<sint>::max());
-	    assert(mData >= std::numeric_limits<sint>::min());
+	    assert(mData <= std::numeric_limits<signed long>::max());
+	    assert(mData >= std::numeric_limits<signed long>::min());
 	    return mpz_get_si(mData.get_mpz_t());
 	}
 	template<>
 	inline uint Number<mpz_class>::toInt<uint>() const {
-	    assert(mData <= std::numeric_limits<uint>::max());
-	    assert(mData >= std::numeric_limits<uint>::min());
+	    assert(mData <= std::numeric_limits<unsigned long>::max());
+	    assert(mData >= std::numeric_limits<unsigned long>::min());
 	    return mpz_get_ui(mData.get_mpz_t());
 	} 
 
