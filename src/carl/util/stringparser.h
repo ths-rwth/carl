@@ -280,7 +280,7 @@ namespace carl
 			{
 				return parse<C>(inputStringCopy);
 			}
-			catch(std::exception& e)
+			catch(std::exception&)
 			{
 				throw InvalidInputStringException("Could not build coefficient", inputStringCopy);
 			}
