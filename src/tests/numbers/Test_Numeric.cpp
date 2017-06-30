@@ -11,7 +11,7 @@ using namespace carl;
 
 TEST(Numeric, constructors)
 {
-    size_t num_of_allocated_elements = Numeric<Rational>::mRationalPool.size();
+    std::size_t num_of_allocated_elements = Numeric<Rational>::mRationalPool.size();
     Numeric<Rational> n0;
     EXPECT_EQ( Rational(0), n0.toRational());
     Numeric<Rational> n1( 2, true );
@@ -25,7 +25,7 @@ TEST(Numeric, constructors)
     EXPECT_EQ( Rational(4), n4.toRational());
     Numeric<Rational> n5( n3 );
     EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
-    EXPECT_EQ( Rational( (ContentType) 5 ), n5.toRational());
+    EXPECT_EQ( Rational(5), n5.toRational());
     Numeric<Rational> n6( (HIGHTEST_INTEGER_VALUE - 1) );
     EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
     EXPECT_EQ( Rational( (HIGHTEST_INTEGER_VALUE - 1) ), n6.toRational());
