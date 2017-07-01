@@ -26,19 +26,19 @@ TEST(Numeric, constructors)
     Numeric<Rational> n5( n3 );
     EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
     EXPECT_EQ( Rational(5), n5.toRational());
-    Numeric<Rational> n6( (HIGHTEST_INTEGER_VALUE - 1) );
+    Numeric<Rational> n6 = carl::fromInt<Rational>(HIGHTEST_INTEGER_VALUE - 1);
     EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
-    EXPECT_EQ( Rational( (HIGHTEST_INTEGER_VALUE - 1) ), n6.toRational());
+    EXPECT_EQ( carl::fromInt<Rational>(HIGHTEST_INTEGER_VALUE - 1), n6.toRational());
     Numeric<Rational> n7( HIGHTEST_INTEGER_VALUE );
     ++num_of_allocated_elements;
     EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
-    EXPECT_EQ( Rational( HIGHTEST_INTEGER_VALUE ), n7.toRational());
+    EXPECT_EQ( carl::fromInt<Rational>( HIGHTEST_INTEGER_VALUE ), n7.toRational());
     Numeric<Rational> n8( -(HIGHTEST_INTEGER_VALUE - 1) );
-    EXPECT_EQ( Rational( -(HIGHTEST_INTEGER_VALUE - 1) ), n8.toRational());
+    EXPECT_EQ( carl::fromInt<Rational>( -(HIGHTEST_INTEGER_VALUE - 1) ), n8.toRational());
     Numeric<Rational> n9( -HIGHTEST_INTEGER_VALUE );
     ++num_of_allocated_elements;
     EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
-    EXPECT_EQ( Rational( -HIGHTEST_INTEGER_VALUE ), n9.toRational());
+    EXPECT_EQ( carl::fromInt<Rational>( -HIGHTEST_INTEGER_VALUE ), n9.toRational());
     Numeric<Rational> n10( (Rational( 1 )/Rational( 3 )) );
     ++num_of_allocated_elements;
     EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
@@ -66,14 +66,14 @@ TEST(Numeric, operations)
     EXPECT_EQ( Rational( -921102 ), n.toRational());
 
     n -= Numeric<Rational>( (HIGHTEST_INTEGER_VALUE - 1) );
-    EXPECT_EQ( Rational( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) ) ), n.toRational());
+    EXPECT_EQ( carl::fromInt<Rational>( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) ) ), n.toRational());
 
     Numeric<Rational> n2;
     n2 -= Numeric<Rational>( HIGHTEST_INTEGER_VALUE );
-    EXPECT_EQ( Rational( ( -HIGHTEST_INTEGER_VALUE ) ), n2.toRational());
+    EXPECT_EQ( carl::fromInt<Rational>( ( -HIGHTEST_INTEGER_VALUE ) ), n2.toRational());
 
     n -= n2;
-    EXPECT_EQ( Rational( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) - (-HIGHTEST_INTEGER_VALUE) ) ), n.toRational());
+    EXPECT_EQ( carl::fromInt<Rational>( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) - (-HIGHTEST_INTEGER_VALUE) ) ), n.toRational());
 
     Numeric<Rational> n3( (HIGHTEST_INTEGER_VALUE - 1) );
     n3 *= Numeric<Rational>( 2 );
