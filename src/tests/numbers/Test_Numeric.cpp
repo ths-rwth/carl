@@ -77,7 +77,7 @@ TEST(Numeric, operations)
 
     Numeric<Rational> n3( (HIGHTEST_INTEGER_VALUE - 1) );
     n3 *= Numeric<Rational>( 2 );
-    EXPECT_EQ( Rational( (HIGHTEST_INTEGER_VALUE - 1) ) * Rational( 2 ), n3.toRational());
+    EXPECT_EQ( carl::fromInt<Rational>( (HIGHTEST_INTEGER_VALUE - 1) ) * Rational( 2 ), n3.toRational());
 
     Numeric<Rational> n4( (Rational(1)/Rational(3)) );
     n4 *= Numeric<Rational>( 9 );
@@ -91,7 +91,7 @@ TEST(Numeric, operations)
 
     Numeric<Rational> n6( HIGHTEST_INTEGER_VALUE + 1 );
     n6 /= Numeric<Rational>( 3 );
-    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 )/Rational( 3 )), n6.toRational() );
+    EXPECT_EQ( carl::fromInt<Rational>( HIGHTEST_INTEGER_VALUE + 1 )/Rational( 3 ), n6.toRational() );
 
     Numeric<Rational> n7( 44 );
     n7 /= Numeric<Rational>( 11 );
@@ -99,7 +99,7 @@ TEST(Numeric, operations)
     EXPECT_TRUE( IS_INT( n7.content() ) );
 
     Numeric<Rational> n8( HIGHTEST_INTEGER_VALUE - 3 );
-    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n8 ).toRational() );
+    EXPECT_EQ( carl::fromInt<Rational>( HIGHTEST_INTEGER_VALUE - 3 ), carl::abs( n8 ).toRational() );
     ++n8;
     EXPECT_TRUE( IS_INT( n8.content() ) );
     ++n8;
@@ -108,10 +108,10 @@ TEST(Numeric, operations)
     EXPECT_FALSE( IS_INT( n8.content() ) );
     ++n8;
     EXPECT_FALSE( IS_INT( n8.content() ) );
-    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n8 ).toRational() );
+    EXPECT_EQ( carl::fromInt<Rational>( HIGHTEST_INTEGER_VALUE + 1 ), carl::abs( n8 ).toRational() );
 
     Numeric<Rational> n9( -HIGHTEST_INTEGER_VALUE + 3 );
-    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n9 ).toRational() );
+    EXPECT_EQ( carl::fromInt<Rational>( HIGHTEST_INTEGER_VALUE - 3 ), carl::abs( n9 ).toRational() );
     --n9;
     EXPECT_TRUE( IS_INT( n9.content() ) );
     --n9;
@@ -120,7 +120,7 @@ TEST(Numeric, operations)
     EXPECT_FALSE( IS_INT( n9.content() ) );
     --n9;
     EXPECT_FALSE( IS_INT( n9.content() ) );
-    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n9 ).toRational() );
+    EXPECT_EQ( carl::fromInt<Rational>( HIGHTEST_INTEGER_VALUE + 1 ), carl::abs( n9 ).toRational() );
 
     Numeric<Rational> c1;
     Numeric<Rational> c2( 12 );
