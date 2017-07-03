@@ -103,7 +103,7 @@ namespace carl
         T toRational() const
         {
             if( std::abs( this->mContent ) < HIGHTEST_INTEGER_VALUE )
-                return T( this->mContent );
+                return carl::fromInt<T>(this->mContent);
             else
                 return mRationalPool[std::size_t(this->mContent)-std::size_t(HIGHTEST_INTEGER_VALUE)];
         }
