@@ -341,7 +341,7 @@ namespace carl
          */
 		RationalFunction derivative(const Variable& x, unsigned nth = 1) const;
 		
-		
+		std::string toString(bool infix = true, bool friendlyNames = true) const;
     private:
         
         /**
