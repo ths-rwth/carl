@@ -427,7 +427,20 @@ namespace carl
             return false;
 		return lhs.nominatorAsPolynomial()*rhs.denominatorAsPolynomial() < rhs.nominatorAsPolynomial()*lhs.denominatorAsPolynomial();
 	}
-	
+
+    template<typename Pol, bool AS>
+    std::string RationalFunction<Pol, AS>::toString(bool infix, bool friendlyNames) const {
+        if (denominator().isOne()) {
+            return nominator().toString(infix, friendlyNames);
+        }
+
+        if (infix) {
+            return "(" + nominatorAsPolynomial().toString(infix, friendlyNames) + ")/(" + denominatorAsPolynomial().toString(infix, friendlyNames) + ")";
+        } else {
+            return "(/" + nominatorAsPolynomial().toString(infix, friendlyNames) + " " + denominatorAsPolynomial().toString(infix, friendlyNames) + ")";
+        }
+    }
+
 	template<typename Pol, bool AS>
 	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol, AS>& rhs)
 	{
