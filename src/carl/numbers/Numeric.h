@@ -147,7 +147,7 @@ namespace carl
         
         inline void maybeRationalize( const T& _rat )
         {
-            if( carl::isInteger( _rat ) && carl::getNum( _rat ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _rat ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _rat ) && carl::getNum( _rat ) > -carl::fromInt<T>(HIGHTEST_INTEGER_VALUE) && carl::getNum( _rat ) < carl::fromInt<T>(HIGHTEST_INTEGER_VALUE) )
             {
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _rat ) );
             }
@@ -160,7 +160,7 @@ namespace carl
         inline void maybeIntegralize()
         {
             const T& rat = this->rational();
-            if( carl::isInteger( rat ) && carl::getNum( rat ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( rat ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( rat ) && carl::getNum( rat ) > -carl::fromInt<T>(HIGHTEST_INTEGER_VALUE) && carl::getNum( rat ) < carl::fromInt<T>(HIGHTEST_INTEGER_VALUE) )
             {
                 mFreeRationalIds.push_back( this->mContent );
                 this->mContent = carl::toInt<ContentType>( carl::getNum( rat ) );
@@ -169,7 +169,7 @@ namespace carl
 
         inline void maybeIntegralize( const T& _rat )
         {
-            if( carl::isInteger( _rat ) && carl::getNum( _rat ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _rat ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _rat ) && carl::getNum( _rat ) > -carl::fromInt<T>(HIGHTEST_INTEGER_VALUE) && carl::getNum( _rat ) < carl::fromInt<T>(HIGHTEST_INTEGER_VALUE) )
             {
                 mFreeRationalIds.push_back( this->mContent );
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _rat ) );
