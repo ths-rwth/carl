@@ -8,6 +8,11 @@
 
 using namespace carl;
 
+TEST(Numeric, withinNativeRange)
+{
+	EXPECT_TRUE(Rational(5) > -carl::fromInt<Rational>(carl::HIGHTEST_INTEGER_VALUE));
+	EXPECT_TRUE(Rational(5) < carl::fromInt<Rational>(carl::HIGHTEST_INTEGER_VALUE));
+}
 
 TEST(Numeric, constructors)
 {
