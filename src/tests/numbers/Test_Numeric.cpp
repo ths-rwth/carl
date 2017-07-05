@@ -13,10 +13,13 @@ TEST(Numeric, constructors)
 {
     std::size_t num_of_allocated_elements = Numeric<Rational>::mRationalPool.size();
     Numeric<Rational> n0;
+    EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
     EXPECT_EQ( Rational(0), n0.toRational());
     Numeric<Rational> n1( 2, true );
+    EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
     EXPECT_EQ( Rational(2), n1.toRational());
     Numeric<Rational> n2( 4 );
+    EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
     EXPECT_EQ( Rational(4), n2.toRational());
     Numeric<Rational> n3( Rational( 5 ) );
     EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
