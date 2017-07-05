@@ -535,7 +535,7 @@ namespace carl
         else
         {
             if( IS_INT( _valueB.content() ) )
-                return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), typename IntegralType<T>::type( _valueB.content() ) ) );
+                return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), carl::fromInt<typename IntegralType<T>::type>( _valueB.content() ) ) );
             else
                 return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
         }
