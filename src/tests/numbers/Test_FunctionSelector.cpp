@@ -22,12 +22,12 @@ TEST(FunctionSelector, basic)
 		[](const mpq_class& n){ return carl::isZero(n + 1); }
 	);
 	
-	std::cout << mpz_class(-1) << " -> " << s(mpz_class(-1)) << std::endl;
-	std::cout << mpz_class(0) << " -> " << s(mpz_class(0)) << std::endl;
-	std::cout << mpz_class(1) << " -> " << s(mpz_class(1)) << std::endl;
-	std::cout << mpq_class(-1) << " -> " << s(mpq_class(-1)) << std::endl;
-	std::cout << mpq_class(0) << " -> " << s(mpq_class(0)) << std::endl;
-	std::cout << mpq_class(1) << " -> " << s(mpq_class(1)) << std::endl;
+	EXPECT_EQ(false, s(mpz_class(-1)));
+	EXPECT_EQ(true, s(mpz_class(0)));
+	EXPECT_EQ(false, s(mpz_class(1)));
+	EXPECT_EQ(true, s(mpq_class(-1)));
+	EXPECT_EQ(false, s(mpq_class(0)));
+	EXPECT_EQ(false, s(mpq_class(1)));
 }
 
 TEST(FunctionSelector, binary)
@@ -39,10 +39,10 @@ TEST(FunctionSelector, binary)
 		[](const mpq_class& n1, const mpq_class& n2){ return carl::isZero(n1 + n2 + 2); }
 	);
 	
-	std::cout << mpz_class(-1) << " -> " << s(mpz_class(-1), mpz_class(-1)) << std::endl;
-	std::cout << mpz_class(0) << " -> " << s(mpz_class(0), mpz_class(0)) << std::endl;
-	std::cout << mpz_class(1) << " -> " << s(mpz_class(1), mpz_class(1)) << std::endl;
-	std::cout << mpq_class(-1) << " -> " << s(mpq_class(-1), mpq_class(-1)) << std::endl;
-	std::cout << mpq_class(0) << " -> " << s(mpq_class(0), mpq_class(0)) << std::endl;
-	std::cout << mpq_class(1) << " -> " << s(mpq_class(1), mpq_class(1)) << std::endl;
+	EXPECT_EQ(false, s(mpz_class(-1), mpz_class(-1)));
+	EXPECT_EQ(true, s(mpz_class(0), mpz_class(0)));
+	EXPECT_EQ(false, s(mpz_class(1), mpz_class(1)));
+	EXPECT_EQ(true, s(mpq_class(-1), mpq_class(-1)));
+	EXPECT_EQ(false, s(mpq_class(0), mpq_class(0)));
+	EXPECT_EQ(false, s(mpq_class(1), mpq_class(1)));
 }
