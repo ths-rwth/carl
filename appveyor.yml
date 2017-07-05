@@ -5,8 +5,8 @@ environment:
   BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib64-msvc-14.1
   CTEST_OUTPUT_ON_FAILURE: 1
 
-cache:
-  - C:\Libraries\mpir-3.0.0 -> appveyor.xml
+#cache:
+#  - C:\Libraries\mpir-3.0.0 -> appveyor.xml
 
 build_script:
   - call ".ci\setup_appveyor.cmd"
