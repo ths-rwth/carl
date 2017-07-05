@@ -152,16 +152,22 @@ inline To fromInt(const From& n);
 
 template<>
 inline mpz_class fromInt(const uint& n) {
-	assert(n <= std::numeric_limits<unsigned long>::max());
-	assert(n >= std::numeric_limits<unsigned long>::min());
-	return mpz_class(static_cast<unsigned long>(n));
+	mpz_class res;
+	mpz_set_ui(res.get_mpz_t(), n);
+	return res;
+	//assert(n <= std::numeric_limits<unsigned long>::max());
+	//assert(n >= std::numeric_limits<unsigned long>::min());
+	//return mpz_class(static_cast<unsigned long>(n));
 }
 
 template<>
 inline mpz_class fromInt(const sint& n) {
-	assert(n <= std::numeric_limits<signed long>::max());
-	assert(n >= std::numeric_limits<signed long>::min());
-	return mpz_class(static_cast<signed long>(n));
+	mpz_class res;
+	mpz_set_si(res.get_mpz_t(), n);
+	return res;
+	//assert(n <= std::numeric_limits<signed long>::max());
+	//assert(n >= std::numeric_limits<signed long>::min());
+	//return mpz_class(static_cast<signed long>(n));
 }
 
 template<>
