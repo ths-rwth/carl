@@ -166,16 +166,12 @@ inline mpz_class fromInt(const sint& n) {
 
 template<>
 inline mpq_class fromInt(const uint& n) {
-	assert(n <= std::numeric_limits<unsigned long>::max());
-	assert(n >= std::numeric_limits<unsigned long>::min());
-	return mpq_class(static_cast<unsigned long>(n));
+	return fromInt<mpz_class>(n);
 }
 
 template<>
 inline mpq_class fromInt(const sint& n) {
-	assert(n <= std::numeric_limits<signed long>::max());
-	assert(n >= std::numeric_limits<signed long>::min());
-	return mpq_class(static_cast<signed long>(n));
+	return fromInt<mpz_class>(n);
 }
 
 /**
