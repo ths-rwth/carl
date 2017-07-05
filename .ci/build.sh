@@ -12,7 +12,7 @@ if [[ ${TASK} == "coverage" ]]; then
 	
 	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
-	/usr/bin/time make ${MAKE_PARALLEL} || return 1
+	/usr/bin/time make || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} coverage-collect || return 1
 	
 	coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
