@@ -2098,7 +2098,7 @@ namespace carl
 
 
     template<typename Number>
-    inline Interval<Number> pow(const Interval<Number>& _in, unsigned _exponent)
+    inline Interval<Number> pow(const Interval<Number>& _in, uint _exponent)
     {
         return _in.pow(_exponent);
     }
