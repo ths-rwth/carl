@@ -302,14 +302,14 @@ namespace carl
                 return this->mContent <= _value.mContent;
             else
             {
-                return _value.rational() >= this->mContent;
+                return _value.rational() >= carl::fromInt<T>(this->mContent);
             }
         }
         else
         {
             if( IS_INT( _value.mContent ) )
             {
-                return this->rational() <= _value.mContent;
+                return this->rational() <= carl::fromInt<T>(_value.mContent);
             }
             else
                 return this->rational() <= _value.rational();
@@ -484,7 +484,7 @@ namespace carl
         {
             if( IS_INT( _valueB.content() ) )
             {
-                return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), typename IntegralType<T>::type( _valueB.content() ) ) );
+                return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), carl::fromInt<typename IntegralType<T>::type>( _valueB.content() ) ) );
             }
             else
                 return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
@@ -530,7 +530,7 @@ namespace carl
                 return Numeric<T>( (std::abs(_valueA.content()*_valueB.content())/g) );
             }
             else
-                return Numeric<T>( carl::lcm( typename IntegralType<T>::type( _valueA.content() ), carl::getNum( _valueB.rational() ) ) );
+                return Numeric<T>( carl::lcm( carl::fromInt<typename IntegralType<T>::type>( _valueA.content() ), carl::getNum( _valueB.rational() ) ) );
         }
         else
         {
@@ -659,9 +659,9 @@ namespace carl
     template<typename T>
     Numeric<T>& operator-=( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
-        if( Numeric<T>::withinNativeRange( _valueA.mContent ) )
+        if( IS_INT( _valueA.mContent ) )
         {
-            if( Numeric<T>::withinNativeRange( _valueB.mContent ) )
+            if( IS_INT( _valueB.mContent ) )
             {
                 _valueA.mContent -= _valueB.mContent;
                 _valueA.maybeRationalize();
@@ -676,7 +676,7 @@ namespace carl
         else
         {
             T& rat = _valueA.rRational();
-            if( Numeric<T>::withinNativeRange( _valueB.mContent ) )
+            if( IS_INT( _valueB.mContent ) )
             {
                 rat -= carl::fromInt<T>(_valueB.mContent);
             }
@@ -698,9 +698,9 @@ namespace carl
     template<typename T>
     Numeric<T>& operator*=( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
-        if( Numeric<T>::withinNativeRange( _valueA.mContent ) )
+        if( IS_INT( _valueA.mContent ) )
         {
-            if( Numeric<T>::withinNativeRange( _valueB.mContent ) )
+            if( IS_INT( _valueB.mContent ) )
             {
                 _valueA.mContent *= _valueB.mContent;
                 _valueA.maybeRationalize();
@@ -715,7 +715,7 @@ namespace carl
         else
         {
             T& rat = _valueA.rRational();
-            if( Numeric<T>::withinNativeRange( _valueB.mContent ) )
+            if( IS_INT( _valueB.mContent ) )
             {
                 rat *= carl::fromInt<T>(_valueB.mContent);
             }
