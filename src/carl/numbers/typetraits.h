@@ -35,6 +35,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 
 #include "../util/platform.h"
 #include "config.h"
+#include <limits>
 #include <type_traits>
 
 
@@ -379,4 +380,10 @@ class PreventConversion
 //        PreventConversion( const O& _other ) = delete;
         operator const T&() const { return mContent; }
 };
+
+template<typename T, typename T2>
+bool fitsWithin(const T2& t) {
+	return std::numeric_limits<T>::min() <= t && t <= std::numeric_limits<T>::max();
+}
+
 }
