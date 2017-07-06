@@ -1171,12 +1171,13 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 								break;
 							}
 						}
-					}
+					}	
 				}
 			}
 			if(shiftedTc == shiftedTcs.end())
 			{
-				Coeff posRatZero = positive ? (Coeff(*tcFactor) / Coeff(*lcFactor)) : Coeff(-(Coeff(*tcFactor) / Coeff(*lcFactor)));
+				Coeff posRatZero = carl::fromInt<typename IntegralType<Coeff>::type>(*tcFactor) / carl::fromInt<typename IntegralType<Coeff>::type>(*lcFactor);
+				if (!positive) posRatZero = -posRatZero;
 				CARL_LOG_TRACE("carl.core", "UnivELF: consider possible non zero rational factor  " << posRatZero);
 				Coeff image = result.syntheticDivision(posRatZero);
 				if (carl::isZero(image)) {
