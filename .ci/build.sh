@@ -4,7 +4,9 @@ mkdir build || return 1
 cd build/ || return 1
 cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
 
-MAKE_PARALLEL="-j2"
+if [ -z "$MAKE_PARALLEL" ]; then
+	MAKE_PARALLEL="-j2"
+fi
 
 if [[ ${TASK} == "coverage" ]]; then
 	gem install coveralls-lcov
@@ -12,7 +14,7 @@ if [[ ${TASK} == "coverage" ]]; then
 	
 	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
-	/usr/bin/time make || return 1
+	/usr/bin/time make ${MAKE_PARALLEL} || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} coverage-collect || return 1
 	
 	coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
