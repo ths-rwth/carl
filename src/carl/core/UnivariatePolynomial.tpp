@@ -1043,7 +1043,7 @@ FactorMap<Coeff> UnivariatePolynomial<Coeff>::factorization() const
 	}
 	assert(mCoefficients.size() > 1);
 	// Exclude the factors  (x-r)^i  with  r rational.
-	remainingPoly = excludeLinearFactors<sint>(remainingPoly, result, carl::fromInt<typename IntegralType<Coeff>::type>(INT_MAX));
+	remainingPoly = excludeLinearFactors<sint>(remainingPoly, result, INT_MAX);
 	assert(!remainingPoly.isConstant() || remainingPoly.lcoeff() == (Coeff)1);
 	if(!remainingPoly.isConstant())
 	{
@@ -1125,7 +1125,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 		assert(result.coefficients().size() > 1);
 		typename IntegralType<Coeff>::type lc = carl::abs(getNum(result.lcoeff()));
 		typename IntegralType<Coeff>::type tc = carl::abs(getNum(result.coefficients().front()));
-		if( maxInt != 0 && (tc > maxInt || lc > maxInt) )
+		typename IntegralType<Coeff>::type mi = carl::fromInt<typename IntegralType<Coeff>::type>(maxInt);
+		if( maxInt != 0 && (tc > mi || lc > mi) )
 		{
 			return result;
 		}
