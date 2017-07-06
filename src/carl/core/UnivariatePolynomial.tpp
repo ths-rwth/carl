@@ -1203,7 +1203,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 					// Add a zero-preserving shift.
 					assert(isInteger(image));
 					typename IntegralType<Coeff>::type imageInt = carl::abs(getNum(image));
-					if( imageInt <= maxInt )
+					if( imageInt <= carl::fromInt<IntNumberType>(maxInt) )
 					{
 						CARL_LOG_TRACE("carl.core", "UnivELF: new shift with " << getNum(posRatZero) << " to " << carl::abs(getNum(image)));
 						shiftedTcs.push_back(std::pair<Integer, Integer>(toInt<Integer>(getNum(posRatZero)), toInt<Integer>(carl::abs(getNum(image)))));
