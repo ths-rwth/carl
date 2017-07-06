@@ -89,19 +89,19 @@ matrix:
 #      osx_image: xcode8.2
 #      env: USE=g++-6
     - os: linux
-      env: USE=g++-6 TASK=coverage
+      env: USE=g++-6 TASK=coverage MAKE_PARALLEL=-j1
       addons:
         apt:
           sources: [*sources_base]
           packages: [*packages_base, lcov]
     - os: linux
-      env: USE=g++-6 TASK=doxygen
+      env: USE=g++-6 TASK=doxygen MAKE_PARALLEL=-j1
       addons:
         apt:
           sources: [*sources_base]
           packages: [*packages_base, doxygen, texinfo, texlive]
     - os: linux
-      env: USE=g++-6 TASK=pycarl
+      env: USE=g++-6 TASK=pycarl MAKE_PARALLEL=-j1
       addons:
         apt:
           sources: [*sources_base]
@@ -114,9 +114,9 @@ matrix:
       osx_image: xcode8.2
       env: USE=g++-6
     - os: linux
-      env: USE=g++-6 TASK=coverage
+      env: USE=g++-6 TASK=coverage MAKE_PARALLEL=-j1
     - os: linux
-      env: USE=g++-6 TASK=pycarl
+      env: USE=g++-6 TASK=pycarl MAKE_PARALLEL=-j1
 
 
 before_install:
