@@ -431,13 +431,13 @@ namespace carl
     template<typename Pol, bool AS>
     std::string RationalFunction<Pol, AS>::toString(bool infix, bool friendlyNames) const {
         if (denominator().isOne()) {
-            return nominator().toString(infix, friendlyNames);
+            return nominatorAsPolynomial().toString(infix, friendlyNames);
         }
 
         if (infix) {
             return "(" + nominatorAsPolynomial().toString(infix, friendlyNames) + ")/(" + denominatorAsPolynomial().toString(infix, friendlyNames) + ")";
         } else {
-            return "(/" + nominatorAsPolynomial().toString(infix, friendlyNames) + " " + denominatorAsPolynomial().toString(infix, friendlyNames) + ")";
+            return "(/ " + nominatorAsPolynomial().toString(infix, friendlyNames) + " " + denominatorAsPolynomial().toString(infix, friendlyNames) + ")";
         }
     }
 
