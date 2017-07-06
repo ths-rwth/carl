@@ -4,14 +4,14 @@ IF NOT EXIST mpir-3.0.0 (
 	echo Downloading and building GMP / MPIR
 	appveyor DownloadFile http://mpir.org/mpir-3.0.0.zip
 	
-	7z x -y mpir-3.0.0.zip > nul
+	7z x -y mpir-3.0.0.zip
 	
 	cd mpir-3.0.0\build.vc15
-	
-	msbuild.bat gc dll x64 RELEASE > nul
-	msbuild.bat gc dll x64 DEBUG > nul
-	msbuild.bat gc lib x64 RELEASE > nul
-	msbuild.bat gc lib x64 DEBUG > nul
+
+	msbuild.bat gc dll x64 RELEASE
+	msbuild.bat gc dll x64 DEBUG
+	msbuild.bat gc lib x64 RELEASE
+	msbuild.bat gc lib x64 DEBUG
 	
 	cd c:\Libraries\mpir-3.0.0\dll\x64\Release
 	cp mpir.dll gmp.dll
