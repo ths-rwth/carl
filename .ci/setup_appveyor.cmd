@@ -25,6 +25,8 @@ IF NOT EXIST mpir-3.0.0 (
 	cd c:\Libraries\mpir-3.0.0\lib\x64\Debug
 	cp mpir.lib gmp.lib
 	cp mpirxx.lib gmpxx.lib
+	
+	echo Finished building GMP / MPIR
 )
 
 set PATH=%PATH%;c:\Libraries\mpir-3.0.0\dll\x64\Debug
