@@ -1,6 +1,6 @@
 
 # Add all targets to the build-tree export set
-export(EXPORT carl_Targets FILE "${PROJECT_BINARY_DIR}/carlExport/carlTargets.cmake")
+export(EXPORT carl_Targets FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
 
 
 # Export the package for use from the build-tree
@@ -38,7 +38,7 @@ endforeach()
 
 include(CMakePackageConfigHelpers)
 
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlExport/carlConfigVersion.cmake
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
 	 VERSION 0.1.0
 	 COMPATIBILITY SameMajorVersion )
 
@@ -47,7 +47,7 @@ set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src") # TODO looks not correct, thi
 
 configure_package_config_file(
 	cmake/carlConfig.cmake.in
-	${PROJECT_BINARY_DIR}/carlExport/carlConfig.cmake
+	${PROJECT_BINARY_DIR}/carlConfig.cmake
 	INSTALL_DESTINATION ${PROJECT_BINARY_DIR}
 	PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
 )

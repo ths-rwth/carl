@@ -27,7 +27,7 @@ if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.0)
 	endif()
 
 	install(FILES ${CMAKE_BINARY_DIR}/carlInstall/carlConfig.cmake DESTINATION ${CMAKE_INSTALL_DIR})
-	install(FILES ${CMAKE_BINARY_DIR}/carlExport/carlConfigVersion.cmake DESTINATION ${CMAKE_INSTALL_DIR})
+	install(FILES ${CMAKE_BINARY_DIR}/carlConfigVersion.cmake DESTINATION ${CMAKE_INSTALL_DIR})
 	install(EXPORT carl_Targets FILE carlTargets.cmake DESTINATION ${CMAKE_INSTALL_DIR})
 else()
 	message(STATUS "Disabled install target due to cmake version less than 3.1")
