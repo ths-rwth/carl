@@ -106,6 +106,12 @@ matrix:
         apt:
           sources: [*sources_base]
           packages: [*packages_base, python3]
+    - os: linux
+      env: USE=g++-6 TASK=addons MAKE_PARALLEL=-j1
+      addons:
+        apt:
+          sources: [*sources_base]
+          packages: [*packages_base]
   allow_failures:
     - os: osx
       osx_image: xcode8.2
@@ -117,6 +123,8 @@ matrix:
       env: USE=g++-6 TASK=coverage MAKE_PARALLEL=-j1
     - os: linux
       env: USE=g++-6 TASK=pycarl MAKE_PARALLEL=-j1
+    - os: linux
+      env: USE=g++-6 TASK=addons MAKE_PARALLEL=-j1
 
 
 before_install:
