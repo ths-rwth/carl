@@ -72,6 +72,8 @@ option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( COVERAGE "Enable collection of coverage statistics" OFF )
 option( EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
 
+option( BUILD_ADDONS "Build addons" OFF )
+
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Build type")
 endif()
@@ -213,6 +215,9 @@ if (BINDINGS_PYTHON)
 	add_subdirectory(bindings/pycarl)
 endif()
 
+if(BUILD_ADDONS)
+	include(resources/addons/addons.cmake)
+endif()
 
 
 
