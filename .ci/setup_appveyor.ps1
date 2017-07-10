@@ -36,7 +36,7 @@ echo "Looking for preinstalled Boost"
 $env:PATH += ";C:\Libraries\boost_1_64_0"
 $env:PATH += ";C:\Libraries\boost_1_64_0\lib64-msvc-14.1"
 
-cd c:\projects\carl-windows
+cd c:\projects\carl
 md build
 cd build
 
@@ -45,4 +45,4 @@ cmake --build . --config Debug --target lib_carl
 cmake --build . --config Debug --target lib_carl_static
 cmake --build . --config Debug --target all-tests
 .\bin\Debug\runCoreTests.exe
-#cmake --build . --config Debug --target RUN_TESTS
+cmake --build . --config Debug --target RUN_TESTS
