@@ -249,7 +249,7 @@ public:
 	virtual ~IncrementalRootFinder() = default;
 
 	const UnivariatePolynomial<Number>& getPolynomial() const noexcept {
-		return this->polynomial;
+		return AbstractRootFinder<Number>::getPolynomial();
 	}
 
 	/**

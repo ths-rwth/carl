@@ -40,25 +40,25 @@ protected:
 	 * Original polynomial to solve.
 	 * Stored for informational purposes.
 	 */
-	UnivariatePolynomial<Number> originalPolynomial;
+	UnivariatePolynomial<Number> mOriginalPolynomial;
 	/**
 	 * Polynomial to solve.
 	 * This polynomial may be changed during the solving process.
 	 */
-	UnivariatePolynomial<Number> polynomial;
+	UnivariatePolynomial<Number> mPolynomial;
 	/**
 	 * Interval to be searched.
 	 */
-	Interval<Number> interval;
+	Interval<Number> mInterval;
 	/**
 	 * Roots that have been found.
 	 * If the instantiated root finder works in an incremental manner, this list may not contain all roots, if it is called before the root finder has indicated that it is finished.
 	 */
-	std::vector<RealAlgebraicNumber<Number>> roots;
+	std::vector<RealAlgebraicNumber<Number>> mRoots;
 	/**
 	 * Flag that indicates if the search has finished.
      */
-	bool finished;
+	bool mFinished;
 #ifdef ROOTFINDER_CACHE
 	static std::map<UnivariatePolynomial<Number>, std::vector<RealAlgebraicNumber<Number>>> cache;
 #endif
@@ -88,15 +88,15 @@ public:
 	 * However, it is a factor of the original polynomial.
 	 * @return Current polynomial.
 	 */
-	const UnivariatePolynomial<Number>& getPolynomial() const {
-		return this->polynomial;
+	const UnivariatePolynomial<Number>& getPolynomial() const noexcept {
+		return mPolynomial;
 	}
 	/**
 	 * Returns the polynomial that was given to the RootFinder.
      * @return Polynomial given to the RootFinder.
      */
 	const UnivariatePolynomial<Number>& getOriginalPolynomial() const {
-		return this->originalPolynomial;
+		return mOriginalPolynomial;
 	}
 	
 	/**
@@ -113,13 +113,13 @@ protected:
 	 * @param root Pointer to new root.
 	 * @param reducePolynomial Indicates if the polynomial should be reduced.
 	 */
-	virtual void addRoot(const RealAlgebraicNumber<Number>& root, bool reducePolynomial = true);
+	void addRoot(const RealAlgebraicNumber<Number>& root, bool reducePolynomial = true);
 	
 	/**
 	 * Adds a new root to the internal root list from an interval.
      * @param interval Isolating interval.
      */
-	virtual void addRoot(const Interval<Number>& interval);
+	void addRoot(const Interval<Number>& interval);
 	
 	/**
 	 * Informational method for subclasses specifying the maximum degree of the polynomial that solveTrivial() can handle.
@@ -150,7 +150,7 @@ protected:
 	 * Indicates if the root finding process has finished.
 	 */
 	bool isFinished() const {
-		return this->finished;
+		return mFinished;
 	}
 	
 	/**
@@ -158,24 +158,29 @@ protected:
 	 * Sorts roots that have been found.
      */
 	void setFinished() {
-		if (! this->isFinished()) {
-			this->finished = true;
-			std::sort(roots.begin(), roots.end());
+		if (!isFinished()) {
+			mFinished = true;
+			std::sort(mRoots.begin(), mRoots.end());
 #ifdef ROOTFINDER_CACHE
-			this->storeInCache();
+			storeInCache();
 #endif
 		}
 	}
 #ifdef ROOTFINDER_CACHE
 	bool storeInCache() {
 		if (cache.find(this->originalPolynomial) == cache.end()) {
-			cache[this->originalPolynomial] = this->roots;
+			cache[this->originalPolynomial] = mRoots;
 			return true;
 		}
 		return false;
 	}
-	bool inCache() {
-		return cache.find(this->originalPolynomial) != cache.end();
+	bool restoreFromCache() {
+		auto it = cache.find(mOriginalPolynomial);
+		if (it == cache.end()) return false;
+		mRoots = cache[mOriginalPolynomial];
+		mFinished = true;
+		CARL_LOG_TRACE("carl.core.rootfinder", "Hit cache: " << mOriginalPolynomial << " -> " << mRoots);
+		return true;
 	}
 #endif
 };

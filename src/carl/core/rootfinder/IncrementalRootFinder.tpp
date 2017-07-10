@@ -27,8 +27,9 @@ IncrementalRootFinder<Number, C>::IncrementalRootFinder(
 		AbstractRootFinder<Number>(polynomial, interval, tryTrivialSolver),
 		splittingStrategy(strategy)
 {
-	if (!this->interval.isEmpty()) {
-		this->addQueue(this->interval, splittingStrategy);
+	if (!this->mInterval.isEmpty()) {
+		CARL_LOG_DEBUG("carl.core.rootfinder", "Adding initial queue element " << this->mInterval);
+		this->addQueue(this->mInterval, splittingStrategy);
 	}
 }
 
@@ -49,9 +50,11 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 	Interval<Number> interval = std::get<0>(item);
 	SplittingStrategy strategy = std::get<1>(item);
 	
+	CARL_LOG_TRACE("carl.core.rootfinder", "Processing " << interval);
 
 	if (strategy == SplittingStrategy::EIGENVALUES) {
 		splittingStrategies::EigenValueStrategy<Number>::getInstance()(interval, *this);
+		CARL_LOG_TRACE("carl.core.rootfinder", "Called Eigenvalue strategy");
 		return true;
 	} else if (strategy == SplittingStrategy::ABERTH) {
 		//AberthStrategy<Number>::instance()(interval, *this);
@@ -59,19 +62,23 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 	}
 
 	if (interval.contains(0)) {
-		if (this->polynomial.evaluate(0) == 0) this->addRoot(RealAlgebraicNumber<Number>(0));
+		if (getPolynomial().evaluate(0) == 0) this->addRoot(RealAlgebraicNumber<Number>(0));
 		this->addQueue(Interval<Number>(interval.lower(), BoundType::STRICT, 0, BoundType::STRICT), strategy);
 		this->addQueue(Interval<Number>(0, BoundType::STRICT, interval.upper(), BoundType::STRICT), strategy);
 		return true;
 	}
 
-	uint variations = this->polynomial.signVariations(interval);
+	uint variations = getPolynomial().signVariations(interval);
+	CARL_LOG_TRACE("carl.core.rootfinder", "Sign variations: " << variations);
 
 	if (variations == 0) return true;
 	if (variations == 1) {
 		// If one of the interval bounds is a root, sturm sequences will break. Hence we continue splitting.
-		if (!this->polynomial.isRoot(interval.lower()) && !this->polynomial.isRoot(interval.upper())) {
-			assert(this->polynomial.countRealRoots(interval) == 1);
+		CARL_LOG_TRACE("carl.core.rootfinder", "Single: " << variations);
+		if (!getPolynomial().isRoot(interval.lower()) && !getPolynomial().isRoot(interval.upper())) {
+			CARL_LOG_TRACE("carl.core.rootfinder", "Root should be within " << interval);
+			assert(getPolynomial().countRealRoots(interval) == 1);
+			CARL_LOG_TRACE("carl.core.rootfinder", "It is indeed, adding it");
 			this->addRoot(interval);
 			return true;
 		}
