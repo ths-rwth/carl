@@ -33,8 +33,8 @@ $env:PATH += ";c:\Libraries\mpir-3.0.0\dll\x64\Debug"
 $env:PATH += ";c:\Libraries\mpir-3.0.0\lib\x64\Debug"
 
 echo "Looking for preinstalled Boost"
-$env:PATH += ";C:\Libraries\boost_1_64_0"
-$env:PATH += ";C:\Libraries\boost_1_64_0\lib64-msvc-14.1"
+$env:PATH += ";%BOOST_ROOT%"
+$env:PATH += ";%BOOST_LIBRARYDIR%"
 
 cd c:\projects\carl
 md build
