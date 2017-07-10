@@ -17,7 +17,7 @@ namespace rootfinder {
         
 // hiervon eine thom version machen!!!
 template<typename Coeff, typename Number>
-boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
+boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		const Interval<Number>& interval,
@@ -32,7 +32,7 @@ boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
 	}
 	if (p.isConstant()) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "p is constant but not zero -> no root");
-		return std::list<RealAlgebraicNumber<Number>>({});
+		return std::vector<RealAlgebraicNumber<Number>>({});
 	}
 	
 	UnivariatePolynomial<Coeff> tmp(p);
@@ -60,7 +60,7 @@ boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
 }
 
 template<typename Coeff, typename Number>
-boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
+boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable>& variables,
 		const std::list<RealAlgebraicNumber<Number>>& values,

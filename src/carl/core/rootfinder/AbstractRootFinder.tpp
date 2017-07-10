@@ -82,12 +82,11 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 }
 
 template<typename Number>
-std::list<RealAlgebraicNumber<Number>> AbstractRootFinder<Number>::getAllRoots() {
+const std::vector<RealAlgebraicNumber<Number>>& AbstractRootFinder<Number>::getAllRoots() {
 	if (! this->isFinished()) {
 		this->findRoots();
 		this->setFinished();
 	}
-	this->roots.sort(carl::less<RealAlgebraicNumber<Number>>());
 	return this->roots;
 }
 

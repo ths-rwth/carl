@@ -227,11 +227,6 @@ private:
 	 * Interval queue containing all items that must still be processed.
 	 */
 	std::priority_queue<QueueItem, std::vector<QueueItem>, IntervalSizeComparator> queue;
-	/**
-	 * Iterator pointing to the next root within the root list that should be returned.
-	 */
-	typename std::list<RealAlgebraicNumber<Number>>::iterator nextRoot;
-
 public:
 
 	/**
@@ -258,20 +253,6 @@ public:
 	}
 
 	/**
-	 * Computes some new isolating root of the polynomial.
-	 * If all roots have already been found, returns false.
-	 * @return True if a new root is available, false otherwise.
-	 */
-	bool hasNext();
-
-	/**
-	 * Returns the next root as computed by hasNext().
-	 * Asserts that there actually is a new root.
-	 * @return A new root.
-	 */
-	RealAlgebraicNumber<Number> next();
-
-	/**
 	 * Adds a new item to the internal interval queue.
 	 * Convenience routine for splitting heuristics.
 	 * @param interval Interval to add.
@@ -284,11 +265,9 @@ public:
 protected:
 
 	virtual void addRoot(const RealAlgebraicNumber<Number>& root, bool reducePolynomial = true) {
-		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(root, reducePolynomial);
 	}
 	virtual void addRoot(const Interval<Number>& interval) {
-		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(interval);
 	}
 

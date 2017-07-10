@@ -54,13 +54,13 @@ protected:
 	 * Roots that have been found.
 	 * If the instantiated root finder works in an incremental manner, this list may not contain all roots, if it is called before the root finder has indicated that it is finished.
 	 */
-	std::list<RealAlgebraicNumber<Number>> roots;
+	std::vector<RealAlgebraicNumber<Number>> roots;
 	/**
 	 * Flag that indicates if the search has finished.
      */
 	bool finished;
 #ifdef ROOTFINDER_CACHE
-	static std::map<UnivariatePolynomial<Number>, std::list<RealAlgebraicNumber<Number>>> cache;
+	static std::map<UnivariatePolynomial<Number>, std::vector<RealAlgebraicNumber<Number>>> cache;
 #endif
 
 public:
@@ -104,7 +104,7 @@ public:
 	 * Additional calls will not recompute all roots but only return the cached result.
 	 * @returns List of roots.
 	 */
-	std::list<RealAlgebraicNumber<Number>> getAllRoots();
+	const std::vector<RealAlgebraicNumber<Number>>& getAllRoots();
 	
 protected:
 	/**
@@ -160,7 +160,7 @@ protected:
 	void setFinished() {
 		if (! this->isFinished()) {
 			this->finished = true;
-			this->roots.sort();
+			std::sort(roots.begin(), roots.end());
 #ifdef ROOTFINDER_CACHE
 			this->storeInCache();
 #endif
@@ -182,7 +182,7 @@ protected:
 
 #ifdef ROOTFINDER_CACHE
 template<typename Number>
-std::map<UnivariatePolynomial<Number>, std::list<RealAlgebraicNumber<Number>>> AbstractRootFinder<Number>::cache;
+std::map<UnivariatePolynomial<Number>, std::vector<RealAlgebraicNumber<Number>>> AbstractRootFinder<Number>::cache;
 #endif
 
 }

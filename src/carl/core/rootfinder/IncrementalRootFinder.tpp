@@ -25,8 +25,7 @@ IncrementalRootFinder<Number, C>::IncrementalRootFinder(
 		bool tryTrivialSolver
 		) :
 		AbstractRootFinder<Number>(polynomial, interval, tryTrivialSolver),
-		splittingStrategy(strategy),
-		nextRoot(this->roots.end())
+		splittingStrategy(strategy)
 {
 	if (!this->interval.isEmpty()) {
 		this->addQueue(this->interval, splittingStrategy);
@@ -38,25 +37,6 @@ void IncrementalRootFinder<Number, C>::findRoots() {
 	while (this->processQueueItem()) {}
 	this->setFinished();
 }
-
-template<typename Number, typename C>
-bool IncrementalRootFinder<Number, C>::hasNext() {
-	while (this->nextRoot == this->roots.end()) {
-		if (!this->processQueueItem()) {
-			this->setFinished();
-			return false;
-		}
-	}
-	return true;
-}
-
-template<typename Number, typename C>
-RealAlgebraicNumber<Number> IncrementalRootFinder<Number, C>::next() {
-	assert(this->nextRoot != this->roots.end());
-	auto tmp = this->nextRoot++;
-	return *tmp;
-}
-
 
 template<typename Number, typename C>
 bool IncrementalRootFinder<Number, C>::processQueueItem() {

@@ -232,7 +232,7 @@ bool CAD<Number>::prepareElimination() {
 		// (1)
 		/// @todo make this more efficient
 		std::vector<cad::EliminationSet<Number>> sets(mVariables.size(), cad::EliminationSet<Number>(&this->polynomials, typename cad::EliminationSet<Number>::PolynomialComparator(this->setting.order), typename cad::EliminationSet<Number>::PolynomialComparator(this->setting.order)));
-		for (long unsigned i = newVariableCount; i < sets.size(); i++) {
+		for (std::size_t i = newVariableCount; i < sets.size(); i++) {
 			std::swap(sets[i], this->eliminationSets[i - newVariableCount]);
 		}
 		std::swap(this->eliminationSets, sets);
@@ -410,7 +410,7 @@ cad::Answer CAD<Number>::check(
 	this->prepareElimination();
 	assert(this->sampleTree.isConsistent());
 	mConstraints.set(_constraints, mVariables);
-    #ifdef LOGGING_CARL
+    #ifdef LOGGING
 	CARL_LOG_DEBUG("carl.cad", "Checking the system");
 	for (const auto& c: mConstraints) CARL_LOG_DEBUG("carl.cad", "  " << c);
 	CARL_LOG_DEBUG("carl.cad", "within " << ( bounds.empty() ? "no bounds." : "these bounds:" ));
@@ -845,7 +845,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		return this->samples(
 			openVariableCount,
 	        //carl::realRootsThom(*p, m, bounds),
-			*roots,
+			std::list<RealAlgebraicNumber<Number>>(roots->begin(), roots->end()),
 			currentSamples,
 			replacedSamples,
 			bounds

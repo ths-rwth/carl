@@ -34,7 +34,7 @@ namespace rootfinder {
  * @return
  */
 template<typename Coeff, typename Number, typename Finder = IncrementalRootFinder<Number>, EnableIf<std::is_same<Coeff, Number>> = dummy>
-std::list<RealAlgebraicNumber<Number>> realRoots(
+std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
@@ -54,7 +54,7 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
  * @return
  */
 template<typename Coeff, typename Number, DisableIf<std::is_same<Coeff, Number>> = dummy>
-std::list<RealAlgebraicNumber<Number>> realRoots(
+std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
@@ -72,7 +72,7 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
  * @return
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-std::list<RealAlgebraicNumber<Number>> realRoots(
+std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
@@ -101,7 +101,7 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
  * @return
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
+boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
@@ -109,7 +109,7 @@ boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
 );
 
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
+boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable>& variables,
 		const std::list<RealAlgebraicNumber<Number>>& values,
