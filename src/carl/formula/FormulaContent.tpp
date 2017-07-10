@@ -140,7 +140,7 @@ namespace carl {
         mType( FormulaType::PBCONSTRAINT )
     {
 		mpPBConstraintVS = new PBConstraint<Pol>(std::move(_pbc));
-		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mPBConstraintVS);
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mpPBConstraintVS);
 #else
 		mType(FormulaType::PBCONSTRAINT),
 		mPBConstraint(std::move(_pbc))
