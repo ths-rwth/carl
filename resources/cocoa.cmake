@@ -4,7 +4,7 @@ if (TARGET GMP_EP)
 endif()
 
 ExternalProject_Add(
-    CoCoALib_EP
+    CoCoALib-EP
 	URL "http://cocoa.dima.unige.it/cocoalib/tgz/CoCoALib-${COCOA_VERSION}.tgz"
 	URL_MD5 ${COCOA_TGZHASH}
 	BUILD_IN_SOURCE YES
@@ -16,12 +16,12 @@ ExternalProject_Add(
 	LOG_BUILD 1
 )
 
-ExternalProject_Get_Property(CoCoALib_EP SOURCE_DIR)
+ExternalProject_Get_Property(CoCoALib-EP SOURCE_DIR)
 
 add_imported_library(COCOA SHARED "${SOURCE_DIR}/lib/libcocoa${STATIC_EXT}" "${SOURCE_DIR}/include")
 add_imported_library(COCOA STATIC "${SOURCE_DIR}/lib/libcocoa${STATIC_EXT}" "${SOURCE_DIR}/include")
 
-add_dependencies(CoCoALib_EP GMP_STATIC)
-add_dependencies(COCOA_SHARED CoCoALib_EP)
-add_dependencies(COCOA_STATIC CoCoALib_EP)
+add_dependencies(CoCoALib-EP GMP_STATIC)
+add_dependencies(COCOA_SHARED CoCoALib-EP)
+add_dependencies(COCOA_STATIC CoCoALib-EP)
 add_dependencies(resources COCOA_SHARED COCOA_STATIC)

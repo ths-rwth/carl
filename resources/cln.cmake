@@ -6,20 +6,20 @@ endif()
 string(REPLACE "." "-" CLN_TAG ${CLN_VERSION})
 
 ExternalProject_Add(
-    CLN
+    CLN-EP
     GIT_REPOSITORY "git://www.ginac.de/cln.git"
 	GIT_TAG "cln_${CLN_TAG}"
 	BUILD_IN_SOURCE 1
 	CONFIGURE_COMMAND ${AUTORECONF} -iv COMMAND ./configure --prefix=<INSTALL_DIR>
 )
 
-ExternalProject_Get_Property(CLN INSTALL_DIR)
+ExternalProject_Get_Property(CLN-EP INSTALL_DIR)
 
 add_imported_library(CLN SHARED "${INSTALL_DIR}/lib/libcln${DYNAMIC_EXT}" "${INSTALL_DIR}/include")
 add_imported_library(CLN STATIC "${INSTALL_DIR}/lib/libcln${STATIC_EXT}" "${INSTALL_DIR}/include")
 
-add_dependencies(CLN_SHARED CLN)
-add_dependencies(CLN_STATIC CLN)
+add_dependencies(CLN_SHARED CLN-EP)
+add_dependencies(CLN_STATIC CLN-EP)
 add_dependencies(resources CLN_SHARED CLN_STATIC)
 
 mark_as_advanced(AUTORECONF)

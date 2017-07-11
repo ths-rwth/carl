@@ -10,7 +10,7 @@ else()
 endif()
 
 ExternalProject_Add(
-	Boost_EP
+	Boost-EP
 	GIT_SUBMODULES 
 		libs/algorithm
 		libs/any
@@ -72,7 +72,7 @@ ExternalProject_Add(
 	INSTALL_COMMAND ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release install
 )
 
-ExternalProject_Get_Property(Boost_EP INSTALL_DIR)
+ExternalProject_Get_Property(Boost-EP INSTALL_DIR)
 
 set(shared_libs)
 set(static_libs)
@@ -87,7 +87,6 @@ add_imported_library(Boost STATIC "${static_libs}" "${INSTALL_DIR}/include" ${BO
 unset(shared_libs)
 unset(static_libs)
 
-add_dependencies(Boost_SHARED Boost_EP)
-add_dependencies(Boost_STATIC Boost_EP)
-
+add_dependencies(Boost_SHARED Boost-EP)
+add_dependencies(Boost_STATIC Boost-EP)
 add_dependencies(resources Boost_SHARED Boost_STATIC)

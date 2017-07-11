@@ -1,5 +1,5 @@
 ExternalProject_Add(
-    GTest_EP
+    GTest-EP
 	GIT_REPOSITORY https://github.com/google/googletest.git
 	GIT_TAG "release-${GTEST_VERSION}"
 	UPDATE_COMMAND ""
@@ -12,8 +12,8 @@ ExternalProject_Add(
 	LOG_BUILD 1
 )
 
-ExternalProject_Get_Property(GTest_EP source_dir)
-ExternalProject_Get_Property(GTest_EP binary_dir)
+ExternalProject_Get_Property(GTest-EP source_dir)
+ExternalProject_Get_Property(GTest-EP binary_dir)
 
 if(WIN32)
 	add_imported_library(GTESTCORE STATIC "${binary_dir}/googlemock/gtest/${CMAKE_BUILD_TYPE}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${STATIC_EXT}" "${source_dir}/googletest/include")
@@ -27,5 +27,5 @@ else()
 	set(GTEST_LIBRARIES GTESTCORE_STATIC GTESTMAIN_STATIC pthread dl)
 endif()
 
-add_dependencies(GTESTCORE_STATIC GTest_EP)
-add_dependencies(GTESTMAIN_STATIC GTest_EP)
+add_dependencies(GTESTCORE_STATIC GTest-EP)
+add_dependencies(GTESTMAIN_STATIC GTest-EP)
