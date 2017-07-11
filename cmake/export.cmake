@@ -57,7 +57,7 @@ set(CONF_INCLUDE_DIRS "\${carl_CMAKE_DIR}/${REL_INCLUDE_DIR}")
 
 configure_package_config_file(
 	cmake/carlConfig.cmake.in
-	${PROJECT_BINARY_DIR}/carlInstall/carlConfig.cmake
+	${PROJECT_BINARY_DIR}/carlConfig.install.cmake
 	INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
 	PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
 )
