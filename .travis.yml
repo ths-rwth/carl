@@ -32,6 +32,7 @@ addons:
       - libgtest-dev
       - openjdk-7-jdk
       - time
+      - uuid-dev
 
 matrix:
   include:
