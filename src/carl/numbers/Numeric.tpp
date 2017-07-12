@@ -112,7 +112,7 @@ namespace carl
     {
         if( IS_INT( this->mContent ) )
         {
-            if( carl::isInteger( _value ) && carl::getNum( _value ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _value ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _value ) && withinNativeRange(_value) )
             {
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _value ) );
             }
@@ -123,7 +123,7 @@ namespace carl
         }
         else
         {
-            if( carl::isInteger( _value ) && carl::getNum( _value ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _value ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _value ) && withinNativeRange(_value) )
             {
                 mFreeRationalIds.push_back( this->mContent );
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _value ) );
