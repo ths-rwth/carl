@@ -33,7 +33,7 @@ target_include_directories( lib_carl PUBLIC
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/carl>
 	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
 )
-target_link_libraries(lib_carl PUBLIC EIGEN3 GMPXX_SHARED GMP_SHARED Boost_SHARED)
+target_link_libraries(lib_carl PUBLIC EIGEN3 GMPXX_SHARED GMP_SHARED Boost_SHARED ${CMAKE_DL_LIBS})
 if(USE_CLN_NUMBERS)
 	target_link_libraries(lib_carl PUBLIC CLN_SHARED)
 endif()
@@ -62,7 +62,7 @@ if(BUILD_STATIC)
         set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_END_STATIC TRUE )
         set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_START_STATIC TRUE )
 
-	target_link_libraries(lib_carl_static PUBLIC EIGEN3 GMPXX_STATIC GMP_STATIC Boost_STATIC)
+	target_link_libraries(lib_carl_static PUBLIC EIGEN3 GMPXX_STATIC GMP_STATIC Boost_STATIC ${CMAKE_DL_LIBS})
 	if(USE_CLN_NUMBERS)
 		target_link_libraries(lib_carl_static PUBLIC CLN_STATIC)
 	endif()
