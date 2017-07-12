@@ -1,7 +1,7 @@
 ExternalProject_Add(
     GTest-EP
-	GIT_REPOSITORY https://github.com/google/googletest.git
-	GIT_TAG "release-${GTEST_VERSION}"
+	URL https://github.com/google/googletest/archive/release-${GTEST_VERSION}.zip
+	DOWNLOAD_NO_PROGRESS 1
 	UPDATE_COMMAND ""
 	BUILD_COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest
 	COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest_main
