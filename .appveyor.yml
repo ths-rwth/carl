@@ -6,7 +6,7 @@ environment:
   CTEST_OUTPUT_ON_FAILURE: 1
 
 cache:
-  - C:\Libraries\mpir-3.0.0 -> .appveyor.xml
+  - C:\Libraries\mpir-3.0.0 -> .appveyor.yml
 
 build_script:
   - ps: .ci\setup_appveyor.ps1
