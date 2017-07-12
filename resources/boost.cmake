@@ -2,69 +2,18 @@ set( Boost_Bootstrap_Command )
 if( UNIX )
 	set( Boost_Bootstrap_Command ./bootstrap.sh )
 	set( Boost_b2_Command ./b2 )
-else()
-	if( WIN32 )
-		set( Boost_Bootstrap_Command bootstrap.bat )
-		set( Boost_b2_Command b2.exe )
-	endif()
+elseif( WIN32 )
+	set( Boost_Bootstrap_Command bootstrap.bat )
+	set( Boost_b2_Command b2.exe )
 endif()
+
+string(REPLACE "." "_" BOOST_VERSION_FILENAME ${BOOST_VERSION})
 
 ExternalProject_Add(
 	Boost-EP
-	GIT_SUBMODULES 
-		libs/algorithm
-		libs/any
-		libs/array
-		libs/assert
-		libs/bind
-		libs/concept_check
-		libs/config
-		libs/container
-		libs/core
-		libs/detail
-		libs/dynamic_bitset
-		libs/filesystem
-		libs/foreach
-		libs/format
-		libs/function
-		libs/function_types
-		libs/functional
-		libs/fusion
-		libs/integer
-		libs/intrusive
-		libs/io
-		libs/iostreams
-		libs/iterator
-		libs/lexical_cast
-		libs/math
-		libs/move
-		libs/mpl
-		libs/numeric/conversion
-		libs/numeric/interval
-		libs/optional 
-		libs/phoenix
-		libs/predef
-		libs/preprocessor
-		libs/program_options
-		libs/proto
-		libs/range
-		libs/regex
-		libs/smart_ptr
-		libs/spirit
-		libs/static_assert
-		libs/system
-		libs/throw_exception
-		libs/tokenizer
-		libs/type_index
-		libs/type_traits
-		libs/typeof
-		libs/utility
-		libs/variant
-		tools/build
-		tools/inspect 
-	GIT_REPOSITORY https://github.com/boostorg/boost.git
-	GIT_TAG "boost-${BOOST_VERSION}"
+	URL https://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_${BOOST_VERSION_FILENAME}.zip/download
 	BUILD_IN_SOURCE 1
+	DOWNLOAD_NO_PROGRESS 1
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
 	CONFIGURE_COMMAND ${Boost_Bootstrap_Command} --prefix=<INSTALL_DIR>
