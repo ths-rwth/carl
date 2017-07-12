@@ -18,7 +18,7 @@ ExternalProject_Add(
 	PATCH_COMMAND ""
 	CONFIGURE_COMMAND ${Boost_Bootstrap_Command} --prefix=<INSTALL_DIR>
 	BUILD_COMMAND  ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release headers
-	INSTALL_COMMAND ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release install
+	INSTALL_COMMAND ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release --without-python --without-mpi install
 )
 
 ExternalProject_Get_Property(Boost-EP INSTALL_DIR)
