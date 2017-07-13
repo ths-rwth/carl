@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-mkdir build || return 1
+mkdir -p build || return 1
 cd build/ || return 1
 cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
 
