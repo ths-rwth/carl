@@ -6,7 +6,7 @@ ExternalProject_Add(
 	BUILD_COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest
 	COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest_main
 	INSTALL_COMMAND ""
-	BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/resources/src/GTest_EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${STATIC_EXT} ${CMAKE_BINARY_DIR}/resources/src/GTest_EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${STATIC_EXT}
+	BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${STATIC_EXT} ${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${STATIC_EXT}
 	LOG_DOWNLOAD 1
 	LOG_CONFIGURE 1
 	LOG_BUILD 1
