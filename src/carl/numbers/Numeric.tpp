@@ -159,7 +159,7 @@ namespace carl
                 this->mContent = _value;
             }
             else
-                this->rRational() = T( _value );
+                this->rRational() = carl::fromInt<T>( _value );
         }
         return *this; // NOLINT
     }
