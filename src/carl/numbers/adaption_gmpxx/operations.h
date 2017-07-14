@@ -119,6 +119,7 @@ inline double toDouble(const mpz_class& n) {
 
 template<typename Integer>
 inline Integer toInt(const mpz_class& n);
+
 template<>
 inline sint toInt<sint>(const mpz_class& n) {
     assert(n <= std::numeric_limits<signed long>::max());
@@ -193,15 +194,6 @@ template<>
 inline uint toInt<uint>(const mpq_class& n) {
 	return toInt<uint>(toInt<mpz_class>(n));
 }
-
-/*template<>
-inline uint toInt<uint>(const mpq_class& n) {
-	return toInt<uint>(toInt<mpz_class>(n));
-}
-template<>
-inline sint toInt<sint>(const mpq_class& n) {
-	return toInt<sint>(toInt<mpz_class>(n));
-}*/
 
 template<typename T>
 inline T rationalize(double n);
