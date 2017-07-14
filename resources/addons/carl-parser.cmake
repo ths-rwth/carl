@@ -8,8 +8,6 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(carl-parser BINARY_DIR)
 
-message(STATUS "DIR: ${BINARY_DIR}")
-
 add_dependencies(addons carl-parser)
 add_dependencies(carl-parser lib_carl)
 
