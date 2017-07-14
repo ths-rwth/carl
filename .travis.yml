@@ -5,6 +5,7 @@ dist: trusty
 cache:
   apt: true
   directories:
+    - $HOME/usr/
     - build/resources
 
 _apt_packages:
