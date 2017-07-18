@@ -12,44 +12,26 @@
 static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
+#include "include.h"
+
+#include <carl/util/hash.h>
+
 #include <cstddef>
 #include <functional>
-#ifdef __WIN
-	#pragma warning(push, 0)
-	#include <mpirxx.h>
-	#pragma warning(pop)
-#else
-	#include <gmpxx.h>
-#endif
 
-namespace std
-{
-// This is actually gmp
-//template<>
-//struct hash<mpq_t>
-//{
-//	size_t operator()(const mpq_t& gmp_rational) const
-//	{
-//		return mpz_get_ui(mpq_numref(gmp_rational)) ^ mpz_get_ui(mpq_denref(gmp_rational));
-//	}
-//};
+namespace std {
 
 template<> 
-struct hash<mpz_class>
-{
-	size_t operator()(const mpz_class& z) const
-	{
+struct hash<mpz_class> {
+	std::size_t operator()(const mpz_class& z) const {
 		return z.get_ui();
 	}
 };
-	
+
 template<>
-struct hash<mpq_class>
-{
-	size_t operator()(const mpq_class& q) const
-	{
-		std::hash<mpz_class> H;
-		return H(q.get_num()) ^ H(q.get_den());
+struct hash<mpq_class> {
+	std::size_t operator()(const mpq_class& q) const {
+		return carl::hash_all(q.get_num(), q.get_den());
 	}
 };
 

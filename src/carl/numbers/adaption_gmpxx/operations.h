@@ -14,6 +14,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
 #include "../../util/platform.h"
+#include "include.h"
 #include "typetraits.h"
 
 #include <climits>

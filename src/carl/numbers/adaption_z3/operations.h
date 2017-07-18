@@ -10,7 +10,7 @@
 #include "../../util/platform.h"
 #include <limits.h>
 
-#include "z3_include.h"
+#include "include.h"
 
 namespace carl {
 
