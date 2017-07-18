@@ -3,14 +3,7 @@
 #include "carl/core/FactorizedPolynomial.h"
 #include "carl/util/stringparser.h"
 #include "carl/util/platform.h"
-
-#ifdef __WIN
-	#pragma warning(push, 0)
-	#include <mpirxx.h>
-	#pragma warning(pop)
-#else
-	#include <gmpxx.h>
-#endif
+#include "carl/numbers/numbers.h"
 
 #include "../Common.h"
 
@@ -607,4 +600,3 @@ TEST(FactorizedPolynomial, Derivation)
     FPol fp4( p3, pCache );
     EXPECT_EQ( fp4, derivation );
 }
-
