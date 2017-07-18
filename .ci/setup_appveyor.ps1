@@ -4,7 +4,6 @@ echo "Looking for preinstalled Boost"
 $env:PATH += ";$BOOST_ROOT"
 $env:PATH += ";$BOOST_LIBRARYDIR"
 
-cd c:\projects\carl
 md build
 cd build
 
