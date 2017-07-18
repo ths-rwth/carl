@@ -1,5 +1,3 @@
-cd c:\Libraries\
-
 echo "Looking for preinstalled Boost"
 $env:PATH += ";$BOOST_ROOT"
 $env:PATH += ";$BOOST_LIBRARYDIR"
