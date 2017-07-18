@@ -8,7 +8,7 @@ function install {
 }
 
 brew update --quiet
-brew install cln cmake doxygen eigen llvm
+brew install cln doxygen eigen llvm
 
 if [[ ${USE} == "g++-4.8" ]]; then
 	echo "g++-4.8 is not supported"
