@@ -1,5 +1,5 @@
 include(ExternalProject)
-SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
+set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 
 add_custom_target(resources)
 

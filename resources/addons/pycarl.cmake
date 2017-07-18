@@ -10,7 +10,6 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(pycarl SOURCE_DIR)
 
-message(STATUS "Custom command for ${SOURCE_DIR}/pycarl-env/bin/activate")
 add_custom_command(
     OUTPUT ${SOURCE_DIR}/pycarl-env/bin/activate
     COMMAND virtualenv -p python3 pycarl-env
