@@ -13,8 +13,8 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
 #include "include.h"
+#include "../../util/hash.h"
 
-#include <carl/util/hash.h>
 
 #include <cstddef>
 #include <functional>
