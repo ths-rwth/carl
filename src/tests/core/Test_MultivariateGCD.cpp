@@ -1,15 +1,8 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include "carl/core/MultivariateGCD.h"
 #include "carl/core/PrimitiveEuclideanAlgorithm.h"
+#include <carl/numbers/numbers.h>
 #include "carl/util/platform.h"
-
-#ifdef __WIN
-	#pragma warning(push, 0)
-	#include <mpirxx.h>
-	#pragma warning(pop)
-#else
-	#include <gmpxx.h>
-#endif
 
 #include "../Common.h"
 
