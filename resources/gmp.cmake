@@ -6,7 +6,7 @@ if(UNIX)
 	mark_as_advanced(M4)
 
 	ExternalProject_Add(
-		GMP_EP
+		GMP-EP
 		URL "https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2"
 		URL_MD5 86ee6e54ebfc4a90b643a65e402c4048
 		BUILD_IN_SOURCE YES
@@ -14,7 +14,7 @@ if(UNIX)
 	)
 elseif(WIN32)
 	ExternalProject_Add(
-		GMP_EP
+		GMP-EP
 		URL "http://mpir.org/mpir-3.0.0.zip"
 		URL_MD5 0ac60c2e6e183d401d1f876ca177cdb7
 		CONFIGURE_COMMAND ""
@@ -35,15 +35,15 @@ elseif(WIN32)
 	)
 endif()
 
-ExternalProject_Get_Property(GMP_EP INSTALL_DIR)
+ExternalProject_Get_Property(GMP-EP INSTALL_DIR)
 
 add_imported_library(GMP SHARED "${INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}gmp${DYNAMIC_EXT}" "${INSTALL_DIR}/include")
 add_imported_library(GMP STATIC "${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}gmp${STATIC_EXT}" "${INSTALL_DIR}/include")
 add_imported_library(GMPXX SHARED "${INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}gmpxx${DYNAMIC_EXT}" "${INSTALL_DIR}/include")
 add_imported_library(GMPXX STATIC "${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}gmpxx${STATIC_EXT}" "${INSTALL_DIR}/include")
 
-add_dependencies(GMP_SHARED GMP_EP)
-add_dependencies(GMP_STATIC GMP_EP)
-add_dependencies(GMPXX_SHARED GMP_EP)
-add_dependencies(GMPXX_STATIC GMP_EP)
+add_dependencies(GMP_SHARED GMP-EP)
+add_dependencies(GMP_STATIC GMP-EP)
+add_dependencies(GMPXX_SHARED GMP-EP)
+add_dependencies(GMPXX_STATIC GMP-EP)
 add_dependencies(resources GMP_SHARED GMP_STATIC GMPXX_SHARED GMPXX_STATIC)
