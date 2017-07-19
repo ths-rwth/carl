@@ -833,7 +833,7 @@ namespace carl
     }
     
 	template <typename P>
-	bool operator==( const FactorizedPolynomial<P>& _lhs, const typename P::CoeffType& _rhs )
+	bool operator==( const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs )
     {
         return !existsFactorization( _lhs ) && _lhs.coefficient() == _rhs;
     }
