@@ -3,7 +3,7 @@ if( UNIX )
 	set( Boost_Bootstrap_Command ./bootstrap.sh )
 	set( Boost_b2_Command ./b2 )
 elseif( WIN32 )
-	set( Boost_Bootstrap_Command bootstrap.bat )
+	set( Boost_Bootstrap_Command ${CMAKE_COMMAND} -E env "VSCMD_START_DIR=<BUILD_DIR>" .\\bootstrap.bat )
 	set( Boost_b2_Command b2.exe )
 endif()
 
@@ -17,9 +17,9 @@ ExternalProject_Add(
 	DOWNLOAD_NO_PROGRESS 1
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
-	CONFIGURE_COMMAND ${Boost_Bootstrap_Command} --prefix=<INSTALL_DIR>
+	CONFIGURE_COMMAND ${Boost_Bootstrap_Command}
 	BUILD_COMMAND  ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release headers
-	INSTALL_COMMAND ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release --without-python --without-mpi install
+	INSTALL_COMMAND ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release --without-python --without-mpi install --prefix=<INSTALL_DIR>
 )
 
 ExternalProject_Get_Property(Boost-EP INSTALL_DIR)
