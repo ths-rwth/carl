@@ -1,15 +1,9 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include "carl/core/MultivariateHensel.h"
 #include "carl/core/VariablePool.h"
 #include "carl/util/platform.h"
 
-#ifdef __WIN
-	#pragma warning(push, 0)
-	#include <mpirxx.h>
-	#pragma warning(pop)
-#else
-	#include <gmpxx.h>
-#endif
+#include <carl/numbers/numbers.h>
 
 using namespace carl;
 /*

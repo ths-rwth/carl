@@ -13,23 +13,8 @@
 static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
-#include "../../util/platform.h"
-#include <cstddef>
-CLANG_WARNING_DISABLE("-Wmismatched-tags")
-CLANG_WARNING_DISABLE("-Wsign-conversion")
-#ifdef USE_CLN_NUMBERS
-	#include <cln/cln.h>
-#elif defined(__WIN)
-	#pragma warning(push, 0)
-	#include <mpirxx.h>
-	#pragma warning(pop)
-#else
-	#include <gmpxx.h>
-#endif
-CLANG_WARNING_RESET
-CLANG_WARNING_RESET
-
 #include "../typetraits.h"
+#include "include.h"
 
 namespace carl {
 	
