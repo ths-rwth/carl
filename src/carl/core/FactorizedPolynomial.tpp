@@ -49,7 +49,7 @@ namespace carl
                 mCoefficient *= CoeffType(-1);
             }
             /*
-             * The following is not very nice, but we know, that the hash won't change, once the polynomial 
+             * The following is not very nice, but we know, that the hash won't change, once the polynomial
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
              * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
              */
@@ -70,7 +70,7 @@ namespace carl
                 else
                 {
                     delete pfPair;
-                } 
+                }
             }
             else
             {
@@ -100,7 +100,7 @@ namespace carl
             assert( mpCache != nullptr );
             // TODO expensive
             for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
-            assert( carl::isOne(factor->first.coefficient()) );
+                assert( carl::isOne(factor->first.coefficient()) );
             PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( _factorization ) );
             auto ret = mpCache->cache( pfPair );//, &carl::canBeUpdated, &carl::update );
             mCacheRef = ret.first;
