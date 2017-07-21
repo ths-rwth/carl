@@ -150,16 +150,16 @@ namespace carl
         {
             switch( op )
             {
-                case ConstructorOperation::ADD: 
-                    *this += *it; 
+                case ConstructorOperation::ADD:
+                    *this += *it;
                     break;
-                case ConstructorOperation::SUB: 
-                    *this -= *it; 
+                case ConstructorOperation::SUB:
+                    *this -= *it;
                     break;
-                case ConstructorOperation::MUL: 
-                    *this *= *it; 
+                case ConstructorOperation::MUL:
+                    *this *= *it;
                     break;
-                case ConstructorOperation::DIV: 
+                case ConstructorOperation::DIV:
                     assert(it->isConstant());
                     *this /= it->constantPart();
                     break;
@@ -241,7 +241,7 @@ namespace carl
     
     template<typename P>
     typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::constantPart() const
-    {   
+    {
         if( existsFactorization( *this ) )
         {
             if( factorizedTrivially() )
@@ -259,7 +259,7 @@ namespace carl
 
     template<typename P>
     typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::lcoeff() const
-    {   
+    {
         if( existsFactorization( *this ) )
         {
             if( factorizedTrivially() )
