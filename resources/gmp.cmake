@@ -9,6 +9,7 @@ if(UNIX)
 		GMP-EP
 		URL "https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2"
 		URL_MD5 86ee6e54ebfc4a90b643a65e402c4048
+		DOWNLOAD_NO_PROGRESS 1
 		BUILD_IN_SOURCE YES
 		CONFIGURE_COMMAND ./configure --enable-cxx --prefix=<INSTALL_DIR>
 	)
@@ -17,6 +18,7 @@ elseif(WIN32)
 		GMP-EP
 		URL "http://mpir.org/mpir-3.0.0.zip"
 		URL_MD5 0ac60c2e6e183d401d1f876ca177cdb7
+		DOWNLOAD_NO_PROGRESS 1
 		CONFIGURE_COMMAND ""
 		BUILD_IN_SOURCE YES
 		BUILD_COMMAND cd build.vc15
