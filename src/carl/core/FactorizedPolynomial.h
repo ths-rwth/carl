@@ -243,6 +243,16 @@ namespace carl
             return mCoefficient;
         }
 
+        P polynomialWithCoefficient() const
+        {
+            if(existsFactorization(*this)) {
+                return this->mCoefficient * polynomial();
+            }
+            else {
+                return P(mCoefficient);
+            }
+        }
+
         /**
          * @return true, if the factorized polynomial is constant.
          */
