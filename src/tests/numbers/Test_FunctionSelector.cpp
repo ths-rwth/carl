@@ -1,5 +1,6 @@
 #include "../Common.h"
 
+#include <carl/core/MultivariatePolynomial.h>
 #include <carl/numbers/FunctionSelector.h>
 
 TEST(FunctionSelector, TypeSelector)
