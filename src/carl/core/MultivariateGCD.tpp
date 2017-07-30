@@ -15,6 +15,7 @@
 #include "VariablesInformation.h"
 
 #include "../numbers/FunctionSelector.h"
+#include "../converter/CoCoAAdaptor.h"
 
 namespace carl
 {
