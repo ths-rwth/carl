@@ -41,6 +41,7 @@ namespace carl {
 
 
 #ifdef USE_CLN_NUMBERS
+#include "adaption_cln/include.h"
 #include "adaption_cln/hash.h"
 #include "adaption_cln/operations.h"
 #include "adaption_cln/typetraits.h"
