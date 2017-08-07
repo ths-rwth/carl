@@ -114,6 +114,8 @@ class MultivariateGCD : GCDCalculation
 		}
 		
 	}
+	
+	Polynomial customCalculation(const Polynomial& a, const Polynomial& b);
     
     #ifdef USE_GINAC
     bool checkCorrectnessWithGinac()

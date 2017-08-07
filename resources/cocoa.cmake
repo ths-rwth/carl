@@ -7,11 +7,11 @@ ExternalProject_Add(
     CoCoALib-EP
 	URL "http://cocoa.dima.unige.it/cocoalib/tgz/CoCoALib-${COCOA_VERSION}.tgz"
 	URL_MD5 ${COCOA_TGZHASH}
+	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES
 	CONFIGURE_COMMAND ./configure --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC
 	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} cocoalib
 	INSTALL_COMMAND ""
-	LOG_DOWNLOAD 1
 	LOG_CONFIGURE 1
 	LOG_BUILD 1
 )

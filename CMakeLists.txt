@@ -19,7 +19,7 @@ project(carl CXX)
 set( PROJECT_FULLNAME "carl")
 set( PROJECT_DESCRIPTION "Computer ARithmetic Library")
 set( carl_YEARVERSION 17)
-set( carl_MONTHVERSION 06)
+set( carl_MONTHVERSION 08)
 set( carl_MAINTENANCEVERSION 0)
 if(carl_MAINTENANCEVERSION GREATER 0)
 	set(carl_VERSION "${carl_YEARVERSION}.${carl_MONTHVERSION}.${carl_MAINTENANCEVERSION}")
@@ -71,8 +71,11 @@ option( EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
 
 option( BUILD_ADDONS "Build addons" OFF )
 
+set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
+set_property(CACHE CLANG_SANITIZER PROPERTY STRINGS none address memory thread)
+
 if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Build type")
+	set(CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Build type." FORCE)
 endif()
 
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "DEBUG" "RELEASE")

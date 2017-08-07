@@ -22,15 +22,14 @@ _apt_packages:
 addons:
   apt:
     sources: &sources_base
-      - *sources_boost
+#      - *sources_boost
       - *sources_cmake
       - ubuntu-toolchain-r-test
     packages: &packages_base
-      - *packages_boost
+#      - *packages_boost
       - *packages_cmake
       - g++-6
       - libcln-dev
-      - libeigen3-dev
       - libgmp-dev
       - libgtest-dev
       - openjdk-7-jdk
