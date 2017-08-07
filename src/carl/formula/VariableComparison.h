@@ -79,6 +79,16 @@ namespace carl {
 			if (!boost::get<RAN>(mValue).isNumeric()) return boost::none;
 			return Constraint<Poly>(Poly(mVar) - Poly(boost::get<RAN>(mValue).value()), rel);
 		}
+		Poly definingPolynomial() const {
+			if (boost::get<RAN>(&mValue) != nullptr) {
+				const auto& ran = boost::get<RAN>(mValue);
+				if (ran.isNumeric()) return Poly(mVar) - ran.value();
+				return Poly(ran.getIRPolynomial().replaceVariable(mVar));
+			} else {
+				const auto& mr = boost::get<MR>(mValue);
+				return mr.poly(mVar);
+			}
+		}
 		VariableComparison negation() const {
 			return VariableComparison(mVar, mValue, mRelation, !mNegated);
 		}

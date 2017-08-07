@@ -34,6 +34,9 @@ public:
 	const Poly& poly() const noexcept {
 		return mPoly;
 	}
+	Poly poly(Variable var) const {
+		return mPoly.substitute(mVar, Poly(var));
+	}
 	std::size_t k() const noexcept {
 		return mK;
 	}
