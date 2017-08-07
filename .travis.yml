@@ -69,7 +69,7 @@ matrix:
           sources: [*sources_base, llvm-toolchain-trusty-4.0]
           packages: [*packages_base, clang-4.0]
     - os: linux
-      env: USE=g++-5
+      env: USE=g++-5 MAKE_PARALLEL=-j1
       addons:
         apt:
           sources: [*sources_base]
