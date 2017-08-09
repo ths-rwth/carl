@@ -51,7 +51,7 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	# Build bindings
 	python setup.py build_ext -j 1 develop || return 1
 	# Run tests
-	py.test tests/ || return 1
+	python setup.py test || return 1
 	
 elif [[ ${TASK} == "addons" ]]; then
 	
