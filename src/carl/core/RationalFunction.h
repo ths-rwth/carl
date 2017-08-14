@@ -463,6 +463,7 @@ namespace carl
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
         RationalFunction& operator*=(Variable::Arg rhs);
         RationalFunction& operator*=(const CoeffType& rhs);
+        RationalFunction& operator*=(long rhs);
         /// @}
 
         /**
@@ -607,6 +608,24 @@ namespace carl
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) *= rhs );
 	}
+
+    template<typename Pol, bool AS>
+    inline RationalFunction<Pol, AS> operator*(const typename Pol::CoeffType& lhs, const RationalFunction<Pol, AS>& rhs)
+    {
+        return std::move( RationalFunction<Pol, AS>(rhs) *= lhs );
+    }
+
+    template<typename Pol, bool AS>
+    inline RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, long rhs)
+    {
+        return std::move( RationalFunction<Pol, AS>(lhs) *= rhs );
+    }
+
+    template<typename Pol, bool AS>
+    inline RationalFunction<Pol, AS> operator*( long lhs, const RationalFunction<Pol, AS>& rhs)
+    {
+        return std::move( RationalFunction<Pol, AS>(rhs) *= lhs );
+    }
 	
 	template<typename Pol, bool AS>
 	inline RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)

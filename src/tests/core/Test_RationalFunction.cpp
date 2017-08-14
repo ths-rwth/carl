@@ -123,8 +123,12 @@ TEST(RationalFunction, Multiplication)
     FPol qf2(q2, pCache);
     EXPECT_EQ(computePolynomial(qf1), computePolynomial(rf3.nominator()));
     EXPECT_EQ(computePolynomial(qf2), computePolynomial(rf3.denominator()));
+    RFactFunc rf4 = rf3 * 2;
+    RFactFunc rf5 = 2 * rf3;
+    EXPECT_EQ(rf4, rf5);
 
-    //(1/4*PF)/((-1/4)*PF+1) * ((-1/4)*PF+1)/((-1/2)*PF+1)
+
+//(1/4*PF)/((-1/4)*PF+1) * ((-1/4)*PF+1)/((-1/2)*PF+1)
     carl::VariablePool::getInstance().clear();
     Variable t = carl::freshRealVariable("t");
     Pol pf(t);

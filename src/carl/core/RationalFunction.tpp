@@ -290,6 +290,7 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const typename Pol::CoeffType& rhs)
 	{
+	    // TODO handle rhs == 0
         if( this->isConstant() )
         {
             this->mNumberQuotient *= rhs;
@@ -299,6 +300,21 @@ namespace carl
 		mPolynomialQuotient->first *= rhs;
 		eliminateCommonFactor( !AS );
 		return *this;
+	}
+
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol,AS>::operator*=(long rhs)
+	{
+	    // TODO handle rhs == 0
+	    if( this->isConstant() )
+	    {
+	        this->mNumberQuotient *= rhs;
+	        return *this;
+	    }
+	    mIsSimplified = false;
+	    mPolynomialQuotient->first *= rhs;
+	    eliminateCommonFactor( !AS );
+	    return *this;
 	}
 	
 	template<typename Pol, bool AS>
