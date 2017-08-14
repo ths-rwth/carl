@@ -463,7 +463,7 @@ namespace carl
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
         RationalFunction& operator*=(Variable::Arg rhs);
         RationalFunction& operator*=(const CoeffType& rhs);
-        RationalFunction& operator*=(long rhs);
+        RationalFunction& operator*=(carl::sint rhs);
         /// @}
 
         /**
@@ -616,13 +616,13 @@ namespace carl
     }
 
     template<typename Pol, bool AS>
-    inline RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, long rhs)
+    inline RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, carl::sint rhs)
     {
         return std::move( RationalFunction<Pol, AS>(lhs) *= rhs );
     }
 
     template<typename Pol, bool AS>
-    inline RationalFunction<Pol, AS> operator*( long lhs, const RationalFunction<Pol, AS>& rhs)
+    inline RationalFunction<Pol, AS> operator*( carl::sint lhs, const RationalFunction<Pol, AS>& rhs)
     {
         return std::move( RationalFunction<Pol, AS>(rhs) *= lhs );
     }

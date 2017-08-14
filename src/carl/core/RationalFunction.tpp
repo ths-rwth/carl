@@ -303,18 +303,9 @@ namespace carl
 	}
 
 	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS>& RationalFunction<Pol,AS>::operator*=(long rhs)
+	RationalFunction<Pol, AS>& RationalFunction<Pol,AS>::operator*=(carl::sint rhs)
 	{
-	    // TODO handle rhs == 0
-	    if( this->isConstant() )
-	    {
-	        this->mNumberQuotient *= rhs;
-	        return *this;
-	    }
-	    mIsSimplified = false;
-	    mPolynomialQuotient->first *= rhs;
-	    eliminateCommonFactor( !AS );
-	    return *this;
+	    return *this *= carl::rationalize<typename Pol::CoeffType>(rhs);
 	}
 	
 	template<typename Pol, bool AS>
