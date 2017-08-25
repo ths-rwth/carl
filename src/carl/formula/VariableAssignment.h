@@ -51,9 +51,21 @@ namespace carl {
 		bool operator==(const VariableAssignment& va) const {
 			return mComparison == va.mComparison;
 		}
+		bool operator<(const VariableAssignment& va) const {
+			return mComparison < va.mComparison;
+		}
 	};
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableAssignment<Poly>& va) {
 		return os << va.toString();
 	}
+}
+
+namespace std {
+	template<typename Pol>
+	struct hash<carl::VariableAssignment<Pol>> {
+		std::size_t operator()(const carl::VariableAssignment<Pol>& va) const {
+			return std::hash<carl::VariableComparison<Pol>>()(va);
+		}
+	};
 }
