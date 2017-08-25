@@ -15,10 +15,10 @@ TYPED_TEST(MultivariateRootTest, Constructor)
 {
 	using Poly = MultivariatePolynomial<TypeParam>;
 	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable y = MultivariateRoot<Poly>::var();
 	Poly p = x*y + TypeParam(2)*y*y;
 	
-	MultivariateRoot<Poly> mr(p, 1, y);
+	MultivariateRoot<Poly> mr(p, 1);
 	
 	EXPECT_EQ(p, mr.poly());
 	EXPECT_EQ(1, mr.k());
@@ -30,11 +30,11 @@ TYPED_TEST(MultivariateRootTest, Evaluate)
 	using Poly = MultivariatePolynomial<TypeParam>;
 	using MultiRoot = MultivariateRoot<Poly>;
 	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable y = MultivariateRoot<Poly>::var();
 	Poly p = x*y + TypeParam(2)*y*y;
 	
-	MultiRoot mr1(p, 1, y);
-	MultiRoot mr2(p, 2, y);
+	MultiRoot mr1(p, 1);
+	MultiRoot mr2(p, 2);
 	
 	EXPECT_EQ(p, mr1.poly());
 	EXPECT_EQ(1, mr1.k());
