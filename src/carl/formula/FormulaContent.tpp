@@ -72,6 +72,7 @@ namespace carl {
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(VariableComparison<Pol>&& _variableComparison):
+		mHash(std::hash<VariableComparison<Pol>>()(_variableComparison)),
 #ifdef __VS
         mType( FormulaType::VARCOMPARE )
     {
@@ -87,6 +88,7 @@ namespace carl {
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(VariableAssignment<Pol>&& _variableAssignment):
+		mHash(std::hash<VariableAssignment<Pol>>()(_variableAssignment)),
 #ifdef __VS
         mType( FormulaType::VARASSIGN )
     {
@@ -214,6 +216,7 @@ namespace carl {
 
     template<typename Pol>
     bool FormulaContent<Pol>::operator==(const FormulaContent& _content) const {
+		CARL_LOG_TRACE("carl.formula", *this << " == " << _content << " (" << mId << " / " << _content.mId << ")");
 		if (mId != 0 && _content.mId != 0) return mId == _content.mId;
         if (mType != _content.mType) return false;
 		switch (mType) {
