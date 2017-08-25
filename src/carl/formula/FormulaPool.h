@@ -254,7 +254,11 @@ namespace carl
                 return create(std::move(Constraint<Pol>(_constraint)));
             }
 			const FormulaContent<Pol>* create(VariableComparison<Pol>&& _variableComparison) {
-                return add(new FormulaContent<Pol>(std::move(_variableComparison)));
+				if (isBaseFormula(_variableComparison)) {
+                    return add(new FormulaContent<Pol>(std::move(_variableComparison)));
+                } else {
+                    return add(new FormulaContent<Pol>(_variableComparison.negation()))->mNegation;
+                }
             }
             const FormulaContent<Pol>* create(const VariableComparison<Pol>& _variableComparison) {
 				auto val = _variableComparison.asConstraint();
@@ -262,7 +266,11 @@ namespace carl
                 return create(std::move(VariableComparison<Pol>(_variableComparison)));
             }
 			const FormulaContent<Pol>* create(VariableAssignment<Pol>&& _variableAssignment) {
-                return add(new FormulaContent<Pol>(std::move(_variableAssignment)));
+				if (isBaseFormula(_variableAssignment)) {
+                    return add(new FormulaContent<Pol>(std::move(_variableAssignment)));
+                } else {
+                    return add(new FormulaContent<Pol>(_variableAssignment.negation()))->mNegation;
+                }
             }
             const FormulaContent<Pol>* create(const VariableAssignment<Pol>& _variableAssignment) {
 				return create(std::move(VariableAssignment<Pol>(_variableAssignment)));
