@@ -92,4 +92,11 @@ std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
 
 }
 
+namespace std {
+	template<typename Pol>
+	struct hash<carl::MultivariateRoot<Pol>> {
+		std::size_t operator()(const carl::MultivariateRoot<Pol>& mv) const {
+			return carl::hash_all(mv.poly(), mv.k());
+		}
+	};
 }
