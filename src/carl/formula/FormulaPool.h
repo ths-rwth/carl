@@ -501,12 +501,13 @@ namespace carl
             {
                 FORMULA_POOL_LOCK_GUARD
                 const FormulaContent<Pol>* tmp = getBaseFormula(_elem);
-                //const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
-                CARL_LOG_DEBUG("carl.formula", "Freeing " << static_cast<const void*>(tmp) << ", current usage: " << tmp->mUsages);
+				assert(tmp == getBaseFormula(tmp));
+				assert(isBaseFormula(tmp));
                 assert( tmp->mUsages > 0 );
                 --tmp->mUsages;
                 if( tmp->mUsages == 1 )
                 {
+					CARL_LOG_DEBUG("carl.formula", "Actually freeing " << *tmp << " from pool");
                     bool stillStoredAsTseitinVariable = false;
                     if( freeTseitinVariable( tmp ) )
                         stillStoredAsTseitinVariable = true;
@@ -574,10 +575,9 @@ namespace carl
                 //const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
                 assert( tmp != nullptr );
                 assert( tmp->mUsages < std::numeric_limits<size_t>::max() );
-                CARL_LOG_DEBUG("carl.formula", "Registering " << static_cast<const void*>(tmp) << ", current usage: " << tmp->mUsages);
                 ++tmp->mUsages;
-                if (tmp->mUsages == 1 && _elem->mType == FormulaType::CONSTRAINT) {
-                    CARL_LOG_DEBUG("carl.formula", "Is a constraint, increasing again");
+                if (tmp->mUsages == 1 && (_elem->mType == FormulaType::CONSTRAINT || _elem->mType == FormulaType::VARCOMPARE || _elem->mType == FormulaType::VARASSIGN)) {
+                    CARL_LOG_TRACE("carl.formula", "Is a constraint, increasing again");
                     ++tmp->mUsages;
                 }
             }
