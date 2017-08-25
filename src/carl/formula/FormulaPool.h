@@ -142,15 +142,30 @@ namespace carl
 				return va < va.negation();
 			}
             bool isBaseFormula(const FormulaContent<Pol>* f) const {
-                assert(f->mType == FormulaType::CONSTRAINT);
+				if (f->mType == FormulaType::CONSTRAINT) {
 #ifdef __VS
-                const auto& a = *f->mpConstraintVS;
-                const auto& b = *f->mNegation->mpConstraintVS;
+					return *f->mpConstraintVS < *f->mNegation->mpConstraintVS;
 #else
-                const auto& a = f->mConstraint;
-                const auto& b = f->mNegation->mConstraint;
+					return f->mConstraint < f->mNegation->mConstraint;
 #endif
-                return a < b;
+				}
+				if (f->mType == FormulaType::VARCOMPARE) {
+#ifdef __VS
+					return *f->mpVariableComparisonVS < *f->mNegation->mpVariableComparisonVS;
+#else
+					return f->mVariableComparison < f->mNegation->mVariableComparison;
+#endif
+				}
+				if (f->mType == FormulaType::VARASSIGN) {
+#ifdef __VS
+					return *f->mpVariableAssignmentVS < *f->mNegation->mpVariableAssignmentVS;
+#else
+					return f->mVariableAssignment < f->mNegation->mVariableAssignment;
+#endif
+				}
+				return f->mType != FormulaType::NOT;
+				assert(false);
+				return true;
             }
 
             const FormulaContent<Pol>* getBaseFormula(const FormulaContent<Pol>* f) const {
@@ -159,7 +174,7 @@ namespace carl
                     CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
                     return f->mNegation;
                 }
-                if (f->mType == FormulaType::CONSTRAINT) {
+                if (f->mType == FormulaType::CONSTRAINT || f->mType == FormulaType::VARCOMPARE || f->mType == FormulaType::VARASSIGN) {
                     if (isBaseFormula(f)) {
                         CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
                         return f;
@@ -179,7 +194,19 @@ namespace carl
 #else
                     return new FormulaContent<Pol>(f->mConstraint.negation());
 #endif
-                } else {
+				} else if (f->mType == FormulaType::VARCOMPARE) {
+#ifdef __VS
+					return new FormulaContent<Pol>(f->mpVariableComparisonVS->negation());
+#else
+					return new FormulaContent<Pol>(f->mVariableComparison.negation());
+#endif
+				} else if (f->mType == FormulaType::VARASSIGN) {
+#ifdef __VS
+					return new FormulaContent<Pol>(f->mpVariableAssignmentVS->negation());
+#else
+					return new FormulaContent<Pol>(f->mVariableAssignment.negation());
+#endif
+				} else {
                     return new FormulaContent<Pol>(NOT, std::move(Formula<Pol>(f)));
                 }
             }
