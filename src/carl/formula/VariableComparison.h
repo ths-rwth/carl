@@ -6,6 +6,7 @@
 #include "../core/Relation.h"
 #include "../core/Variable.h"
 #include "../numbers/numbers.h"
+#include "../util/hash.h"
 
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
@@ -103,16 +104,29 @@ namespace carl {
 		
 		std::string toString(unsigned = 0, bool = false, bool = true) const {
 			std::stringstream ss;
-			ss << "(" << (negated() ? "!" : "") << relation() << " " << var() << " " << mValue << ")";
+			ss << "(" << (negated() ? "! " : "") << relation() << " " << var() << " " << mValue << ")";
 			return ss.str();
 		}
 		
 		bool operator==(const VariableComparison& vc) const {
 			return mRelation == vc.mRelation && mVar == vc.mVar && mValue == vc.mValue && mNegated == vc.mNegated;
 		}
+		bool operator<(const VariableComparison& vc) const {
+			if (mNegated != vc.mNegated) return !mNegated;
+			return std::tie(mRelation, mVar, mValue) < std::tie(vc.mRelation, vc.mVar, vc.mValue);
+		}
 	};
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableComparison<Poly>& vc) {
 		return os << vc.toString();
 	}
+}
+
+namespace std {
+	template<typename Pol>
+	struct hash<carl::VariableComparison<Pol>> {
+		std::size_t operator()(const carl::VariableComparison<Pol>& vc) const {
+			return carl::hash_all(vc.var(), variant_hash(vc.value()), vc.relation(), vc.negated());
+		}
+	};
 }
