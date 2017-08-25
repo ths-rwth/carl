@@ -284,7 +284,7 @@ namespace carl
             /**
              * @return A hash value for this formula.
              */
-            size_t getHash() const
+            std::size_t getHash() const
             {
                 return mpContent->mHash;
             }
@@ -292,7 +292,7 @@ namespace carl
             /**
              * @return The unique id for this formula.
              */
-            size_t getId() const
+            std::size_t getId() const
             {
                 return mpContent->mId;
             }
@@ -391,6 +391,10 @@ namespace carl
             {
                 return Formula( mpContent->mNegation );
             }
+			Formula baseFormula() const
+			{
+				return Formula(FormulaPool<Pol>::getInstance().getBaseFormula(mpContent));
+			}
             
             const Formula& removeNegations() const
             {
@@ -1248,7 +1252,7 @@ namespace std
          * @param _formulaContent The formula content to get the hash for.
          * @return The hash of the given formula content.
          */
-        size_t operator()( const carl::FormulaContent<Pol>& _formulaContent ) const 
+        std::size_t operator()( const carl::FormulaContent<Pol>& _formulaContent ) const
         {
             return _formulaContent.hash();
         }
