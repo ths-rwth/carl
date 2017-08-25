@@ -132,9 +132,15 @@ namespace carl
             }
             
         private:
-            bool isBaseFormula(const Constraint<Pol>& c) const {
-                return c < c.negation();
-            }
+			bool isBaseFormula(const Constraint<Pol>& c) const {
+				return c < c.negation();
+			}
+			bool isBaseFormula(const VariableComparison<Pol>& vc) const {
+				return vc < vc.negation();
+			}
+			bool isBaseFormula(const VariableAssignment<Pol>& va) const {
+				return va < va.negation();
+			}
             bool isBaseFormula(const FormulaContent<Pol>* f) const {
                 assert(f->mType == FormulaType::CONSTRAINT);
 #ifdef __VS
