@@ -14,6 +14,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 
 
 namespace carl 
@@ -54,6 +55,11 @@ private:
 		assert(std::size_t(vt) < mNextIDs.size());
 		return mNextIDs[std::size_t(vt)];
 	}
+	
+	/**
+	 * Contains persistent variables that are restored after clear was called.
+	 */
+	std::vector<std::pair<Variable,std::string>> mPersistentVariables;
 
 	/**
 	 * Stores human-readable names for variables that can be set via setVariableName().
@@ -98,6 +104,9 @@ protected:
 	Variable getFreshVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 public:
+	
+	Variable getFreshPersistentVariable(VariableType type = VariableType::VT_REAL) noexcept;
+	Variable getFreshPersistentVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 	/**
 	 * Clears everything already created in this pool.
@@ -106,6 +115,17 @@ public:
     {
         mVariableNames.clear();
 		mNextIDs.fill(1);
+		for (auto pv: mPersistentVariables) {
+			Variable v = pv.first;
+			while (nextID(v.getType()) < v.getId()) {
+				getFreshVariable(v.getType());
+			}
+			if (pv.second != "") {
+				getFreshVariable(pv.second, v.getType());
+			} else {
+				getFreshVariable(v.getType());
+			}
+		}
     }
 
 
