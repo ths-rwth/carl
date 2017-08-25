@@ -61,6 +61,7 @@ namespace carl
         auto iterBoolPair = this->insert( _element );
         if( iterBoolPair.second ) // Formula has not yet been generated.
         {
+			CARL_LOG_TRACE("carl.formula", "Just added " << static_cast<const void*>(_element) << " / " << static_cast<const void*>(*iterBoolPair.first) << " to the pool");
             // Add also the negation of the formula to the pool in order to ensure that it
             // has the next id and hence would occur next to the formula in a set of sub-formula,
             // which is sorted by the ids.
@@ -74,7 +75,10 @@ namespace carl
             negation->mNegation = _element;
             Formula<Pol>::init( *negation );
             ++mIdAllocator;
-        }
+        } else {
+			CARL_LOG_TRACE("carl.formula", "Found " << static_cast<const void*>(*iterBoolPair.first) << " in pool");
+		}
+		CARL_LOG_TRACE("carl.formula", "Returning " << static_cast<const void*>(*iterBoolPair.first));
         return *iterBoolPair.first;
     }
     
