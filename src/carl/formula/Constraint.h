@@ -70,59 +70,6 @@ namespace carl
     {
         return _poly;
     }
-            
-    /**
-     * Gives the string to the given relation symbol.
-     * @param _rel The relation symbol.
-     * @return The resulting string.
-     */
-    inline std::string relationToString( const Relation& _rel )
-    {
-        switch( _rel )
-        {
-            case Relation::EQ:
-                return "=";
-            case Relation::NEQ:
-                return "!=";
-            case Relation::LEQ:
-                return "<=";
-            case Relation::GEQ:
-                return ">=";
-            case Relation::LESS:
-                return "<";
-            case Relation::GREATER:
-                return ">";
-            default:
-                return "~";
-        }
-    }
-
-    /**
-     * Inverts the given relation symbol.
-     * @param _rel The relation symbol to invert.
-     * @return The resulting inverted relation symbol.
-     */
-    inline Relation invertRelation( const Relation& _rel )
-    {
-        switch( _rel )
-        {
-            case Relation::EQ:
-                return Relation::NEQ;
-            case Relation::NEQ:
-                return Relation::EQ;
-            case Relation::LEQ:
-                return Relation::GREATER;
-            case Relation::GEQ:
-                return Relation::LESS;
-            case Relation::LESS:
-                return Relation::GEQ;
-            case Relation::GREATER:
-                return Relation::LEQ;
-            default:
-                assert( false );
-                return Relation::EQ;
-        }
-    }
 
     /**
      * Turns around the given relation symbol.
@@ -821,8 +768,8 @@ namespace carl
             Pol coefficient( const Variable& _var, uint _degree ) const;
             
             Constraint negation() const {
-                CARL_LOG_TRACE("carl.formula", "negation of " << *this << " is " << Constraint(lhs(), carl::invertRelation(relation())));
-                return Constraint(lhs(), carl::invertRelation(relation()));
+                CARL_LOG_DEBUG("carl.formula", "negation of " << *this << " is " << Constraint(lhs(), carl::inverse(relation())));
+                return Constraint(lhs(), carl::inverse(relation()));
             }
 
             /**

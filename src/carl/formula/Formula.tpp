@@ -1342,7 +1342,7 @@ namespace carl
         const Constraint<Pol>& constraint = negated ? _constraint.subformula().constraint() : _constraint.constraint();
         assert( constraint.isConsistent() == 2 );
         typename Pol::NumberType boundValue;
-        Relation relation = negated ? carl::invertRelation( constraint.relation() ) : constraint.relation();
+        Relation relation = negated ? carl::inverse( constraint.relation() ) : constraint.relation();
         const Pol& lhs = constraint.lhs();
         Pol poly;
         bool multipliedByMinusOne = lhs.lterm().coeff() < typename Pol::NumberType( 0 );
@@ -1362,7 +1362,7 @@ namespace carl
         boundValue *= cf;
         poly *= cf;
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "try to add the bound  " << relationToString( relation ) << boundValue << "  for the polynomial  " << poly << endl; 
+        cout << "try to add the bound  " << relation << boundValue << "  for the polynomial  " << poly << endl; 
         #endif
         auto resA = _constraintBounds.insert( make_pair( std::move(poly), std::move( map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>() ) ) );
         auto resB = resA.first->second.insert( make_pair( boundValue, make_pair( relation, _constraint ) ) );
@@ -1652,7 +1652,7 @@ namespace carl
                 for( ; iter != bounds.end(); ++iter )
                 {
                     #ifdef CONSTRAINT_BOUND_DEBUG
-                    cout << "   bound is  " << relationToString( iter->second.first ) << iter->first << endl;
+                    cout << "   bound is  " << iter->second.first << iter->first << endl;
                     #endif
                     if( (_inConjunction && iter->second.first == Relation::NEQ)
                         || (!_inConjunction && iter->second.first == Relation::EQ) )
