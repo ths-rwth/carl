@@ -515,7 +515,8 @@ namespace carl
                         stillStoredAsTseitinVariable = true;
                     if( !stillStoredAsTseitinVariable )
                     {
-                        mPool.erase( tmp );
+                        mPool.erase( tmp->mNegation );
+						mPool.erase( tmp );
                         delete tmp->mNegation;
                         delete tmp;
                     }
@@ -576,7 +577,7 @@ namespace carl
                 assert( tmp != nullptr );
                 assert( tmp->mUsages < std::numeric_limits<size_t>::max() );
                 ++tmp->mUsages;
-                if (tmp->mUsages == 1 && (_elem->mType == FormulaType::CONSTRAINT || _elem->mType == FormulaType::VARCOMPARE || _elem->mType == FormulaType::VARASSIGN)) {
+                if (tmp->mUsages == 1 && (tmp->mType == FormulaType::CONSTRAINT || tmp->mType == FormulaType::VARCOMPARE || tmp->mType == FormulaType::VARASSIGN)) {
                     CARL_LOG_TRACE("carl.formula", "Is a constraint, increasing again");
                     ++tmp->mUsages;
                 }
