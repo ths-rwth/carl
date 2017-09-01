@@ -72,6 +72,7 @@ namespace carl {
 			if (boost::get<RAN>(&mValue) == nullptr) {
 				const MR& mr = boost::get<MR>(mValue);
 				if (mr.poly().degree(mr.var()) != 1) return boost::none;
+				if (mr.k() != 1) return boost::none;
 				auto lcoeff = mr.poly().coeff(mr.var(), 1);
 				if (!lcoeff.isConstant()) return boost::none;
 				auto ccoeff = mr.poly().coeff(mr.var(), 0);
