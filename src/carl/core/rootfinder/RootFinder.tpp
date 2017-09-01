@@ -50,12 +50,24 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 	if (IRmap.empty()) {
 		return realRoots(tmp, interval, pivoting);
 	} else {
-		CARL_LOG_FUNC("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
+		CARL_LOG_TRACE("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
 		std::map<Variable, Interval<Number>> varToInterval;
-		UnivariatePolynomial<Number> res = RealAlgebraicNumberEvaluation::evaluateCoefficients(tmp, IRmap, varToInterval);
-		if (res.isZero()) return boost::none;
-		CARL_LOG_FUNC("carl.core.rootfinder", "Calling on " << res);
-		return realRoots(res, interval, pivoting);
+		UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluateCoefficients(tmp, IRmap, varToInterval);
+		if (evaledpoly.isZero()) return boost::none;
+		CARL_LOG_TRACE("carl.core.rootfinder", "Calling on " << evaledpoly);
+		auto res = realRoots(evaledpoly, interval, pivoting);
+		MultivariatePolynomial<Number> mvpoly(tmp);
+		for (auto it = res.begin(); it != res.end();) {
+			CARL_LOG_TRACE("carl.core.rootfinder", "Checking " << tmp.mainVar() << " = " << *it);
+			IRmap[tmp.mainVar()] = *it;
+			if (!RealAlgebraicNumberEvaluation::evaluate(mvpoly, IRmap).isZero()) {
+				CARL_LOG_TRACE("carl.core.rootfinder", "Purging spurious root " << *it);
+				it = res.erase(it);
+			} else {
+				it++;
+			}
+		}
+		return res;
 	}
 }
 

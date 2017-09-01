@@ -198,6 +198,7 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 		}
 		interval = IntervalEvaluation::evaluate(poly, varToInterval);
 	}
+	CARL_LOG_DEBUG("carl.ran", "Result is " << RealAlgebraicNumber<Number>(res, interval));
 	return RealAlgebraicNumber<Number>(res, interval);
 }
 
