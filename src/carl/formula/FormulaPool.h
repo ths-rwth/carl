@@ -171,19 +171,19 @@ namespace carl
             const FormulaContent<Pol>* getBaseFormula(const FormulaContent<Pol>* f) const {
                 assert(f != nullptr);
                 if (f->mType == FormulaType::NOT) {
-                    CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
+                    CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f->mNegation);
                     return f->mNegation;
                 }
                 if (f->mType == FormulaType::CONSTRAINT || f->mType == FormulaType::VARCOMPARE || f->mType == FormulaType::VARASSIGN) {
                     if (isBaseFormula(f)) {
-                        CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
+                        CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f);
                         return f;
                     } else {
-                        CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
+                        CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f->mNegation);
                         return f->mNegation;
                     }
                 }
-                CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
+                CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f);
                 return f;
             }
 
@@ -505,6 +505,7 @@ namespace carl
 				assert(isBaseFormula(tmp));
                 assert( tmp->mUsages > 0 );
                 --tmp->mUsages;
+				CARL_LOG_TRACE("carl.formula", "Usage of " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << " (coming from " << static_cast<const void*>(_elem) << "): " << tmp->mUsages);
                 if( tmp->mUsages == 1 )
                 {
 					CARL_LOG_DEBUG("carl.formula", "Actually freeing " << *tmp << " from pool");
@@ -515,6 +516,7 @@ namespace carl
                         stillStoredAsTseitinVariable = true;
                     if( !stillStoredAsTseitinVariable )
                     {
+						CARL_LOG_TRACE("carl.formula", "Deleting " << tmp << " / " << tmp->mNegation << " from pool");
                         mPool.erase( tmp->mNegation );
 						mPool.erase( tmp );
                         delete tmp->mNegation;
@@ -537,6 +539,7 @@ namespace carl
                         mTseitinVars.erase( tvIter );
                         assert( mTseitinVarToFormula.find( tmp ) != mTseitinVarToFormula.end() );
                         mTseitinVarToFormula.erase( tmp );
+						CARL_LOG_TRACE("carl.formula", "Deleting " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << " from pool");
                         mPool.erase( tmp );
                         delete tmp->mNegation;
                         delete tmp;
@@ -558,6 +561,7 @@ namespace carl
                             //const FormulaContent<Pol>* tmp = fcont->mType == FormulaType::NOT ? fcont->mNegation : fcont;
                             mTseitinVars.erase( tmpTVIter->second );
                             mTseitinVarToFormula.erase( tmpTVIter );
+							CARL_LOG_TRACE("carl.formula", "Deleting " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << " from pool");
                             mPool.erase( tmp );
                             delete tmp->mNegation;
                             delete tmp;
@@ -581,6 +585,7 @@ namespace carl
                     CARL_LOG_TRACE("carl.formula", "Is a constraint, increasing again");
                     ++tmp->mUsages;
                 }
+				CARL_LOG_TRACE("carl.formula", "Increased usage of " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << "(based on " << static_cast<const void*>(_elem) << ")" << " to " << tmp->mUsages);
             }
             
         public:
