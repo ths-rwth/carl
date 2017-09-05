@@ -39,78 +39,84 @@ addons:
 matrix:
   include:
     - os: linux
-      env: USE=clang++-3.6
+      env: CC=clang-3.6 CXX=clang++-3.6
       addons:
         apt:
           sources: [*sources_base, llvm-toolchain-precise-3.6]
           packages: [*packages_base, clang-3.6]
     - os: linux
-      env: USE=clang++-3.7
+      env: CC=clang-3.7 CXX=clang++-3.7
       addons:
         apt:
           sources: [*sources_base, llvm-toolchain-precise-3.7]
           packages: [*packages_base, clang-3.7]
     - os: linux
-      env: USE=clang++-3.8
+      env: CC=clang-3.8 CXX=clang++-3.8
       addons:
         apt:
           sources: [*sources_base, llvm-toolchain-precise-3.8]
           packages: [*packages_base, clang-3.8]
     - os: linux
-      env: USE=clang++-3.9
+      env: CC=clang-3.9 CXX=clang++-3.9
       addons:
         apt:
           sources: [*sources_base, llvm-toolchain-trusty-3.9]
           packages: [*packages_base, clang-3.9]
     - os: linux
-      env: USE=clang++-4.0
+      env: CC=clang-4.0 CXX=clang++-4.0
       addons:
         apt:
           sources: [*sources_base, llvm-toolchain-trusty-4.0]
           packages: [*packages_base, clang-4.0]
     - os: linux
-      env: USE=g++-5 MAKE_PARALLEL=-j1
+      env: CC=clang-5.0 CXX=clang++-5.0
+      addons:
+        apt:
+          sources: [*sources_base, llvm-toolchain-trusty-5.0]
+          packages: [*packages_base, clang-5.0]
+    - os: linux
+      env: CC=gcc-5 CXX=g++-5 MAKE_PARALLEL=-j1
       addons:
         apt:
           sources: [*sources_base]
           packages: [*packages_base, g++-5]
     - os: linux
-      env: USE=g++-6 MAKE_PARALLEL=-j1
+      env: CC=gcc-6 CXX=g++-6 MAKE_PARALLEL=-j1
     - os: osx
       osx_image: xcode7.3
-      env: USE=clang++-7.4
+      env: CC=clang-7.4 CXX=clang++-7.4
     - os: osx
       osx_image: xcode8.2
-      env: USE=clang++-8.0
+      env: CC=clang-8.0 CXX=clang++-8.0
     - os: osx
       osx_image: xcode8.3
-      env: USE=clang++-8.1
+      env: CC=clang-8.1 CXX=clang++-8.1
 #    - os: osx
 #      osx_image: xcode8.2
-#      env: USE=g++-5
+#      env: CC=gcc-5 CXX=g++-5
 #    - os: osx
 #      osx_image: xcode8.2
-#      env: USE=g++-6
+#      env: CC=gcc-6 CXX=g++-6
     - os: linux
-      env: USE=g++-6 TASK=coverage MAKE_PARALLEL=-j1
+      env: CC=gcc-6 CXX=g++-6 TASK=coverage MAKE_PARALLEL=-j1
       addons:
         apt:
           sources: [*sources_base]
           packages: [*packages_base, lcov]
     - os: linux
-      env: USE=g++-6 TASK=doxygen MAKE_PARALLEL=-j1
+      env: CC=gcc-6 CXX=g++-6 TASK=doxygen MAKE_PARALLEL=-j1
       addons:
         apt:
           sources: [*sources_base]
           packages: [*packages_base, doxygen, texinfo, texlive]
     - os: linux
-      env: USE=g++-6 TASK=pycarl MAKE_PARALLEL=-j1
+      env: CC=gcc-6 CXX=g++-6 TASK=pycarl MAKE_PARALLEL=-j1
       addons:
         apt:
           sources: [*sources_base]
           packages: [*packages_base, python3]
     - os: linux
-      env: USE=g++-6 TASK=addons MAKE_PARALLEL=-j1
+      env: CC=gcc-6 CXX=g++-6 TASK=addons MAKE_PARALLEL=-j1
       addons:
         apt:
           sources: [*sources_base]
@@ -118,16 +124,16 @@ matrix:
   allow_failures:
     - os: osx
       osx_image: xcode8.2
-      env: USE=g++-5
+      env: CC=gcc-5 CXX=g++-5
     - os: osx
       osx_image: xcode8.2
-      env: USE=g++-6
+      env: CC=gcc-6 CXX=g++-6
     - os: linux
-      env: USE=g++-6 TASK=coverage MAKE_PARALLEL=-j1
+      env: CC=gcc-6 CXX=g++-6 TASK=coverage MAKE_PARALLEL=-j1
     - os: linux
-      env: USE=g++-6 TASK=pycarl MAKE_PARALLEL=-j1
+      env: CC=gcc-6 CXX=g++-6 TASK=pycarl MAKE_PARALLEL=-j1
     - os: linux
-      env: USE=g++-6 TASK=addons MAKE_PARALLEL=-j1
+      env: CC=gcc-6 CXX=g++-6 TASK=addons MAKE_PARALLEL=-j1
 
 
 before_install:
