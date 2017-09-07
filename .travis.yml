@@ -84,13 +84,10 @@ matrix:
       env: CC=gcc-6 CXX=g++-6 MAKE_PARALLEL=-j1
     - os: osx
       osx_image: xcode7.3
-      env: CC=clang-7.4 CXX=clang++-7.4
     - os: osx
       osx_image: xcode8.2
-      env: CC=clang-8.0 CXX=clang++-8.0
     - os: osx
       osx_image: xcode8.3
-      env: CC=clang-8.1 CXX=clang++-8.1
 #    - os: osx
 #      osx_image: xcode8.2
 #      env: CC=gcc-5 CXX=g++-5
