@@ -1,6 +1,7 @@
 ExternalProject_Add(
     GTest-EP
 	URL https://github.com/google/googletest/archive/release-${GTEST_VERSION}.zip
+	URL_MD5 ${GTEST_ZIPHASH}
 	DOWNLOAD_NO_PROGRESS 1
 	UPDATE_COMMAND ""
 	BUILD_COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest
