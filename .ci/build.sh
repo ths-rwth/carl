@@ -8,11 +8,14 @@ if [ -z "$MAKE_PARALLEL" ]; then
 	MAKE_PARALLEL="-j2"
 fi
 
-if [[ ${TASK} == "coverage" ]]; then
+if [[ ${TASK} == "dependencies" ]]; then
+	
+	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
+	
+elif [[ ${TASK} == "coverage" ]]; then
 	gem install coveralls-lcov
 	cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON -D COVERAGE=ON ../ || return 1
 	
-	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} coverage-collect || return 1
@@ -42,7 +45,6 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	virtualenv -p python3 pycarl-env
 	source pycarl-env/bin/activate
 	
-	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
 	
 	# Clone pycarl
@@ -57,13 +59,11 @@ elif [[ ${TASK} == "addons" ]]; then
 	
 	cmake -D BUILD_ADDONS=ON -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
 	
-	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
 	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
 	
 else
-	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
 	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
