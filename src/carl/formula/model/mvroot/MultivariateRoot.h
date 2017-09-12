@@ -61,14 +61,14 @@ public:
 	boost::optional<RAN> evaluate(const EvalMap& m) const {
 		CARL_LOG_DEBUG("carl.multivariateroot", "Evaluating " << *this << " against " << m);
 		auto poly = mPoly.toUnivariatePolynomial(sVar);
-		std::map<Variable, Interval<Number>> intervalMap;
-		auto unipoly = RealAlgebraicNumberEvaluation::evaluateCoefficients(poly, m, intervalMap);
-		CARL_LOG_TRACE("carl.multivariateroot", "Intermediate polynomial is " << unipoly);
-		auto roots = rootfinder::realRoots(unipoly);
-		CARL_LOG_TRACE("carl.multivariateroot", "Got roots " << roots);
-		if (roots.size() < mK) return boost::none;
-		assert(roots.size() >= mK);
-		auto it = roots.begin();
+		auto roots = rootfinder::realRoots(poly, m);
+		if (!roots || (roots->size() < mK)) {
+			CARL_LOG_TRACE("carl.multivariateroot", mK << "th root does not exist.");
+			return boost::none;
+		}
+		CARL_LOG_TRACE("carl.multivariateroot", "Got roots " << *roots);
+		assert(roots->size() >= mK);
+		auto it = roots->begin();
 		std::advance(it, long(mK)-1);
 		CARL_LOG_DEBUG("carl.multivariateroot", "Result is " << *it);
 		return *it;
