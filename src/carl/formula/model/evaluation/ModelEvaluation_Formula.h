@@ -20,28 +20,40 @@ namespace model {
 
 	template<typename Rational, typename Poly>
 	void evaluateVarCompare(Formula<Poly>& f, const Model<Rational,Poly>& m) {
+		CARL_LOG_DEBUG("carl.model.evaluation", "Evaluating " << f << " on " << m);
 		assert(f.getType() == FormulaType::VARCOMPARE);
 		const auto& vc = f.variableComparison();
 		auto it = m.find(vc.var());
-		if (it == m.end()) return;
+		if (it == m.end()) {
+			CARL_LOG_DEBUG("carl.model.evaluation", "Could not evaluate " << vc << " as " << vc.var() << " is not part of the model");
+			return;
+		}
 		const auto& value = m.evaluated(vc.var());
 		assert(value.isRational() || value.isRAN());
 		RealAlgebraicNumber<Rational> reference = value.isRational() ? RealAlgebraicNumber<Rational>(value.asRational()) : value.asRAN();
+		CARL_LOG_DEBUG("carl.model.evaluation", "Reference value: " << vc.var() << " == " << reference);
 		ModelValue<Rational,Poly> cmp = vc.value();
 		if (cmp.isSubstitution()) {
 			// If assigned directly, the shared_ptr<Substitution> goes out of scope before the result is copied into cmp.
 			// Therefore, we start by copying the data and overwriting it afterwards.
 			auto res = cmp.asSubstitution()->evaluate(m);
 			if (res.isBool() && !res.asBool()) {
+				CARL_LOG_DEBUG("carl.model.evaluation", "MVRoot does not exist, returning false");
 				f = Formula<Poly>(FormulaType::FALSE);
 				return;
 			}
+			CARL_LOG_DEBUG("carl.model.evaluation", "Evaluated substitution " << cmp << " -> " << res);
 			cmp = res;
 		}
-		if (cmp.isSubstitution()) return;
+		if (cmp.isSubstitution()) {
+			CARL_LOG_DEBUG("carl.model.evaluation", "MVRoot is still a substitution, cannot evaluate.");
+			return;
+		}
 		assert(cmp.isRational() || cmp.isRAN());
 		RealAlgebraicNumber<Rational> val = cmp.isRational() ? RealAlgebraicNumber<Rational>(cmp.asRational()) : cmp.asRAN();
+		CARL_LOG_DEBUG("carl.model.evaluation", "rhs is " << val);
 		f = Formula<Poly>(FormulaType::FALSE);
+		CARL_LOG_DEBUG("carl.model.evaluation", "Comparison: " << reference << " " << vc.relation() << " " << val);
 		switch (vc.relation()) {
 			case Relation::EQ:
 				if (reference == val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
@@ -62,7 +74,10 @@ namespace model {
 				if (reference >= val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 		}
-		if (vc.negated()) f = f.negated();
+		if (vc.negated()) {
+			f = f.negated();
+			CARL_LOG_DEBUG("carl.model.evaluation", "Applying negation, result is " << f);
+		}
 	}
 	
 	template<typename Rational, typename Poly>
