@@ -25,20 +25,20 @@ matrix:
   include:
 {%- for job in jobs %}
     - stage: {{ job.stage }}
-      os: {{ job.os.name }}
-{%- if job.os.osx_image %}
-      osx_image: {{ job.os.osx_image}}
-{%- endif %}
-{%- if job.env|length > 0 %}
+      os: {{ job.os }}
+  {%- if job.osx_image %}
+      osx_image: {{ job.osx_image}}
+  {%- endif %}
+  {%- if job.env|length > 0 %}
       env: {{ job.env|join(' ') }}
-{%- endif %}
-      script: {{ job.script|join(' ') }} source .ci/build.sh
-    {%- if job.apt_pkg|length > 0 %}
+  {%- endif %}
+      script: {{ job.script|join(' ') }}
+  {%- if job.apt_pkg %}
       addons:
         apt:
           sources: [{{ job.apt_src|join(', ') }}]
-          packages: [*packages_base, {{ job.apt_pkg|join(', ') }}]
-    {%- endif %}
+          packages: [{{ job.apt_pkg|join(', ') }}]
+  {%- endif %}
 {%- endfor %}
 
 before_install:
