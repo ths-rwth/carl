@@ -223,6 +223,25 @@ matrix:
       os: osx
       osx_image: xcode8.3
       script: source .ci/build.sh
+  allow_failures:
+    - stage: dependencies
+      os: linux
+      env: CC=gcc-6 CXX=g++-6 TASK=coverage
+    - stage: dependencies
+      os: linux
+      env: CC=gcc-6 CXX=g++-6 TASK=pycarl
+    - stage: dependencies
+      os: linux
+      env: CC=gcc-6 CXX=g++-6 TASK=addons
+    - stage: build
+      os: linux
+      env: CC=gcc-6 CXX=g++-6 TASK=coverage
+    - stage: build
+      os: linux
+      env: CC=gcc-6 CXX=g++-6 TASK=pycarl
+    - stage: build
+      os: linux
+      env: CC=gcc-6 CXX=g++-6 TASK=addons
 
 before_install:
   - cd .ci/ && source setup_travis.sh && cd ../

@@ -40,6 +40,17 @@ matrix:
           packages: [{{ job.apt_pkg|join(', ') }}]
   {%- endif %}
 {%- endfor %}
+  allow_failures:
+{%- for job in jobs if job.allow_failure %}
+    - stage: {{ job.stage }}
+      os: {{ job.os }}
+  {%- if job.osx_image %}
+      osx_image: {{ job.osx_image}}
+  {%- endif %}
+  {%- if job.env|length > 0 %}
+      env: {{ job.env|join(' ') }}
+  {%- endif %}
+{%- endfor %}
 
 before_install:
   - cd .ci/ && source setup_travis.sh && cd ../

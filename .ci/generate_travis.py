@@ -92,32 +92,33 @@ def stagemapper(j):
 
 jobs = [
 #	("stage", "os", "script_options", "env", "apt")
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.6"], ["clang-3.6"]),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.7"], ["clang-3.7"]),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.8"], ["clang-3.8"]),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.9"], ["clang-3.9"]),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-4.0"], ["clang-4.0"]),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-5.0"], ["clang-5.0"]),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-5"], ["g++-5"]),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6"], []),
-	(["dependencies","build"], "xcode7.3", ["build.sh"], [], []),
-	(["dependencies","build"], "xcode8.2", ["build.sh"], [], []),
-	(["dependencies","build"], "xcode8.3", ["build.sh"], [], []),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","coverage"], ["lcov"]),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","doxygen"], ["doxygen", "texinfo", "texlive"]),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","pycarl"], ["python3"]),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","addons"], []),
+	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.6"], ["clang-3.6"], False),
+	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.7"], ["clang-3.7"], False),
+	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.8"], ["clang-3.8"], False),
+	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.9"], ["clang-3.9"], False),
+	(["dependencies","build"], "linux", ["build.sh"], ["clang-4.0"], ["clang-4.0"], False),
+	(["dependencies","build"], "linux", ["build.sh"], ["clang-5.0"], ["clang-5.0"], False),
+	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-5"], ["g++-5"], False),
+	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6"], [], False),
+	(["dependencies","build"], "xcode7.3", ["build.sh"], [], [], False),
+	(["dependencies","build"], "xcode8.2", ["build.sh"], [], [], False),
+	(["dependencies","build"], "xcode8.3", ["build.sh"], [], [], False),
+	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","coverage"], ["lcov"], True),
+	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","doxygen"], ["doxygen", "texinfo", "texlive"], False),
+	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","pycarl"], ["python3"], True),
+	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","addons"], [], True),
 ]
 
 
 def nameJob(j):
-	(stages,os,script,env,apt) = j
+	(stages,os,script,env,apt,allowfail) = j
 	return {
 		"stage": stages,
 		"os": os,
 		"env": env,
 		"script": script,
 		"apt": apt,
+		"allow_failure": allowfail,
 	}
 
 mapper = [
