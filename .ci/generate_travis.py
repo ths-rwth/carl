@@ -89,40 +89,36 @@ def stagemapper(j):
 		res.append(tmp)
 	return res
 
-
-jobs = [
-#	("stage", "os", "script_options", "env", "apt")
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.6"], ["clang-3.6"], False),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.7"], ["clang-3.7"], False),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.8"], ["clang-3.8"], False),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-3.9"], ["clang-3.9"], False),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-4.0"], ["clang-4.0"], False),
-	(["dependencies","build"], "linux", ["build.sh"], ["clang-5.0"], ["clang-5.0"], False),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-5"], ["g++-5"], False),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6"], [], False),
-	(["dependencies","build"], "xcode7.3", ["build.sh"], [], [], False),
-	(["dependencies","build"], "xcode8.2", ["build.sh"], [], [], False),
-	(["dependencies","build"], "xcode8.3", ["build.sh"], [], [], False),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","coverage"], ["lcov"], True),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","doxygen"], ["doxygen", "texinfo", "texlive"], False),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","pycarl"], ["python3"], True),
-	(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","addons"], [], True),
-]
-
-
-def nameJob(j):
-	(stages,os,script,env,apt,allowfail) = j
+def job(stages, os, script, env, apt = [], allow_failure = False):
 	return {
 		"stage": stages,
 		"os": os,
 		"env": env,
 		"script": script,
 		"apt": apt,
-		"allow_failure": allowfail,
+		"allow_failure": allow_failure,
 	}
 
+jobs = [
+#	("stage", "os", "script_options", "env", "apt")
+	job(["build"], "linux", ["build.sh"], ["clang-3.6"], ["clang-3.6"]),
+	job(["build"], "linux", ["build.sh"], ["clang-3.7"], ["clang-3.7"]),
+	job(["build"], "linux", ["build.sh"], ["clang-3.8"], ["clang-3.8"]),
+	job(["build"], "linux", ["build.sh"], ["clang-3.9"], ["clang-3.9"]),
+	job(["build"], "linux", ["build.sh"], ["clang-4.0"], ["clang-4.0"]),
+	job(["build"], "linux", ["build.sh"], ["clang-5.0"], ["clang-5.0"]),
+	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-5"], ["g++-5"]),
+	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6"]),
+	job(["build"], "xcode7.3", ["build.sh"], []),
+	job(["build"], "xcode8.2", ["build.sh"], []),
+	job(["build"], "xcode8.3", ["build.sh"], []),
+	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","coverage"], ["lcov"], allow_failure = True),
+	job(["build"], "linux", ["j1", "build.sh"], ["g++-6","doxygen"], ["doxygen", "texinfo", "texlive"]),
+	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","pycarl"], ["python3"], True),
+	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","addons"], [], True),
+]
+
 mapper = [
-	partial(map, nameJob),
 	partial(multimap, stagemapper),
 	partial(map, lambda j: applymapper(j, "os", osmap)),
 	partial(map, lambda j: applypropmapper(j, "env", envs)),
