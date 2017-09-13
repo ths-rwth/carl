@@ -110,7 +110,7 @@ jobs = [
 	job(["build"], "linux", ["build.sh"], ["clang-5.0"], ["clang-5.0"]),
 	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-5"], ["g++-5"]),
 	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6"]),
-	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-7"]),
+	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-7"], ["g++-7"]),
 	job(["build"], "xcode7.3", ["build.sh"], []),
 	job(["build"], "xcode8.2", ["build.sh"], []),
 	job(["build"], "xcode8.3", ["build.sh"], []),
