@@ -37,7 +37,7 @@ matrix:
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: dependencies
       os: linux
-      env: CC=gcc-6 CXX=g++-7
+      env: CC=gcc-7 CXX=g++-7
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: dependencies
       os: linux
@@ -121,7 +121,7 @@ matrix:
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: build
       os: linux
-      env: CC=gcc-6 CXX=g++-7
+      env: CC=gcc-7 CXX=g++-7
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: build
       os: linux

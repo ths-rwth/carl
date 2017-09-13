@@ -48,7 +48,7 @@ envs = {
 	"clang-5.0": ["CC=clang-5.0 CXX=clang++-5.0"],
 	"g++-5": ["CC=gcc-5 CXX=g++-5"],
 	"g++-6": ["CC=gcc-6 CXX=g++-6"],
-	"g++-7": ["CC=gcc-6 CXX=g++-7"],
+	"g++-7": ["CC=gcc-7 CXX=g++-7"],
 	"coverage": ["TASK=coverage"],
 	"doxygen": ["TASK=doxygen"],
 	"pycarl": ["TASK=pycarl"],
@@ -133,7 +133,8 @@ for m in mapper:
 
 jobs = sorted(jobs, key = lambda x: (-len(x["stage"]),x["os"]))
 
-j2_env = Environment(loader = FileSystemLoader("."))
+j2_env = Environment(loader = FileSystemLoader("."), keep_trailing_newline = True)
 tpl = j2_env.get_template("travis.yml.tpl")
 res = tpl.render(jobs = jobs)
-print(res)
+
+open("../.travis.yml", "w").write(res)
