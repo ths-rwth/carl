@@ -37,6 +37,10 @@ matrix:
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: dependencies
       os: linux
+      env: CC=gcc-6 CXX=g++-7
+      script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
+    - stage: dependencies
+      os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=coverage
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -114,6 +118,10 @@ matrix:
     - stage: build
       os: linux
       env: CC=gcc-6 CXX=g++-6
+      script: MAKE_PARALLEL=-j1 source .ci/build.sh
+    - stage: build
+      os: linux
+      env: CC=gcc-6 CXX=g++-7
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: build
       os: linux
