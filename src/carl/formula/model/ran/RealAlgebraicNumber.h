@@ -320,9 +320,9 @@ namespace std {
 	struct hash<carl::RealAlgebraicNumber<Number>> {
 		std::size_t operator()(const carl::RealAlgebraicNumber<Number>& n) const {
 			if (n.isNumeric()) {
-				return carl::hash_all(true, n.mIsRoot, n.mValue);
+				return carl::hash_all(true, n.isRoot(), n.value());
 			} else {
-				return carl::hash_all(false, n.mIsRoot, n.mIR);
+				return carl::hash_all(false, n.isRoot(), n.mIR);
 			}
 		}
 	};

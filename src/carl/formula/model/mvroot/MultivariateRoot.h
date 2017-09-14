@@ -66,12 +66,11 @@ public:
 			CARL_LOG_TRACE("carl.multivariateroot", mK << "th root does not exist.");
 			return boost::none;
 		}
-		CARL_LOG_TRACE("carl.multivariateroot", "Got roots " << *roots);
+		CARL_LOG_TRACE("carl.multivariateroot", "Taking " << mK << " of " << *roots << " roots");
 		assert(roots->size() >= mK);
-		auto it = roots->begin();
-		std::advance(it, long(mK)-1);
-		CARL_LOG_DEBUG("carl.multivariateroot", "Result is " << *it);
-		return *it;
+		assert(mK > 0);
+		CARL_LOG_DEBUG("carl.multivariateroot", "Result is " << (*roots)[mK-1]);
+		return (*roots)[mK-1];
 	}
 	
 	bool operator==(const MultivariateRoot& mr) const {
