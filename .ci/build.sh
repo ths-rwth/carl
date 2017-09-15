@@ -55,6 +55,12 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	# Run tests
 	python setup.py test || return 1
 	
+elif [[ ${TASK} == "tidy" ]]; then
+	
+	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
+	/usr/bin/time make ${MAKE_PARALLEL} || return 1
+	/usr/bin/time make tidy || return 1
+
 elif [[ ${TASK} == "addons" ]]; then
 	
 	cmake -D BUILD_ADDONS=ON -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1

@@ -63,6 +63,14 @@ matrix:
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=addons
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
+    - stage: dependencies
+      os: linux
+      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
+      script: TASK=dependencies source .ci/build.sh
+      addons:
+        apt:
+          sources: [*sources_base, llvm-toolchain-trusty-5.0]
+          packages: [*packages_base, clang-5.0]
     - stage: build
       os: linux
       env: CC=clang-3.6 CXX=clang++-3.6
@@ -160,6 +168,14 @@ matrix:
       env: CC=gcc-6 CXX=g++-6 TASK=addons
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: build
+      os: linux
+      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
+      script: source .ci/build.sh
+      addons:
+        apt:
+          sources: [*sources_base, llvm-toolchain-trusty-5.0]
+          packages: [*packages_base, clang-5.0]
+    - stage: build
       os: osx
       osx_image: xcode7.3
       script: source .ci/build.sh
@@ -181,6 +197,9 @@ matrix:
     - stage: dependencies
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=addons
+    - stage: dependencies
+      os: linux
+      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
     - stage: build
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=coverage
@@ -190,6 +209,9 @@ matrix:
     - stage: build
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=addons
+    - stage: build
+      os: linux
+      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
 
 before_install:
   - cd .ci/ && source setup_travis.sh && cd ../

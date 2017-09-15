@@ -53,6 +53,7 @@ envs = {
 	"doxygen": ["TASK=doxygen"],
 	"pycarl": ["TASK=pycarl"],
 	"addons": ["TASK=addons"],
+	"tidy": ["TASK=tidy"],
 }
 
 apts = {
@@ -118,6 +119,7 @@ jobs = [
 	job(["build"], "linux", ["j1", "build.sh"], ["g++-6","doxygen"], ["doxygen", "texinfo", "texlive"]),
 	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","pycarl"], ["python3"], True),
 	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6","addons"], [], True),
+	job(["dependencies","build"], "linux", ["build.sh"], ["clang-5.0","tidy"], ["clang-5.0"], True),
 ]
 
 mapper = [
