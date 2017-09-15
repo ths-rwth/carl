@@ -197,28 +197,6 @@ inline uint toInt<uint>(const mpq_class& n) {
 }
 
 template<typename T>
-inline T rationalize(double n);
-
-template<typename T>
-inline T rationalize(float n);
-
-template<typename T>
-inline T rationalize(int n);
-
-template<typename T>
-inline T rationalize(uint n);
-
-template<typename T>
-inline T rationalize(unsigned long long n);
-
-template<typename T>
-inline T rationalize(sint n);
-
-template<typename T>
-inline T rationalize(const std::string& n);
-
-
-template<typename T>
 inline T rationalize(const PreventConversion<mpq_class>&);
 
 template<>

@@ -6,9 +6,9 @@
 #include <sstream>
 
 #if !defined __VS
+#include <cxxabi.h>
 #include <dlfcn.h>
 #include <execinfo.h>
-#include <cxxabi.h>
 #endif
 
 namespace carl {
