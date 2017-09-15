@@ -49,9 +49,9 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
  * @return Evaluation result
  */
 template<typename Number>
-RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m);
+RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m);
 template<typename Number>
-RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, RANMap<Number>& m);
+RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m);
 
 /**
  * Computes a univariate polynomial with rational coefficients that has the roots of p whose coefficient variables have been substituted by the roots given in m.
@@ -123,31 +123,32 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
 
 // This is called by smtrat::CAD implementation (from CAD.h)
 template<typename Number>
-RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
+RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m) {
 	CARL_LOG_TRACE("carl.ran", "Evaluating " << p << " on " << m);
 	MultivariatePolynomial<Number> pol(p);
+	RANMap<Number> IRmap;
 	
-	for (auto it = m.begin(); it != m.end();) {
+	for (const auto& r: m) {
 		//assert(pol.has(it->first));
-		if (it->second.isNumeric()) {
+		if (r.second.isNumeric()) {
 			// Plug in numeric representations
-			pol.substituteIn(it->first, MultivariatePolynomial<Number>(it->second.value()));
-			it = m.erase(it);
+			pol.substituteIn(r.first, MultivariatePolynomial<Number>(r.second.value()));
 		} else {
 			// Defer interval representations
-			it++;
+			IRmap.emplace(r.first, r.second);
 		}
 	}
 	if (pol.isNumber()) {
 		return RealAlgebraicNumber<Number>(pol.constantPart());
 	}
-        
-        // need to evaluate polynomial on non-trivial RANs 
-        assert(m.size() > 0);
-        if(m.begin()->second.isInterval())
-                return evaluateIR(pol, m);
-        else 
-                return evaluateTE(pol, m);
+
+	// need to evaluate polynomial on non-trivial RANs
+	assert(IRmap.size() > 0);
+	if(IRmap.begin()->second.isInterval()) {
+		return evaluateIR(pol, IRmap);
+	} else {
+		return evaluateTE(pol, IRmap);
+	}
 }
 
 
@@ -160,7 +161,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
  * @return Evaluation result
  */
 template<typename Number>
-RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
+RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
 	assert(m.size() > 0);
 	auto poly = p.toUnivariatePolynomial(m.begin()->first);
