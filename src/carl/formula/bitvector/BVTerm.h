@@ -113,11 +113,11 @@ namespace carl
 
 		BVTerm(BVTermType _type, const BVVariable& _variable);
 
-		BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _index = 0);
+		BVTerm(BVTermType _type, const BVTerm& _operand, std::size_t _index = 0);
 
 		BVTerm(BVTermType _type, const BVTerm& _first, const BVTerm& _second);
 
-		BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _first, const size_t _last);
+		BVTerm(BVTermType _type, const BVTerm& _operand, std::size_t _first, std::size_t _last);
 
 		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const;
 

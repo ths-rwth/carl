@@ -492,12 +492,10 @@ namespace carl
                     result += variableListToString( "," );
                     result += "}, (";
                     // Make pseudo Booleans.
-                    set<Variable> boolVars = set<Variable>();
-                    booleanVars( boolVars );
-                    for( auto j = boolVars.begin(); j != boolVars.end(); ++j )
-                    {
-                        string boolName = VariablePool::getInstance().getName( *j, true );
-                        result += "(" + boolName + " = 0 or " + boolName + " = 1) and ";
+                    std::set<Variable> boolVars;
+                    booleanVars(boolVars);
+                    for (auto v: boolVars) {
+                        result += "(" + v.getName() + " = 0 or " + v.getName() + " = 1) and ";
                     }
                 }
                 else
@@ -518,13 +516,13 @@ namespace carl
     template<typename Pol>
     string Formula<Pol>::variableListToString( string _separator, const unordered_map<string, string>& _variableIds ) const
     {
-        Variables realVars = Variables();
+        Variables realVars;
         realValuedVars( realVars );
-        set<Variable> boolVars = set<Variable>();
+        std::set<Variable> boolVars;
         booleanVars( boolVars );
         auto i = realVars.begin();
         auto j = boolVars.begin();
-        string result = "";
+        string result;
         if( i != realVars.end() )
         {
             stringstream sstream;

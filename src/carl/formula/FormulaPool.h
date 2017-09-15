@@ -401,10 +401,10 @@ namespace carl
 			 */
 			const FormulaContent<Pol>* create(FormulaType _type, std::vector<Variable>&& _vars, const Formula<Pol>& _term) {
 				assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
-				if (_vars.size() > 0) {
-					return add( new FormulaContent<Pol>(_type, std::move(_vars), _term ) );
-				} else {
+				if (_vars.empty()) {
 					return _term.mpContent;
+				} else {
+					return add( new FormulaContent<Pol>(_type, std::move(_vars), _term ) );
 				}
 			}
             

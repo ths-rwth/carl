@@ -23,7 +23,7 @@ namespace carl
     {
     }
 
-    BVTerm::BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _index) :
+    BVTerm::BVTerm(BVTermType _type, const BVTerm& _operand, std::size_t _index) :
     mpContent(BVTermPool::getInstance().create(_type, _operand, _index))
     {
     }
@@ -33,7 +33,7 @@ namespace carl
     {
     }
 
-    BVTerm::BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _first, const size_t _last) :
+    BVTerm::BVTerm(BVTermType _type, const BVTerm& _operand, std::size_t _first, std::size_t _last) :
     mpContent(BVTermPool::getInstance().create(_type, _operand, _first, _last))
     {
     }

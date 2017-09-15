@@ -5,18 +5,18 @@
 
 namespace boost { namespace spirit { namespace traits {
 #if BOOST_VERSION >= 105900
-	template<> inline bool scale(int exp, mpz_class& r, mpz_class rin) {
+	template<> inline bool scale(int exp, mpz_class& n, mpz_class acc_n) {
 		if (exp >= 0)
-			r = rin * carl::pow(mpz_class(10), unsigned(exp));
+			n = acc_n * carl::pow(mpz_class(10), unsigned(exp));
 		else
-			r = carl::div(rin, carl::pow(mpz_class(10), unsigned(-exp)));
+			n = carl::div(acc_n, carl::pow(mpz_class(10), unsigned(-exp)));
 		return true;
 	}
-	template<> inline bool scale(int exp, mpq_class& r, mpq_class rin) {
+	template<> inline bool scale(int exp, mpq_class& n, mpq_class acc_n) {
 		if (exp >= 0)
-			r = rin * carl::pow(mpq_class(10), unsigned(exp));
+			n = acc_n * carl::pow(mpq_class(10), unsigned(exp));
 		else
-			r = rin / carl::pow(mpq_class(10), unsigned(-exp));
+			n = acc_n / carl::pow(mpq_class(10), unsigned(-exp));
 		return true;
 	}
 #else

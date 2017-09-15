@@ -34,7 +34,7 @@ namespace carl
 			mValue.resize(_width);
         }
 #ifdef USE_CLN_NUMBERS
-        explicit BVValue(std::size_t _width, const cln::cl_I _value) :
+        explicit BVValue(std::size_t _width, const cln::cl_I& _value) :
         	mValue(_width)
         {
             for(std::size_t i=0;i<_width;++i) {
@@ -42,7 +42,7 @@ namespace carl
             }
         }
 #endif
-        BVValue(std::size_t _width, const mpz_class _value) :
+        BVValue(std::size_t _width, const mpz_class& _value) :
         	mValue()
         {
             // Obtain an mpz_t copy of _value
