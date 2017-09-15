@@ -63,14 +63,6 @@ matrix:
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=addons
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
-    - stage: dependencies
-      os: linux
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
-      script: TASK=dependencies source .ci/build.sh
-      addons:
-        apt:
-          sources: [*sources_base, llvm-toolchain-trusty-5.0]
-          packages: [*packages_base, clang-5.0]
     - stage: build
       os: linux
       env: CC=clang-3.6 CXX=clang++-3.6
@@ -197,9 +189,6 @@ matrix:
     - stage: dependencies
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=addons
-    - stage: dependencies
-      os: linux
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
     - stage: build
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=coverage
