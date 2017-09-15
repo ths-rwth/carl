@@ -71,8 +71,8 @@ TYPED_TEST(MultivariateRootTest, Evaluate2)
 	Formula<Poly> f(vc);
 	
 	ModelT m;
-	IntervalT rani(Rational(-5793)/4096, BoundType::STRICT, Rational(-181)/128, BoundType::STRICT);
-	UnivariatePolynomial<Rational> ranp(x, {Rational(-2), Rational(0), Rational(1)});
+	IntervalT rani(TypeParam(-5793)/4096, BoundType::STRICT, TypeParam(-181)/128, BoundType::STRICT);
+	UnivariatePolynomial<TypeParam> ranp(x, {TypeParam(-2), TypeParam(0), TypeParam(1)});
 	m.assign(x, RANT(ranp, rani));
 	m.assign(y, RANT(-1));
 	
