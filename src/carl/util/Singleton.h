@@ -25,17 +25,6 @@ namespace carl
 template<typename T>
 class Singleton
 {
-private:
-	/**
-	 * There shall be no copy constructor.
-	 */
-	Singleton(const Singleton&) = delete;
-
-	/**
-	 * There shall be no assignment operator.
-	 */
-	Singleton& operator=(const Singleton&) = delete;
-
 protected:
 	/**
 	 * Protected default constructor.
@@ -43,9 +32,14 @@ protected:
 	Singleton() = default;
 
 public:
+	Singleton(const Singleton&) = delete;
+	Singleton(Singleton&&) = delete;
+	Singleton& operator=(const Singleton&) = delete;
+	Singleton& operator=(Singleton&&) = delete;
+
 	/**
 	 * Virtual destructor.
-     */
+	*/
 	virtual ~Singleton() = default;
 	/**
 	 * Returns the single instance of this class by reference.

@@ -127,10 +127,6 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
  */
 struct Sink {
 	/**
-	 * Default destructor.
-	 */
-	virtual ~Sink() = default;
-	/**
 	 * Abstract logging interface.
 	 * The intended usage is to write any log output to the output stream returned by this function.
 	 * @return Output stream.
@@ -149,7 +145,6 @@ struct StreamSink: public Sink {
 	 * @param _os Output stream.
 	 */
 	explicit StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
-	~StreamSink() override = default;
 	std::ostream& log() noexcept override { return os; }
 };
 /**
@@ -164,7 +159,6 @@ struct FileSink: public Sink {
 	 * @param filename
 	 */
 	explicit FileSink(const std::string& filename): os(filename, std::ios::out) {}
-	~FileSink() override = default;
 	std::ostream& log() noexcept override { return os; }
 };
 
@@ -243,8 +237,6 @@ struct Formatter {
 	std::size_t channelwidth = 10;
 	/// Print information like log level, file etc.
 	bool printInformation = true;
-	
-	virtual ~Formatter() = default;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
 	 * @param f Filter.
