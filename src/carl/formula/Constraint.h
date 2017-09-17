@@ -193,8 +193,9 @@ namespace carl
             void initVariableInformations()
             {
                 VariablesInformation<false,Pol> varinfos = mLhs.template getVarInfo<false>();
-                for( auto varInfo = varinfos.begin(); varInfo != varinfos.end(); ++varInfo )
-                    mVarInfoMap.emplace_hint( mVarInfoMap.end(), varInfo->first, varInfo->second );
+				for (const auto& vi: varinfos) {
+					mVarInfoMap.emplace_hint(mVarInfoMap.end(), vi.first, vi.second);
+				}
             }
                
             /**
@@ -210,13 +211,12 @@ namespace carl
             /**
              * Destructor.
              */
-            ~ConstraintContent();
+            ~ConstraintContent() = default;
 
             /**
              * @return A hash value for this constraint.
              */
-            size_t hash() const
-            {
+            std::size_t hash() const {
                 return mHash;
             }
             

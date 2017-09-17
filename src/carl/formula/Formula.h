@@ -200,8 +200,8 @@ namespace carl
                     FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
             }
             
-            Formula( Formula&& _formula ):
-                mpContent( _formula.mpContent )
+            Formula(Formula&& _formula) noexcept:
+                mpContent(_formula.mpContent)
             {
                 _formula.mpContent = nullptr;
             }
@@ -1187,7 +1187,7 @@ namespace carl
 		
 		struct Substitutor {
 			const std::map<Formula,Formula>& replacements;
-            Substitutor(const std::map<Formula,Formula>& repl): replacements(repl) {}
+            explicit Substitutor(const std::map<Formula,Formula>& repl): replacements(repl) {}
             Formula operator()(const Formula& formula) {
 				auto it = replacements.find(formula);
 				if (it == replacements.end()) return formula;
@@ -1197,7 +1197,7 @@ namespace carl
         
         struct PolynomialSubstitutor {
             const std::map<Variable,typename Formula::PolynomialType>& replacements;
-            PolynomialSubstitutor(const std::map<Variable,typename Formula::PolynomialType>& repl): replacements(repl) {}
+            explicit PolynomialSubstitutor(const std::map<Variable,typename Formula::PolynomialType>& repl): replacements(repl) {}
             Formula operator()(const Formula& formula) {
                 if (formula.getType() != FormulaType::CONSTRAINT) return formula;
                 return Formula(formula.constraint().lhs().substitute(replacements), formula.constraint().relation());
@@ -1206,7 +1206,7 @@ namespace carl
         
         struct BitvectorSubstitutor {
             const std::map<BVVariable,BVTerm>& replacements;
-            BitvectorSubstitutor(const std::map<BVVariable,BVTerm>& repl): replacements(repl) {}
+            explicit BitvectorSubstitutor(const std::map<BVVariable,BVTerm>& repl): replacements(repl) {}
             Formula operator()(const Formula& formula) {
                 if (formula.getType() != FormulaType::BITVECTOR) return formula;
                 BVTerm lhs = formula.bvConstraint().lhs().substitute(replacements);
@@ -1217,7 +1217,7 @@ namespace carl
         
         struct UninterpretedSubstitutor {
             const std::map<UVariable,UFInstance>& replacements;
-            UninterpretedSubstitutor(const std::map<UVariable,UFInstance>& repl): replacements(repl) {}
+            explicit UninterpretedSubstitutor(const std::map<UVariable,UFInstance>& repl): replacements(repl) {}
             Formula operator()(const Formula& formula) {
                 if (formula.getType() != FormulaType::UEQ) return formula;
                 
@@ -1269,7 +1269,7 @@ namespace std
          * @param _formula The formula to get the hash for.
          * @return The hash of the given formula.
          */
-        size_t operator()( const carl::Formula<Pol>& _formula ) const 
+        std::size_t operator()( const carl::Formula<Pol>& _formula ) const 
         {
             return _formula.getHash();
         }

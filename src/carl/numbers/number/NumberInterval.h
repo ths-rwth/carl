@@ -18,7 +18,7 @@ namespace carl {
 		Number(): BaseNumber() {}
 		explicit Number(const Interval<cln::cl_I>& t): BaseNumber(t) {}
 		explicit Number(Interval<cln::cl_I>&& t): BaseNumber(t) {}
-		Number(const Number<Interval<cln::cl_I>>& n): BaseNumber(n) {}
+		Number(const Number<Interval<cln::cl_I>>& n) = default;
 		Number(Number<Interval<cln::cl_I>>&& n) noexcept : BaseNumber(std::move(n)) {}
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
@@ -74,7 +74,7 @@ namespace carl {
 		Number(): BaseNumber() {}
 		explicit Number(const Interval<cln::cl_RA>& t): BaseNumber(t) {}
 		explicit Number(Interval<cln::cl_RA>&& t): BaseNumber(t) {}
-		Number(const Number<Interval<cln::cl_RA>>& n): BaseNumber(n) {}
+		Number(const Number<Interval<cln::cl_RA>>& n) = default;
 		Number(Number<Interval<cln::cl_RA>>&& n) noexcept : BaseNumber(std::move(n)) {}
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}

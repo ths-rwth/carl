@@ -38,7 +38,7 @@ namespace carl
     {
     }
 
-    std::string BVTerm::toString(const std::string _init, bool _oneline, bool _infix, bool _friendlyNames) const
+    std::string BVTerm::toString(const std::string& _init, bool _oneline, bool _infix, bool _friendlyNames) const
     {
         return mpContent->toString(_init, _oneline, _infix, _friendlyNames);
     }

@@ -12,6 +12,7 @@
 #include <type_traits>
 
 #include "config.h"
+#include "logging.h"
 
 namespace carl {
 	

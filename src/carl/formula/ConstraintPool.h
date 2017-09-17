@@ -104,7 +104,7 @@ namespace carl
              * Constructor of the constraint pool.
              * @param _capacity Expected necessary capacity of the pool.
              */
-            ConstraintPool( unsigned _capacity = 10000 );
+            explicit ConstraintPool( unsigned _capacity = 10000 );
 
         public:
 

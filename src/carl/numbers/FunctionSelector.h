@@ -58,7 +58,7 @@ namespace function_selector {
 	private:
 		std::tuple<Functions...> mFunctions;
 	public:
-		FunctionSelector(Functions&&... f): mFunctions(std::forward<Functions>(f)...) {}
+		explicit FunctionSelector(Functions&&... f): mFunctions(std::forward<Functions>(f)...) {}
 		template<typename... Args>
 		auto operator()(Args&&... args) const {
 			using T = typename TypeSelector::template type<Args...>;

@@ -119,7 +119,7 @@ namespace carl
 
 		BVTerm(BVTermType _type, const BVTerm& _operand, std::size_t _first, std::size_t _last);
 
-		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const;
+		std::string toString(const std::string& _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const;
 
 		friend std::ostream& operator<<(std::ostream& _out, const BVTerm& _term)
 		{
@@ -175,8 +175,8 @@ namespace carl
 		BVTerm mOperand;
 		size_t mIndex;
 
-		explicit BVUnaryContent(const BVTerm& _operand, const size_t _index = 0) :
-			mOperand(_operand), mIndex(_index)
+		explicit BVUnaryContent(BVTerm _operand, std::size_t _index = 0) :
+			mOperand(std::move(_operand)), mIndex(_index)
 		{
 		}
 
@@ -197,8 +197,8 @@ namespace carl
 		BVTerm mFirst;
 		BVTerm mSecond;
 
-		BVBinaryContent(const BVTerm& _first, const BVTerm& _second) :
-		mFirst(_first), mSecond(_second)
+		BVBinaryContent(BVTerm _first, BVTerm _second) :
+		mFirst(std::move(_first)), mSecond(std::move(_second))
 		{
 		}
 
@@ -220,8 +220,8 @@ namespace carl
 		std::size_t mHighest;
 		std::size_t mLowest;
 
-		BVExtractContent(const BVTerm& _operand, const size_t _highest, const size_t _lowest) :
-		mOperand(_operand), mHighest(_highest), mLowest(_lowest)
+		BVExtractContent(BVTerm _operand, std::size_t _highest, std::size_t _lowest) :
+		mOperand(std::move(_operand)), mHighest(_highest), mLowest(_lowest)
 		{
 		}
 
