@@ -432,7 +432,7 @@ namespace carl
          * For terms with exactly one variable, get this variable.
          * @return The only variable occuring in the term.
          */
-        Variable::Arg getSingleVariable() const
+        Variable getSingleVariable() const
         { 
             assert( existsFactorization( *this ) );
             if( factorizedTrivially() )
@@ -452,7 +452,7 @@ namespace carl
             return std::move(polynomial().toUnivariatePolynomial() *= mCoefficient); // In this case it makes sense to expand the polynomial.
         }
         
-        UnivariatePolynomial<FactorizedPolynomial<P>> toUnivariatePolynomial( Variable::Arg _var ) const;
+        UnivariatePolynomial<FactorizedPolynomial<P>> toUnivariatePolynomial( Variable _var ) const;
         
         /**
          * Checks if the polynomial has a constant term that is not zero.
@@ -464,10 +464,10 @@ namespace carl
          * @param _var The variable to check for its occurrence.
          * @return true, if the variable occurs in this term.
          */
-        bool has( Variable::Arg _var ) const;
+        bool has( Variable _var ) const;
     
         template<bool gatherCoeff>
-        VariableInformation<gatherCoeff, FactorizedPolynomial<P>> getVarInfo( Variable::Arg _var ) const;
+        VariableInformation<gatherCoeff, FactorizedPolynomial<P>> getVarInfo( Variable _var ) const;
 
         template<bool gatherCoeff>
         VariablesInformation<gatherCoeff, FactorizedPolynomial<P>> getVarInfo() const
@@ -553,7 +553,7 @@ namespace carl
          * Replace the given variable by the given value.
          * @return A new factorized polynomial without resulting from this substitution.
          */
-        FactorizedPolynomial<P> substitute(Variable::Arg _var, const FactorizedPolynomial<P>& _value) const;
+        FactorizedPolynomial<P> substitute(Variable _var, const FactorizedPolynomial<P>& _value) const;
 
         /**
          * Replace all variables by a value given in their map.
@@ -577,7 +577,7 @@ namespace carl
         /**
          * Replace the given variable by the given polynomial within this multivariate polynomial.
          */
-        void substituteIn(Variable::Arg _var, const FactorizedPolynomial<P>& _value);
+        void substituteIn(Variable _var, const FactorizedPolynomial<P>& _value);
         
         /**
          * Calculates the square of this factorized polynomial if it is a square.

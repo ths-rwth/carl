@@ -364,7 +364,7 @@ namespace carl
 		 *                        or with their dedicated names.
 		 * @return The resulting string representation of this term.
 		 */
-		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
+		std::string toString(const std::string& _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
 		{
             if(isInvalid()) {
                 return _init + "%invalid%";

@@ -19,7 +19,7 @@ namespace carl
         return this->mpInvalid;
     }
 
-    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVValue _value)
+    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVValue& _value)
     {
         return this->add(new Term(_type, _value));
     }

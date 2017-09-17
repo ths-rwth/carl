@@ -364,7 +364,7 @@ namespace carl
     }
     
     template<typename P>
-    UnivariatePolynomial<FactorizedPolynomial<P>> FactorizedPolynomial<P>::toUnivariatePolynomial( Variable::Arg _var ) const
+    UnivariatePolynomial<FactorizedPolynomial<P>> FactorizedPolynomial<P>::toUnivariatePolynomial( Variable _var ) const
     {
         // TODO: This should maybe done directly on the factorization.
         UnivariatePolynomial<P> univPol = polynomial().toUnivariatePolynomial( _var );
@@ -400,7 +400,7 @@ namespace carl
     }
 
     template<typename P>
-    bool FactorizedPolynomial<P>::has( Variable::Arg _var ) const
+    bool FactorizedPolynomial<P>::has( Variable _var ) const
     {   
         if( existsFactorization( *this ) )
         {
@@ -418,7 +418,7 @@ namespace carl
     
     template<typename P>
     template<bool gatherCoeff>
-    VariableInformation<gatherCoeff, FactorizedPolynomial<P>> FactorizedPolynomial<P>::getVarInfo(Variable::Arg var) const
+    VariableInformation<gatherCoeff, FactorizedPolynomial<P>> FactorizedPolynomial<P>::getVarInfo(Variable var) const
     {
         // TODO: Maybe we should use the factorization for collecting degrees and coefficients.
         VariableInformation<gatherCoeff, P> vi = polynomial().template getVarInfo<gatherCoeff>( var );
@@ -546,7 +546,7 @@ namespace carl
         FactorizedPolynomial<P> mult( *this );
         while( _exp > 0 )
         {
-            if( _exp & 1 )
+            if( (_exp & 1) != 0 )
                 res *= mult;
             _exp /= 2;
             if( _exp > 0 )
@@ -581,13 +581,13 @@ namespace carl
     }
 	
     template<typename P>
-    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute( Variable::Arg _var, const FactorizedPolynomial<P>& _value ) const
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute( Variable _var, const FactorizedPolynomial<P>& _value ) const
     {
         if( !existsFactorization( *this ) )
             return *this;
         if( factorizedTrivially() )
         {
-            P subResult = polynomial().substitute( _var, (P) _value );
+            P subResult = polynomial().substitute( _var, static_cast<P>(_value) );
             if( subResult.isConstant() )
             {
                 FactorizedPolynomial<P> result( (subResult.constantPart() * mCoefficient) );
@@ -721,7 +721,7 @@ namespace carl
     }
 	
     template<typename P>
-    void FactorizedPolynomial<P>::substituteIn( Variable::Arg _var, const FactorizedPolynomial<P>& _value )
+    void FactorizedPolynomial<P>::substituteIn( Variable _var, const FactorizedPolynomial<P>& _value )
     {
         FactorizedPolynomial<P> res( *this );
         res.substitute( _var, _value );
@@ -1203,7 +1203,7 @@ namespace carl
     {
         if( existsFactorization( *this ) )
         {
-            std::string result = "";
+            std::string result;
             if( _infix )
             {
                 if( mCoefficient != Coeff<P>( 1 ) )
