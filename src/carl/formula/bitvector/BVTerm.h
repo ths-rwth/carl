@@ -177,7 +177,7 @@ namespace carl
 		std::size_t mIndex;
 
 		explicit BVUnaryContent(BVTerm operand, std::size_t index = 0) :
-			mOperand(std::move(operand)), mIndex(index)
+			mOperand(operand), mIndex(index)
 		{}
 
 		bool operator==(const BVUnaryContent& rhs) const {
@@ -193,7 +193,7 @@ namespace carl
 		BVTerm mSecond;
 
 		BVBinaryContent(BVTerm first, BVTerm second):
-			mFirst(std::move(first)), mSecond(std::move(second))
+			mFirst(first), mSecond(second)
 		{}
 		bool operator==(const BVBinaryContent& rhs) const {
 			return std::tie(mFirst,mSecond) == std::tie(rhs.mFirst,rhs.mSecond);
@@ -209,7 +209,7 @@ namespace carl
 		std::size_t mLowest;
 
 		BVExtractContent(BVTerm _operand, std::size_t _highest, std::size_t _lowest) :
-		mOperand(std::move(_operand)), mHighest(_highest), mLowest(_lowest)
+		mOperand(_operand), mHighest(_highest), mLowest(_lowest)
 		{}
 		bool operator==(const BVExtractContent& rhs) const {
 			return std::tie(mOperand,mHighest,mLowest) == std::tie(rhs.mOperand,rhs.mHighest,rhs.mLowest);

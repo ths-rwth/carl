@@ -30,7 +30,7 @@ namespace carl
         if( _bitvectorVars )
         {
             assert( bvVars != nullptr );
-            for (const auto& v: *bvVars) _vars.insert(v());
+            for (const auto& v: *bvVars) _vars.insert(v);
             delete bvVars;
         }
         if( considerUninterpreted )
@@ -422,7 +422,7 @@ namespace carl
             for( const auto& uvar : uvars )
                 os << "(declare-fun " << uvar() << " () " << uvar.domain() << ")\n";
             for( const auto& bvvar : bvvars )
-                os << "(declare-fun " << bvvar() << " () " << bvvar.sort() << ")\n";
+                os << "(declare-fun " << bvvar << " () " << bvvar.sort() << ")\n";
             for (const auto& ufc: UFManager::getInstance().ufContents()) {
                 if (ufc == nullptr) continue;
                 os << "(declare-fun " << ufc->name() << " (";

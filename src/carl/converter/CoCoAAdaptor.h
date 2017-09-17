@@ -114,7 +114,7 @@ public:
 	}
 	
 public:
-	CoCoAAdaptor(const std::vector<Poly>& polys):
+	explicit CoCoAAdaptor(const std::vector<Poly>& polys):
 		mSymbolBack(collectVariables(polys)),
 		mRing(CoCoA::NewPolyRing(mQ, long(mSymbolBack.size())))
 	{

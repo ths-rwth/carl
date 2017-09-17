@@ -21,9 +21,9 @@ namespace carl {
 
 		Number(): BaseNumber() {}
 		explicit Number(const long int t) {mData = t; }
-		Number(const Number<long int>& n): BaseNumber(n) {}
+		Number(const Number<long int>& n) = default;
 		Number(Number<long int>&& n) noexcept : BaseNumber(n) {}
-		explicit Number(const std::string& s) { mData = atoi(s.c_str()); }
+		explicit Number(const std::string& s) { mData = std::stol(s); }
 		/*Number(long long int n) { mData = cln::cl_I(n); }
 		Number(unsigned long long int n) { mData = cln::cl_I(n);} */
 	 	Number(const Number<mpz_class>& n); 

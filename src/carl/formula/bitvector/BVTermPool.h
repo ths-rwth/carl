@@ -15,9 +15,9 @@ namespace carl
 		friend Singleton<BVTermPool>;
 	public:
 
-		typedef BVTermContent Term;
-		typedef Term* TermPtr;
-		typedef const Term* ConstTermPtr;
+		using Term = BVTermContent;
+		using TermPtr = Term*;
+		using ConstTermPtr = const Term*;
 	private:
 
 		ConstTermPtr mpInvalid;
