@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <boost/variant.hpp>
+#include "../../util/variant_util.h"
+
 #include "BVVariable.h"
 #include "BVValue.h"
 
@@ -145,9 +148,8 @@ namespace carl
 
 		bool isInvalid() const;
 
-		bool operator==(const BVTerm& _other) const
-		{
-			return mpContent == _other.mpContent;
+		bool operator==(const BVTerm& rhs) const {
+			return mpContent == rhs.mpContent;
 		}
 		bool operator<(const BVTerm& rhs) const;
 
@@ -170,71 +172,50 @@ namespace carl
 		BVTerm substitute(const std::map<BVVariable,BVTerm>& /*unused*/) const;
 	};
 
-	struct BVUnaryContent
-	{
+	struct BVUnaryContent {
 		BVTerm mOperand;
-		size_t mIndex;
+		std::size_t mIndex;
 
-		explicit BVUnaryContent(BVTerm _operand, std::size_t _index = 0) :
-			mOperand(std::move(_operand)), mIndex(_index)
-		{
-		}
+		explicit BVUnaryContent(BVTerm operand, std::size_t index = 0) :
+			mOperand(std::move(operand)), mIndex(index)
+		{}
 
-		bool operator==(const BVUnaryContent& _other) const
-		{
-			return mOperand == _other.mOperand && mIndex == _other.mIndex;
+		bool operator==(const BVUnaryContent& rhs) const {
+			return std::tie(mIndex,mOperand) == std::tie(rhs.mIndex,rhs.mOperand);
 		}
-		bool operator<(const BVUnaryContent& _other) const
-		{
-			if (!(mOperand == _other.mOperand)) return mOperand < _other.mOperand;
-			if (mIndex != _other.mIndex) return mIndex < _other.mIndex;
-			return false;
+		bool operator<(const BVUnaryContent& rhs) const {
+			return std::tie(mOperand,mIndex) < std::tie(rhs.mOperand,rhs.mIndex);
 		}
 	};
 
-	struct BVBinaryContent
-	{
+	struct BVBinaryContent {
 		BVTerm mFirst;
 		BVTerm mSecond;
 
-		BVBinaryContent(BVTerm _first, BVTerm _second) :
-		mFirst(std::move(_first)), mSecond(std::move(_second))
-		{
+		BVBinaryContent(BVTerm first, BVTerm second):
+			mFirst(std::move(first)), mSecond(std::move(second))
+		{}
+		bool operator==(const BVBinaryContent& rhs) const {
+			return std::tie(mFirst,mSecond) == std::tie(rhs.mFirst,rhs.mSecond);
 		}
-
-		bool operator==(const BVBinaryContent& _other) const
-		{
-			return mFirst == _other.mFirst && mSecond == _other.mSecond;
-		}
-		bool operator<(const BVBinaryContent& _other) const
-		{
-			if (!(mFirst == _other.mFirst)) return mFirst < _other.mFirst;
-			if (!(mSecond == _other.mSecond)) return mSecond < _other.mSecond;
-			return false;
+		bool operator<(const BVBinaryContent& rhs) const {
+			return std::tie(mFirst,mSecond) < std::tie(rhs.mFirst,rhs.mSecond);
 		}
 	};
 
-	struct BVExtractContent
-	{
+	struct BVExtractContent {
 		BVTerm mOperand;
 		std::size_t mHighest;
 		std::size_t mLowest;
 
 		BVExtractContent(BVTerm _operand, std::size_t _highest, std::size_t _lowest) :
 		mOperand(std::move(_operand)), mHighest(_highest), mLowest(_lowest)
-		{
+		{}
+		bool operator==(const BVExtractContent& rhs) const {
+			return std::tie(mOperand,mHighest,mLowest) == std::tie(rhs.mOperand,rhs.mHighest,rhs.mLowest);
 		}
-
-		bool operator==(const BVExtractContent& _other) const
-		{
-			return mOperand == _other.mOperand && mHighest == _other.mHighest && mLowest == _other.mLowest;
-		}
-		bool operator<(const BVExtractContent& _other) const
-		{
-			if (!(mOperand == _other.mOperand)) return mOperand < _other.mOperand;
-			if (mHighest != _other.mHighest) return mHighest < _other.mHighest;
-			if (mLowest != _other.mLowest) return mLowest < _other.mLowest;
-			return false;
+		bool operator<(const BVExtractContent& rhs) const {
+			return std::tie(mOperand,mHighest,mLowest) < std::tie(rhs.mOperand,rhs.mHighest,rhs.mLowest);
 		}
 	};
 
@@ -245,26 +226,31 @@ namespace carl
 
 	private:
 		BVTermType mType;
+		
+		boost::variant<BVVariable,BVValue,BVUnaryContent,BVBinaryContent,BVExtractContent> mContent;
+		
+		template<typename T>
+		T& getContent() {
+			assert(carl::variant_is_type<T>(mContent));
+			return boost::get<T>(mContent);
+		}
+		template<typename T>
+		const T& getContent() const {
+			assert(carl::variant_is_type<T>(mContent));
+			return boost::get<T>(mContent);
+		}
+		
+		BVVariable& getVariable() { return getContent<BVVariable>(); }
+		const BVVariable& getVariable() const { return getContent<BVVariable>(); }
+		BVValue& getValue() { return getContent<BVValue>(); }
+		const BVValue& getValue() const { return getContent<BVValue>(); }
+		BVUnaryContent& getUnary() { return getContent<BVUnaryContent>(); }
+		const BVUnaryContent& getUnary() const { return getContent<BVUnaryContent>(); }
+		BVBinaryContent& getBinary() { return getContent<BVBinaryContent>(); }
+		const BVBinaryContent& getBinary() const { return getContent<BVBinaryContent>(); }
+		BVExtractContent& getExtract() { return getContent<BVExtractContent>(); }
+		const BVExtractContent& getExtract() const { return getContent<BVExtractContent>(); }
 
-#ifdef __VS
-		union
-		{
-			BVVariable* mpVariableVS;
-			BVValue* mpValueVS;
-			BVUnaryContent* mpUnaryVS;
-			BVBinaryContent* mpBinaryVS;
-			BVExtractContent* mpExtractVS;
-		};
-#else
-		union
-		{
-			BVVariable mVariable;
-			BVValue mValue;
-			BVUnaryContent mUnary;
-			BVBinaryContent mBinary;
-			BVExtractContent mExtract;
-		};
-#endif
 		std::size_t mWidth;
 		std::size_t mId;
 		std::size_t mHash;
@@ -272,58 +258,28 @@ namespace carl
 	public:
 
 		BVTermContent() :
-#ifdef __VS
-		mType(BVTermType::CONSTANT), mWidth(0), mId(0), mHash(0)
-		{
-			mpValueVS = new BVValue();
-		}
-#else
-		mType(BVTermType::CONSTANT), mValue(), mWidth(0), mId(0), mHash(0)
+		mType(BVTermType::CONSTANT), mContent(BVValue()), mWidth(0), mId(0), mHash(carl::variant_hash(mContent))
 		{
 		}
-#endif
 
 		BVTermContent(BVTermType _type, BVValue _value) :
-#ifdef __VS
-		mType(_type), mWidth(_value.width()), mId(0),
-		mHash((std::hash<BVValue>()(_value) << 5) ^ typeId(_type))
-		{
-			mpValueVS = new BVValue(_value);
-			assert(_type == BVTermType::CONSTANT);
-		}
-#else
-			mType(_type), mValue(_value), mWidth(_value.width()), mId(0),
-			mHash((std::hash<BVValue>()(_value) << 5) ^ typeId(_type))
+			mType(_type), mContent(_value), mWidth(_value.width()), mId(0),
+			mHash(carl::variant_hash(mContent))
 		{
 			assert(_type == BVTermType::CONSTANT);
 		}
-#endif
 
 		BVTermContent(BVTermType _type, const BVVariable& _variable) :
-#ifdef __VS
-		mType(_type), mWidth(_variable.width()), mId(0),
-		mHash(((std::size_t)_variable().getId() << 5) ^ typeId(_type))
+		mType(_type), mContent(_variable), mWidth(_variable.width()), mId(0),
+		mHash(carl::variant_hash(mContent))
 		{
-			mpVariableVS = new BVVariable(_variable);
-#else
-		mType(_type), mVariable(_variable), mWidth(_variable.width()), mId(0),
-		mHash((_variable().getId() << 5) ^ typeId(_type))
-		{
-#endif
 			assert(_type == BVTermType::VARIABLE);
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _index = 0) :
-#ifdef __VS
-			mType(_type), mWidth(0), mId(0),
-		mHash((_index << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
+			mType(_type), mContent(BVUnaryContent(_operand, _index)), mWidth(0), mId(0),
+			mHash(carl::variant_hash(mContent))
 		{
-			mpUnaryVS = new BVUnaryContent(_operand, _index);
-#else
-			mType(_type), mUnary(_operand, _index), mWidth(0), mId(0),
-			mHash((_index << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
-		{
-#endif
 			assert(typeIsUnary(_type));
 			if (_type == BVTermType::NOT || _type == BVTermType::NEG) {
 				assert(_index == 0);
@@ -341,16 +297,9 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm& _first, const BVTerm& _second) :
-#ifdef __VS
-			mType(_type), mWidth(0), mId(0),
-		mHash((_first.hash() << 10) ^ (_second.hash() << 5) ^ typeId(_type))
+			mType(_type), mContent(BVBinaryContent(_first, _second)), mWidth(0), mId(0),
+			mHash(carl::variant_hash(mContent))
 		{
-			mpBinaryVS = new BVBinaryContent(_first, _second); 
-#else
-			mType(_type), mBinary(_first, _second), mWidth(0), mId(0),
-			mHash((_first.hash() << 10) ^ (_second.hash() << 5) ^ typeId(_type))
-		{
-#endif
 			assert(typeIsBinary(_type));
 
 			if(_type == BVTermType::CONCAT) {
@@ -363,45 +312,20 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _highest, const size_t _lowest) :
-#ifdef __VS
-			mType(_type), mWidth(_highest - _lowest + 1), mId(0),
-		mHash((_highest << 15) ^ (_lowest << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
+			mType(_type), mContent(BVExtractContent(_operand, _highest, _lowest)), mWidth(_highest - _lowest + 1), mId(0),
+			mHash(carl::variant_hash(mContent))
 		{
-			mpExtractVS = new BVExtractContent(_operand, _highest, _lowest);
-#else
-			mType(_type), mExtract(_operand, _highest, _lowest), mWidth(_highest - _lowest + 1), mId(0),
-			mHash((_highest << 15) ^ (_lowest << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
-		{
-#endif
 			assert(_type == BVTermType::EXTRACT);
 			assert(_highest < _operand.width() && _highest >= _lowest);
 		}
 
-		~BVTermContent()
-		{
-#ifdef __VS
-			if(mType == BVTermType::VARIABLE) {
-				mpVariableVS->~BVVariable();
-			} else if(mType == BVTermType::CONSTANT) {
-				mpValueVS->~BVValue();
-			}
-#else
-			if (mType == BVTermType::VARIABLE) {
-				mVariable.~BVVariable();
-			}
-			else if (mType == BVTermType::CONSTANT) {
-				mValue.~BVValue();
-			}
-#endif
-		}
+		~BVTermContent() = default;
 
-		size_t width() const
-		{
+		std::size_t width() const {
 			return mWidth;
 		}
 
-		BVTermType type() const
-		{
+		BVTermType type() const {
 			return mType;
 		}
 
@@ -410,36 +334,21 @@ namespace carl
             return (mType == BVTermType::CONSTANT && mWidth == 0);
         }
 		void collectVariables(std::set<BVVariable>& vars) const {
-#ifdef __VS
-			if(mType == BVTermType::CONSTANT) {
-			} else if(mType == BVTermType::VARIABLE) {
-				vars.insert(*mpVariableVS);
-			} else if(mType == BVTermType::EXTRACT) {
-				mpExtractVS->mOperand.collectVariables(vars);
-			} else if(typeIsUnary(mType)) {
-				mpUnaryVS->mOperand.collectVariables(vars);
-			}
-			else if (typeIsBinary(mType)) {
-				mpBinaryVS->mFirst.collectVariables(vars);
-				mpBinaryVS->mSecond.collectVariables(vars);
-			}
-#else
 			if (mType == BVTermType::CONSTANT) {
 			}
 			else if (mType == BVTermType::VARIABLE) {
-				vars.insert(mVariable);
+				vars.insert(getVariable());
 			}
 			else if (mType == BVTermType::EXTRACT) {
-				mExtract.mOperand.collectVariables(vars);
+				getExtract().mOperand.collectVariables(vars);
 			}
 			else if (typeIsUnary(mType)) {
-				mUnary.mOperand.collectVariables(vars);
+				getUnary().mOperand.collectVariables(vars);
 			}
 			else if (typeIsBinary(mType)) {
-				mBinary.mFirst.collectVariables(vars);
-				mBinary.mSecond.collectVariables(vars);
+				getBinary().mFirst.collectVariables(vars);
+				getBinary().mSecond.collectVariables(vars);
 			}
-#endif
 			else {
 				std::cerr << "Type is " << mType << std::endl;
 				assert(false);
@@ -459,22 +368,13 @@ namespace carl
 		{
             if(isInvalid()) {
                 return _init + "%invalid%";
-#ifdef __VS
-            } else if(mType == BVTermType::CONSTANT) {
-                return _init + mpValueVS->toString();
-			}
-			else if (mType == BVTermType::VARIABLE) {
-				return _init + mpVariableVS->toString(_friendlyNames);
-			}
-#else
 			}
 			else if (mType == BVTermType::CONSTANT) {
-				return _init + mValue.toString();
+				return _init + getValue().toString();
 			}
 			else if (mType == BVTermType::VARIABLE) {
-				return _init + mVariable.toString(_friendlyNames);
+				return _init + getVariable().toString(_friendlyNames);
 			}
-#endif
 			else {
 				std::string operatorStr = carl::toString(mType);
 				std::string operatorPrefix = operatorStr;
@@ -486,46 +386,25 @@ namespace carl
 
 				// Rewrite operator strings for indexed (parameterized) operators
 				if(mType == BVTermType::EXTRACT) {
-#ifdef __VS
-					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mpExtractVS->mHighest) + " " + std::to_string(mpExtractVS->mLowest) + ")";
-					operatorInfix = operatorStr + "_{" + std::to_string(mpExtractVS->mHighest) + "," + std::to_string(mpExtractVS->mLowest) + "}";
-#else
-					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mExtract.mHighest) + " " + std::to_string(mExtract.mLowest) + ")";
-					operatorInfix = operatorStr + "_{" + std::to_string(mExtract.mHighest) + "," + std::to_string(mExtract.mLowest) + "}";
-#endif
+					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(getExtract().mHighest) + " " + std::to_string(getExtract().mLowest) + ")";
+					operatorInfix = operatorStr + "_{" + std::to_string(getExtract().mHighest) + "," + std::to_string(getExtract().mLowest) + "}";
 				} else if(mType == BVTermType::LROTATE || mType == BVTermType::RROTATE
 					|| mType == BVTermType::EXT_U || mType == BVTermType::EXT_S || mType == BVTermType::REPEAT) {
-#ifdef __VS
-					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mpUnaryVS->mIndex) + ")";
-					operatorInfix = operatorStr + "_" + std::to_string(mpUnaryVS->mIndex);
-#else
-					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mUnary.mIndex) + ")";
-					operatorInfix = operatorStr + "_" + std::to_string(mUnary.mIndex);
-#endif
+					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(getUnary().mIndex) + ")";
+					operatorInfix = operatorStr + "_" + std::to_string(getUnary().mIndex);
 				}
 
 				// Fill arg* variables
-#ifdef __VS
-				if(mType == BVTermType::EXTRACT) {
-					argFirst = mpExtractVS->mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-				} else if(typeIsUnary(mType)) {
-					argFirst = mpUnaryVS->mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-				} else if(typeIsBinary(mType)) {
-					argFirst = mpBinaryVS->mFirst.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-					argSecond = mpBinaryVS->mSecond.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-				}
-#else
 				if (mType == BVTermType::EXTRACT) {
-					argFirst = mExtract.mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argFirst = getExtract().mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 				}
 				else if (typeIsUnary(mType)) {
-					argFirst = mUnary.mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argFirst = getUnary().mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 				}
 				else if (typeIsBinary(mType)) {
-					argFirst = mBinary.mFirst.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-					argSecond = mBinary.mSecond.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argFirst = getBinary().mFirst.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argSecond = getBinary().mSecond.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 				}
-#endif
 				else {
 					assert(false);
 				}
@@ -557,91 +436,13 @@ namespace carl
 			return this->mHash;
 		}
 
-		bool operator==(const BVTermContent& _other) const
-		{
-			if(mId != 0 && _other.mId != 0) {
-				return mId == _other.mId;
-			}
-
-			if(mType != _other.mType) {
-				return false;
-			}
-
-#ifdef __VS
-			if(mType == BVTermType::CONSTANT) {
-				return *mpValueVS == *_other.mpValueVS;
-			} else if(mType == BVTermType::VARIABLE) {
-				return *mpVariableVS == *_other.mpVariableVS;
-			} else if(mType == BVTermType::EXTRACT) {
-				return *mpExtractVS == *_other.mpExtractVS;
-			} else if(typeIsUnary(mType)) {
-				return *mpUnaryVS == *_other.mpUnaryVS;
-			} else if(typeIsBinary(mType)) {
-				return *mpBinaryVS == *_other.mpBinaryVS;
-			}
-#else
-			if (mType == BVTermType::CONSTANT) {
-				return mValue == _other.mValue;
-			}
-			else if (mType == BVTermType::VARIABLE) {
-				return mVariable == _other.mVariable;
-			}
-			else if (mType == BVTermType::EXTRACT) {
-				return mExtract == _other.mExtract;
-			}
-			else if (typeIsUnary(mType)) {
-				return mUnary == _other.mUnary;
-			}
-			else if (typeIsBinary(mType)) {
-				return mBinary == _other.mBinary;
-			}
-#endif
-			else {
-				std::cerr << "Type is " << mType << std::endl;
-				assert(false);
-				return false;
-			}
+		bool operator==(const BVTermContent& rhs) const {
+			if(mId != 0 && rhs.mId != 0) return mId == rhs.mId;
+			return std::tie(mType, mHash, mWidth, mContent) == std::tie(rhs.mType, rhs.mHash, rhs.mWidth, mContent);
 		}
 		bool operator<(const BVTermContent& rhs) const {
 			if(mId != 0 && rhs.mId != 0) return mId < rhs.mId;
-			if(mType != rhs.mType) return mType < rhs.mType;
-#ifdef __VS
-			if (mType == BVTermType::CONSTANT) {
-				return *mpValueVS < *rhs.mpValueVS;
-			}
-			else if (mType == BVTermType::VARIABLE) {
-				return *mpVariableVS < *rhs.mpVariableVS;
-			}
-			else if (mType == BVTermType::EXTRACT) {
-				return *mpExtractVS < *rhs.mpExtractVS;
-			}
-			else if (typeIsUnary(mType)) {
-				return *mpUnaryVS < *rhs.mpUnaryVS;
-			}
-			else if (typeIsBinary(mType)) {
-				return *mpBinaryVS < *rhs.mpBinaryVS;
-			}
-#else
-			if (mType == BVTermType::CONSTANT) {
-				return mValue < rhs.mValue;
-			}
-			else if (mType == BVTermType::VARIABLE) {
-				return mVariable < rhs.mVariable;
-			}
-			else if (mType == BVTermType::EXTRACT) {
-				return mExtract < rhs.mExtract;
-			}
-			else if (typeIsUnary(mType)) {
-				return mUnary < rhs.mUnary;
-			}
-			else if (typeIsBinary(mType)) {
-				return mBinary < rhs.mBinary;
-			}
-#endif
-			else {
-				assert(false);
-				return false;
-			}
+			return std::tie(mType, mHash, mWidth, mContent) < std::tie(rhs.mType, rhs.mHash, rhs.mWidth, mContent);
 		}
 
 		/**
@@ -649,48 +450,58 @@ namespace carl
 		 * @param _out The stream to print on.
 		 * @param _term The term to be printed.
 		 */
-		friend std::ostream& operator<<(std::ostream& _out, const BVTermContent& _term)
-		{
-			return(_out << _term.toString());
+		friend std::ostream& operator<<(std::ostream& os, const BVTermContent& _term) {
+			return os << _term.toString();
 		}
 	};
 }
 
 namespace std
 {
+	template<>
+	struct hash<carl::BVUnaryContent>{
+		std::size_t operator()(const carl::BVUnaryContent& uc) const {
+			return carl::hash_all(uc.mOperand, uc.mIndex);
+		}
+	};
+	template<>
+	struct hash<carl::BVBinaryContent>{
+		std::size_t operator()(const carl::BVBinaryContent& bc) const {
+			return carl::hash_all(bc.mFirst, bc.mSecond);
+		}
+	};
+	template<>
+	struct hash<carl::BVExtractContent>{
+		std::size_t operator()(const carl::BVExtractContent& ec) const {
+			return carl::hash_all(ec.mOperand, ec.mHighest, ec.mLowest);
+		}
+	};
+	
 	/**
 	 * Implements std::hash for bit vector term contents.
 	 */
-	template <>
-	struct hash<carl::BVTermContent>
-	{
-		public:
-
+	template<>
+	struct hash<carl::BVTermContent>{
 		/**
 		 * @param _termContent The bit vector term content to get the hash for.
 		 * @return The hash of the given bit vector term content.
 		 */
-		size_t operator()(const carl::BVTermContent& _termContent) const
-		{
-			return _termContent.hash();
+		std::size_t operator()(const carl::BVTermContent& tc) const {
+			return tc.hash();
 		}
 	};
 
     /**
      * Implements std::hash for bit vector terms.
      */
-    template <>
-    struct hash<carl::BVTerm>
-    {
-        public:
-
+    template<>
+    struct hash<carl::BVTerm> {
         /**
          * @param _term The bit vector term to get the hash for.
          * @return The hash of the given bit vector term.
          */
-        size_t operator()(const carl::BVTerm& _term) const
-        {
-            return _term.hash();
+        std::size_t operator()(const carl::BVTerm& t) const {
+            return t.hash();
         }
     };
 }    // namespace std
