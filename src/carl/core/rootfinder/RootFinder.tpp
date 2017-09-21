@@ -57,9 +57,11 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		CARL_LOG_TRACE("carl.core.rootfinder", "Calling on " << evaledpoly);
 		auto res = realRoots(evaledpoly, interval, pivoting);
 		MultivariatePolynomial<Number> mvpoly(tmp);
+		CARL_LOG_TRACE("carl.core.rootfinder", "Checking " << res << " on " << mvpoly);
 		for (auto it = res.begin(); it != res.end();) {
 			CARL_LOG_TRACE("carl.core.rootfinder", "Checking " << tmp.mainVar() << " = " << *it);
 			IRmap[tmp.mainVar()] = *it;
+			CARL_LOG_TRACE("carl.core.rootfinder", "Evaluating " << mvpoly << " on " << IRmap);
 			if (!RealAlgebraicNumberEvaluation::evaluate(mvpoly, IRmap).isZero()) {
 				CARL_LOG_TRACE("carl.core.rootfinder", "Purging spurious root " << *it);
 				it = res.erase(it);
