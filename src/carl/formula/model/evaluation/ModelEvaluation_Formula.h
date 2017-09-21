@@ -13,9 +13,15 @@ namespace model {
 	
 	template<typename Rational, typename Poly>
 	void substituteSubformulas(Formula<Poly>& f, const Model<Rational,Poly>& m) {
+		CARL_LOG_DEBUG("carl.model.evaluation", "Evaluating " << f << " on " << m);
 		Formulas<Poly> res = f.subformulas();
-		for (auto& r: res) substitute(r, m);
+		for (auto& r: res) {
+			CARL_LOG_DEBUG("carl.model.evaluation", "Evaluating " << r << " on " << m);
+			r = substitute(r, m);
+			CARL_LOG_DEBUG("carl.model.evaluation", "Result: " << r);
+		}
 		f = Formula<Poly>(f.getType(), std::move(res));
+		CARL_LOG_DEBUG("carl.model.evaluation", "Result: " << f);
 	}
 
 	template<typename Rational, typename Poly>

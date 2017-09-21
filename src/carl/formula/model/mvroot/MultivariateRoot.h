@@ -86,7 +86,7 @@ const Variable MultivariateRoot<Poly>::sVar = carl::VariablePool::getInstance().
 
 template<typename P>
 std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
-	return os << "root(" << mr.poly() << ", " << mr.k() << ", " << MultivariateRoot<P>::var() << " = " << mr.var().getId() << ")";
+	return os << "root(" << mr.poly() << ", " << mr.k() << ", " << MultivariateRoot<P>::var() << ")";
 }
 
 }
