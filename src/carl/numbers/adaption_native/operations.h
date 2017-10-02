@@ -175,6 +175,9 @@ inline double pow(double in, uint exp) {
 inline double log(double in) {
 	return std::log(in);
 }
+inline double log10(double in) {
+	return std::log10(in);
+}
 
 /**
  * Returns the highest power of two below n.

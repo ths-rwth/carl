@@ -366,6 +366,9 @@ inline mpq_class lcm(const mpq_class& a, const mpq_class& b) {
 inline mpq_class log(const mpq_class& n) {
 	return carl::rationalize<mpq_class>(std::log(mpq_class(n).get_d()));
 }
+inline mpq_class log10(const mpq_class& n) {
+	return carl::rationalize<mpq_class>(std::log10(mpq_class(n).get_d()));
+}
 
 inline mpq_class sin(const mpq_class& n) {
 	return carl::rationalize<mpq_class>(std::sin(mpq_class(n).get_d()));
