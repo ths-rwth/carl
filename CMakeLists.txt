@@ -16,27 +16,19 @@ cmake_minimum_required (VERSION 3.2 FATAL_ERROR)
 # # # # # # # # # # # # # # # # # # # # # #
 project(carl CXX)
 
+# path to find own modules
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+# Include own macros.
+include( carlmacros )
+
+set_version(17 08)
+
 set( PROJECT_FULLNAME "carl")
 set( PROJECT_DESCRIPTION "Computer ARithmetic Library")
-set( carl_YEARVERSION 17)
-set( carl_MONTHVERSION 08)
-set( carl_MAINTENANCEVERSION 0)
-if(carl_MAINTENANCEVERSION GREATER 0)
-	set(carl_VERSION "${carl_YEARVERSION}.${carl_MONTHVERSION}.${carl_MAINTENANCEVERSION}")
-else()
-	set(carl_VERSION "${carl_YEARVERSION}.${carl_MONTHVERSION}")
-endif()
-set( PROJECT_VERSION "${carl_VERSION}")
 set( carl_NAME "CArL" )
 set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
-# path to find own modules
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-# for cmake 2.8.7
-include(FindPackageHandleStandardArgs)
-
-# Include own macros.
-include( carlmacros )
+message(STATUS "Version: ${PROJECT_FULLNAME} ${PROJECT_VERSION}")
 
 # # # # # # # # # # # # # # # # # # # # # #
 # B. Options

@@ -5,6 +5,26 @@
 #
 # This file contains several macros which are used in this project. Notice that several are copied straight from web ressources.
 
+function(set_version major minor)
+	execute_process(
+		COMMAND git describe
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		OUTPUT_VARIABLE GIT_VERSION
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+	string(REGEX REPLACE "${major}.${minor}-" "" patch "${GIT_VERSION}")
+	set(PROJECT_VERSION_PATCH ${patch} PARENT_SCOPE)
+
+	set(PROJECT_VERSION_MAJOR ${major} PARENT_SCOPE)
+	set(PROJECT_VERSION_MINOR ${minor} PARENT_SCOPE)
+	set(PROJECT_VERSION_PATCH ${patch} PARENT_SCOPE)
+	if(patch)
+		set(PROJECT_VERSION "${major}.${minor}.${patch}" PARENT_SCOPE)
+	else()
+		set(PROJECT_VERSION "${major}.${minor}" PARENT_SCOPE)
+	endif()
+endfunction(set_version)
+
 function(add_imported_library_interface name include)
 	add_library(${name} INTERFACE IMPORTED)
 	set_target_properties(${name} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${include}")
