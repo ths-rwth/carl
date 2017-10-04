@@ -25,6 +25,7 @@ matrix:
   include:
     - stage: dependencies
       os: linux
+      compiler: g++-5
       env: CC=gcc-5 CXX=g++-5
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -33,10 +34,12 @@ matrix:
           packages: [*packages_base, g++-5]
     - stage: dependencies
       os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: dependencies
       os: linux
+      compiler: g++-7
       env: CC=gcc-7 CXX=g++-7
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -45,6 +48,7 @@ matrix:
           packages: [*packages_base, g++-7]
     - stage: dependencies
       os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=coverage
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -53,6 +57,7 @@ matrix:
           packages: [*packages_base, lcov]
     - stage: dependencies
       os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=pycarl
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -61,10 +66,12 @@ matrix:
           packages: [*packages_base, python3]
     - stage: dependencies
       os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=addons
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: build
       os: linux
+      compiler: clang++-3.6
       env: CC=clang-3.6 CXX=clang++-3.6
       script: source .ci/build.sh
       addons:
@@ -73,6 +80,7 @@ matrix:
           packages: [*packages_base, clang-3.6]
     - stage: build
       os: linux
+      compiler: clang++-3.7
       env: CC=clang-3.7 CXX=clang++-3.7
       script: source .ci/build.sh
       addons:
@@ -81,6 +89,7 @@ matrix:
           packages: [*packages_base, clang-3.7]
     - stage: build
       os: linux
+      compiler: clang++-3.8
       env: CC=clang-3.8 CXX=clang++-3.8
       script: source .ci/build.sh
       addons:
@@ -89,6 +98,7 @@ matrix:
           packages: [*packages_base, clang-3.8]
     - stage: build
       os: linux
+      compiler: clang++-3.9
       env: CC=clang-3.9 CXX=clang++-3.9
       script: source .ci/build.sh
       addons:
@@ -97,6 +107,7 @@ matrix:
           packages: [*packages_base, clang-3.9]
     - stage: build
       os: linux
+      compiler: clang++-4.0
       env: CC=clang-4.0 CXX=clang++-4.0
       script: source .ci/build.sh
       addons:
@@ -105,6 +116,7 @@ matrix:
           packages: [*packages_base, clang-4.0]
     - stage: build
       os: linux
+      compiler: clang++-5.0
       env: CC=clang-5.0 CXX=clang++-5.0
       script: source .ci/build.sh
       addons:
@@ -113,6 +125,7 @@ matrix:
           packages: [*packages_base, clang-5.0]
     - stage: build
       os: linux
+      compiler: g++-5
       env: CC=gcc-5 CXX=g++-5
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -121,10 +134,12 @@ matrix:
           packages: [*packages_base, g++-5]
     - stage: build
       os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: build
       os: linux
+      compiler: g++-7
       env: CC=gcc-7 CXX=g++-7
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -133,6 +148,7 @@ matrix:
           packages: [*packages_base, g++-7]
     - stage: build
       os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=coverage
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -141,6 +157,7 @@ matrix:
           packages: [*packages_base, lcov]
     - stage: build
       os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=doxygen
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -149,6 +166,7 @@ matrix:
           packages: [*packages_base, doxygen, texinfo, texlive]
     - stage: build
       os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=pycarl
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -157,10 +175,12 @@ matrix:
           packages: [*packages_base, python3]
     - stage: build
       os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=addons
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: build
       os: linux
+      compiler: clang++-5.0
       env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
       script: source .ci/build.sh
       addons:

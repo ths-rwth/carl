@@ -27,7 +27,10 @@ matrix:
     - stage: {{ job.stage }}
       os: {{ job.os }}
   {%- if job.osx_image %}
-      osx_image: {{ job.osx_image}}
+      osx_image: {{ job.osx_image }}
+  {%- endif %}
+  {%- if job.compiler %}
+      compiler: {{ job.compiler }}
   {%- endif %}
   {%- if job.env|length > 0 %}
       env: {{ job.env|join(' ') }}

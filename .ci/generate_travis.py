@@ -26,7 +26,17 @@ def softreduce(elems, initial):
 
 def applymapper(j, entry, m):
 	if entry not in j: return j
-	return softmerge(j, m.get(j[entry], {}))
+	if isinstance(j[entry], list):
+		tmp = j.copy()
+		del tmp[entry]
+		for l in j[entry]:
+			if l in m:
+				tmp = softmerge(tmp, m[l])
+			else:
+				tmp[entry].append(l)
+		return tmp
+	else:
+		return softmerge(j, m.get(j[entry], {}))
 
 def applypropmapper(j, prop, m):
 	if prop not in j: return j
@@ -40,20 +50,20 @@ osmap = {
 }
 
 envs = {
-	"clang-3.6": ["CC=clang-3.6 CXX=clang++-3.6"],
-	"clang-3.7": ["CC=clang-3.7 CXX=clang++-3.7"],
-	"clang-3.8": ["CC=clang-3.8 CXX=clang++-3.8"],
-	"clang-3.9": ["CC=clang-3.9 CXX=clang++-3.9"],
-	"clang-4.0": ["CC=clang-4.0 CXX=clang++-4.0"],
-	"clang-5.0": ["CC=clang-5.0 CXX=clang++-5.0"],
-	"g++-5": ["CC=gcc-5 CXX=g++-5"],
-	"g++-6": ["CC=gcc-6 CXX=g++-6"],
-	"g++-7": ["CC=gcc-7 CXX=g++-7"],
-	"coverage": ["TASK=coverage"],
-	"doxygen": ["TASK=doxygen"],
-	"pycarl": ["TASK=pycarl"],
-	"addons": ["TASK=addons"],
-	"tidy": ["TASK=tidy"],
+	"clang-3.6": {"env": ["CC=clang-3.6 CXX=clang++-3.6"], "compiler": "clang++-3.6"},
+	"clang-3.7": {"env": ["CC=clang-3.7 CXX=clang++-3.7"], "compiler": "clang++-3.7"},
+	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8"},
+	"clang-3.9": {"env": ["CC=clang-3.9 CXX=clang++-3.9"], "compiler": "clang++-3.9"},
+	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0"},
+	"clang-5.0": {"env": ["CC=clang-5.0 CXX=clang++-5.0"], "compiler": "clang++-5.0"},
+	"g++-5": {"env": ["CC=gcc-5 CXX=g++-5"], "compiler": "g++-5"},
+	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6"},
+	"g++-7": {"env": ["CC=gcc-7 CXX=g++-7"], "compiler": "g++-7"},
+	"coverage": {"env": ["TASK=coverage"]},
+	"doxygen": {"env": ["TASK=doxygen"]},
+	"pycarl": {"env": ["TASK=pycarl"]},
+	"addons": {"env": ["TASK=addons"]},
+	"tidy": {"env": ["TASK=tidy"]},
 }
 
 apts = {
@@ -125,7 +135,7 @@ jobs = [
 mapper = [
 	partial(multimap, stagemapper),
 	partial(map, lambda j: applymapper(j, "os", osmap)),
-	partial(map, lambda j: applypropmapper(j, "env", envs)),
+	partial(map, lambda j: applymapper(j, "env", envs)),
 	partial(map, lambda j: applypropmapper(j, "script", script)),
 	partial(map, aptmapper),
 ]
