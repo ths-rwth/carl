@@ -4,6 +4,8 @@
 #	${include_dirs}
 #)
 
+set(LIB_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+
 # include util in library.
 add_subdirectory(util)
 
@@ -20,8 +22,8 @@ file(GLOB_RECURSE carl_lib_sources "*.cpp")
 add_library(lib_carl SHARED ${carl_lib_sources})
 add_dependencies(lib_carl resources)
 set_target_properties( lib_carl PROPERTIES
-	VERSION "${PROJECT_VERSION}"
-	SOVERSION "${PROJECT_VERSION}"
+	VERSION "${LIB_VERSION}"
+	SOVERSION "${LIB_VERSION}"
 	CLEAN_DIRECT_OUTPUT 1
 	OUTPUT_NAME carl
 	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -51,8 +53,8 @@ if(BUILD_STATIC)
 	add_library(lib_carl_static STATIC ${carl_lib_sources})
 	add_dependencies(lib_carl_static resources)
 	set_target_properties( lib_carl_static PROPERTIES
-		VERSION "${PROJECT_VERSION}"
-		SOVERSION "${PROJECT_VERSION}"
+		VERSION "${LIB_VERSION}"
+		SOVERSION "${LIB_VERSION}"
 		CLEAN_DIRECT_OUTPUT 1
 		OUTPUT_NAME carl
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
