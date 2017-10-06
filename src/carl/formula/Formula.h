@@ -979,6 +979,10 @@ namespace carl
                 assert( _formula.getId() != 0 );
                 return mpContent->mId >= _formula.getId();
             }
+			
+			Formula operator!() const {
+				return negated();
+			}
 
         private:
             
