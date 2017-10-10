@@ -1,3 +1,5 @@
+option( COVERAGE "Enable collection of coverage statistics" OFF )
+
 if (COVERAGE)
 	if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 		message(SEND_ERROR "Coverage collection with clang is not supported yet.")

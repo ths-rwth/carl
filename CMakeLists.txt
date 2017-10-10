@@ -58,9 +58,6 @@ export_option(BUILD_STATIC)
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
-option( COVERAGE "Enable collection of coverage statistics" OFF )
-option( EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
-option( ENABLE_PACKAGING "Use CPack for packaging." OFF)
 
 set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
 set_property(CACHE CLANG_SANITIZER PROPERTY STRINGS none address memory thread)
@@ -155,61 +152,16 @@ if (NOT WIN32)
 	list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
 endif()
 
-# # # # # # # # # # # # # # # # # # # # # #
-# D. Writen information files
-# # # # # # # # # # # # # # # # # # # # # #
-
-# Getting git info (To be added later)
-#include(GetGitRevisionDescription)
-#get_git_head_revision(GIT_REFSPEC GIT_SHA1)
-
 include(clang-tidy)
 include(coverage)
 
-# # # # # # # # # # # # # # # # # # # # # #
-# E. Invoke subdirectories.
-# # # # # # # # # # # # # # # # # # # # # #
-
 add_subdirectory(src)
 
-# # # # # # # # # # # # # # # # # # # # # #
-# F. Export Compile Information
-# # # # # # # # # # # # # # # # # # # # # #
-
 include(export)
-
-#write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
-#	 VERSION 0.1.0
-# COMPATIBILITY SameMajorVersion )
-# ... for the install tree
-#file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
-#set(CONF_INCLUDE_DIRS "\${carl_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-#configure_package_config_file(cmake/carlConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake
-#							  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
-#							  PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
-#							 )
-#install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
-#		DESTINATION ${CMAKE_INSTALL_DIR} )
-
-
-	
-
-# Install the export set for use with the install-tree
-#install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
-
-# # # # # # # # # # # # # # # # # # # # # #
-# G. CPack
-# # # # # # # # # # # # # # # # # # # # # #
-
 
 if (BINDINGS_PYTHON)
 	add_subdirectory(bindings/pycarl)
 endif()
 
 include(resources/addons/addons.cmake)
-
-if(ENABLE_PACKAGING)
-	include(packaging)
-endif()
-
-# add_subdirectory(bindings)
+include(packaging)
