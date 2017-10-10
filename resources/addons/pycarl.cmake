@@ -17,7 +17,8 @@ ExternalProject_Add_Step(pycarl create-venv
     DEPENDEES download
 )
 
-add_dependencies(pycarl carl-parser)
+add_dependencies(pycarl lib_carl carl-parser)
+add_dependencies(addons pycarl)
 
 add_test(NAME pycarl
     COMMAND . pycarl-env/bin/activate && py.test tests/
