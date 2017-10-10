@@ -4,7 +4,7 @@ ExternalProject_Add(
     GIT_REPOSITORY https://github.com/moves-rwth/pycarl.git
     BUILD_IN_SOURCE YES
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND . pycarl-venv/bin/activate && python setup.py build_ext -j 1 develop
+    BUILD_COMMAND . pycarl-venv/bin/activate && python setup.py build_ext --carl-dir ${CMAKE_BINARY_DIR} -j 1 develop
     INSTALL_COMMAND ""
 )
 
