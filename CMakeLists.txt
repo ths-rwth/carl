@@ -62,8 +62,6 @@ option( COVERAGE "Enable collection of coverage statistics" OFF )
 option( EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
 option( ENABLE_PACKAGING "Use CPack for packaging." OFF)
 
-option( BUILD_ADDONS "Build addons" OFF )
-
 set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
 set_property(CACHE CLANG_SANITIZER PROPERTY STRINGS none address memory thread)
 
@@ -208,9 +206,7 @@ if (BINDINGS_PYTHON)
 	add_subdirectory(bindings/pycarl)
 endif()
 
-if(BUILD_ADDONS)
-	include(resources/addons/addons.cmake)
-endif()
+include(resources/addons/addons.cmake)
 
 if(ENABLE_PACKAGING)
 	include(packaging)

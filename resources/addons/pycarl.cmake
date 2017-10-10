@@ -12,14 +12,15 @@ ExternalProject_Add(
     GIT_REPOSITORY https://github.com/moves-rwth/pycarl.git
     BUILD_IN_SOURCE YES
     CONFIGURE_COMMAND ${VIRTUALENV} -p python3 pycarl-venv
-    BUILD_COMMAND ./pycarl-venv/bin/python setup.py build_ext -j 1 develop
+    BUILD_COMMAND ./pycarl-venv/bin/python setup.py build_ext --carl-dir ${CMAKE_BINARY_DIR} -j 1 develop
     INSTALL_COMMAND ""
     TEST_COMMAND ./pycarl-venv/bin/pip install pytest
 )
 
 ExternalProject_Get_Property(pycarl SOURCE_DIR)
 
-add_dependencies(pycarl carl-parser)
+add_dependencies(pycarl lib_carl carl-parser)
+add_dependencies(addons pycarl)
 
 add_test(NAME pycarl
     COMMAND ./pycarl-venv/bin/python -m pytest tests

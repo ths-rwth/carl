@@ -172,7 +172,7 @@ public:
 	 * @param rhs Variable.
 	 * @return `os`
 	 */
-	friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs) {
+	friend std::ostream& operator<<(std::ostream& os, Variable rhs) {
 		#ifdef CARL_USE_FRIENDLY_VARNAMES
         return os << rhs.getName();
 		#else
@@ -193,22 +193,22 @@ public:
 	 * @param rhs Second variable.
 	 * @return `lhs ~ rhs`, `~` being the relation that is checked.
 	 */
-	friend bool operator==(Variable::Arg lhs, Variable::Arg rhs) noexcept {
+	friend bool operator==(Variable lhs, Variable rhs) noexcept {
 		return lhs.mContent == rhs.mContent;
 	}
-	friend bool operator!=(Variable::Arg lhs, Variable::Arg rhs) noexcept {
+	friend bool operator!=(Variable lhs, Variable rhs) noexcept {
 		return lhs.mContent != rhs.mContent;
 	}
-	friend bool operator<(Variable::Arg lhs, Variable::Arg rhs) noexcept {
+	friend bool operator<(Variable lhs, Variable rhs) noexcept {
 		return lhs.mContent < rhs.mContent;
 	}
-	friend bool operator<=(Variable::Arg lhs, Variable::Arg rhs) noexcept {
+	friend bool operator<=(Variable lhs, Variable rhs) noexcept {
 		return lhs.mContent <= rhs.mContent;
 	}
-	friend bool operator>(Variable::Arg lhs, Variable::Arg rhs) noexcept {
+	friend bool operator>(Variable lhs, Variable rhs) noexcept {
 		return lhs.mContent > rhs.mContent;
 	}
-	friend bool operator>=(Variable::Arg lhs, Variable::Arg rhs) noexcept {
+	friend bool operator>=(Variable lhs, Variable rhs) noexcept {
 		return lhs.mContent >= rhs.mContent;
 	}
 	/// @}

@@ -144,14 +144,14 @@ public:
 	 * @param variableName Flag, if a name set via setVariableName shall be considered.
 	 * @return Some name for the Variable.
 	 */
-	std::string getName(Variable::Arg v, bool variableName = true) const;
+	std::string getName(Variable v, bool variableName = true) const;
 	/**
 	 * Add a name for a given Variable.
 	 * This method is thread-safe.
 	 * @param v Variable.
 	 * @param name Some string naming the variable.
 	 */
-	void setName(Variable::Arg v, const std::string& name);
+	void setName(Variable v, const std::string& name);
 
 	/**
 	 * Sets the prefix used when printing anonymous variables.

@@ -67,7 +67,7 @@ Variable VariablePool::findVariableWithName(const std::string& name) const noexc
 	return Variable::NO_VARIABLE;
 }
 
-std::string VariablePool::getName(Variable::Arg v, bool variableName) const {
+std::string VariablePool::getName(Variable v, bool variableName) const {
 	if (v.getId() == 0) return "NO_VARIABLE";
 	if (variableName) {
         SETNAME_LOCK_GUARD
@@ -94,7 +94,7 @@ std::string VariablePool::getName(Variable::Arg v, bool variableName) const {
 	}
 }
 
-void VariablePool::setName(Variable::Arg v, const std::string& name) {
+void VariablePool::setName(Variable v, const std::string& name) {
 	#ifdef CARL_USE_FRIENDLY_VARNAMES
 	SETNAME_LOCK_GUARD
 	mVariableNames[v] = name;
