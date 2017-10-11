@@ -63,7 +63,7 @@ elif [[ ${TASK} == "tidy" ]]; then
 
 elif [[ ${TASK} == "addons" ]]; then
 	
-	cmake -D BUILD_ADDONS=ON -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
+	cmake -D BUILD_ADDONS=ON -D BUILD_ADDON_PARSER=ON -D BUILD_ADDON_PYCARL=ON -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
 	
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
