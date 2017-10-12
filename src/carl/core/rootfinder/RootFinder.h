@@ -27,11 +27,7 @@ namespace rootfinder {
 // realRoots() for univariate polynomials
 
 /**
- * Finds all real roots of a univariate polynomial with numeric coefficients within a given interval.
- * @param polynomial
- * @param interval
- * @param pivoting
- * @return
+ * Find all real roots of a univariate 'polynomial' with numeric coefficients within a given 'interval'.
  */
 template<typename Coeff, typename Number, typename Finder = IncrementalRootFinder<Number>, EnableIf<std::is_same<Coeff, Number>> = dummy>
 std::vector<RealAlgebraicNumber<Number>> realRoots(
@@ -46,12 +42,8 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 }
 
 /**
- * Finds all real roots of a univariate polynomial with non-numeric coefficients within a given interval.
- * This method asserts that all these coefficients are however numbers wrapped in another type and tries to retrieve the numbers using .constantPart();
- * @param polynomial
- * @param interval
- * @param pivoting
- * @return
+ * Find all real roots of a univariate 'polynomial' with non-numeric coefficients within a given 'interval'.
+ * However, all coefficients must be types that contain numeric numbers that are retrievable by using .constantPart();
  */
 template<typename Coeff, typename Number, DisableIf<std::is_same<Coeff, Number>> = dummy>
 std::vector<RealAlgebraicNumber<Number>> realRoots(
@@ -63,13 +55,11 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 	return realRoots(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constantPart(); })), interval, pivoting);
 }
 
+
 /**
- * Convenience method so we can swap the arguments and omit the interval but give a strategy.
- * Calls realRoots with the given univariate polynomial.
- * @param polynomial
- * @param pivoting
- * @param interval
- * @return
+ * Find all real roots of a univariate 'polynomial' with non-numeric coefficients within a given 'interval'.
+ * However, all coefficients must be types that contain numeric numbers that are retrievable by using .constantPart();
+ * Note that this is a convenience method with swapped arguments to omit the interval but give a strategy.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
 std::vector<RealAlgebraicNumber<Number>> realRoots(
@@ -85,20 +75,20 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 // realRoots() for multivariate polynomials
 
 /**
- * Finds all real roots of the polynomial p within the given interval.
- *
- * This methods substitutes all variables of the coefficients of p as given in the map.
- * It asserts that
+ * Replace all variables except one of the multivariate polynomial 'p' by
+ * numbers as given in the mapping 'm', which creates a univariate polynomial,
+ * and return all roots of that created polynomial.
+ * Note that 'p' is represented as a univariate polynomial with polynomial coefficients.
+ * Its main variable is not replaced and stays the main variable of the created polynomial.
+ * However, all variables in the polynomial coefficients are replaced, which is why
  * <ul>
- *   <li>the main variable of p is not in m</li>
- *   <li>all variables from the coefficients of p are in m</li>
+ *   <li>the main variable of 'p' must not be in 'm'</li>
+ *   <li>all variables from the coefficients of 'p' must be in 'm'</li>
  * </ul>
- * If the return value is boost::none, the polynomial evaluated to zero.
- * @param p
- * @param m
- * @param interval
- * @param pivoting
- * @return
+ * Note that boost::none is returned if replacing variables in 'p' already yields
+ * the zero-polynomial and no valid root computation is possible.
+ * However, if it's a non-zero-polynomial that simply has no roots, an empty vector 
+ * of roots is returned.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
 boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
@@ -122,12 +112,9 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 /////////////////////////
 
 /**
- * Calculates the number of real roots of the given polynomial within the given interval.
- * Uses realRoots() to obtain the real roots.
- * @param polynomial
- * @param interval
- * @param pivoting
- * @return
+ * Count only the number of real roots of the 'polynomial' within the given 'interval'.
+ * However, this function uses realRoots() to obtain the real roots.
+ * TODO What's the point of this function? We can use realRoots(..).size().
  */
 template<typename Coeff, typename Number= typename UnderlyingNumberType<Coeff>::type>
 uint countRealRoots(

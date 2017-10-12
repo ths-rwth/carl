@@ -8,6 +8,9 @@
 
 namespace carl {
 namespace ran {
+  /**
+   * FIX isn't this the standard representation of a real algebraic number?
+   */
 	template<typename Number>
 	struct IntervalContent {
 		using Polynomial = UnivariatePolynomial<Number>;

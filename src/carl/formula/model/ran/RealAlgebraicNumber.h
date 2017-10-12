@@ -14,6 +14,24 @@
 
 namespace carl {
 
+/**
+ * Represent a real algebraic number either implicitly by a polynomial and an interval 
+ * or explicitly by a single, more performant rational number if that number is only finitely long,
+ * or explicitly by a more advanced Thom encoding.
+ * FIX what is the Thom encoding and when and why should someone use it? 
+ * FIX Add design explanation why there are three representation mixed into one class?
+ * Rationale:
+ * A real number cannot always be adequately represented in finite memory, since
+ * it may be infinitely long. Representing
+ * it by a float or any other finite-precision representation as well as doing 
+ * arithmatic may introduce unacceptable rouding errors.
+ * Real algebraic numbers are a subset of the real numbers without those drawbacks.
+ * A real number is algebraic if it's the root of some univariate polynomial with
+ * rational coefficients, so it always has an implicit, finite, full-precision 
+ * representation by such a polynomial and an isolating interval that uniquely 
+ * contains this root (and no other root). It is also possible
+ * to do relatively fast arithmetic with this representation without rounding errors.
+ */
 template<typename Number>
 class RealAlgebraicNumber {
 private:
@@ -24,16 +42,22 @@ private:
 	using Polynomial = typename IntervalContent::Polynomial;
 	
 	mutable Number mValue = carl::constant_zero<Number>::get();
+	// A flag/tag that a user of this class can set.
+	// It indicates that this number stems from an outside root computation.
 	bool mIsRoot = true;
+	// FIX why is it a shared pointer? Why would we need to share the same Interval Representation?
+	// FIX change variable name to mIntervalRepresentation or similar
 	mutable std::shared_ptr<IntervalContent> mIR;
 	std::shared_ptr<ThomEncoding<Number>> mTE;
 	
+	//FIX change name to 'makeNumericIfPossible' or similar, since this function doesn't just check.
 	void checkForSimplification() const {
 		if (mIR && mIR->interval.isPointInterval()) {
 			switchToNR(mIR->interval.lower());
 		}
 	}
-	
+	// Switch to numeric representation.
+	// FIX why is it declared a const member function if it changes this object?
 	void switchToNR(const Number& n) const {
 		mValue = n;
 		if (mIR) {
@@ -92,6 +116,9 @@ public:
 	RealAlgebraicNumber& operator=(const RealAlgebraicNumber& n) = default;
 	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) = default;
 	
+	/**
+	 * Return the size of this representation in memory in number of bits.
+	 */
 	std::size_t size() const {
 		if (isNumeric()) return carl::bitsize(mValue);
 		else if (isInterval()) return carl::bitsize(mIR->interval.lower()) + carl::bitsize(mIR->interval.upper()) * mIR->polynomial.degree();
@@ -99,15 +126,14 @@ public:
 	}
 	
 	/**
-	 * @return the flag marking whether the real algebraic number stems from a root computation or not
+	 * Check if this number stems from an outside root computation.
 	 */
 	bool isRoot() const {
 		return mIsRoot;
 	}
 
 	/**
-	 * Set the flag marking whether the real algebraic number stems from a root computation or not.
-	 * @param isRoot
+	 * Set the flag marking whether the number stems from an outside root computation.
 	 */
 	void setIsRoot(bool isRoot) noexcept {
 		mIsRoot = isRoot;
@@ -120,14 +146,26 @@ public:
 		else return false;
 	}
 	
+	/**
+	 * Check if the underlying representation is an explicit number.
+	 */
 	bool isNumeric() const {
 		checkForSimplification();
 		return !mIR && !mTE;
 	}
+	/**
+	 * Check if the underlying representation is an implict number
+	 * (encoded by a polynomial and an interval).
+	 */
 	bool isInterval() const {
 		checkForSimplification();
 		return bool(mIR);
 	}
+	
+	/**
+	 * Check if the underlying representation is an explicit number
+	 * that uses the Thom encoding.
+	 */
 	bool isThom() const noexcept {
 		return bool(mTE);
 	}
@@ -213,6 +251,10 @@ public:
 		else return false;
 	}
 	
+	/**
+	 * Check if this (possibly implicitly represented) number lies within
+	 * the bounds of interval 'i'.
+	 */
 	bool containedIn(const Interval<Number>& i) const {
 		if (isNumeric()) return i.contains(mValue);
 		else if (isInterval()) {

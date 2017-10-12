@@ -63,8 +63,7 @@ namespace carl
    template <class Number> struct is_interval<const carl::Interval<Number>> : std::true_type {};
 
    /**
-	* Function which determines, if the interval is the zero interval.
-	* @return True if it is a pointinterval rooted at 0.
+	* Check if this interval is a point-interval containing 0.
 	*/
    template<typename Number>
    static bool isZero(const Interval<Number>& _in)
@@ -73,8 +72,7 @@ namespace carl
    }
 
    /**
-	* Function which determines, if the interval is the one interval.
-	* @return True if it is a pointinterval rooted at 1.
+	* Check if this interval is a point-interval containing 1.
 	*/
    template<typename Number>
    static bool isOne(const Interval<Number>& _in)

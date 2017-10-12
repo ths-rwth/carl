@@ -17,7 +17,8 @@ template<typename Number> class RealAlgebraicPoint;
 namespace carl {
 
 /**
- * A RealAlgebraicPoint represents a multidimensional point that consists of real algebraic numbers.
+ * Represent a multidimensional point consisting of a real algebraic number for
+ * each coordinate.
  */
 template<typename Number>
 class RealAlgebraicPoint {

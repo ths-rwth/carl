@@ -131,6 +131,15 @@ public:
 	Poly gcd(const Poly& p1, const Poly& p2) const {
 		return convert(CoCoA::gcd(convert(p1), convert(p2)));
 	}
+	
+	/**
+	 * Break down a polynomial into its irreducible factors.
+	 * Note that one of those factors is a constant-polynomial (of degree 0), 
+	 * which is included by default but can be left out by setting the flag 
+	 * 'includeConstants' to false, e.g., for root computations.
+	 * TODO The Cocoa Doc mentions only 1 constant-poly, but why is this flag
+	 * called 'includeConstants'?
+	 */
 	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
 		auto finfo = CoCoA::factor(convert(p));
 		Factors<Poly> res;
