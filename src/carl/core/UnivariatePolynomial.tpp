@@ -1784,17 +1784,12 @@ const std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::prin
 ) {
 	// Attention: Mathematica / Wolframalpha has one entry less (the last one) which is identical to p!
 	std::list<UnivariatePolynomial<Coeff>> subres = UnivariatePolynomial<Coeff>::subresultants(p, q, strategy);
+	CARL_LOG_DEBUG("carl.upoly", "PSC of " << p << " and " << q << " on " << p.mainVar() << ": " << subres);
 	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs;
 	uint i = 0;
 	for (const auto& s: subres) {
 		assert(!s.isZero());
-		if (s.degree() < i) {
-			// this and all further subresultants won't have a non-zero i-th coefficient
-			break;
-		}
-		assert(s.degree() == i);
 		subresCoeffs.emplace_back(s.mainVar(), s.lcoeff());
-		i++;
 	}
 	return subresCoeffs;
 }
