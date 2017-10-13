@@ -10,10 +10,13 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 		chmod +x cmake-3.7.2-Linux-x86_64.sh
 		./cmake-3.7.2-Linux-x86_64.sh --prefix=$PREFIX --exclude-subdir --skip-license
 	fi
+	if [ ! -f $PREFIX/bin/doxygen ]; then
+		wget -nv http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.linux.bin.tar.gz
+		tar -xzf doxygen-1.8.13.linux.bin.tar.gz -C $PREFIX/bin/
+		cp $PREFIX/bin/doxygen-*/bin/* $PREFIX/bin/
+	fi
 
 	export PATH="$PREFIX/bin:$PATH"
-
-	cmake --version#
 
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
