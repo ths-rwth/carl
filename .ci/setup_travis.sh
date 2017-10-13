@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+git fetch --unshallow
+
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 
 	mkdir -p ~/usr
