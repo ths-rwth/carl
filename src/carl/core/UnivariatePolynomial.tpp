@@ -1786,7 +1786,6 @@ const std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::prin
 	std::list<UnivariatePolynomial<Coeff>> subres = UnivariatePolynomial<Coeff>::subresultants(p, q, strategy);
 	CARL_LOG_DEBUG("carl.upoly", "PSC of " << p << " and " << q << " on " << p.mainVar() << ": " << subres);
 	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs;
-	uint i = 0;
 	for (const auto& s: subres) {
 		assert(!s.isZero());
 		subresCoeffs.emplace_back(s.mainVar(), s.lcoeff());

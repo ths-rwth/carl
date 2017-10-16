@@ -67,7 +67,7 @@ auto s = carl::createFunctionSelector<TypeSelector, types>(
 #if defined USE_GINAC
 	,
 	[](const auto& n1, const auto& n2){ return ginacGcd<Polynomial>( n1, n2 ); },
-	[](const auto& n1, const auto& n2){ return ginacGcd<Polynomial>( n1, n2 );}
+	[](const auto& n1, const auto& n2){ return ginacGcd<Polynomial>( n1, n2 ); }
 #endif
 );
 	return s(mp1, mp2);
