@@ -12,7 +12,7 @@ function(set_version major minor)
 		OUTPUT_VARIABLE GIT_VERSION
 		OUTPUT_STRIP_TRAILING_WHITESPACE
 	)
-	string(REGEX REPLACE "${major}.${minor}-" "" patch "${GIT_VERSION}")
+	string(REGEX REPLACE "${major}.${minor}-?" "" patch "${GIT_VERSION}")
 	
 	set(PROJECT_VERSION_MAJOR ${major} PARENT_SCOPE)
 	set(PROJECT_VERSION_MINOR ${minor} PARENT_SCOPE)
