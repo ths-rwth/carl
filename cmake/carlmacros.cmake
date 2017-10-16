@@ -12,7 +12,16 @@ function(set_version major minor)
 		OUTPUT_VARIABLE GIT_VERSION
 		OUTPUT_STRIP_TRAILING_WHITESPACE
 	)
-	string(REGEX REPLACE "${major}.${minor}-?" "" patch "${GIT_VERSION}")
+	set(patch "")
+	if (GIT_VERSION MATCHES "([0-9]+)\.([0-9]+)(-?.*)")
+		set(major ${CMAKE_MATCH_1})
+		set(minor ${CMAKE_MATCH_2})
+		if (CMAKE_MATCH_3 MATCHES "-([0-9]+)-(g[0-9a-f]+)")
+			set(patch "${CMAKE_MATCH_1}-${CMAKE_MATCH_2}")
+		endif()
+	else()
+		message(STATUS "Could not parse version from git, using ${major}.${minor}")
+	endif()
 	
 	set(PROJECT_VERSION_MAJOR ${major} PARENT_SCOPE)
 	set(PROJECT_VERSION_MINOR ${minor} PARENT_SCOPE)
