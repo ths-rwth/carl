@@ -67,7 +67,7 @@ namespace carl
 		void setBit(unsigned pos, bool val = true) {
 			static_assert(sizeof(unsigned) == 4, "Currently bitvectors are only supported on these platforms.");
 			unsigned vecElem = pos >> 5;
-			unsigned mask = unsigned(1);
+			unsigned mask = 1;
 			mask <<= (pos & unsigned(31));
 			if(vecElem >=  mBits.size()) {
 				mBits.resize(std::size_t(vecElem) + 1, 0);

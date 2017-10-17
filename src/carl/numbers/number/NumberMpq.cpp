@@ -4,6 +4,8 @@
 #include "NumberClRA.h"
 #include "NumberMpz.h"
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 
 namespace carl {

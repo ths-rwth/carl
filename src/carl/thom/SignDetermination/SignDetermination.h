@@ -105,8 +105,8 @@ private:
 	}       
 	static Eigen::MatrixXf adaptedMat(const std::list<Alpha>& ada, const std::list<SignCondition>& signs) {
 		Eigen::MatrixXf res(ada.size(), signs.size());
-		long i = 0;
-		long j = 0;
+		Eigen::Index i = 0;
+		Eigen::Index j = 0;
 		for (const auto& alpha : ada) {
 			for (const auto& sigma : signs) {
 				res(i, j) = float(sigmaToTheAlpha(alpha, sigma));
@@ -126,18 +126,18 @@ private:
 		}
 		return m3;
 	}
-	static void removeColumn(Eigen::MatrixXf& matrix, long colToRemove) {
-		long numRows = matrix.rows();
-		long numCols = matrix.cols()-1;
+	static void removeColumn(Eigen::MatrixXf& matrix, Eigen::Index colToRemove) {
+		Eigen::Index numRows = matrix.rows();
+		Eigen::Index numCols = matrix.cols()-1;
 
 		if (colToRemove < numCols) {
 			matrix.block(0, colToRemove, numRows, numCols - colToRemove) = matrix.block(0, colToRemove + 1 ,numRows, numCols - colToRemove);
 		}
 		matrix.conservativeResize(numRows, numCols);
 	} 
-	static void removeRow(Eigen::MatrixXf& matrix, long rowToRemove) {
-		long numRows = matrix.rows()-1;
-		long numCols = matrix.cols();
+	static void removeRow(Eigen::MatrixXf& matrix, Eigen::Index rowToRemove) {
+		Eigen::Index numRows = matrix.rows()-1;
+		Eigen::Index numCols = matrix.cols();
 
 		if (rowToRemove < numRows) {
 			matrix.block(rowToRemove,0,numRows-rowToRemove,numCols) = matrix.block(rowToRemove+1,0,numRows-rowToRemove,numCols);
@@ -183,11 +183,11 @@ private:
 
 		do {
 			Eigen::MatrixXf linesMat(n, mat.cols());
-			long row = 0;
+			Eigen::Index row = 0;
 			for(std::size_t i = 0; i < lines.size(); i++) {
 				if (lines[i] == 0) continue;
-				for (long j = 0; j < mat.cols(); j++) {
-					linesMat(row, j) = mat(long(i), j);
+				for (Eigen::Index j = 0; j < mat.cols(); j++) {
+					linesMat(row, j) = mat(Eigen::Index(i), j);
 				}
 				row++;
 			}

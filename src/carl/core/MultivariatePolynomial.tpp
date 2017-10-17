@@ -70,7 +70,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename C>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(EnableIfNotSame<C,sint> c) : MultivariatePolynomial(Coeff(c))
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(EnableIfNotSame<C,sint> c) : MultivariatePolynomial(fromInt<Coeff>(c))
 {
 	mOrdered = true;
 	assert(this->isConsistent());
@@ -78,7 +78,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(EnableIf
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename C>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(EnableIfNotSame<C,uint> c) : MultivariatePolynomial(Coeff(c))
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(EnableIfNotSame<C,uint> c) : MultivariatePolynomial(fromInt<Coeff>(c))
 {
 	mOrdered = true;
 	assert(this->isConsistent());

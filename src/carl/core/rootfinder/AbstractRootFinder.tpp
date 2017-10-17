@@ -18,105 +18,107 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		const Interval<Number>& _interval,
 		bool tryTrivialSolver
 	) :
-		originalPolynomial(_polynomial),
-		polynomial(_polynomial.squareFreePart()),
-		//polynomial(polynomial),
-		interval(_interval),
-		finished(false)
+		mOriginalPolynomial(_polynomial),
+		mPolynomial(_polynomial.squareFreePart()),
+		mInterval(_interval),
+		mFinished(false)
 {
-#ifdef ROOTFINDER_CACHE
-	if (this->inCache()) {
-		CARL_LOG_TRACE("carl.core.rootfinder", "Hit cache: " << this->originalPolynomial);
-		this->roots = cache[this->originalPolynomial];
-		this->finished = true;
-		return;
-	}
+#ifdef ROOTFIND1ER_CACHE
+	if (restoreFromCache()) return;
 #endif
-	CARL_LOG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial << " with interval " << this->interval);
-	if (this->polynomial.zeroIsRoot()) {
-		this->addRoot(RealAlgebraicNumber<Number>(0));
+	CARL_LOG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << mPolynomial << " with interval " << mInterval);
+	if (mPolynomial.zeroIsRoot()) {
+		CARL_LOG_DEBUG("carl.core.rootfinder", "Detected zero root in " << mPolynomial);
+		addRoot(RealAlgebraicNumber<Number>(0));
 	}
-	if (this->polynomial.isZero()) {
-		this->setFinished();
+	if (mPolynomial.isZero()) {
+		setFinished();
 		return;
 	}
-	if (tryTrivialSolver && this->solveTrivial()) {
+	if (tryTrivialSolver && solveTrivial()) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
-		this->setFinished();
+		setFinished();
 		return;
 	}
-	if ((this->interval.lowerBoundType() == BoundType::INFTY) || (this->interval.upperBoundType() == BoundType::INFTY)) {
-		Number bound = this->polynomial.cauchyBound();
+	if ((mInterval.lowerBoundType() == BoundType::INFTY) || (mInterval.upperBoundType() == BoundType::INFTY)) {
+		CARL_LOG_TRACE("carl.core.rootfinder", "Generating artificial bound.");
+		Number bound = mPolynomial.cauchyBound();
 
-		if (this->interval.lowerBoundType() == BoundType::INFTY) {
-			this->interval.setLowerBoundType(BoundType::STRICT);
-			if (-bound < this->interval.upper()) {
-				this->interval.setLower(-bound);
+		if (mInterval.lowerBoundType() == BoundType::INFTY) {
+			mInterval.setLowerBoundType(BoundType::STRICT);
+			if (-bound < mInterval.upper()) {
+				mInterval.setLower(-bound);
 			} else {
-				this->interval.setLower(this->interval.upper());
+				mInterval.setLower(mInterval.upper());
 			}
 		}
-		if (this->interval.upperBoundType() == BoundType::INFTY) {
-			this->interval.setUpperBoundType(BoundType::STRICT);
-			if (this->interval.lower() < bound) {
-				this->interval.setUpper(bound);
+		if (mInterval.upperBoundType() == BoundType::INFTY) {
+			mInterval.setUpperBoundType(BoundType::STRICT);
+			if (mInterval.lower() < bound) {
+				mInterval.setUpper(bound);
 			} else {
-				this->interval.setUpper(this->interval.lower());
+				mInterval.setUpper(mInterval.lower());
 			}
 		}
 	}
 	
-	if (this->interval.lowerBoundType() == BoundType::WEAK) {
-		this->interval.setLowerBoundType(BoundType::STRICT);
-		if (this->polynomial.isRoot(this->interval.lower())) {
-			this->addRoot(RealAlgebraicNumber<Number>(this->interval.lower()));
+	if (mInterval.lowerBoundType() == BoundType::WEAK) {
+		mInterval.setLowerBoundType(BoundType::STRICT);
+		if (mPolynomial.isRoot(mInterval.lower())) {
+			this->addRoot(RealAlgebraicNumber<Number>(mInterval.lower()));
 		}
 	}
-	if (this->interval.upperBoundType() == BoundType::WEAK) {
-		this->interval.setUpperBoundType(BoundType::STRICT);
-		if (this->polynomial.isRoot(this->interval.upper())) {
-			this->addRoot(RealAlgebraicNumber<Number>(this->interval.upper()));
+	if (mInterval.upperBoundType() == BoundType::WEAK) {
+		mInterval.setUpperBoundType(BoundType::STRICT);
+		if (mPolynomial.isRoot(mInterval.upper())) {
+			this->addRoot(RealAlgebraicNumber<Number>(mInterval.upper()));
 		}
 	}
+	CARL_LOG_TRACE("carl.core.rootfinder", "Bounds: " << mInterval);
 }
 
 template<typename Number>
-std::list<RealAlgebraicNumber<Number>> AbstractRootFinder<Number>::getAllRoots() {
-	if (! this->isFinished()) {
+const std::vector<RealAlgebraicNumber<Number>>& AbstractRootFinder<Number>::getAllRoots() {
+	if (!isFinished()) {
 		this->findRoots();
 		this->setFinished();
 	}
-	this->roots.sort(carl::less<RealAlgebraicNumber<Number>>());
-	return this->roots;
+	return mRoots;
 }
 
 template<typename Number>
 void AbstractRootFinder<Number>::addRoot(const RealAlgebraicNumber<Number>& root, bool reducePolynomial) {
 	if (root.isNumeric()) {
 		if (reducePolynomial) {
-			this->polynomial.eliminateRoot(root.value());
+			CARL_LOG_DEBUG("carl.core.rootfinder", "Eliminating root from " << mPolynomial);
+			mPolynomial.eliminateRoot(root.value());
+			CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << mPolynomial);
 		}
 	}
-	this->roots.push_back(root);
+	mRoots.push_back(root);
 }
 
 template<typename Number>
 void AbstractRootFinder<Number>::addRoot(const Interval<Number>& interval) {
-	this->addRoot(RealAlgebraicNumber<Number>(this->polynomial, interval));
+	CARL_LOG_DEBUG("carl.core.rootfinder", "Constructing RAN from " << mPolynomial << " and " << interval);
+	this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, interval));
 }
 
 template<typename Number>
 bool AbstractRootFinder<Number>::solveTrivial() {
-	switch (this->polynomial.degree()) {
+	CARL_LOG_DEBUG("carl.core.rootfinder", "Trying to trivially solve polynomial " << mPolynomial);
+	switch (mPolynomial.degree()) {
 		case 0: break;
 		case 1: {
-			Number a = this->polynomial.coefficients()[1], b = this->polynomial.coefficients()[0];
+			CARL_LOG_DEBUG("carl.core.rootfinder", "Trivially solving linear polynomial " << mPolynomial);
+			Number a = mPolynomial.coefficients()[1], b = mPolynomial.coefficients()[0];
 			assert(a != Number(0));
 			this->addRoot(RealAlgebraicNumber<Number>(-b / a), false);
 			break;
 		}
 		case 2: {
-			Number a = this->polynomial.coefficients()[2], b = this->polynomial.coefficients()[1], c = this->polynomial.coefficients()[0];
+			CARL_LOG_DEBUG("carl.core.rootfinder", "Trivially solving quadratic polynomial " << mPolynomial);
+			Number a = mPolynomial.coefficients()[2], b = mPolynomial.coefficients()[1], c = mPolynomial.coefficients()[0];
 			assert(a != Number(0));
 			/* Use this formulation of p-q-formula:
 			 * x = ( -b +- \sqrt{ b*b - 4*a*c } ) / (2*a)
@@ -133,8 +135,8 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 				} else {
 					// Root is within interval (res.first, res.second)
 					Interval<Number> r(res.first, BoundType::STRICT, res.second, BoundType::STRICT);
-					this->addRoot(RealAlgebraicNumber<Number>(this->polynomial, (Number(-b) - r) / Number(2*a)), false);
-					this->addRoot(RealAlgebraicNumber<Number>(this->polynomial, (Number(-b) + r) / Number(2*a)), false);
+					this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, (Number(-b) - r) / Number(2*a)), false);
+					this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, (Number(-b) + r) / Number(2*a)), false);
 				}
 			}
 			break;

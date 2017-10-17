@@ -38,8 +38,8 @@ using CoeffMatrix = Eigen::Matrix<Coeff, Eigen::Dynamic, Eigen::Dynamic>;
 
 template<typename Coeff>
 void printMatrix(const CoeffMatrix<Coeff>& m) {
-	for(std::size_t i = 0; i < m.rows(); i++) {
-		for(std::size_t j = 0; j < m.cols(); j++) {
+	for (Eigen::Index i = 0; i < m.rows(); i++) {
+		for (Eigen::Index j = 0; j < m.cols(); j++) {
 			std::cout << m(i, j) << "\t";
 		}
 		std::cout << std::endl;
@@ -50,7 +50,7 @@ void printMatrix(const CoeffMatrix<Coeff>& m) {
 template<typename Coeff>
 std::vector<Coeff> charPol(const CoeffMatrix<Coeff>& m) {
 	CARL_LOG_FUNC("carl.thom.tarski", "");
-	long n = m.cols();
+	Eigen::Index n = m.cols();
 	CARL_LOG_ASSERT("carl.thom.tarski", n == m.rows(), "can only compute characteristic polynomial of square matrix");
 	CARL_LOG_INFO("carl.thom.tarski", "input has size " << n << "x" << n);
 	

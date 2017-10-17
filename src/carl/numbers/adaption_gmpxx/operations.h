@@ -14,11 +14,8 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
 #include "../../util/platform.h"
+#include "include.h"
 #include "typetraits.h"
-
-CLANG_WARNING_DISABLE("-Wunused-local-typedef")
-#include <boost/algorithm/string.hpp>
-CLANG_WARNING_RESET
 
 #include <climits>
 #include <cmath>
@@ -123,16 +120,17 @@ inline double toDouble(const mpz_class& n) {
 
 template<typename Integer>
 inline Integer toInt(const mpz_class& n);
+
 template<>
 inline sint toInt<sint>(const mpz_class& n) {
-    assert(n <= std::numeric_limits<sint>::max());
-    assert(n >= std::numeric_limits<sint>::min());
+    assert(n <= std::numeric_limits<signed long>::max());
+    assert(n >= std::numeric_limits<signed long>::min());
     return mpz_get_si(n.get_mpz_t());
 }
 template<>
 inline uint toInt<uint>(const mpz_class& n) {
-    assert(n <= std::numeric_limits<uint>::max());
-    assert(n >= std::numeric_limits<uint>::min());
+    assert(n <= std::numeric_limits<unsigned long>::max());
+    assert(n >= std::numeric_limits<unsigned long>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
 
@@ -151,6 +149,39 @@ inline mpz_class toInt<mpz_class>(const mpq_class& n) {
 	return getNum(n);
 }
 
+template<typename To, typename From>
+inline To fromInt(const From& n);
+
+template<>
+inline mpz_class fromInt(const uint& n) {
+	mpz_class res;
+	mpz_set_ui(res.get_mpz_t(), n);
+	return res;
+	//assert(n <= std::numeric_limits<unsigned long>::max());
+	//assert(n >= std::numeric_limits<unsigned long>::min());
+	//return mpz_class(static_cast<unsigned long>(n));
+}
+
+template<>
+inline mpz_class fromInt(const sint& n) {
+	mpz_class res;
+	mpz_set_si(res.get_mpz_t(), n);
+	return res;
+	//assert(n <= std::numeric_limits<signed long>::max());
+	//assert(n >= std::numeric_limits<signed long>::min());
+	//return mpz_class(static_cast<signed long>(n));
+}
+
+template<>
+inline mpq_class fromInt(const uint& n) {
+	return fromInt<mpz_class>(n);
+}
+
+template<>
+inline mpq_class fromInt(const sint& n) {
+	return fromInt<mpz_class>(n);
+}
+
 /**
  * Convert a fraction to an unsigned.
  * @param n A fraction.
@@ -164,37 +195,6 @@ template<>
 inline uint toInt<uint>(const mpq_class& n) {
 	return toInt<uint>(toInt<mpz_class>(n));
 }
-
-/*template<>
-inline uint toInt<uint>(const mpq_class& n) {
-	return toInt<uint>(toInt<mpz_class>(n));
-}
-template<>
-inline sint toInt<sint>(const mpq_class& n) {
-	return toInt<sint>(toInt<mpz_class>(n));
-}*/
-
-template<typename T>
-inline T rationalize(double n);
-
-template<typename T>
-inline T rationalize(float n);
-
-template<typename T>
-inline T rationalize(int n);
-
-template<typename T>
-inline T rationalize(uint n);
-
-template<typename T>
-inline T rationalize(unsigned long long n);
-
-template<typename T>
-inline T rationalize(sint n);
-
-template<typename T>
-inline T rationalize(const std::string& n);
-
 
 template<typename T>
 inline T rationalize(const PreventConversion<mpq_class>&);
@@ -218,20 +218,12 @@ inline mpq_class rationalize<mpq_class>(int n) {
 
 template<>
 inline mpq_class rationalize<mpq_class>(uint n) {
-	return mpq_class(n);
-}
-
-template<>
-inline mpq_class rationalize<mpq_class>(unsigned long long n) {
-	mpz_t z;
-	mpz_init(z);
-	mpz_import(z, 1, -1, sizeof n, 0, 0, &n);
-	return mpq_class(mpz_class(z));
+	return mpq_class(static_cast<unsigned long>(n));
 }
 
 template<>
 inline mpq_class rationalize<mpq_class>(sint n) {
-	return mpq_class(n);
+	return mpq_class(static_cast<signed long>(n));
 }
 
 template<> [[deprecated("use parse() instead.")]]
@@ -373,6 +365,9 @@ inline mpq_class lcm(const mpq_class& a, const mpq_class& b) {
 
 inline mpq_class log(const mpq_class& n) {
 	return carl::rationalize<mpq_class>(std::log(mpq_class(n).get_d()));
+}
+inline mpq_class log10(const mpq_class& n) {
+	return carl::rationalize<mpq_class>(std::log10(mpq_class(n).get_d()));
 }
 
 inline mpq_class sin(const mpq_class& n) {

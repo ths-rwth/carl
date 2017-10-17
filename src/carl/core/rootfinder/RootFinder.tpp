@@ -17,7 +17,7 @@ namespace rootfinder {
         
 // hiervon eine thom version machen!!!
 template<typename Coeff, typename Number>
-boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
+boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		const Interval<Number>& interval,
@@ -32,7 +32,7 @@ boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
 	}
 	if (p.isConstant()) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "p is constant but not zero -> no root");
-		return std::list<RealAlgebraicNumber<Number>>({});
+		return std::vector<RealAlgebraicNumber<Number>>({});
 	}
 	
 	UnivariatePolynomial<Coeff> tmp(p);
@@ -50,17 +50,31 @@ boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
 	if (IRmap.empty()) {
 		return realRoots(tmp, interval, pivoting);
 	} else {
-		CARL_LOG_FUNC("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
+		CARL_LOG_TRACE("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
 		std::map<Variable, Interval<Number>> varToInterval;
-		UnivariatePolynomial<Number> res = RealAlgebraicNumberEvaluation::evaluateCoefficients(tmp, IRmap, varToInterval);
-		if (res.isZero()) return boost::none;
-		CARL_LOG_FUNC("carl.core.rootfinder", "Calling on " << res);
-		return realRoots(res, interval, pivoting);
+		UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluateCoefficients(tmp, IRmap, varToInterval);
+		if (evaledpoly.isZero()) return boost::none;
+		CARL_LOG_TRACE("carl.core.rootfinder", "Calling on " << evaledpoly);
+		auto res = realRoots(evaledpoly, interval, pivoting);
+		MultivariatePolynomial<Number> mvpoly(tmp);
+		CARL_LOG_TRACE("carl.core.rootfinder", "Checking " << res << " on " << mvpoly);
+		for (auto it = res.begin(); it != res.end();) {
+			CARL_LOG_TRACE("carl.core.rootfinder", "Checking " << tmp.mainVar() << " = " << *it);
+			IRmap[tmp.mainVar()] = *it;
+			CARL_LOG_TRACE("carl.core.rootfinder", "Evaluating " << mvpoly << " on " << IRmap);
+			if (!RealAlgebraicNumberEvaluation::evaluate(mvpoly, IRmap).isZero()) {
+				CARL_LOG_TRACE("carl.core.rootfinder", "Purging spurious root " << *it);
+				it = res.erase(it);
+			} else {
+				it++;
+			}
+		}
+		return res;
 	}
 }
 
 template<typename Coeff, typename Number>
-boost::optional<std::list<RealAlgebraicNumber<Number>>> realRoots(
+boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable>& variables,
 		const std::list<RealAlgebraicNumber<Number>>& values,

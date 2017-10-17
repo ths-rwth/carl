@@ -64,3 +64,22 @@ TEST(RootFinder, realRoots)
 		EXPECT_TRUE(represents(roots->back(), (Rational)1));
 	}
 }
+
+TEST(RootFinder, evalRoots)
+{
+	carl::Variable x = freshRealVariable("x");
+	carl::Variable y = freshRealVariable("y");
+	
+	UPolynomial xpoly(x, {-2, 0, 1});
+	carl::Interval<Rational> xint(Rational(5)/4, carl::BoundType::STRICT, Rational(3)/2, carl::BoundType::STRICT);
+	carl::RealAlgebraicNumber<Rational> xval(xpoly, xint);
+	
+	UMPolynomial p = UMPolynomial(y, {MPolynomial(x), MPolynomial(-1)});
+	std::map<carl::Variable, carl::RealAlgebraicNumber<Rational>> m;
+	m.emplace(x, xval);
+	auto roots = carl::rootfinder::realRoots(p, m);
+	EXPECT_TRUE(bool(roots));
+	std::cout << *roots << std::endl;
+	EXPECT_TRUE(roots->size() == 1);
+	EXPECT_TRUE(roots->front() == xval);
+}

@@ -16,8 +16,7 @@
 
 namespace carl
 {
-
-	using namespace boost::numeric;
+	namespace bn = boost::numeric;
 
 /*******************************************************************************
  * Transformations and advanced getters/setters

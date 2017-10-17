@@ -23,7 +23,9 @@ namespace carl
 		} else if(in == "Uninterpreted") {
 			return VariableType::VT_UNINTERPRETED;
 		} else {
-			throw std::invalid_argument("Input string does not encode an input string");
+			assert(false);
+			CARL_LOG_ERROR("carl.variable", "Input " << in << " is not a variable type.");
+			return VariableType::VT_REAL;
 		}
 
 	}

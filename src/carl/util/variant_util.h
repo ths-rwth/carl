@@ -37,4 +37,18 @@ Target variant_extend(const boost::variant<Args...>& variant) {
 	return boost::apply_visitor(detail::variant_extend_visitor<Target>(), variant);
 }
 
+namespace detail {
+	struct variant_hash: public boost::static_visitor<std::size_t> {
+		template <class T>
+		std::size_t operator()(const T& val) const {
+			return std::hash<T>()(val);
+		}
+	};
+}
+
+template<typename... T>
+inline std::size_t variant_hash(const boost::variant<T...>& value) {
+	return boost::apply_visitor(detail::variant_hash(), value);
+}
+
 }

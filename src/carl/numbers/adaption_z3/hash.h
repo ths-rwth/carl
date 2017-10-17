@@ -8,19 +8,10 @@
 #pragma once
 #include <functional>
 
-#include "z3_include.h"
+#include "include.h"
 
 namespace std
 {
-// This is actually gmp
-//template<>
-//struct hash<mpq_t>
-//{
-//	size_t operator()(const mpq_t& gmp_rational) const
-//	{
-//		return mpz_get_ui(mpq_numref(gmp_rational)) ^ mpz_get_ui(mpq_denref(gmp_rational));
-//	}
-//};
 
 template<> 
 struct hash<mpz>

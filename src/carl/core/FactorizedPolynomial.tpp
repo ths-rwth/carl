@@ -49,7 +49,7 @@ namespace carl
                 mCoefficient *= CoeffType(-1);
             }
             /*
-             * The following is not very nice, but we know, that the hash won't change, once the polynomial 
+             * The following is not very nice, but we know, that the hash won't change, once the polynomial
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
              * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
              */
@@ -70,7 +70,7 @@ namespace carl
                 else
                 {
                     delete pfPair;
-                } 
+                }
             }
             else
             {
@@ -100,7 +100,7 @@ namespace carl
             assert( mpCache != nullptr );
             // TODO expensive
             for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
-            assert( carl::isOne(factor->first.coefficient()) );
+                assert( carl::isOne(factor->first.coefficient()) );
             PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( _factorization ) );
             auto ret = mpCache->cache( pfPair );//, &carl::canBeUpdated, &carl::update );
             mCacheRef = ret.first;
@@ -150,16 +150,16 @@ namespace carl
         {
             switch( op )
             {
-                case ConstructorOperation::ADD: 
-                    *this += *it; 
+                case ConstructorOperation::ADD:
+                    *this += *it;
                     break;
-                case ConstructorOperation::SUB: 
-                    *this -= *it; 
+                case ConstructorOperation::SUB:
+                    *this -= *it;
                     break;
-                case ConstructorOperation::MUL: 
-                    *this *= *it; 
+                case ConstructorOperation::MUL:
+                    *this *= *it;
                     break;
-                case ConstructorOperation::DIV: 
+                case ConstructorOperation::DIV:
                     assert(it->isConstant());
                     *this /= it->constantPart();
                     break;
@@ -241,7 +241,7 @@ namespace carl
     
     template<typename P>
     typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::constantPart() const
-    {   
+    {
         if( existsFactorization( *this ) )
         {
             if( factorizedTrivially() )
@@ -259,7 +259,7 @@ namespace carl
 
     template<typename P>
     typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::lcoeff() const
-    {   
+    {
         if( existsFactorization( *this ) )
         {
             if( factorizedTrivially() )
@@ -364,7 +364,7 @@ namespace carl
     }
     
     template<typename P>
-    UnivariatePolynomial<FactorizedPolynomial<P>> FactorizedPolynomial<P>::toUnivariatePolynomial( Variable::Arg _var ) const
+    UnivariatePolynomial<FactorizedPolynomial<P>> FactorizedPolynomial<P>::toUnivariatePolynomial( Variable _var ) const
     {
         // TODO: This should maybe done directly on the factorization.
         UnivariatePolynomial<P> univPol = polynomial().toUnivariatePolynomial( _var );
@@ -400,7 +400,7 @@ namespace carl
     }
 
     template<typename P>
-    bool FactorizedPolynomial<P>::has( Variable::Arg _var ) const
+    bool FactorizedPolynomial<P>::has( Variable _var ) const
     {   
         if( existsFactorization( *this ) )
         {
@@ -418,7 +418,7 @@ namespace carl
     
     template<typename P>
     template<bool gatherCoeff>
-    VariableInformation<gatherCoeff, FactorizedPolynomial<P>> FactorizedPolynomial<P>::getVarInfo(Variable::Arg var) const
+    VariableInformation<gatherCoeff, FactorizedPolynomial<P>> FactorizedPolynomial<P>::getVarInfo(Variable var) const
     {
         // TODO: Maybe we should use the factorization for collecting degrees and coefficients.
         VariableInformation<gatherCoeff, P> vi = polynomial().template getVarInfo<gatherCoeff>( var );
@@ -546,7 +546,7 @@ namespace carl
         FactorizedPolynomial<P> mult( *this );
         while( _exp > 0 )
         {
-            if( _exp & 1 )
+            if( (_exp & 1) != 0 )
                 res *= mult;
             _exp /= 2;
             if( _exp > 0 )
@@ -581,13 +581,13 @@ namespace carl
     }
 	
     template<typename P>
-    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute( Variable::Arg _var, const FactorizedPolynomial<P>& _value ) const
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute( Variable _var, const FactorizedPolynomial<P>& _value ) const
     {
         if( !existsFactorization( *this ) )
             return *this;
         if( factorizedTrivially() )
         {
-            P subResult = polynomial().substitute( _var, (P) _value );
+            P subResult = polynomial().substitute( _var, static_cast<P>(_value) );
             if( subResult.isConstant() )
             {
                 FactorizedPolynomial<P> result( (subResult.constantPart() * mCoefficient) );
@@ -721,7 +721,7 @@ namespace carl
     }
 	
     template<typename P>
-    void FactorizedPolynomial<P>::substituteIn( Variable::Arg _var, const FactorizedPolynomial<P>& _value )
+    void FactorizedPolynomial<P>::substituteIn( Variable _var, const FactorizedPolynomial<P>& _value )
     {
         FactorizedPolynomial<P> res( *this );
         res.substitute( _var, _value );
@@ -833,7 +833,7 @@ namespace carl
     }
     
 	template <typename P>
-	bool operator==( const FactorizedPolynomial<P>& _lhs, const typename P::CoeffType& _rhs )
+	bool operator==( const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs )
     {
         return !existsFactorization( _lhs ) && _lhs.coefficient() == _rhs;
     }
@@ -1203,7 +1203,7 @@ namespace carl
     {
         if( existsFactorization( *this ) )
         {
-            std::string result = "";
+            std::string result;
             if( _infix )
             {
                 if( mCoefficient != Coeff<P>( 1 ) )

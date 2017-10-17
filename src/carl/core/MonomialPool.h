@@ -113,7 +113,7 @@ namespace carl{
 			Monomial::Arg add( Monomial::Content&& c, exponent totalDegree = 0 );
 			
 			Monomial::Arg create();
-			Monomial::Arg create( Variable::Arg _var, exponent _exp );
+			Monomial::Arg create( Variable _var, exponent _exp );
 			
 			Monomial::Arg create( std::vector<std::pair<Variable, exponent>>&& _exponents, exponent _totalDegree );
 			

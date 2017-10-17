@@ -6,6 +6,7 @@
 #include "../core/Relation.h"
 #include "../core/Variable.h"
 #include "../numbers/numbers.h"
+#include "../util/hash.h"
 
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
@@ -71,6 +72,7 @@ namespace carl {
 			if (boost::get<RAN>(&mValue) == nullptr) {
 				const MR& mr = boost::get<MR>(mValue);
 				if (mr.poly().degree(mr.var()) != 1) return boost::none;
+				if (mr.k() != 1) return boost::none;
 				auto lcoeff = mr.poly().coeff(mr.var(), 1);
 				if (!lcoeff.isConstant()) return boost::none;
 				auto ccoeff = mr.poly().coeff(mr.var(), 0);
@@ -78,6 +80,16 @@ namespace carl {
 			}
 			if (!boost::get<RAN>(mValue).isNumeric()) return boost::none;
 			return Constraint<Poly>(Poly(mVar) - Poly(boost::get<RAN>(mValue).value()), rel);
+		}
+		Poly definingPolynomial() const {
+			if (boost::get<RAN>(&mValue) != nullptr) {
+				const auto& ran = boost::get<RAN>(mValue);
+				if (ran.isNumeric()) return Poly(mVar) - ran.value();
+				return Poly(ran.getIRPolynomial().replaceVariable(mVar));
+			} else {
+				const auto& mr = boost::get<MR>(mValue);
+				return mr.poly(mVar);
+			}
 		}
 		VariableComparison negation() const {
 			return VariableComparison(mVar, mValue, mRelation, !mNegated);
@@ -93,16 +105,29 @@ namespace carl {
 		
 		std::string toString(unsigned = 0, bool = false, bool = true) const {
 			std::stringstream ss;
-			ss << "(" << (negated() ? "!" : "") << relation() << " " << var() << " " << mValue << ")";
+			ss << "(" << var() << " " << (negated() ? "!" : "") << relation() << " " << mValue << ")";
 			return ss.str();
 		}
 		
 		bool operator==(const VariableComparison& vc) const {
 			return mRelation == vc.mRelation && mVar == vc.mVar && mValue == vc.mValue && mNegated == vc.mNegated;
 		}
+		bool operator<(const VariableComparison& vc) const {
+			if (mNegated != vc.mNegated) return !mNegated;
+			return std::tie(mRelation, mVar, mValue) < std::tie(vc.mRelation, vc.mVar, vc.mValue);
+		}
 	};
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableComparison<Poly>& vc) {
 		return os << vc.toString();
 	}
+}
+
+namespace std {
+	template<typename Pol>
+	struct hash<carl::VariableComparison<Pol>> {
+		std::size_t operator()(const carl::VariableComparison<Pol>& vc) const {
+			return carl::hash_all(vc.var(), variant_hash(vc.value()), vc.relation(), vc.negated());
+		}
+	};
 }

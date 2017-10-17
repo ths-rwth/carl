@@ -45,10 +45,12 @@ namespace carl
     template<typename Pol>
     std::pair<typename FastPointerSet<FormulaContent<Pol>>::iterator,bool> FormulaPool<Pol>::insert( FormulaContent<Pol>* _element )
     {
+		CARL_LOG_DEBUG("carl.formula", "Inserting " << static_cast<const void*>(_element));
         auto iterBoolPair = mPool.insert( _element );
         if( !iterBoolPair.second ) // Formula has already been generated.
         {
-            delete _element;
+			CARL_LOG_DEBUG("carl.formula", "Deleting " << static_cast<const void*>(_element) << " as it was already part of the pool");
+	        delete _element;
         }
         return iterBoolPair;
     }
@@ -61,20 +63,26 @@ namespace carl
         auto iterBoolPair = this->insert( _element );
         if( iterBoolPair.second ) // Formula has not yet been generated.
         {
-            // Add also the negation of the formula to the pool in order to ensure that it
+			CARL_LOG_DEBUG("carl.formula", "Just added " << static_cast<const void*>(_element) << " / " << static_cast<const void*>(*iterBoolPair.first) << " to the pool");
+			// Add also the negation of the formula to the pool in order to ensure that it
             // has the next id and hence would occur next to the formula in a set of sub-formula,
             // which is sorted by the ids.
             _element->mId = mIdAllocator; 
             Formula<Pol>::init( *_element );
             ++mIdAllocator;
-            auto negation = createNegatedContent(*iterBoolPair.first);
-            //auto negation = new FormulaContent<Pol>(NOT, std::move( Formula<Pol>( *iterBoolPair.first ) ) );
+            auto negation = createNegatedContent(_element);
+			assert(mPool.find(negation) == mPool.end());
+			//auto negation = new FormulaContent<Pol>(NOT, std::move( Formula<Pol>( *iterBoolPair.first ) ) );
             _element->mNegation = negation;
             negation->mId = mIdAllocator; 
             negation->mNegation = _element;
             Formula<Pol>::init( *negation );
             ++mIdAllocator;
-        }
+			CARL_LOG_DEBUG("carl.formula", "Added " << _element << " / " << negation << " to pool");
+        } else {
+			CARL_LOG_TRACE("carl.formula", "Found " << static_cast<const void*>(*iterBoolPair.first) << " in pool");
+		}
+		CARL_LOG_TRACE("carl.formula", "Returning " << static_cast<const void*>(*iterBoolPair.first));
         return *iterBoolPair.first;
     }
     

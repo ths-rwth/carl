@@ -290,6 +290,7 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const typename Pol::CoeffType& rhs)
 	{
+	    // TODO handle rhs == 0
         if( this->isConstant() )
         {
             this->mNumberQuotient *= rhs;
@@ -299,6 +300,12 @@ namespace carl
 		mPolynomialQuotient->first *= rhs;
 		eliminateCommonFactor( !AS );
 		return *this;
+	}
+
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol,AS>::operator*=(carl::sint rhs)
+	{
+	    return *this *= carl::rationalize<typename Pol::CoeffType>(rhs);
 	}
 	
 	template<typename Pol, bool AS>
@@ -427,7 +434,25 @@ namespace carl
             return false;
 		return lhs.nominatorAsPolynomial()*rhs.denominatorAsPolynomial() < rhs.nominatorAsPolynomial()*lhs.denominatorAsPolynomial();
 	}
-	
+
+    template<typename Pol, bool AS>
+    std::string RationalFunction<Pol, AS>::toString(bool infix, bool friendlyNames) const {
+
+
+        std::string numeratorString = isConstant() ? carl::toString(nominatorAsNumber()) : nominatorAsPolynomial().toString(infix, friendlyNames);
+        std::string denominatorString = isConstant() ? carl::toString(denominatorAsNumber()) : denominatorAsPolynomial().toString(infix, friendlyNames);
+
+        if (denominator().isOne()) {
+            return numeratorString;
+        }
+
+        if (infix) {
+            return "(" + numeratorString + ")/(" + denominatorString + ")";
+        } else {
+            return "(/ " + numeratorString + " " + denominatorString + ")";
+        }
+    }
+
 	template<typename Pol, bool AS>
 	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol, AS>& rhs)
 	{

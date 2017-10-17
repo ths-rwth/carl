@@ -158,6 +158,17 @@ TYPED_TEST(RationalNumbers, log) {
   EXPECT_EQ(TypeParam(0), carl::log(TypeParam(1)));
 }
 
+TYPED_TEST(RationalNumbers, log10) {
+  TypeParam res = carl::log10(TypeParam(42));
+  EXPECT_GE(res, TypeParam(160)/TypeParam(100));
+  EXPECT_LE(res, TypeParam(170)/TypeParam(100));
+  res = carl::log10(TypeParam(1)/(42));
+  EXPECT_GE(res, TypeParam(-170)/TypeParam(100));
+  EXPECT_LE(res, TypeParam(-160)/TypeParam(100));
+
+  EXPECT_EQ(TypeParam(0), carl::log10(TypeParam(1)));
+}
+
 TYPED_TEST(RationalNumbers, sin_cos) {
   // ---- ---- ---- SIN ---- ---- ----
   TypeParam res = carl::sin(TypeParam(42)); //some number

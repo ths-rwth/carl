@@ -145,6 +145,30 @@ inline uint toInt<uint>(const cln::cl_I& n) {
     return uint(cln::cl_I_to_long(n));
 }
 
+
+template<typename To, typename From>
+inline To fromInt(const From& n);
+
+template<>
+inline cln::cl_I fromInt(const uint& n) {
+	return cln::cl_I(n);
+}
+
+template<>
+inline cln::cl_I fromInt(const sint& n) {
+	return cln::cl_I(n);
+}
+
+template<>
+inline cln::cl_RA fromInt(const uint& n) {
+	return cln::cl_RA(n);
+}
+
+template<>
+inline cln::cl_RA fromInt(const sint& n) {
+	return cln::cl_RA(n);
+}
+
 /**
  * Convert a fraction to an integer.
  * This method assert, that the given fraction is an integer, i.e. that the denominator is one.
@@ -190,11 +214,6 @@ inline cln::cl_RA rationalize<cln::cl_RA>(int n) {
 
 template<>
 inline cln::cl_RA rationalize<cln::cl_RA>(uint n) {
-	return cln::cl_RA(n);
-}
-
-template<>
-inline cln::cl_RA rationalize<cln::cl_RA>(unsigned long long n) {
 	return cln::cl_RA(n);
 }
 
@@ -379,6 +398,9 @@ inline cln::cl_RA pow(const cln::cl_RA& basis, std::size_t exp) {
 
 inline cln::cl_RA log(const cln::cl_RA& n) {
 	return cln::rationalize(cln::realpart(cln::log(n)));
+}
+inline cln::cl_RA log10(const cln::cl_RA& n) {
+	return cln::rationalize(cln::realpart(cln::log(n, 10)));
 }
 
 inline cln::cl_RA sin(const cln::cl_RA& n) {

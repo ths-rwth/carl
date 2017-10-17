@@ -3,14 +3,7 @@
 #include "carl/core/FactorizedPolynomial.h"
 #include "carl/util/stringparser.h"
 #include "carl/util/platform.h"
-
-#ifdef __WIN
-	#pragma warning(push, 0)
-	#include <mpirxx.h>
-	#pragma warning(pop)
-#else
-	#include <gmpxx.h>
-#endif
+#include "carl/numbers/numbers.h"
 
 #include "../Common.h"
 
@@ -269,6 +262,29 @@ TEST(FactorizedPolynomial, Construction)
     //Unary minus
     std::cout<< "-(" << fpA << ") = " << (-fpA) << std::endl;
     std::cout << "-(" << fpB << ") = " << (-fpB) << std::endl;
+}
+
+TEST(FactorizedPolynomial, Coefficient)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y"});
+
+    Pol fA = sp.parseMultivariatePolynomial<Rational>("3*x*y");
+    Pol fB = sp.parseMultivariatePolynomial<Rational>("4*x");
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpc1( (Rational) 5);
+    FPol fpc2( (Rational) -4);
+    FPol fpA( fA, pCache );
+    FPol fpB( fB, pCache );
+    FPol fpc3 = fpc1 * fpc2;
+    FPol fpC = fpA * fpB;
+
+    EXPECT_EQ(fpc3.coefficient(), -20);
+    EXPECT_EQ(fpc3.constantPart(), -20);
+    EXPECT_EQ(fpC.coefficient(), 12);
+    EXPECT_EQ(fpC.constantPart(), 0);
 }
 
 TEST(FactorizedPolynomial, CommonDivisor)
@@ -607,4 +623,3 @@ TEST(FactorizedPolynomial, Derivation)
     FPol fp4( p3, pCache );
     EXPECT_EQ( fp4, derivation );
 }
-

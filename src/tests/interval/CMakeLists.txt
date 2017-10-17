@@ -10,3 +10,4 @@ endif()
 target_link_libraries(runIntervalTests TestCommon)
 
 add_test( NAME interval COMMAND runIntervalTests )
+add_dependencies(all-tests runIntervalTests)

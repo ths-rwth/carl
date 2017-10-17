@@ -18,11 +18,11 @@ namespace carl {
 		//constructs a/b:
 		//(this looks hacky.. seems to be the only really functioning way though: take the integers as strings, put the sign at the front and construct
 		//cl_RA from the string "[-]a/b")
-		Number<cln::cl_RA>::Number(const Number<cln::cl_I>& a,const Number<cln::cl_I>& b) :
-			 Number(((a.isNegative() != b.isNegative()) ? "-" : "") + a.abs().toString()+"/"+b.abs().toString()) {}
+		Number<cln::cl_RA>::Number(const Number<cln::cl_I>& a, const Number<cln::cl_I>& b):
+			Number(cln::cl_RA(a) / b) {}
 
 	
-		Number<cln::cl_RA>::Number(const Number<cln::cl_I>& n) { mData = cln::cl_RA(n.getValue()); }
+		Number<cln::cl_RA>::Number(const Number<cln::cl_I>& n): Number(n.getValue()) {}
 		//Number(const cln::cl_I& n) { mData = cln::cl_RA(n); }
 
 
@@ -38,7 +38,7 @@ namespace carl {
 		//this can maybe be done such that it's the same as for mpq_class
     	   Number<cln::cl_RA>::Number(const std::string& s) {	
 		//here, we need to distinguish two cases: we want to deal with normal floating point inputs (as "3.5") but also fractions ("7/2")
-		if (s.find_first_of("/") == std::string::npos) { //this is the floating point case				
+		if (s.find_first_of('/') == std::string::npos) { //this is the floating point case				
 		
 			std::vector<std::string> strs;
 			boost::split(strs, s, boost::is_any_of("."));

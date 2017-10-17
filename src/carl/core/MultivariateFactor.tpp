@@ -50,7 +50,7 @@ Factors<MultivariatePolynomial<C,O,P>> factor(const Term<C>& _t)
 
 
 template<typename C, typename O, typename P>
-Factors<MultivariatePolynomial<C,O,P>> factor(std::shared_ptr<const Monomial> _m)
+Factors<MultivariatePolynomial<C,O,P>> factor(const Monomial::Arg& _m)
 {
 	Factors<MultivariatePolynomial<C,O,P>> result;
 	if (!_m) return result;

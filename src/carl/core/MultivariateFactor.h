@@ -42,12 +42,12 @@ class MultivariateFactor
     
     private:
         
-	typedef MultivariatePolynomial<Coeff,Ordering,Policies> Poly;
+	using Poly = MultivariatePolynomial<Coeff,Ordering,Policies>;
 	
 	const Poly& mp;
 	
 	public:
-	MultivariateFactor(const Poly& _p):
+	explicit MultivariateFactor(const Poly& _p):
         mp(_p)
 	{}
 	
@@ -62,4 +62,3 @@ class MultivariateFactor
 }
 
 #include "MultivariateFactor.tpp"
-

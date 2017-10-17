@@ -22,8 +22,7 @@ namespace carl
         return mId < _sortValue.id();
     }
     
-    std::ostream& operator<<( std::ostream& _out, const SortValue& _sortValue )
-    {
-        return (_out << _sortValue.sort() << "!val!" << _sortValue.id());
+    std::ostream& operator<<(std::ostream& os, const SortValue& sv) {
+        return os << sv.sort() << "!val!" << sv.id();
     }
 }

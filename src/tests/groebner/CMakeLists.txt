@@ -8,3 +8,4 @@ cotire(runGroebnerTests)
 target_link_libraries(runGroebnerTests TestCommon)
 
 add_test( NAME groebner COMMAND runGroebnerTests )
+add_dependencies(all-tests runGroebnerTests)

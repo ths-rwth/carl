@@ -415,6 +415,11 @@ namespace carl {
     {
         return (_out << _formula.toString());
     }
+	template<typename P>
+    std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>* _formula )
+    {
+        return (_out << _formula->toString());
+    }
 	
 }
 

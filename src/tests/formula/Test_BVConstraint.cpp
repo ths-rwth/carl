@@ -78,7 +78,7 @@ TEST(BVConstraint, Construction)
         BVValue clnVal(8, clnNumber);
         BVValue gmpVal(8, gmpNumber);
         EXPECT_TRUE(clnVal == gmpVal);
-        EXPECT_TRUE(boost::dynamic_bitset<>(clnVal).to_ulong() == ((i + 256) % 256));
+        EXPECT_TRUE(BVValue::Base(clnVal).to_ulong() == ((i + 256) % 256));
     }
 
     // Test BVValue construction from CLN / GMP objects

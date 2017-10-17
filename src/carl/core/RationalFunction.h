@@ -341,7 +341,7 @@ namespace carl
          */
 		RationalFunction derivative(const Variable& x, unsigned nth = 1) const;
 		
-		
+		std::string toString(bool infix = true, bool friendlyNames = true) const;
     private:
         
         /**
@@ -463,6 +463,7 @@ namespace carl
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
         RationalFunction& operator*=(Variable::Arg rhs);
         RationalFunction& operator*=(const CoeffType& rhs);
+        RationalFunction& operator*=(carl::sint rhs);
         /// @}
 
         /**
@@ -607,6 +608,24 @@ namespace carl
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) *= rhs );
 	}
+
+    template<typename Pol, bool AS>
+    inline RationalFunction<Pol, AS> operator*(const typename Pol::CoeffType& lhs, const RationalFunction<Pol, AS>& rhs)
+    {
+        return std::move( RationalFunction<Pol, AS>(rhs) *= lhs );
+    }
+
+    template<typename Pol, bool AS>
+    inline RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, carl::sint rhs)
+    {
+        return std::move( RationalFunction<Pol, AS>(lhs) *= rhs );
+    }
+
+    template<typename Pol, bool AS>
+    inline RationalFunction<Pol, AS> operator*( carl::sint lhs, const RationalFunction<Pol, AS>& rhs)
+    {
+        return std::move( RationalFunction<Pol, AS>(rhs) *= lhs );
+    }
 	
 	template<typename Pol, bool AS>
 	inline RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)

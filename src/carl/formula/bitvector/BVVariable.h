@@ -9,11 +9,9 @@
 #include "../../core/VariablePool.h"
 #include "../SortManager.h"
 
-namespace carl
-{
+namespace carl {
 
-	class BVVariable
-	{
+	class BVVariable {
 	private:
 		Variable mVar;
 		Sort mSort;
@@ -26,7 +24,7 @@ namespace carl
 		{
 		}
 
-		BVVariable(Variable::Arg _variable, const Sort& _sort):
+		BVVariable(Variable _variable, const Sort& _sort):
 			mVar(_variable), mSort(_sort), mWidth(0)
 		{
 			assert(SortManager::getInstance().getType(_sort) == VariableType::VT_BITVECTOR);
@@ -37,70 +35,62 @@ namespace carl
 			mWidth = indices->front();
 		}
 
-		Variable operator()() const
-		{
+		Variable variable() const {
+			return mVar;
+		}
+		operator Variable() const {
 			return mVar;
 		}
 
         /**
         * @return The sort (domain) of this uninterpreted variable.
         */
-        const Sort& sort() const
-        {
+        const Sort& sort() const {
             return mSort;
         }
 
-		bool operator==(const BVVariable& _other) const
-		{
+		bool operator==(const BVVariable& _other) const {
 			return mVar == _other.mVar;
 		}
-		bool operator<(const BVVariable& _other) const
-		{
+		bool operator<(const BVVariable& _other) const {
 			return mVar < _other.mVar;
 		}
 
-		std::size_t width() const
-		{
+		std::size_t width() const {
 			return mWidth;
 		}
 
 		/**
 		 * @return The string representation of this bit vector variable.
 		 */
-		std::string toString(bool _friendlyNames) const
-		{
+		std::string toString(bool _friendlyNames) const	{
 			return VariablePool::getInstance().getName(mVar, _friendlyNames);
 		}
 
 		/**
 		 * Prints the given bit vector variable on the given output stream.
-		 * @param _os The output stream to print on.
-		 * @param _bvvar The bit vector variable to print.
+		 * @param os The output stream to print on.
+		 * @param v The bit vector variable to print.
 		 * @return The output stream after printing the given bit vector variable on it.
 		 */
-		friend std::ostream& operator<<(std::ostream& _os, const BVVariable& _bvvar)
-		{
-			return(_os << _bvvar());
+		friend std::ostream& operator<<(std::ostream& os, const BVVariable& v) {
+			return os << v.variable();
 		}
 	};
 } // end namespace carl
 
-namespace std
-{
+namespace std {
     /**
      * Implements std::hash for bitvector variables.
      */
     template<>
-    struct hash<carl::BVVariable>
-    {
-    public:
+    struct hash<carl::BVVariable> {
         /**
-         * @param _bvVar The bitvector variable to get the hash for.
+         * @param v The bitvector variable to get the hash for.
          * @return The hash of the given bitvector variable.
          */
-        size_t operator()( const carl::BVVariable& _bvVar ) const
-        {
-            return hash<carl::Variable>()( _bvVar() ) ;
+        std::size_t operator()(const carl::BVVariable& v) const {
+            return std::hash<carl::Variable>()(v);
         }
     };
 }

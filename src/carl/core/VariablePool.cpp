@@ -39,20 +39,35 @@ Variable VariablePool::getFreshVariable(const std::string& name, VariableType ty
 	if (name.substr(0, mVariablePrefix.size()) == mVariablePrefix) {
 		CARL_LOG_WARN("carl", "The prefix for auxiliary variable names \"" << mVariablePrefix << "\" is a prefix for the variable name \"" << name << "\".");
 	}
-	Variable tmp = this->getFreshVariable(type);
-	this->setName(tmp, name);
+	Variable tmp = getFreshVariable(type);
+	setName(tmp, name);
 	return tmp;
 }
 
-Variable VariablePool::findVariableWithName(const std::string& name) const noexcept
-{
-	for (auto v: mVariableNames) {
+Variable VariablePool::getFreshPersistentVariable(VariableType type) noexcept {
+	Variable res = getFreshVariable(type);
+	if (res.getId() >= mPersistentVariables.size()) {
+		mPersistentVariables.resize(res.getId()+1, std::make_pair(Variable::NO_VARIABLE, ""));
+	}
+	mPersistentVariables[res.getId()] = std::make_pair(res, "");
+	return res;
+}
+
+Variable VariablePool::getFreshPersistentVariable(const std::string& name, VariableType type) {
+	Variable res = getFreshPersistentVariable(type);
+	mPersistentVariables[res.getId()] = std::make_pair(res, name);
+	setName(res, name);
+	return res;
+}
+
+Variable VariablePool::findVariableWithName(const std::string& name) const noexcept {
+	for (const auto& v: mVariableNames) {
 		if (v.second == name) return v.first;
 	}
 	return Variable::NO_VARIABLE;
 }
 
-std::string VariablePool::getName(Variable::Arg v, bool variableName) const {
+std::string VariablePool::getName(Variable v, bool variableName) const {
 	if (v.getId() == 0) return "NO_VARIABLE";
 	if (variableName) {
         SETNAME_LOCK_GUARD
@@ -79,7 +94,7 @@ std::string VariablePool::getName(Variable::Arg v, bool variableName) const {
 	}
 }
 
-void VariablePool::setName(Variable::Arg v, const std::string& name) {
+void VariablePool::setName(Variable v, const std::string& name) {
 	#ifdef CARL_USE_FRIENDLY_VARNAMES
 	SETNAME_LOCK_GUARD
 	mVariableNames[v] = name;

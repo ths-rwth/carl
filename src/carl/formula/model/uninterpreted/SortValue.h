@@ -79,7 +79,7 @@ class SortValue
          * @param _sortValue The sort value to print.
          * @return The output stream after printing the given sort value on it.
          */
-        friend std::ostream& operator<<( std::ostream& _os, const SortValue& _sortValue );
+        friend std::ostream& operator<<(std::ostream& os, const SortValue& sv);
 
         /**
          * @param _sortValue The sort value to compare with.
@@ -109,9 +109,8 @@ namespace std
          * @param _sortValue The sort value to get the hash for.
          * @return The hash of the given sort value.
          */
-        std::size_t operator()( const carl::SortValue& _sortValue ) const 
-        {
-            return hash_all(_sortValue.id(),  _sortValue.sort());
+        std::size_t operator()(const carl::SortValue& sv) const {
+            return carl::hash_all(sv.id(), sv.sort());
         }
     };
 }

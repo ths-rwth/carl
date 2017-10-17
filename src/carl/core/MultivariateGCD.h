@@ -95,7 +95,7 @@ class MultivariateGCD : GCDCalculation
      * @param p2
      * @return NoVariable if intersection is empty, otherwise some variable v which is in p1 and p2.
      */
-	Variable getMainVar(const Polynomial p1, const Polynomial p2) const
+	Variable getMainVar(const Polynomial& p1, const Polynomial& p2) const
 	{
 		// TODO find good heuristic.
 		std::set<Variable> common;
@@ -114,6 +114,8 @@ class MultivariateGCD : GCDCalculation
 		}
 		
 	}
+	
+	Polynomial customCalculation(const Polynomial& a, const Polynomial& b);
     
     #ifdef USE_GINAC
     bool checkCorrectnessWithGinac()

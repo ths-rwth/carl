@@ -12,3 +12,4 @@ cotire(runCADTests)
 target_link_libraries(runCADTests TestCommon)
 
 add_test( NAME cad COMMAND runCADTests )
+add_dependencies(all-tests runCADTests)

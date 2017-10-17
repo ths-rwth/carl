@@ -22,13 +22,15 @@ namespace carl
     
 	inline static BoundType getWeakestBoundType( BoundType type1, BoundType type2 )
 	{
-		return (type1 == BoundType::INFTY || type2 == BoundType::INFTY)
-		? BoundType::INFTY : (type1 == BoundType::WEAK || type2 == BoundType::WEAK) ? BoundType::WEAK : BoundType::STRICT;
+		if (type1 == BoundType::INFTY || type2 == BoundType::INFTY) return BoundType::INFTY;
+		if (type1 == BoundType::WEAK || type2 == BoundType::WEAK) return BoundType::WEAK;
+		return BoundType::STRICT;
 	}
 	inline static BoundType getStrictestBoundType( BoundType type1, BoundType type2 )
 	{
-		return (type1 == BoundType::INFTY || type2 == BoundType::INFTY)
-		? BoundType::INFTY : (type1 == BoundType::STRICT || type2 == BoundType::STRICT) ? BoundType::STRICT : BoundType::WEAK;
+		if (type1 == BoundType::INFTY || type2 == BoundType::INFTY) return BoundType::INFTY;
+		if (type1 == BoundType::STRICT || type2 == BoundType::STRICT) return BoundType::STRICT;
+		return BoundType::WEAK;
 	}
         
         inline static BoundType getOtherBoundType( BoundType type ) 

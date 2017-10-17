@@ -13,8 +13,8 @@
 #include <type_traits>
 
 namespace carl {
-	using uint = unsigned long;
-	using sint = long;
+	using uint = std::uint64_t;
+	using sint = std::int64_t;
 	
 	static_assert(std::is_arithmetic<uint>::value, "");
 	static_assert(std::is_arithmetic<sint>::value, "");
@@ -41,6 +41,7 @@ namespace carl {
 
 
 #ifdef USE_CLN_NUMBERS
+#include "adaption_cln/include.h"
 #include "adaption_cln/hash.h"
 #include "adaption_cln/operations.h"
 #include "adaption_cln/typetraits.h"
@@ -56,7 +57,7 @@ namespace carl {
 #include "adaption_float/typetraits.h"
 
 #ifdef USE_Z3_NUMBERS
-#include "adaption_z3/z3_include.h"
+#include "adaption_z3/include.h"
 #include "adaption_z3/hash.h"
 #include "adaption_z3/operations.h"
 #include "adaption_z3/typetraits.h"

@@ -77,7 +77,7 @@ namespace carl
 		return add(Monomial::Arg());
 	}
 
-	Monomial::Arg MonomialPool::create( Variable::Arg _var, exponent _exp )
+	Monomial::Arg MonomialPool::create( Variable _var, exponent _exp )
 	{
 		return add(Monomial::Arg(new Monomial(_var, _exp)));
 	}

@@ -11,24 +11,26 @@ endif()
 string(REPLACE "." "-" GINAC_TAG ${GINAC_VERSION})
 
 ExternalProject_Add(
-    GiNaC
+    GiNaC-EP
     GIT_REPOSITORY "git://www.ginac.de/ginac.git"
 	GIT_TAG "release_${GINAC_TAG}"
+	DOWNLOAD_NO_PROGRESS 1
 	UPDATE_COMMAND ""
 	CONFIGURE_COMMAND ${AUTORECONF} -iv <SOURCE_DIR> 
-		COMMAND PYTHON=${PYTHON2} <SOURCE_DIR>/configure --quiet --prefix=<INSTALL_DIR>
+		COMMAND <SOURCE_DIR>/configure --quiet --prefix=<INSTALL_DIR> PYTHON=${PYTHON2}
 	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} -C ginac
 	INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} -C ginac install
+	LOG_INSTALL 1
 )
 
-ExternalProject_Get_Property(GiNaC INSTALL_DIR)
+ExternalProject_Get_Property(GiNaC-EP INSTALL_DIR)
 
 add_imported_library(GINAC SHARED "${INSTALL_DIR}/lib/libginac${DYNAMIC_EXT}" "${INSTALL_DIR}/include")
 add_imported_library(GINAC STATIC "${INSTALL_DIR}/lib/libginac${STATIC_EXT}" "${INSTALL_DIR}/include")
 
-add_dependencies(GiNaC CLN_SHARED CLN_STATIC)
-add_dependencies(GINAC_SHARED GiNaC)
-add_dependencies(GINAC_STATIC GiNaC)
+add_dependencies(GiNaC-EP CLN_SHARED CLN_STATIC)
+add_dependencies(GINAC_SHARED GiNaC-EP)
+add_dependencies(GINAC_STATIC GiNaC-EP)
 add_dependencies(resources GINAC_SHARED GINAC_STATIC)
 
 mark_as_advanced(AUTORECONF)

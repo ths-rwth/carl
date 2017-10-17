@@ -200,20 +200,16 @@ TEST(UnivariatePolynomial, factorization)
 
     unsigned seed = 21344325;
     std::default_random_engine generator (seed);
-    for(int e = 2; e <= 10; ++e)
-    {
+    for (int e = 2; e <= 10; ++e) {
         std::cauchy_distribution<double> distribution(0.0,3.0+10.0*std::pow(0.9,e));
-        for(int j=0; j<10; ++j)
-        {
+        for (int j=0; j<10; ++j) {
             std::vector<Rational> coeffs;
-            for(int i=0; i<=e; ++i)
-            {
+            for(int i=0; i<=e; ++i) {
                 double ran = distribution(generator);
                 int coe = (ran > INT_MAX || ran < INT_MIN) ? 0 : (int) ran;
                 coeffs.push_back((Rational) coe);
             }
-            if(coeffs.back() == (Rational) 0)
-            {
+            if (coeffs.back() == (Rational) 0) {
                 coeffs.back() = (Rational) 1;
             }
             UnivariatePolynomial<Rational> randomPol(x, coeffs);
@@ -221,45 +217,40 @@ TEST(UnivariatePolynomial, factorization)
         }
     }
 
-    for(UnivariatePolynomial<Rational> pol : polys)
+    for(const auto& pol : polys)
     {
-//        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
-        std::map<UnivariatePolynomial<Rational>, carl::uint> factors = pol.factorization();
+        std::cout << "Factorizing " << pol << "..." << std::endl;
+        const auto& factors = pol.factorization();
+        std::cout << "Factorization of " << pol << " = " << factors << std::endl;
         UnivariatePolynomial<Rational> productOfFactors = UnivariatePolynomial<Rational>(x, (Rational)1);
-        for(auto factor = factors.begin(); factor != factors.end(); ++factor)
-        {
-//            std::cout << "           ";
-//            if(factor != factors.begin())
-//                std::cout << "* ";
-//            std::cout << "(" << factor->first << ")^" << factor->second << std::endl;
-            EXPECT_NE((unsigned)0, factor->second);
-            for(unsigned i=0; i < factor->second; ++i)
-            {
-                productOfFactors *= factor->first;
+        for (const auto& factor: factors) {
+            EXPECT_NE((unsigned)0, factor.second);
+            for(unsigned i=0; i < factor.second; ++i) {
+                productOfFactors *= factor.first;
             }
         }
-//        std::cout << std::endl;
         EXPECT_EQ(pol, productOfFactors);
     }
-
     UnivariatePolynomial<Rational> pol2(x, {(Rational)-1, (Rational)2, (Rational)-6, (Rational)2});
+    std::cout << "syntheticDivision of " << pol2 << std::endl;
     EXPECT_EQ(5, pol2.syntheticDivision((Rational)3) );
 
     UnivariatePolynomial<Rational> pol3(x, {(Rational)-42, (Rational)0, (Rational)-12, (Rational)1});
+    std::cout << "syntheticDivision of " << pol3 << std::endl;
     EXPECT_EQ(-123, pol3.syntheticDivision((Rational)3) );
 
     UnivariatePolynomial<Rational> pol4(x, {(Rational)1, (Rational)0, (Rational)1});
     UnivariatePolynomial<Rational> pol5(x, {(Rational)1, (Rational)0, (Rational)-1});
     UnivariatePolynomial<Rational> pol6 = pol4*pol5*pol5*pol5;
+    std::cout << "Square free factorization of  " << pol6 << "  is  " << std::endl;
     auto sffactors = pol6.squareFreeFactorization();
-//    std::cout << "Square free factorization of  " << pol6 << "  is  " << std::endl;
     UnivariatePolynomial<Rational> productOfFactors = UnivariatePolynomial<Rational>(x, (Rational)1);
     for(auto factor = sffactors.begin(); factor != sffactors.end(); ++factor)
     {
 //        std::cout << "        ";
 //        if(factor != sffactors.begin())
 //            std::cout << "* ";
-//        std::cout << "(" << factor->second << ")^" << factor->first << std::endl;
+        std::cout << "(" << factor->second << ")^" << factor->first << std::endl;
         EXPECT_NE((unsigned)0, factor->first);
         for(unsigned i=0; i < factor->first; ++i)
         {

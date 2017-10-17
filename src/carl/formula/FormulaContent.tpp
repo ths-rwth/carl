@@ -72,6 +72,7 @@ namespace carl {
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(VariableComparison<Pol>&& _variableComparison):
+		mHash(std::hash<VariableComparison<Pol>>()(_variableComparison)),
 #ifdef __VS
         mType( FormulaType::VARCOMPARE )
     {
@@ -87,6 +88,7 @@ namespace carl {
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(VariableAssignment<Pol>&& _variableAssignment):
+		mHash(std::hash<VariableAssignment<Pol>>()(_variableAssignment)),
 #ifdef __VS
         mType( FormulaType::VARASSIGN )
     {
@@ -140,7 +142,7 @@ namespace carl {
         mType( FormulaType::PBCONSTRAINT )
     {
 		mpPBConstraintVS = new PBConstraint<Pol>(std::move(_pbc));
-		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mPBConstraintVS);
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mpPBConstraintVS);
 #else
 		mType(FormulaType::PBCONSTRAINT),
 		mPBConstraint(std::move(_pbc))
@@ -214,6 +216,7 @@ namespace carl {
 
     template<typename Pol>
     bool FormulaContent<Pol>::operator==(const FormulaContent& _content) const {
+		CARL_LOG_TRACE("carl.formula", *this << " == " << _content << " (" << mId << " / " << _content.mId << ")");
 		if (mId != 0 && _content.mId != 0) return mId == _content.mId;
         if (mType != _content.mType) return false;
 		switch (mType) {
@@ -243,9 +246,9 @@ namespace carl {
 			case FormulaType::CONSTRAINT:
 				return *mpConstraintVS == *_content.mpConstraintVS;
 			case FormulaType::VARCOMPARE:
-				return *mpVariableComparison == *_content.mpVariableComparison;
+				return *mpVariableComparisonVS == *_content.mpVariableComparisonVS;
 			case FormulaType::VARASSIGN:
-				return *mpVariableAssignment == *_content.mpVariableAssignment;
+				return *mpVariableAssignmentVS == *_content.mpVariableAssignmentVS;
 			case FormulaType::BITVECTOR:
 				return *mpBVConstraintVS == *_content.mpBVConstraintVS;
 			case FormulaType::UEQ:
@@ -311,7 +314,7 @@ namespace carl {
         }
 		else if (mType == FormulaType::PBCONSTRAINT)
 		{
-			return (_init + mpPBConstraintVS->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+			return (_init + mpPBConstraintVS->toString( _resolveUnequal == 0, _infix, _friendlyNames ) + activity);
 		}
 #else
 		if (mType == FormulaType::BOOL)

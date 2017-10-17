@@ -241,7 +241,7 @@ namespace carl
 		/**
 		 * @return The stored value as a real algebraic number.
 		 */
-		RealAlgebraicNumber<Rational> asRAN() const {
+		const RealAlgebraicNumber<Rational>& asRAN() const {
 			assert(isRAN());
 			return boost::get<RealAlgebraicNumber<Rational>>(mData);
 		}

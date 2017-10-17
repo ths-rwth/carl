@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <bitset>
 #include <cstdint>
 #include <iostream>
@@ -39,7 +40,7 @@ std::string binary(const T& a, const bool& spacing = true)
  * @return Basename of s.
  */
 inline std::string basename(const std::string& s) {
-	return s.substr(s.rfind('/') + 1);
+	return s.substr(std::max(s.rfind('/') + 1, s.rfind('\\') + 1));
 }
 
 }

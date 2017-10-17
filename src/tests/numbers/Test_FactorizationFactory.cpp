@@ -8,11 +8,11 @@
 template<typename T>
 class FactorizationFactory: public testing::Test {};
 
-using Res = std::vector<std::size_t>;
+using Res = std::vector<carl::uint>;
 
-TEST(FactorizationFactory, size_t)
+TEST(FactorizationFactory, uint)
 {
-    carl::FactorizationFactory<std::size_t> factorization;
+    carl::FactorizationFactory<carl::uint> factorization;
     EXPECT_EQ(Res({}), factorization(0));
     EXPECT_EQ(Res({1}), factorization(1));
     EXPECT_EQ(Res({2}), factorization(2));
@@ -35,9 +35,9 @@ TEST(FactorizationFactory, size_t)
     EXPECT_EQ(Res({19}), factorization(19));
     EXPECT_EQ(Res({2,2,5}), factorization(20));
     
-    for (std::size_t i = 21; i < 500; i++) {
+    for (carl::uint i = 21; i < 500; i++) {
         auto res = factorization(i);
-        auto product = std::accumulate(res.begin(), res.end(), std::size_t(1), [](auto a, auto b){ return a*b; });
+        auto product = std::accumulate(res.begin(), res.end(), carl::uint(1), [](auto a, auto b){ return a*b; });
         EXPECT_EQ(product, i);
     }
 }

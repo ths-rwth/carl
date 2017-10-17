@@ -43,7 +43,7 @@ namespace carl
     {
         if( mFreeRationalIds.empty() )
         {
-            mRationalPool.emplace_back( _value );
+            mRationalPool.emplace_back(carl::fromInt<T>(_value));
             assert( mRationalPool.size() + (size_t) HIGHTEST_INTEGER_VALUE - 1 <= std::numeric_limits<size_t>::max() );
             return ContentType(mRationalPool.size() + HIGHTEST_INTEGER_VALUE - 1);
         }
@@ -52,7 +52,7 @@ namespace carl
             ContentType id = mFreeRationalIds.back();
             mFreeRationalIds.pop_back();
             assert( id >= HIGHTEST_INTEGER_VALUE );
-            mRationalPool[std::size_t(id-HIGHTEST_INTEGER_VALUE)] = _value;
+            mRationalPool[std::size_t(id-HIGHTEST_INTEGER_VALUE)] = carl::fromInt<T>(_value);
             return id;
         }
     }
@@ -71,7 +71,7 @@ namespace carl
      */
     template<typename T>
     Numeric<T>::Numeric( const T& _value ):
-        mContent( (carl::isInteger( _value ) && carl::getNum( _value ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _value ) < HIGHTEST_INTEGER_VALUE) ? carl::toInt<ContentType>( carl::getNum( _value ) ) : allocate( _value ) )
+        mContent( (carl::isInteger( _value ) && withinNativeRange(carl::getNum(_value))) ? carl::toInt<ContentType>( carl::getNum( _value ) ) : allocate( _value ) )
     {}
 
     /**
@@ -112,7 +112,7 @@ namespace carl
     {
         if( IS_INT( this->mContent ) )
         {
-            if( carl::isInteger( _value ) && carl::getNum( _value ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _value ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _value ) && withinNativeRange(_value) )
             {
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _value ) );
             }
@@ -123,7 +123,7 @@ namespace carl
         }
         else
         {
-            if( carl::isInteger( _value ) && carl::getNum( _value ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _value ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _value ) && withinNativeRange(_value) )
             {
                 mFreeRationalIds.push_back( this->mContent );
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _value ) );
@@ -159,7 +159,7 @@ namespace carl
                 this->mContent = _value;
             }
             else
-                this->rRational() = T( _value );
+                this->rRational() = carl::fromInt<T>( _value );
         }
         return *this; // NOLINT
     }
@@ -207,7 +207,7 @@ namespace carl
                 return this->mContent == _value.mContent;
             else
             {
-                assert( _value.rational() != T( this->mContent ) );
+                assert( _value.rational() != carl::fromInt<T>(this->mContent) );
                 return false;
             }
         }
@@ -215,7 +215,7 @@ namespace carl
         {
             if( IS_INT( _value.mContent ) )
             {
-                assert( this->rational() != T( _value.mContent ) );
+                assert( this->rational() != carl::fromInt<T>(_value.mContent) );
                 return false;
             }
             else
@@ -240,7 +240,7 @@ namespace carl
                 return this->mContent != _value.mContent;
             else
             {
-                assert( _value.rational() != T( this->mContent ) );
+                assert( _value.rational() != carl::fromInt<T>(this->mContent) );
                 return true;
             }
         }
@@ -248,7 +248,7 @@ namespace carl
         {
             if( IS_INT( _value.mContent ) )
             {
-                assert( this->rational() != T( _value.mContent ) );
+                assert( this->rational() != carl::fromInt<T>(_value.mContent) );
                 return true;
             }
             else
@@ -273,14 +273,14 @@ namespace carl
                 return this->mContent < _value.mContent;
             else
             {
-                return _value.rational() > this->mContent;
+                return _value.rational() > carl::fromInt<T>(this->mContent);
             }
         }
         else
         {
             if( IS_INT( _value.mContent ) )
             {
-                return this->rational() < _value.mContent;
+                return this->rational() < carl::fromInt<T>(_value.mContent);
             }
             else
                 return this->rational() < _value.rational();
@@ -302,14 +302,14 @@ namespace carl
                 return this->mContent <= _value.mContent;
             else
             {
-                return _value.rational() >= this->mContent;
+                return _value.rational() >= carl::fromInt<T>(this->mContent);
             }
         }
         else
         {
             if( IS_INT( _value.mContent ) )
             {
-                return this->rational() <= _value.mContent;
+                return this->rational() <= carl::fromInt<T>(_value.mContent);
             }
             else
                 return this->rational() <= _value.rational();
@@ -331,14 +331,14 @@ namespace carl
                 return this->mContent > _value.mContent;
             else
             {
-                return _value.rational() < this->mContent;
+                return _value.rational() < carl::fromInt<T>(this->mContent);
             }
         }
         else
         {
             if( IS_INT( _value.mContent ) )
             {
-                return this->rational() > _value.mContent;
+                return this->rational() > carl::fromInt<T>(_value.mContent);
             }
             else
                 return this->rational() > _value.rational();
@@ -360,14 +360,14 @@ namespace carl
                 return this->mContent >= _value.mContent;
             else
             {
-                return _value.rational() <= this->mContent;
+                return _value.rational() <= carl::fromInt<T>(this->mContent);
             }
         }
         else
         {
             if( IS_INT( _value.mContent ) )
             {
-                return this->rational() >= _value.mContent;
+                return this->rational() >= carl::fromInt<T>(_value.mContent);
             }
             else
                 return this->rational() >= _value.rational();
@@ -394,10 +394,10 @@ namespace carl
         {
             T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
-                rat = carl::div( carl::getNum( rat ), typename IntegralType<T>::type( _valueB.mContent ) );
+                rat = carl::div( carl::getNum( rat ), carl::fromInt<typename IntegralType<T>::type>( _valueB.mContent ) );
             else
                 rat = carl::div( carl::getNum( rat ), carl::getNum( _valueB.rational() ) );
-            if( carl::getNum( rat ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( rat ) < HIGHTEST_INTEGER_VALUE )
+            if( Numeric<T>::withinNativeRange(rat) )
             {
                 Numeric<T>::mFreeRationalIds.push_back( _valueA.mContent );
                 _valueA.mContent = carl::toInt<ContentType>( carl::getNum( rat ) );
@@ -440,7 +440,7 @@ namespace carl
             else
             {
                 typename IntegralType<T>::type a = carl::abs( carl::getNum( _valueB.rational() ) );
-                a = carl::mod( a, _valueA.mContent );
+                a = carl::mod( a, carl::fromInt<typename IntegralType<T>::type>(_valueA.mContent) );
                 if( a != 0 )
                     Numeric<T>::gcd_( _valueA.mContent, carl::toInt<ContentType>( a ) );
             }
@@ -452,7 +452,7 @@ namespace carl
                 typename IntegralType<T>::type a = carl::abs( carl::getNum( _valueA.rational() ) );
                 Numeric<T>::mFreeRationalIds.push_back( _valueA.mContent );
                 _valueA.mContent = std::abs( _valueB.mContent );
-                a = carl::mod( a, _valueA.mContent );
+                a = carl::mod( a, carl::fromInt<typename IntegralType<T>::type>(_valueA.mContent) );
                 if( a != 0 )
                     Numeric<T>::gcd_( _valueA.mContent, carl::toInt<ContentType>( a ) );
             }
@@ -484,7 +484,7 @@ namespace carl
         {
             if( IS_INT( _valueB.content() ) )
             {
-                return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), typename IntegralType<T>::type( _valueB.content() ) ) );
+                return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), carl::fromInt<typename IntegralType<T>::type>( _valueB.content() ) ) );
             }
             else
                 return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
@@ -530,12 +530,12 @@ namespace carl
                 return Numeric<T>( (std::abs(_valueA.content()*_valueB.content())/g) );
             }
             else
-                return Numeric<T>( carl::lcm( typename IntegralType<T>::type( _valueA.content() ), carl::getNum( _valueB.rational() ) ) );
+                return Numeric<T>( carl::lcm( carl::fromInt<typename IntegralType<T>::type>( _valueA.content() ), carl::getNum( _valueB.rational() ) ) );
         }
         else
         {
             if( IS_INT( _valueB.content() ) )
-                return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), typename IntegralType<T>::type( _valueB.content() ) ) );
+                return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), carl::fromInt<typename IntegralType<T>::type>( _valueB.content() ) ) );
             else
                 return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
         }
@@ -630,7 +630,7 @@ namespace carl
             else
             {
                 T rat = _valueB.rational();
-                rat += _valueA.mContent;
+                rat += fromInt<T>(_valueA.mContent);
                 _valueA.maybeRationalize( rat );
             }
         }
@@ -639,7 +639,7 @@ namespace carl
             T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
             {
-                rat += _valueB.mContent;
+                rat += fromInt<T>(_valueB.mContent);
             }
             else
             {
@@ -669,7 +669,7 @@ namespace carl
             else
             {
                 T rat = -_valueB.rational();
-                rat += _valueA.mContent;
+                rat += carl::fromInt<T>(_valueA.mContent);
                 _valueA.maybeRationalize( rat );
             }
         }
@@ -678,7 +678,7 @@ namespace carl
             T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
             {
-                rat -= _valueB.mContent;
+                rat -= carl::fromInt<T>(_valueB.mContent);
             }
             else
             {
@@ -708,7 +708,7 @@ namespace carl
             else
             {
                 T rat = _valueB.rational();
-                rat *= T( _valueA.mContent );
+                rat *= carl::fromInt<T>(_valueA.mContent);
                 _valueA.maybeRationalize( rat );
             }
         }
@@ -717,7 +717,7 @@ namespace carl
             T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
             {
-                rat *= T( _valueB.mContent );
+                rat *= carl::fromInt<T>(_valueB.mContent);
             }
             else
             {
@@ -739,10 +739,10 @@ namespace carl
     {
         if( IS_INT( _valueA.mContent ) )
         {
-            T rat = T( _valueA.mContent );
+            T rat = carl::fromInt<T>(_valueA.mContent);
             if( IS_INT( _valueB.mContent ) )
             {
-                rat /= T( _valueB.mContent );
+                rat /= carl::fromInt<T>(_valueB.mContent);
             }
             else
             {
@@ -755,7 +755,7 @@ namespace carl
             T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
             {
-                rat /= T( _valueB.mContent );
+                rat /= carl::fromInt<T>(_valueB.mContent);
             }
             else
             {

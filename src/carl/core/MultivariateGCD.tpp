@@ -14,6 +14,9 @@
 #include "MultivariatePolynomial.h"
 #include "VariablesInformation.h"
 
+#include "../numbers/FunctionSelector.h"
+#include "../converter/CoCoAAdaptor.h"
+
 namespace carl
 {
 
@@ -47,30 +50,47 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 
 	// And we check for linearly appearing variables. Notice that ay + b is irreducible and thus,
 	// gcd(p, ay + b) is either ay + b or 1.
-    
-    #ifdef USE_GINAC
-    return ginacGcd<Polynomial>( mp1, mp2 );
-    #else 
-	Variable x = getMainVar(mp1, mp2);
+	using TypeSelector = carl::function_selector::NaryTypeSelector;
+#if defined USE_GINAC
+using types = carl::function_selector::wrap_types<mpz_class,mpq_class,cln::cl_I,cln::cl_RA>;
+#else
+using types = carl::function_selector::wrap_types<mpz_class,mpq_class>;
+#endif
+auto s = carl::createFunctionSelector<TypeSelector, types>(
+#if defined USE_COCOA
+	[](const auto& n1, const auto& n2){ CoCoAAdaptor<Polynomial> c({n1, n2}); return c.gcd(n1,n2); },
+	[](const auto& n1, const auto& n2){ CoCoAAdaptor<Polynomial> c({n1, n2}); return c.gcd(n1,n2); }
+#else
+	[this](const auto& n1, const auto& n2){ return this->customCalculation(n1,n2); },
+	[this](const auto& n1, const auto& n2){ return this->customCalculation(n1,n2); }
+#endif
+#if defined USE_GINAC
+	,
+	[](const auto& n1, const auto& n2){ return ginacGcd<Polynomial>( n1, n2 ); },
+	[](const auto& n1, const auto& n2){ return ginacGcd<Polynomial>( n1, n2 ); }
+#endif
+);
+	return s(mp1, mp2);
+}
+
+template<typename GCDCalculation, typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::customCalculation(const Polynomial& a, const Polynomial& b) {
+	Variable x = getMainVar(a, b);
 	if(x == Variable::NO_VARIABLE)
 	{
 		return Polynomial(1);
 	}
-	UnivReprPol A = mp1.toUnivariatePolynomial(x);
-	UnivReprPol B = mp2.toUnivariatePolynomial(x);
+	UnivReprPol A = a.toUnivariatePolynomial(x);
+	UnivReprPol B = b.toUnivariatePolynomial(x);
 	UnivReprPol GCD = (*static_cast<GCDCalculation*>(this))(A.normalized(),B.normalized());
     Polynomial result = Polynomial(GCD);
     // TODO: prevent the following case in the given algorithm GCDCalculation
-    if( carl::isNegative( result.lcoeff() ) && !(carl::isNegative( mp1.lcoeff() ) && carl::isNegative( mp2.lcoeff() )) )
+    if( carl::isNegative( result.lcoeff() ) && !(carl::isNegative( a.lcoeff() ) && carl::isNegative(  b.lcoeff() )) )
     {
         result = -result;
     }
 	return result;
-	//return Result()
-//		return Result(GCD, A/GCD, B/GCD);
-    #endif
-
-}	
+}
 
 template<typename C, typename O, typename P>
 Term<C> gcd(const MultivariatePolynomial<C,O,P>& a, const Term<C>& b)

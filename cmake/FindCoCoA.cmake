@@ -18,9 +18,9 @@ if(COCOA_INCLUDE_DIR AND COCOA_LIBRARY)
 	set(COCOA_FOUND TRUE)
 
 	# Version
-	function(GetVersion OUTPUT FILENAME DESC)
+	function(GetVersion OUTPUT FILENAME)
 		file(STRINGS ${FILENAME} RES REGEX "CoCoALib version .*")
-		string(REGEX MATCH "[0-9]+" RES "${RES}")
+		string(REGEX MATCH "[0-9]+\.[0-9]+" RES "${RES}")
 		set(${OUTPUT} "${RES}" PARENT_SCOPE)
 	endfunction()
 	GetVersion(COCOA_VERSION "${COCOA_INCLUDE_DIR}/CoCoA/library.H")
