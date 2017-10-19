@@ -13,7 +13,6 @@ namespace carl
 {
 
 VariablePool::VariablePool() noexcept:
-	SingletonInstantiated<VariablePool>(),
 	mNextIDs(),
 	freshVarMutex(),
 	setNameMutex(),

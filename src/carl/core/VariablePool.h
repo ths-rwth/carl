@@ -6,7 +6,7 @@
 #pragma once
 
 #include "../config.h"
-#include "../util/Singleton.h"
+#include "../util/SingletonManager.h"
 #include "Variable.h"
 
 #include <array>
@@ -27,9 +27,9 @@ namespace carl
  *
  * All methods that modify the pool, that are getInstance(), getFreshVariable() and setName(), are thread-safe.
  */
-class VariablePool : public SingletonInstantiated<VariablePool>
+class VariablePool
 {
-friend SingletonInstantiated<VariablePool>;
+	friend class SingletonManager;
 private:
 	/**
 	 * Contains the id of the next variable to be created for each type.
@@ -182,6 +182,10 @@ public:
 	friend inline Variable freshVariable(const VariableType& vt) noexcept;
 	friend inline Variable freshVariable(const std::string& name, const VariableType& vt);
 
+
+	static VariablePool& getInstance() {
+		return SingletonManager::instance().get<VariablePool>();
+	}
 };
 
 inline Variable freshVariable(const VariableType& vt) noexcept {

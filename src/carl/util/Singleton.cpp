@@ -12,5 +12,5 @@ namespace carl {
 	}
 	
 	template class SingletonInstantiated<MonomialPool>;
-	template class SingletonInstantiated<VariablePool>;
+	//template class SingletonInstantiated<VariablePool>;
 }
