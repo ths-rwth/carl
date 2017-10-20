@@ -48,6 +48,8 @@ TEST(Formula, Construction)
     EXPECT_EQ( Constr( px+Rational(1), Relation::LESS ), Constr( x, Relation::LESS, -Rational(1) ) );
     EXPECT_EQ( Constr( px+Rational(1), Relation::GEQ ), Constr( x, Relation::GEQ, -Rational(1) ) );
     EXPECT_EQ( Constr( px+Rational(1), Relation::GREATER ), Constr( x, Relation::GREATER, -Rational(1) ) );
+    // Test should be fixed
+    // EXPECT_EQ( Constr( px+Rational(1), Relation::EQ ), Constr( x, Relation::EQ, -Rational(1) ) );
 
     // Uninterpreted functions are
 
