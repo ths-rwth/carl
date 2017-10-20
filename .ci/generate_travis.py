@@ -56,6 +56,7 @@ envs = {
 	"clang-3.9": {"env": ["CC=clang-3.9 CXX=clang++-3.9"], "compiler": "clang++-3.9"},
 	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0"},
 	"clang-5.0": {"env": ["CC=clang-5.0 CXX=clang++-5.0"], "compiler": "clang++-5.0"},
+	"clang-6.0": {"env": ["CC=clang-6.0 CXX=clang++-6.0"], "compiler": "clang++-6.0"},
 	"g++-5": {"env": ["CC=gcc-5 CXX=g++-5"], "compiler": "g++-5"},
 	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6"},
 	"g++-7": {"env": ["CC=gcc-7 CXX=g++-7"], "compiler": "g++-7"},
@@ -74,6 +75,7 @@ apts = {
 	"clang-3.9": { "apt_src": ["llvm-toolchain-trusty-3.9"], "apt_pkg": ["clang-3.9"]},
 	"clang-4.0": { "apt_src": ["llvm-toolchain-trusty-4.0"], "apt_pkg": ["clang-4.0"]},
 	"clang-5.0": { "apt_src": ["llvm-toolchain-trusty-5.0"], "apt_pkg": ["clang-5.0"]},
+	"clang-6.0": { "apt_src": ["llvm-toolchain-trusty"], "apt_pkg": ["clang-6.0"]},
 }
 
 def aptmapper(j):
@@ -119,6 +121,7 @@ jobs = [
 	job(["build"], "linux", ["build.sh"], ["clang-3.9"], ["clang-3.9"]),
 	job(["build"], "linux", ["build.sh"], ["clang-4.0"], ["clang-4.0"]),
 	job(["build"], "linux", ["build.sh"], ["clang-5.0"], ["clang-5.0"]),
+	job(["build"], "linux", ["build.sh"], ["clang-6.0"], ["clang-6.0"]),
 	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-5"], ["g++-5"]),
 	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-6"]),
 	job(["dependencies","build"], "linux", ["j1", "build.sh"], ["g++-7"], ["g++-7"]),

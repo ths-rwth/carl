@@ -125,6 +125,15 @@ matrix:
           packages: [*packages_base, clang-5.0]
     - stage: build
       os: linux
+      compiler: clang++-6.0
+      env: CC=clang-6.0 CXX=clang++-6.0
+      script: source .ci/build.sh
+      addons:
+        apt:
+          sources: [*sources_base, llvm-toolchain-trusty]
+          packages: [*packages_base, clang-6.0]
+    - stage: build
+      os: linux
       compiler: g++-5
       env: CC=gcc-5 CXX=g++-5
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
