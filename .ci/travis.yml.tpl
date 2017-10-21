@@ -69,3 +69,6 @@ notifications:
       - "Commit to %{repository_name}/%{branch} from %{author}"
       - "%{commit_message}"
       - "Build: %{message} %{duration} %{build_url}"
+  slack:
+    rooms:
+      secure: eEyvqmcbM8Lwi1GJLXl/W1s+r9u/GHjsOjpawLE59jj553z3MWMAdOXnwnJfjRLiHQ8mWClFYK7wknwBOknWoIKAMe3nCYEtHMOaKLUQbxxeC8fWieQx1hivRXcJ8nH9o3gSDgc2YO5+1xfM9Eynsyf/geu+0UaWc2wHFModlQfkSIHO3gErVXqfdbrLvLUKeS3DAwOPIFBpok0L3wN4h+wlPmTE7rkVH9qgi377EzCVup+aMk8jj+sduhGVIjc81qPLmR1WxGNLSwGFY2UcVNaaWVZJ1tZZ/0IFxnUKtea0cmzaRtW5mfgQ2FsiR+ZIuWu09Rub9fEiShKqyj3YOXHJs1lNl731wIUAskDERCr/+tXQoF54fkQj9xBkyIAiZlceQ9CRHAvFD4dU+tfhZeYfOVWNf9hsUkdMo/c6ZcrQq7FTektKs8JT6Wx3lTxoWBaDhjsSaGMhNlaR7tx6myIIhAbNwQh5GgY6rKawDUq0hzg8O2MM3LxHNN8p7EbpOZZHWCjrx6ATTIMFD8MgfakpcExGjz4Qy+hQApIqE7C1zOmnTXEVtCkxP6TAQPwQHFwcdUKh7PXTu531nQXvulcVd3IHup1KsiLR6l4f3xxJqh57E/7gK9bLyxvIP75h7QzuJ9WQSKU+FOgt0vYO5b/Td8I0R+wL/tWzqWdhkfQ=
