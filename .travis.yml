@@ -58,6 +58,11 @@ matrix:
     - stage: dependencies
       os: linux
       compiler: g++-6
+      env: CC=gcc-6 CXX=g++-6 TASK=coverity
+      script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
+    - stage: dependencies
+      os: linux
+      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=pycarl
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -164,6 +169,23 @@ matrix:
         apt:
           sources: [*sources_base]
           packages: [*packages_base, lcov]
+    - stage: build
+      os: linux
+      compiler: g++-6
+      env: CC=gcc-6 CXX=g++-6 TASK=coverity
+      script: echo "Skip"
+      addons:
+        apt:
+          sources: [*sources_base]
+          packages: [*packages_base, lcov]
+        coverity_scan:
+          project:
+            name: "smtrat/carl"
+            description: "CArL"
+          notification_email: gereon.kremer@cs.rwth-aachen.de
+          build_command_prepend: cov-configure --comptype gcc --compiler `which $CXX`
+          build_command: .ci/build.sh MAKE_PARALLEL=-j1
+          branch_pattern: master
     - stage: build
       os: linux
       compiler: g++-6

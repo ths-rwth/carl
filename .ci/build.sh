@@ -21,6 +21,11 @@ elif [[ ${TASK} == "coverage" ]]; then
 	/usr/bin/time make ${MAKE_PARALLEL} coverage-collect || return 1
 	
 	coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
+elif [[ ${TASK} == "coverity" ]]; then
+		MAKE_PARALLEL="-j1"
+		
+		/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
+		/usr/bin/time make ${MAKE_PARALLEL} || return 1
 elif [[ ${TASK} == "doxygen" ]]; then
 	make doc || return 1
 	
