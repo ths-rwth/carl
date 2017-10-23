@@ -63,7 +63,7 @@ matrix:
     - stage: dependencies
       os: linux
       compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=sonar
+      env: CC=gcc-6 CXX=g++-6 TASK=sonarcloud
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: dependencies
       os: linux
@@ -192,7 +192,7 @@ matrix:
     - stage: build
       os: linux
       compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=sonar
+      env: CC=gcc-6 CXX=g++-6 TASK=sonarcloud
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
         apt: *apt_base
@@ -257,6 +257,12 @@ matrix:
     - stage: build
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=coverage
+    - stage: build
+      os: linux
+      env: CC=gcc-6 CXX=g++-6 TASK=coverity
+    - stage: build
+      os: linux
+      env: CC=gcc-6 CXX=g++-6 TASK=sonarcloud
     - stage: build
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=pycarl
