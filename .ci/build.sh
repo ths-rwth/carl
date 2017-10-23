@@ -22,10 +22,17 @@ elif [[ ${TASK} == "coverage" ]]; then
 	
 	coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
 elif [[ ${TASK} == "coverity" ]]; then
-		MAKE_PARALLEL="-j1"
-		
-		/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
-		/usr/bin/time make ${MAKE_PARALLEL} || return 1
+	MAKE_PARALLEL="-j1"
+	
+	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
+	/usr/bin/time make ${MAKE_PARALLEL} || return 1
+elif [[ ${TASK} == "sonarcloud" ]]; then
+	
+	WRAPPER="build-wrapper-linux-x86-64 --out-dir bw-output"
+	$WRAPPER make ${MAKE_PARALLEL} lib_carl || return 1
+	$WRAPPER make ${MAKE_PARALLEL} || return 1
+	
+	cd ../ && sonar-scanner && cd build/
 elif [[ ${TASK} == "doxygen" ]]; then
 	make doc || return 1
 	
