@@ -178,7 +178,7 @@ matrix:
       os: linux
       compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=coverity
-      script: echo "Skip"
+      script: cat cov-int/scm_log.txt
       addons:
         apt: *apt_base
         coverity_scan:
@@ -198,8 +198,6 @@ matrix:
         apt: *apt_base
         sonarcloud:
           organization: smtrat-github
-          token:
-            secure: "hmFc0MVQCd9WXs08gEFZZm2YvQjRXkP8vArH2Ik3dlJSgvJkEzmi0JFrcIpzo/sRLNFd17KyB6RIT84Zd9jJzmOp5VCLmwXnwYOGXwMooIPTvCSn5qcTGrOxMxSsRUXw3nnBTHRp7D4eeUSSUMntd5EsDTRT+Par2AzGR97z2f08NdwzjWCKkAXPPtpi0lO4ZhrZSw1lYl0SqZlz5sKNKtUHHnF7mQUeimx9lmntj+clPRKceWNs9tybdzBM45bTW9/Ak+hOJVXE68iRwaTwC4MNuNJdVh7uu2F6joDuvekGk3DpzN0xqSfKd42Th7+2g5O/en9ZTfAoqhXxXY7itINdfDP4nQI1an5Kc3HF4s/s+El8KK5AAzh7PWZ25CghA80qHNearnBjGAmVJhgpNqK8Wj1W2CMKLS4BzB533RzkxQsSKDR/KlLtHq2mqrgrI3JJ/tEXRyrdMiM6CUQMAVu9jQlnEdCxtOZ746V+F1zWmtG2aDs0/V5j59D5gzyDtPQRjDf7iOnR5GcGOXERLu1EZGb23/eIX+MUgxP/9RxpfkGquOrlRwwUOBOXRxIj1dlfIbg5i2lljk9ZlDIo/FsFYMgXKh/dHVOARC/LVUkCnm4SSmeVDQIoJDUoVg7OGMHeK4ygUqgL/ocfaMh72awl6pC6SebRtZzmX8fv6P4="
     - stage: build
       os: linux
       compiler: g++-6
