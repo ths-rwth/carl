@@ -36,11 +36,26 @@ matrix:
       env: {{ job.env|join(' ') }}
   {%- endif %}
       script: {{ job.script|join(' ') }}
-  {%- if job.apt_pkg %}
+  {%- if job.addons %}
       addons:
+    {%- if job.addons.apt %}
         apt:
-          sources: [{{ job.apt_src|join(', ') }}]
-          packages: [{{ job.apt_pkg|join(', ') }}]
+          sources: [{{ job.addons.apt.sources|join(', ') }}]
+          packages: [{{ job.addons.apt.packages|join(', ') }}]
+    {%- endif %}
+    {%- if job.addons.coverity_scan %}
+        coverity_scan:
+          project:
+            name: "{{ job.addons.coverity_scan.name }}"
+            description: "{{ job.addons.coverity_scan.description }}"
+      {%- for prop,value in job.addons.coverity_scan.properties.items() %}
+          {{ prop }}: "{{ value }}"
+      {%- endfor %}
+    {%- endif %}
+    {%- if job.addons.sonarcloud %}
+        sonarcloud:
+          organization: "{{ job.addons.sonarcloud.organization }}"
+    {%- endif %}
   {%- endif %}
 {%- endfor %}
   allow_failures:

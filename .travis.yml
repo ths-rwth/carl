@@ -9,7 +9,7 @@ cache:
     - build/resources
 
 addons:
-  apt: &apt_base
+  apt:
     sources: &sources_base
       - ubuntu-toolchain-r-test
     packages: &packages_base
@@ -166,6 +166,36 @@ matrix:
           sources: [*sources_base]
           packages: [*packages_base, g++-7]
     - stage: build
+      os: osx
+      osx_image: xcode7.3
+      script: source .ci/build.sh
+    - stage: build
+      os: osx
+      osx_image: xcode8.2
+      script: source .ci/build.sh
+    - stage: build
+      os: osx
+      osx_image: xcode8.3
+      script: source .ci/build.sh
+    - stage: build
+      os: linux
+      compiler: g++-6
+      env: CC=gcc-6 CXX=g++-6 TASK=doxygen
+      script: MAKE_PARALLEL=-j1 source .ci/build.sh
+      addons:
+        apt:
+          sources: [*sources_base]
+          packages: [*packages_base, doxygen, texinfo, texlive]
+    - stage: build
+      os: linux
+      compiler: clang++-5.0
+      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
+      script: source .ci/build.sh
+      addons:
+        apt:
+          sources: [*sources_base, llvm-toolchain-trusty-5.0]
+          packages: [*packages_base, clang-5.0]
+    - stage: build
       os: linux
       compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=coverage
@@ -180,33 +210,28 @@ matrix:
       env: CC=gcc-6 CXX=g++-6 TASK=coverity
       script: cat cov-int/scm_log.txt
       addons:
-        apt: *apt_base
+        apt:
+          sources: [*sources_base]
+          packages: [*packages_base]
         coverity_scan:
           project:
             name: "smtrat/carl"
             description: "CArL"
-          notification_email: gereon.kremer@cs.rwth-aachen.de
-          build_command_prepend: cov-configure --comptype gcc --compiler `which $CXX`
-          build_command: .ci/build.sh MAKE_PARALLEL=-j1
-          branch_pattern: master
+          notification_email: "gereon.kremer@cs.rwth-aachen.de"
+          build_command_prepend: "cov-configure --comptype gcc --compiler `which $CXX`"
+          build_command: ".ci/build.sh MAKE_PARALLEL=-j1"
+          branch_pattern: "master"
     - stage: build
       os: linux
       compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=sonarcloud
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
-        apt: *apt_base
-        sonarcloud:
-          organization: smtrat-github
-    - stage: build
-      os: linux
-      compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=doxygen
-      script: MAKE_PARALLEL=-j1 source .ci/build.sh
-      addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, doxygen, texinfo, texlive]
+          packages: [*packages_base]
+        sonarcloud:
+          organization: "smtrat-github"
     - stage: build
       os: linux
       compiler: g++-6
@@ -221,37 +246,10 @@ matrix:
       compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=addons
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
-    - stage: build
-      os: linux
-      compiler: clang++-5.0
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
-      script: source .ci/build.sh
-      addons:
-        apt:
-          sources: [*sources_base, llvm-toolchain-trusty-5.0]
-          packages: [*packages_base, clang-5.0]
-    - stage: build
-      os: osx
-      osx_image: xcode7.3
-      script: source .ci/build.sh
-    - stage: build
-      os: osx
-      osx_image: xcode8.2
-      script: source .ci/build.sh
-    - stage: build
-      os: osx
-      osx_image: xcode8.3
-      script: source .ci/build.sh
   allow_failures:
-    - stage: dependencies
+    - stage: build
       os: linux
-      env: CC=gcc-6 CXX=g++-6 TASK=coverage
-    - stage: dependencies
-      os: linux
-      env: CC=gcc-6 CXX=g++-6 TASK=pycarl
-    - stage: dependencies
-      os: linux
-      env: CC=gcc-6 CXX=g++-6 TASK=addons
+      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
     - stage: build
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=coverage
@@ -267,9 +265,6 @@ matrix:
     - stage: build
       os: linux
       env: CC=gcc-6 CXX=g++-6 TASK=addons
-    - stage: build
-      os: linux
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
 
 before_install:
   - cd .ci/ && source setup_travis.sh && cd ../
