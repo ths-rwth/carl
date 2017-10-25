@@ -232,6 +232,8 @@ matrix:
           packages: [*packages_base]
         sonarcloud:
           organization: "smtrat-github"
+          token:
+            secure: "ulhpzLkttWvU5ZydOoQBDF5h/YcExXn6afnAwRlCeqINXxrX6UnzoDImXzfK6i12phdctaSOtZkHy0QuXOZhnRLx0WcTVOOMS5cIzPzUwJBFRD9FaeEHjjQAlCSNhpHcbC9fUfGf7Sh21kNyzMmrGnpCFDMKANECI5vfSf6drpSgbcbckUv6WgJW4kggykXLRGIIEpeA6IvPma+3mC3Wou9O3yWjitBNmP9J+cB6/Dvekbrz6dZttZ58bO5rxKYtkMDjqI0zrmG4hSuILiqTXWG08mHXG4e4N7s43vO0ESXUYq3xWEaZcWgPV5OWXbqpUKIeyaJEpyKunE8bKTiUtpR1uy24oo/8203PB2M/sN3+hHMayPWsoCidBxg4J4ebEaLeHfdAtNccEt3pmNv5JyF4wBY2lY3JhjlxcVF4dW4jP/6sQWM4rbkWJ5quY9U1HnohTxdtzkkKt3/D5y+qcXqdAwPdP7vwMafbrDzf6S4JbBhqjM/kcSn+iJ0CEFsP3InkkAF1KRTO+0fswsh2dbM/jk0Qkq71mTOSwm3jqbqyORLEZGtiJT9Ub6gMZLVR3LBjxTCgfFo7X3nsh4SXTJFhQhsl9XI27V0zo4pz3p7Tkzla4rP4Sl6dYlksIcMX5JGvcPcpsh3UtRt0xqbhV86yYXcd+22zHbUEMSNQwSI="
     - stage: build
       os: linux
       compiler: g++-6

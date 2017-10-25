@@ -55,6 +55,8 @@ matrix:
     {%- if job.addons.sonarcloud %}
         sonarcloud:
           organization: "{{ job.addons.sonarcloud.organization }}"
+          token:
+            secure: "{{ job.addons.sonarcloud.token }}"
     {%- endif %}
   {%- endif %}
 {%- endfor %}
