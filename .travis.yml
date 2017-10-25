@@ -6,6 +6,7 @@ cache:
   apt: true
   directories:
     - $HOME/usr/
+    - $HOME/.sonar/cache
     - build/resources
 
 addons:
@@ -233,7 +234,7 @@ matrix:
         sonarcloud:
           organization: "smtrat-github"
           token:
-            secure: "ulhpzLkttWvU5ZydOoQBDF5h/YcExXn6afnAwRlCeqINXxrX6UnzoDImXzfK6i12phdctaSOtZkHy0QuXOZhnRLx0WcTVOOMS5cIzPzUwJBFRD9FaeEHjjQAlCSNhpHcbC9fUfGf7Sh21kNyzMmrGnpCFDMKANECI5vfSf6drpSgbcbckUv6WgJW4kggykXLRGIIEpeA6IvPma+3mC3Wou9O3yWjitBNmP9J+cB6/Dvekbrz6dZttZ58bO5rxKYtkMDjqI0zrmG4hSuILiqTXWG08mHXG4e4N7s43vO0ESXUYq3xWEaZcWgPV5OWXbqpUKIeyaJEpyKunE8bKTiUtpR1uy24oo/8203PB2M/sN3+hHMayPWsoCidBxg4J4ebEaLeHfdAtNccEt3pmNv5JyF4wBY2lY3JhjlxcVF4dW4jP/6sQWM4rbkWJ5quY9U1HnohTxdtzkkKt3/D5y+qcXqdAwPdP7vwMafbrDzf6S4JbBhqjM/kcSn+iJ0CEFsP3InkkAF1KRTO+0fswsh2dbM/jk0Qkq71mTOSwm3jqbqyORLEZGtiJT9Ub6gMZLVR3LBjxTCgfFo7X3nsh4SXTJFhQhsl9XI27V0zo4pz3p7Tkzla4rP4Sl6dYlksIcMX5JGvcPcpsh3UtRt0xqbhV86yYXcd+22zHbUEMSNQwSI="
+            secure: "nIGn6M7vkwD6HAKgS94QZIIU+A+dWOgqXzJ7lnAdGLXUx3cStVMO1LuOANttGyeGSJNj8Fa+YzwCx5EMQDvZW/b8cuoRld+I4gbmszUB6BXwQ6JJvpFczHrPpwyeo2LKrBN549aBCtOaLzw7rVPDzcdC6T39IvxpPXVCMTTjoq7Mp12HSWS8Ra8YIsOnJfYKVSxjCwcY9ICac70zpA6uKuWBNL13EBM+IpLACLFDKMcaIdb2CGyRvtbt7u8BOU9mjulRtpg1Ndc3eGEIIJJXM8lQTA+iMB6iapGWYbMB5Gwifrwy59UTgNbdR/6sWP5E5kxBGxn1lyp9VP6ChSS/b3Szhh0jUWaqBxoAK0Kh4KBeW7eeLvaUALuPmoNneGUZACrbNDq6aVzHUgwEKQTxF0reDkG3ZaEU+1NCukvLaI58OBxenb5bMOlEWzUMSMMuNO0MgVKXc3Nvr4oEm0USP6Ixky1AUTKTVDY87HHuQ+kCM/L5MQUQTwtQPuWF1zkDry+6A2LNABySla9AAtxlUth7rGvLwaTz2o3yMOIohQb12r8LqXnjESVcENk0f0gbyqeqM7aPcXAyqc6YDW9LBDSsWWa9SqxEfwz2zktzsWfKfCZWi4Fn7CaPdHGsGlSaGsXGovrT1DbyQPiTND0R1cinfrOqZBgwjWOB6JTol+g="
     - stage: build
       os: linux
       compiler: g++-6

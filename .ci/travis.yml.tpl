@@ -6,6 +6,7 @@ cache:
   apt: true
   directories:
     - $HOME/usr/
+    - $HOME/.sonar/cache
     - build/resources
 
 addons:
