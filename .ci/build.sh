@@ -32,7 +32,7 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	$WRAPPER make ${MAKE_PARALLEL} lib_carl || return 1
 	$WRAPPER make ${MAKE_PARALLEL} || return 1
 	
-	cd ../ && sonar-scanner -Dproject.settings=.ci/sonarcloud.properties && cd build/
+	cd ../ && sonar-scanner -X -Dproject.settings=.ci/sonarcloud.properties && cd build/
 elif [[ ${TASK} == "doxygen" ]]; then
 	make doc || return 1
 	
