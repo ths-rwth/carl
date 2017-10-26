@@ -48,7 +48,7 @@ auto tuple_tail(Tuple&& t) {
 }
 
 template<typename Converter, typename Information, typename FOut, typename... TOut>
-struct tuple_convert {
+class tuple_convert {
 private:
 	Information i;
 	tuple_convert<Converter, Information, TOut...> conv;
@@ -61,7 +61,7 @@ public:
 };
 
 template<typename Converter, typename Information, typename Out>
-struct tuple_convert<Converter, Information, Out> {
+class tuple_convert<Converter, Information, Out> {
 private:
 	Information i;
 public:

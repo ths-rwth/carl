@@ -8,7 +8,7 @@ namespace carl {
 
 namespace detail {
 	template<typename T>
-	struct variant_is_type_visitor: public boost::static_visitor<bool> {
+	struct variant_is_type_visitor: boost::static_visitor<bool> {
 		template<typename TT>
 		constexpr bool operator()(const TT& /*unused*/) const noexcept {
 			return std::is_same<T,TT>::value;
@@ -38,7 +38,7 @@ Target variant_extend(const boost::variant<Args...>& variant) {
 }
 
 namespace detail {
-	struct variant_hash: public boost::static_visitor<std::size_t> {
+	struct variant_hash: boost::static_visitor<std::size_t> {
 		template <class T>
 		std::size_t operator()(const T& val) const {
 			return std::hash<T>()(val);

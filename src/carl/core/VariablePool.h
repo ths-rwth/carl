@@ -179,8 +179,8 @@ public:
 		}
 	}
 
-	friend inline Variable freshVariable(const VariableType& vt) noexcept;
-	friend inline Variable freshVariable(const std::string& name, const VariableType& vt);
+	friend Variable freshVariable(const VariableType& vt) noexcept;
+	friend Variable freshVariable(const std::string& name, const VariableType& vt);
 
 };
 

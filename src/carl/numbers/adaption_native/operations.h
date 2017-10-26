@@ -64,10 +64,6 @@ inline std::size_t bitsize(unsigned /*unused*/) {
 	return sizeof(unsigned) * 8;
 }
 
-template<typename C>
-inline void reserve(std::size_t /*unused*/) {
-}
-
 /**
  * Conversion functions
  *

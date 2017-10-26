@@ -63,11 +63,11 @@ namespace detail {
 		return res;
 	}
 
-	#ifdef USE_CLN_NUMBERS
+#ifdef USE_CLN_NUMBERS
 	inline cln::cl_I next_prime(const cln::cl_I& n, const PrimeFactory<cln::cl_I>&) {
 		return cln::nextprobprime(n + 1);
 	}
-	#endif
+#endif
 }
 
 template<typename T>
