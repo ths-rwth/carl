@@ -40,7 +40,7 @@ inline bool isNegative(sint n) {
 }
 
 inline bool isNumber(double d) {
-	return (d == d) && !std::isinf(d);
+	return !std::isnan(d) && !std::isinf(d);
 }
 
 inline bool isInteger(double d) {
