@@ -173,11 +173,7 @@ public:
 	 * @return `os`
 	 */
 	friend std::ostream& operator<<(std::ostream& os, Variable rhs) {
-		#ifdef CARL_USE_FRIENDLY_VARNAMES
-        return os << rhs.getName();
-		#else
-		return os << "x_" << rhs.getId();
-		#endif
+		return os << rhs.getName();
 	}
 	
 	/// @name Comparison operators

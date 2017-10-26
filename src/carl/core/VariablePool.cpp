@@ -95,10 +95,8 @@ std::string VariablePool::getName(Variable v, bool variableName) const {
 }
 
 void VariablePool::setName(Variable v, const std::string& name) {
-	#ifdef CARL_USE_FRIENDLY_VARNAMES
 	SETNAME_LOCK_GUARD
 	mVariableNames[v] = name;
-	#endif
 }
 
 }
