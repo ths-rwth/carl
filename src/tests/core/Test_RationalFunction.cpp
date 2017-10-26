@@ -73,10 +73,6 @@ TEST(RationalFunction, Construction)
     std::cout << rf4 << std::endl;
     rf4.simplify();
     std::cout << rf4 << std::endl;
-    rf1 = rf1;
-    rf2 = rf2;
-    rf3 = rf3;
-    rf4 = rf4;
 }
 
 TEST(RationalFunction, Multiplication)
