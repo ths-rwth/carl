@@ -165,3 +165,4 @@ endif()
 
 include(resources/addons/addons.cmake)
 include(packaging)
+include(prepare-ci)

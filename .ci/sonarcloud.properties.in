@@ -1,6 +1,6 @@
-sonar.projectKey=carl
-sonar.projectName=CArL
-sonar.projectVersion=17.10
+sonar.projectKey=${PROJECT_FULLNAME}
+sonar.projectName=${${PROJECT_FULLNAME}_NAME}
+sonar.projectVersion=${PROJECT_VERSION}
 
 # =====================================================
 #   Meta-data for the project
