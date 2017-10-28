@@ -33,7 +33,7 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	WRAPPER="build-wrapper-linux-x86-64 --out-dir ../bw-output"
 	$WRAPPER make ${MAKE_PARALLEL} lib_carl || return 1
 	$WRAPPER make ${MAKE_PARALLEL} || return 1
-	make collect-coverage
+	make coverage-collect
 	
 	cd ../ && sonar-scanner -X -Dproject.settings=build/sonarcloud.properties && cd build/
 elif [[ ${TASK} == "doxygen" ]]; then
