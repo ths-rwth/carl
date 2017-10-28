@@ -126,6 +126,7 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
  * Base class for a logging sink. It only provides an interface to access some std::ostream.
  */
 struct Sink {
+	virtual ~Sink() = default;
 	/**
 	 * Abstract logging interface.
 	 * The intended usage is to write any log output to the output stream returned by this function.
@@ -137,7 +138,7 @@ struct Sink {
  * Logging sink that wraps an arbitrary `std::ostream`.
  * It is meant to be used for streams like `std::cout` or `std::cerr`.
  */
-struct StreamSink: public Sink {
+struct StreamSink final: public Sink {
 	/// Output stream.
 	std::ostream os;
 	/**
@@ -150,7 +151,7 @@ struct StreamSink: public Sink {
 /**
  * Logging sink for file output.
  */
-struct FileSink: public Sink {
+struct FileSink final: public Sink {
 	/// File output stream.
 	std::ofstream os;
 	/**
@@ -237,6 +238,8 @@ struct Formatter {
 	std::size_t channelwidth = 10;
 	/// Print information like log level, file etc.
 	bool printInformation = true;
+	
+	virtual ~Formatter() = default;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
 	 * @param f Filter.
