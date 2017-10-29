@@ -8,19 +8,12 @@ if (COVERAGE)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
 
 		add_custom_target(coverage-collect
-			#COMMAND lcov --version
-			#COMMAND cp ${CMAKE_SOURCE_DIR}/cmake/lcov-wrapper.sh .
-			#COMMAND chmod +x lcov-wrapper.sh
-			#COMMAND lcov --directory . --zerocounters
 			COMMAND make
 			COMMAND rm -f ${CMAKE_BINARY_DIR}/coverage/*
 			COMMAND make test LLVM_PROFILE_FILE=${CMAKE_BINARY_DIR}/coverage/%p.profraw
 			COMMAND llvm-profdata merge -sparse ${CMAKE_BINARY_DIR}/coverage/*.profraw -o ${CMAKE_BINARY_DIR}/llvm.profdata
-			COMMAND llvm-cov show -instr-profile llvm.profdata libcarl.so > coverage.txt
-			#COMMAND lcov --directory . --base-directory . --gcov-tool ./lcov-wrapper.sh --capture -o coverage.info
-			#COMMAND lcov --remove coverage.info '/usr/*' 'build/resources/*' 'src/tests/*' --output-file coverage.info
-			#COMMAND genhtml coverage.info -o "coverage/"
-			#COMMAND rm lcov-wrapper.sh
+			COMMAND mkdir -p ${CMAKE_BINARY_DIR}/coverage-out/*
+			COMMAND llvm-cov show -instr-profile llvm.profdata libcarl.so > coverage-out/coverage.txt
 			WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 		)
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
