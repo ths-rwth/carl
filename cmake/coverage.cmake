@@ -16,6 +16,7 @@ if (COVERAGE)
 			COMMAND rm -f ${CMAKE_BINARY_DIR}/coverage/*
 			COMMAND make test LLVM_PROFILE_FILE=${CMAKE_BINARY_DIR}/coverage/%p.profraw
 			COMMAND llvm-profdata merge -sparse ${CMAKE_BINARY_DIR}/coverage/*.profraw -o ${CMAKE_BINARY_DIR}/llvm.profdata
+			COMMAND llvm-cov show -instr-profile llvm.profdata libcarl.so > coverage.txt
 			#COMMAND lcov --directory . --base-directory . --gcov-tool ./lcov-wrapper.sh --capture -o coverage.info
 			#COMMAND lcov --remove coverage.info '/usr/*' 'build/resources/*' 'src/tests/*' --output-file coverage.info
 			#COMMAND genhtml coverage.info -o "coverage/"

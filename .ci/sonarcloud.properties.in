@@ -24,4 +24,4 @@ sonar.cpp.file.suffixes=.h,.tpp,.cpp
 # Properties specific to the C/C++ analyzer:
 sonar.cfamily.build-wrapper-output=bw-output
 sonar.cfamily.gcov.reportsPath=.
-sonar.cfamily.llvm-cov.reportPath=build/llvm.profdata
+sonar.cfamily.llvm-cov.reportPath=build/coverage.txt
