@@ -8,12 +8,7 @@ if (COVERAGE)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
 
 		add_custom_target(coverage-collect
-			COMMAND make
-			COMMAND rm -f ${CMAKE_BINARY_DIR}/coverage/*
-			COMMAND make test LLVM_PROFILE_FILE=${CMAKE_BINARY_DIR}/coverage/%p.profraw
-			COMMAND llvm-profdata merge -sparse ${CMAKE_BINARY_DIR}/coverage/*.profraw -o ${CMAKE_BINARY_DIR}/llvm.profdata
-			COMMAND mkdir -p ${CMAKE_BINARY_DIR}/coverage-out/*
-			COMMAND llvm-cov show -instr-profile llvm.profdata libcarl.so > coverage-out/coverage.txt
+			COMMAND ${CMAKE_SOURCE_DIR}/cmake/coverage-clang.sh ${CMAKE_BINARY_DIR}
 			WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 		)
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
