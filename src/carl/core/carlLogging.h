@@ -125,7 +125,8 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
 /**
  * Base class for a logging sink. It only provides an interface to access some std::ostream.
  */
-struct Sink {
+class Sink {
+public:
 	virtual ~Sink() = default;
 	/**
 	 * Abstract logging interface.
@@ -138,9 +139,10 @@ struct Sink {
  * Logging sink that wraps an arbitrary `std::ostream`.
  * It is meant to be used for streams like `std::cout` or `std::cerr`.
  */
-struct StreamSink final: public Sink {
+class StreamSink final: public Sink {
 	/// Output stream.
 	std::ostream os;
+public:
 	/**
 	 * Create a StreamSink from some output stream.
 	 * @param _os Output stream.
@@ -151,9 +153,10 @@ struct StreamSink final: public Sink {
 /**
  * Logging sink for file output.
  */
-struct FileSink final: public Sink {
+class FileSink final: public Sink {
 	/// File output stream.
 	std::ofstream os;
+public:
 	/**
 	 * Create a FileSink that logs to the specified file.
 	 * The file is truncated upon construction.
@@ -166,16 +169,22 @@ struct FileSink final: public Sink {
 /**
  * This class checks if some log message shall be forwarded to some sink.
  */
-struct Filter {
+class Filter {
 	/// Mapping from channels to (minimal) log levels.
 	std::map<std::string, LogLevel> mData;
-	
+public:
 	/**
 	 * Constructor.
 	 * @param level Default minimal log level.
 	 */
 	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT): mData() {
 		(*this)("", level);
+	}
+	/**
+	 * Returns the internal filter data.
+	 */
+	const auto& data() const {
+		return mData;
 	}
 	/**
 	 * Set the minimum log level for some channel.
@@ -233,19 +242,19 @@ struct RecordInfo {
 /**
  * Formats a log messages.
  */
-struct Formatter {
+class Formatter {
 	/// Width of the longest channel.
 	std::size_t channelwidth = 10;
 	/// Print information like log level, file etc.
 	bool printInformation = true;
-	
+public:
 	virtual ~Formatter() = default;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
 	 * @param f Filter.
 	 */
 	virtual void configure(const Filter& f) noexcept {
-		for (const auto& t: f.mData) {
+		for (const auto& t: f.data()) {
 			if (t.first.size() > channelwidth) channelwidth = t.first.size();
 		}
 	}
