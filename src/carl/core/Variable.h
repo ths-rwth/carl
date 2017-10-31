@@ -139,23 +139,32 @@ public:
 	 * Retrieves the id of the variable.
 	 * @return Variable id.
 	 */
-	constexpr std::size_t getId() const noexcept {
+	constexpr std::size_t id() const noexcept {
 		return (mContent >> RESERVED_FOR_TYPE) % (std::size_t(1) << AVAILABLE);
+	}
+	constexpr std::size_t getId() const noexcept {
+		return id();
 	}
 	
 	/**
 	 * Retrieves the type of the variable.
 	 * @return Variable type.
 	 */
-	constexpr VariableType getType() const noexcept {
+	constexpr VariableType type() const noexcept {
 		return VariableType(mContent % (std::size_t(1) << RESERVED_FOR_TYPE));
+	}
+	constexpr VariableType getType() const noexcept {
+		return type();
 	}
 	
 	/**
 	 * Retrieves the name of the variable.
 	 * @return Variable name.
 	 */
-	std::string getName() const;
+	std::string name() const;
+	std::string getName() const {
+		return name();
+	}
 	
 	/**
 	 * Retrieves the rank of the variable.
@@ -172,7 +181,7 @@ public:
 	 * @return `os`
 	 */
 	friend std::ostream& operator<<(std::ostream& os, Variable rhs) {
-		return os << rhs.getName();
+		return os << rhs.name();
 	}
 	
 	/// @name Comparison operators
@@ -239,7 +248,7 @@ namespace std {
 		 * @param variable Variable.
 		 * @return Hash of variable
 		 */
-		std::size_t operator()(const carl::Variable& variable) const noexcept {
+		std::size_t operator()(carl::Variable variable) const noexcept {
 			return variable.getId();
 		}
 	};

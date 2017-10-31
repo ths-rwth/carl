@@ -50,8 +50,7 @@ private:
 		for (const auto& p: polys) p.gatherVariables(vars);
 		return std::vector<Variable>(vars.begin(), vars.end());
 	}
-	
-public:
+
 	CoCoA::RingElem convert(const Poly& p) const {
 		CoCoA::RingElem res(mRing);
 		for (const auto& t: p) {
@@ -134,10 +133,8 @@ public:
 	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
 		auto finfo = CoCoA::factor(convert(p));
 		Factors<Poly> res;
-		if (includeConstants) {
-			if (!CoCoA::IsOne(finfo.myRemainingFactor())) {
-				res.emplace(convert(finfo.myRemainingFactor()), 1);
-			}
+		if (includeConstants && !CoCoA::IsOne(finfo.myRemainingFactor())) {
+			res.emplace(convert(finfo.myRemainingFactor()), 1);
 		}
 		for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
 			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);

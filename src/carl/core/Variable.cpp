@@ -7,7 +7,7 @@ namespace carl
 {
 	const Variable Variable::NO_VARIABLE = Variable();
 	
-	std::string Variable::getName() const {
+	std::string Variable::name() const {
 		return carl::VariablePool::getInstance().getName(*this, true);
 	}
 
@@ -23,8 +23,8 @@ namespace carl
 		} else if(in == "Uninterpreted") {
 			return VariableType::VT_UNINTERPRETED;
 		} else {
-			assert(false);
 			CARL_LOG_ERROR("carl.variable", "Input " << in << " is not a variable type.");
+			assert(false);
 			return VariableType::VT_REAL;
 		}
 

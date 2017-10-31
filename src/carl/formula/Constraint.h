@@ -928,22 +928,22 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d=0
                         if( c == d ) return A_IFF_B; 
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d=0
                         if( c == d ) return A_XOR_B;
-                        else return B_IMPLIES_A;
+                        return B_IMPLIES_A;
                     case Relation::LESS: // p+c<0  and  p+d=0
                         if( c < d ) return B_IMPLIES_A;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::GREATER: // p+c>0  and  p+d=0
                         if( c > d ) return B_IMPLIES_A;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::LEQ: // p+c<=0  and  p+d=0
                         if( c <= d ) return B_IMPLIES_A;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::GEQ: // p+c>=0  and  p+d=0
                         if( c >= d ) return B_IMPLIES_A;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     default:
                         return false;
                 }
@@ -952,24 +952,24 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d!=0
                         if( c == d ) return A_XOR_B;
-                        else return A_IMPLIES_B;
+                        return A_IMPLIES_B;
                     case Relation::NEQ: // p+c!=0  and  p+d!=0
                         if( c == d ) return A_IFF_B;
-                        else return 0;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d!=0
                         if( c >= d ) return A_IMPLIES_B;
-                        else return 0;
+                        return 0;
                     case Relation::GREATER: // p+c>0  and  p+d!=0
                         if( c <= d ) return A_IMPLIES_B;
-                        else return 0;
+                        return 0;
                     case Relation::LEQ: // p+c<=0  and  p+d!=0
                         if( c > d ) return A_IMPLIES_B;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     case Relation::GEQ: // p+c>=0  and  p+d!=0
                         if( c < d ) return A_IMPLIES_B;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     default:
                         return 0;
                 }
@@ -978,24 +978,24 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d<0
                         if( c > d ) return A_IMPLIES_B;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d<0
                         if( c <= d ) return B_IMPLIES_A;
-                        else return 0;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d<0
                         if( c == d ) return A_IFF_B;
-                        else if( c < d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        if( c < d ) return B_IMPLIES_A;
+                        return A_IMPLIES_B;
                     case Relation::GREATER: // p+c>0  and  p+d<0
                         if( c <= d ) return NOT__A_AND_B;
-                        else return 0;
+                        return 0;
                     case Relation::LEQ: // p+c<=0  and  p+d<0
                         if( c > d ) return A_IMPLIES_B;
-                        else return B_IMPLIES_A;
+                        return B_IMPLIES_A;
                     case Relation::GEQ: // p+c>=0  and  p+d<0
                         if( c < d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_XOR_B;
-                        else return 0;
+                        if( c == d ) return A_XOR_B;
+                        return 0;
                     default:
                         return 0;
                 }
@@ -1005,24 +1005,24 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d>0
                         if( c < d ) return A_IMPLIES_B;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d>0
                         if( c >= d ) return B_IMPLIES_A;
-                        else return 0;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d>0
                         if( c >= d ) return NOT__A_AND_B;
-                        else return 0;
+                        return 0;
                     case Relation::GREATER: // p+c>0  and  p+d>0
                         if( c == d ) return A_IFF_B;
-                        else if( c > d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        if( c > d ) return B_IMPLIES_A;
+                        return A_IMPLIES_B;
                     case Relation::LEQ: // p+c<=0  and  p+d>0
                         if( c > d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_XOR_B;
-                        else return 0;
+                        if( c == d ) return A_XOR_B;
+                        return 0;
                     case Relation::GEQ: // p+c>=0  and  p+d>0
                         if( c > d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        return A_IMPLIES_B;
                     default:
                         return 0;
                 }
@@ -1033,26 +1033,26 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d<=0
                         if( c >= d ) return A_IMPLIES_B;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d<=0
                         if( c < d ) return B_IMPLIES_A;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d<=0
                         if( c < d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        return A_IMPLIES_B;
                     case Relation::GREATER: // p+c>0  and  p+d<=0
                         if( c < d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_XOR_B;
-                        else return 0;
+                        if( c == d ) return A_XOR_B;
+                        return 0;
                     case Relation::LEQ: // p+c<=0  and  p+d<=0
                         if( c == d ) return A_IFF_B;
-                        else if( c < d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        if( c < d ) return B_IMPLIES_A;
+                        return A_IMPLIES_B;
                     case Relation::GEQ: // p+c>=0  and  p+d<=0
                         if( c < d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     default:
                         return 0;
                 }
@@ -1063,26 +1063,26 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d>=0
                         if( c <= d ) return A_IMPLIES_B;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d>=0
                         if( c > d ) return B_IMPLIES_A;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d>=0
                         if( c > d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_XOR_B;
-                        else return 0;
+                        if( c == d ) return A_XOR_B;
+                        return 0;
                     case Relation::GREATER: // p+c>0  and  p+d>=0
                         if( c < d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        return A_IMPLIES_B;
                     case Relation::LEQ: // p+c<=0  and  p+d>=0
                         if( c > d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     case Relation::GEQ: // p+c>=0  and  p+d>=0
                         if( c == d ) return A_IFF_B;
-                        else if( c < d ) return A_IMPLIES_B;
-                        else return B_IMPLIES_A;
+                        if( c < d ) return A_IMPLIES_B;
+                        return B_IMPLIES_A;
                     default:
                         return 0;
                 }
@@ -1111,14 +1111,12 @@ namespace std
      * Implements std::hash for constraint contents.
      */
     template<typename Pol>
-    struct hash<carl::ConstraintContent<Pol>>
-    {
-    public:
+    struct hash<carl::ConstraintContent<Pol>> {
         /**
          * @param _constraintContent The constraint content to get the hash for.
          * @return The hash of the given constraint content.
          */
-        size_t operator()( const carl::ConstraintContent<Pol>& _constraintContent ) const 
+        std::size_t operator()( const carl::ConstraintContent<Pol>& _constraintContent ) const 
         {
             return _constraintContent.hash();
         }
@@ -1128,14 +1126,12 @@ namespace std
      * Implements std::hash for constraints.
      */
     template<typename Pol>
-    struct hash<carl::Constraint<Pol>>
-    {
-    public:
+    struct hash<carl::Constraint<Pol>> {
         /**
          * @param _constraint The constraint to get the hash for.
          * @return The hash of the given constraint.
          */
-        size_t operator()( const carl::Constraint<Pol>& _constraint ) const 
+        std::size_t operator()( const carl::Constraint<Pol>& _constraint ) const 
         {
             return _constraint.getHash();
         }
@@ -1145,20 +1141,17 @@ namespace std
      * Implements std::hash for vectors of constraints.
      */
     template<typename Pol>
-    struct hash<std::vector<carl::Constraint<Pol>>>
-    {
-    public:
+    struct hash<std::vector<carl::Constraint<Pol>>> {
         /**
          * @param _arg The vector of constraints to get the hash for.
          * @return The hash of the given vector of constraints.
          */
-        size_t operator()( const std::vector<carl::Constraint<Pol>>& _arg ) const
+        std::size_t operator()( const std::vector<carl::Constraint<Pol>>& _arg ) const
         {
-            size_t result = 0;
-            for( auto cons = _arg.begin(); cons != _arg.end(); ++cons )
-            {
+            std::size_t result = 0;
+			for (const auto& c: _arg) {
                 result <<= 5;
-                result ^= cons->id();
+                result ^= c.id();
             }
             return result;
         }
