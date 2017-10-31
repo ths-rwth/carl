@@ -93,7 +93,6 @@ class VariablePool;
 class Variable
 {
 	friend VariablePool;
-private:
 	/// Type if a variable is passed by reference.
 	using ByRef = const Variable&;
 	/// Type if a variable is passed by value.
