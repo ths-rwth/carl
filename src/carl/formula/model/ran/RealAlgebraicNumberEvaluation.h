@@ -1,8 +1,3 @@
-/**
- * @file RealAlgebraicNumberEvaluation.h
- * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- */
-
 #pragma once
 
 #include <map>
@@ -25,28 +20,20 @@ template <typename Number>
 using RANMap = std::map<Variable, RealAlgebraicNumber<Number>>;
 
 /**
- * Evaluates the given polynomial at the given point based on the variable order.
- * Asserts that the number of variables matches the dimension of the point, all variables of p have an assignment in m and that m has no additional assignments.
+ * Evaluate the given polynomial 'p' at the given 'point' based on the variable order given by 'variables'.
  * If a variable is assigned a numeric representation, the corresponding value is directly plugged in.
  * All assignments of interval representations are passed on to <code>evaluate(MultivariatePolynomial, RANIRMap)</code>.
- * 
- * @param p Polynomial to be evaluated
- * @param point Values for variables
- * @param variables Variables to be assigned
- * @return Evaluation result
+ * Note that the number of variables must match the dimension of the 'point', all 
+ * variables of 'p' must appear in 'variables' and that 'variables' must not mention any additional variables.
  */
 template<typename Number, typename Coeff>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, const RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
 
 /**
- * Evaluates the given polynomial with the given values for the variables.
- * Asserts that all variables of p have an assignment in m and that m has no additional assignments.
+ * Evaluate the given polynomial 'p' at the point represented by the variable-to-nummber-mapping 'm'.
  * If a variable is assigned a numeric representation, the corresponding value is directly plugged in.
  * All assignments of interval representations are passed on to <code>evaluate(MultivariatePolynomial, RANIRMap)</code>.
- * 
- * @param p Polynomial to be evaluated
- * @param m Variable assignment
- * @return Evaluation result
+ * Note that variables of 'p' must be assigned in 'm' and that 'm' must not assign any additional variables.
  */
 template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m);
@@ -54,7 +41,7 @@ template<typename Number>
 RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, RANMap<Number>& m);
 
 /**
- * Computes a univariate polynomial with rational coefficients that has the roots of p whose coefficient variables have been substituted by the roots given in m.
+ * Compute a univariate polynomial with rational coefficients that has the roots of 'p' whose coefficient variables have been substituted by the roots given in m.
  * The map varToInterval gives back an assignment of variables to the isolating intervals of the roots for each variable.
  * Note that the resulting polynomial has the main variable of p in the end.
  *
@@ -76,7 +63,7 @@ MultivariatePolynomial<Number> evaluatePolynomial(
 );
 
 /**
- * Evaluates the coefficients of the given polynomial p w.r.t. the given evaluation map m.
+ * Evaluate the coefficients of the given polynomial p w.r.t. the given evaluation map m.
  * The algorithm assumes that all variables in m are coefficient variables.
  *
  * The map varToInterval gives back an assignment of variables to the isolating intervals of the roots for each variable.
@@ -152,7 +139,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
 
 
 /**
- * Evaluates the given polynomial with the given values for the variables.
+ * Evaluate the given polynomial with the given values for the variables.
  * Asserts that all variables of p have an assignment in m and that m has no additional assignments.
  * 
  * @param p Polynomial to be evaluated

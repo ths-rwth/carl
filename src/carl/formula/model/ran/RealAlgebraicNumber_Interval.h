@@ -81,7 +81,7 @@ namespace ran {
 			}
 		}
 			
-		/** Refines the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
+		/** Refine the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
 		 * @param n
 		 * @rcomplexity constant
 		 * @scomplexity constant

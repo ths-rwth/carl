@@ -1,8 +1,3 @@
-/* 
- * @file RealAlgebraicPoint.h
- * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- */
-
 #pragma once
 
 #include <vector>
@@ -17,8 +12,8 @@ template<typename Number> class RealAlgebraicPoint;
 namespace carl {
 
 /**
- * Represent a multidimensional point consisting of a real algebraic number for
- * each coordinate.
+ * Represent a multidimensional point consisting of one real algebraic number for
+ * each coordinate axis.
  */
 template<typename Number>
 class RealAlgebraicPoint {
@@ -30,14 +25,14 @@ private:
 
 public:
 	/**
-	 * Creates an empty Point of dimension 0.
+	 * Create an empty Point of dimension 0.
 	 */
 	RealAlgebraicPoint() noexcept:
 		numbers()
 	{}
 
 	/**
-	 * Creates a real algebraic point with the specified components.
+	 * Create a real algebraic point with the specified components.
 	 * @param v pointers to real algebraic numbers
 	 */
 	explicit RealAlgebraicPoint(const std::vector<RealAlgebraicNumber<Number>>& v):
@@ -45,7 +40,7 @@ public:
 	{}
 
 	/**
-	 * Creates a real algebraic point with the specified components.
+	 * Create a real algebraic point with the specified components.
 	 * @param v pointers to real algebraic numbers
 	 */
 	explicit RealAlgebraicPoint(std::vector<RealAlgebraicNumber<Number>>&& v):
@@ -53,7 +48,7 @@ public:
 	{}
 
 	/**
-	 * Creates a real algebraic point with the specified components from a list.
+	 * Create a real algebraic point with the specified components from a list.
 	 * @param v pointers to real algebraic numbers
 	 */
 	explicit RealAlgebraicPoint(const std::list<RealAlgebraicNumber<Number>>& v):
@@ -61,14 +56,14 @@ public:
 	{}
 
 	/**
-	 * Creates a real algebraic point with the specified components from a list.
+	 * Create a real algebraic point with the specified components from a list.
 	 * @param v pointers to real algebraic numbers
 	 */
 	RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumber<Number>>& v):
 		numbers(v.begin(), v.end())
 	{}
 
-	/** Gives the number of components of this point.
+	/** Give the number of components of this point.
 	 * @return the dimension of this point
 	 */
 	std::size_t dim() const {
@@ -76,7 +71,7 @@ public:
 	}
 
 	/**
-	 * Conjoins a point with a real algebraic number and returns the conjoined point as new object.
+	 * Conjoin a point with a real algebraic number and return the conjoined point as new object.
 	 * e.g.: a point of dimension n conjoined with
 	 * a real algebraic number is a point of dimension
 	 * n+1.
@@ -90,7 +85,7 @@ public:
 	}
 	
 	/**
-	 * Retrieves the number of this point at the given index.
+	 * Retrieve the number of this point at the given index.
 	 * @param index Index.
 	 * @return Value of this point at the given index.
 	 */
@@ -100,7 +95,7 @@ public:
 	}
 	
 	/**
-	 * Retrieves the number of this point at the given index.
+	 * Retrieve the number of this point at the given index.
 	 * @param index Index.
 	 * @return Value of this point at the given index.
 	 */
@@ -113,7 +108,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Num>& r);
 
 	/**
-	 * Checks if two RealAlgebraicPoints are equal.
+	 * Check if two RealAlgebraicPoints are equal.
      * @param r RealAlgebraicPoint.
      * @return `this == r`.
      */

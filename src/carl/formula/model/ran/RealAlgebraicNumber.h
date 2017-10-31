@@ -15,22 +15,28 @@
 namespace carl {
 
 /**
- * Represent a real algebraic number either implicitly by a polynomial and an interval 
- * or explicitly by a single, more performant rational number if that number is only finitely long,
- * or explicitly by a more advanced Thom encoding.
- * FIX what is the Thom encoding and when and why should someone use it? 
- * FIX Add design explanation why there are three representation mixed into one class?
+ * Represent a real algebraic number (RAN) in one of several ways:
+ * - Implicitly by a univariate polynomial and an interval.
+ * - Implicitly by a polynomial and a sequence of signs (called Thom encoding).
+ * - Explicitly by a rational number.
  * Rationale:
- * A real number cannot always be adequately represented in finite memory, since
- * it may be infinitely long. Representing
- * it by a float or any other finite-precision representation as well as doing 
- * arithmatic may introduce unacceptable rouding errors.
- * Real algebraic numbers are a subset of the real numbers without those drawbacks.
- * A real number is algebraic if it's the root of some univariate polynomial with
- * rational coefficients, so it always has an implicit, finite, full-precision 
- * representation by such a polynomial and an isolating interval that uniquely 
- * contains this root (and no other root). It is also possible
- * to do relatively fast arithmetic with this representation without rounding errors.
+ * - A real number cannot always be adequately represented in finite memory, since
+ *   it may be infinitely long. Representing
+ *   it by a float or any other finite-precision representation and doing 
+ *   arithmatic may introduce unacceptable rouding errors.
+ *   The algebraic reals, a subset of the reals, is the set of those reals that can be represented
+ *   as the root of a univariate polynomial with rational coefficients so there is always 
+ *   an implicit, finite, full-precision 
+ *   representation by an univariate polynomial and an isolating interval that 
+ *   contains this root (only this root and no other). It is also possible
+ *   to do relatively fast arithmetic with this representation without rounding errors.
+ * - When the algebraic real is only finitely long prefer the rational number 
+ *   representation because it's faster.
+ * - The idea of the Thom-Encoding is as follows: Take a square-free univariate polynomial p
+ *   with degree n that has the algebraic real as its root, compute the first n-1 derivates of p, 
+ *   plug in this algebraic real into each derivate and only keep the sign. 
+ *   Then polynomial p with this sequence of signs uniquely represents this algebraic real.
+ * - TODO Add design explanation why there are three representation mixed into one class
  */
 template<typename Number>
 class RealAlgebraicNumber {
@@ -45,19 +51,19 @@ private:
 	// A flag/tag that a user of this class can set.
 	// It indicates that this number stems from an outside root computation.
 	bool mIsRoot = true;
-	// FIX why is it a shared pointer? Why would we need to share the same Interval Representation?
-	// FIX change variable name to mIntervalRepresentation or similar
+	// TODO why is it a shared pointer? Why would we need to share the same Interval Representation?
+	// TODO change variable name to mIntervalRepresentation or similar
 	mutable std::shared_ptr<IntervalContent> mIR;
 	std::shared_ptr<ThomEncoding<Number>> mTE;
 	
-	//FIX change name to 'makeNumericIfPossible' or similar, since this function doesn't just check.
+	//TODO change name to 'makeNumericIfPossible' or similar, since this function doesn't just check.
 	void checkForSimplification() const {
 		if (mIR && mIR->interval.isPointInterval()) {
 			switchToNR(mIR->interval.lower());
 		}
 	}
 	// Switch to numeric representation.
-	// FIX why is it declared a const member function if it changes this object?
+	// TODO why is it declared a const member function if it changes this object?
 	void switchToNR(const Number& n) const {
 		mValue = n;
 		if (mIR) {
