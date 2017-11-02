@@ -245,9 +245,10 @@ struct RecordInfo {
 class Formatter {
 	/// Width of the longest channel.
 	std::size_t channelwidth = 10;
+public:
 	/// Print information like log level, file etc.
 	bool printInformation = true;
-public:
+
 	virtual ~Formatter() = default;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
