@@ -51,14 +51,14 @@ namespace carl
 	 * 
 	 * @ingroup multirp
 	 */
-	class Monomial
+	class Monomial final
 	{
 		friend class MonomialPool;
 	public:
 		using Arg = std::shared_ptr<const Monomial>;
 		using Content = std::vector<std::pair<Variable, uint>>;
 		~Monomial();
-	protected:
+	private:
 		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents.
 		Content mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
