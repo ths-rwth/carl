@@ -45,7 +45,7 @@ inline std::string to_string(const VariableType& t) {
 		case VariableType::VT_BITVECTOR:
 			return "Bitvector";
 		default:
-			return "Invalid " + std::to_string(int(t));
+			return "Invalid " + std::to_string(static_cast<std::underlying_type_t<VariableType>>(t));
 	}
 }
 
@@ -121,7 +121,7 @@ private:
 	* @param rank The rank.
 	*/
 	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0) noexcept :
-		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | std::size_t(type))
+		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | static_cast<std::size_t>(type))
 	{
 		assert(rank < (1 << RESERVED_FOR_RANK));
 		assert(0 < id && id < (std::size_t(1) << AVAILABLE));
@@ -140,7 +140,7 @@ public:
 	 * @return Variable id.
 	 */
 	constexpr std::size_t id() const noexcept {
-		return (mContent >> RESERVED_FOR_TYPE) % (std::size_t(1) << AVAILABLE);
+		return (mContent >> RESERVED_FOR_TYPE) % (static_cast<std::size_t>(1) << AVAILABLE);
 	}
 	constexpr std::size_t getId() const noexcept {
 		return id();
@@ -151,7 +151,7 @@ public:
 	 * @return Variable type.
 	 */
 	constexpr VariableType type() const noexcept {
-		return VariableType(mContent % (std::size_t(1) << RESERVED_FOR_TYPE));
+		return static_cast<VariableType>(mContent % (std::size_t(1) << RESERVED_FOR_TYPE));
 	}
 	constexpr VariableType getType() const noexcept {
 		return type();

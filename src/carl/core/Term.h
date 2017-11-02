@@ -95,10 +95,10 @@ class Term {
 		 * Get the coefficient.
 		 * @return Coefficient.
 		 */
-		inline Coefficient& coeff() {
+		Coefficient& coeff() {
 			return mCoeff;
 		}
-		inline const Coefficient& coeff() const {
+		const Coefficient& coeff() const {
 			return mCoeff;
 		}
 		
@@ -106,16 +106,14 @@ class Term {
 		 * Get the monomial.
 		 * @return Monomial.
 		 */
-		inline const Monomial::Arg& monomial() const
-		{
+		const Monomial::Arg& monomial() const {
 			return mMonomial;
 		}
 		/**
 		 * Gives the total degree, i.e. the sum of all exponents.
 		 * @return Total degree.
 		 */
-		inline uint tdeg() const
-		{
+		uint tdeg() const {
 			if(!mMonomial) return 0;
 			return mMonomial->tdeg();
 		}
@@ -124,8 +122,7 @@ class Term {
 		 * Checks whether the term is zero.
 		 * @return 
 		 */
-		inline bool isZero() const
-		{
+		bool isZero() const {
 			return carl::isZero(mCoeff); //change this to mCoeff.isZero() at some point
 		}
 		
@@ -133,53 +130,47 @@ class Term {
 		 * Checks whether the term equals one.
          * @return 
          */
-		inline bool isOne() const
-		{
-			return (isConstant() && carl::isOne(mCoeff)); //change this to mCoeff.isOne() at some point
+		bool isOne() const {
+			return isConstant() && carl::isOne(mCoeff); //change this to mCoeff.isOne() at some point
 		}
 		/**
 		 * Checks whether the monomial is a constant.
 		 * @return 
 		 */
-		inline bool isConstant() const
-		{
+		bool isConstant() const {
 			return !mMonomial;
 		}
         
         /**
          * @return true, if the image of this term is integer-valued.
          */
-        inline bool integerValued() const
-        {
-            if(!carl::isInteger(mCoeff)) return false;
-            return (!mMonomial || mMonomial->integerValued());
+        bool integerValued() const {
+            if (!carl::isInteger(mCoeff)) return false;
+            return !mMonomial || mMonomial->integerValued();
         }
         
 		/**
 		 * Checks whether the monomial has exactly the degree one.
 		 * @return 
 		 */
-		inline bool isLinear() const
-		{
-			if(!mMonomial) return true;
+		bool isLinear() const {
+			if (!mMonomial) return true;
 			return mMonomial->isLinear();
 		}
 		/**
 		 * 
 		 * @return 
 		 */
-		inline size_t getNrVariables() const
-		{
-			if(!mMonomial) return 0;
+		std::size_t getNrVariables() const {
+			if (!mMonomial) return 0;
 			return mMonomial->nrVariables();
 		}
         
         /**
          * @return An approximation of the complexity of this monomial.
          */
-        size_t complexity() const
-        {
-            if(!mMonomial) return 1;
+        std::size_t complexity() const {
+            if (!mMonomial) return 1;
             return mMonomial->complexity();
         }
 		
@@ -187,8 +178,7 @@ class Term {
 		 * @param v The variable to check for its occurrence.
 		 * @return true, if the variable occurs in this term.
 		 */
-		inline bool has(Variable v) const
-		{
+		bool has(Variable v) const {
 			if (!mMonomial) return false;
 			return mMonomial->has(v);
 		}
@@ -198,14 +188,12 @@ class Term {
 		 * @param v The variable which may occur.
 		 * @return true if no variable occurs, or just v occurs. 
 		 */
-		bool hasNoOtherVariable(Variable v) const
-		{
-			if(!mMonomial) return true;
+		bool hasNoOtherVariable(Variable v) const {
+			if (!mMonomial) return true;
 			return mMonomial->hasNoOtherVariable(v);
 		}
 		
-        bool isSingleVariable() const
-        {
+        bool isSingleVariable() const {
             if (!mMonomial) return false;
             return mMonomial->isLinear();
         }
@@ -213,8 +201,7 @@ class Term {
 		 * For terms with exactly one variable, get this variable.
 		 * @return The only variable occuring in the term.
 		 */
-		Variable getSingleVariable() const
-		{
+		Variable getSingleVariable() const {
 			assert(getNrVariables() == 1);
 			return mMonomial->getSingleVariable();
 		}
@@ -223,8 +210,7 @@ class Term {
 		 * Checks if the term is a square.
 		 * @return If this is square.
 		 */
-		bool isSquare() const
-		{
+		bool isSquare() const {
 			return (mCoeff >= CoefficientType(0)) && ((!mMonomial) || mMonomial->isSquare());
 		}
 		

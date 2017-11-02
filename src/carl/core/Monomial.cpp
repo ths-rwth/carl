@@ -14,7 +14,7 @@ namespace carl
 		MonomialPool::getInstance().free(this);
 #endif
 	}
-	Monomial::Arg Monomial::dropVariable(Variable::Arg v) const
+	Monomial::Arg Monomial::dropVariable(Variable v) const
 	{
 		///@todo this should work on the shared_ptr directly. Then we could directly return this shared_ptr instead of the ugly copying.
 		CARL_LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
@@ -34,7 +34,7 @@ namespace carl
 		return MonomialPool::getInstance().create( std::move(newExps), tDeg );
 	}
 	
-	bool Monomial::divide(Variable::Arg v, Monomial::Arg& res) const
+	bool Monomial::divide(Variable v, Monomial::Arg& res) const
 	{
 		auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
 		if(it == mExponents.cend()) return false;
@@ -173,7 +173,7 @@ namespace carl
 		return createMonomial(std::move(newExps), expsum);
 	}
 	
-	std::pair<std::size_t,Monomial::Arg> Monomial::derivative(Variable::Arg v) const {
+	std::pair<std::size_t,Monomial::Arg> Monomial::derivative(Variable v) const {
 		CARL_LOG_FUNC("carl.core.monomial", *this << ", " << v);
 	    
 	     // Linear implementation, as we expect very small monomials.
@@ -437,7 +437,7 @@ namespace carl
 		return result;
 	}
 
-	Monomial::Arg operator*(const Monomial::Arg& lhs, Variable::Arg rhs)
+	Monomial::Arg operator*(const Monomial::Arg& lhs, Variable rhs)
 	{
 		if (!lhs) {
 			return MonomialPool::getInstance().create(rhs, 1);
@@ -461,12 +461,11 @@ namespace carl
 		return MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + 1 );
 	}
 	
-	Monomial::Arg operator*(Variable::Arg lhs, const Monomial::Arg& rhs)
-	{
+	Monomial::Arg operator*(Variable lhs, const Monomial::Arg& rhs) {
 		return rhs * lhs;
 	}
 	
-	Monomial::Arg operator*(Variable::Arg lhs, Variable::Arg rhs)
+	Monomial::Arg operator*(Variable lhs, Variable rhs)
 	{
 		Monomial::Content newExps;
 		if( lhs < rhs )
@@ -484,7 +483,7 @@ namespace carl
 		return MonomialPool::getInstance().create( std::move(newExps), 2 );
 	}
 	
-	Monomial::Arg pow(Variable::Arg v, std::size_t exp) {
+	Monomial::Arg pow(Variable v, std::size_t exp) {
 		return createMonomial(v, exp);
 	}
 }
