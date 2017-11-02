@@ -1,3 +1,4 @@
+
 /**
  * @file CADLogging.h
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
@@ -23,12 +24,12 @@ class DotGenerator: public carl::Singleton<DotGenerator> {
 	};
 	struct DotSink : public carl::logging::FileSink {
 		DotSink(const std::string& filename) : FileSink(filename) {
-			this->os << "strict digraph {" << std::endl;
-			this->os << "graph [rankdir=\"LR\"];" << std::endl;
-			this->os << "graph [splines=line];" << std::endl;
+			log() << "strict digraph {" << std::endl;
+			log() << "graph [rankdir=\"LR\"];" << std::endl;
+			log() << "graph [splines=line];" << std::endl;
 		}
 		~DotSink() {
-			this->os << "}" << std::endl;
+			log() << "}" << std::endl;
 		}
 	};
 

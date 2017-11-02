@@ -153,7 +153,7 @@ public:
 /**
  * Logging sink for file output.
  */
-class FileSink final: public Sink {
+class FileSink: public Sink {
 	/// File output stream.
 	std::ofstream os;
 public:
