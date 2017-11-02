@@ -30,7 +30,7 @@ public:
 		std::lock_guard<std::mutex> lock(mMutex);
 #endif
 		std::size_t res = mNext;
-		if (mFree.empty()) mNext++;
+		if (mFree.empty()) ++mNext;
 		else {
 			res = mFree.top();
 			mFree.pop();
@@ -44,10 +44,10 @@ public:
 		std::lock_guard<std::mutex> lock(mMutex);
 #endif
 		if (id == mNext-1) {
-			mNext--;
+			--mNext;
 			while (!mFree.empty()) {
 				if (mFree.top() != mNext-1) break;
-				mNext--;
+				--mNext;
 				mFree.pop();
 			}
 		} else {
@@ -79,7 +79,7 @@ public:
 	IDGenerator(): mNext(1) {}
 	std::size_t get() {
 		std::size_t res = mNext;
-		if (mFree.empty()) mNext++;
+		if (mFree.empty()) ++mNext;
 		else {
 			res = mFree.top();
 			mFree.pop();

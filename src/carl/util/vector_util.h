@@ -24,7 +24,7 @@ std::vector<std::pair<T1,T2>> vector_zip(const std::vector<T1>& v1, const std::v
 	assert(v1.size() == v2.size());
 	std::vector<std::pair<T1,T2>> res;
 	auto it1 = v1.begin();
-	for (auto it2 = v2.begin(); it2 != v2.end(); it1++, it2++) {
+	for (auto it2 = v2.begin(); it2 != v2.end(); ++it1, ++it2) {
 		res.emplace_back(*it1, *it2);
 	}
 	return res;
@@ -42,7 +42,7 @@ namespace detail {
 	}
 	template<typename Result, typename It, typename... Its>
 	void vector_zip_tuple(Result& res, It begin, It end, Its... its) {
-		for (; begin != end; begin++, advance_all(its...)) {
+		for (; begin != end; ++begin, advance_all(its...)) {
 			res.emplace_back(*begin, *its...);
 		}
 	}

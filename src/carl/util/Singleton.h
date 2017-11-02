@@ -40,12 +40,12 @@ public:
 	/**
 	 * Virtual destructor.
 	*/
-	virtual ~Singleton() = default;
+	virtual ~Singleton() noexcept = default;
 	/**
 	 * Returns the single instance of this class by reference.
 	 * If there is no instance yet, a new one is created.
 	 */
-	static inline T& getInstance() {
+	static T& getInstance() {
 		static T t;
 		return t;
 	}
