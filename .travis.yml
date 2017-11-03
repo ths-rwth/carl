@@ -213,6 +213,7 @@ matrix:
           project:
             name: "smtrat/carl"
             description: "CArL"
+          notification_email: "gereon.kremer@cs.rwth-aachen.de"
           build_command_prepend: "cov-configure --comptype gcc --compiler `which $CXX`"
           build_command: ".ci/build.sh MAKE_PARALLEL=-j1"
           branch_pattern: "master"
