@@ -72,17 +72,19 @@ public:
 		CARL_LOG_DEBUG("carl.multivariateroot", "Result is " << (*roots)[mK-1]);
 		return (*roots)[mK-1];
 	}
-	
-	bool operator==(const MultivariateRoot& mr) const {
-		return std::tie(mK, mPoly) == std::tie(mr.mK, mr.mPoly);
-	}
-	bool operator<(const MultivariateRoot& mr) const {
-		return std::tie(mK, mPoly) < std::tie(mr.mK, mr.mPoly);
-	}
 };
 
 template<typename Poly>
 const Variable MultivariateRoot<Poly>::sVar = carl::VariablePool::getInstance().getFreshPersistentVariable("__z");
+
+template<typename Poly>
+inline bool operator==(const MultivariateRoot<Poly>& lhs, const MultivariateRoot<Poly>& rhs) {
+	return std::forward_as_tuple(lhs.k(), lhs.poly()) == std::forward_as_tuple(rhs.k(), rhs.poly());
+}
+template<typename Poly>
+inline bool operator<(const MultivariateRoot<Poly>& lhs, const MultivariateRoot<Poly>& rhs) {
+	return std::forward_as_tuple(lhs.k(), lhs.poly()) < std::forward_as_tuple(rhs.k(), rhs.poly());
+}
 
 template<typename P>
 std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
