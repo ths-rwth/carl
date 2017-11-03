@@ -34,7 +34,7 @@ namespace carl
 	 */
 	struct InfinityValue {
 		bool positive = false;
-		explicit InfinityValue() {}
+		explicit InfinityValue() = default;
 		explicit InfinityValue(bool positive): positive(positive) {}
 	};
 	
