@@ -152,7 +152,7 @@ public:
 	 * @return Variable type.
 	 */
 	constexpr VariableType type() const noexcept {
-		return static_cast<VariableType>(mContent % (std::size_t(1) << RESERVED_FOR_TYPE));
+		return static_cast<VariableType>(mContent % (static_cast<std::size_t>(1) << RESERVED_FOR_TYPE));
 	}
 	[[deprecated("use type() instead.")]]
 	constexpr VariableType getType() const noexcept {

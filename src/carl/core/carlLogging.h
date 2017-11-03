@@ -127,7 +127,7 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
  */
 class Sink {
 public:
-	virtual ~Sink() = default;
+	virtual ~Sink() noexcept = default;
 	/**
 	 * Abstract logging interface.
 	 * The intended usage is to write any log output to the output stream returned by this function.
@@ -249,7 +249,7 @@ public:
 	/// Print information like log level, file etc.
 	bool printInformation = true;
 
-	virtual ~Formatter() = default;
+	virtual ~Formatter() noexcept = default;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
 	 * @param f Filter.

@@ -35,7 +35,7 @@ private:
 	 * Contains the id of the next variable to be created for each type.
 	 * As such, is also a counter of the variables that exist.
 	 */
-	std::array<std::size_t, std::size_t(VariableType::TYPE_SIZE)> mNextIDs;
+	std::array<std::size_t, static_cast<std::size_t>(VariableType::TYPE_SIZE)> mNextIDs;
 
 	/**
 	 * Mutex for calling getFreshVariable().
@@ -47,13 +47,13 @@ private:
 	 */
 	mutable std::mutex setNameMutex;
 
-	std::size_t& nextID(const VariableType& vt) noexcept {
-		assert(std::size_t(vt) < mNextIDs.size());
-		return mNextIDs[std::size_t(vt)];
+	std::size_t& nextID(VariableType vt) noexcept {
+		assert(static_cast<std::size_t>(vt) < mNextIDs.size());
+		return mNextIDs[static_cast<std::size_t>(vt)];
 	}
-	const std::size_t& nextID(const VariableType& vt) const noexcept {
-		assert(std::size_t(vt) < mNextIDs.size());
-		return mNextIDs[std::size_t(vt)];
+	std::size_t nextID(VariableType vt) const noexcept {
+		assert(static_cast<std::size_t>(vt) < mNextIDs.size());
+		return mNextIDs[static_cast<std::size_t>(vt)];
 	}
 	
 	/**
@@ -179,15 +179,15 @@ public:
 		}
 	}
 
-	friend Variable freshVariable(const VariableType& vt) noexcept;
-	friend Variable freshVariable(const std::string& name, const VariableType& vt);
+	friend Variable freshVariable(VariableType vt) noexcept;
+	friend Variable freshVariable(const std::string& name, VariableType vt);
 
 };
 
-inline Variable freshVariable(const VariableType& vt) noexcept {
+inline Variable freshVariable(VariableType vt) noexcept {
 	return VariablePool::getInstance().getFreshVariable(vt);
 }
-inline Variable freshVariable(const std::string& name, const VariableType& vt) {
+inline Variable freshVariable(const std::string& name, VariableType vt) {
 	return VariablePool::getInstance().getFreshVariable(name, vt);
 }
 
