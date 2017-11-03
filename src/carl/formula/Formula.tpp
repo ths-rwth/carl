@@ -418,7 +418,7 @@ namespace carl
                         }
                     });
             for( auto var : vars )
-                os << "(declare-fun " << var << " () " << var.getType() << ")\n";
+                os << "(declare-fun " << var << " () " << var.type() << ")\n";
             for( const auto& uvar : uvars )
                 os << "(declare-fun " << uvar() << " () " << uvar.domain() << ")\n";
             for( const auto& bvvar : bvvars )
@@ -495,7 +495,7 @@ namespace carl
                     std::set<Variable> boolVars;
                     booleanVars(boolVars);
                     for (auto v: boolVars) {
-                        result += "(" + v.getName() + " = 0 or " + v.getName() + " = 1) and ";
+                        result += "(" + v.name() + " = 0 or " + v.name() + " = 1) and ";
                     }
                 }
                 else
@@ -763,7 +763,7 @@ namespace carl
                 Variables vars(quantifiedVariables().begin(), quantifiedVariables().end());
                 Formula<Pol> f = quantifiedFormula();
                 for (auto it = vars.begin(); it != vars.end();) {
-                    if (it->getType() == VariableType::VT_BOOL) {
+                    if (it->type() == VariableType::VT_BOOL) {
                         // Just leave boolean variables at the base level up to the SAT solver.
                         if (cur > 0) {
                             f = Formula<Pol>(

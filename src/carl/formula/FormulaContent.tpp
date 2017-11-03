@@ -21,15 +21,15 @@ namespace carl {
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(carl::Variable::Arg _variable):
 #ifdef __VS
-		mHash((std::size_t)_variable.getId()) // TODO: subtract the id of the boolean variable with the smallest id
+		mHash((std::size_t)_variable.id()) // TODO: subtract the id of the boolean variable with the smallest id
 		{
 		mpVariableVS = new carl::Variable(_variable);
 #else
-		mHash((std::size_t)_variable.getId()), // TODO: subtract the id of the boolean variable with the smallest id
+		mHash((std::size_t)_variable.id()), // TODO: subtract the id of the boolean variable with the smallest id
 		mVariable(_variable)
 	{
 #endif
-		switch (_variable.getType()) {
+		switch (_variable.type()) {
 			case VariableType::VT_BOOL:
 				mType = BOOL;
 				break;

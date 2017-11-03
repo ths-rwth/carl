@@ -28,7 +28,7 @@ private:
 		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
 	}
 	void declare(Variable v) {
-		*this << "(declare-fun " << v << " () " << v.getType() << ")" << std::endl;
+		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
 	}
 
 	template<typename Pol>
@@ -167,7 +167,7 @@ private:
 	}
 
 	void write(const Variable& v) {
-		*this << v.getName();
+		*this << v.name();
 	}
 	void write(const VariableType& vt) {
 		switch (vt) {

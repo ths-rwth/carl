@@ -113,7 +113,7 @@ namespace carl
         {
             case Relation::GREATER:
                 lhs = -lhs;
-                if( _var.getType() == VariableType::VT_INT )
+                if( _var.type() == VariableType::VT_INT )
                 {
                     if( isInteger( _bound ) )
                         lhs += _bound + typename Pol::NumberType( 1 );
@@ -129,7 +129,7 @@ namespace carl
                 break;
             case Relation::GEQ:
                 lhs = -lhs;
-                if( _var.getType() == VariableType::VT_INT )
+                if( _var.type() == VariableType::VT_INT )
                 {
                     if( isInteger( _bound ) )
                         lhs += _bound;
@@ -144,7 +144,7 @@ namespace carl
                 }
                 break;
             case Relation::LESS:
-                if( _var.getType() == VariableType::VT_INT )
+                if( _var.type() == VariableType::VT_INT )
                 {
                     if( isInteger( _bound ) )
                         lhs -= (_bound - typename Pol::NumberType( 1 ));
@@ -158,7 +158,7 @@ namespace carl
                 }
                 break;
             case Relation::LEQ:
-                if( _var.getType() == VariableType::VT_INT )
+                if( _var.type() == VariableType::VT_INT )
                 {
                     if( isInteger( _bound ) )
                         lhs -= _bound;
@@ -169,7 +169,7 @@ namespace carl
                     lhs -= _bound;
                 break;
 			case Relation::EQ:
-				if (_var.getType() == VariableType::VT_INT) {
+				if (_var.type() == VariableType::VT_INT) {
 					if (isInteger(_bound)) {
 						lhs -= _bound;
 					} else {
@@ -180,7 +180,7 @@ namespace carl
 				}
 				break;
 			case Relation::NEQ:
-				if (_var.getType() == VariableType::VT_INT) {
+				if (_var.type() == VariableType::VT_INT) {
 					if (isInteger(_bound)) {
 						lhs -= _bound;
 					} else {

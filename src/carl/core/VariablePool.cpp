@@ -46,16 +46,16 @@ Variable VariablePool::getFreshVariable(const std::string& name, VariableType ty
 
 Variable VariablePool::getFreshPersistentVariable(VariableType type) noexcept {
 	Variable res = getFreshVariable(type);
-	if (res.getId() >= mPersistentVariables.size()) {
-		mPersistentVariables.resize(res.getId()+1, std::make_pair(Variable::NO_VARIABLE, ""));
+	if (res.id() >= mPersistentVariables.size()) {
+		mPersistentVariables.resize(res.id()+1, std::make_pair(Variable::NO_VARIABLE, ""));
 	}
-	mPersistentVariables[res.getId()] = std::make_pair(res, "");
+	mPersistentVariables[res.id()] = std::make_pair(res, "");
 	return res;
 }
 
 Variable VariablePool::getFreshPersistentVariable(const std::string& name, VariableType type) {
 	Variable res = getFreshPersistentVariable(type);
-	mPersistentVariables[res.getId()] = std::make_pair(res, name);
+	mPersistentVariables[res.id()] = std::make_pair(res, name);
 	setName(res, name);
 	return res;
 }
@@ -68,7 +68,7 @@ Variable VariablePool::findVariableWithName(const std::string& name) const noexc
 }
 
 std::string VariablePool::getName(Variable v, bool variableName) const {
-	if (v.getId() == 0) return "NO_VARIABLE";
+	if (v.id() == 0) return "NO_VARIABLE";
 	if (variableName) {
         SETNAME_LOCK_GUARD
 		auto it = mVariableNames.find(v);
@@ -76,19 +76,19 @@ std::string VariablePool::getName(Variable v, bool variableName) const {
 			return it->second;
 		}
 	}
-	switch (v.getType()) {
+	switch (v.type()) {
 		case VariableType::VT_BOOL:
-			return mVariablePrefix + "b_" + std::to_string(v.getId());
+			return mVariablePrefix + "b_" + std::to_string(v.id());
 		case VariableType::VT_REAL:
-			return mVariablePrefix + "r_" + std::to_string(v.getId());
+			return mVariablePrefix + "r_" + std::to_string(v.id());
 		case VariableType::VT_INT:
-			return mVariablePrefix + "i_" + std::to_string(v.getId());
+			return mVariablePrefix + "i_" + std::to_string(v.id());
 		case VariableType::VT_UNINTERPRETED:
-			return mVariablePrefix + "u_" + std::to_string(v.getId());
+			return mVariablePrefix + "u_" + std::to_string(v.id());
         case VariableType::VT_BITVECTOR:
-            return mVariablePrefix + "bv_" + std::to_string(v.getId());
+            return mVariablePrefix + "bv_" + std::to_string(v.id());
 		default:
-			CARL_LOG_ERROR("carl", "Variable has invalid type: " << v.getType());
+			CARL_LOG_ERROR("carl", "Variable has invalid type: " << v.type());
 			assert(false);
 			return "";
 	}

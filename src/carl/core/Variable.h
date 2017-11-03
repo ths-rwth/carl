@@ -142,6 +142,7 @@ public:
 	constexpr std::size_t id() const noexcept {
 		return (mContent >> RESERVED_FOR_TYPE) % (static_cast<std::size_t>(1) << AVAILABLE);
 	}
+	[[deprecated("use id() instead.")]]
 	constexpr std::size_t getId() const noexcept {
 		return id();
 	}
@@ -153,6 +154,7 @@ public:
 	constexpr VariableType type() const noexcept {
 		return static_cast<VariableType>(mContent % (std::size_t(1) << RESERVED_FOR_TYPE));
 	}
+	[[deprecated("use type() instead.")]]
 	constexpr VariableType getType() const noexcept {
 		return type();
 	}
@@ -162,6 +164,7 @@ public:
 	 * @return Variable name.
 	 */
 	std::string name() const;
+	[[deprecated("use name() instead.")]]
 	std::string getName() const {
 		return name();
 	}
@@ -170,8 +173,12 @@ public:
 	 * Retrieves the rank of the variable.
 	 * @return Variable rank.
 	 */
-	constexpr std::size_t getRank() const noexcept {
+	constexpr std::size_t rank() const noexcept {
 		return mContent >> (AVAILABLE + RESERVED_FOR_TYPE);
+	}
+	[[deprecated("use rank() instead.")]]
+	constexpr std::size_t getRank() const noexcept {
+		return rank();
 	}
 	
 	/**
@@ -249,7 +256,7 @@ namespace std {
 		 * @return Hash of variable
 		 */
 		std::size_t operator()(carl::Variable variable) const noexcept {
-			return variable.getId();
+			return variable.id();
 		}
 	};
 } // namespace std

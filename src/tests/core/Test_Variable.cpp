@@ -16,8 +16,8 @@ TEST(Variable, Equals)
 {
     Variable v1 = carl::freshIntegerVariable("v1");
     Variable v2 = carl::freshRealVariable("v2");
-    EXPECT_EQ(VariableType::VT_INT,v1.getType());
-    EXPECT_EQ(VariableType::VT_REAL,v2.getType());
+    EXPECT_EQ(VariableType::VT_INT,v1.type());
+    EXPECT_EQ(VariableType::VT_REAL,v2.type());
     EXPECT_TRUE(v1 != v2);
     EXPECT_TRUE(v1 == v1);
 }

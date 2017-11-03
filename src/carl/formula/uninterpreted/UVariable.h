@@ -41,7 +41,7 @@ namespace carl
 
 			explicit UVariable(Variable var):
                 mVar(var),
-				mDomain(SortManager::getInstance().getInterpreted(var.getType()))
+				mDomain(SortManager::getInstance().getInterpreted(var.type()))
             {
 			}
             

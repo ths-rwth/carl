@@ -117,13 +117,13 @@ public:
 		mNextIDs.fill(1);
 		for (auto pv: mPersistentVariables) {
 			Variable v = pv.first;
-			while (nextID(v.getType()) < v.getId()) {
-				getFreshVariable(v.getType());
+			while (nextID(v.type()) < v.id()) {
+				getFreshVariable(v.type());
 			}
 			if (pv.second != "") {
-				getFreshVariable(pv.second, v.getType());
+				getFreshVariable(pv.second, v.type());
 			} else {
-				getFreshVariable(v.getType());
+				getFreshVariable(v.type());
 			}
 		}
     }
