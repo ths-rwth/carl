@@ -1,8 +1,6 @@
 #include "Variable.h"
 #include "VariablePool.h"
 
-#include <stdexcept>
-
 namespace carl
 {
 	const Variable Variable::NO_VARIABLE = Variable();

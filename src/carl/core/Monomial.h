@@ -11,7 +11,6 @@
 #include "CompareResult.h"
 #include "Variable.h"
 #include "VariablePool.h"
-#include "carlLoggingHelper.h"
 #include "logging.h"
 
 #include <algorithm>

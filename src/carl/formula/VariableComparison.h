@@ -114,12 +114,14 @@ namespace carl {
 	};
 	template<typename Poly>
 	bool operator==(const VariableComparison<Poly>& lhs, const VariableComparison<Poly>& rhs) {
-		return std::forward_as_tuple(lhs.relation(), lhs.var(), lhs.negated(), lhs.value()) == std::forward_as_tuple(rhs.relation(), rhs.var(), rhs.negated(), rhs.value());
+		return lhs.relation() == rhs.relation() && lhs.var() == rhs.var() && lhs.negated() == rhs.negated() && lhs.value() == rhs.value();
 	}
 	template<typename Poly>
 	bool operator<(const VariableComparison<Poly>& lhs, const VariableComparison<Poly>& rhs) {
 		if (lhs.negated() != rhs.negated()) return !lhs.negated();
-		return std::forward_as_tuple(lhs.relation(), lhs.var(), lhs.value()) < std::forward_as_tuple(rhs.relation(), rhs.var(), rhs.value());
+		if (lhs.var() != rhs.var()) return lhs.var() < rhs.var();
+		if (lhs.relation() != rhs.relation()) return lhs.relation() < rhs.relation();
+		return lhs.value() < rhs.value();
 	}
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableComparison<Poly>& vc) {
