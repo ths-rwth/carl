@@ -11,6 +11,8 @@
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
+#include <tuple>
+
 namespace carl {
 	template<typename Poly>
 	class VariableComparison {
@@ -31,7 +33,7 @@ namespace carl {
 		//		return ran;
 		//	}
 		//};
-		struct VariableCollector: public boost::static_visitor<Variables> {
+		struct VariableCollector: boost::static_visitor<Variables> {
 			Variables operator()(const MR& mr) const {
 				return mr.gatherVariables();
 			}
@@ -109,14 +111,16 @@ namespace carl {
 			return ss.str();
 		}
 		
-		bool operator==(const VariableComparison& vc) const {
-			return mRelation == vc.mRelation && mVar == vc.mVar && mValue == vc.mValue && mNegated == vc.mNegated;
-		}
-		bool operator<(const VariableComparison& vc) const {
-			if (mNegated != vc.mNegated) return !mNegated;
-			return std::tie(mRelation, mVar, mValue) < std::tie(vc.mRelation, vc.mVar, vc.mValue);
-		}
 	};
+	template<typename Poly>
+	bool operator==(const VariableComparison<Poly>& lhs, const VariableComparison<Poly>& rhs) {
+		return std::forward_as_tuple(lhs.relation(), lhs.var(), lhs.negated(), lhs.value()) == std::forward_as_tuple(rhs.relation(), rhs.var(), rhs.negated(), rhs.value());
+	}
+	template<typename Poly>
+	bool operator<(const VariableComparison<Poly>& lhs, const VariableComparison<Poly>& rhs) {
+		if (lhs.negated() != rhs.negated()) return !lhs.negated();
+		return std::forward_as_tuple(lhs.relation(), lhs.var(), lhs.value()) < std::forward_as_tuple(rhs.relation(), rhs.var(), rhs.value());
+	}
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableComparison<Poly>& vc) {
 		return os << vc.toString();

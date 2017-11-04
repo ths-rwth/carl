@@ -80,7 +80,7 @@ class SortManager : public Singleton<SortManager> {
 			}
 			
 			/// Destructs a sort content.
-			~SortContent() = default;
+			~SortContent() noexcept = default;
 			
 			SortContent& operator=(const SortContent& sc) = delete;
 			
