@@ -7,13 +7,11 @@
 
 #include "../Common.h"
 
-using namespace carl;
-
 TEST(Monomial, Constructor)
 {
-	Variable x = freshRealVariable("x");
+	auto x = carl::freshRealVariable("x");
 	
-	auto m = createMonomial(x, 3);
+	auto m = carl::createMonomial(x, 3);
 	EXPECT_TRUE(m->exponents().size() == 1);
 	EXPECT_TRUE(m->exponents().front().first == x);
 	EXPECT_TRUE(m->exponents().front().second == 3);
@@ -21,27 +19,27 @@ TEST(Monomial, Constructor)
 
 TEST(Monomial, tdeg)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
 
-	Monomial::Arg m1 = x*x*x;
+	carl::Monomial::Arg m1 = x*x*x;
 	EXPECT_TRUE(m1->tdeg() == 3);
-	Monomial::Arg m2 = x*x*y;
+	carl::Monomial::Arg m2 = x*x*y;
 	EXPECT_TRUE(m2->tdeg() == 3);
-	Monomial::Arg m3 = x*y*y*y;
+	carl::Monomial::Arg m3 = x*y*y*y;
 	EXPECT_TRUE(m3->tdeg() == 4);
 }
 
 TEST(Monomial, degreeCategories)
 {
-	Variable x = freshRealVariable("x");
+	auto x = carl::freshRealVariable("x");
 	
-	Monomial::Arg m1 = createMonomial(x, exponent(1));
+	carl::Monomial::Arg m1 = carl::createMonomial(x, 1);
 	EXPECT_FALSE(m1->isConstant());
 	EXPECT_TRUE(m1->isLinear());
 	EXPECT_TRUE(m1->isAtMostLinear());
 	EXPECT_FALSE(m1->isSquare());
-	Monomial::Arg m2 = createMonomial(x, exponent(2));
+	carl::Monomial::Arg m2 = carl::createMonomial(x, 2);
 	EXPECT_FALSE(m2->isConstant());
 	EXPECT_FALSE(m2->isLinear());
 	EXPECT_FALSE(m2->isAtMostLinear());
@@ -50,14 +48,14 @@ TEST(Monomial, degreeCategories)
 
 TEST(Monomial, hasNoOtherVariable)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Monomial::Arg m1 = carl::createMonomial(x, 1);
-	Monomial::Arg m2 = x*x;
-	Monomial::Arg m3 = x*x*y;
-	Monomial::Arg m4 = carl::createMonomial(y, 1);
-	Monomial::Arg m5 = y*y;
-	Monomial::Arg m6 = y*y*x;
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
+	carl::Monomial::Arg m1 = carl::createMonomial(x, 1);
+	carl::Monomial::Arg m2 = x*x;
+	carl::Monomial::Arg m3 = x*x*y;
+	carl::Monomial::Arg m4 = carl::createMonomial(y, 1);
+	carl::Monomial::Arg m5 = y*y;
+	carl::Monomial::Arg m6 = y*y*x;
 	
 	EXPECT_TRUE(m1->hasNoOtherVariable(x));
 	EXPECT_FALSE(m1->hasNoOtherVariable(y));
@@ -75,11 +73,11 @@ TEST(Monomial, hasNoOtherVariable)
 
 TEST(Monomial, Operators)
 {
-	Variable v0 = freshRealVariable("a");
-	Variable v1 = freshRealVariable("b");
-	Variable v2 = freshRealVariable("c");
+	auto v0 = carl::freshRealVariable("a");
+	auto v1 = carl::freshRealVariable("b");
+	auto v2 = carl::freshRealVariable("c");
 
-	Monomial::Arg m0 = carl::createMonomial(v0, exponent(1));
+	carl::Monomial::Arg m0 = carl::createMonomial(v0, 1);
 	m0 = m0 * v1;
 	EXPECT_EQ((unsigned)1,m0->exponentOfVariable(v1));
 	m0 = m0 * v1;
@@ -90,8 +88,8 @@ TEST(Monomial, Operators)
 	EXPECT_EQ((unsigned)4,m0->tdeg());
 	EXPECT_EQ((unsigned)3,m0->nrVariables());
 
-	Monomial::Arg m3 = carl::createMonomial(v1, exponent(1));
-	Monomial::Arg m2 = carl::createMonomial(v1, exponent(1));
+	carl::Monomial::Arg m3 = carl::createMonomial(v1, 1);
+	carl::Monomial::Arg m2 = carl::createMonomial(v1, 1);
 	m2 = m2 * v1;
 	m3 = m3 * v1;
 	EXPECT_EQ(m2, m3);
@@ -99,10 +97,10 @@ TEST(Monomial, Operators)
 
 TEST(Monomial, VariableMultiplication)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
 	//EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1)})), x);
-	EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)})), x * y);
+	EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)})), x * y);
 	//EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 1)})), x * x * y);
 	//EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 2)})), y * x * y);
 	//EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 3)})), x * x * x);
@@ -110,27 +108,27 @@ TEST(Monomial, VariableMultiplication)
 
 TEST(Monomial, MonomialMultiplication)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
 	EXPECT_EQ(
-		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})),
-		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)}))
+		carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})),
+		carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 1), std::make_pair(y, 2)})) * carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)}))
 	);
 	EXPECT_EQ(
-		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})),
-		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 3)}))
+		carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})),
+		carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 2)})) * carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(y, 3)}))
 	);
 	EXPECT_EQ(
-		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 5), std::make_pair(y, 3)})),
-		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 3), std::make_pair(y, 3)}))
+		carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 5), std::make_pair(y, 3)})),
+		carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 2)})) * carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 3), std::make_pair(y, 3)}))
 	);
 }
 
 TEST(Monomial, derivative)
 {
-	Variable v0 = freshRealVariable("x");
-	Variable v1 = freshRealVariable("y");
-	Monomial::Arg m0 = v0 * v1;
+	auto v0 = carl::freshRealVariable("x");
+	auto v1 = carl::freshRealVariable("y");
+	auto m0 = v0 * v1;
 	auto d1 = m0->derivative(v0);
 	EXPECT_EQ(1, d1.first);
 	EXPECT_EQ(v1, d1.second);
@@ -138,18 +136,18 @@ TEST(Monomial, derivative)
 
 TEST(Monomial, division)
 {
-	Variable v0 = freshRealVariable("x");
-	Variable v1 = freshRealVariable("y");
-	Variable v2 = freshRealVariable("z");
+	auto v0 = carl::freshRealVariable("x");
+	auto v1 = carl::freshRealVariable("y");
+	auto v2 = carl::freshRealVariable("z");
 
-	Monomial::Arg m0 = v0 * v0 * v1 * v1 * v2;
-	Monomial::Arg m1 = v0 * v0 * v0;
-	Monomial::Arg m2 = v0 * v0 * v1 * v2;
-	Monomial::Arg m0x = v0 * v0 * v1 * v2;
-	Monomial::Arg m0y = v0 * v0 * v1 * v1;
-	Monomial::Arg m0z = v0 * v1;
-	Monomial::Arg tmp;
-	Monomial::Arg one;
+	carl::Monomial::Arg m0 = v0 * v0 * v1 * v1 * v2;
+	carl::Monomial::Arg m1 = v0 * v0 * v0;
+	carl::Monomial::Arg m2 = v0 * v0 * v1 * v2;
+	carl::Monomial::Arg m0x = v0 * v0 * v1 * v2;
+	carl::Monomial::Arg m0y = v0 * v0 * v1 * v1;
+	carl::Monomial::Arg m0z = v0 * v1;
+	carl::Monomial::Arg tmp;
+	carl::Monomial::Arg one;
 	EXPECT_TRUE(m0->divide(one, tmp));
 	EXPECT_EQ(m0, tmp);
 	EXPECT_TRUE(m1->divide(one, tmp));
@@ -166,30 +164,30 @@ TEST(Monomial, division)
 
 TEST(Monomial, divisible)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Monomial::Arg m1 = carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 2), std::make_pair(x, 2)}));
-	Monomial::Arg m2 = carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)}));
-	Monomial::Arg m3 = carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 1), std::make_pair(x, 1)}));
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
+	auto m1 = carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(y, 2), std::make_pair(x, 2)}));
+	auto m2 = carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)}));
+	auto m3 = carl::createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(y, 1), std::make_pair(x, 1)}));
 //	std::cout << m1 << " divisible by " << m2 << std::endl;
 //	std::cout << m2 << " == " << m3 << std::endl;
 	EXPECT_TRUE(m2==m3);
 	EXPECT_TRUE(m1->divisible(m2));
 	
 	{
-		Monomial::Arg m1 = createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 2)}));
-		Monomial::Arg m2 = createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 2), std::make_pair(x, 2)}));
+		auto m1 = createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(y, 2)}));
+		auto m2 = createMonomial(std::initializer_list<std::pair<carl::Variable, carl::exponent>>({std::make_pair(y, 2), std::make_pair(x, 2)}));
 		EXPECT_TRUE(m2->divisible(m1));
 	}
 }
 
 TEST(Monomial, Comparison)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Variable z = freshRealVariable("z");
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
+	auto z = carl::freshRealVariable("z");
 
-	ComparisonList<Monomial::Arg> monomials;
+	ComparisonList<carl::Monomial::Arg> monomials;
 	monomials.push_back(x * x * x);
 	monomials.push_back(x * x * y);
 	monomials.push_back(x * y * y);
@@ -204,10 +202,10 @@ TEST(Monomial, Comparison)
 
 TEST(Monomial, OtherComparison)
 {
-	ComparisonList<Variable,Monomial::Arg> list;
+	ComparisonList<carl::Variable,carl::Monomial::Arg> list;
 
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
 
 	list.push_back(x);
 	list.push_back(y);
@@ -223,20 +221,20 @@ TEST(Monomial, OtherComparison)
 
 TEST(Monomial, sqrt)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Monomial::Arg m1 = x*x*y*y*y*y;
-	Monomial::Arg m2 = x*y*y;
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
+	carl::Monomial::Arg m1 = x*x*y*y*y*y;
+	carl::Monomial::Arg m2 = x*y*y;
 	EXPECT_EQ(m2, m1->sqrt());
 }
 
 TEST(Monomial, pow)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Monomial::Arg one;
-	Monomial::Arg m1 = x*y*y;
-	Monomial::Arg m2 = x*x*y*y*y*y;
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
+	carl::Monomial::Arg one;
+	carl::Monomial::Arg m1 = x*y*y;
+	carl::Monomial::Arg m2 = x*x*y*y*y*y;
 	EXPECT_EQ(one, m1->pow(0));
 	EXPECT_EQ(m1, m1->pow(1));
 	EXPECT_EQ(m2, m1->pow(2));
@@ -244,9 +242,9 @@ TEST(Monomial, pow)
 
 TEST(Monomial, CalcLCM)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Monomial::Arg m1 = y*y;
-	Monomial::Arg m2 = x*x*y;
-	EXPECT_EQ(y, Monomial::calcLcmAndDivideBy(m1, m2));
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
+	carl::Monomial::Arg m1 = y*y;
+	carl::Monomial::Arg m2 = x*x*y;
+	EXPECT_EQ(y, carl::Monomial::calcLcmAndDivideBy(m1, m2));
 }

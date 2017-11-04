@@ -28,4 +28,3 @@ TEST(MonomialPool, clear)
 	m = createMonomial(x, 3);
 	EXPECT_EQ(pool.size(), 1);
 }
-
