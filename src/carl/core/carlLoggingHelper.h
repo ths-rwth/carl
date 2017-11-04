@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <bitset>
 #include <cstdint>
-#include <iostream>
 #include <sstream>
 
 namespace carl {
