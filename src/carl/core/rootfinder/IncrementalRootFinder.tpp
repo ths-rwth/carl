@@ -27,9 +27,9 @@ IncrementalRootFinder<Number, C>::IncrementalRootFinder(
 		AbstractRootFinder<Number>(polynomial, interval, tryTrivialSolver),
 		splittingStrategy(strategy)
 {
-	if (!this->mInterval.isEmpty()) {
-		CARL_LOG_DEBUG("carl.core.rootfinder", "Adding initial queue element " << this->mInterval);
-		this->addQueue(this->mInterval, splittingStrategy);
+	if (!this->getInterval().isEmpty()) {
+		CARL_LOG_DEBUG("carl.core.rootfinder", "Adding initial queue element " << this->getInterval());
+		this->addQueue(this->getInterval(), splittingStrategy);
 	}
 }
 

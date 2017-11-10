@@ -88,12 +88,10 @@ const std::vector<RealAlgebraicNumber<Number>>& AbstractRootFinder<Number>::getA
 
 template<typename Number>
 void AbstractRootFinder<Number>::addRoot(const RealAlgebraicNumber<Number>& root, bool reducePolynomial) {
-	if (root.isNumeric()) {
-		if (reducePolynomial) {
-			CARL_LOG_DEBUG("carl.core.rootfinder", "Eliminating root from " << mPolynomial);
-			mPolynomial.eliminateRoot(root.value());
-			CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << mPolynomial);
-		}
+	if (reducePolynomial && root.isNumeric()) {
+		CARL_LOG_DEBUG("carl.core.rootfinder", "Eliminating root from " << mPolynomial);
+		mPolynomial.eliminateRoot(root.value());
+		CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << mPolynomial);
 	}
 	mRoots.push_back(root);
 }
@@ -111,15 +109,18 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 		case 0: break;
 		case 1: {
 			CARL_LOG_DEBUG("carl.core.rootfinder", "Trivially solving linear polynomial " << mPolynomial);
-			Number a = mPolynomial.coefficients()[1], b = mPolynomial.coefficients()[0];
-			assert(a != Number(0));
+			const auto& a = mPolynomial.coefficients()[1];
+			const auto& b = mPolynomial.coefficients()[0];
+			assert(!carl::isZero(a));
 			this->addRoot(RealAlgebraicNumber<Number>(-b / a), false);
 			break;
 		}
 		case 2: {
 			CARL_LOG_DEBUG("carl.core.rootfinder", "Trivially solving quadratic polynomial " << mPolynomial);
-			Number a = mPolynomial.coefficients()[2], b = mPolynomial.coefficients()[1], c = mPolynomial.coefficients()[0];
-			assert(a != Number(0));
+			const auto& a = mPolynomial.coefficients()[2];
+			const auto& b = mPolynomial.coefficients()[1];
+			const auto& c = mPolynomial.coefficients()[0];
+			assert(!carl::isZero(a));
 			/* Use this formulation of p-q-formula:
 			 * x = ( -b +- \sqrt{ b*b - 4*a*c } ) / (2*a)
 			 */
@@ -138,6 +139,8 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 					this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, (Number(-b) - r) / Number(2*a)), false);
 					this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, (Number(-b) + r) / Number(2*a)), false);
 				}
+			} else {
+				// No root.
 			}
 			break;
 		}
