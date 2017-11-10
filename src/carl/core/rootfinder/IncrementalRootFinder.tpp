@@ -53,7 +53,7 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 	CARL_LOG_TRACE("carl.core.rootfinder", "Processing " << interval);
 
 	if (strategy == SplittingStrategy::EIGENVALUES) {
-		splittingStrategies::EigenValueStrategy<Number>::getInstance()(interval, *this);
+		splitting_strategies::EigenValueStrategy<Number>::getInstance()(interval, *this);
 		CARL_LOG_TRACE("carl.core.rootfinder", "Called Eigenvalue strategy");
 		return true;
 	} else if (strategy == SplittingStrategy::ABERTH) {
@@ -86,13 +86,13 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 
 	//std::cerr << "calling strategy " << strategy << std::endl;
 	switch (strategy) {
-		case SplittingStrategy::GENERIC: splittingStrategies::GenericStrategy<Number>::getInstance()(interval, *this);
+		case SplittingStrategy::GENERIC: splitting_strategies::GenericStrategy<Number>::getInstance()(interval, *this);
 			break;
 		case SplittingStrategy::EIGENVALUES:	// Should not happen, safe fallback anyway
 		case SplittingStrategy::ABERTH:		// Should not happen, safe fallback anyway
-		case SplittingStrategy::BINARYSAMPLE: splittingStrategies::BinarySampleStrategy<Number>::getInstance()(interval, *this);
+		case SplittingStrategy::BINARYSAMPLE: splitting_strategies::BinarySampleStrategy<Number>::getInstance()(interval, *this);
 			break;
-		case SplittingStrategy::BINARYNEWTON: splittingStrategies::BinaryNewtonStrategy<Number>::getInstance()(interval, *this);
+		case SplittingStrategy::BINARYNEWTON: splitting_strategies::BinaryNewtonStrategy<Number>::getInstance()(interval, *this);
 			break;
 		case SplittingStrategy::GRID: //GridStrategy<Number>::instance()(interval, *this);
 			break;
@@ -136,7 +136,7 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 		} else if (roots.size() > 1) {
 			Number tmp = 2 * roots[0] - roots[1];
 			if (interval.contains(tmp)) res.push_back(tmp);
-			for (std::size_t i = 0; i < roots.size()-1; i++) {
+			for (std::size_t i = 0; i < roots.size()-1; ++i) {
 				if (interval.contains(roots[i]) && finder.getPolynomial().evaluate(roots[i]) == 0) {
 					res.push_back(roots[i]);
 				}
@@ -162,7 +162,7 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 	if (res[0] < res[1]) {
 		finder.addQueue(Interval<Number>(res[0], BoundType::STRICT, res[1], BoundType::STRICT), SplittingStrategy::BINARYSAMPLE);
 	}
-	for (std::size_t i = 1; i < res.size()-1; i++) {
+	for (std::size_t i = 1; i < res.size()-1; ++i) {
 		if (finder.getPolynomial().evaluate(res[i]) == 0) {
 			finder.addRoot(RealAlgebraicNumber<Number>(res[i]));
 		}
@@ -173,7 +173,7 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 	}	
 }
 
-namespace splittingStrategies {
+namespace splitting_strategies {
 
 template<typename Number>
 void GenericStrategy<Number>::operator()(const Interval<Number>& interval, RootFinder<Number>& finder) {
@@ -231,7 +231,7 @@ void EigenValueStrategy<Number>::operator()(const Interval<Number>& interval, Ro
 	uint degree = p.degree();
 	Eigen::MatrixXd m = Eigen::MatrixXd::Zero(Index(degree), Index(degree));
 	m(0, Index(degree)-1) = toDouble(Number(-p.coefficients()[0] / p.coefficients()[degree]));
-	for (uint i = 1; i < degree; i++) {
+	for (uint i = 1; i < degree; ++i) {
 		m(Index(i), Index(i)-1) = 1;
 		m(Index(i), Index(degree)-1) = toDouble(Number(-p.coefficients()[i] / p.coefficients()[degree]));
 	}
@@ -241,7 +241,7 @@ void EigenValueStrategy<Number>::operator()(const Interval<Number>& interval, Ro
 	
 	// Save real parts to tmp
 	std::vector<double> tmp(std::size_t(eigenvalues.size()));
-	for (uint i = 0; i < std::size_t(eigenvalues.size()); i++) {
+	for (uint i = 0; i < std::size_t(eigenvalues.size()); ++i) {
 		if (eigenvalues[Index(i)].imag() > eigenvalues[Index(i)].real() / 4) tmp[i] = 0;
 		else tmp[i] = eigenvalues[Index(i)].real();
 	}
