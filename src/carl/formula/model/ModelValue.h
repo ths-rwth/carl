@@ -120,35 +120,6 @@ namespace carl
 		}
 
 		/**
-		 * Check if two Assignments are equal.
-		 * Two Assignments are considered equal, if both are either bool or not bool and their value is the same.
-		 * 
-		 * If both Assignments are not bools, the check may return false although they represent the same value.
-		 * If both are numbers in different representations, this comparison is only done as a "best effort".
-		 * 
-		 * @param _ass Another Assignment.
-		 * @return *this == a.
-		 */
-		bool operator==(const ModelValue& _mval) const {
-			if (isBool() && _mval.isBool()) {
-				return asBool() == _mval.asBool();
-			} else if (isRational() && _mval.isRational()) {
-				return asRational() == _mval.asRational();
-			} else if (isSqrtEx() && _mval.isSqrtEx()) {
-				return asSqrtEx() == _mval.asSqrtEx();
-			} else if (isRAN() & _mval.isRAN()) {
-				return asRAN() == _mval.asRAN();
-			} else if (isBVValue() && _mval.isBVValue()) {
-				return asBVValue() == _mval.asBVValue();
-			} else if (isSortValue() & _mval.isSortValue()) {
-				return asSortValue() == _mval.asSortValue();
-			} else if (isUFModel() & _mval.isUFModel()) {
-				return asUFModel() == _mval.asUFModel();
-			}
-			return false;
-		}
-
-		/**
 		 * @return true, if the stored value is a bool.
 		 */
 		bool isBool() const {
@@ -288,9 +259,40 @@ namespace carl
 		ModelSubstitutionPtr<Rational,Poly>& asSubstitution() {
 			assert(isSubstitution());
 			return boost::get<ModelSubstitutionPtr<Rational,Poly>>(mData);
-		}
-		
+		}	
 	};
+
+	/**
+	 * Check if two Assignments are equal.
+	 * Two Assignments are considered equal, if both are either bool or not bool and their value is the same.
+	 * 
+	 * If both Assignments are not bools, the check may return false although they represent the same value.
+	 * If both are numbers in different representations, this comparison is only done as a "best effort".
+	 * 
+	 * @param lhs First Assignment.
+	 * @param rhs Second Assignment.
+	 * @return lhs == rhs.
+	 */
+	template<typename Rational, typename Poly>
+	bool operator==(const ModelValue<Rational,Poly>& lhs, const ModelValue<Rational,Poly>& rhs) {
+		if (lhs.isBool() && rhs.isBool()) {
+			return lhs.asBool() == rhs.asBool();
+		} else if (lhs.isRational() && rhs.isRational()) {
+			return lhs.asRational() == rhs.asRational();
+		} else if (lhs.isSqrtEx() && rhs.isSqrtEx()) {
+			return lhs.asSqrtEx() == rhs.asSqrtEx();
+		} else if (lhs.isRAN() && rhs.isRAN()) {
+			return lhs.asRAN() == rhs.asRAN();
+		} else if (lhs.isBVValue() && rhs.isBVValue()) {
+			return lhs.asBVValue() == rhs.asBVValue();
+		} else if (lhs.isSortValue() && rhs.isSortValue()) {
+			return lhs.asSortValue() == rhs.asSortValue();
+		} else if (lhs.isUFModel() && rhs.isUFModel()) {
+			return lhs.asUFModel() == rhs.asUFModel();
+		} else {
+			return false;
+		}
+	}
 	
 	template<typename R, typename P>
 	inline std::ostream& operator<<(std::ostream& os, const ModelValue<R,P>& mv) {

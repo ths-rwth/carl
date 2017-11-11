@@ -93,7 +93,8 @@ namespace model {
 		auto it = m.find(va.var());
 		if (it == m.end()) return;
 		const auto& value = m.evaluated(va.var());
-		if (value == va.value()) {
+		const ModelValue<Rational,Poly>& vavalue = va.value();
+		if (value == vavalue) {
 			f = Formula<Poly>(FormulaType::TRUE);
 		} else {
 			f = Formula<Poly>(FormulaType::FALSE);
