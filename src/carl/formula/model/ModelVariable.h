@@ -11,40 +11,26 @@
 namespace carl
 {
 
-	class ModelVariable: private boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction> {
+	class ModelVariable {
         /**
          * Base type we are deriving from.
          */
-        using Super = boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction>;
+        using Base = boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction>;
+		
+		Base mData;
         
     public:
 		friend bool operator==(const ModelVariable& lhs, const ModelVariable& rhs);
-        /**
-         * Default constructor.
-         */
-        ModelVariable(): Super()
-        {}
 
         /**
          * Initializes the ModelVariable from some valid type of the underlying variant.
          */
         template<typename T>
-        ModelVariable(const T& _t): Super(_t)
+        ModelVariable(const T& _t): mData(_t)
         {}
-
-        /**
-         * Assign some value to the underlying variant.
-         * @param t Some value.
-         * @return *this.
-         */
-        template<typename T>
-        ModelVariable& operator=(const T& _t) {
-            Super::operator=(_t);
-            return *this;
-        }
 		
 		std::size_t hash() const {
-			return carl::variant_hash(static_cast<const Super&>(*this));
+			return carl::variant_hash(mData);
 		}
         
         /**
@@ -52,7 +38,7 @@ namespace carl
          */
         bool isVariable() const
         {
-            return type() == typeid(carl::Variable);
+            return mData.type() == typeid(carl::Variable);
         }
         
         /**
@@ -60,7 +46,7 @@ namespace carl
          */
         bool isBVVariable() const
         {
-            return type() == typeid(carl::BVVariable);
+            return mData.type() == typeid(carl::BVVariable);
         }
 
         /**
@@ -68,7 +54,7 @@ namespace carl
          */
         bool isUVariable() const
         {
-            return type() == typeid(carl::UVariable);
+            return mData.type() == typeid(carl::UVariable);
         }
 
         /**
@@ -76,7 +62,7 @@ namespace carl
          */
         bool isFunction() const
         {
-            return type() == typeid(carl::UninterpretedFunction);
+            return mData.type() == typeid(carl::UninterpretedFunction);
         }
         
         /**
@@ -85,7 +71,7 @@ namespace carl
         carl::Variable::Arg asVariable() const
         {
             assert( isVariable() );
-            return boost::get<carl::Variable>(*this);
+            return boost::get<carl::Variable>(mData);
         }
         
         /**
@@ -94,7 +80,7 @@ namespace carl
         const carl::BVVariable& asBVVariable() const
         {
             assert( isBVVariable() );
-            return boost::get<carl::BVVariable>(*this);
+            return boost::get<carl::BVVariable>(mData);
         }
 
         /**
@@ -103,7 +89,7 @@ namespace carl
         const carl::UVariable& asUVariable() const
         {
             assert( isUVariable() );
-            return boost::get<carl::UVariable>(*this);
+            return boost::get<carl::UVariable>(mData);
         }
         
         /**
@@ -112,7 +98,7 @@ namespace carl
         const carl::UninterpretedFunction& asFunction() const
         {
             assert( isFunction() );
-            return boost::get<carl::UninterpretedFunction>(*this);
+            return boost::get<carl::UninterpretedFunction>(mData);
         }
     };
 	
@@ -124,7 +110,7 @@ namespace carl
 	 *                or in the second case the functions are equal (equal ids).
 	 */
 	inline bool operator==(const ModelVariable& lhs, const ModelVariable& rhs) {
-		if (lhs.which() != rhs.which()) {
+		if (lhs.mData.which() != rhs.mData.which()) {
 			return false;
 		} else if (lhs.isVariable()) {
 			return lhs.asVariable() == rhs.asVariable();
