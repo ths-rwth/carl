@@ -265,16 +265,6 @@ namespace carl
     }
 
     template<typename Pol>
-    bool ConstraintContent<Pol>::operator==( const ConstraintContent& _constraint ) const
-    {
-        if( mID == 0 || _constraint.mID == 0 )
-        {
-            return mRelation == _constraint.mRelation && mLhs == _constraint.mLhs;
-        }
-        return mID == _constraint.mID;
-    }
-
-    template<typename Pol>
     string ConstraintContent<Pol>::toString( unsigned _unequalSwitch, bool _infix, bool _friendlyVarNames ) const
     {
         string result = "";

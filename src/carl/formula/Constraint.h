@@ -211,7 +211,7 @@ namespace carl
             /**
              * Destructor.
              */
-            ~ConstraintContent() = default;
+            ~ConstraintContent() noexcept = default;
 
             /**
              * @return A hash value for this constraint.
@@ -219,6 +219,16 @@ namespace carl
             std::size_t hash() const {
                 return mHash;
             }
+			
+			std::size_t id() const {
+				return mID;
+			}
+			Relation relation() const {
+				return mRelation;
+			}
+			const auto& lhs() const {
+				return mLhs;
+			}
             
             /**
              * @param _variable The variable for which to determine the maximal degree.
@@ -284,13 +294,6 @@ namespace carl
             unsigned isConsistent() const;
             
             /**
-             * Compares this constraint with the given constraint.
-             * @return  true,   if this constraint is equal to the given one;
-             *          false,  otherwise.
-             */
-            bool operator==( const ConstraintContent& _constraint ) const;
-            
-            /**
              * Gives the string representation of this constraint.
              * @param _unequalSwitch A switch to indicate which kind of unequal should be used.
              *         For p != 0 with infix:  0: "p != 0", 1: "p <> 0", 2: "p /= 0"
@@ -303,7 +306,20 @@ namespace carl
             std::string toString( unsigned _unequalSwitch = 0, bool _infix = true, bool _friendlyVarNames = true ) const;
             
     };
-            
+	
+	/**
+	 * @param lhs Left ConstraintContent
+	 * @param rhs Right ConstraintContent
+	 * @return `lhs == rhs`
+	 */
+	template<typename Pol>
+	bool operator==(const ConstraintContent<Pol>& lhs, const ConstraintContent<Pol>& rhs) {
+		if (lhs.id() == 0 || rhs.id() == 0) {
+            return lhs.relation() == rhs.relation() && lhs.lhs() == rhs.lhs();
+        }
+        return lhs.id() == rhs.id();
+	}
+
     /**
      * Prints the representation of the given constraints on the given stream.
      * @param _out The stream to print on.
@@ -372,7 +388,7 @@ namespace carl
              */
             const Pol& lhs() const
             {
-                return mpContent->mLhs;
+                return mpContent->lhs();
             }
 
             /**
@@ -388,7 +404,7 @@ namespace carl
              */
             Relation relation() const
             {
-                return mpContent->mRelation;
+                return mpContent->relation();
             }
 
             /**
@@ -396,7 +412,7 @@ namespace carl
              */
             size_t id() const
             {
-                return mpContent->mID;
+                return mpContent->id();
             }
 
             /**
@@ -404,7 +420,7 @@ namespace carl
              */
             size_t getHash() const
             {
-                return mpContent->mHash;
+                return mpContent->hash();
             }
 
             /**
@@ -694,70 +710,7 @@ namespace carl
              *          false, otherwise.
              */
             bool hasFinitelyManySolutionsIn( const Variable& _var ) const;
-            
-            /**
-             * @param _constraint The formula to compare with.
-             * @return true, if this formula and the given formula are equal;
-             *         false, otherwise.
-             */
-            bool operator==( const Constraint& _constraint ) const
-            {
-                return mpContent == _constraint.mpContent;
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if this constraint and the given constraint are not equal.
-             */
-            bool operator!=( const Constraint& _constraint ) const
-            {
-                return mpContent != _constraint.mpContent;
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if the id of this constraint is less than the id of the given one.
-             */
-            bool operator<( const Constraint& _constraint ) const
-            {
-                assert( id() != 0 );
-                assert( _constraint.id() != 0 );
-                return id() < _constraint.id();
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if the id of this constraint is greater than the id of the given one.
-             */
-            bool operator>( const Constraint& _constraint ) const
-            {
-                assert( id() != 0 );
-                assert( _constraint.id() != 0 );
-                return id() > _constraint.id();
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if the id of this constraint is less or equal than the id of the given one.
-             */
-            bool operator<=( const Constraint& _constraint ) const
-            {
-                assert( id() != 0 );
-                assert( _constraint.id() != 0 );
-                return id() <= _constraint.id();
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if the id of this constraint is greater or equal than the id of the given one.
-             */
-            bool operator>=( const Constraint& _constraint ) const
-            {
-                assert( id() != 0 );
-                assert( _constraint.id() != 0 );
-                return id() >= _constraint.id();
-            }
-            
+                        
             /**
              * Calculates the coefficient of the given variable with the given degree. Note, that it only
              * computes the coefficient once and stores the result.
@@ -804,7 +757,72 @@ namespace carl
              * @param _out The stream to print on.
              */
             void printProperties( std::ostream& _out = std::cout ) const;
+			
+			/**
+			 * @param lhs Left constraint
+			 * @param rhs Right constraint
+			 * @return `lhs == rhs`
+			 */
+			template<typename P>
+			friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+				return lhs.mpContent == rhs.mpContent;
+			}
+			
+			/**
+			 * @param lhs Left constraint
+			 * @param rhs Right constraint
+			 * @return `lhs != rhs`
+			 */
+			template<typename P>
+			friend bool operator!=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+				return lhs.mpContent != rhs.mpContent;
+			}
     };
+	
+	/**
+	 * @param lhs Left constraint
+	 * @param rhs Right constraint
+	 * @return `lhs < rhs`
+	 */
+	template<typename P>
+	bool operator<(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		assert(lhs.id() != 0 && rhs.id() != 0);
+		return lhs.id() < rhs.id();
+	}
+	
+	/**
+	 * @param lhs Left constraint
+	 * @param rhs Right constraint
+	 * @return `lhs > rhs`
+	 */
+	 template<typename P>
+	 bool operator>(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		assert(lhs.id() != 0 && rhs.id() != 0);
+		return lhs.id() > rhs.id();
+	 }
+	
+	 /**
+ 	 * @param lhs Left constraint
+ 	 * @param rhs Right constraint
+ 	 * @return `lhs <= rhs`
+ 	 */
+	 template<typename P>
+	 bool operator<=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		assert(lhs.id() != 0 && rhs.id() != 0);
+		return lhs.id() <= rhs.id();
+	 }
+	
+	 /**
+ 	 * @param lhs Left constraint
+ 	 * @param rhs Right constraint
+ 	 * @return `lhs >= rhs`
+ 	 */
+	 template<typename P>
+	 bool operator>=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		assert(lhs.id() != 0 && rhs.id() != 0);
+		return lhs.id() >= rhs.id();
+	 }
+
     
     const signed A_IFF_B = 2;
     const signed A_IMPLIES_B = 1;
