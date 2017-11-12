@@ -757,27 +757,32 @@ namespace carl
              * @param _out The stream to print on.
              */
             void printProperties( std::ostream& _out = std::cout ) const;
-			
-			/**
-			 * @param lhs Left constraint
-			 * @param rhs Right constraint
-			 * @return `lhs == rhs`
-			 */
-			template<typename P>
-			friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs) {
-				return lhs.mpContent == rhs.mpContent;
-			}
-			
-			/**
-			 * @param lhs Left constraint
-			 * @param rhs Right constraint
-			 * @return `lhs != rhs`
-			 */
-			template<typename P>
-			friend bool operator!=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
-				return lhs.mpContent != rhs.mpContent;
-			}
+		
+		template<typename P>
+		friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs);
+		template<typename P>
+		friend bool operator!=(const Constraint<P>& lhs, const Constraint<P>& rhs);
     };
+	
+	/**
+	 * @param lhs Left constraint
+	 * @param rhs Right constraint
+	 * @return `lhs == rhs`
+	 */
+	template<typename P>
+	bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		return lhs.mpContent == rhs.mpContent;
+	}
+	
+	/**
+	 * @param lhs Left constraint
+	 * @param rhs Right constraint
+	 * @return `lhs != rhs`
+	 */
+	template<typename P>
+	bool operator!=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		return lhs.mpContent != rhs.mpContent;
+	}
 	
 	/**
 	 * @param lhs Left constraint
