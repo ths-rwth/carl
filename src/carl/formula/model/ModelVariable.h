@@ -4,20 +4,21 @@
 #include "../bitvector/BVVariable.h"
 #include "../uninterpreted/UninterpretedFunction.h"
 #include "../uninterpreted/UVariable.h"
+#include "../../util/variant_util.h"
 
 #include <boost/variant.hpp>
 
 namespace carl
 {
 
-	class ModelVariable: public boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction> {
+	class ModelVariable: private boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction> {
         /**
          * Base type we are deriving from.
          */
-        typedef boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction> Super;
+        using Super = boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction>;
         
     public:
-		friend struct std::hash<ModelVariable>;
+		friend bool operator==(const ModelVariable& lhs, const ModelVariable& rhs);
         /**
          * Default constructor.
          */
@@ -41,6 +42,10 @@ namespace carl
             Super::operator=(_t);
             return *this;
         }
+		
+		std::size_t hash() const {
+			return carl::variant_hash(static_cast<const Super&>(*this));
+		}
         
         /**
          * @return true, if the stored value is a variable.
@@ -162,12 +167,7 @@ namespace std {
 	template<>
 	struct hash<carl::ModelVariable>: boost::static_visitor<std::size_t> {
 		std::size_t operator()(const carl::ModelVariable& mv) const {
-			auto r = boost::apply_visitor(*this, mv);
-			return r;
-		}
-		template<typename T>
-		std::size_t operator()(const T& t) const {
-			return std::hash<T>()(t);
+			return mv.hash();
 		}
 	};
 }
