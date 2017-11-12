@@ -161,6 +161,19 @@ namespace carl
 			return false;
 		}
 	}
+	
+	inline std::ostream& operator<<(std::ostream& os, const ModelVariable& mv) {
+		if (mv.isVariable()) {
+			return os << mv.asVariable();
+		} else if (mv.isBVVariable()) {
+			return os << mv.asBVVariable();
+		} else if (mv.isUVariable()) {
+			return os << mv.asUVariable();
+		} else {
+			assert(mv.isFunction());
+			return os << mv.asFunction();
+		}
+	}
 }
 
 namespace std {
