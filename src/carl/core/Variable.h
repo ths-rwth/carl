@@ -1,5 +1,5 @@
 /**
- * @file Variable.h 
+ * @file Variable.h
  * @author Sebastian Junges
  */
 
@@ -15,7 +15,7 @@
 #include "logging.h"
 
 namespace carl {
-	
+
 /**
  * Several types of variables are supported.
  * BOOL: the Booleans
@@ -24,8 +24,14 @@ namespace carl {
  * UNINTERPRETED: all uninterpreted types
  * BITVECTOR: bitvectors of any length
  */
-enum class VariableType { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, VT_BITVECTOR = 4, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_BITVECTOR, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
-
+enum class VariableType { VT_BOOL = 0,
+						  VT_REAL = 1,
+						  VT_INT = 2,
+						  VT_UNINTERPRETED = 3,
+						  VT_BITVECTOR = 4,
+						  MIN_TYPE = VT_BOOL,
+						  MAX_TYPE = VT_BITVECTOR,
+						  TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
 
 /**
  * To string conversion for variable type
@@ -34,18 +40,18 @@ enum class VariableType { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED
  */
 inline std::string to_string(const VariableType& t) {
 	switch (t) {
-		case VariableType::VT_BOOL:
-			return "Bool";
-		case VariableType::VT_REAL:
-			return "Real";
-		case VariableType::VT_INT:
-			return "Int";
-		case VariableType::VT_UNINTERPRETED:
-			return "Uninterpreted";
-		case VariableType::VT_BITVECTOR:
-			return "Bitvector";
-		default:
-			return "Invalid " + std::to_string(static_cast<std::underlying_type_t<VariableType>>(t));
+	case VariableType::VT_BOOL:
+		return "Bool";
+	case VariableType::VT_REAL:
+		return "Real";
+	case VariableType::VT_INT:
+		return "Int";
+	case VariableType::VT_UNINTERPRETED:
+		return "Uninterpreted";
+	case VariableType::VT_BITVECTOR:
+		return "Bitvector";
+	default:
+		return "Invalid " + std::to_string(static_cast<std::underlying_type_t<VariableType>>(t));
 	}
 }
 
@@ -90,13 +96,13 @@ class VariablePool;
  * Moreover, notice that for small classes like this, pass-by-value could be faster than pass-by-ref.
  * However, this depends much on the capabilities of the compiler. 
  */
-class Variable
-{
+class Variable {
 	friend VariablePool;
 	/// Type if a variable is passed by reference.
 	using ByRef = const Variable&;
 	/// Type if a variable is passed by value.
 	using ByValue = Variable;
+
 public:
 #ifdef VARIABLE_PASS_BY_VALUE
 	/// Argument type for variables being function arguments.
@@ -105,7 +111,7 @@ public:
 	/// Argument type for variables being function arguments.
 	using Arg = ByRef;
 #endif
- 
+
 private:
 	/**
 	 * The content of the variable.
@@ -113,16 +119,15 @@ private:
 	 * All other data (like names or alike) are stored in the VariablePool.
 	 */
 	std::size_t mContent = 0;
-	
+
 	/**
 	* Private constructor to be used by the VariablePool.
 	* @param id The identifier of the variable.
 	* @param type The type.
 	* @param rank The rank.
 	*/
-	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0) noexcept :
-		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | static_cast<std::size_t>(type))
-	{
+	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0) noexcept
+		: mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | static_cast<std::size_t>(type)) {
 		assert(rank < (1 << RESERVED_FOR_RANK));
 		assert(0 < id && id < (std::size_t(1) << AVAILABLE));
 		assert(VariableType::MIN_TYPE <= type && type <= VariableType::MAX_TYPE);
@@ -142,11 +147,10 @@ public:
 	constexpr std::size_t id() const noexcept {
 		return (mContent >> RESERVED_FOR_TYPE) % (static_cast<std::size_t>(1) << AVAILABLE);
 	}
-	[[deprecated("use id() instead.")]]
-	constexpr std::size_t getId() const noexcept {
+	[[deprecated("use id() instead.")]] constexpr std::size_t getId() const noexcept {
 		return id();
 	}
-	
+
 	/**
 	 * Retrieves the type of the variable.
 	 * @return Variable type.
@@ -154,21 +158,19 @@ public:
 	constexpr VariableType type() const noexcept {
 		return static_cast<VariableType>(mContent % (static_cast<std::size_t>(1) << RESERVED_FOR_TYPE));
 	}
-	[[deprecated("use type() instead.")]]
-	constexpr VariableType getType() const noexcept {
+	[[deprecated("use type() instead.")]] constexpr VariableType getType() const noexcept {
 		return type();
 	}
-	
+
 	/**
 	 * Retrieves the name of the variable.
 	 * @return Variable name.
 	 */
 	std::string name() const;
-	[[deprecated("use name() instead.")]]
-	std::string getName() const {
+	[[deprecated("use name() instead.")]] std::string getName() const {
 		return name();
 	}
-	
+
 	/**
 	 * Retrieves the rank of the variable.
 	 * @return Variable rank.
@@ -176,11 +178,10 @@ public:
 	constexpr std::size_t rank() const noexcept {
 		return mContent >> (AVAILABLE + RESERVED_FOR_TYPE);
 	}
-	[[deprecated("use rank() instead.")]]
-	constexpr std::size_t getRank() const noexcept {
+	[[deprecated("use rank() instead.")]] constexpr std::size_t getRank() const noexcept {
 		return rank();
 	}
-	
+
 	/**
 	 * Streaming operator for Variable.
 	 * @param os Output stream.
@@ -190,7 +191,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, Variable rhs) {
 		return os << rhs.name();
 	}
-	
+
 	/// @name Comparison operators
 	/// @{
 	/**
@@ -245,18 +246,18 @@ static_assert(std::is_literal_type<Variable>::value, "Variable should be a liter
 } // namespace carl
 
 namespace std {
+/**
+ * Specialization of `std::hash` for Variable.
+ */
+template<>
+struct hash<carl::Variable> {
 	/**
-	 * Specialization of `std::hash` for Variable.
+	 * Calculates the hash of a Variable.
+	 * @param variable Variable.
+	 * @return Hash of variable
 	 */
-	template<>
-	struct hash<carl::Variable> {
-		/**
-		 * Calculates the hash of a Variable.
-		 * @param variable Variable.
-		 * @return Hash of variable
-		 */
-		std::size_t operator()(carl::Variable variable) const noexcept {
-			return variable.id();
-		}
-	};
+	std::size_t operator()(carl::Variable variable) const noexcept {
+		return variable.id();
+	}
+};
 } // namespace std
