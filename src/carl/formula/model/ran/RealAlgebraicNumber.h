@@ -76,6 +76,7 @@ public:
 			switchToNR(-b / a);
 		} else {
 			if (i.contains(0)) refineAvoiding(0);
+			refineToIntegrality();
 		}
 	}
 
@@ -142,6 +143,12 @@ public:
 		if (isNumeric()) return carl::isInteger(mValue);
 		else if (isInterval()) return mIR->isIntegral();
 		else return false;
+	}
+	Number integerBelow() const {
+		refineToIntegrality();
+		if (isNumeric()) return carl::floor(mValue);
+		else if (isInterval()) return carl::floor(mIR->interval.lower());
+		return carl::constant_zero<Number>::get();
 	}
 	
 	Number branchingPoint() const {
@@ -319,11 +326,7 @@ namespace std {
 	template<typename Number>
 	struct hash<carl::RealAlgebraicNumber<Number>> {
 		std::size_t operator()(const carl::RealAlgebraicNumber<Number>& n) const {
-			if (n.isNumeric()) {
-				return carl::hash_all(true, n.isRoot(), n.value());
-			} else {
-				return carl::hash_all(false, n.isRoot(), n.mIR);
-			}
+			return carl::hash_all(n.isRoot(), n.integerBelow());
 		}
 	};
 	
