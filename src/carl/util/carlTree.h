@@ -169,8 +169,8 @@ bool operator!=(const BaseIterator<T,I,r>& i1, const BaseIterator<T,I,r>& i2) {
  */
 template<typename T, bool reverse = false>
 struct PreorderIterator:
-	public BaseIterator<T,PreorderIterator<T,reverse>, reverse>,
-	public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
+	BaseIterator<T,PreorderIterator<T,reverse>, reverse>,
+	std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 {
 	using Base = BaseIterator<T,PreorderIterator<T,reverse>, reverse>;
 	PreorderIterator(const tree<T>* t): Base(t, MAXINT) {}
@@ -202,7 +202,7 @@ struct PreorderIterator:
 		}
 		return *this;
 	}
-public:
+
 	template<typename It,bool rev>
 	PreorderIterator(const BaseIterator<T,It,rev>& ii): Base(ii) {}
 	PreorderIterator(const PreorderIterator& ii): Base(ii) {}
@@ -239,8 +239,8 @@ static_assert(std::is_destructible<PreorderIterator<int,true>>::value, "");
  */
 template<typename T, bool reverse = false>
 struct PostorderIterator:
-	public BaseIterator<T, PostorderIterator<T, reverse>,reverse>,
-	public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
+	BaseIterator<T, PostorderIterator<T, reverse>,reverse>,
+	std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 {
 	using Base = BaseIterator<T, PostorderIterator<T, reverse>,reverse>;
 	PostorderIterator(const tree<T>* t): Base(t, MAXINT) {}
@@ -276,7 +276,7 @@ struct PostorderIterator:
 		}
 		return *this;
 	}
-public:
+
 	template<typename It>
 	PostorderIterator(const BaseIterator<T,It,reverse>& ii): Base(ii) {}
 	PostorderIterator(const PostorderIterator& ii): Base(ii) {}
@@ -303,8 +303,8 @@ static_assert(std::is_destructible<PostorderIterator<int,true>>::value, "");
  */
 template<typename T, bool reverse = false>
 struct LeafIterator:
-	public BaseIterator<T,LeafIterator<T,reverse>, reverse>,
-	public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
+	BaseIterator<T,LeafIterator<T,reverse>, reverse>,
+	std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 {
 	using Base = BaseIterator<T,LeafIterator<T,reverse>,reverse>;
 	LeafIterator(const tree<T>* t): Base(t, MAXINT) {}
@@ -335,7 +335,7 @@ struct LeafIterator:
 		}
 		return *this;
 	}
-public:
+
 	template<typename It>
 	LeafIterator(const BaseIterator<T,It,reverse>& ii): Base(ii) {}
 	LeafIterator(const LeafIterator& ii): Base(ii) {}
@@ -362,8 +362,8 @@ static_assert(std::is_destructible<LeafIterator<int,true>>::value, "");
  */
 template<typename T, bool reverse = false>
 struct DepthIterator:
-	public BaseIterator<T,DepthIterator<T,reverse>,reverse>,
-	public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
+	BaseIterator<T,DepthIterator<T,reverse>,reverse>,
+	std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 {
 	using Base = BaseIterator<T,DepthIterator<T,reverse>,reverse>;
 	std::size_t depth;
@@ -418,7 +418,7 @@ struct DepthIterator:
 		}
 		return *this;
 	}
-public:
+
 	template<typename It>
 	DepthIterator(const BaseIterator<T,It,reverse>& ii): Base(ii), depth(this->nodes()[ii.current].depth) {}
 	DepthIterator(const DepthIterator& ii): Base(ii), depth(ii.depth) {}
@@ -447,8 +447,8 @@ static_assert(std::is_destructible<DepthIterator<int,true>>::value, "");
  */
 template<typename T, bool reverse = false>
 struct ChildrenIterator:
-	public BaseIterator<T,ChildrenIterator<T,reverse>,reverse>,
-	public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
+	BaseIterator<T,ChildrenIterator<T,reverse>,reverse>,
+	std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 {
 	using Base = BaseIterator<T,ChildrenIterator<T,reverse>,reverse>;
 	std::size_t parent;
@@ -481,7 +481,7 @@ struct ChildrenIterator:
 		}
 		return *this;
 	}
-public:
+
 	template<typename It>
 	ChildrenIterator(const BaseIterator<T,It,reverse>& ii): Base(ii), parent(MAXINT) {
 		if (this->mTree->is_valid(ii)) parent = this->nodes()[ii.current].parent;
@@ -512,8 +512,8 @@ static_assert(std::is_destructible<ChildrenIterator<int,true>>::value, "");
  */
 template<typename T>
 struct PathIterator:
-	public BaseIterator<T, PathIterator<T>,false>,
-	public std::iterator<std::forward_iterator_tag, T, std::size_t, T*, T&>
+	BaseIterator<T, PathIterator<T>,false>,
+	std::iterator<std::forward_iterator_tag, T, std::size_t, T*, T&>
 {
 	using Base = BaseIterator<T, PathIterator<T>,false>;
 	PathIterator(const tree<T>* t, std::size_t root): Base(t, root) {}
@@ -523,7 +523,7 @@ struct PathIterator:
 		}
 		return *this;
 	}
-public:
+
 	template<typename It>
 	PathIterator(const BaseIterator<T,It,false>& ii): Base(ii) {}
 	PathIterator(const PathIterator& ii): Base(ii) {}
