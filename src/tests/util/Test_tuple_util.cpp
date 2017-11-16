@@ -22,10 +22,10 @@ TEST(TupleUtil, tail)
 TEST(TupleUtil, foreach) {
 	struct Visitor {
 		int operator()(int i) const { return i+1; }
-		int operator()(bool i) const { return 15; }
+		int operator()(bool i) const { return 0; }
 	};
 	EXPECT_EQ(
-		std::make_tuple(2,3,15),
+		std::make_tuple(2,3,0),
 		carl::tuple_foreach(Visitor(), std::make_tuple(1,2,false))
 	);
 }

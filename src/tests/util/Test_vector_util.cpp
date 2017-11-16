@@ -16,7 +16,7 @@ TEST(VectorUtil, concat)
 	carl::vector_concat(res1, v);
 	std::vector<std::size_t> res2 = carl::vector_concat(v);
 	EXPECT_EQ(res1, res2);
-	for (std::size_t i = 1; i < 7; i++) {
+	for (std::size_t i = 1; i < res1.size(); ++i) {
 		EXPECT_EQ(i, res1[i-1]);
 	}
 }
