@@ -39,3 +39,15 @@ else()
 	set(CLANG_TIDY_CHECKS "-checks='${CLANG_TIDY_CHECKS}'")
 	#message(STATUS "Enabled checks for clang-tidy: ${CLANG_TIDY_CHECKS}")
 endif()
+
+find_program(CLANG_FORMAT clang-format)
+if(NOT CLANG_FORMAT)
+	message(STATUS "Did not find clang-format, target format is disabled.")
+else()
+	message(STATUS "Found clang-format, use \"make format\" to run it.")
+	
+	add_custom_target(format
+		COMMAND find ./ -iname "*.h" -o -iname "*.tpp" -o -iname "*.cpp" | xargs ${CLANG_FORMAT} -style=file -i -verbose
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/
+	)
+endif()
