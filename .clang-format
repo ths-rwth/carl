@@ -3,6 +3,7 @@ BasedOnStyle: LLVM
 
 AccessModifierOffset: -4
 AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: true
 AlwaysBreakTemplateDeclarations: true
 BreakStringLiterals: false
 ColumnLimit: 0
