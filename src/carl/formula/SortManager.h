@@ -71,7 +71,7 @@ struct SortContent {
 
 	SortContent& operator=(const SortContent& sc) = delete;
 	SortContent(SortContent&& sc) noexcept = default;
-	SortContent& operator=(SortContent&& sc) noexcept = default;
+	SortContent& operator=(SortContent&& sc) = default;
 
 	/**
 	 * Return a copy of this SortContent without any indices.
