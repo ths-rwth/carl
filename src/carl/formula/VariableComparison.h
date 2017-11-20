@@ -11,6 +11,15 @@
 #include <boost/variant.hpp>
 
 namespace carl {
+  /**
+   * Represent an algebraic constraint/(in)equality of the form
+   * 'root(p(x,y,z), i) < a'
+   * where p is a multivariate polynomial, i is a root index and 'a'
+   * just any variable.  This generalizes a constraint/(in)equality of the form
+   * 'root(p(x), i) < a', basically comparing 'a' to an algebraic real (that
+   * uses a univariate polynomial),  to a multivariate one, where you still
+   * need to plug in values for 'y' and 'z' to get the univariate polynomial.
+   */
 	template<typename Poly>
 	class VariableComparison {
 	public:
@@ -38,10 +47,11 @@ namespace carl {
 				return Variables();
 			}
 		};
-	public:	
+	public:
 		VariableComparison(Variable v, const boost::variant<MR, RAN>& value, Relation rel, bool neg): mVar(v), mValue(value), mRelation(rel), mNegated(neg) {}
 		VariableComparison(Variable v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {
 			if (value.isUnivariate()) {
+			  // If the value of type MultivariateRoot is really just univariate, we convert it to an algebraic real.
 				auto res = value.evaluate({});
 				if (res) {
 					mValue = *res;
@@ -50,7 +60,7 @@ namespace carl {
 			}
 		}
 		VariableComparison(Variable v, const RAN& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {}
-		
+
 		Variable var() const {
 			return mVar;
 		}
@@ -100,13 +110,13 @@ namespace carl {
 			auto newVars = boost::apply_visitor(VariableCollector(), mValue);
 			vars.insert(newVars.begin(), newVars.end());
 		}
-		
+
 		std::string toString(unsigned = 0, bool = false, bool = true) const {
 			std::stringstream ss;
 			ss << "(" << (negated() ? "!" : "") << relation() << " " << var() << " " << mValue << ")";
 			return ss.str();
 		}
-		
+
 		bool operator==(const VariableComparison& vc) const {
 			return mRelation == vc.mRelation && mVar == vc.mVar && mValue == vc.mValue && mNegated == vc.mNegated;
 		}
