@@ -133,12 +133,18 @@ public:
 	}
 	
 	/**
-	 * Break down a polynomial into its irreducible factors.
-	 * Note that one of those factors is a constant-polynomial (of degree 0), 
-	 * which is included by default but can be left out by setting the flag 
-	 * 'includeConstants' to false, e.g., for root computations.
-	 * TODO The Cocoa Doc mentions only 1 constant-poly, but why is this flag
-	 * called 'includeConstants'?
+	 * Break down a polynomial into its irreducible factors together with
+   * their exponents.
+   * E.g. "x^3 + 4 x^2 + 5 x + 2" factorizes into "(x+1)^2 * (x+2)^1"
+   * where "(x+1)", "(x+2)" are the irreducible factors and "2" and "1" are
+   * their exponents.
+   *
+   * @param includeConstantFlag One of those factors is a constant-polynomial
+   * (degree 0), which is included by default but can be left out by setting
+   * the flag 'includeConstantFlag' to false, e.g., for root computations.
+   *
+   * @return A map whose keys are the irreducible factors and whose values are
+   * the exponents.
 	 */
 	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
 		auto finfo = CoCoA::factor(convert(p));
