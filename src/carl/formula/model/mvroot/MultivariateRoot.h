@@ -15,17 +15,18 @@
 namespace carl {
 
 /**
- * This is basically a hack to represent a function f: algReal^k -> algReal;
- * from multi-dimensional point whose components are algebraic reals to an
+ * @file
+ * Represent what is called an "indexed root expression".
+ * Think of this as a algebraic real(= univariate poly + root index) that
+ * replaces the univariate poly with a multivariate poly and a distinguished main variable.
+ * You first have to plug in values for all non-main variables
+ * to get univariate poly that only mentions the main variable.
+ * When you do this, you basically end up with an algebraic real.
+ * However, this algebraic real can vary depending on the values plugged in
+ * for the non-main variables.
+ * That's why you can also think of this as a function f: algReal^k -> algReal;
+ * that maps multi-dimensional point (whose components are algebraic reals) to an
  * algebraic real.
- * Think of this class as representing a real algebraic number (root of a
- * univariate poly; normally stored as a univariate poly and a number,
- * representing which of the possibly many roots this number is) that is stored
- * as a multivariate poly (and a distinguished main variable, and a root
- * number/index) where you first have to plug in values for all variables that
- * are not the main variable to get the normally used univariate poly).
- * Thus this algebraic real can vary depending on the values plugged in for the
- * other variables.
  */
 template<typename Poly>
 class MultivariateRoot {
