@@ -20,7 +20,7 @@ private:
 	std::vector<Variable> mSymbolBack;
 	CoCoA::ring mQ = CoCoA::RingQQ();
 	CoCoA::SparsePolyRing mRing;
-	
+
 	CoCoA::BigInt convert(const mpz_class& n) const {
 		return CoCoA::BigInt(n.get_mpz_t());
 	}
@@ -33,7 +33,7 @@ private:
 	mpq_class convert(const CoCoA::BigRat& n) const {
 		return mpq_class(CoCoA::mpqref(n));
 	}
-	
+
 	void convert(mpz_class& res, const CoCoA::RingElem& n) const {
 		CoCoA::BigInt i;
 		CoCoA::IsInteger(i, n);
@@ -44,13 +44,13 @@ private:
 		CoCoA::IsRational(r, n);
 		res = convert(r);
 	}
-	
+
 	static std::vector<Variable> collectVariables(const std::vector<Poly>& polys) {
 		std::set<Variable> vars;
 		for (const auto& p: polys) p.gatherVariables(vars);
 		return std::vector<Variable>(vars.begin(), vars.end());
 	}
-	
+
 public:
 	CoCoA::RingElem convert(const Poly& p) const {
 		CoCoA::RingElem res(mRing);
@@ -74,7 +74,7 @@ public:
 		}
 		return res;
 	}
-	
+
 	Poly convert(const CoCoA::RingElem& p) const {
 		Poly res;
 		for (CoCoA::SparsePolyIter i = CoCoA::BeginIter(p); !CoCoA::IsEnded(i); ++i) {
@@ -97,7 +97,7 @@ public:
 		}
 		return res;
 	}
-	
+
 	std::vector<CoCoA::RingElem> convert(const std::vector<Poly>& p) const {
 		std::vector<CoCoA::RingElem> res;
 		for (const auto& poly: p) res.emplace_back(convert(poly));
@@ -108,11 +108,11 @@ public:
 		for (const auto& poly: p) res.emplace_back(convert(poly));
 		return res;
 	}
-	
+
 	const auto& variables() const {
 		return mSymbolBack;
 	}
-	
+
 public:
 	CoCoAAdaptor(const std::vector<Poly>& polys):
 		mSymbolBack(collectVariables(polys)),
@@ -127,11 +127,11 @@ public:
 	CoCoAAdaptor(const std::initializer_list<Poly>& polys):
 		CoCoAAdaptor(std::vector<Poly>(polys))
 	{}
-	
+
 	Poly gcd(const Poly& p1, const Poly& p2) const {
 		return convert(CoCoA::gcd(convert(p1), convert(p2)));
 	}
-	
+
 	/**
 	 * Break down a polynomial into its irreducible factors together with
    * their exponents.
@@ -146,19 +146,31 @@ public:
    * @return A map whose keys are the irreducible factors and whose values are
    * the exponents.
 	 */
-	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
-		auto finfo = CoCoA::factor(convert(p));
+	Factors<Poly> factorize(const Poly& p, bool includeConstantFlag = true) const {
+    const vector<Poly> v{p}; // Reuse factorize on vector to avoid duplicate code
+    return factorize(v, includeConstantFlag);
+	}
+
+  /**
+   * Overload for vector of polys.
+   * @see #factorize for single poly.
+   */
+	Factors<Poly> factorize(const vector<Poly>& polys, bool includeConstantsFlag = true) const {
 		Factors<Poly> res;
-		if (includeConstants) {
-			if (!CoCoA::IsOne(finfo.myRemainingFactor())) {
-				res.emplace(convert(finfo.myRemainingFactor()), 1);
-			}
-		}
-		for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
-			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
-		}
+    for(const Poly& p : polys) {
+      auto finfo = CoCoA::factor(convert(p));
+      if (includeConstantsFlag) {
+        if (!CoCoA::IsOne(finfo.myRemainingFactor())) {
+          res.emplace(convert(finfo.myRemainingFactor()), 1);
+        }
+      }
+      for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
+        res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
+      }
+    }
 		return res;
 	}
+
 	Poly squareFreePart(const Poly& p) const {
 		auto finfo = CoCoA::SqFreeFactor(convert(p));
 		Poly res(1);
@@ -167,6 +179,7 @@ public:
 		}
 		return res;
 	}
+
 	auto GBasis(const std::vector<Poly>& p) const {
 		return convert(CoCoA::GBasis(CoCoA::ideal(convert(p))));
 	}
