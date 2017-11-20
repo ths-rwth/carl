@@ -159,10 +159,8 @@ public:
 		Factors<Poly> res;
     for(const Poly& p : polys) {
       auto finfo = CoCoA::factor(convert(p));
-      if (includeConstantsFlag) {
-        if (!CoCoA::IsOne(finfo.myRemainingFactor())) {
-          res.emplace(convert(finfo.myRemainingFactor()), 1);
-        }
+      if (includeConstantsFlag && !CoCoA::IsOne(finfo.myRemainingFactor())) {
+        res.emplace(convert(finfo.myRemainingFactor()), 1);
       }
       for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
         res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
