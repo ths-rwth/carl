@@ -8,7 +8,7 @@
 namespace carl
 {
 	/**
-	 * This class represents a model, that is an assignment for variables to some values.
+	 * Represent a collection of assignments/mappings from variables to values.
 	 * A variable can be assigned to different values that are represented by a ModelValue.
 	 * Most notably, a value may be a substitution based on the values of other variables.
 	 * If a variable that is used by a substitution for another variable is erased from the model, this substitution is evaluated and replaced by the result.
