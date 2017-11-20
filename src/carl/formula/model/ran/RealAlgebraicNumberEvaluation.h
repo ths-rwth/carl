@@ -1,5 +1,12 @@
 #pragma once
 
+/**
+ * @file
+ * Collect functions to evaluate a polynomial wrt. algebraic reals, i.e.  plug
+ * in algebraic reals for some or all of the variables inside a polynomial and
+ * get the resulting polynomial or algebraic real.
+ */
+
 #include <map>
 #include <vector>
 
@@ -10,7 +17,7 @@
 
 #include "../../../core/MultivariatePolynomial.h"
 #include "../../../interval/IntervalEvaluation.h"
-#include "../../../thom/ThomEvaluation.h"   
+#include "../../../thom/ThomEvaluation.h"
 #include "../../../util/SFINAE.h"
 
 namespace carl {
@@ -23,7 +30,7 @@ using RANMap = std::map<Variable, RealAlgebraicNumber<Number>>;
  * Evaluate the given polynomial 'p' at the given 'point' based on the variable order given by 'variables'.
  * If a variable is assigned a numeric representation, the corresponding value is directly plugged in.
  * All assignments of interval representations are passed on to <code>evaluate(MultivariatePolynomial, RANIRMap)</code>.
- * Note that the number of variables must match the dimension of the 'point', all 
+ * Note that the number of variables must match the dimension of the 'point', all
  * variables of 'p' must appear in 'variables' and that 'variables' must not mention any additional variables.
  */
 template<typename Number, typename Coeff>
@@ -52,13 +59,13 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
  */
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluatePolynomial(
-		const UnivariatePolynomial<Coeff>& p, 
+		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		std::map<Variable, Interval<Number>>& varToInterval
 );
 template<typename Number>
 MultivariatePolynomial<Number> evaluatePolynomial(
-		const MultivariatePolynomial<Number>& p, 
+		const MultivariatePolynomial<Number>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m
 );
 
@@ -113,7 +120,7 @@ template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
 	CARL_LOG_TRACE("carl.ran", "Evaluating " << p << " on " << m);
 	MultivariatePolynomial<Number> pol(p);
-	
+
 	for (auto it = m.begin(); it != m.end();) {
 		//assert(pol.has(it->first));
 		if (it->second.isNumeric()) {
@@ -128,12 +135,12 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
 	if (pol.isNumber()) {
 		return RealAlgebraicNumber<Number>(pol.constantPart());
 	}
-        
-        // need to evaluate polynomial on non-trivial RANs 
+
+        // need to evaluate polynomial on non-trivial RANs
         assert(m.size() > 0);
         if(m.begin()->second.isInterval())
                 return evaluateIR(pol, m);
-        else 
+        else
                 return evaluateTE(pol, m);
 }
 
@@ -141,7 +148,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
 /**
  * Evaluate the given polynomial with the given values for the variables.
  * Asserts that all variables of p have an assignment in m and that m has no additional assignments.
- * 
+ *
  * @param p Polynomial to be evaluated
  * @param m Variable assignment
  * @return Evaluation result
@@ -191,7 +198,7 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluatePolynomial(
-		const UnivariatePolynomial<Coeff>& p, 
+		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		std::map<Variable, Interval<Number>>& varToInterval
 ) {
@@ -216,7 +223,7 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 
 template<typename Number>
 MultivariatePolynomial<Number> evaluatePolynomial(
-		const MultivariatePolynomial<Number>& p, 
+		const MultivariatePolynomial<Number>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m
 ) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
