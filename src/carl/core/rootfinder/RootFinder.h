@@ -1,9 +1,3 @@
-/**
- * @file RootFinder.h
- * @ingroup rootfinder
- * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- */
-
 #pragma once
 
 #include "../../formula/model/ran/RealAlgebraicNumber.h"
@@ -87,7 +81,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
  * </ul>
  * Note that boost::none is returned if replacing variables in 'p' already yields
  * the zero-polynomial and no valid root computation is possible.
- * However, if it's a non-zero-polynomial that simply has no roots, an empty vector 
+ * However, if it's a non-zero-polynomial that simply has no roots, an empty vector
  * of roots is returned.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
