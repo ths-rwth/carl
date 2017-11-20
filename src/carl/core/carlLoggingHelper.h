@@ -1,8 +1,3 @@
-/**
- * @file carlLoggingHelper.h
- * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- */
-
 #pragma once
 
 #include <algorithm>
@@ -14,7 +9,7 @@
 namespace carl {
 
 /**
- * Returns the binary representation given value as bit string.
+ * Return the binary representation given value as bit string.
  * Note that this method is tailored to little endian systems.
  * @param a A value of any type
  * @param spacing Specifies if the bytes shall be separated by a space.
@@ -35,12 +30,10 @@ std::string binary(const T& a, const bool& spacing = true)
 }
 
 /**
- * Returns the basename of a given filename.
- * @param s Filename.
- * @return Basename of s.
+ * Return the basename of a given filename.
  */
-inline std::string basename(const std::string& s) {
-	return s.substr(std::max(s.rfind('/') + 1, s.rfind('\\') + 1));
+inline std::string basename(const std::string& filename) {
+	return filename.substr(std::max(filename.rfind('/') + 1, filename.rfind('\\') + 1));
 }
 
 }

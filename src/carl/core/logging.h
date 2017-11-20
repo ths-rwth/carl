@@ -1,6 +1,5 @@
 /**
- * @file logging.h
- * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * @file
  *
  * A small wrapper for any logging library we might want to use.
  * If LOGGING is not set, all logging is disabled.
@@ -8,9 +7,6 @@
  * Note that this header should *not* be included if you want to use the carl
  * logging facilities yourself. To do that, include carlLogging.h and create
  * logging macros like below for your own application.
- *
- * Created: 21/11/2012
- * @version: 2014-07-30
  */
 
 #pragma once

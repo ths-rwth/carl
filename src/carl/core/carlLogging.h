@@ -1,8 +1,3 @@
-/**
- * @file carlLogging.h
- * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- */
-
 #pragma once
 
 #include "../io/streamingOperators.h"
@@ -83,19 +78,19 @@ namespace logging {
 enum class LogLevel {
 	/// All log messages.
 	LVL_ALL,
-	/// Log messages used for tracing the program flow in detail.
+	/// Finer-grained informational events than the DEBUG.
 	LVL_TRACE,
-	/// Log messages used for debugging.
+	/// Fine-grained informational events that are most useful to debug an application.
 	LVL_DEBUG,
-	/// Log messages used for information.
+	/// Highlight the progress of the application at coarse-grained level.
 	LVL_INFO,
-	/// Log messages used to warn about an undesired state.
+	/// Potentially harmful situations or undesired states.
 	LVL_WARN,
-	/// Log messages used for errors that can be handled.
+	/// Error events that might still allow the application to continue running.
 	LVL_ERROR,
-	/// Log messages used for errors that lead to program termination.
+	/// Severe error events that will presumably lead the application to terminate.
 	LVL_FATAL,
-	/// Log no messages.
+	/// No messages.
 	LVL_OFF,
 	/// Default log level.
 	LVL_DEFAULT = LVL_WARN
