@@ -38,16 +38,14 @@ namespace carl
         if(mIsSimplified) return;
         if(nominatorAsPolynomial().isZero())
         {
-            delete mPolynomialQuotient;
-            mPolynomialQuotient = nullptr;
+            mPolynomialQuotient.reset();
             mNumberQuotient = std::move(CoeffType(0));
             mIsSimplified = true;
             return;
         }
         if(nominatorAsPolynomial() == denominatorAsPolynomial())
         {
-            delete mPolynomialQuotient;
-            mPolynomialQuotient = nullptr;
+            mPolynomialQuotient.reset();
             mNumberQuotient = std::move(CoeffType(1));
             mIsSimplified = true;
             return;
@@ -75,8 +73,7 @@ namespace carl
         if( nominatorAsPolynomial().isConstant() && denominatorAsPolynomial().isConstant() )
         {
             mNumberQuotient = std::move( constantPart() );
-            delete mPolynomialQuotient;
-            mPolynomialQuotient = nullptr;
+            mPolynomialQuotient.reset();
             mIsSimplified = true;
         }
     }

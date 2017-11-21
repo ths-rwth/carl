@@ -23,61 +23,55 @@ namespace carl
         
     private:
         
-        std::pair<Pol,Pol>* mPolynomialQuotient;
+        std::unique_ptr<std::pair<Pol,Pol>> mPolynomialQuotient;
         CoeffType mNumberQuotient;
         bool mIsSimplified;
 
     public:
         
         RationalFunction(): 
-            mPolynomialQuotient(nullptr),
             mNumberQuotient(0),
             mIsSimplified(true)
         {}
 
-        explicit RationalFunction(int v): 
-            mPolynomialQuotient(nullptr),
+        explicit RationalFunction(int v):
             mNumberQuotient(v), 
             mIsSimplified(true)
         {}
 
         explicit RationalFunction(const CoeffType& c): 
-            mPolynomialQuotient(nullptr),
             mNumberQuotient(c), 
             mIsSimplified(true)
         {}
 
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
         explicit RationalFunction(Variable::Arg v): 
-            mPolynomialQuotient(new std::pair<Pol,Pol>(std::move(P(v)), std::move(Pol(1)))), 
+            mPolynomialQuotient(std::make_unique<std::pair<Pol,Pol>>(std::move(P(v)), std::move(Pol(1)))),
             mNumberQuotient(),
             mIsSimplified(true)
         {}
 
         explicit RationalFunction(const Pol& p):
-            mPolynomialQuotient(nullptr),
             mNumberQuotient(),
             mIsSimplified(true)
         {
             if( p.isConstant() )
                 mNumberQuotient = p.constantPart();
             else
-                mPolynomialQuotient = new std::pair<Pol,Pol>(p, std::move(Pol(1)));
+                mPolynomialQuotient = std::make_unique<std::pair<Pol,Pol>>(p, std::move(Pol(1)));
         }
 
         explicit RationalFunction(Pol&& p):
-            mPolynomialQuotient(nullptr),
             mNumberQuotient(),
             mIsSimplified(true)
         {
             if( p.isConstant() )
                 mNumberQuotient = p.constantPart();
             else
-                mPolynomialQuotient = new std::pair<Pol,Pol>(std::move(p), std::move(Pol(1)));
+                mPolynomialQuotient = std::make_unique<std::pair<Pol,Pol>>(std::move(p), std::move(Pol(1)));
         }
 
         explicit RationalFunction(const Pol& nom, const Pol& denom):
-            mPolynomialQuotient(nullptr),
             mNumberQuotient(),
             mIsSimplified(false)
         {
@@ -88,14 +82,14 @@ namespace carl
             }
             else
             {
-                mPolynomialQuotient = new std::pair<Pol,Pol>(nom, denom);
+                mPolynomialQuotient = std::make_unique<std::pair<Pol,Pol>>(nom, denom);
                 eliminateCommonFactor( !AutoSimplify );
                 assert(isConstant() || !denominatorAsPolynomial().isZero());
             }
         }
 
         explicit RationalFunction(Pol&& nom, Pol&& denom):
-            mPolynomialQuotient(new std::pair<Pol,Pol>(std::move(nom),std::move(denom))),
+            mPolynomialQuotient(std::make_unique<std::pair<Pol,Pol>>(std::move(nom),std::move(denom))),
             mNumberQuotient(),
             mIsSimplified(false)
         {
@@ -103,63 +97,40 @@ namespace carl
             assert(isConstant() || !denominatorAsPolynomial().isZero());
         }
 
-		explicit RationalFunction(std::pair<Pol,Pol>* quotient, const CoeffType& num, bool simplified):
-			mPolynomialQuotient(quotient),
+		explicit RationalFunction(std::unique_ptr<std::pair<Pol,Pol>>&& quotient, const CoeffType& num, bool simplified):
+			mPolynomialQuotient(std::move(quotient)),
 			mNumberQuotient(num),
 			mIsSimplified(simplified)
 		{}
         
         RationalFunction(const RationalFunction& _rf):
-            mPolynomialQuotient( _rf.isConstant() ? nullptr : new std::pair<Pol,Pol>(_rf.nominator(), _rf.denominator()) ),
+            mPolynomialQuotient( _rf.isConstant() ? nullptr : std::make_unique<std::pair<Pol,Pol>>(_rf.nominator(), _rf.denominator()) ),
             mNumberQuotient( _rf.mNumberQuotient ),
             mIsSimplified(_rf.mIsSimplified)
         {}
         
         RationalFunction(RationalFunction&& _rf):
-            mPolynomialQuotient( _rf.mPolynomialQuotient ),
+            mPolynomialQuotient(std::move(rf.mPolynomialQuotient)),
             mNumberQuotient( std::move( _rf.mNumberQuotient ) ),
             mIsSimplified(_rf.mIsSimplified)
         {
-            _rf.mPolynomialQuotient = nullptr;
         }
         
-        ~RationalFunction()
-        {
-            if( !isConstant() )
-            {
-                delete mPolynomialQuotient;
-            }
-        }
+        ~RationalFunction() noexcept = default;
         
         RationalFunction& operator=(const RationalFunction& _rf)
         {
             if( this == &_rf ) return *this;
             mIsSimplified = _rf.mIsSimplified;
             mNumberQuotient = _rf.mNumberQuotient;
-            if( !isConstant() )
-            {
-                delete mPolynomialQuotient;
-            }
-            mPolynomialQuotient = _rf.isConstant() ? nullptr : new std::pair<Pol,Pol>(_rf.nominatorAsPolynomial(), _rf.denominatorAsPolynomial());
+            mPolynomialQuotient = _rf.isConstant() ? nullptr : std::make_unique<std::pair<Pol,Pol>>(_rf.nominatorAsPolynomial(), _rf.denominatorAsPolynomial());
             return *this;
         }
         
         RationalFunction& operator=(RationalFunction&& _rf)
         {
             mIsSimplified = _rf.mIsSimplified;
-            if( !isConstant() )
-            {
-                delete mPolynomialQuotient;
-            }
-            if( _rf.isConstant() )
-            {
-                mPolynomialQuotient = nullptr;
-            }
-            else
-            {
-                mPolynomialQuotient = _rf.mPolynomialQuotient;
-                _rf.mPolynomialQuotient = nullptr;
-            }
+            mPolynomialQuotient = std::move(_rf.mPolynomialQuotient);
             mNumberQuotient = std::move(_rf.mNumberQuotient);
             return *this;
         }
@@ -248,7 +219,7 @@ namespace carl
 			if (isConstant()) {
 				return RationalFunction(nullptr, 1/mNumberQuotient, mIsSimplified);
 			} else {
-				return RationalFunction(new std::pair<Pol,Pol>(mPolynomialQuotient->second, mPolynomialQuotient->first), carl::constant_zero<CoeffType>().get(), mIsSimplified);
+				return RationalFunction(std::make_unique<std::pair<Pol,Pol>>(*mPolynomialQuotient), carl::constant_zero<CoeffType>().get(), mIsSimplified);
 			}
 		}
 
