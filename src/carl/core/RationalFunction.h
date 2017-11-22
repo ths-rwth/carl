@@ -106,17 +106,8 @@ namespace carl
 		{}
         
         RationalFunction(const RationalFunction& _rf) = default;
-        
-<<<<<<< HEAD
-        RationalFunction(RationalFunction&& _rf):
-            mPolynomialQuotient(std::move(_rf.mPolynomialQuotient)),
-            mNumberQuotient( std::move( _rf.mNumberQuotient ) ),
-            mIsSimplified(_rf.mIsSimplified)
-        {
-        }
-=======
+
         RationalFunction(RationalFunction&& _rf) = default;
->>>>>>> Replaced std::unique_ptr by boost::optional.
         
         ~RationalFunction() noexcept = default;
         
