@@ -35,7 +35,8 @@ namespace carl
     template<typename Pol, bool AS>
 	void RationalFunction<Pol, AS>::eliminateCommonFactor( bool _justNormalize )
     {
-        if(mIsSimplified) return;
+        if (mIsSimplified) return;
+		assert(!isConstant());
         if(nominatorAsPolynomial().isZero())
         {
             mPolynomialQuotient.reset();
@@ -180,7 +181,7 @@ namespace carl
     
     template<typename Pol, bool AS>
     template<bool byInverse, typename P, DisableIf<needs_cache<P>>>
-    RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::add(Variable::Arg rhs)
+    RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::add(Variable rhs)
     {
         if( this->isConstant() )
         {
@@ -268,7 +269,7 @@ namespace carl
 	
 	template<typename Pol, bool AS>
     template<typename P, DisableIf<needs_cache<P>>>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(Variable::Arg rhs)
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(Variable rhs)
 	{
         if( this->isConstant() )
         {
@@ -360,14 +361,14 @@ namespace carl
 	
 	template<typename Pol, bool AS>
     template<typename P, DisableIf<needs_cache<P>>>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(Variable::Arg rhs)
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(Variable rhs)
 	{
         if( this->isConstant() )
         {
             CoeffType c(this->mNumberQuotient);
             Pol resultNum( rhs );
             resultNum *= CoeffType(getDenom(c));
-            *this = std::move( RationalFunction<Pol, AS>( std::move(Pol(CoeffType(getNum(c)))), std::move(resultNum) ) );
+            *this = RationalFunction<Pol, AS>(Pol(CoeffType(getNum(c))), std::move(resultNum) );
             return *this;
         }
 		mIsSimplified = false;

@@ -9,6 +9,8 @@
 #include "MultivariateGCD.h"
 #include "FactorizedPolynomial.h"
 
+#include <boost/optional.hpp>
+
 namespace carl
 {
 	
@@ -23,7 +25,7 @@ namespace carl
         
     private:
         
-        std::unique_ptr<std::pair<Pol,Pol>> mPolynomialQuotient;
+        boost::optional<std::pair<Pol,Pol>> mPolynomialQuotient;
         CoeffType mNumberQuotient;
         bool mIsSimplified;
 
@@ -45,8 +47,8 @@ namespace carl
         {}
 
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
-        explicit RationalFunction(Variable::Arg v): 
-            mPolynomialQuotient(std::make_unique<std::pair<Pol,Pol>>(std::move(P(v)), std::move(Pol(1)))),
+        explicit RationalFunction(Variable v): 
+            mPolynomialQuotient(std::pair<Pol,Pol>(std::move(P(v)), std::move(Pol(1)))),
             mNumberQuotient(),
             mIsSimplified(true)
         {}
@@ -58,7 +60,7 @@ namespace carl
             if( p.isConstant() )
                 mNumberQuotient = p.constantPart();
             else
-                mPolynomialQuotient = std::make_unique<std::pair<Pol,Pol>>(p, std::move(Pol(1)));
+                mPolynomialQuotient = std::pair<Pol,Pol>(p, std::move(Pol(1)));
         }
 
         explicit RationalFunction(Pol&& p):
@@ -68,7 +70,7 @@ namespace carl
             if( p.isConstant() )
                 mNumberQuotient = p.constantPart();
             else
-                mPolynomialQuotient = std::make_unique<std::pair<Pol,Pol>>(std::move(p), std::move(Pol(1)));
+                mPolynomialQuotient = std::pair<Pol,Pol>(std::move(p), std::move(Pol(1)));
         }
 
         explicit RationalFunction(const Pol& nom, const Pol& denom):
@@ -82,14 +84,14 @@ namespace carl
             }
             else
             {
-                mPolynomialQuotient = std::make_unique<std::pair<Pol,Pol>>(nom, denom);
+                mPolynomialQuotient = std::pair<Pol,Pol>(nom, denom);
                 eliminateCommonFactor( !AutoSimplify );
                 assert(isConstant() || !denominatorAsPolynomial().isZero());
             }
         }
 
         explicit RationalFunction(Pol&& nom, Pol&& denom):
-            mPolynomialQuotient(std::make_unique<std::pair<Pol,Pol>>(std::move(nom),std::move(denom))),
+            mPolynomialQuotient(std::pair<Pol,Pol>(std::move(nom),std::move(denom))),
             mNumberQuotient(),
             mIsSimplified(false)
         {
@@ -97,43 +99,30 @@ namespace carl
             assert(isConstant() || !denominatorAsPolynomial().isZero());
         }
 
-		explicit RationalFunction(std::unique_ptr<std::pair<Pol,Pol>>&& quotient, const CoeffType& num, bool simplified):
+		explicit RationalFunction(boost::optional<std::pair<Pol,Pol>>&& quotient, const CoeffType& num, bool simplified):
 			mPolynomialQuotient(std::move(quotient)),
 			mNumberQuotient(num),
 			mIsSimplified(simplified)
 		{}
         
-        RationalFunction(const RationalFunction& _rf):
-            mPolynomialQuotient( _rf.isConstant() ? nullptr : std::make_unique<std::pair<Pol,Pol>>(_rf.nominator(), _rf.denominator()) ),
-            mNumberQuotient( _rf.mNumberQuotient ),
-            mIsSimplified(_rf.mIsSimplified)
-        {}
+        RationalFunction(const RationalFunction& _rf) = default;
         
+<<<<<<< HEAD
         RationalFunction(RationalFunction&& _rf):
             mPolynomialQuotient(std::move(_rf.mPolynomialQuotient)),
             mNumberQuotient( std::move( _rf.mNumberQuotient ) ),
             mIsSimplified(_rf.mIsSimplified)
         {
         }
+=======
+        RationalFunction(RationalFunction&& _rf) = default;
+>>>>>>> Replaced std::unique_ptr by boost::optional.
         
         ~RationalFunction() noexcept = default;
         
-        RationalFunction& operator=(const RationalFunction& _rf)
-        {
-            if( this == &_rf ) return *this;
-            mIsSimplified = _rf.mIsSimplified;
-            mNumberQuotient = _rf.mNumberQuotient;
-            mPolynomialQuotient = _rf.isConstant() ? nullptr : std::make_unique<std::pair<Pol,Pol>>(_rf.nominatorAsPolynomial(), _rf.denominatorAsPolynomial());
-            return *this;
-        }
+        RationalFunction& operator=(const RationalFunction& _rf) = default;
         
-        RationalFunction& operator=(RationalFunction&& _rf)
-        {
-            mIsSimplified = _rf.mIsSimplified;
-            mPolynomialQuotient = std::move(_rf.mPolynomialQuotient);
-            mNumberQuotient = std::move(_rf.mNumberQuotient);
-            return *this;
-        }
+        RationalFunction& operator=(RationalFunction&& _rf) = default;
 
         /**
          * @return The nominator
@@ -217,9 +206,9 @@ namespace carl
 		RationalFunction inverse() const {
 			assert(!this->isZero());
 			if (isConstant()) {
-				return RationalFunction(nullptr, 1/mNumberQuotient, mIsSimplified);
+				return RationalFunction(boost::none, 1/mNumberQuotient, mIsSimplified);
 			} else {
-				return RationalFunction(std::make_unique<std::pair<Pol,Pol>>(*mPolynomialQuotient), carl::constant_zero<CoeffType>().get(), mIsSimplified);
+				return RationalFunction(boost::optional<std::pair<Pol,Pol>>(*mPolynomialQuotient), carl::constant_zero<CoeffType>().get(), mIsSimplified);
 			}
 		}
 
@@ -245,7 +234,7 @@ namespace carl
 
         inline bool isConstant() const 
         {
-            return mPolynomialQuotient == nullptr;
+            return !mPolynomialQuotient;
         }
 
         inline CoeffType constantPart() const 
@@ -328,7 +317,7 @@ namespace carl
         RationalFunction& add(const Pol& rhs);
         
         template<bool byInverse = false, typename P = Pol, DisableIf<needs_cache<P>> = dummy>
-        RationalFunction& add(Variable::Arg rhs);
+        RationalFunction& add(Variable rhs);
         
         template<bool byInverse = false>
         RationalFunction& add(const CoeffType& rhs);
@@ -365,7 +354,7 @@ namespace carl
         }
 
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
-        inline RationalFunction& operator+=(Variable::Arg rhs)
+        inline RationalFunction& operator+=(Variable rhs)
         {
             return this->template add<false>( rhs );
         }
@@ -405,7 +394,7 @@ namespace carl
         }
 
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
-        inline RationalFunction& operator-=(Variable::Arg rhs)
+        inline RationalFunction& operator-=(Variable rhs)
         {
             return this->template add<true>( rhs );
         }
@@ -432,7 +421,7 @@ namespace carl
             return (*this *= Pol(rhs));
         }
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
-        RationalFunction& operator*=(Variable::Arg rhs);
+        RationalFunction& operator*=(Variable rhs);
         RationalFunction& operator*=(const CoeffType& rhs);
         RationalFunction& operator*=(carl::sint rhs);
         /// @}
@@ -451,7 +440,7 @@ namespace carl
             return (*this /= Pol(rhs));
         }
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
-        RationalFunction& operator/=(Variable::Arg rhs);
+        RationalFunction& operator/=(Variable rhs);
         RationalFunction& operator/=(const CoeffType& rhs);
         RationalFunction& operator/=(unsigned long rhs);
         /// @}
@@ -491,7 +480,7 @@ namespace carl
 	}
 
 	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
-	inline RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
+	inline RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, Variable rhs)
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) += rhs );
 	}
@@ -533,7 +522,7 @@ namespace carl
 	}
 
 	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
-	inline RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
+	inline RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, Variable rhs)
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) -= rhs );
 	}
@@ -569,7 +558,7 @@ namespace carl
 	}
 
 	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
-	inline RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
+	inline RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, Variable rhs)
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) *= rhs );
 	}
@@ -623,7 +612,7 @@ namespace carl
 	}
 
 	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
-	inline RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
+	inline RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, Variable rhs)
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) /= rhs );
 	}
