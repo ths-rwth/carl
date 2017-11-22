@@ -24,6 +24,7 @@ class Timer {
 	clock::time_point mStart;
 public:
 	Timer() noexcept: mStart(clock::now()) {}
+
 	/**
 	 * Calculated the number of milliseconds since this object has been created.
 	 * @return Milliseconds passed.
@@ -39,16 +40,16 @@ public:
 	void reset() noexcept {
 		mStart = clock::now();
 	}
-	/**
-	 * Streaming operator for a Timer.
-	 * Prints the result of `t.passed()`.
-	 * @param os Output stream.
-	 * @param t Timer.
-	 * @return os.
-	 */
-	friend std::ostream& operator<<(std::ostream& os, const Timer& t) {
-		return os << t.passed();
-	}
 };
+/**
+ * Streaming operator for a Timer.
+ * Prints the result of `t.passed()`.
+ * @param os Output stream.
+ * @param t Timer.
+ * @return os.
+ */
+inline std::ostream& operator<<(std::ostream& os, const Timer& t) {
+	return os << t.passed();
+}
 
 }
