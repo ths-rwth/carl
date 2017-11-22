@@ -110,7 +110,7 @@ namespace carl
         {}
         
         RationalFunction(RationalFunction&& _rf):
-            mPolynomialQuotient(std::move(rf.mPolynomialQuotient)),
+            mPolynomialQuotient(std::move(_rf.mPolynomialQuotient)),
             mNumberQuotient( std::move( _rf.mNumberQuotient ) ),
             mIsSimplified(_rf.mIsSimplified)
         {
