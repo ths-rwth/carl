@@ -208,7 +208,7 @@ namespace carl
 			if (isConstant()) {
 				return RationalFunction(boost::none, 1/mNumberQuotient, mIsSimplified);
 			} else {
-				return RationalFunction(boost::optional<std::pair<Pol,Pol>>(*mPolynomialQuotient), carl::constant_zero<CoeffType>().get(), mIsSimplified);
+				return RationalFunction(boost::optional<std::pair<Pol,Pol>>(std::pair<Pol,Pol>(mPolynomialQuotient->second, mPolynomialQuotient->first)), carl::constant_zero<CoeffType>().get(), mIsSimplified);
 			}
 		}
 
