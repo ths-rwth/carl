@@ -14,4 +14,5 @@ TEST(Timer, Basics)
 	t.reset();
 	std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 	EXPECT_TRUE(t.passed() >= delay);
+	EXPECT_TRUE(std::stoll(getOutput(t)) >= 50);
 }
