@@ -106,6 +106,9 @@ class Term {
 		 * Get the monomial.
 		 * @return Monomial.
 		 */
+		Monomial::Arg& monomial() {
+			return mMonomial;
+		}
 		const Monomial::Arg& monomial() const {
 			return mMonomial;
 		}
@@ -305,21 +308,6 @@ class Term {
 	    std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 
 		bool isConsistent() const;
-		
-		Term<Coefficient> operator-() const;
-		
-		/// @name In-place multiplication operators
-		/// @{
-		/**
-		 * Multiply this term with something and return the changed term.
-		 * @param rhs Right hand side.
-		 * @return Changed term.
-		 */
-		Term& operator*=(const Coefficient& rhs);
-		Term& operator*=(Variable rhs);
-		Term& operator*=(const Monomial::Arg& rhs);
-		Term& operator*=(const Term& rhs);
-		/// @}
 
 		/// @name Division operators
 		/// @{
@@ -385,6 +373,70 @@ class Term {
          */
 		static Term gcd(const Term& t1, const Term& t2);
 };
+
+
+template<typename Coeff>
+Term<Coeff> operator-(const Term<Coeff>& rhs) {
+	return Term<Coeff>(-rhs.coeff(), rhs.monomial());
+}
+
+
+
+/// @name In-place multiplication operators
+/// @{
+/**
+ * Multiply a term with something and return the changed term.
+ * @param lhs Left hand side.
+ * @param rhs Right hand side.
+ * @return Changed `lhs`.
+ */
+template<typename Coeff>
+Term<Coeff>& operator*=(Term<Coeff>& lhs, const Coeff& rhs) {
+	if (carl::isZero(rhs)) {
+		lhs.clear();
+	} else {
+		lhs.coeff() *= rhs;
+	}
+	return lhs;
+}
+template<typename Coeff>
+Term<Coeff>& operator*=(Term<Coeff>& lhs, Variable rhs) {
+	if (carl::isZero(lhs.coeff())) {
+		return lhs;
+	}
+	if (lhs.monomial()) {
+		lhs.monomial() = lhs.monomial() * rhs;
+	} else {
+		lhs.monomial() = createMonomial(rhs, 1);
+	}
+	return lhs;
+}
+template<typename Coeff>
+Term<Coeff>& operator*=(Term<Coeff>& lhs, const Monomial::Arg& rhs) {
+	if (carl::isZero(lhs.coeff())) {
+		return lhs;
+	}
+	if (lhs.monomial()) {
+		lhs.monomial() = lhs.monomial() * rhs;
+	} else {
+		lhs.monomial() = rhs;
+	}
+	return lhs;
+}
+template<typename Coeff>
+Term<Coeff>& operator*=(Term<Coeff>& lhs, const Term<Coeff>& rhs) {
+	if (carl::isZero(lhs.coeff())) {
+		return lhs;
+	}
+	if (carl::isZero(rhs.coeff())) {
+		lhs.clear();
+		return lhs;
+	}
+	lhs.monomial() = lhs.monomial() * rhs.monomial();
+	lhs.coeff() *= rhs.coeff();
+	return lhs;
+}
+/// @}
 
 	/// @name Comparison operators
 	/// @{
@@ -556,20 +608,20 @@ class Term {
 	 * @return `lhs * rhs`
 	 */
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
-		return Term<Coeff>(lhs) *= rhs;
+	inline Term<Coeff> operator*(Term<Coeff> lhs, const Term<Coeff>& rhs) {
+		return lhs *= rhs;
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
-		return Term<Coeff>(lhs) *= rhs;
+	inline Term<Coeff> operator*(Term<Coeff> lhs, const Monomial::Arg& rhs) {
+		return lhs *= rhs;
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Term<Coeff>& lhs, Variable rhs) {
-		return Term<Coeff>(lhs) *= rhs;
+	inline Term<Coeff> operator*(Term<Coeff> lhs, Variable rhs) {
+		return lhs *= rhs;
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs) {
-		return Term<Coeff>(lhs) *= rhs;
+	inline Term<Coeff> operator*(Term<Coeff> lhs, const Coeff& rhs) {
+		return lhs *= rhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Monomial::Arg& lhs, const Term<Coeff>& rhs) {
