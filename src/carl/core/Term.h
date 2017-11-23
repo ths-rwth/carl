@@ -557,59 +557,59 @@ class Term {
 	 */
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
-		return std::move(Term<Coeff>(lhs) *= rhs);
+		return Term<Coeff>(lhs) *= rhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
-		return std::move(Term<Coeff>(lhs) *= rhs);
+		return Term<Coeff>(lhs) *= rhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Term<Coeff>& lhs, Variable rhs) {
-		return std::move(Term<Coeff>(lhs) *= rhs);
+		return Term<Coeff>(lhs) *= rhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs) {
-		return std::move(Term<Coeff>(lhs) *= rhs);
+		return Term<Coeff>(lhs) *= rhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Monomial::Arg& lhs, const Term<Coeff>& rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	template<typename Coeff, EnableIf<carl::is_number<Coeff>> = dummy>
 	inline Term<Coeff> operator*(const Monomial::Arg& lhs, const Coeff& rhs) {
-		return std::move(Term<Coeff>(rhs, lhs));
+		return Term<Coeff>(rhs, lhs);
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(Variable lhs, const Term<Coeff>& rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(Variable lhs, const Coeff& rhs) {
-		return std::move(Term<Coeff>(rhs, lhs, 1));
+		return Term<Coeff>(rhs, lhs, 1);
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	template<typename Coeff, EnableIf<carl::is_number<Coeff>> = dummy>
 	inline Term<Coeff> operator*(const Coeff& lhs, const Monomial::Arg& rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Coeff& lhs, Variable rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
     template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
     inline Term<Coeff> operator/(const Term<Coeff>& lhs, const Coeff& rhs) {
-        return std::move(lhs * reciprocal(rhs));
+        return lhs * reciprocal(rhs);
     }
     template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
     inline Term<Coeff> operator/(const Monomial::Arg& lhs, const Coeff& rhs) {
-        return std::move(lhs * reciprocal(rhs));
+        return lhs * reciprocal(rhs);
     }
     template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
     inline Term<Coeff> operator/(Variable& lhs, const Coeff& rhs) {
-        return std::move(lhs * reciprocal(rhs));
+        return lhs * reciprocal(rhs);
     }
 	/// @}
 
