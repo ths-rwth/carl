@@ -101,7 +101,7 @@ jobs = [
 	job("0-clang", ["build", "linux", "clang-3.9", "build.sh"]),
 	job("0-clang", ["build", "linux", "clang-4.0", "build.sh"]),
 	job("0-clang", ["build", "linux", "clang-5.0", "build.sh"]),
-	job("0-clang", ["build", "linux", "clang-6.0", "build.sh"]),
+	job("0-clang", ["build", "linux", "clang-6.0", "build.sh", "mayfail"]),
 	job("1-gcc", ["dependencies", "linux", "g++-5", "j1", "build.sh"]),
 	job("1-gcc", ["build", "linux", "g++-5", "j1", "build.sh"]),
 	job("1-gcc", ["dependencies", "linux", "g++-6", "j1", "build.sh"]),
