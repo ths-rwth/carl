@@ -12,6 +12,7 @@
 #include "../util/Cache.h"
 #include "DivisionResult.h"
 #include "PolynomialFactorizationPair.h"
+#include "VariablesInformation.h"
 
 namespace carl
 {
