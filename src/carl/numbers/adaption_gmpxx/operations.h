@@ -64,19 +64,19 @@ inline bool isNegative(const mpq_class& n) {
 	return n < carl::constant_zero<mpq_class>().get();
 }
 
-inline mpz_class getNum(const mpq_class& n) {
+inline const mpz_class& getNum(const mpq_class& n) {
 	return n.get_num();
 }
 
-inline mpz_class getNum(const mpz_class& n) {
+inline const mpz_class& getNum(const mpz_class& n) {
 	return n;
 }
 
-inline mpz_class getDenom(const mpq_class& n) {
+inline const mpz_class& getDenom(const mpq_class& n) {
 	return n.get_den();
 }
 
-inline mpz_class getDenom(const mpz_class& n) {
+inline const mpz_class& getDenom(const mpz_class& n) {
 	return n;
 }
 
