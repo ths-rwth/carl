@@ -25,7 +25,7 @@ namespace carl
         /**
          * Initializes the ModelVariable from some valid type of the underlying variant.
          */
-        template<typename T>
+        template<typename T, typename T2 = typename std::enable_if<convertible_to_variant<T, Base>::value, T>::type>
         ModelVariable(const T& _t): mData(_t)
         {}
 		

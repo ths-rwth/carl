@@ -91,7 +91,7 @@ namespace carl
 		/**
 		 * Initializes the Assignment from some valid type of the underlying variant.
 		 */
-		template<typename T>
+		template<typename T, typename T2 = typename std::enable_if<convertible_to_variant<T, Super>::value, T>::type>
 		ModelValue(const T& _t): mData(_t) {}
 		
 		template<typename ...Args>
