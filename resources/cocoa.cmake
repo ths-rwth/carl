@@ -10,7 +10,7 @@ ExternalProject_Add(
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES
 	CONFIGURE_COMMAND ./configure --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC
-	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} cocoalib
+	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} lib
 	INSTALL_COMMAND ""
 )
 
