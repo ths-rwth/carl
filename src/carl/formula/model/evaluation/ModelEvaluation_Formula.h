@@ -42,6 +42,7 @@ namespace model {
 		if (cmp.isSubstitution()) {
 			// If assigned directly, the shared_ptr<Substitution> goes out of scope before the result is copied into cmp.
 			// Therefore, we start by copying the data and overwriting it afterwards.
+			CARL_LOG_DEBUG("carl.model.evaluation", "Evaluating " << cmp.asSubstitution() << " on " << m);
 			auto res = cmp.asSubstitution()->evaluate(m);
 			if (res.isBool() && !res.asBool()) {
 				CARL_LOG_DEBUG("carl.model.evaluation", "MVRoot does not exist, returning false");
