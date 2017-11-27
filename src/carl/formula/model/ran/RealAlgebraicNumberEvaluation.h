@@ -215,10 +215,15 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	UnivariatePolynomial<Coeff> tmp = p;
 	for (const auto& i: m) {
 		if (i.second.isNumeric()) {
+			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
 			tmp.substituteIn(i.first, Coeff(i.second.value()));
 		} else if (i.second.isInterval()) {
+			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
+			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
 			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
+			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp.switchVariable(i.first));
 			tmp = tmp.switchVariable(i.first).resultant(p2);
+			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
 			varToInterval[i.first] = i.second.getInterval();
 		} else {
 			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
