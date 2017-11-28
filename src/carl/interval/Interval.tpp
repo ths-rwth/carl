@@ -578,10 +578,8 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
                 }
                 else // N * Z
                 {
-                    if( ylt != BoundType::INFTY )
-                        lowerBoundType = ylt;
-                    if( yut != BoundType::INFTY )
-                        upperBoundType = yut;
+                    lowerBoundType = getStrictestBoundType(xut, yut);
+                    upperBoundType = getStrictestBoundType(xut, ylt);
                     resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
                 }
             }

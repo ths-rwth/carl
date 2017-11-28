@@ -300,3 +300,12 @@ TYPED_TEST(IntervalRationalTest, abs) {
 	EXPECT_EQ(i5.abs().lowerBoundType(), BoundType::WEAK);
 	EXPECT_EQ(i5.abs().upperBoundType(), BoundType::STRICT);
 }
+
+TYPED_TEST(IntervalRationalTest, mul_assign)
+{
+	Interval<TypeParam> i(TypeParam(-1));
+	Interval<TypeParam> j(TypeParam(0), BoundType::INFTY, TypeParam(0), BoundType::STRICT);
+	Interval<TypeParam> res(TypeParam(0), BoundType::STRICT, TypeParam(0), BoundType::INFTY);
+	i *= j;
+	EXPECT_EQ(i, res);
+}
