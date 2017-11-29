@@ -88,6 +88,33 @@ TEST(CoCoA, SquareFreePart) {
 	}
 }
 
+TEST(CoCoA, SquareFreeBase)
+{
+	using Poly = carl::MultivariatePolynomial<mpq_class>;
+	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable y = carl::freshRealVariable("y");
+	carl::CoCoAAdaptor<Poly> c({Poly(x*y)});
+
+	Poly p = (x*x - mpq_class(1)) * (x*x - mpq_class(1)) * (x-mpq_class(2));
+	Poly q = (x*x + mpq_class(1)) * (x*x + mpq_class(1)) * (x+mpq_class(1));
+	Poly r = (x*x - mpq_class(1)) * (x*x + mpq_class(1)) * (x+mpq_class(1)) * (x-mpq_class(2)) * (x+mpq_class(3));
+	Poly res = (x+mpq_class(3));
+	Poly onePoly = (x+mpq_class(1)-x);
+	std::vector<Poly> polyvec({p,q});
+	{
+		Poly sqareFreeBase = c.makeCoprimeWith(r.squareFreePart(),p);
+		sqareFreeBase = c.makeCoprimeWith(sqareFreeBase,q);
+		EXPECT_EQ(sqareFreeBase, res);
+		EXPECT_EQ(c.gcd(p,sqareFreeBase), onePoly);
+		EXPECT_EQ(c.gcd(q,sqareFreeBase), onePoly);
+	}
+	{
+		Poly sqareFreeBase = r.squareFreePart().coprimePart(p).coprimePart(q);
+		EXPECT_EQ(sqareFreeBase, res);
+	}
+}
+
+
 carl::MultivariatePolynomial<mpq_class> randomPoly(const std::initializer_list<carl::Variable>& vars) {
 	static std::mt19937 rand(4);
 	carl::MultivariatePolynomial<mpq_class> res;

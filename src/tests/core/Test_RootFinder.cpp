@@ -63,6 +63,15 @@ TEST(RootFinder, realRoots)
 		EXPECT_TRUE(represents(roots->front(), (Rational)-1));
 		EXPECT_TRUE(represents(roots->back(), (Rational)1));
 	}
+	{
+		MPolynomial c1 = (y + (Rational)(1));
+		MPolynomial c2 = (y + (Rational)(1))* (Rational)(-2);
+		UMPolynomial p(x, {c2,c1});
+		std::map<carl::Variable, carl::RealAlgebraicNumber<Rational>> m;
+		m.emplace(y, carl::RealAlgebraicNumber<Rational>(Rational(-1)));
+		auto roots = carl::rootfinder::realRoots(p, m);
+		EXPECT_TRUE(roots==boost::none);
+	}
 }
 
 TEST(RootFinder, evalRoots)
