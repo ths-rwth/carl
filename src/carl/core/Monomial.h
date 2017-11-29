@@ -335,7 +335,7 @@ namespace carl
 		}
 		
 		/**
-		 * For a monomial m = Prod( x_i^e_i ) * v^e, divides m by v^e
+		 * For a monomial m = Prod( x_i^{e_i} ) * v^e, divides m by v^e
 		 * @return nullptr if result is 1, otherwise m/v^e.
 		 */
 		Monomial::Arg dropVariable(Variable v) const;
@@ -420,7 +420,7 @@ namespace carl
 		
 		/**
 		 * Calculates the separable part of this monomial.
-		 * For a monomial \f$ \\prod_i x_i^e_i with e_i \neq 0 \f$, this is \f$ \\prod_i x_i^1 \f$.
+		 * For a monomial \f$ \\prod_i x_i^{e_i} with e_i \neq 0 \f$, this is \f$ \\prod_i x_i^1 \f$.
 		 * @return Separable part.
 		 */
 		Monomial::Arg separablePart() const;
