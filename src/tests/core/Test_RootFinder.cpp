@@ -70,7 +70,7 @@ TEST(RootFinder, realRoots)
 		std::map<carl::Variable, carl::RealAlgebraicNumber<Rational>> m;
 		m.emplace(y, carl::RealAlgebraicNumber<Rational>(Rational(-1)));
 		auto roots = carl::rootfinder::realRoots(p, m);
-		EXPECT_TRUE(roots==boost::none);
+		EXPECT_TRUE(roots == boost::none);
 	}
 }
 
