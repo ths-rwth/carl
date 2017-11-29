@@ -154,7 +154,7 @@ public:
 		return res;
 	}
 	auto GBasis(const std::vector<Poly>& p) const {
-		return convert(CoCoA::GBasis(CoCoA::ideal(convert(p))));
+		return convert(CoCoA::ReducedGBasis(CoCoA::ideal(convert(p))));
 	}
 };
 
