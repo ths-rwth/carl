@@ -132,11 +132,8 @@ macro(export_target output TARGET)
 		message(STATUS "Unknown type ${TYPE}")
 	endif()
 	if(NOT "${ARGN}" STREQUAL "")
-		set(deps ${ARGN})
-		foreach(d ${deps})
-			set(${output} "${${output}}
-set_target_properties(${TARGET} PROPERTIES IMPORTED_LINK_INTERFACE_LIBRARIES \"${d}\")")
-		endforeach()
+		set(${output} "${${output}}
+set_target_properties(${TARGET} PROPERTIES IMPORTED_LINK_INTERFACE_LIBRARIES \"${ARGN}\")")
 	endif()
 	_export_target_end(${output})
 endmacro(export_target)
