@@ -130,6 +130,10 @@ public:
 	Poly gcd(const Poly& p1, const Poly& p2) const {
 		return convert(CoCoA::gcd(convert(p1), convert(p2)));
 	}
+	Poly makeCoprimeWith(const Poly& p1, const Poly& p2) const {
+		CoCoA::RingElem res = convert(p1);
+		return convert(res / CoCoA::gcd(res, convert(p2)));
+	}
 	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
 		auto finfo = CoCoA::factor(convert(p));
 		Factors<Poly> res;
