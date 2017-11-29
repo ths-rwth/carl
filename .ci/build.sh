@@ -37,6 +37,9 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	
 	cd ../ && sonar-scanner -X -Dproject.settings=build/sonarcloud.properties && cd build/
 elif [[ ${TASK} == "doxygen" ]]; then
+	
+	cmake -D DOCUMENTATION_CREATE_PDF=ON ../
+	
 	make doc || return 1
 	
 	git config --global user.email "gereon.kremer@cs.rwth-aachen.de"
@@ -44,12 +47,14 @@ elif [[ ${TASK} == "doxygen" ]]; then
 	
 	git clone https://${GH_TOKEN}@github.com/smtrat/smtrat.github.io.git
 	cd smtrat.github.io/ || return 1
+	git checkout --orphan master
 	
 	# Update cloned copy
 	cp -r ../doc/html/* carl/ || return 1
-	# Check if something has changed
-	git diff --summary --exit-code && return 0
-	git add carl/ || return 1
+	cp ../doc/*.pdf . || return 1
+	
+	git add . || return 1
+	
 	# Commit and push
 	git commit -m "Updated documentation for carl" || return 1
 	git push origin master || return 1
