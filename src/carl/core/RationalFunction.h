@@ -137,7 +137,7 @@ public:
 	/**
 	 * @return The nominator as a polynomial.
 	 */
-	const CoeffType& nominatorAsNumber() const {
+	CoeffType nominatorAsNumber() const {
 		assert(isConstant());
 		return carl::getNum(mNumberQuotient);
 	}
@@ -145,7 +145,7 @@ public:
 	/**
 	 * @return  The denominator as a polynomial.
 	 */
-	const CoeffType& denominatorAsNumber() const {
+	CoeffType denominatorAsNumber() const {
 		assert(isConstant());
 		return carl::getDenom(mNumberQuotient);
 	}
