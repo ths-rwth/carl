@@ -47,6 +47,10 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 			IRmap.emplace(v, m.at(v));
 		}
 	}
+	if (tmp.isZero()) {
+		CARL_LOG_TRACE("carl.core.rootfinder", "p is 0 after substituting rational assignments -> everything is a root");
+		return boost::none;
+	}
 	if (IRmap.empty()) {
 		return realRoots(tmp, interval, pivoting);
 	} else {
