@@ -301,7 +301,7 @@ TYPEDEF_HIDES_STRUCT   = NO
 # Private class members and static file members will be hidden unless
 # the EXTRACT_PRIVATE and EXTRACT_STATIC tags are set to YES
 
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class
 # will be included in the documentation.
@@ -311,13 +311,13 @@ EXTRACT_PRIVATE        = YES
 # If the EXTRACT_STATIC tag is set to YES all static members of a file
 # will be included in the documentation.
 
-EXTRACT_STATIC         = @DOXYGEN_EXTRACT_STATIC@
+EXTRACT_STATIC         = YES
 
 # If the EXTRACT_LOCAL_CLASSES tag is set to YES classes (and structs)
 # defined locally in source files will be included in the documentation.
 # If set to NO only classes defined in header files are included.
 
-EXTRACT_LOCAL_CLASSES  = @DOXYGEN_EXTRACT_LOCAL@
+EXTRACT_LOCAL_CLASSES  = YES
 
 # This flag is only useful for Objective-C code. When set to YES local
 # methods, which are defined in the implementation section but not in
@@ -368,7 +368,7 @@ HIDE_IN_BODY_DOCS      = NO
 # to NO (the default) then the documentation will be excluded.
 # Set it to YES to include the internal documentation.
 
-INTERNAL_DOCS          = @DOXYGEN_EXTRACT_INTERNAL@
+INTERNAL_DOCS          = NO
 
 # If the CASE_SENSE_NAMES tag is set to NO then Doxygen will only generate
 # file names in lower-case letters. If set to YES upper-case letters are also

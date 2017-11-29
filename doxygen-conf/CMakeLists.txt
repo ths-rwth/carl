@@ -27,18 +27,6 @@ endif()
 option(DOCUMENTATION_CREATE_PDF "Create PDF reference manual" OFF )
 option(DOCUMENTATION_INCLUDE_SOURCE_REFERENCE "Include source reference in manual" ON)
 
-option(DOCUMENTATION_WITH_STATIC "Create documentation for static members" ON )
-option(DOCUMENTATION_WITH_PRIVATE "Create documentation for private members" ON )
-option(DOCUMENTATION_WITH_LOCAL "Create documentation for local members" ON )
-option(DOCUMENTATION_WITH_INTERNAL "Create documentation for internal features" OFF )
-
-mark_as_advanced(
-	DOCUMENTATION_WITH_PRIVATE
-	DOCUMENTATION_WITH_STATIC
-	DOCUMENTATION_WITH_LOCAL
-	DOCUMENTATION_WITH_INTERNAL
- )
-
 # Cmake modules needed
 # # # # # # # # # # # #
 
@@ -69,30 +57,6 @@ else( DOCUMENTATION_CREATE_PDF )
   set(DOXYGEN_PDF_HYPERLINKS NO )
 endif( DOCUMENTATION_CREATE_PDF )
 
-if( DOCUMENTATION_WITH_PRIVATE )
-  set(DOXYGEN_EXTRACT_PRIVATE YES )
-else( DOCUMENTATION_WITH_PRIVATE )
-  set(DOXYGEN_EXTRACT_PRIVATE NO )
-endif( DOCUMENTATION_WITH_PRIVATE )
-
-if( DOCUMENTATION_WITH_STATIC )
-  set(DOXYGEN_EXTRACT_STATIC YES )
-else( DOCUMENTATION_WITH_STATIC )
-  set(DOXYGEN_EXTRACT_STATIC NO )
-endif( DOCUMENTATION_WITH_STATIC )
-
-if( DOCUMENTATION_WITH_LOCAL )
-  set(DOXYGEN_EXTRACT_LOCAL YES )
-else( DOCUMENTATION_WITH_LOCAL )
-  set(DOXYGEN_EXTRACT_LOCAL NO )
-endif( DOCUMENTATION_WITH_LOCAL )
-
-if( DOCUMENTATION_WITH_INTERNAL )
-  set(DOXYGEN_EXTRACT_INTERNAL YES )
-else( DOCUMENTATION_WITH_INTERNAL )
-  set(DOXYGEN_EXTRACT_INTERNAL NO )
-endif( DOCUMENTATION_WITH_INTERNAL )
-
 if( DOT )
   set(HAVE_DOT YES )
 else( DOT )
@@ -102,48 +66,43 @@ endif( DOT )
 # Doxygen settings
 # # # # # # # # # #
 
-set(DOXYGEN_LANGUAGE "English" CACHE STRING "Language used by doxygen" )
-mark_as_advanced(DOXYGEN_LANGUAGE )
+set(DOXYGEN_LANGUAGE "English" CACHE STRING "Language used by doxygen")
+mark_as_advanced(DOXYGEN_LANGUAGE)
 
-set(DOXYGEN_SOURCE_DIR
-	${PROJECT_SOURCE_DIR}/doc/markdown
-)
+set(DOXYGEN_SOURCE_DIR ${PROJECT_SOURCE_DIR}/doc/markdown)
+
 if( DOCUMENTATION_INCLUDE_SOURCE_REFERENCE )
-set( DOXYGEN_SOURCE_DIR ${DOXYGEN_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src )
-else(DOCUMENTATION_INCLUDE_SOURCE_REFERENCE )
-
+	set(DOXYGEN_SOURCE_DIR ${DOXYGEN_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src)
 endif( DOCUMENTATION_INCLUDE_SOURCE_REFERENCE ) 
 
+set(DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/doc)
 
-
-set(DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/doc )
 STRING(REGEX REPLACE ";" " " DOXYGEN_INPUT_LIST "${DOXYGEN_SOURCE_DIR}" )
 
 # Generate doxygen.conf
 # # # # # # # # # # # #
 
-configure_file( doxygen.conf.in ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf )
-add_custom_target( doxygen-doc
-		           ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
-		           DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf )
+configure_file(doxygen.conf.in ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 
-# Add "doc" target depending on whether pdflatex is available or not
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Target for running doxygen
+add_custom_target(doc-doxygen
+	${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
+	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
+)
 
-if( DOXYGEN_PDFLATEX )
-  set( TEX_DIR ${CMAKE_CURRENT_BINARY_DIR}/../${DOXYGEN_OUTPUT_DIR}/latex )
-  set( PDF_OUTPUT ${TEX_DIR}/refman.pdf )
-  add_custom_command( OUTPUT ${PDF_OUTPUT}
-					  POST_BUILD
-                      COMMAND ${PDFLATEX_COMPILER}
-                      ARGS refman.tex
-                      WORKING_DIRECTORY ${TEX_DIR}
-                      DEPENDS doxygen-doc )
-  add_custom_target( doc
-                     COMMAND mv -T ${PDF_OUTPUT} ${CMAKE_CURRENT_BINARY_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION}.pdf
-                     DEPENDS ${PDF_OUTPUT} )
-else( DOXYGEN_PDFLATEX )
-  add_custom_target( doc 
-                     DEPENDS doxygen-doc )
-endif( DOXYGEN_PDFLATEX )
+# Target for building the whole documentation
+add_custom_target(doc
+	DEPENDS doc-doxygen
+)
 
+if(DOXYGEN_PDFLATEX)
+	set(TEX_DIR ${DOXYGEN_OUTPUT_DIR}/latex)
+	add_custom_target(doc-pdf
+		BYPRODUCTS ${TEX_DIR}/refman.pdf
+		COMMAND ${PDFLATEX_COMPILER} refman.tex
+		COMMAND mv ${TEX_DIR}/refman.pdf ${DOXYGEN_OUTPUT_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION}.pdf
+		WORKING_DIRECTORY ${TEX_DIR}
+		DEPENDS doc-doxygen
+	)
+	add_dependencies(doc doc-pdf)
+endif(DOXYGEN_PDFLATEX)

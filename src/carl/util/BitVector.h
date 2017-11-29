@@ -1,6 +1,5 @@
 /** 
  * @file   BitVector.h
- *         Created on June 25, 2013, 6:23 PM
  * @author: Sebastian Junges
  *
  * 
