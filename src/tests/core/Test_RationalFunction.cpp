@@ -396,3 +396,10 @@ TEST(RationalFunction, Substitute)
     Pol polySub = poly.substitute(replacement);
     EXPECT_EQ(polySub, z / Rational(2) + Rational(2) * y + Rational(4));
 }
+
+TEST(RationalFunction, AsNumber)
+{
+    RFunc rf = RFunc(Pol(1));
+    Rational num = rf.nominatorAsNumber() / rf.denominatorAsNumber();
+    EXPECT_EQ(num, 1);
+}
