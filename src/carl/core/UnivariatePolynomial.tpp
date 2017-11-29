@@ -15,6 +15,7 @@
 #include "MultivariateGCD.h"
 #include "MultivariatePolynomial.h"
 #include "Sign.h"
+#include "polynomialfunctions/SquareFreePart.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -585,9 +586,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const 
 template<typename Coeff>
 template<typename C, DisableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
-//
-	CARL_LOG_NOTIMPLEMENTED();
-	return *this;
+	return carl::squareFreePart(MultivariatePolynomial<NumberType>(*this)).toUnivariatePolynomial(mainVar());
 }
 
 template<typename Coefficient>

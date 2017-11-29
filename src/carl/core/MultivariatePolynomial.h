@@ -18,6 +18,8 @@
 #include "VariableInformation.h"
 #include "../numbers/numbers.h"
 #include "../util/TermAdditionManager.h"
+#include "polynomialfunctions/SquareFreePart.h"
+#include "polynomialfunctions/CoprimePart.h"
 
 
 namespace carl
@@ -572,6 +574,18 @@ public:
 	 * @return 
 	 */
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
+	
+	/**
+	* Calculates the squarefree part of the Polynomial. Only works with CoCoA.
+	* @return
+	*/
+	MultivariatePolynomial squareFreePart() const;
+	/**
+	* Calculates the part ofthe Polynomial, that is coprime to q. Only works with CoCoA.
+	* @param q
+	* @return
+	*/
+	MultivariatePolynomial coprimePart(const MultivariatePolynomial& q) const;
 
 	void square();
 
