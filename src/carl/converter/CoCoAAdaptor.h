@@ -126,6 +126,17 @@ public:
 	CoCoAAdaptor(const std::initializer_list<Poly>& polys):
 		CoCoAAdaptor(std::vector<Poly>(polys))
 	{}
+	void resetVariableOrdering(const std::vector<Variable>& ordering) {
+		assert(ordering.size() == mSymbolBack.size());
+		assert(ordering.size() == mSymbolThere.size());
+		mSymbolBack = ordering;
+
+		auto indets = CoCoA::indets(mRing);
+		for (std::size_t i = 0; i < mSymbolBack.size(); i++) {
+			mSymbolThere.emplace(mSymbolBack[i], indets[i]);
+			std::cout << mSymbolBack[i] << " -> " << indets[i] << std::endl;
+		}
+	}
 	
 	Poly gcd(const Poly& p1, const Poly& p2) const {
 		return convert(CoCoA::gcd(convert(p1), convert(p2)));
