@@ -181,7 +181,7 @@ matrix:
       addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, doxygen, texinfo, texlive, ghostscript]
+          packages: [*packages_base, doxygen, texinfo, texlive, latex-xcolor, ghostscript]
     - stage: build
       os: linux
       compiler: clang++-5.0

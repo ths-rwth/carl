@@ -68,7 +68,7 @@ properties = {
 	"task.coverage": {"env": ["TASK=coverage"], "addons": addons(apt = ([],["lcov"]))},
 	"task.coverity": {"env": ["TASK=coverity"]},
 	"task.sonarcloud": {"env": ["TASK=sonarcloud"]},
-	"task.doxygen": {"env": ["TASK=doxygen"], "addons": addons(apt = ([],["doxygen", "texinfo", "texlive", "ghostscript"]))},
+	"task.doxygen": {"env": ["TASK=doxygen"], "addons": addons(apt = ([],["doxygen", "texinfo", "texlive", "latex-xcolor", "ghostscript"]))},
 	"task.pycarl": {"env": ["TASK=pycarl"], "addons": addons(apt = ([],["python3"]))},
 	"task.addons": {"env": ["TASK=addons"]},
 	"task.tidy": {"env": ["TASK=tidy"]},
