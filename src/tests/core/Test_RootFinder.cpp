@@ -1,7 +1,8 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
-#include "carl/core/rootfinder/RootFinder.h"
-#include "carl/core/UnivariatePolynomial.h"
+#include <carl/core/rootfinder/RootFinder.h>
+#include <carl/core/UnivariatePolynomial.h>
+#include <carl/core/util/Chebyshev.h>
 
 #include "../Common.h"
 
@@ -91,4 +92,17 @@ TEST(RootFinder, evalRoots)
 	std::cout << *roots << std::endl;
 	EXPECT_TRUE(roots->size() == 1);
 	EXPECT_TRUE(roots->front() == xval);
+}
+
+TEST(RootFinder, Chebyshev)
+{
+	carl::Chebyshev<Rational> chebyshev(freshRealVariable("x"));
+	std::size_t n = 50;
+	auto roots = rootfinder::realRoots(chebyshev(n));
+	EXPECT_TRUE(roots.size() == n);
+	carl::RealAlgebraicNumber<Rational> mone(Rational(-1));
+	carl::RealAlgebraicNumber<Rational> pone(Rational(1));
+	for (const auto& r: roots) {
+		EXPECT_TRUE(mone <= r && r <= pone);
+	}
 }
