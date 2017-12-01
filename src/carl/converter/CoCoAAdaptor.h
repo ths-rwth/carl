@@ -133,7 +133,7 @@ public:
 
 		auto indets = CoCoA::indets(mRing);
 		for (std::size_t i = 0; i < mSymbolBack.size(); i++) {
-			mSymbolThere.emplace(mSymbolBack[i], indets[i]);
+			mSymbolThere[mSymbolBack[i]] = indets[i];
 		}
 	}
 	
