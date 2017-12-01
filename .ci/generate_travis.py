@@ -65,7 +65,6 @@ properties = {
 	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6"},
 	"g++-7": {"env": ["CC=gcc-7 CXX=g++-7"], "compiler": "g++-7", "addons": addons(apt = ([],["g++-7"]))},
 	
-	"task.coverage": {"env": ["TASK=coverage"], "addons": addons(apt = ([],["lcov"]))},
 	"task.coverity": {"env": ["TASK=coverity"]},
 	"task.sonarcloud": {"env": ["TASK=sonarcloud"]},
 	"task.doxygen": {"env": ["TASK=doxygen"], "addons": addons(apt = ([],["doxygen", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra", "latex-xcolor", "ghostscript"]))},
@@ -113,8 +112,6 @@ jobs = [
 	job("2-macos", ["build", "xcode8.3", "build.sh"]),
 	job("3-docs", ["build", "linux", "g++-6", "task.doxygen", "j1", "build.sh"]),
 	job("4-tidy", ["build", "linux", "clang-5.0", "task.tidy", "build.sh", "mayfail"]),
-	job("5-checker", ["dependencies", "linux", "g++-6", "task.coverage", "j1", "build.sh"]),
-	job("5-checker", ["build", "linux", "g++-6", "task.coverage", "j1", "build.sh", "mayfail"]),
 	job("5-checker", ["dependencies", "linux", "g++-6", "task.coverity", "j1", "build.sh"]),
 	job("5-checker", ["build", "linux", "g++-6", "task.coverity", "addon.coverity", "mayfail"]),
 	#job("5-checker", ["dependencies", "linux", "clang-6.0", "task.sonarcloud", "j1", "build.sh"]),
