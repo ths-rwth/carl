@@ -100,6 +100,7 @@ if(DOXYGEN_PDFLATEX)
 	add_custom_target(doc-pdf
 		BYPRODUCTS ${TEX_DIR}/refman.pdf
 		COMMAND ${PDFLATEX_COMPILER} refman.tex
+		COMMAND ${PDFLATEX_COMPILER} refman.tex
 		COMMAND mv ${TEX_DIR}/refman.pdf ${DOXYGEN_OUTPUT_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION}.pdf
 		WORKING_DIRECTORY ${TEX_DIR}
 		DEPENDS doc-doxygen
