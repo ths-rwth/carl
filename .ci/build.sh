@@ -38,6 +38,7 @@ elif [[ ${TASK} == "doxygen" ]]; then
 	
 	git clone https://${GH_TOKEN}@github.com/smtrat/smtrat.github.io.git
 	cd smtrat.github.io/ || return 1
+	git branch -m master old_master
 	git checkout --orphan master
 	
 	# Update cloned copy
