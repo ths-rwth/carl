@@ -86,7 +86,7 @@ private:
 				CoCoA::exponents(exponents, CoCoA::PP(i));
 				Monomial::Content monContent;
 				std::size_t tdeg = 0;
-				for (std::size_t i = 0; i < exponents.size(); i++) {
+				for (std::size_t i = 0; i < exponents.size(); ++i) {
 					if (exponents[i] == 0) continue;
 					monContent.emplace_back(mSymbolBack[i], exponents[i]);
 					tdeg += std::size_t(exponents[i]);
@@ -119,7 +119,7 @@ public:
 	{
 		auto indets = CoCoA::indets(mRing);
 
-		for (std::size_t i = 0; i < mSymbolBack.size(); i++) {
+		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
 			mSymbolThere.emplace(mSymbolBack[i], indets[i]);
 		}
 	}
@@ -132,7 +132,7 @@ public:
 		mSymbolBack = ordering;
 
 		auto indets = CoCoA::indets(mRing);
-		for (std::size_t i = 0; i < mSymbolBack.size(); i++) {
+		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
 			mSymbolThere[mSymbolBack[i]] = indets[i];
 		}
 	}
@@ -150,7 +150,7 @@ public:
 		if (includeConstants && !CoCoA::IsOne(finfo.myRemainingFactor())) {
 			res.emplace(convert(finfo.myRemainingFactor()), 1);
 		}
-		for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
+		for (std::size_t i = 0; i < finfo.myFactors().size(); ++i) {
 			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
 		}
 		return res;
