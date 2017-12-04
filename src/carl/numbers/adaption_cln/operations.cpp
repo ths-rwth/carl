@@ -131,6 +131,11 @@ namespace carl
             return std::make_pair(lower, upper);
         }
     }
+	
+	std::pair<cln::cl_RA, cln::cl_RA> root_safe(const cln::cl_RA& a, uint n) {
+		auto res = cln::realpart(cln::expt(a, cln::cl_RA(1)/n));
+		return std::make_pair(cln::cl_RA(cln::floor1(res)), cln::cl_RA(cln::ceiling1(res)));
+	}
 
     template<>
     cln::cl_RA rationalize<cln::cl_RA>(const std::string& n)

@@ -443,6 +443,8 @@ std::pair<cln::cl_RA, cln::cl_RA> sqrt_safe(const cln::cl_RA& a);
  */
 std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a);
 
+std::pair<cln::cl_RA, cln::cl_RA> root_safe(const cln::cl_RA& a, uint n);
+
 /**
  * Calculate the remainder of the integer division.
  * @param a First argument.
