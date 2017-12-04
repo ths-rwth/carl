@@ -67,6 +67,35 @@ namespace carl
 
         return std::make_pair(lower,upper);
     }
+	
+	std::pair<mpq_class,mpq_class> root_safe(const mpq_class& a, uint n)
+	{
+		assert(mpq_sgn(a.__get_mp()) > 0);
+		mpz_class den = a.get_den();
+		mpz_class num = a.get_num();
+		mpz_class root_den;
+		int den_exact = mpz_root(root_den.__get_mp(), den.__get_mp(), n);
+
+		mpz_class root_num;
+		int num_exact = mpz_root(root_num.__get_mp(), num.__get_mp(), n);
+		
+		mpq_class lower;
+		mpq_class upper;
+
+		lower = root_num;
+		if(den_exact)
+			lower /= root_den;
+		else
+			lower /= root_den+1;
+
+		if(num_exact)
+			upper = root_num;
+		else
+			upper = root_num+1;
+
+		upper /= root_den;
+		return std::make_pair(lower,upper);
+	}
 
     std::pair<mpq_class, mpq_class> sqrt_fast(const mpq_class& a)
     {

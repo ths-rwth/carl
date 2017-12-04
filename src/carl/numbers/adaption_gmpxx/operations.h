@@ -417,6 +417,12 @@ mpq_class sqrt(const mpq_class& a);
 std::pair<mpq_class,mpq_class> sqrt_safe(const mpq_class& a);
 
 /**
+ * Calculate the nth root of a fraction.
+ * The precise result is contained in the resulting interval.
+ */
+std::pair<mpq_class,mpq_class> root_safe(const mpq_class& a, uint n);
+
+/**
  * Compute square root in a fast but less precise way.
  * Use cln::sqrt() to obtain an approximation. If the result is rational, i.e. the result is exact, use this result.
  * Otherwise use the nearest integers as bounds on the square root.
