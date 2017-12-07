@@ -70,59 +70,6 @@ namespace carl
     {
         return _poly;
     }
-            
-    /**
-     * Gives the string to the given relation symbol.
-     * @param _rel The relation symbol.
-     * @return The resulting string.
-     */
-    inline std::string relationToString( const Relation& _rel )
-    {
-        switch( _rel )
-        {
-            case Relation::EQ:
-                return "=";
-            case Relation::NEQ:
-                return "!=";
-            case Relation::LEQ:
-                return "<=";
-            case Relation::GEQ:
-                return ">=";
-            case Relation::LESS:
-                return "<";
-            case Relation::GREATER:
-                return ">";
-            default:
-                return "~";
-        }
-    }
-
-    /**
-     * Inverts the given relation symbol.
-     * @param _rel The relation symbol to invert.
-     * @return The resulting inverted relation symbol.
-     */
-    inline Relation invertRelation( const Relation& _rel )
-    {
-        switch( _rel )
-        {
-            case Relation::EQ:
-                return Relation::NEQ;
-            case Relation::NEQ:
-                return Relation::EQ;
-            case Relation::LEQ:
-                return Relation::GREATER;
-            case Relation::GEQ:
-                return Relation::LESS;
-            case Relation::LESS:
-                return Relation::GEQ;
-            case Relation::GREATER:
-                return Relation::LEQ;
-            default:
-                assert( false );
-                return Relation::EQ;
-        }
-    }
 
     /**
      * Turns around the given relation symbol.
@@ -246,8 +193,9 @@ namespace carl
             void initVariableInformations()
             {
                 VariablesInformation<false,Pol> varinfos = mLhs.template getVarInfo<false>();
-                for( auto varInfo = varinfos.begin(); varInfo != varinfos.end(); ++varInfo )
-                    mVarInfoMap.emplace_hint( mVarInfoMap.end(), varInfo->first, varInfo->second );
+				for (const auto& vi: varinfos) {
+					mVarInfoMap.emplace_hint(mVarInfoMap.end(), vi.first, vi.second);
+				}
             }
                
             /**
@@ -263,15 +211,24 @@ namespace carl
             /**
              * Destructor.
              */
-            ~ConstraintContent();
+            ~ConstraintContent() noexcept = default;
 
             /**
              * @return A hash value for this constraint.
              */
-            size_t hash() const
-            {
+            std::size_t hash() const {
                 return mHash;
             }
+			
+			std::size_t id() const {
+				return mID;
+			}
+			Relation relation() const {
+				return mRelation;
+			}
+			const auto& lhs() const {
+				return mLhs;
+			}
             
             /**
              * @param _variable The variable for which to determine the maximal degree.
@@ -306,7 +263,7 @@ namespace carl
             {
                 for( auto var = mVariables.begin(); var != mVariables.end(); ++var )
                 {
-                    if( var->getType() == VariableType::VT_INT )
+                    if( var->type() == VariableType::VT_INT )
                         return true;
                 }
                 return false;
@@ -321,7 +278,7 @@ namespace carl
             {
                 for( auto var = mVariables.begin(); var != mVariables.end(); ++var )
                 {
-                    if( var->getType() == VariableType::VT_REAL )
+                    if( var->type() == VariableType::VT_REAL )
                         return true;
                 }
                 return false;
@@ -337,13 +294,6 @@ namespace carl
             unsigned isConsistent() const;
             
             /**
-             * Compares this constraint with the given constraint.
-             * @return  true,   if this constraint is equal to the given one;
-             *          false,  otherwise.
-             */
-            bool operator==( const ConstraintContent& _constraint ) const;
-            
-            /**
              * Gives the string representation of this constraint.
              * @param _unequalSwitch A switch to indicate which kind of unequal should be used.
              *         For p != 0 with infix:  0: "p != 0", 1: "p <> 0", 2: "p /= 0"
@@ -356,7 +306,20 @@ namespace carl
             std::string toString( unsigned _unequalSwitch = 0, bool _infix = true, bool _friendlyVarNames = true ) const;
             
     };
-            
+	
+	/**
+	 * @param lhs Left ConstraintContent
+	 * @param rhs Right ConstraintContent
+	 * @return `lhs == rhs`
+	 */
+	template<typename Pol>
+	bool operator==(const ConstraintContent<Pol>& lhs, const ConstraintContent<Pol>& rhs) {
+		if (lhs.id() == 0 || rhs.id() == 0) {
+            return lhs.relation() == rhs.relation() && lhs.lhs() == rhs.lhs();
+        }
+        return lhs.id() == rhs.id();
+	}
+
     /**
      * Prints the representation of the given constraints on the given stream.
      * @param _out The stream to print on.
@@ -425,7 +388,7 @@ namespace carl
              */
             const Pol& lhs() const
             {
-                return mpContent->mLhs;
+                return mpContent->lhs();
             }
 
             /**
@@ -441,7 +404,7 @@ namespace carl
              */
             Relation relation() const
             {
-                return mpContent->mRelation;
+                return mpContent->relation();
             }
 
             /**
@@ -449,7 +412,7 @@ namespace carl
              */
             size_t id() const
             {
-                return mpContent->mID;
+                return mpContent->id();
             }
 
             /**
@@ -457,7 +420,7 @@ namespace carl
              */
             size_t getHash() const
             {
-                return mpContent->mHash;
+                return mpContent->hash();
             }
 
             /**
@@ -747,70 +710,7 @@ namespace carl
              *          false, otherwise.
              */
             bool hasFinitelyManySolutionsIn( const Variable& _var ) const;
-            
-            /**
-             * @param _constraint The formula to compare with.
-             * @return true, if this formula and the given formula are equal;
-             *         false, otherwise.
-             */
-            bool operator==( const Constraint& _constraint ) const
-            {
-                return mpContent == _constraint.mpContent;
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if this constraint and the given constraint are not equal.
-             */
-            bool operator!=( const Constraint& _constraint ) const
-            {
-                return mpContent != _constraint.mpContent;
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if the id of this constraint is less than the id of the given one.
-             */
-            bool operator<( const Constraint& _constraint ) const
-            {
-                assert( id() != 0 );
-                assert( _constraint.id() != 0 );
-                return id() < _constraint.id();
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if the id of this constraint is greater than the id of the given one.
-             */
-            bool operator>( const Constraint& _constraint ) const
-            {
-                assert( id() != 0 );
-                assert( _constraint.id() != 0 );
-                return id() > _constraint.id();
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if the id of this constraint is less or equal than the id of the given one.
-             */
-            bool operator<=( const Constraint& _constraint ) const
-            {
-                assert( id() != 0 );
-                assert( _constraint.id() != 0 );
-                return id() <= _constraint.id();
-            }
-            
-            /**
-             * @param _constraint The constraint to compare with.
-             * @return true, if the id of this constraint is greater or equal than the id of the given one.
-             */
-            bool operator>=( const Constraint& _constraint ) const
-            {
-                assert( id() != 0 );
-                assert( _constraint.id() != 0 );
-                return id() >= _constraint.id();
-            }
-            
+                        
             /**
              * Calculates the coefficient of the given variable with the given degree. Note, that it only
              * computes the coefficient once and stores the result.
@@ -821,8 +721,8 @@ namespace carl
             Pol coefficient( const Variable& _var, uint _degree ) const;
             
             Constraint negation() const {
-                CARL_LOG_TRACE("carl.formula", "negation of " << *this << " is " << Constraint(lhs(), carl::invertRelation(relation())));
-                return Constraint(lhs(), carl::invertRelation(relation()));
+                CARL_LOG_DEBUG("carl.formula", "negation of " << *this << " is " << Constraint(lhs(), carl::inverse(relation())));
+                return Constraint(lhs(), carl::inverse(relation()));
             }
 
             /**
@@ -857,7 +757,77 @@ namespace carl
              * @param _out The stream to print on.
              */
             void printProperties( std::ostream& _out = std::cout ) const;
+		
+		template<typename P>
+		friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs);
+		template<typename P>
+		friend bool operator!=(const Constraint<P>& lhs, const Constraint<P>& rhs);
     };
+	
+	/**
+	 * @param lhs Left constraint
+	 * @param rhs Right constraint
+	 * @return `lhs == rhs`
+	 */
+	template<typename P>
+	bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		return lhs.mpContent == rhs.mpContent;
+	}
+	
+	/**
+	 * @param lhs Left constraint
+	 * @param rhs Right constraint
+	 * @return `lhs != rhs`
+	 */
+	template<typename P>
+	bool operator!=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		return lhs.mpContent != rhs.mpContent;
+	}
+	
+	/**
+	 * @param lhs Left constraint
+	 * @param rhs Right constraint
+	 * @return `lhs < rhs`
+	 */
+	template<typename P>
+	bool operator<(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		assert(lhs.id() != 0 && rhs.id() != 0);
+		return lhs.id() < rhs.id();
+	}
+	
+	/**
+	 * @param lhs Left constraint
+	 * @param rhs Right constraint
+	 * @return `lhs > rhs`
+	 */
+	 template<typename P>
+	 bool operator>(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		assert(lhs.id() != 0 && rhs.id() != 0);
+		return lhs.id() > rhs.id();
+	 }
+	
+	 /**
+ 	 * @param lhs Left constraint
+ 	 * @param rhs Right constraint
+ 	 * @return `lhs <= rhs`
+ 	 */
+	 template<typename P>
+	 bool operator<=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		assert(lhs.id() != 0 && rhs.id() != 0);
+		return lhs.id() <= rhs.id();
+	 }
+	
+	 /**
+ 	 * @param lhs Left constraint
+ 	 * @param rhs Right constraint
+ 	 * @return `lhs >= rhs`
+ 	 */
+	 template<typename P>
+	 bool operator>=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
+		assert(lhs.id() != 0 && rhs.id() != 0);
+		return lhs.id() >= rhs.id();
+	 }
+
     
     const signed A_IFF_B = 2;
     const signed A_IMPLIES_B = 1;
@@ -981,22 +951,22 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d=0
                         if( c == d ) return A_IFF_B; 
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d=0
                         if( c == d ) return A_XOR_B;
-                        else return B_IMPLIES_A;
+                        return B_IMPLIES_A;
                     case Relation::LESS: // p+c<0  and  p+d=0
                         if( c < d ) return B_IMPLIES_A;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::GREATER: // p+c>0  and  p+d=0
                         if( c > d ) return B_IMPLIES_A;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::LEQ: // p+c<=0  and  p+d=0
                         if( c <= d ) return B_IMPLIES_A;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::GEQ: // p+c>=0  and  p+d=0
                         if( c >= d ) return B_IMPLIES_A;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     default:
                         return false;
                 }
@@ -1005,24 +975,24 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d!=0
                         if( c == d ) return A_XOR_B;
-                        else return A_IMPLIES_B;
+                        return A_IMPLIES_B;
                     case Relation::NEQ: // p+c!=0  and  p+d!=0
                         if( c == d ) return A_IFF_B;
-                        else return 0;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d!=0
                         if( c >= d ) return A_IMPLIES_B;
-                        else return 0;
+                        return 0;
                     case Relation::GREATER: // p+c>0  and  p+d!=0
                         if( c <= d ) return A_IMPLIES_B;
-                        else return 0;
+                        return 0;
                     case Relation::LEQ: // p+c<=0  and  p+d!=0
                         if( c > d ) return A_IMPLIES_B;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     case Relation::GEQ: // p+c>=0  and  p+d!=0
                         if( c < d ) return A_IMPLIES_B;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     default:
                         return 0;
                 }
@@ -1031,24 +1001,24 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d<0
                         if( c > d ) return A_IMPLIES_B;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d<0
                         if( c <= d ) return B_IMPLIES_A;
-                        else return 0;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d<0
                         if( c == d ) return A_IFF_B;
-                        else if( c < d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        if( c < d ) return B_IMPLIES_A;
+                        return A_IMPLIES_B;
                     case Relation::GREATER: // p+c>0  and  p+d<0
                         if( c <= d ) return NOT__A_AND_B;
-                        else return 0;
+                        return 0;
                     case Relation::LEQ: // p+c<=0  and  p+d<0
                         if( c > d ) return A_IMPLIES_B;
-                        else return B_IMPLIES_A;
+                        return B_IMPLIES_A;
                     case Relation::GEQ: // p+c>=0  and  p+d<0
                         if( c < d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_XOR_B;
-                        else return 0;
+                        if( c == d ) return A_XOR_B;
+                        return 0;
                     default:
                         return 0;
                 }
@@ -1058,24 +1028,24 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d>0
                         if( c < d ) return A_IMPLIES_B;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d>0
                         if( c >= d ) return B_IMPLIES_A;
-                        else return 0;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d>0
                         if( c >= d ) return NOT__A_AND_B;
-                        else return 0;
+                        return 0;
                     case Relation::GREATER: // p+c>0  and  p+d>0
                         if( c == d ) return A_IFF_B;
-                        else if( c > d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        if( c > d ) return B_IMPLIES_A;
+                        return A_IMPLIES_B;
                     case Relation::LEQ: // p+c<=0  and  p+d>0
                         if( c > d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_XOR_B;
-                        else return 0;
+                        if( c == d ) return A_XOR_B;
+                        return 0;
                     case Relation::GEQ: // p+c>=0  and  p+d>0
                         if( c > d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        return A_IMPLIES_B;
                     default:
                         return 0;
                 }
@@ -1086,26 +1056,26 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d<=0
                         if( c >= d ) return A_IMPLIES_B;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d<=0
                         if( c < d ) return B_IMPLIES_A;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d<=0
                         if( c < d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        return A_IMPLIES_B;
                     case Relation::GREATER: // p+c>0  and  p+d<=0
                         if( c < d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_XOR_B;
-                        else return 0;
+                        if( c == d ) return A_XOR_B;
+                        return 0;
                     case Relation::LEQ: // p+c<=0  and  p+d<=0
                         if( c == d ) return A_IFF_B;
-                        else if( c < d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        if( c < d ) return B_IMPLIES_A;
+                        return A_IMPLIES_B;
                     case Relation::GEQ: // p+c>=0  and  p+d<=0
                         if( c < d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     default:
                         return 0;
                 }
@@ -1116,26 +1086,26 @@ namespace carl
                 {
                     case Relation::EQ: // p+c=0  and  p+d>=0
                         if( c <= d ) return A_IMPLIES_B;
-                        else return NOT__A_AND_B;
+                        return NOT__A_AND_B;
                     case Relation::NEQ: // p+c!=0  and  p+d>=0
                         if( c > d ) return B_IMPLIES_A;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     case Relation::LESS: // p+c<0  and  p+d>=0
                         if( c > d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_XOR_B;
-                        else return 0;
+                        if( c == d ) return A_XOR_B;
+                        return 0;
                     case Relation::GREATER: // p+c>0  and  p+d>=0
                         if( c < d ) return B_IMPLIES_A;
-                        else return A_IMPLIES_B;
+                        return A_IMPLIES_B;
                     case Relation::LEQ: // p+c<=0  and  p+d>=0
                         if( c > d ) return NOT__A_AND_B;
-                        else if( c == d ) return A_AND_B__IFF_C;
-                        else return 0;
+                        if( c == d ) return A_AND_B__IFF_C;
+                        return 0;
                     case Relation::GEQ: // p+c>=0  and  p+d>=0
                         if( c == d ) return A_IFF_B;
-                        else if( c < d ) return A_IMPLIES_B;
-                        else return B_IMPLIES_A;
+                        if( c < d ) return A_IMPLIES_B;
+                        return B_IMPLIES_A;
                     default:
                         return 0;
                 }
@@ -1164,14 +1134,12 @@ namespace std
      * Implements std::hash for constraint contents.
      */
     template<typename Pol>
-    struct hash<carl::ConstraintContent<Pol>>
-    {
-    public:
+    struct hash<carl::ConstraintContent<Pol>> {
         /**
          * @param _constraintContent The constraint content to get the hash for.
          * @return The hash of the given constraint content.
          */
-        size_t operator()( const carl::ConstraintContent<Pol>& _constraintContent ) const 
+        std::size_t operator()( const carl::ConstraintContent<Pol>& _constraintContent ) const 
         {
             return _constraintContent.hash();
         }
@@ -1181,14 +1149,12 @@ namespace std
      * Implements std::hash for constraints.
      */
     template<typename Pol>
-    struct hash<carl::Constraint<Pol>>
-    {
-    public:
+    struct hash<carl::Constraint<Pol>> {
         /**
          * @param _constraint The constraint to get the hash for.
          * @return The hash of the given constraint.
          */
-        size_t operator()( const carl::Constraint<Pol>& _constraint ) const 
+        std::size_t operator()( const carl::Constraint<Pol>& _constraint ) const 
         {
             return _constraint.getHash();
         }
@@ -1198,20 +1164,17 @@ namespace std
      * Implements std::hash for vectors of constraints.
      */
     template<typename Pol>
-    struct hash<std::vector<carl::Constraint<Pol>>>
-    {
-    public:
+    struct hash<std::vector<carl::Constraint<Pol>>> {
         /**
          * @param _arg The vector of constraints to get the hash for.
          * @return The hash of the given vector of constraints.
          */
-        size_t operator()( const std::vector<carl::Constraint<Pol>>& _arg ) const
+        std::size_t operator()( const std::vector<carl::Constraint<Pol>>& _arg ) const
         {
-            size_t result = 0;
-            for( auto cons = _arg.begin(); cons != _arg.end(); ++cons )
-            {
+            std::size_t result = 0;
+			for (const auto& c: _arg) {
                 result <<= 5;
-                result ^= cons->id();
+                result ^= c.id();
             }
             return result;
         }

@@ -326,8 +326,10 @@ TYPED_TEST(UnivariatePolynomialIntTest, switchVariable)
 	Variable x = freshRealVariable("x");
 	Variable y = freshRealVariable("y");
 	UnivariatePolynomial<TypeParam> p(x, {1,2,3});
+	MultivariatePolynomial<TypeParam> mp = TypeParam(3)*x*x + TypeParam(2)*x + TypeParam(1);
+	UnivariatePolynomial<MultivariatePolynomial<TypeParam>> res(y, {mp});
 	auto q = p.switchVariable(y);
-	std::cout << p << " -> " << q << std::endl;
+	EXPECT_EQ(q, res);
 }
 
 TEST(UnivariatePolynomial, resultant)

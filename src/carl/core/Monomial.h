@@ -11,7 +11,6 @@
 #include "CompareResult.h"
 #include "Variable.h"
 #include "VariablePool.h"
-#include "carlLoggingHelper.h"
 #include "logging.h"
 
 #include <algorithm>
@@ -31,7 +30,7 @@ namespace carl
 	 * @param v Variable.
 	 * @return `p.first == v`
 	 */
-	inline bool operator==(const std::pair<Variable, uint>& p, Variable::Arg v) {
+	inline bool operator==(const std::pair<Variable, uint>& p, Variable v) {
 		return p.first == v;
 	}
 
@@ -51,14 +50,14 @@ namespace carl
 	 * 
 	 * @ingroup multirp
 	 */
-	class Monomial
+	class Monomial final
 	{
 		friend class MonomialPool;
 	public:
 		using Arg = std::shared_ptr<const Monomial>;
 		using Content = std::vector<std::pair<Variable, uint>>;
 		~Monomial();
-	protected:
+	private:
 		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents.
 		Content mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
@@ -88,7 +87,7 @@ namespace carl
 		 * @param v The variable.
 		 * @param e The exponent.
 		 */
-		explicit Monomial(Variable::Arg v, uint e = 1) :
+		explicit Monomial(Variable v, uint e = 1) :
 			mExponents(1, std::make_pair(v,e)),
 			mTotalDegree(e)
 		{
@@ -194,7 +193,7 @@ namespace carl
 		 * Returns the hash of this monomial
 		 * @return Hash.
 		 */
-		inline std::size_t hash() const {
+		std::size_t hash() const {
 			return mHash;
 		}
 
@@ -202,7 +201,7 @@ namespace carl
 		 * Return the id of this monomial.
 		 * @return Id.
 		 */
-		inline std::size_t id() const {
+		std::size_t id() const {
 			return mId;
 		}
 		
@@ -210,8 +209,7 @@ namespace carl
 		 * Gives the total degree, i.e. the sum of all exponents.
 		 * @return Total degree.
 		 */
-		exponent tdeg() const
-		{
+		exponent tdeg() const {
 			return mTotalDegree;
 		}
 		
@@ -223,29 +221,26 @@ namespace carl
 		 * Checks whether the monomial is a constant.
 		 * @return If monomial is constant.
 		 */
-		bool isConstant() const
-		{
+		bool isConstant() const {
 			return mTotalDegree == 0;
 		}
         
         /**
          * @return true, if the image of this monomial is integer-valued.
          */
-        inline bool integerValued() const
-        {
-            for (const auto& it: mExponents)
-			{
-				if (it.first.getType() != VariableType::VT_INT) return false;
-			}
-            return true;
+        bool integerValued() const {
+			auto res = std::find_if(
+				mExponents.begin(), mExponents.end(),
+				[](const auto& e){ return e.first.type() != VariableType::VT_INT; }
+			);
+			return res != mExponents.end();
         }
         
 		/**
 		 * Checks whether the monomial has exactly degree one.
 		 * @return If monomial is linear.
 		 */
-		bool isLinear() const
-		{
+		bool isLinear() const {
 			return mTotalDegree == 1;
 		}
 		
@@ -253,8 +248,7 @@ namespace carl
 		 * Checks whether the monomial has at most degree one.
 		 * @return If monomial is linear or constant.
 		 */
-		bool isAtMostLinear() const
-		{
+		bool isAtMostLinear() const {
 			return mTotalDegree <= 1;
 		}
 		
@@ -262,30 +256,27 @@ namespace carl
 		 * Checks whether the monomial is a square, i.e. whether all exponents are even.
 		 * @return If monomial is a square.
 		 */
-		bool isSquare() const
-		{
+		bool isSquare() const {
 			if (mTotalDegree % 2 == 1) return false;
-			for (const auto& it: mExponents)
-			{
-				if (it.second % 2 == 1) return false;
-			}
-			return true;
+			auto res = std::find_if(
+				mExponents.begin(), mExponents.end(),
+				[](const auto& e){ return e.second % 2 == 1; }
+			);
+			return res == mExponents.end();
 		}
 		
 		/**
 		 * Returns the number of variables that occur in the monomial.
 		 * @return Number of variables.
 		 */
-		size_t nrVariables() const
-		{
+		std::size_t nrVariables() const {
 			return mExponents.size();
 		}
         
         /**
          * @return An approximation of the complexity of this monomial.
          */
-        size_t complexity() const
-        {
+        std::size_t complexity() const {
             return mTotalDegree;
         }
 
@@ -294,8 +285,7 @@ namespace carl
 		 * Asserts that there is in fact only a single variable.
 		 * @return Variable.
 		 */
-		Variable::Arg getSingleVariable() const
-		{
+		Variable getSingleVariable() const {
 			assert(mExponents.size() == 1);
 			return mExponents.front().first;
 		}
@@ -305,8 +295,7 @@ namespace carl
 		 * @param v Variable.
 		 * @return If there is only v.
 		 */
-		bool hasNoOtherVariable(Variable::Arg v) const
-		{
+		bool hasNoOtherVariable(Variable v) const {
 			if(mExponents.size() == 1) {
 				return mExponents.front().first == v;
 			}
@@ -318,8 +307,7 @@ namespace carl
 		 * @param index Index.
 		 * @return VarExpPair.
 		 */
-		const std::pair<Variable, uint>& operator[](std::size_t index) const
-		{
+		const std::pair<Variable, uint>& operator[](std::size_t index) const {
 			assert(index < mExponents.size());
 			return mExponents[index];
 		}
@@ -328,8 +316,7 @@ namespace carl
 		 * @param v Variable.
 		 * @return Exponent of v.
 		 */
-		exponent exponentOfVariable(Variable::Arg v) const
-		{
+		exponent exponentOfVariable(Variable v) const {
 			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
 			if(it == mExponents.cend()) {
 				return 0;
@@ -343,16 +330,15 @@ namespace carl
 		 * @param v The variable to check for its occurrence.
 		 * @return true, if the variable occurs in this term.
 		 */
-		bool has(Variable::Arg v) const
-		{
+		bool has(Variable v) const {
 			return (std::find(mExponents.cbegin(), mExponents.cend(), v) != mExponents.cend());
 		}
 		
 		/**
-		 * For a monomial m = Prod( x_i^e_i ) * v^e, divides m by v^e
+		 * For a monomial m = Prod( x_i^{e_i} ) * v^e, divides m by v^e
 		 * @return nullptr if result is 1, otherwise m/v^e.
 		 */
-		Monomial::Arg dropVariable(Variable::Arg v) const;
+		Monomial::Arg dropVariable(Variable v) const;
 
 		/**
 		 * Divides the monomial by a variable v.
@@ -360,7 +346,7 @@ namespace carl
 		 * @param v Variable
 		 * @return This divided by v.
 		 */
-		bool divide(Variable::Arg v, Monomial::Arg& res) const;
+		bool divide(Variable v, Monomial::Arg& res) const;
 
 		
 		/**
@@ -434,7 +420,7 @@ namespace carl
 		
 		/**
 		 * Calculates the separable part of this monomial.
-		 * For a monomial \f$ \\prod_i x_i^e_i with e_i \neq 0 \f$, this is \f$ \\prod_i x_i^1 \f$.
+		 * For a monomial \f$ \\prod_i x_i^{e_i} with e_i \neq 0 \f$, this is \f$ \\prod_i x_i^1 \f$.
 		 * @return Separable part.
 		 */
 		Monomial::Arg separablePart() const;
@@ -462,7 +448,7 @@ namespace carl
 		 * @param v Variable.
 		 * @return Partial derivative.
 		 */
-		std::pair<std::size_t,Monomial::Arg> derivative(Variable::Arg v) const;
+		std::pair<std::size_t,Monomial::Arg> derivative(Variable v) const;
 		
 		/**
 		 * Applies the given substitutions to this monomial.
@@ -490,7 +476,7 @@ namespace carl
 			return lexicalCompare(*lhs, *rhs);
 		}
 		
-		static CompareResult compareLexical(const Monomial::Arg& lhs, Variable::Arg rhs)
+		static CompareResult compareLexical(const Monomial::Arg& lhs, Variable rhs)
 		{
 			if(!lhs) return CompareResult::LESS;
 			if(lhs->mExponents.front().first < rhs) return CompareResult::GREATER;
@@ -513,7 +499,7 @@ namespace carl
 			return lexicalCompare(*lhs, *rhs);
 		}
 		
-		static CompareResult compareGradedLexical(const Monomial::Arg& lhs, Variable::Arg rhs)
+		static CompareResult compareGradedLexical(const Monomial::Arg& lhs, Variable rhs)
 		{
 			if(!lhs) return CompareResult::LESS;
 			if(lhs->mTotalDegree > 1) return CompareResult::GREATER;
@@ -647,13 +633,13 @@ namespace carl
 		return lhs->exponents() == rhs->exponents();
 	}
 	
-	inline bool operator==(const Monomial::Arg& lhs, Variable::Arg rhs) {
+	inline bool operator==(const Monomial::Arg& lhs, Variable rhs) {
 		if (lhs == nullptr) return false;
 		if (lhs->tdeg() != 1) return false;
 		return lhs->begin()->first == rhs;
 	}
 	
-	inline bool operator==(Variable::Arg lhs, const Monomial::Arg& rhs) {
+	inline bool operator==(Variable lhs, const Monomial::Arg& rhs) {
 		return rhs == lhs;
 	}
 	
@@ -661,11 +647,11 @@ namespace carl
 		return !(lhs == rhs);
 	}
 	
-	inline bool operator!=(const Monomial::Arg& lhs, Variable::Arg rhs) {
+	inline bool operator!=(const Monomial::Arg& lhs, Variable rhs) {
 		return !(lhs == rhs);
 	}
 	
-	inline bool operator!=(Variable::Arg lhs, const Monomial::Arg& rhs) {
+	inline bool operator!=(Variable lhs, const Monomial::Arg& rhs) {
 		return !(rhs == lhs);
 	}
 	
@@ -682,13 +668,13 @@ namespace carl
 		return cr == CompareResult::LESS;
 	}
 	
-	inline bool operator<(const Monomial::Arg& lhs, Variable::Arg rhs) {
+	inline bool operator<(const Monomial::Arg& lhs, Variable rhs) {
 		if (lhs == nullptr) return true;
 		if (lhs->tdeg() > 1) return false;
 		return lhs->begin()->first < rhs;
 	}
 	
-	inline bool operator<(Variable::Arg lhs, const Monomial::Arg& rhs) {
+	inline bool operator<(Variable lhs, const Monomial::Arg& rhs) {
 		if (rhs == nullptr) return false;
 		if (rhs->tdeg() > 1) return true;
 		return lhs < rhs->begin()->first;
@@ -698,11 +684,11 @@ namespace carl
 		return !(rhs < lhs);
 	}
 	
-	inline bool operator<=(const Monomial::Arg& lhs, Variable::Arg rhs) {
+	inline bool operator<=(const Monomial::Arg& lhs, Variable rhs) {
 		return !(rhs < lhs);
 	}
 	
-	inline bool operator<=(Variable::Arg lhs, const Monomial::Arg& rhs) {
+	inline bool operator<=(Variable lhs, const Monomial::Arg& rhs) {
 		return !(rhs < lhs);
 	}
 	
@@ -710,11 +696,11 @@ namespace carl
 		return rhs < lhs;
 	}
 	
-	inline bool operator>(const Monomial::Arg& lhs, Variable::Arg rhs) {
+	inline bool operator>(const Monomial::Arg& lhs, Variable rhs) {
 		return rhs < lhs;
 	}
 	
-	inline bool operator>(Variable::Arg lhs, const Monomial::Arg& rhs) {
+	inline bool operator>(Variable lhs, const Monomial::Arg& rhs) {
 		return rhs < lhs;
 	}
 	
@@ -722,11 +708,11 @@ namespace carl
 		return rhs <= lhs;
 	}
 	
-	inline bool operator>=(const Monomial::Arg& lhs, Variable::Arg rhs) {
+	inline bool operator>=(const Monomial::Arg& lhs, Variable rhs) {
 		return rhs <= lhs;
 	}
 	
-	inline bool operator>=(Variable::Arg lhs, const Monomial::Arg& rhs) {
+	inline bool operator>=(Variable lhs, const Monomial::Arg& rhs) {
 		return rhs <= lhs;
 	}
 	
@@ -742,14 +728,14 @@ namespace carl
 	 */
 	Monomial::Arg operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs);
 	
-	Monomial::Arg operator*(const Monomial::Arg& lhs, Variable::Arg rhs);
+	Monomial::Arg operator*(const Monomial::Arg& lhs, Variable rhs);
 	
-	Monomial::Arg operator*(Variable::Arg lhs, const Monomial::Arg& rhs);
+	Monomial::Arg operator*(Variable lhs, const Monomial::Arg& rhs);
 	
-	Monomial::Arg operator*(Variable::Arg lhs, Variable::Arg rhs);
+	Monomial::Arg operator*(Variable lhs, Variable rhs);
 	/// @}
 	
-	Monomial::Arg pow(Variable::Arg v, std::size_t exp);
+	Monomial::Arg pow(Variable v, std::size_t exp);
 	inline Monomial::Arg pow(const Monomial::Arg& m, std::size_t exp) {
 		return m->pow(exp);
 	}
@@ -800,10 +786,8 @@ namespace std
 	 * @return Hash of monomial.
 	 */
 	template<>
-	struct hash<carl::Monomial>
-	{
-		size_t operator()(const carl::Monomial& monomial) const 
-		{
+	struct hash<carl::Monomial> {
+		std::size_t operator()(const carl::Monomial& monomial) const {
 			return monomial.hash();
 		}
 	};

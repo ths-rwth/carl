@@ -19,14 +19,15 @@ namespace carl {
 
 	template<typename Rational, typename Poly>
 	class ModelSubstitution {
-	protected:
+	private:
 		mutable boost::optional<ModelValue<Rational, Poly>> mCachedValue;
 		
+	protected:
 		/// Evaluates this substitution with respect to the given model.
 		virtual ModelValue<Rational, Poly> evaluateSubstitution(const Model<Rational, Poly>& model) const = 0;
 	public:
-		ModelSubstitution() {}
-		virtual ~ModelSubstitution() {}
+		ModelSubstitution() = default;
+		virtual ~ModelSubstitution() noexcept = default;
 		
 		const ModelValue<Rational, Poly>& evaluate(const Model<Rational, Poly>& model) const {
 			if (mCachedValue == boost::none) {

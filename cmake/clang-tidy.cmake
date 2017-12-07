@@ -3,10 +3,20 @@ if(NOT CLANG_TIDY)
 	message(STATUS "Did not find clang-tidy, target tidy is disabled.")
 else()
 	message(STATUS "Found clang-tidy, use \"make tidy\" to run it.")
+	if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # Matches "Clang" and "AppleClang"
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
+			message(STATUS "Please enable readability-redundant-member-init (disabled due to #32966)")
+		endif()
+	endif()
 
 	set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 	set(CLANG_TIDY_CHECKS "*")
+	
+	# Avoid https://bugs.llvm.org/show_bug.cgi?id=32966
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-readability-redundant-member-init")
+	
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-llvm-header-guard")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-llvm-include-order")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-llvm-namespace-comment")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-readability-else-after-return")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-misc-macro-parentheses")
@@ -28,4 +38,16 @@ else()
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-runtime-references")
 	set(CLANG_TIDY_CHECKS "-checks='${CLANG_TIDY_CHECKS}'")
 	#message(STATUS "Enabled checks for clang-tidy: ${CLANG_TIDY_CHECKS}")
+endif()
+
+find_program(CLANG_FORMAT clang-format)
+if(NOT CLANG_FORMAT)
+	message(STATUS "Did not find clang-format, target format is disabled.")
+else()
+	message(STATUS "Found clang-format, use \"make format\" to run it.")
+	
+	add_custom_target(format
+		COMMAND find ./ -iname "*.h" -o -iname "*.tpp" -o -iname "*.cpp" | xargs ${CLANG_FORMAT} -style=file -i -verbose
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/
+	)
 endif()

@@ -148,13 +148,13 @@ namespace carl {
                     Interval<double> rootA, rootB;
                     if( tmp.unite( -tmp, rootA, rootB ) )
                     {   
-                        if (mVar.getType() == VariableType::VT_INT) {
+                        if (mVar.type() == VariableType::VT_INT) {
                             rootA = rootA.integralPart();
                         }
                         rootA.intersect_assign(_varInterval);
                         if( !rootA.isEmpty() )
                             _result.push_back(std::move(rootA));
-                        if (mVar.getType() == VariableType::VT_INT) {
+                        if (mVar.type() == VariableType::VT_INT) {
                             rootB = rootB.integralPart();
                         }
                         rootB.intersect_assign(_varInterval);
@@ -163,7 +163,7 @@ namespace carl {
                     }
                     else
                     {
-                        if (mVar.getType() == VariableType::VT_INT) {
+                        if (mVar.type() == VariableType::VT_INT) {
                             rootA = rootA.integralPart();
                         }
                         rootA.intersect_assign(_varInterval);
@@ -173,7 +173,7 @@ namespace carl {
                 }
                 else
                 {
-                    if (mVar.getType() == VariableType::VT_INT) {
+                    if (mVar.type() == VariableType::VT_INT) {
                         tmp = tmp.integralPart();
                     }
                     _result.push_back( std::move(tmp) );
@@ -547,7 +547,7 @@ namespace carl {
                     resA = intervals.at(variable).intersect(centerInterval.sub(result2));
                     resB = intervals.at(variable).intersect(centerInterval.sub(result1));
                 }
-                if (variable.getType() == VariableType::VT_INT) {
+                if (variable.type() == VariableType::VT_INT) {
                     resA = resA.integralPart();
                     resB = resB.integralPart();
                 }
@@ -579,7 +579,7 @@ namespace carl {
 				std::cout << __func__ << ": result: " << result1 << std::endl;
 				#endif
                 resA = intervals.at(variable).intersect(centerInterval.sub(result1));
-				if (variable.getType() == VariableType::VT_INT) {
+				if (variable.type() == VariableType::VT_INT) {
 					resA = resA.integralPart();
 				}
 				#ifdef CONTRACTION_DEBUG

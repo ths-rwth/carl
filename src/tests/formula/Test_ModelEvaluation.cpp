@@ -27,10 +27,10 @@ TEST(ModelEvaluation, Formula)
 TEST(ModelEvaluation, EvaluateMVR)
 {
 	Variable x = freshRealVariable("x");
-	Variable z = freshRealVariable("z_");
+	Variable z = MultivariateRoot<Pol>::var();
 	ModelT m;
 	m.assign(x, Rational(-1));
-	MultivariateRoot<Pol> mvr(Pol(x)*z, 1, z);
+	MultivariateRoot<Pol> mvr(Pol(x)*z, 1);
 	auto res = model::evaluate(mvr, m);
 	EXPECT_TRUE(res.isRational());
 	EXPECT_TRUE(isZero(res.asRational()));

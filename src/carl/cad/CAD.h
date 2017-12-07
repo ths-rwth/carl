@@ -671,7 +671,7 @@ public:
 	bool checkIntegrality(It node) const {
 		for (auto pit = sampleTree.begin_path(node); pit.depth() != 0; ++pit) {
 			Variable var = mVariables[pit.depth() - 1];
-			if ((var.getType() == VariableType::VT_INT) && (!pit->isIntegral())) return false;
+			if ((var.type() == VariableType::VT_INT) && (!pit->isIntegral())) return false;
 		}
 		return true;
 	}

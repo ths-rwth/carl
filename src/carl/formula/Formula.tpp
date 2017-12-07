@@ -30,7 +30,7 @@ namespace carl
         if( _bitvectorVars )
         {
             assert( bvVars != nullptr );
-            for (const auto& v: *bvVars) _vars.insert(v());
+            for (const auto& v: *bvVars) _vars.insert(v);
             delete bvVars;
         }
         if( considerUninterpreted )
@@ -285,10 +285,12 @@ namespace carl
 			case FormulaType::VARCOMPARE:
 			{
 				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
+				break;
 			}
 			case FormulaType::VARASSIGN:
 			{
 				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
+				break;
 			}
             case FormulaType::BITVECTOR:
             {
@@ -416,11 +418,11 @@ namespace carl
                         }
                     });
             for( auto var : vars )
-                os << "(declare-fun " << var << " () " << var.getType() << ")\n";
+                os << "(declare-fun " << var << " () " << var.type() << ")\n";
             for( const auto& uvar : uvars )
                 os << "(declare-fun " << uvar() << " () " << uvar.domain() << ")\n";
             for( const auto& bvvar : bvvars )
-                os << "(declare-fun " << bvvar() << " () " << bvvar.sort() << ")\n";
+                os << "(declare-fun " << bvvar << " () " << bvvar.sort() << ")\n";
             for (const auto& ufc: UFManager::getInstance().ufContents()) {
                 if (ufc == nullptr) continue;
                 os << "(declare-fun " << ufc->name() << " (";
@@ -490,12 +492,10 @@ namespace carl
                     result += variableListToString( "," );
                     result += "}, (";
                     // Make pseudo Booleans.
-                    set<Variable> boolVars = set<Variable>();
-                    booleanVars( boolVars );
-                    for( auto j = boolVars.begin(); j != boolVars.end(); ++j )
-                    {
-                        string boolName = VariablePool::getInstance().getName( *j, true );
-                        result += "(" + boolName + " = 0 or " + boolName + " = 1) and ";
+                    std::set<Variable> boolVars;
+                    booleanVars(boolVars);
+                    for (auto v: boolVars) {
+                        result += "(" + v.name() + " = 0 or " + v.name() + " = 1) and ";
                     }
                 }
                 else
@@ -516,13 +516,13 @@ namespace carl
     template<typename Pol>
     string Formula<Pol>::variableListToString( string _separator, const unordered_map<string, string>& _variableIds ) const
     {
-        Variables realVars = Variables();
+        Variables realVars;
         realValuedVars( realVars );
-        set<Variable> boolVars = set<Variable>();
+        std::set<Variable> boolVars;
         booleanVars( boolVars );
         auto i = realVars.begin();
         auto j = boolVars.begin();
-        string result = "";
+        string result;
         if( i != realVars.end() )
         {
             stringstream sstream;
@@ -763,7 +763,7 @@ namespace carl
                 Variables vars(quantifiedVariables().begin(), quantifiedVariables().end());
                 Formula<Pol> f = quantifiedFormula();
                 for (auto it = vars.begin(); it != vars.end();) {
-                    if (it->getType() == VariableType::VT_BOOL) {
+                    if (it->type() == VariableType::VT_BOOL) {
                         // Just leave boolean variables at the base level up to the SAT solver.
                         if (cur > 0) {
                             f = Formula<Pol>(
@@ -1342,7 +1342,7 @@ namespace carl
         const Constraint<Pol>& constraint = negated ? _constraint.subformula().constraint() : _constraint.constraint();
         assert( constraint.isConsistent() == 2 );
         typename Pol::NumberType boundValue;
-        Relation relation = negated ? carl::invertRelation( constraint.relation() ) : constraint.relation();
+        Relation relation = negated ? carl::inverse( constraint.relation() ) : constraint.relation();
         const Pol& lhs = constraint.lhs();
         Pol poly;
         bool multipliedByMinusOne = lhs.lterm().coeff() < typename Pol::NumberType( 0 );
@@ -1362,7 +1362,7 @@ namespace carl
         boundValue *= cf;
         poly *= cf;
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "try to add the bound  " << relationToString( relation ) << boundValue << "  for the polynomial  " << poly << endl; 
+        cout << "try to add the bound  " << relation << boundValue << "  for the polynomial  " << poly << endl; 
         #endif
         auto resA = _constraintBounds.insert( make_pair( std::move(poly), std::move( map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>() ) ) );
         auto resB = resA.first->second.insert( make_pair( boundValue, make_pair( relation, _constraint ) ) );
@@ -1652,7 +1652,7 @@ namespace carl
                 for( ; iter != bounds.end(); ++iter )
                 {
                     #ifdef CONSTRAINT_BOUND_DEBUG
-                    cout << "   bound is  " << relationToString( iter->second.first ) << iter->first << endl;
+                    cout << "   bound is  " << iter->second.first << iter->first << endl;
                     #endif
                     if( (_inConjunction && iter->second.first == Relation::NEQ)
                         || (!_inConjunction && iter->second.first == Relation::EQ) )

@@ -165,10 +165,9 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator --()
 template<typename IntegerType>
 GFNumber<IntegerType>& GFNumber<IntegerType>::operator -=(const GFNumber& rhs)
 {
-	if(rhs.isZero()) return *this;
-	if(mGf == nullptr)
-	{
-		mGf == rhs.mGf;
+	if (rhs.isZero()) return *this;
+	if (mGf == nullptr) {
+		mGf = rhs.mGf;
 	}
 	mN -= rhs.mN;
 	return *this;

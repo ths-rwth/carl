@@ -1,8 +1,9 @@
-#include "../Common.h"
+#include <gtest/gtest.h>
 
 #include <carl/core/carlLogging.h>
 #include <carl/core/carlLoggingHelper.h>
-#include <gtest/gtest.h>
+
+#include "../Common.h"
 
 #include <sstream>
 

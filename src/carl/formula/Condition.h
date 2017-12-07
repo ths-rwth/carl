@@ -28,22 +28,22 @@ namespace carl {
             {}
 
             explicit constexpr Condition(std::size_t i):
-                std::bitset<CONDITION_SIZE>(std::size_t(1) << i)
+                std::bitset<CONDITION_SIZE>(static_cast<std::size_t>(1) << i)
             {}
-
-            /**
-             * Check whether the bits of this condition are always set if the corresponding bit
-             * of the given condition is set.
-             *
-             * @param _condition The condition to compare with.
-             * @return  true,   if all bits of this condition are always set if the corresponding bit
-             *                  of the given condition is set;
-             *          false,  otherwise.
-             */
-            bool operator<=(const Condition& _condition) const {
-                return (*this & (~_condition)).none();
-            }
     };
+	
+	/**
+	 * Check whether the bits of this condition are always set if the corresponding bit
+	 * of the given condition is set.
+	 *
+	 * @param _condition The condition to compare with.
+	 * @return  true,   if all bits of this condition are always set if the corresponding bit
+	 *                  of the given condition is set;
+	 *          false,  otherwise.
+	 */
+	inline bool operator<=(const Condition& lhs, const Condition& rhs) {
+		return (lhs & (~rhs)).none();
+	}
 
     static constexpr Condition PROP_TRUE = Condition();
 

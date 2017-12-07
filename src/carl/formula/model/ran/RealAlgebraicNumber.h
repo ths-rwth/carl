@@ -30,6 +30,8 @@
 
 #include "../../../core/Sign.h"
 #include "../../../core/UnivariatePolynomial.h"
+#include "../../../core/MultivariateGCD.h"
+#include "../../../core/MultivariatePolynomial.h"
 #include "../../../interval/Interval.h"
 
 #include "RealAlgebraicNumberSettings.h"
@@ -106,6 +108,7 @@ public:
 			switchToNR(-b / a);
 		} else {
 			if (i.contains(0)) refineAvoiding(0);
+			refineToIntegrality();
 		}
 	}
 
@@ -188,6 +191,13 @@ public:
 		else return false;
 	}
 
+	Number integerBelow() const {
+		refineToIntegrality();
+		if (isNumeric()) return carl::floor(mValue);
+		else if (isInterval()) return carl::floor(mIR->interval.lower());
+		return carl::constant_zero<Number>::get();
+	}
+	
 	Number branchingPoint() const {
 		if (isNumeric()) return mValue;
 		assert(isInterval());
@@ -303,6 +313,25 @@ public:
 		checkForSimplification();
 	}
 
+	void simplifyByPolynomial(Variable var, const MultivariatePolynomial<Number>& poly) const {
+		UnivariatePolynomial<Number> irp(var, getIRPolynomial().template convert<Number>().coefficients());
+		CARL_LOG_DEBUG("carl.ran", "gcd(" << irp << ", " << poly << ")");
+		auto gmv = carl::gcd(MultivariatePolynomial<Number>(irp), poly);
+		CARL_LOG_DEBUG("carl.ran", "Simplyfing, gcd = " << gmv);
+		if (gmv.isOne()) return;
+		auto g = gmv.toUnivariatePolynomial();
+		if (isRootOf(g)) {
+			CARL_LOG_DEBUG("carl.ran", "Is a root of " << g);
+			mIR->polynomial = g;
+			mIR->sturmSequence = g.standardSturmSequence();
+		} else {
+			CARL_LOG_DEBUG("carl.ran", "Is not a root of " << g);
+			CARL_LOG_DEBUG("carl.ran", "Dividing " << mIR->polynomial << " by " << g);
+			mIR->polynomial = mIR->polynomial.divideBy(g.replaceVariable(IntervalContent::auxVariable)).quotient;
+			mIR->sturmSequence = mIR->polynomial.standardSturmSequence();
+		}
+	}
+	
 	RealAlgebraicNumber<Number> abs() const {
 		if (isNumeric()) return RealAlgebraicNumber<Number>(carl::abs(mValue), mIsRoot);
 		if (isInterval()) {
@@ -367,11 +396,7 @@ namespace std {
 	template<typename Number>
 	struct hash<carl::RealAlgebraicNumber<Number>> {
 		std::size_t operator()(const carl::RealAlgebraicNumber<Number>& n) const {
-			if (n.isNumeric()) {
-				return carl::hash_all(true, n.mIsRoot, n.mValue);
-			} else {
-				return carl::hash_all(false, n.mIsRoot, n.mIR);
-			}
+			return carl::hash_all(n.isRoot(), n.integerBelow());
 		}
 	};
 

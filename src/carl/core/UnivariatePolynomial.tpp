@@ -15,6 +15,7 @@
 #include "MultivariateGCD.h"
 #include "MultivariatePolynomial.h"
 #include "Sign.h"
+#include "polynomialfunctions/SquareFreePart.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -585,9 +586,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const 
 template<typename Coeff>
 template<typename C, DisableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
-//
-	CARL_LOG_NOTIMPLEMENTED();
-	return *this;
+	return carl::squareFreePart(MultivariatePolynomial<NumberType>(*this)).toUnivariatePolynomial(mainVar());
 }
 
 template<typename Coefficient>
@@ -1784,17 +1783,11 @@ const std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::prin
 ) {
 	// Attention: Mathematica / Wolframalpha has one entry less (the last one) which is identical to p!
 	std::list<UnivariatePolynomial<Coeff>> subres = UnivariatePolynomial<Coeff>::subresultants(p, q, strategy);
+	CARL_LOG_DEBUG("carl.upoly", "PSC of " << p << " and " << q << " on " << p.mainVar() << ": " << subres);
 	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs;
-	uint i = 0;
 	for (const auto& s: subres) {
 		assert(!s.isZero());
-		if (s.degree() < i) {
-			// this and all further subresultants won't have a non-zero i-th coefficient
-			break;
-		}
-		assert(s.degree() == i);
 		subresCoeffs.emplace_back(s.mainVar(), s.lcoeff());
-		i++;
 	}
 	return subresCoeffs;
 }

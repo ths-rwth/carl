@@ -23,8 +23,8 @@ TEST(BVVariable, Basics)
 	EXPECT_EQ(v2.sort(), s);
 	EXPECT_EQ(v2, v3);
 	EXPECT_TRUE(v3 < v4);
-	EXPECT_EQ(v2(), a);
-	EXPECT_EQ(v4(), b);
+	EXPECT_EQ(v2, a);
+	EXPECT_EQ(v4, b);
 	EXPECT_EQ(getOutput(v2), "a");
 	EXPECT_EQ(getOutput(v4), "b");
 }

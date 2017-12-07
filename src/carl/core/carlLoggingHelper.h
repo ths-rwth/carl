@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <bitset>
 #include <cstdint>
-#include <iostream>
 #include <sstream>
 
 namespace carl {
@@ -19,10 +18,10 @@ template<typename T>
 std::string binary(const T& a, const bool& spacing = true)
 {
 	std::stringstream ss;
-    const std::uint8_t* begin = reinterpret_cast<const std::uint8_t*>(&a); // NOLINT
+	const std::uint8_t* begin = reinterpret_cast<const std::uint8_t*>(&a); // NOLINT
 	const std::uint8_t* end = begin + sizeof(T);
 	while (begin != end) {
-		end--;
+		--end;
 		ss << std::bitset<8>(std::uint8_t(*end));
 		if (spacing && (begin != end)) ss << " ";
 	}

@@ -4,52 +4,41 @@
 #include "../bitvector/BVVariable.h"
 #include "../uninterpreted/UninterpretedFunction.h"
 #include "../uninterpreted/UVariable.h"
+#include "../../util/variant_util.h"
 
 #include <boost/variant.hpp>
 
 namespace carl
 {
 
-	class ModelVariable : public boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction>
-    {
+	class ModelVariable {
         /**
          * Base type we are deriving from.
          */
-        typedef boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction> Super;
+        using Base = boost::variant<Variable,BVVariable,UVariable,UninterpretedFunction>;
+		
+		Base mData;
         
     public:
-		friend struct std::hash<ModelVariable>;
-        /**
-         * Default constructor.
-         */
-        ModelVariable(): Super()
-        {}
+		friend bool operator==(const ModelVariable& lhs, const ModelVariable& rhs);
 
         /**
          * Initializes the ModelVariable from some valid type of the underlying variant.
          */
-        template<typename T>
-        ModelVariable(const T& _t): Super(_t)
+        template<typename T, typename T2 = typename std::enable_if<convertible_to_variant<T, Base>::value, T>::type>
+        ModelVariable(const T& _t): mData(_t)
         {}
-
-        /**
-         * Assign some value to the underlying variant.
-         * @param t Some value.
-         * @return *this.
-         */
-        template<typename T>
-        ModelVariable& operator=( const T& _t )
-        {
-            Super::operator=(_t);
-            return *this;
-        }
+		
+		std::size_t hash() const {
+			return carl::variant_hash(mData);
+		}
         
         /**
          * @return true, if the stored value is a variable.
          */
         bool isVariable() const
         {
-            return type() == typeid(carl::Variable);
+            return mData.type() == typeid(carl::Variable);
         }
         
         /**
@@ -57,7 +46,7 @@ namespace carl
          */
         bool isBVVariable() const
         {
-            return type() == typeid(carl::BVVariable);
+            return mData.type() == typeid(carl::BVVariable);
         }
 
         /**
@@ -65,7 +54,7 @@ namespace carl
          */
         bool isUVariable() const
         {
-            return type() == typeid(carl::UVariable);
+            return mData.type() == typeid(carl::UVariable);
         }
 
         /**
@@ -73,7 +62,7 @@ namespace carl
          */
         bool isFunction() const
         {
-            return type() == typeid(carl::UninterpretedFunction);
+            return mData.type() == typeid(carl::UninterpretedFunction);
         }
         
         /**
@@ -82,7 +71,7 @@ namespace carl
         carl::Variable::Arg asVariable() const
         {
             assert( isVariable() );
-            return boost::get<carl::Variable>(*this);
+            return boost::get<carl::Variable>(mData);
         }
         
         /**
@@ -91,7 +80,7 @@ namespace carl
         const carl::BVVariable& asBVVariable() const
         {
             assert( isBVVariable() );
-            return boost::get<carl::BVVariable>(*this);
+            return boost::get<carl::BVVariable>(mData);
         }
 
         /**
@@ -100,7 +89,7 @@ namespace carl
         const carl::UVariable& asUVariable() const
         {
             assert( isUVariable() );
-            return boost::get<carl::UVariable>(*this);
+            return boost::get<carl::UVariable>(mData);
         }
         
         /**
@@ -109,124 +98,67 @@ namespace carl
         const carl::UninterpretedFunction& asFunction() const
         {
             assert( isFunction() );
-            return boost::get<carl::UninterpretedFunction>(*this);
+            return boost::get<carl::UninterpretedFunction>(mData);
         }
-
-        /**
-         * @return true, if the first argument is a variable and the second is a function 
-         *                or if both are variables and the first is smaller (lower id)
-         *                or if both are function and the first smaller (lower id).
-         */
-        bool operator<( const ModelVariable& _mvar ) const
-        {
-            if( isVariable() )
-            {
-                if( _mvar.isVariable() ) return asVariable() < _mvar.asVariable();
-                assert( _mvar.isBVVariable() || _mvar.isUVariable() || _mvar.isFunction() );
-                return true;
-            }
-            if( isBVVariable() )
-            {
-                if( _mvar.isVariable() ) return false;
-                if( _mvar.isBVVariable() ) return asBVVariable() < _mvar.asBVVariable();
-                assert( _mvar.isUVariable() || _mvar.isFunction() );
-                return true;
-            }
-            if( isUVariable() )
-            {
-				if( _mvar.isVariable() || _mvar.isBVVariable() ) return false;
-                if( _mvar.isUVariable() ) return asUVariable() < _mvar.asUVariable();
-                assert( _mvar.isFunction() );
-                return true;
-            }
-            if( isFunction() )
-            {
-                if( _mvar.isVariable() || _mvar.isBVVariable() || _mvar.isUVariable() ) return false;
-                if( _mvar.isFunction() ) return asFunction() < _mvar.asFunction();
-            }
-            assert( false );
-            return false;
-        }
-        
-        /**
-         * @return true, if the first and the second are either both variables or both functions 
-         *               and in the first case the variables are equal (equal ids)
-         *                or in the second case the functions are equal (equal ids).
-         */
-        bool operator==( const ModelVariable& _mvar ) const
-        {
-			if (which() != _mvar.which()) {
-				return false;
-			}
-            if (isVariable()) {
-                return asVariable() == _mvar.asVariable();
-            }
-            if (isBVVariable()) {
-                return asBVVariable() == _mvar.asBVVariable();
-            }
-            if (isUVariable()) {
-                return asUVariable() == _mvar.asUVariable();
-            }
-			assert(isFunction());
-            return asFunction() == _mvar.asFunction();
-        }	
     };
 	
 	
-	inline bool operator<( const ModelVariable& _mvar, const carl::Variable& _var )
-	{
-	    if( _mvar.isVariable() )
-	        return _mvar.asVariable() < _var;
-	    return false;
-	}
 
-	inline bool operator<( const carl::Variable& _var, const ModelVariable& _mvar )
-	{
-	    if( _mvar.isVariable() )
-	        return _var < _mvar.asVariable();
-	    return true;
+	/**
+	 * @return true, if the first and the second are either both variables or both functions 
+	 *               and in the first case the variables are equal (equal ids)
+	 *                or in the second case the functions are equal (equal ids).
+	 */
+	inline bool operator==(const ModelVariable& lhs, const ModelVariable& rhs) {
+		if (lhs.mData.which() != rhs.mData.which()) {
+			return false;
+		} else if (lhs.isVariable()) {
+			return lhs.asVariable() == rhs.asVariable();
+		} else if (lhs.isBVVariable()) {
+			return lhs.asBVVariable() == rhs.asBVVariable();
+		} else if (lhs.isUVariable()) {
+			return lhs.asUVariable() == rhs.asUVariable();
+		} else {
+			assert(lhs.isFunction());
+			return lhs.asFunction() == rhs.asFunction();
+		}
 	}
-
-	inline bool operator<(const ModelVariable& _mvar, const carl::BVVariable& _bvvar)
-	{
-	    if( _mvar.isBVVariable() )
-	        return _mvar.asBVVariable() < _bvvar;
-	    return _mvar.isVariable();
+	
+	/**
+	 * @return true, if the first argument is a variable and the second is a function 
+	 *                or if both are variables and the first is smaller (lower id)
+	 *                or if both are function and the first smaller (lower id).
+	 */
+	inline bool operator<(const ModelVariable& lhs, const ModelVariable& rhs) {
+		if (lhs.isVariable()) {
+			if (rhs.isVariable()) return lhs.asVariable() < rhs.asVariable();
+			return true;
+		} else if (lhs.isBVVariable()) {
+			if (rhs.isBVVariable()) return lhs.asBVVariable() < rhs.asBVVariable();
+			return !rhs.isVariable();
+		} else if (lhs.isUVariable()) {
+			if (rhs.isUVariable()) return lhs.asUVariable() < rhs.asUVariable();
+			return rhs.isFunction();
+		} else if (lhs.isFunction()) {
+			if (rhs.isFunction()) return lhs.asFunction() < rhs.asFunction();
+			return false;
+		} else {
+			assert(false);
+			return false;
+		}
 	}
-
-	inline bool operator<( const carl::BVVariable& _bvvar, const ModelVariable& _mvar )
-	{
-	    if( _mvar.isBVVariable() )
-	        return _bvvar < _mvar.asBVVariable();
-	    return !_mvar.isVariable();
-	}
-
-	inline bool operator<( const ModelVariable& _mvar, const carl::UVariable& _uv )
-	{
-	    if( _mvar.isUVariable() )
-	        return _mvar.asUVariable() < _uv;
-	    return !_mvar.isFunction();
-	}
-
-	inline bool operator<( const carl::UVariable& _uv, const ModelVariable& _mvar )
-	{
-	    if( _mvar.isUVariable() )
-	        return _uv < _mvar.asUVariable();
-	    return _mvar.isFunction();
-	}
-
-	inline bool operator<( const ModelVariable& _mvar, const carl::UninterpretedFunction& _uf )
-	{
-	    if( _mvar.isFunction() )
-	        return _mvar.asFunction() < _uf;
-	    return true;
-	}
-
-	inline bool operator<( const carl::UninterpretedFunction& _uf, const ModelVariable& _mvar )
-	{
-	    if( _mvar.isFunction() )
-	        return _uf < _mvar.asFunction();
-	    return false;
+	
+	inline std::ostream& operator<<(std::ostream& os, const ModelVariable& mv) {
+		if (mv.isVariable()) {
+			return os << mv.asVariable();
+		} else if (mv.isBVVariable()) {
+			return os << mv.asBVVariable();
+		} else if (mv.isUVariable()) {
+			return os << mv.asUVariable();
+		} else {
+			assert(mv.isFunction());
+			return os << mv.asFunction();
+		}
 	}
 }
 
@@ -234,12 +166,7 @@ namespace std {
 	template<>
 	struct hash<carl::ModelVariable>: boost::static_visitor<std::size_t> {
 		std::size_t operator()(const carl::ModelVariable& mv) const {
-			auto r = boost::apply_visitor(*this, mv);
-			return r;
-		}
-		template<typename T>
-		std::size_t operator()(const T& t) const {
-			return std::hash<T>()(t);
+			return mv.hash();
 		}
 	};
 }

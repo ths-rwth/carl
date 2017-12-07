@@ -1,9 +1,7 @@
 /** 
  * @file   IntervalEvaluation.h
- *         Created on August 23, 2013, 1:12 PM
  * @author: Sebastian Junges
  * @author: Stefan Schupp
- * 
  */
 
 

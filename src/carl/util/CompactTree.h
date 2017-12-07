@@ -40,8 +40,8 @@ namespace carl
     {
         public:
             class Node;
-            CompactTree( size_t initialCapacity = 0 );
-            CompactTree( const CompactTree& tree, size_t minCapacity = 0 );
+            explicit CompactTree( std::size_t initialCapacity = 0 );
+            CompactTree( const CompactTree& tree, std::size_t minCapacity = 0 );
             ~CompactTree()
             {
                 delete[] (_array + 1);
@@ -55,12 +55,12 @@ namespace carl
                 return _lastLeaf == Node( 0 );
             }
 
-            size_t size() const
+            std::size_t size() const
             {
                 return _lastLeaf.getNormalIndex();
             }
 
-            size_t capacity() const
+            std::size_t capacity() const
             {
                 return _capacityEnd.getNormalIndex();
             }
@@ -164,7 +164,7 @@ namespace carl
 
             void clear();
 
-            size_t getMemoryUse() const;
+            std::size_t getMemoryUse() const;
 
             bool isValid() const;
 

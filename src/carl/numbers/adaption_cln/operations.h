@@ -399,6 +399,9 @@ inline cln::cl_RA pow(const cln::cl_RA& basis, std::size_t exp) {
 inline cln::cl_RA log(const cln::cl_RA& n) {
 	return cln::rationalize(cln::realpart(cln::log(n)));
 }
+inline cln::cl_RA log10(const cln::cl_RA& n) {
+	return cln::rationalize(cln::realpart(cln::log(n, 10)));
+}
 
 inline cln::cl_RA sin(const cln::cl_RA& n) {
 	return cln::rationalize(cln::sin(n));
@@ -439,6 +442,8 @@ std::pair<cln::cl_RA, cln::cl_RA> sqrt_safe(const cln::cl_RA& a);
  * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z.
  */
 std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a);
+
+std::pair<cln::cl_RA, cln::cl_RA> root_safe(const cln::cl_RA& a, uint n);
 
 /**
  * Calculate the remainder of the integer division.

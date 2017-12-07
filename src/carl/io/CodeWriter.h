@@ -30,7 +30,7 @@ struct ConstructorPrinter {
 	}
     #endif
 	void operator()(std::ostream& os, const Variable& v) {
-		os << "Variable(" << v.getId() << ")";
+		os << "Variable(" << v.id() << ")";
 	}
 	void operator()(std::ostream& os, const Monomial::Arg& m) {
 		os << "std::make_shared<const Monomial>(std::initializer_list<std::pair<Variable, exponent>>({";

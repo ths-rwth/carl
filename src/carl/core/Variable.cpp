@@ -1,13 +1,11 @@
 #include "Variable.h"
 #include "VariablePool.h"
 
-#include <stdexcept>
-
 namespace carl
 {
 	const Variable Variable::NO_VARIABLE = Variable();
 	
-	std::string Variable::getName() const {
+	std::string Variable::name() const {
 		return carl::VariablePool::getInstance().getName(*this, true);
 	}
 
@@ -23,7 +21,9 @@ namespace carl
 		} else if(in == "Uninterpreted") {
 			return VariableType::VT_UNINTERPRETED;
 		} else {
-			throw std::invalid_argument("Input string does not encode an input string");
+			CARL_LOG_ERROR("carl.variable", "Input " << in << " is not a variable type.");
+			assert(false);
+			return VariableType::VT_REAL;
 		}
 
 	}

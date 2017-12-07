@@ -53,7 +53,6 @@ private:
 		return std::vector<Variable>(vars.begin(), vars.end());
 	}
 
-public:
 	CoCoA::RingElem convert(const Poly& p) const {
 		CoCoA::RingElem res(mRing);
 		for (const auto& t: p) {
@@ -89,7 +88,7 @@ public:
 				CoCoA::exponents(exponents, CoCoA::PP(i));
 				Monomial::Content monContent;
 				std::size_t tdeg = 0;
-				for (std::size_t i = 0; i < exponents.size(); i++) {
+				for (std::size_t i = 0; i < exponents.size(); ++i) {
 					if (exponents[i] == 0) continue;
 					monContent.emplace_back(mSymbolBack[i], exponents[i]);
 					tdeg += std::size_t(exponents[i]);
@@ -116,13 +115,13 @@ public:
 	}
 
 public:
-	CoCoAAdaptor(const std::vector<Poly>& polys):
+	explicit CoCoAAdaptor(const std::vector<Poly>& polys):
 		mSymbolBack(collectVariables(polys)),
 		mRing(CoCoA::NewPolyRing(mQ, long(mSymbolBack.size())))
 	{
 		auto indets = CoCoA::indets(mRing);
 
-		for (std::size_t i = 0; i < mSymbolBack.size(); i++) {
+		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
 			mSymbolThere.emplace(mSymbolBack[i], indets[i]);
 		}
 	}
@@ -130,8 +129,24 @@ public:
 		CoCoAAdaptor(std::vector<Poly>(polys))
 	{}
 
+	void resetVariableOrdering(const std::vector<Variable>& ordering) {
+		assert(ordering.size() == mSymbolBack.size());
+		assert(ordering.size() == mSymbolThere.size());
+		mSymbolBack = ordering;
+
+		auto indets = CoCoA::indets(mRing);
+		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
+			mSymbolThere[mSymbolBack[i]] = indets[i];
+		}
+	}
+	
 	Poly gcd(const Poly& p1, const Poly& p2) const {
 		return convert(CoCoA::gcd(convert(p1), convert(p2)));
+	}
+
+	Poly makeCoprimeWith(const Poly& p1, const Poly& p2) const {
+		CoCoA::RingElem res = convert(p1);
+		return convert(res / CoCoA::gcd(res, convert(p2)));
 	}
 
 	/**
@@ -148,17 +163,17 @@ public:
    * @return A map whose keys are the irreducible factors and whose values are
    * the exponents.
 	 */
-	Factors<Poly> factorize(const Poly& p, bool includeConstantFlag = true) const {
-      Factors<Poly> res;
-      auto finfo = CoCoA::factor(convert(p));
-      if (includeConstantFlag && !CoCoA::IsOne(finfo.myRemainingFactor())) {
-        res.emplace(convert(finfo.myRemainingFactor()), 1);
-      }
-      for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
-        res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
-      }
-      return res;
-	}
+	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
+		auto finfo = CoCoA::factor(convert(p));
+		Factors<Poly> res;
+		if (includeConstants && !CoCoA::IsOne(finfo.myRemainingFactor())) {
+			res.emplace(convert(finfo.myRemainingFactor()), 1);
+		}
+		for (std::size_t i = 0; i < finfo.myFactors().size(); ++i) {
+			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
+		}
+    return res;
+  }
 
 	/**
 	 * Break down polynomials into their irreducible factors without
@@ -189,10 +204,10 @@ public:
 	}
 
 	auto GBasis(const std::vector<Poly>& p) const {
-		return convert(CoCoA::GBasis(CoCoA::ideal(convert(p))));
+		return convert(CoCoA::ReducedGBasis(CoCoA::ideal(convert(p))));
 	}
 };
 
-}
+} // namespace carl
 
 #endif

@@ -6,9 +6,12 @@
 #include "../core/Relation.h"
 #include "../core/Variable.h"
 #include "../numbers/numbers.h"
+#include "../util/hash.h"
 
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
+
+#include <tuple>
 
 namespace carl {
   /**
@@ -39,7 +42,7 @@ namespace carl {
 		//		return ran;
 		//	}
 		//};
-		struct VariableCollector: public boost::static_visitor<Variables> {
+		struct VariableCollector: boost::static_visitor<Variables> {
 			Variables operator()(const MR& mr) const {
 				return mr.gatherVariables();
 			}
@@ -81,6 +84,7 @@ namespace carl {
 			if (boost::get<RAN>(&mValue) == nullptr) {
 				const MR& mr = boost::get<MR>(mValue);
 				if (mr.poly().degree(mr.var()) != 1) return boost::none;
+				if (mr.k() != 1) return boost::none;
 				auto lcoeff = mr.poly().coeff(mr.var(), 1);
 				if (!lcoeff.isConstant()) return boost::none;
 				auto ccoeff = mr.poly().coeff(mr.var(), 0);
@@ -113,16 +117,33 @@ namespace carl {
 
 		std::string toString(unsigned = 0, bool = false, bool = true) const {
 			std::stringstream ss;
-			ss << "(" << (negated() ? "!" : "") << relation() << " " << var() << " " << mValue << ")";
+			ss << "(" << var() << " " << (negated() ? "!" : "") << relation() << " " << mValue << ")";
 			return ss.str();
 		}
-
-		bool operator==(const VariableComparison& vc) const {
-			return mRelation == vc.mRelation && mVar == vc.mVar && mValue == vc.mValue && mNegated == vc.mNegated;
-		}
 	};
+
+	template<typename Poly>
+	bool operator==(const VariableComparison<Poly>& lhs, const VariableComparison<Poly>& rhs) {
+		return lhs.relation() == rhs.relation() && lhs.var() == rhs.var() && lhs.negated() == rhs.negated() && lhs.value() == rhs.value();
+	}
+	template<typename Poly>
+	bool operator<(const VariableComparison<Poly>& lhs, const VariableComparison<Poly>& rhs) {
+		if (lhs.negated() != rhs.negated()) return !lhs.negated();
+		if (lhs.var() != rhs.var()) return lhs.var() < rhs.var();
+		if (lhs.relation() != rhs.relation()) return lhs.relation() < rhs.relation();
+		return lhs.value() < rhs.value();
+	}
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableComparison<Poly>& vc) {
 		return os << vc.toString();
 	}
+}
+
+namespace std {
+	template<typename Pol>
+	struct hash<carl::VariableComparison<Pol>> {
+		std::size_t operator()(const carl::VariableComparison<Pol>& vc) const {
+			return carl::hash_all(vc.var(), variant_hash(vc.value()), vc.relation(), vc.negated());
+		}
+	};
 }

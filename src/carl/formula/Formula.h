@@ -200,8 +200,8 @@ namespace carl
                     FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
             }
             
-            Formula( Formula&& _formula ):
-                mpContent( _formula.mpContent )
+            Formula(Formula&& _formula) noexcept:
+                mpContent(_formula.mpContent)
             {
                 _formula.mpContent = nullptr;
             }
@@ -284,7 +284,7 @@ namespace carl
             /**
              * @return A hash value for this formula.
              */
-            size_t getHash() const
+            std::size_t getHash() const
             {
                 return mpContent->mHash;
             }
@@ -292,7 +292,7 @@ namespace carl
             /**
              * @return The unique id for this formula.
              */
-            size_t getId() const
+            std::size_t getId() const
             {
                 return mpContent->mId;
             }
@@ -391,6 +391,10 @@ namespace carl
             {
                 return Formula( mpContent->mNegation );
             }
+			Formula baseFormula() const
+			{
+				return Formula(FormulaPool<Pol>::getInstance().getBaseFormula(mpContent));
+			}
             
             const Formula& removeNegations() const
             {
@@ -975,6 +979,10 @@ namespace carl
                 assert( _formula.getId() != 0 );
                 return mpContent->mId >= _formula.getId();
             }
+			
+			Formula operator!() const {
+				return negated();
+			}
 
         private:
             
@@ -1183,7 +1191,7 @@ namespace carl
 		
 		struct Substitutor {
 			const std::map<Formula,Formula>& replacements;
-            Substitutor(const std::map<Formula,Formula>& repl): replacements(repl) {}
+            explicit Substitutor(const std::map<Formula,Formula>& repl): replacements(repl) {}
             Formula operator()(const Formula& formula) {
 				auto it = replacements.find(formula);
 				if (it == replacements.end()) return formula;
@@ -1193,7 +1201,7 @@ namespace carl
         
         struct PolynomialSubstitutor {
             const std::map<Variable,typename Formula::PolynomialType>& replacements;
-            PolynomialSubstitutor(const std::map<Variable,typename Formula::PolynomialType>& repl): replacements(repl) {}
+            explicit PolynomialSubstitutor(const std::map<Variable,typename Formula::PolynomialType>& repl): replacements(repl) {}
             Formula operator()(const Formula& formula) {
                 if (formula.getType() != FormulaType::CONSTRAINT) return formula;
                 return Formula(formula.constraint().lhs().substitute(replacements), formula.constraint().relation());
@@ -1202,7 +1210,7 @@ namespace carl
         
         struct BitvectorSubstitutor {
             const std::map<BVVariable,BVTerm>& replacements;
-            BitvectorSubstitutor(const std::map<BVVariable,BVTerm>& repl): replacements(repl) {}
+            explicit BitvectorSubstitutor(const std::map<BVVariable,BVTerm>& repl): replacements(repl) {}
             Formula operator()(const Formula& formula) {
                 if (formula.getType() != FormulaType::BITVECTOR) return formula;
                 BVTerm lhs = formula.bvConstraint().lhs().substitute(replacements);
@@ -1213,7 +1221,7 @@ namespace carl
         
         struct UninterpretedSubstitutor {
             const std::map<UVariable,UFInstance>& replacements;
-            UninterpretedSubstitutor(const std::map<UVariable,UFInstance>& repl): replacements(repl) {}
+            explicit UninterpretedSubstitutor(const std::map<UVariable,UFInstance>& repl): replacements(repl) {}
             Formula operator()(const Formula& formula) {
                 if (formula.getType() != FormulaType::UEQ) return formula;
                 
@@ -1248,7 +1256,7 @@ namespace std
          * @param _formulaContent The formula content to get the hash for.
          * @return The hash of the given formula content.
          */
-        size_t operator()( const carl::FormulaContent<Pol>& _formulaContent ) const 
+        std::size_t operator()( const carl::FormulaContent<Pol>& _formulaContent ) const
         {
             return _formulaContent.hash();
         }
@@ -1265,7 +1273,7 @@ namespace std
          * @param _formula The formula to get the hash for.
          * @return The hash of the given formula.
          */
-        size_t operator()( const carl::Formula<Pol>& _formula ) const 
+        std::size_t operator()( const carl::Formula<Pol>& _formula ) const 
         {
             return _formula.getHash();
         }

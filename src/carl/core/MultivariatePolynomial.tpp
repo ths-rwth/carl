@@ -13,6 +13,9 @@
 #include "logging.h"
 #include "../numbers/numbers.h"
 
+#include "polynomialfunctions/CoprimePart.h"
+#include "polynomialfunctions/SquareFreePart.h"
+
 #include <algorithm>
 #include <memory>
 #include <mutex>
@@ -1367,6 +1370,17 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
 	assert(this->isConsistent());
 }
 
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::squareFreePart() const {
+	return carl::squareFreePart(*this);
+}
+
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::coprimePart(const MultivariatePolynomial<Coeff,Ordering,Policies>& q) const {
+	return carl::coprimePart(*this, q);
+}
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(std::size_t exp) const

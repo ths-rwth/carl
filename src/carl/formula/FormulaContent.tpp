@@ -21,15 +21,15 @@ namespace carl {
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(carl::Variable::Arg _variable):
 #ifdef __VS
-		mHash((std::size_t)_variable.getId()) // TODO: subtract the id of the boolean variable with the smallest id
+		mHash((std::size_t)_variable.id()) // TODO: subtract the id of the boolean variable with the smallest id
 		{
 		mpVariableVS = new carl::Variable(_variable);
 #else
-		mHash((std::size_t)_variable.getId()), // TODO: subtract the id of the boolean variable with the smallest id
+		mHash((std::size_t)_variable.id()), // TODO: subtract the id of the boolean variable with the smallest id
 		mVariable(_variable)
 	{
 #endif
-		switch (_variable.getType()) {
+		switch (_variable.type()) {
 			case VariableType::VT_BOOL:
 				mType = BOOL;
 				break;
@@ -72,6 +72,7 @@ namespace carl {
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(VariableComparison<Pol>&& _variableComparison):
+		mHash(std::hash<VariableComparison<Pol>>()(_variableComparison)),
 #ifdef __VS
         mType( FormulaType::VARCOMPARE )
     {
@@ -87,6 +88,7 @@ namespace carl {
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(VariableAssignment<Pol>&& _variableAssignment):
+		mHash(std::hash<VariableAssignment<Pol>>()(_variableAssignment)),
 #ifdef __VS
         mType( FormulaType::VARASSIGN )
     {
@@ -214,6 +216,7 @@ namespace carl {
 
     template<typename Pol>
     bool FormulaContent<Pol>::operator==(const FormulaContent& _content) const {
+		CARL_LOG_TRACE("carl.formula", *this << " == " << _content << " (" << mId << " / " << _content.mId << ")");
 		if (mId != 0 && _content.mId != 0) return mId == _content.mId;
         if (mType != _content.mType) return false;
 		switch (mType) {

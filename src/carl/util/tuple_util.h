@@ -48,7 +48,7 @@ auto tuple_tail(Tuple&& t) {
 }
 
 template<typename Converter, typename Information, typename FOut, typename... TOut>
-struct tuple_convert {
+class tuple_convert {
 private:
 	Information i;
 	tuple_convert<Converter, Information, TOut...> conv;
@@ -61,7 +61,7 @@ public:
 };
 
 template<typename Converter, typename Information, typename Out>
-struct tuple_convert<Converter, Information, Out> {
+class tuple_convert<Converter, Information, Out> {
 private:
 	Information i;
 public:
@@ -89,6 +89,26 @@ namespace detail {
 template<typename F, typename Tuple>
 auto tuple_apply(F&& f, Tuple&& t) {
 	return detail::tuple_apply_impl(std::forward<F>(f), std::forward<Tuple>(t), std::make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type>::value>{});
+}
+
+
+namespace detail {
+	/**
+	 * Helper method for carl::tuple_foreach that actually does the work.
+	 */
+	template<typename F, typename Tuple, std::size_t... I>
+	auto tuple_foreach_impl(F&& f, Tuple&& t, std::index_sequence<I...> /*unused*/) {
+		return std::make_tuple(f(std::get<I>(std::forward<Tuple>(t)))...);
+	}
+}
+
+/**
+ * Invokes a callable object f on every element of a tuple and returns a tuple containing the results.
+ * This basically corresponds to the functional `map(func, list)`.`
+ */
+template<typename F, typename Tuple>
+auto tuple_foreach(F&& f, Tuple&& t) {
+	return detail::tuple_foreach_impl(std::forward<F>(f), std::forward<Tuple>(t), std::make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type>::value>{});
 }
 
 }

@@ -130,8 +130,9 @@ class MultivariateGCD : GCDCalculation
         }
         Polynomial result = ginacGcd<Polynomial>(mp1,mp2);
         Polynomial resultB = calculate();
-        if(result != resultB)
+        if(result.normalize() != resultB.normalize())
         {
+			CARL_LOG_DEBUG("carl.gcd", "results " << result << " vs. " << resultB << " did not match.");
             return false;
         }
         return true;

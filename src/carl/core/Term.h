@@ -95,10 +95,10 @@ class Term {
 		 * Get the coefficient.
 		 * @return Coefficient.
 		 */
-		inline Coefficient& coeff() {
+		Coefficient& coeff() {
 			return mCoeff;
 		}
-		inline const Coefficient& coeff() const {
+		const Coefficient& coeff() const {
 			return mCoeff;
 		}
 		
@@ -106,16 +106,17 @@ class Term {
 		 * Get the monomial.
 		 * @return Monomial.
 		 */
-		inline const Monomial::Arg& monomial() const
-		{
+		Monomial::Arg& monomial() {
+			return mMonomial;
+		}
+		const Monomial::Arg& monomial() const {
 			return mMonomial;
 		}
 		/**
 		 * Gives the total degree, i.e. the sum of all exponents.
 		 * @return Total degree.
 		 */
-		inline uint tdeg() const
-		{
+		uint tdeg() const {
 			if(!mMonomial) return 0;
 			return mMonomial->tdeg();
 		}
@@ -124,8 +125,7 @@ class Term {
 		 * Checks whether the term is zero.
 		 * @return 
 		 */
-		inline bool isZero() const
-		{
+		bool isZero() const {
 			return carl::isZero(mCoeff); //change this to mCoeff.isZero() at some point
 		}
 		
@@ -133,53 +133,47 @@ class Term {
 		 * Checks whether the term equals one.
          * @return 
          */
-		inline bool isOne() const
-		{
-			return (isConstant() && carl::isOne(mCoeff)); //change this to mCoeff.isOne() at some point
+		bool isOne() const {
+			return isConstant() && carl::isOne(mCoeff); //change this to mCoeff.isOne() at some point
 		}
 		/**
 		 * Checks whether the monomial is a constant.
 		 * @return 
 		 */
-		inline bool isConstant() const
-		{
+		bool isConstant() const {
 			return !mMonomial;
 		}
         
         /**
          * @return true, if the image of this term is integer-valued.
          */
-        inline bool integerValued() const
-        {
-            if(!carl::isInteger(mCoeff)) return false;
-            return (!mMonomial || mMonomial->integerValued());
+        bool integerValued() const {
+            if (!carl::isInteger(mCoeff)) return false;
+            return !mMonomial || mMonomial->integerValued();
         }
         
 		/**
 		 * Checks whether the monomial has exactly the degree one.
 		 * @return 
 		 */
-		inline bool isLinear() const
-		{
-			if(!mMonomial) return true;
+		bool isLinear() const {
+			if (!mMonomial) return true;
 			return mMonomial->isLinear();
 		}
 		/**
 		 * 
 		 * @return 
 		 */
-		inline size_t getNrVariables() const
-		{
-			if(!mMonomial) return 0;
+		std::size_t getNrVariables() const {
+			if (!mMonomial) return 0;
 			return mMonomial->nrVariables();
 		}
         
         /**
          * @return An approximation of the complexity of this monomial.
          */
-        size_t complexity() const
-        {
-            if(!mMonomial) return 1;
+        std::size_t complexity() const {
+            if (!mMonomial) return 1;
             return mMonomial->complexity();
         }
 		
@@ -187,8 +181,7 @@ class Term {
 		 * @param v The variable to check for its occurrence.
 		 * @return true, if the variable occurs in this term.
 		 */
-		inline bool has(Variable v) const
-		{
+		bool has(Variable v) const {
 			if (!mMonomial) return false;
 			return mMonomial->has(v);
 		}
@@ -198,14 +191,12 @@ class Term {
 		 * @param v The variable which may occur.
 		 * @return true if no variable occurs, or just v occurs. 
 		 */
-		bool hasNoOtherVariable(Variable v) const
-		{
-			if(!mMonomial) return true;
+		bool hasNoOtherVariable(Variable v) const {
+			if (!mMonomial) return true;
 			return mMonomial->hasNoOtherVariable(v);
 		}
 		
-        bool isSingleVariable() const
-        {
+        bool isSingleVariable() const {
             if (!mMonomial) return false;
             return mMonomial->isLinear();
         }
@@ -213,8 +204,7 @@ class Term {
 		 * For terms with exactly one variable, get this variable.
 		 * @return The only variable occuring in the term.
 		 */
-		Variable getSingleVariable() const
-		{
+		Variable getSingleVariable() const {
 			assert(getNrVariables() == 1);
 			return mMonomial->getSingleVariable();
 		}
@@ -223,8 +213,7 @@ class Term {
 		 * Checks if the term is a square.
 		 * @return If this is square.
 		 */
-		bool isSquare() const
-		{
+		bool isSquare() const {
 			return (mCoeff >= CoefficientType(0)) && ((!mMonomial) || mMonomial->isSquare());
 		}
 		
@@ -319,21 +308,6 @@ class Term {
 	    std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 
 		bool isConsistent() const;
-		
-		Term<Coefficient> operator-() const;
-		
-		/// @name In-place multiplication operators
-		/// @{
-		/**
-		 * Multiply this term with something and return the changed term.
-		 * @param rhs Right hand side.
-		 * @return Changed term.
-		 */
-		Term& operator*=(const Coefficient& rhs);
-		Term& operator*=(Variable rhs);
-		Term& operator*=(const Monomial::Arg& rhs);
-		Term& operator*=(const Term& rhs);
-		/// @}
 
 		/// @name Division operators
 		/// @{
@@ -379,7 +353,7 @@ class Term {
 		static bool monomialLess(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
 		{
 			if (lhs && rhs) return monomialLess(*lhs, *rhs);
-            return !lhs;
+			return !lhs;
 		}
 		/**
 		 * Calculates the gcd of (t1, t2).
@@ -399,6 +373,70 @@ class Term {
          */
 		static Term gcd(const Term& t1, const Term& t2);
 };
+
+
+template<typename Coeff>
+Term<Coeff> operator-(const Term<Coeff>& rhs) {
+	return Term<Coeff>(-rhs.coeff(), rhs.monomial());
+}
+
+
+
+/// @name In-place multiplication operators
+/// @{
+/**
+ * Multiply a term with something and return the changed term.
+ * @param lhs Left hand side.
+ * @param rhs Right hand side.
+ * @return Changed `lhs`.
+ */
+template<typename Coeff>
+Term<Coeff>& operator*=(Term<Coeff>& lhs, const Coeff& rhs) {
+	if (carl::isZero(rhs)) {
+		lhs.clear();
+	} else {
+		lhs.coeff() *= rhs;
+	}
+	return lhs;
+}
+template<typename Coeff>
+Term<Coeff>& operator*=(Term<Coeff>& lhs, Variable rhs) {
+	if (carl::isZero(lhs.coeff())) {
+		return lhs;
+	}
+	if (lhs.monomial()) {
+		lhs.monomial() = lhs.monomial() * rhs;
+	} else {
+		lhs.monomial() = createMonomial(rhs, 1);
+	}
+	return lhs;
+}
+template<typename Coeff>
+Term<Coeff>& operator*=(Term<Coeff>& lhs, const Monomial::Arg& rhs) {
+	if (carl::isZero(lhs.coeff())) {
+		return lhs;
+	}
+	if (lhs.monomial()) {
+		lhs.monomial() = lhs.monomial() * rhs;
+	} else {
+		lhs.monomial() = rhs;
+	}
+	return lhs;
+}
+template<typename Coeff>
+Term<Coeff>& operator*=(Term<Coeff>& lhs, const Term<Coeff>& rhs) {
+	if (carl::isZero(lhs.coeff())) {
+		return lhs;
+	}
+	if (carl::isZero(rhs.coeff())) {
+		lhs.clear();
+		return lhs;
+	}
+	lhs.monomial() = lhs.monomial() * rhs.monomial();
+	lhs.coeff() *= rhs.coeff();
+	return lhs;
+}
+/// @}
 
 	/// @name Comparison operators
 	/// @{
@@ -570,60 +608,60 @@ class Term {
 	 * @return `lhs * rhs`
 	 */
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
-		return std::move(Term<Coeff>(lhs) *= rhs);
+	inline Term<Coeff> operator*(Term<Coeff> lhs, const Term<Coeff>& rhs) {
+		return lhs *= rhs;
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
-		return std::move(Term<Coeff>(lhs) *= rhs);
+	inline Term<Coeff> operator*(Term<Coeff> lhs, const Monomial::Arg& rhs) {
+		return lhs *= rhs;
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Term<Coeff>& lhs, Variable rhs) {
-		return std::move(Term<Coeff>(lhs) *= rhs);
+	inline Term<Coeff> operator*(Term<Coeff> lhs, Variable rhs) {
+		return lhs *= rhs;
 	}
 	template<typename Coeff>
-	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs) {
-		return std::move(Term<Coeff>(lhs) *= rhs);
+	inline Term<Coeff> operator*(Term<Coeff> lhs, const Coeff& rhs) {
+		return lhs *= rhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Monomial::Arg& lhs, const Term<Coeff>& rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	template<typename Coeff, EnableIf<carl::is_number<Coeff>> = dummy>
 	inline Term<Coeff> operator*(const Monomial::Arg& lhs, const Coeff& rhs) {
-		return std::move(Term<Coeff>(rhs, lhs));
+		return Term<Coeff>(rhs, lhs);
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(Variable lhs, const Term<Coeff>& rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(Variable lhs, const Coeff& rhs) {
-		return std::move(Term<Coeff>(rhs, lhs, 1));
+		return Term<Coeff>(rhs, lhs, 1);
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	template<typename Coeff, EnableIf<carl::is_number<Coeff>> = dummy>
 	inline Term<Coeff> operator*(const Coeff& lhs, const Monomial::Arg& rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	template<typename Coeff>
 	inline Term<Coeff> operator*(const Coeff& lhs, Variable rhs) {
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
     template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
     inline Term<Coeff> operator/(const Term<Coeff>& lhs, const Coeff& rhs) {
-        return std::move(lhs * reciprocal(rhs));
+        return lhs * reciprocal(rhs);
     }
     template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
     inline Term<Coeff> operator/(const Monomial::Arg& lhs, const Coeff& rhs) {
-        return std::move(lhs * reciprocal(rhs));
+        return lhs * reciprocal(rhs);
     }
     template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
     inline Term<Coeff> operator/(Variable& lhs, const Coeff& rhs) {
-        return std::move(lhs * reciprocal(rhs));
+        return lhs * reciprocal(rhs);
     }
 	/// @}
 

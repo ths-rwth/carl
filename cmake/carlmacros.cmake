@@ -5,6 +5,34 @@
 #
 # This file contains several macros which are used in this project. Notice that several are copied straight from web ressources.
 
+function(set_version major minor)
+	execute_process(
+		COMMAND git describe
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		OUTPUT_VARIABLE GIT_VERSION
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+	set(patch "")
+	if (GIT_VERSION MATCHES "([0-9]+)\.([0-9]+)(-?.*)")
+		set(major ${CMAKE_MATCH_1})
+		set(minor ${CMAKE_MATCH_2})
+		if (CMAKE_MATCH_3 MATCHES "-([0-9]+)-(g[0-9a-f]+)")
+			set(patch "${CMAKE_MATCH_1}-${CMAKE_MATCH_2}")
+		endif()
+	else()
+		message(STATUS "Could not parse version from git, using ${major}.${minor}")
+	endif()
+	
+	set(PROJECT_VERSION_MAJOR ${major} PARENT_SCOPE)
+	set(PROJECT_VERSION_MINOR ${minor} PARENT_SCOPE)
+	set(PROJECT_VERSION_PATCH ${patch} PARENT_SCOPE)
+	if(patch)
+		set(PROJECT_VERSION "${major}.${minor}.${patch}" PARENT_SCOPE)
+	else()
+		set(PROJECT_VERSION "${major}.${minor}" PARENT_SCOPE)
+	endif()
+endfunction(set_version)
+
 function(add_imported_library_interface name include)
 	add_library(${name} INTERFACE IMPORTED)
 	set_target_properties(${name} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${include}")
@@ -104,11 +132,8 @@ macro(export_target output TARGET)
 		message(STATUS "Unknown type ${TYPE}")
 	endif()
 	if(NOT "${ARGN}" STREQUAL "")
-		set(deps ${ARGN})
-		foreach(d ${deps})
-			set(${output} "${${output}}
-set_target_properties(${TARGET} PROPERTIES IMPORTED_LINK_INTERFACE_LIBRARIES \"${d}\")")
-		endforeach()
+		set(${output} "${${output}}
+set_target_properties(${TARGET} PROPERTIES IMPORTED_LINK_INTERFACE_LIBRARIES \"${ARGN}\")")
 	endif()
 	_export_target_end(${output})
 endmacro(export_target)
@@ -123,7 +148,7 @@ endmacro(export_target_recursive)
 
 macro(load_library group name version)
     string(TOUPPER ${name} LIBNAME)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ${DYNAMIC_EXT})
+    set(CMAKE_FIND_LIBRARY_SUFFIXES "${DYNAMIC_EXT};${STATIC_EXT}")
     set(Boost_USE_STATIC_LIBS OFF)
     find_package(${name} ${version} ${ARGN} QUIET)
     if(${name}_FOUND OR ${LIBNAME}_FOUND)
@@ -141,7 +166,7 @@ macro(load_library group name version)
         unset(${LIBNAME}_INCLUDE_DIR CACHE)
         unset(${LIBNAME}_LIBRARY CACHE)
 
-        set(CMAKE_FIND_LIBRARY_SUFFIXES ${STATIC_EXT})
+        set(CMAKE_FIND_LIBRARY_SUFFIXES "${STATIC_EXT};${DYNAMIC_EXT}")
         set(Boost_USE_STATIC_LIBS ON)
         if (ARGN)
             list(REMOVE_ITEM ARGN "REQUIRED")

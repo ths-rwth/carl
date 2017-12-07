@@ -175,7 +175,7 @@ namespace carl
 					catch(InvalidInputStringException& e) 
 					{
 						e.setInputString(inputString);
-						throw e;
+						throw;
 					}
 				}
 			}

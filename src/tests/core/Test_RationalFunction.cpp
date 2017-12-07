@@ -73,10 +73,6 @@ TEST(RationalFunction, Construction)
     std::cout << rf4 << std::endl;
     rf4.simplify();
     std::cout << rf4 << std::endl;
-    rf1 = rf1;
-    rf2 = rf2;
-    rf3 = rf3;
-    rf4 = rf4;
 }
 
 TEST(RationalFunction, Multiplication)
@@ -123,8 +119,12 @@ TEST(RationalFunction, Multiplication)
     FPol qf2(q2, pCache);
     EXPECT_EQ(computePolynomial(qf1), computePolynomial(rf3.nominator()));
     EXPECT_EQ(computePolynomial(qf2), computePolynomial(rf3.denominator()));
+    RFactFunc rf4 = rf3 * 2;
+    RFactFunc rf5 = 2 * rf3;
+    EXPECT_EQ(rf4, rf5);
 
-    //(1/4*PF)/((-1/4)*PF+1) * ((-1/4)*PF+1)/((-1/2)*PF+1)
+
+//(1/4*PF)/((-1/4)*PF+1) * ((-1/4)*PF+1)/((-1/2)*PF+1)
     carl::VariablePool::getInstance().clear();
     Variable t = carl::freshRealVariable("t");
     Pol pf(t);
@@ -395,4 +395,11 @@ TEST(RationalFunction, Substitute)
     Pol poly(Rational(2) * x + x*y + z / Rational(2));
     Pol polySub = poly.substitute(replacement);
     EXPECT_EQ(polySub, z / Rational(2) + Rational(2) * y + Rational(4));
+}
+
+TEST(RationalFunction, AsNumber)
+{
+    RFunc rf = RFunc(Pol(1));
+    Rational num = rf.nominatorAsNumber() / rf.denominatorAsNumber();
+    EXPECT_EQ(num, 1);
 }

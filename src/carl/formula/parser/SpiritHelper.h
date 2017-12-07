@@ -12,7 +12,7 @@ namespace parser {
 	namespace qi = boost::spirit::qi;
 
 	struct ErrorHandler {
-		template<typename> struct result { typedef qi::error_handler_result type; };
+		template<typename> struct result { using type = qi::error_handler_result; };
 		template<typename T1, typename T2>
 		qi::error_handler_result operator()(T1 b, T1 e, T1 where, T2 const& what) const {
 			static_assert(carl::is_instantiation_of<spirit::line_pos_iterator, T1>::value, "The iterators must be a line_pos_iterator.");

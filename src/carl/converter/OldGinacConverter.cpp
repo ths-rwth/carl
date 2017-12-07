@@ -6,7 +6,7 @@ namespace carl
 template<typename Poly>
 bool OldGinacConverter<Poly>::similar( const GiNaC::ex& a, const GiNaC::ex& b) {
     std::lock_guard<std::recursive_mutex> lock( mMutex );
-    if (b == 0) return a == 0;
+    if (b.is_zero()) return a.is_zero();
     GiNaC::ex x = a, y = b;
     while ((!GiNaC::is_exactly_a<GiNaC::numeric>(b)) && GiNaC::divide(x, b, x));
     while ((!GiNaC::is_exactly_a<GiNaC::numeric>(a)) && GiNaC::divide(y, a, y));

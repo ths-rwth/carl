@@ -114,6 +114,10 @@ namespace carl{
 			
 			Monomial::Arg create();
 			Monomial::Arg create( Variable _var, exponent _exp );
+			template<typename Number>
+			Monomial::Arg create( Variable _var, Number&& _exp ) {
+				return create(_var, carl::toInt<exponent>(std::forward<Number>(_exp)));
+			}
 			
 			Monomial::Arg create( std::vector<std::pair<Variable, exponent>>&& _exponents, exponent _totalDegree );
 			

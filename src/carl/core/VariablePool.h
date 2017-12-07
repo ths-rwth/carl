@@ -14,6 +14,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 
 
 namespace carl 
@@ -34,7 +35,7 @@ private:
 	 * Contains the id of the next variable to be created for each type.
 	 * As such, is also a counter of the variables that exist.
 	 */
-	std::array<std::size_t, std::size_t(VariableType::TYPE_SIZE)> mNextIDs;
+	std::array<std::size_t, static_cast<std::size_t>(VariableType::TYPE_SIZE)> mNextIDs;
 
 	/**
 	 * Mutex for calling getFreshVariable().
@@ -46,14 +47,19 @@ private:
 	 */
 	mutable std::mutex setNameMutex;
 
-	std::size_t& nextID(const VariableType& vt) noexcept {
-		assert(std::size_t(vt) < mNextIDs.size());
-		return mNextIDs[std::size_t(vt)];
+	std::size_t& nextID(VariableType vt) noexcept {
+		assert(static_cast<std::size_t>(vt) < mNextIDs.size());
+		return mNextIDs[static_cast<std::size_t>(vt)];
 	}
-	const std::size_t& nextID(const VariableType& vt) const noexcept {
-		assert(std::size_t(vt) < mNextIDs.size());
-		return mNextIDs[std::size_t(vt)];
+	std::size_t nextID(VariableType vt) const noexcept {
+		assert(static_cast<std::size_t>(vt) < mNextIDs.size());
+		return mNextIDs[static_cast<std::size_t>(vt)];
 	}
+	
+	/**
+	 * Contains persistent variables that are restored after clear was called.
+	 */
+	std::vector<std::pair<Variable,std::string>> mPersistentVariables;
 
 	/**
 	 * Stores human-readable names for variables that can be set via setVariableName().
@@ -98,6 +104,9 @@ protected:
 	Variable getFreshVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 public:
+	
+	Variable getFreshPersistentVariable(VariableType type = VariableType::VT_REAL) noexcept;
+	Variable getFreshPersistentVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 	/**
 	 * Clears everything already created in this pool.
@@ -106,6 +115,17 @@ public:
     {
         mVariableNames.clear();
 		mNextIDs.fill(1);
+		for (auto pv: mPersistentVariables) {
+			Variable v = pv.first;
+			while (nextID(v.type()) < v.id()) {
+				getFreshVariable(v.type());
+			}
+			if (pv.second != "") {
+				getFreshVariable(pv.second, v.type());
+			} else {
+				getFreshVariable(v.type());
+			}
+		}
     }
 
 
@@ -124,14 +144,14 @@ public:
 	 * @param variableName Flag, if a name set via setVariableName shall be considered.
 	 * @return Some name for the Variable.
 	 */
-	std::string getName(Variable::Arg v, bool variableName = true) const;
+	std::string getName(Variable v, bool variableName = true) const;
 	/**
 	 * Add a name for a given Variable.
 	 * This method is thread-safe.
 	 * @param v Variable.
 	 * @param name Some string naming the variable.
 	 */
-	void setName(Variable::Arg v, const std::string& name);
+	void setName(Variable v, const std::string& name);
 
 	/**
 	 * Sets the prefix used when printing anonymous variables.
@@ -159,15 +179,15 @@ public:
 		}
 	}
 
-	friend inline Variable freshVariable(const VariableType& vt) noexcept;
-	friend inline Variable freshVariable(const std::string& name, const VariableType& vt);
+	friend Variable freshVariable(VariableType vt) noexcept;
+	friend Variable freshVariable(const std::string& name, VariableType vt);
 
 };
 
-inline Variable freshVariable(const VariableType& vt) noexcept {
+inline Variable freshVariable(VariableType vt) noexcept {
 	return VariablePool::getInstance().getFreshVariable(vt);
 }
-inline Variable freshVariable(const std::string& name, const VariableType& vt) {
+inline Variable freshVariable(const std::string& name, VariableType vt) {
 	return VariablePool::getInstance().getFreshVariable(name, vt);
 }
 

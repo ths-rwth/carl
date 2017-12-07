@@ -132,37 +132,58 @@ namespace carl
             }
             
         private:
-            bool isBaseFormula(const Constraint<Pol>& c) const {
-                return c < c.negation();
-            }
+			bool isBaseFormula(const Constraint<Pol>& c) const {
+				return c < c.negation();
+			}
+			bool isBaseFormula(const VariableComparison<Pol>& vc) const {
+				return vc < vc.negation();
+			}
+			bool isBaseFormula(const VariableAssignment<Pol>& va) const {
+				return va < va.negation();
+			}
             bool isBaseFormula(const FormulaContent<Pol>* f) const {
-                assert(f->mType == FormulaType::CONSTRAINT);
+				if (f->mType == FormulaType::CONSTRAINT) {
 #ifdef __VS
-                const auto& a = *f->mpConstraintVS;
-                const auto& b = *f->mNegation->mpConstraintVS;
+					return *f->mpConstraintVS < *f->mNegation->mpConstraintVS;
 #else
-                const auto& a = f->mConstraint;
-                const auto& b = f->mNegation->mConstraint;
+					return f->mConstraint < f->mNegation->mConstraint;
 #endif
-                return a < b;
+				}
+				if (f->mType == FormulaType::VARCOMPARE) {
+#ifdef __VS
+					return *f->mpVariableComparisonVS < *f->mNegation->mpVariableComparisonVS;
+#else
+					return f->mVariableComparison < f->mNegation->mVariableComparison;
+#endif
+				}
+				if (f->mType == FormulaType::VARASSIGN) {
+#ifdef __VS
+					return *f->mpVariableAssignmentVS < *f->mNegation->mpVariableAssignmentVS;
+#else
+					return f->mVariableAssignment < f->mNegation->mVariableAssignment;
+#endif
+				}
+				return f->mType != FormulaType::NOT;
+				assert(false);
+				return true;
             }
 
             const FormulaContent<Pol>* getBaseFormula(const FormulaContent<Pol>* f) const {
                 assert(f != nullptr);
                 if (f->mType == FormulaType::NOT) {
-                    CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
+                    CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f->mNegation);
                     return f->mNegation;
                 }
-                if (f->mType == FormulaType::CONSTRAINT) {
+                if (f->mType == FormulaType::CONSTRAINT || f->mType == FormulaType::VARCOMPARE || f->mType == FormulaType::VARASSIGN) {
                     if (isBaseFormula(f)) {
-                        CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
+                        CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f);
                         return f;
                     } else {
-                        CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f->mNegation);
+                        CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f->mNegation);
                         return f->mNegation;
                     }
                 }
-                CARL_LOG_TRACE("carl.formula", "Base formula of " << *f << " is " << *f);
+                CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f);
                 return f;
             }
 
@@ -173,7 +194,19 @@ namespace carl
 #else
                     return new FormulaContent<Pol>(f->mConstraint.negation());
 #endif
-                } else {
+				} else if (f->mType == FormulaType::VARCOMPARE) {
+#ifdef __VS
+					return new FormulaContent<Pol>(f->mpVariableComparisonVS->negation());
+#else
+					return new FormulaContent<Pol>(f->mVariableComparison.negation());
+#endif
+				} else if (f->mType == FormulaType::VARASSIGN) {
+#ifdef __VS
+					return new FormulaContent<Pol>(f->mpVariableAssignmentVS->negation());
+#else
+					return new FormulaContent<Pol>(f->mVariableAssignment.negation());
+#endif
+				} else {
                     return new FormulaContent<Pol>(NOT, std::move(Formula<Pol>(f)));
                 }
             }
@@ -221,7 +254,11 @@ namespace carl
                 return create(std::move(Constraint<Pol>(_constraint)));
             }
 			const FormulaContent<Pol>* create(VariableComparison<Pol>&& _variableComparison) {
-                return add(new FormulaContent<Pol>(std::move(_variableComparison)));
+				if (isBaseFormula(_variableComparison)) {
+                    return add(new FormulaContent<Pol>(std::move(_variableComparison)));
+                } else {
+                    return add(new FormulaContent<Pol>(_variableComparison.negation()))->mNegation;
+                }
             }
             const FormulaContent<Pol>* create(const VariableComparison<Pol>& _variableComparison) {
 				auto val = _variableComparison.asConstraint();
@@ -229,7 +266,11 @@ namespace carl
                 return create(std::move(VariableComparison<Pol>(_variableComparison)));
             }
 			const FormulaContent<Pol>* create(VariableAssignment<Pol>&& _variableAssignment) {
-                return add(new FormulaContent<Pol>(std::move(_variableAssignment)));
+				if (isBaseFormula(_variableAssignment)) {
+                    return add(new FormulaContent<Pol>(std::move(_variableAssignment)));
+                } else {
+                    return add(new FormulaContent<Pol>(_variableAssignment.negation()))->mNegation;
+                }
             }
             const FormulaContent<Pol>* create(const VariableAssignment<Pol>& _variableAssignment) {
 				return create(std::move(VariableAssignment<Pol>(_variableAssignment)));
@@ -360,10 +401,10 @@ namespace carl
 			 */
 			const FormulaContent<Pol>* create(FormulaType _type, std::vector<Variable>&& _vars, const Formula<Pol>& _term) {
 				assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
-				if (_vars.size() > 0) {
-					return add( new FormulaContent<Pol>(_type, std::move(_vars), _term ) );
-				} else {
+				if (_vars.empty()) {
 					return _term.mpContent;
+				} else {
+					return add( new FormulaContent<Pol>(_type, std::move(_vars), _term ) );
 				}
 			}
             
@@ -460,12 +501,14 @@ namespace carl
             {
                 FORMULA_POOL_LOCK_GUARD
                 const FormulaContent<Pol>* tmp = getBaseFormula(_elem);
-                //const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
-                CARL_LOG_DEBUG("carl.formula", "Freeing " << static_cast<const void*>(tmp) << ", current usage: " << tmp->mUsages);
+				assert(tmp == getBaseFormula(tmp));
+				assert(isBaseFormula(tmp));
                 assert( tmp->mUsages > 0 );
                 --tmp->mUsages;
+				CARL_LOG_TRACE("carl.formula", "Usage of " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << " (coming from " << static_cast<const void*>(_elem) << "): " << tmp->mUsages);
                 if( tmp->mUsages == 1 )
                 {
+					CARL_LOG_DEBUG("carl.formula", "Actually freeing " << *tmp << " from pool");
                     bool stillStoredAsTseitinVariable = false;
                     if( freeTseitinVariable( tmp ) )
                         stillStoredAsTseitinVariable = true;
@@ -473,7 +516,9 @@ namespace carl
                         stillStoredAsTseitinVariable = true;
                     if( !stillStoredAsTseitinVariable )
                     {
-                        mPool.erase( tmp );
+						CARL_LOG_TRACE("carl.formula", "Deleting " << tmp << " / " << tmp->mNegation << " from pool");
+                        mPool.erase( tmp->mNegation );
+						mPool.erase( tmp );
                         delete tmp->mNegation;
                         delete tmp;
                     }
@@ -494,6 +539,7 @@ namespace carl
                         mTseitinVars.erase( tvIter );
                         assert( mTseitinVarToFormula.find( tmp ) != mTseitinVarToFormula.end() );
                         mTseitinVarToFormula.erase( tmp );
+						CARL_LOG_TRACE("carl.formula", "Deleting " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << " from pool");
                         mPool.erase( tmp );
                         delete tmp->mNegation;
                         delete tmp;
@@ -515,6 +561,7 @@ namespace carl
                             //const FormulaContent<Pol>* tmp = fcont->mType == FormulaType::NOT ? fcont->mNegation : fcont;
                             mTseitinVars.erase( tmpTVIter->second );
                             mTseitinVarToFormula.erase( tmpTVIter );
+							CARL_LOG_TRACE("carl.formula", "Deleting " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << " from pool");
                             mPool.erase( tmp );
                             delete tmp->mNegation;
                             delete tmp;
@@ -533,12 +580,12 @@ namespace carl
                 //const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
                 assert( tmp != nullptr );
                 assert( tmp->mUsages < std::numeric_limits<size_t>::max() );
-                CARL_LOG_DEBUG("carl.formula", "Registering " << static_cast<const void*>(tmp) << ", current usage: " << tmp->mUsages);
                 ++tmp->mUsages;
-                if (tmp->mUsages == 1 && _elem->mType == FormulaType::CONSTRAINT) {
-                    CARL_LOG_DEBUG("carl.formula", "Is a constraint, increasing again");
+                if (tmp->mUsages == 1 && (tmp->mType == FormulaType::CONSTRAINT || tmp->mType == FormulaType::VARCOMPARE || tmp->mType == FormulaType::VARASSIGN)) {
+                    CARL_LOG_TRACE("carl.formula", "Is a constraint, increasing again");
                     ++tmp->mUsages;
                 }
+				CARL_LOG_TRACE("carl.formula", "Increased usage of " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << "(based on " << static_cast<const void*>(_elem) << ")" << " to " << tmp->mUsages);
             }
             
         public:

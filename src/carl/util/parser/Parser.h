@@ -65,7 +65,7 @@ public:
 	}
 	
 	void addVariable(Variable::Arg v) {
-        if( v.getType() == VariableType::VT_BOOL )
+        if( v.type() == VariableType::VT_BOOL )
             formulaParser.addVariable(v);
         else {
             polynomialParser.addVariable(v);

@@ -34,7 +34,7 @@ namespace carl
         
         OldGinacConverter() : Singleton<OldGinacConverter<Poly>>() {}
             
-        ~OldGinacConverter() {}
+        ~OldGinacConverter() = default;
         
         void setPolynomialCache( const std::shared_ptr<typename Poly::CACHE>& _cache )
         {
@@ -112,12 +112,11 @@ namespace carl
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             std::set<Variable> carlVars;
             poly.gatherVariables(carlVars);
-            for(auto var = carlVars.begin(); var != carlVars.end(); ++var)
-            {
-                GiNaC::symbol vg(VariablePool::getInstance().getName(*var));
-                if( carlToGinacVarMap.insert(std::pair<Variable, GiNaC::ex>(*var, vg)).second )
+			for (auto var: carlVars) {
+                GiNaC::symbol vg(var.getName());
+                if( carlToGinacVarMap.emplace(var, vg).second )
                 {
-                    ginacToCarlVarMap.insert(std::pair<GiNaC::ex, Variable>(vg, *var));
+                    ginacToCarlVarMap.emplace(vg, var);
                 }
             }
         }

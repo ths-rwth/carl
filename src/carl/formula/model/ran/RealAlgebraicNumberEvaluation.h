@@ -43,9 +43,9 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
  * Note that variables of 'p' must be assigned in 'm' and that 'm' must not assign any additional variables.
  */
 template<typename Number>
-RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m);
+RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m);
 template<typename Number>
-RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, RANMap<Number>& m);
+RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m);
 
 /**
  * Compute a univariate polynomial with rational coefficients that has the roots of 'p' whose coefficient variables have been substituted by the roots given in m.
@@ -117,31 +117,32 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
 
 // This is called by smtrat::CAD implementation (from CAD.h)
 template<typename Number>
-RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
+RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m) {
 	CARL_LOG_TRACE("carl.ran", "Evaluating " << p << " on " << m);
 	MultivariatePolynomial<Number> pol(p);
-
-	for (auto it = m.begin(); it != m.end();) {
+	RANMap<Number> IRmap;
+	
+	for (const auto& r: m) {
 		//assert(pol.has(it->first));
-		if (it->second.isNumeric()) {
+		if (r.second.isNumeric()) {
 			// Plug in numeric representations
-			pol.substituteIn(it->first, MultivariatePolynomial<Number>(it->second.value()));
-			it = m.erase(it);
+			pol.substituteIn(r.first, MultivariatePolynomial<Number>(r.second.value()));
 		} else {
 			// Defer interval representations
-			it++;
+			IRmap.emplace(r.first, r.second);
 		}
 	}
 	if (pol.isNumber()) {
 		return RealAlgebraicNumber<Number>(pol.constantPart());
 	}
 
-        // need to evaluate polynomial on non-trivial RANs
-        assert(m.size() > 0);
-        if(m.begin()->second.isInterval())
-                return evaluateIR(pol, m);
-        else
-                return evaluateTE(pol, m);
+	// need to evaluate polynomial on non-trivial RANs
+	assert(IRmap.size() > 0);
+	if(IRmap.begin()->second.isInterval()) {
+		return evaluateIR(pol, IRmap);
+	} else {
+		return evaluateTE(pol, IRmap);
+	}
 }
 
 
@@ -154,7 +155,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
  * @return Evaluation result
  */
 template<typename Number>
-RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
+RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
 	assert(m.size() > 0);
 	auto poly = p.toUnivariatePolynomial(m.begin()->first);
@@ -192,6 +193,7 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 		}
 		interval = IntervalEvaluation::evaluate(poly, varToInterval);
 	}
+	CARL_LOG_DEBUG("carl.ran", "Result is " << RealAlgebraicNumber<Number>(res, interval));
 	return RealAlgebraicNumber<Number>(res, interval);
 }
 
@@ -207,10 +209,15 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	UnivariatePolynomial<Coeff> tmp = p;
 	for (const auto& i: m) {
 		if (i.second.isNumeric()) {
+			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
 			tmp.substituteIn(i.first, Coeff(i.second.value()));
 		} else if (i.second.isInterval()) {
+			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
+			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
 			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
+			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp.switchVariable(i.first));
 			tmp = tmp.switchVariable(i.first).resultant(p2);
+			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
 			varToInterval[i.first] = i.second.getInterval();
 		} else {
 			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");

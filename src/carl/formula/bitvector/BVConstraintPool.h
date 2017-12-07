@@ -18,9 +18,9 @@ namespace carl
 	{
 		friend Singleton<BVConstraintPool>;
 
-		typedef BVConstraint Constraint;
-		typedef Constraint* ConstraintPtr;
-		typedef const Constraint* ConstConstraintPtr;
+		using Constraint = BVConstraint;
+		using ConstraintPtr = Constraint*;
+		using ConstConstraintPtr = const Constraint*;
 
 		public:
 

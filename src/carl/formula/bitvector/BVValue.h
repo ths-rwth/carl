@@ -9,6 +9,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <limits>
+#include <memory>
 
 namespace carl
 {
@@ -34,7 +35,7 @@ namespace carl
 			mValue.resize(_width);
         }
 #ifdef USE_CLN_NUMBERS
-        explicit BVValue(std::size_t _width, const cln::cl_I _value) :
+        explicit BVValue(std::size_t _width, const cln::cl_I& _value) :
         	mValue(_width)
         {
             for(std::size_t i=0;i<_width;++i) {
@@ -42,7 +43,7 @@ namespace carl
             }
         }
 #endif
-        BVValue(std::size_t _width, const mpz_class _value) :
+        BVValue(std::size_t _width, const mpz_class& _value) :
         	mValue()
         {
             // Obtain an mpz_t copy of _value
@@ -68,14 +69,15 @@ namespace carl
             std::size_t valueBits = mpz_sizeinbase(value, 2);
             std::size_t blockCount = (valueBits + bitsPerBlock - 1) / bitsPerBlock;
 
-            // The actual conversion from mpz_t to dynamic_bitset blocks
-            auto bits = new Base::block_type[blockCount];
-            mpz_export(&bits[0], &blockCount, -1, sizeof(Base::block_type), -1, 0, value);
+			{
+				// The actual conversion from mpz_t to dynamic_bitset blocks
+				auto bits = std::make_unique<Base::block_type[]>(blockCount);
+				mpz_export(&bits[0], &blockCount, -1, sizeof(Base::block_type), -1, 0, value);
 
-            // Import the blocks into mValue, and resize it afterwards to the desired size
-            mValue.append(&bits[0], &bits[0] + blockCount);
-            mValue.resize(_width);
-            delete[] bits;
+				// Import the blocks into mValue, and resize it afterwards to the desired size
+				mValue.append(&bits[0], &bits[0] + blockCount);
+				mValue.resize(_width);
+			}
 
             // If the value was negative, finalize the construction of the two's complement
             // by inverting all bits

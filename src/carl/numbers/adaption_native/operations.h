@@ -40,7 +40,7 @@ inline bool isNegative(sint n) {
 }
 
 inline bool isNumber(double d) {
-	return (d == d) && !std::isinf(d);
+	return !std::isnan(d) && !std::isinf(d);
 }
 
 inline bool isInteger(double d) {
@@ -62,10 +62,6 @@ inline bool isPositive(double d) {
 
 inline std::size_t bitsize(unsigned /*unused*/) {
 	return sizeof(unsigned) * 8;
-}
-
-template<typename C>
-inline void reserve(std::size_t /*unused*/) {
 }
 
 /**
@@ -174,6 +170,9 @@ inline double pow(double in, uint exp) {
 
 inline double log(double in) {
 	return std::log(in);
+}
+inline double log10(double in) {
+	return std::log10(in);
 }
 
 /**

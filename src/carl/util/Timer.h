@@ -15,14 +15,16 @@ namespace carl
 /**
  * This classes provides an easy way to obtain the current number of milliseconds that the program has been running.
  */
-struct Timer {
+class Timer {
 	/// The clock type used jere.
 	using clock = std::chrono::high_resolution_clock;
 	/// The duration type used here.
 	using duration = std::chrono::duration<std::size_t,std::milli>;
 	/// Start of this timer.
 	clock::time_point mStart;
+public:
 	Timer() noexcept: mStart(clock::now()) {}
+
 	/**
 	 * Calculated the number of milliseconds since this object has been created.
 	 * @return Milliseconds passed.
@@ -38,16 +40,16 @@ struct Timer {
 	void reset() noexcept {
 		mStart = clock::now();
 	}
-	/**
-	 * Streaming operator for a Timer.
-	 * Prints the result of `t.passed()`.
-	 * @param os Output stream.
-	 * @param t Timer.
-	 * @return os.
-	 */
-	friend std::ostream& operator<<(std::ostream& os, const Timer& t) {
-		return os << t.passed();
-	}
 };
+/**
+ * Streaming operator for a Timer.
+ * Prints the result of `t.passed()`.
+ * @param os Output stream.
+ * @param t Timer.
+ * @return os.
+ */
+inline std::ostream& operator<<(std::ostream& os, const Timer& t) {
+	return os << t.passed();
+}
 
 }

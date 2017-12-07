@@ -60,9 +60,10 @@ namespace ran {
 				case -1: return Sign::NEGATIVE;
 				case 0: return Sign::ZERO;
 				case 1: return Sign::POSITIVE;
+				default:
+					CARL_LOG_ERROR("carl.ran", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
+					return Sign::ZERO;
 			}
-			CARL_LOG_ERROR("carl.ran", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
-			return Sign::ZERO;
 		}
 		
 		void refine() {

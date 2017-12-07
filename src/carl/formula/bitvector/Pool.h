@@ -20,8 +20,8 @@ namespace carl
 	{
 		// friend Singleton<Pool>;
 
-		typedef Element* ElementPtr;
-		typedef const Element* ConstElementPtr;
+		using ElementPtr = Element*;
+		using ConstElementPtr = const Element*;
 
 	private:
 

@@ -79,7 +79,7 @@ inline std::ostream& operator<<(std::ostream& os, const SplittingStrategy& s) {
 template<typename Number>
 class RootFinder {
 public:
-	virtual ~RootFinder() = default;
+	virtual ~RootFinder() noexcept = default;
 	/**
 	 * Retrieves the polynomial that is processed.
 	 * @return Polynomial.
@@ -105,7 +105,7 @@ public:
 	virtual void addRoot(const Interval<Number>& interval) = 0;
 };
 
-namespace splittingStrategies {
+namespace splitting_strategies {
 
 /**
  * Abstract base class for all splitting strategies.
@@ -119,7 +119,7 @@ struct AbstractStrategy: Singleton<Strategy> {
  * Implements a generic splitting strategy.
  */
 template<typename Number>
-struct GenericStrategy : public AbstractStrategy<GenericStrategy<Number>, Number> {
+struct GenericStrategy : AbstractStrategy<GenericStrategy<Number>, Number> {
 	/**
 	 * Given an interval \f$(a,b)\f$, it uses the center \f$p = (a+b)/2\f$ as pivot.
 	 * The resulting intervals are \f$(a,p),[p],(p,b)\f$.
@@ -133,7 +133,7 @@ struct GenericStrategy : public AbstractStrategy<GenericStrategy<Number>, Number
  * Implements a binary sample splitting strategy.
  */
 template<typename Number>
-struct BinarySampleStrategy : public AbstractStrategy<BinarySampleStrategy<Number>, Number> {
+struct BinarySampleStrategy : AbstractStrategy<BinarySampleStrategy<Number>, Number> {
 	/**
 	 * Given an interval \f$(a,b)\f$, it uses some sample point \f$p \in (a,b)\f$ as pivot.
 	 * We try to select an easy (i.e. integer or small fraction) point as sample point.
@@ -148,7 +148,7 @@ struct BinarySampleStrategy : public AbstractStrategy<BinarySampleStrategy<Numbe
  * Implements a binary splitting strategy using newton.
  */
 template<typename Number>
-struct BinaryNewtonStrategy : public AbstractStrategy<BinaryNewtonStrategy<Number>, Number> {
+struct BinaryNewtonStrategy : AbstractStrategy<BinaryNewtonStrategy<Number>, Number> {
 	/**
 	 * Given an interval \f$(a,b)\f$, it uses some point \f$p \in (a,b)\f$ as pivot.
 	 * The pivot is determined using Newtons method starting from the center of the interval.
@@ -163,7 +163,7 @@ struct BinaryNewtonStrategy : public AbstractStrategy<BinaryNewtonStrategy<Numbe
  * Implements a n-ary splitting strategy using a grid.
  */
 template<typename Number>
-struct GridStrategy : public AbstractStrategy<GridStrategy<Number>, Number> {
+struct GridStrategy : AbstractStrategy<GridStrategy<Number>, Number> {
 	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
 
@@ -171,7 +171,7 @@ struct GridStrategy : public AbstractStrategy<GridStrategy<Number>, Number> {
  * Implements a n-ary splitting strategy based on the eigenvalues of the companion matrix.
  */
 template<typename Number>
-struct EigenValueStrategy: public AbstractStrategy<EigenValueStrategy<Number>, Number> {
+struct EigenValueStrategy: AbstractStrategy<EigenValueStrategy<Number>, Number> {
 	/**
 	 * Given an interval \f$(a,b)\f$, it uses several pivot points \f$p_i \in (a,b)\f$ as pivots.
 	 * In theory, the eigenvalues of the companion matrix of a polynomial are equal to the (complex) roots of a univariate polynomial.
@@ -187,7 +187,7 @@ struct EigenValueStrategy: public AbstractStrategy<EigenValueStrategy<Number>, N
  * Implements a n-ary splitting strategy based on Aberths method.
  */
 template<typename Number>
-struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> {
+struct AberthStrategy : AbstractStrategy<AberthStrategy<Number>, Number> {
 	std::vector<double> teruiSasaki(const UnivariatePolynomial<Number>& p, uint rootCount);
 	double step(std::vector<double>& roots, const UnivariatePolynomial<Number>& p, const UnivariatePolynomial<Number>& pd);
 	Number step(std::vector<Number>& roots, const UnivariatePolynomial<Number>& p, const UnivariatePolynomial<Number>& pd);
@@ -205,7 +205,7 @@ struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> 
  * The root finder uses a bisection approach internally and implements multiple strategies how the bisection is performed.
  */
 template<typename Number, typename Comparator>
-class IncrementalRootFinder : public AbstractRootFinder<Number>, RootFinder<Number> {
+class IncrementalRootFinder: public AbstractRootFinder<Number>, public RootFinder<Number> {
 
 public:
 	/**
@@ -246,7 +246,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	virtual ~IncrementalRootFinder() = default;
+	virtual ~IncrementalRootFinder() noexcept = default;
 
 	const UnivariatePolynomial<Number>& getPolynomial() const noexcept {
 		return AbstractRootFinder<Number>::getPolynomial();

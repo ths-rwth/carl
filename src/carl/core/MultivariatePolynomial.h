@@ -18,6 +18,8 @@
 #include "VariableInformation.h"
 #include "../numbers/numbers.h"
 #include "../util/TermAdditionManager.h"
+#include "polynomialfunctions/SquareFreePart.h"
+#include "polynomialfunctions/CoprimePart.h"
 
 
 namespace carl
@@ -68,11 +70,9 @@ public:
 	template<typename C, typename T>
 	using EnableIfNotSame = typename std::enable_if<!std::is_same<C,T>::value,T>::type;
     
-protected:
-    
 	template <bool gatherCoeff>
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
-protected:
+private:
 	/// A vector of all terms.
 	mutable TermsType mTerms;
 	/// Flag that indicates if the terms are ordered.
@@ -81,8 +81,8 @@ public:
     ///
     static TermAdditionManager<MultivariatePolynomial,Ordering> mTermAdditionManager;
     
-	enum ConstructorOperation { ADD, SUB, MUL, DIV };
-    friend inline std::ostream& operator<<(std::ostream& os, ConstructorOperation op) {
+	enum class ConstructorOperation { ADD, SUB, MUL, DIV };
+    friend std::ostream& operator<<(std::ostream& os, ConstructorOperation op) {
         switch (op) {
             case ConstructorOperation::ADD: return os << "+";
             case ConstructorOperation::SUB: return os << "-";
@@ -95,8 +95,8 @@ public:
 	/// @name Constructors
 	/// @{
 	MultivariatePolynomial();
-	MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>&);
-	MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>&&);
+	MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>& p);
+	MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>&& p);
 	MultivariatePolynomial& operator=(const MultivariatePolynomial& p);
 	MultivariatePolynomial& operator=(MultivariatePolynomial&& p) noexcept;
 	explicit MultivariatePolynomial(int c): MultivariatePolynomial(sint(c)) {}
@@ -111,7 +111,7 @@ public:
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& p);
 	template<class OtherPolicies, DisableIf<std::is_same<Policies,OtherPolicies>> = dummy>
-	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicies>&);
+	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicies>& p);
 	explicit MultivariatePolynomial(TermsType&& terms, bool duplicates = true, bool ordered = false);
 	explicit MultivariatePolynomial(const TermsType& terms, bool duplicates = true, bool ordered = false);
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
@@ -120,7 +120,7 @@ public:
     explicit MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands);
 	/// @}
 	
-	~MultivariatePolynomial() override = default;
+	~MultivariatePolynomial() noexcept override = default;
 	
 	//Polynomial interface implementations.
 	/**
@@ -148,7 +148,7 @@ public:
 	/**
 	 * Ensure that the terms are ordered.
      */
-	inline void makeOrdered() const {
+	void makeOrdered() const {
 		if (isOrdered()) return;
 		std::sort(mTerms.begin(), mTerms.end(), (bool (&)(Term<Coeff> const&, Term<Coeff> const&))Ordering::less);
 		mOrdered = true;
@@ -574,6 +574,18 @@ public:
 	 * @return 
 	 */
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
+	
+	/**
+	* Calculates the squarefree part of the Polynomial. Only works with CoCoA.
+	* @return
+	*/
+	MultivariatePolynomial squareFreePart() const;
+	/**
+	* Calculates the part ofthe Polynomial, that is coprime to q. Only works with CoCoA.
+	* @param q
+	* @return
+	*/
+	MultivariatePolynomial coprimePart(const MultivariatePolynomial& q) const;
 
 	void square();
 
@@ -588,7 +600,7 @@ public:
 	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
 	UnivariatePolynomial<MultivariatePolynomial> toUnivariatePolynomial(Variable::Arg mainVar) const;
 	
-	const Term<Coeff>& operator[](unsigned) const;
+	const Term<Coeff>& operator[](unsigned index) const;
 
 	MultivariatePolynomial mod(const typename IntegralType<Coeff>::type& modulo) const;
 	

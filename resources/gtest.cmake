@@ -1,14 +1,13 @@
 ExternalProject_Add(
     GTest-EP
 	URL https://github.com/google/googletest/archive/release-${GTEST_VERSION}.zip
+	URL_MD5 ${GTEST_ZIPHASH}
 	DOWNLOAD_NO_PROGRESS 1
 	UPDATE_COMMAND ""
 	BUILD_COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest
 	COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest_main
 	INSTALL_COMMAND ""
 	BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${STATIC_EXT} ${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${STATIC_EXT}
-	LOG_CONFIGURE 1
-	LOG_BUILD 1
 )
 
 ExternalProject_Get_Property(GTest-EP source_dir)

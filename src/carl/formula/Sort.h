@@ -12,14 +12,12 @@
 #include <type_traits>
 #include <utility>
 
-namespace carl
-{
+namespace carl {
 
 /**
  * Implements a sort (for defining types of variables and functions).
  */
-class Sort
-{
+class Sort {
     public:
         /// The type if the unique id to identify a sort in the sort manager.
         using IDType = std::size_t;
@@ -30,25 +28,18 @@ class Sort
         // Members.
 
         /// A unique id to identify this sort in the sort manager.
-        IDType mId;
+        IDType mId = 0;
 
         /**
          * Constructs a sort.
          * @param _id The id of the sort to construct.
          */
-        explicit Sort( IDType _id ):
-            mId(_id)
-        {}
+        explicit Sort(IDType id): mId(id) {}
 
     public:
-        
-        /**
-         * Default constructor.
-         */
-        Sort():
-            mId( 0 )
-        {}
-
+		
+		Sort() noexcept = default;
+		
         /**
          * @return The aritiy of this sort.
          */
@@ -68,39 +59,40 @@ class Sort
          * @param _sort The sort to print.
          * @return The output stream after printing the given sort on it.
          */
-        friend std::ostream& operator<<( std::ostream& _os, const Sort& _sort );
-
-        /**
-         * @param _sort The sort to compare with.
-         * @return true, if this sort equals the given one.
-         */
-        bool operator==( const Sort& _sort ) const;
-
-        /**
-         * @param _sort The sort to compare with.
-         * @return true, if this sort is less than the given one.
-         */
-        bool operator<( const Sort& _sort ) const;
+        friend std::ostream& operator<<(std::ostream& _os, const Sort& _sort);
 };
+
+/**
+* @param _sort The sort to compare with.
+* @return true, if this sort equals the given one.
+*/
+inline bool operator==(const Sort& lhs, const Sort& rhs) {
+	return lhs.id() == rhs.id();
+}
+
+/**
+* @param _sort The sort to compare with.
+* @return true, if this sort is less than the given one.
+*/
+inline bool operator<(const Sort& lhs, const Sort& rhs) {
+	return lhs.id() < rhs.id();
+}
+
 static_assert(std::is_trivially_copyable<Sort>::value, "Sort should be trivially copyable.");
 
 } // end namespace carl
 
-namespace std
-{
+namespace std {
     /**
      * Implements std::hash for sort.
      */
     template<>
-    struct hash<carl::Sort>
-    {
-    public:
+    struct hash<carl::Sort> {
         /**
          * @param _sort The sort to get the hash for.
          * @return The hash of the given sort.
          */
-        std::size_t operator()( const carl::Sort& _sort ) const 
-        {
+        std::size_t operator()(const carl::Sort& _sort) const {
             return std::size_t(_sort.id());
         }
     };

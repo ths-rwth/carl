@@ -197,28 +197,6 @@ inline uint toInt<uint>(const mpq_class& n) {
 }
 
 template<typename T>
-inline T rationalize(double n);
-
-template<typename T>
-inline T rationalize(float n);
-
-template<typename T>
-inline T rationalize(int n);
-
-template<typename T>
-inline T rationalize(uint n);
-
-template<typename T>
-inline T rationalize(unsigned long long n);
-
-template<typename T>
-inline T rationalize(sint n);
-
-template<typename T>
-inline T rationalize(const std::string& n);
-
-
-template<typename T>
 inline T rationalize(const PreventConversion<mpq_class>&);
 
 template<>
@@ -388,6 +366,9 @@ inline mpq_class lcm(const mpq_class& a, const mpq_class& b) {
 inline mpq_class log(const mpq_class& n) {
 	return carl::rationalize<mpq_class>(std::log(mpq_class(n).get_d()));
 }
+inline mpq_class log10(const mpq_class& n) {
+	return carl::rationalize<mpq_class>(std::log10(mpq_class(n).get_d()));
+}
 
 inline mpq_class sin(const mpq_class& n) {
 	return carl::rationalize<mpq_class>(std::sin(mpq_class(n).get_d()));
@@ -434,6 +415,12 @@ bool sqrt_exact(const mpq_class& a, mpq_class& b);
 mpq_class sqrt(const mpq_class& a);
 
 std::pair<mpq_class,mpq_class> sqrt_safe(const mpq_class& a);
+
+/**
+ * Calculate the nth root of a fraction.
+ * The precise result is contained in the resulting interval.
+ */
+std::pair<mpq_class,mpq_class> root_safe(const mpq_class& a, uint n);
 
 /**
  * Compute square root in a fast but less precise way.

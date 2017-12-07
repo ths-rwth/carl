@@ -35,7 +35,7 @@ namespace rootfinder {
  */
 template<typename Number>
 class AbstractRootFinder {
-protected:
+private:
 	/**
 	 * Original polynomial to solve.
 	 * Stored for informational purposes.
@@ -80,7 +80,7 @@ public:
 		bool tryTrivialSolver = true
 	);
 	
-	virtual ~AbstractRootFinder() = default;
+	virtual ~AbstractRootFinder() noexcept = default;
 	
 	/**
 	 * Returns the polynomial that is currently processed.
@@ -95,8 +95,12 @@ public:
 	 * Returns the polynomial that was given to the RootFinder.
      * @return Polynomial given to the RootFinder.
      */
-	const UnivariatePolynomial<Number>& getOriginalPolynomial() const {
+	const UnivariatePolynomial<Number>& getOriginalPolynomial() const noexcept {
 		return mOriginalPolynomial;
+	}
+	
+	const auto& getInterval() const noexcept {
+		return mInterval;
 	}
 	
 	/**

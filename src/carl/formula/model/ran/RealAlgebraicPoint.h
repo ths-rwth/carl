@@ -12,56 +12,57 @@ namespace carl {
 
 /**
  * Represent a multidimensional point whose components are algebraic reals.
+ * This class is just a thin wrapper around vector to have a clearer semantic
+ * meaning.
  */
 template<typename Number>
 class RealAlgebraicPoint {
 private:
-  std::vector<RealAlgebraicNumber<Number>> numbers;
+	/**
+	 * Numbers of this RealAlgebraicPoint.
+	 */
+	std::vector<RealAlgebraicNumber<Number>> mNumbers;
 
-  // This class is just a thin wrapper around vector to have a clearer semantic
-  // meaning.
 public:
-  /**
-   * Create an empty Point of dimension 0.
-   */
-  RealAlgebraicPoint() noexcept:
-    numbers()
-  {}
+	/**
+	 * Create an empty point of dimension 0.
+	 */
+	RealAlgebraicPoint() noexcept = default;
 
   /**
    * Convert from a vector using its numbers in the same order as components.
    */
-  explicit RealAlgebraicPoint(const std::vector<RealAlgebraicNumber<Number>>& v):
-    numbers(v)
-  {}
+	explicit RealAlgebraicPoint(const std::vector<RealAlgebraicNumber<Number>>& v):
+		mNumbers(v)
+	{}
 
   /**
    * Convert from a vector using its numbers in the same order as components.
    */
-  explicit RealAlgebraicPoint(std::vector<RealAlgebraicNumber<Number>>&& v):
-    numbers(std::move(v))
-  {}
+	explicit RealAlgebraicPoint(std::vector<RealAlgebraicNumber<Number>>&& v):
+		mNumbers(std::move(v))
+	{}
 
   /**
    * Convert from a list using its numbers in the same order as components.
    */
-  explicit RealAlgebraicPoint(const std::list<RealAlgebraicNumber<Number>>& v):
-    numbers(v.begin(), v.end())
-  {}
+	explicit RealAlgebraicPoint(const std::list<RealAlgebraicNumber<Number>>& v):
+		mNumbers(v.begin(), v.end())
+	{}
 
   /**
    * Convert from a initializer_list using its numbers in the same order as components.
    */
-  RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumber<Number>>& v):
-    numbers(v.begin(), v.end())
-  {}
+	RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumber<Number>>& v):
+		mNumbers(v.begin(), v.end())
+	{}
 
   /**
    * Give the dimension/number of components of this point.
    */
-  std::size_t dim() const {
-    return this->numbers.size();
-  }
+	std::size_t dim() const {
+		return mNumbers.size();
+	}
 
   /**
    * Get a lower dimensional copy that contains only the first k components.
@@ -69,7 +70,7 @@ public:
   RealAlgebraicPoint prefix(size_t k) const {
     assert(k <= numbers.size());
     std::vector<RealAlgebraicNumber<Number>> copy(k);
-    std::copy_n(numbers.begin(),k,copy.begin());
+    std::copy_n(mNumbers.begin(),k,copy.begin());
     return RealAlgebraicPoint(copy);
   }
 
@@ -78,56 +79,54 @@ public:
    * point, thereby increasing its dimension by 1. The original point remains
    * untouched.
    */
-  RealAlgebraicPoint conjoin(const RealAlgebraicNumber<Number>& r) {
-    RealAlgebraicPoint res = RealAlgebraicPoint(*this);
-    res.numbers.push_back(r);
-    return res;
-  }
-
+	RealAlgebraicPoint conjoin(const RealAlgebraicNumber<Number>& r) {
+		RealAlgebraicPoint res = RealAlgebraicPoint(*this);
+		res.mNumbers.push_back(r);
+		return res;
+	}
+	
   /**
    * Retrieve the component of this point at the given index.
    */
-  const RealAlgebraicNumber<Number>& operator[](std::size_t index) const {
-    assert(index < this->numbers.size());
-    return this->numbers[index];
-  }
-
+	const RealAlgebraicNumber<Number>& operator[](std::size_t index) const {
+		assert(index < mNumbers.size());
+		return mNumbers[index];
+	}
+	
   /**
    * Retrieve the component of this point at the given index.
    */
-  RealAlgebraicNumber<Number>& operator[](std::size_t index) {
-    assert(index < this->numbers.size());
-    return this->numbers[index];
-  }
-
-  template<typename Num>
-  friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Num>& r);
-
-  /**
-   * Check if two RealAlgebraicPoints are equal.
-   */
-  bool operator==(RealAlgebraicPoint<Number>& r) {
-    if (this->dim() != r.dim()) return false;
-    std::not_equal_to<Number> neq;
-    for (std::size_t i = 0; i < this->numbers.size(); i++) {
-      if (neq(this->numbers[i], r.numbers[i])) return false;
-    }
-    return true;
-  }
+	RealAlgebraicNumber<Number>& operator[](std::size_t index) {
+		assert(index < mNumbers.size());
+		return mNumbers[index];
+	}
 };
+
+/**
+ * Check if two RealAlgebraicPoints are equal.
+ */
+template<typename Number>
+bool operator==(RealAlgebraicPoint<Number>& lhs, RealAlgebraicPoint<Number>& rhs) {
+	if (lhs.dim() != rhs.dim()) return false;
+	std::not_equal_to<Number> neq;
+	for (std::size_t i = 0; i < lhs.dim(); ++i) {
+		if (neq(lhs[i], rhs[i])) return false;
+	}
+	return true;
+}
 
 /**
  * Streaming operator for a RealAlgebraicPoint.
  */
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Number>& r) {
-  os << "(";
-  for (std::size_t i = 0; i < r.dim(); i++) {
-    if (i > 0) os << ", ";
-    os << r.numbers[i];
-  }
-  os << ")";
-  return os;
+	os << "(";
+	for (std::size_t i = 0; i < r.dim(); ++i) {
+		if (i > 0) os << ", ";
+		os << r[i];
+	}
+	os << ")";
+	return os;
 }
 
 }

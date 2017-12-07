@@ -10,10 +10,9 @@ ExternalProject_Add(
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES
 	CONFIGURE_COMMAND ./configure --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC
-	BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} cocoalib
+	BUILD_COMMAND make lib
 	INSTALL_COMMAND ""
-	LOG_CONFIGURE 1
-	LOG_BUILD 1
+	BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/resources/src/CoCoALib-EP/lib/libcocoa${STATIC_EXT}
 )
 
 ExternalProject_Get_Property(CoCoALib-EP SOURCE_DIR)

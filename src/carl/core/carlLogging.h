@@ -120,11 +120,9 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
 /**
  * Base class for a logging sink. It only provides an interface to access some std::ostream.
  */
-struct Sink {
-	/**
-	 * Default destructor.
-	 */
-	virtual ~Sink() = default;
+class Sink {
+public:
+	virtual ~Sink() noexcept = default;
 	/**
 	 * Abstract logging interface.
 	 * The intended usage is to write any log output to the output stream returned by this function.
@@ -136,46 +134,52 @@ struct Sink {
  * Logging sink that wraps an arbitrary `std::ostream`.
  * It is meant to be used for streams like `std::cout` or `std::cerr`.
  */
-struct StreamSink: public Sink {
+class StreamSink final: public Sink {
 	/// Output stream.
 	std::ostream os;
+public:
 	/**
 	 * Create a StreamSink from some output stream.
 	 * @param _os Output stream.
 	 */
 	explicit StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
-	~StreamSink() override = default;
 	std::ostream& log() noexcept override { return os; }
 };
 /**
  * Logging sink for file output.
  */
-struct FileSink: public Sink {
+class FileSink: public Sink {
 	/// File output stream.
 	std::ofstream os;
+public:
 	/**
 	 * Create a FileSink that logs to the specified file.
 	 * The file is truncated upon construction.
 	 * @param filename
 	 */
 	explicit FileSink(const std::string& filename): os(filename, std::ios::out) {}
-	~FileSink() override = default;
 	std::ostream& log() noexcept override { return os; }
 };
 
 /**
  * This class checks if some log message shall be forwarded to some sink.
  */
-struct Filter {
+class Filter {
 	/// Mapping from channels to (minimal) log levels.
 	std::map<std::string, LogLevel> mData;
-	
+public:
 	/**
 	 * Constructor.
 	 * @param level Default minimal log level.
 	 */
 	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT): mData() {
 		(*this)("", level);
+	}
+	/**
+	 * Returns the internal filter data.
+	 */
+	const auto& data() const {
+		return mData;
 	}
 	/**
 	 * Set the minimum log level for some channel.
@@ -233,19 +237,20 @@ struct RecordInfo {
 /**
  * Formats a log messages.
  */
-struct Formatter {
+class Formatter {
 	/// Width of the longest channel.
 	std::size_t channelwidth = 10;
+public:
 	/// Print information like log level, file etc.
 	bool printInformation = true;
-	
-	virtual ~Formatter() = default;
+
+	virtual ~Formatter() noexcept = default;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
 	 * @param f Filter.
 	 */
 	virtual void configure(const Filter& f) noexcept {
-		for (const auto& t: f.mData) {
+		for (const auto& t: f.data()) {
 			if (t.first.size() > channelwidth) channelwidth = t.first.size();
 		}
 	}

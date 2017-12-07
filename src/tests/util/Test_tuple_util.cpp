@@ -18,3 +18,14 @@ TEST(TupleUtil, tail)
 	std::tuple<int,int> tail {2,3};
 	EXPECT_EQ(tail, carl::tuple_tail(t));
 }
+
+TEST(TupleUtil, foreach) {
+	struct Visitor {
+		int operator()(int i) const { return i+1; }
+		int operator()(bool i) const { return 0; }
+	};
+	EXPECT_EQ(
+		std::make_tuple(2,3,0),
+		carl::tuple_foreach(Visitor(), std::make_tuple(1,2,false))
+	);
+}

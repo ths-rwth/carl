@@ -19,7 +19,7 @@ namespace carl
         return this->mpInvalid;
     }
 
-    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVValue _value)
+    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVValue& _value)
     {
         return this->add(new Term(_type, _value));
     }
@@ -29,7 +29,7 @@ namespace carl
         return this->add(new Term(_type, _variable));
     }
 
-    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVTerm& _operand, const size_t _index)
+    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVTerm& _operand, std::size_t _index)
     {
         if (_operand.isConstant()) {
             switch (_type) {
@@ -144,7 +144,7 @@ namespace carl
         return this->add(new Term(_type, _first, _second));
     }
 
-    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVTerm& _operand, const size_t _highest, const size_t _lowest)
+    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVTerm& _operand, std::size_t _highest, std::size_t _lowest)
     {
         if(_operand.isConstant()) {
             if(_type == BVTermType::EXTRACT) {

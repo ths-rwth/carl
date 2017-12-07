@@ -10,25 +10,12 @@
 
 #include "SortManager.h"
 
-namespace carl
-{
-    size_t Sort::arity() const
-    {
-        return SortManager::getInstance().getArity( *this );
-    }
-    
-    bool Sort::operator==( const Sort& _sort ) const
-    {
-        return mId == _sort.id();
-    }
+namespace carl {
+	std::size_t Sort::arity() const {
+		return SortManager::getInstance().getArity(*this);
+	}
 
-    bool Sort::operator<( const Sort& _sort ) const
-    {
-        return mId < _sort.id();
-    }
-    
-    std::ostream& operator<<( std::ostream& _os, const Sort& _sort )
-    {
-        return SortManager::getInstance().print(_os, _sort);
-    }
+	std::ostream& operator<<(std::ostream& _os, const Sort& _sort) {
+		return SortManager::getInstance().print(_os, _sort);
+	}
 }

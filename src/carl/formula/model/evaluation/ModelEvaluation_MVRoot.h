@@ -46,16 +46,24 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void evaluate(ModelValue<Rational,Poly>& res, MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
+		CARL_LOG_DEBUG("carl.model.evaluation", "Substituting " << m << " into " << mvr);
 		substituteIn(mvr, m);
 		
 		auto map = collectRANIR(mvr.gatherVariables(), m);
 		if (map.size() == mvr.gatherVariables().size()) {
+			CARL_LOG_DEBUG("carl.model.evaluation", "Fully evaluating " << mvr << " over " << map);
 			auto r = mvr.evaluate(map);
 			if (r) {
+				CARL_LOG_DEBUG("carl.model.evaluation", "Got result " << *r);
 				res = *r;
+				return;
+			} else {
+				CARL_LOG_DEBUG("carl.model.evaluation", "MVRoot does not exist.");
+				res = false;
 				return;
 			}
 		}
+		CARL_LOG_DEBUG("carl.model.evaluation", "Could not evaluate, returning " << mvr);
 		res = createSubstitution<Rational,Poly,ModelMVRootSubstitution<Rational,Poly>>(mvr);
 	}
 }

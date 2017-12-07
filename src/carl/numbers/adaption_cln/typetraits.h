@@ -12,8 +12,8 @@
 static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
-#include "include.h"
 #include "../typetraits.h"
+#include "include.h"
 
 namespace carl {
 

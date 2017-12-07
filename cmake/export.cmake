@@ -1,6 +1,7 @@
+option(EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
 
 # Add all targets to the build-tree export set
-export(EXPORT carl_Targets FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
+export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
 
 
 # Export the package for use from the build-tree
@@ -16,11 +17,12 @@ if(USE_CLN_NUMBERS)
 	export_target(DEP_TARGETS CLN_STATIC GMP_STATIC)
 endif()
 if(USE_GINAC)
-	export_target(DEP_TARGETS GINAC_SHARED)
+	export_target(DEP_TARGETS GINAC_SHARED CLN_SHARED)
 	export_target(DEP_TARGETS GINAC_STATIC CLN_STATIC)
 endif()
 if(USE_COCOA)
-	export_target(DEP_TARGETS COCOA_STATIC)
+	export_target(DEP_TARGETS COCOA_SHARED GMPXX_SHARED GMP_SHARED pthread)
+	export_target(DEP_TARGETS COCOA_STATIC GMPXX_STATIC GMP_STATIC pthread)
 endif()
 export_target(DEP_TARGETS GMP_SHARED)
 export_target(DEP_TARGETS GMP_STATIC)

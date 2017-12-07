@@ -1,0 +1,27 @@
+sonar.projectKey=${PROJECT_FULLNAME}
+sonar.projectName=${${PROJECT_FULLNAME}_NAME}
+sonar.projectVersion=${PROJECT_VERSION}
+
+# =====================================================
+#   Meta-data for the project
+# =====================================================
+
+sonar.links.homepage=https://github.com/smtrat/carl
+sonar.links.ci=https://travis-ci.org/smtract/carl
+sonar.links.scm=https://github.com/smtrat/carl
+sonar.links.issue=https://github.com/smtrat/carl/issues
+
+
+# =====================================================
+#   Properties that will be shared amongst all modules
+# =====================================================
+
+# SQ standard properties
+sonar.language=cpp
+sonar.sources=src/
+sonar.cpp.file.suffixes=.h,.tpp,.cpp
+
+# Properties specific to the C/C++ analyzer:
+sonar.cfamily.build-wrapper-output=bw-output
+sonar.cfamily.gcov.reportsPath=.
+sonar.cfamily.llvm-cov.reportPath=build/coverage.txt

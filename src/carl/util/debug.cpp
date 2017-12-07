@@ -2,12 +2,13 @@
 
 #include "../core/logging.h"
 
+#include <memory>
 #include <sstream>
 
 #if !defined __VS
-#include <execinfo.h>
-#include <dlfcn.h>
 #include <cxxabi.h>
+#include <dlfcn.h>
+#include <execinfo.h>
 #endif
 
 namespace carl {
@@ -50,7 +51,7 @@ namespace carl {
 		int cnt = backtrace(frames, sizeof(frames) / sizeof(void*));
 		if (cnt == 0) return "<unknown, maybe corrupt>";
 		char** symbols = backtrace_symbols(frames, cnt);
-	
+
 		std::stringstream out;
 		Dl_info info = {};
 		if (dladdr(frames[2], &info) != 0 && info.dli_sname != nullptr) {
@@ -87,7 +88,7 @@ __declspec(noreturn) static void handle_signal(int signal) {
 /**
  * Installs the signal handler.
  */
-static bool install_signal_handler() {
+static bool install_signal_handler() noexcept {
 	CARL_LOG_INFO("carl.util", "Installing signal handler for SIGABRT");
 	std::signal(SIGABRT, handle_signal);
 	return true;

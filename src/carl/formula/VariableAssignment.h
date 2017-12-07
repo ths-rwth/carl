@@ -47,13 +47,27 @@ namespace carl {
 			ss << "(" << var() << (negated() ? " -!> " : " -> ") << value() << ")";
 			return ss.str();
 		}
-		
-		bool operator==(const VariableAssignment& va) const {
-			return mComparison == va.mComparison;
-		}
 	};
+	
+	template<typename Poly>
+	bool operator==(const VariableAssignment<Poly>& lhs, const VariableAssignment<Poly>& rhs) {
+		return static_cast<VariableComparison<Poly>>(lhs) == static_cast<VariableComparison<Poly>>(rhs);
+	}
+	template<typename Poly>
+	bool operator<(const VariableAssignment<Poly>& lhs, const VariableAssignment<Poly>& rhs) {
+		return static_cast<VariableComparison<Poly>>(lhs) < static_cast<VariableComparison<Poly>>(rhs);
+	}
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableAssignment<Poly>& va) {
 		return os << va.toString();
 	}
+}
+
+namespace std {
+	template<typename Pol>
+	struct hash<carl::VariableAssignment<Pol>> {
+		std::size_t operator()(const carl::VariableAssignment<Pol>& va) const {
+			return std::hash<carl::VariableComparison<Pol>>()(va);
+		}
+	};
 }

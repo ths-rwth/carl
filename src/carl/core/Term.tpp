@@ -137,7 +137,7 @@ Term<Coefficient> Term<Coefficient>::derivative(Variable v) const
 	if(!mMonomial)
 	{
 		// Derivatives of constants are zero.
-		return std::move(Term<Coefficient>(carl::constant_zero<Coefficient>().get()));
+		return Term<Coefficient>(carl::constant_zero<Coefficient>().get());
 	}
 	auto derivative = mMonomial->derivative(v);
 	return Term<Coefficient>(Coefficient(mCoeff) * derivative.first, derivative.second);
@@ -333,75 +333,6 @@ template<typename Coeff>
 bool operator<(const Coeff& lhs, const Term<Coeff>& rhs) {
 	if (rhs.monomial() == nullptr) return lhs < rhs.coeff();
 	return true;
-}
-
-template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::operator-() const
-{
-	return std::move(Term<Coefficient>(-mCoeff,mMonomial));
-}
-
-template<typename Coefficient>
-Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
-{
-	if(carl::isZero(rhs)) 
-	{
-		clear();
-		return *this;
-	}
-	assert(carl::isZero(mCoeff) || !carl::isZero(Coefficient(mCoeff * rhs))); //change this to mCoeff.isZero() and mCoeff * Number(rhs) at some point
-	mCoeff *= CoefficientType(rhs);
-	return *this;
-}
-template<typename Coefficient>
-Term<Coefficient>& Term<Coefficient>::operator*=(Variable rhs)
-{
-	if(carl::isZero(mCoeff)) //change this to mCoeff.isZero() at some point
-	{
-		return *this;
-	}
-	if(mMonomial)
-	{
-		mMonomial = mMonomial * rhs;
-	}
-	else
-	{
-		mMonomial = createMonomial(rhs, uint(1));
-	}
-	return *this;
-}
-
-template<typename Coefficient>
-Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial::Arg& rhs)
-{
-	if(carl::isZero(mCoeff)) return *this;  //change this to mCoeff.isZero() at some point
-	
-	if(mMonomial)
-	{
-		mMonomial = mMonomial * rhs;
-		
-	}
-	else
-	{
-		mMonomial = rhs;
-	}
-	return *this;   
-}
-
-
-template<typename Coefficient>
-Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
-{
-	if(carl::isZero(mCoeff)) return *this;
-	if(carl::isZero(rhs.mCoeff))		//change this to mCoeff.isZero() at some point 
-	{
-		clear();
-		return *this;
-	}
-	
-	mMonomial = mMonomial * rhs.mMonomial;
-	mCoeff *= rhs.mCoeff;
-	return *this;   
 }
 
 template<typename Coeff>

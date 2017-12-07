@@ -81,10 +81,6 @@ namespace carl
     }
 
     template<typename Pol>
-    ConstraintContent<Pol>::~ConstraintContent()
-    {}
-
-    template<typename Pol>
     unsigned ConstraintContent<Pol>::isConsistent() const
     {
         if( mLhs.isConstant() )
@@ -140,7 +136,7 @@ namespace carl
     template<typename Pol>
     ConstraintContent<Pol>* ConstraintContent<Pol>::simplify() const
     {
-        typedef typename Pol::PolyType PolyT;
+        using PolyT = typename Pol::PolyType;
         Relation rel = mRelation;
         if( (mLhsDefinitess == Definiteness::POSITIVE_SEMI && rel == Relation::LEQ) || (mLhsDefinitess == Definiteness::NEGATIVE_SEMI && rel == Relation::GEQ) )
             rel = Relation::EQ;
@@ -266,16 +262,6 @@ namespace carl
         #else
         mFactorization.emplace( mLhs, 1 );
         #endif
-    }
-
-    template<typename Pol>
-    bool ConstraintContent<Pol>::operator==( const ConstraintContent& _constraint ) const
-    {
-        if( mID == 0 || _constraint.mID == 0 )
-        {
-            return mRelation == _constraint.mRelation && mLhs == _constraint.mLhs;
-        }
-        return mID == _constraint.mID;
     }
 
     template<typename Pol>

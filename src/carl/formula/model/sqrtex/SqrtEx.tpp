@@ -238,7 +238,7 @@ namespace carl
         if( _infix )
         {
             bool complexNum = hasSqrt() && !mConstantPart.isConstant();
-            string result = "";
+            std::string result;
             if( complexNum && !mDenominator.isOne() )
                 result += "(";
             if( hasSqrt() )
@@ -275,7 +275,7 @@ namespace carl
         }
         else
         {
-            string result = "(/ (+ ";
+            std::string result = "(/ (+ ";
             result += mConstantPart.toString( false, _friendlyNames );
             result +=  " (* ";
             result +=  mFactor.toString( false, _friendlyNames );
