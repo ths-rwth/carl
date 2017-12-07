@@ -6,6 +6,8 @@
 #include "../util/Common.h"
 
 #include <map>
+#include <algorithm>
+#include <iterator>
 
 #ifdef USE_COCOA
 
@@ -147,24 +149,32 @@ public:
    * the exponents.
 	 */
 	Factors<Poly> factorize(const Poly& p, bool includeConstantFlag = true) const {
-    const vector<Poly> v{p}; // Reuse factorize on vector to avoid duplicate code
-    return factorize(v, includeConstantFlag);
-	}
-
-  /**
-   * Overload for vector of polys.
-   * @see #factorize for single poly.
-   */
-	Factors<Poly> factorize(const vector<Poly>& polys, bool includeConstantsFlag = true) const {
-		Factors<Poly> res;
-    for(const Poly& p : polys) {
+      Factors<Poly> res;
       auto finfo = CoCoA::factor(convert(p));
-      if (includeConstantsFlag && !CoCoA::IsOne(finfo.myRemainingFactor())) {
+      if (includeConstantFlag && !CoCoA::IsOne(finfo.myRemainingFactor())) {
         res.emplace(convert(finfo.myRemainingFactor()), 1);
       }
       for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
         res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
       }
+      return res;
+	}
+
+	/**
+	 * Break down polynomials into their irreducible factors without
+   * exponents and without a constant-poly factor.
+   * E.g. "3*x^3 + 12 x^2 + 15 x + 6" factorizes into "3 * (x+1)^2 * (x+2)^1"
+   * where "(x+1)", "(x+2)" are the irreducible factors. The
+   * exponents "2" and "1", and the constant factor "3" are left out.
+   */
+  std::vector<Poly> irreducibleFactors(const vector<Poly>& polys) const {
+    std:vector<Poly> res;
+    for(const Poly& p : polys) {
+      auto finfo = CoCoA::factor(convert(p));
+      std::move(
+          finfo.myFactors().begin(),
+          finfo.myFactors.end(),
+          std::back_inserter(res));
     }
 		return res;
 	}
