@@ -42,7 +42,7 @@ private:
 public:
 	MultivariateRoot(const Poly& p, std::size_t k): mPoly(p), mK(k)
 	{
-		assert(mRootIndex > 0);
+		//assert(mRootIndex > 0);
 	}
 
 	std::size_t k() const noexcept {
