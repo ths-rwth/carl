@@ -13,6 +13,9 @@ class UnivariatePolynomial;
 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>& p) {
+	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
+	if (p.isConstant() || p.isLinear()) return p;
+
 	using TypeSelector = carl::function_selector::NaryTypeSelector;
 
 	using types = carl::function_selector::wrap_types<
