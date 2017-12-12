@@ -17,6 +17,47 @@ namespace carl {
 		using BaseType = boost::dynamic_bitset<>;
 		static auto constexpr npos = BaseType::npos;
 		static auto constexpr bits_per_block = BaseType::bits_per_block;
+		
+		struct iterator {
+		private:
+			const Bitset& mBitset;
+			std::size_t mBit;
+			
+			bool compatible(const iterator& rhs) const {
+				return &mBitset == &rhs.mBitset;
+			}
+		public:
+			iterator(const Bitset& b, std::size_t bit): mBitset(b), mBit(bit) {};
+			
+			operator std::size_t() const {
+				return mBit;
+			}
+			std::size_t operator*() const {
+				return mBit;
+			}
+			iterator& operator++() {
+				mBit = mBitset.find_next(mBit);
+				return *this;
+			}
+			iterator operator++(int) {
+				iterator res(*this);
+				++(*this);
+				return res;
+			}
+			bool operator==(const iterator& rhs) const {
+				assert(compatible(rhs));
+				return mBit == rhs.mBit;
+			}
+			bool operator!=(const iterator& rhs) const {
+				assert(compatible(rhs));
+				return !(*this == rhs);
+			}
+			bool operator<(const iterator& rhs) const {
+				assert(compatible(rhs));
+				return mBit < rhs.mBit;
+			}
+		};
+		
 	private:
 		mutable BaseType mData;
 		bool mDefault;
@@ -101,11 +142,17 @@ namespace carl {
 			alignSize(*this, rhs);
 			return mData.is_subset_of(rhs.mData);
 		}
-		auto find_first() const {
+		std::size_t find_first() const {
 			return mData.find_first();
 		}
-		auto find_next(std::size_t pos) const {
+		std::size_t find_next(std::size_t pos) const {
 			return mData.find_next(pos);
+		}
+		iterator begin() const {
+			return iterator(*this, find_first());
+		}
+		iterator end() const {
+			return iterator(*this, npos);
 		}
 		
 		friend void alignSize(const Bitset& lhs, const Bitset& rhs) {
