@@ -6,6 +6,7 @@
 #include <carl/core/MultivariatePolynomial.h>
 
 #include <random>
+#include <map>
 
 #ifdef USE_COCOA
 
@@ -61,6 +62,45 @@ TEST(CoCoA, Factorize) {
 	}
 	{
 		auto res = c.factorize(p2);
+		auto it1 = res.find(q1);
+		EXPECT_FALSE(it1 == res.end());
+		EXPECT_EQ(it1->second, 1);
+		auto it2 = res.find(q3);
+		EXPECT_FALSE(it2 == res.end());
+		EXPECT_EQ(it2->second, 1);
+	}
+}
+
+TEST(CoCoA, IrreducibleFactors) {
+	using Poly = carl::MultivariatePolynomial<mpq_class>;
+	carl::Variable x = carl::freshRealVariable("x");
+
+	Poly p1 = (x * x) - mpq_class(1);
+	Poly p2 = (x + mpq_class(1)) * (x - mpq_class(2));
+	Poly q1 = x + mpq_class(1);
+	Poly q2 = x - mpq_class(1);
+	Poly q3 = x - mpq_class(2);
+
+	carl::CoCoAAdaptor<Poly> c({p1, p2});
+	{
+		auto factors = c.irreducibleFactors(p1);
+    std::map<Poly,int> res;
+    for (Poly& p : factors)
+      res[p] = 1;
+    EXPECT_EQ(factors.size(), 2);
+		auto it1 = res.find(q1);
+		EXPECT_FALSE(it1 == res.end());
+		EXPECT_EQ(it1->second, 1);
+		auto it2 = res.find(q2);
+		EXPECT_FALSE(it2 == res.end());
+		EXPECT_EQ(it2->second, 1);
+	}
+	{
+		auto factors = c.irreducibleFactors(p2);
+    std::map<Poly,int> res;
+    for (Poly& p : factors)
+      res[p] = 1;
+    EXPECT_EQ(factors.size(), 2);
 		auto it1 = res.find(q1);
 		EXPECT_FALSE(it1 == res.end());
 		EXPECT_EQ(it1->second, 1);

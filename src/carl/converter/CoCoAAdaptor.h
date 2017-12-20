@@ -8,6 +8,7 @@
 #include <map>
 #include <algorithm>
 #include <iterator>
+#include <stdlib.h>
 
 #ifdef USE_COCOA
 
@@ -151,7 +152,7 @@ public:
 
 	/**
 	 * Break down a polynomial into its irreducible factors together with
-   * their exponents.
+   * their exponents/multiplicities.
    * E.g. "x^3 + 4 x^2 + 5 x + 2" factorizes into "(x+1)^2 * (x+2)^1"
    * where "(x+1)", "(x+2)" are the irreducible factors and "2" and "1" are
    * their exponents.
@@ -176,23 +177,21 @@ public:
   }
 
 	/**
-	 * Break down polynomials into their irreducible factors without
-   * exponents and without a constant-poly factor.
-   * E.g. "3*x^3 + 12 x^2 + 15 x + 6" factorizes into "3 * (x+1)^2 * (x+2)^1"
-   * where "(x+1)", "(x+2)" are the irreducible factors. The
-   * exponents "2" and "1", and the constant factor "3" are left out.
+   * Break down a polynomial into its unique, non-constant,irreducible factors
+   * without their exponents/multiplicities.
+   * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
+   * factors "(x+1)", "(x+2)", and a constant factor "3" that is omited.
    */
-  std::vector<Poly> irreducibleFactors(const vector<Poly>& polys) const {
-    std:vector<Poly> res;
-    for(const Poly& p : polys) {
-      auto finfo = CoCoA::factor(convert(p));
-      std::move(
-          finfo.myFactors().begin(),
-          finfo.myFactors.end(),
-          std::back_inserter(res));
-    }
-		return res;
-	}
+  std::vector<Poly> irreducibleFactors(const Poly& p) const {
+    std::vector<Poly> res;
+    // warning: don't use 'const auto& cocoaFactors' or range based loops
+		// cocoa crashes with references
+		const auto cocoaFactors = CoCoA::factor(convert(p)).myFactors();
+		for (std::size_t i = 0; i < cocoaFactors.size(); ++i) {
+			res.emplace_back(convert(cocoaFactors[i]));
+		}
+    return res;
+  }
 
 	Poly squareFreePart(const Poly& p) const {
 		auto finfo = CoCoA::SqFreeFactor(convert(p));
