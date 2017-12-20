@@ -5,6 +5,9 @@
 
 namespace carl {
 
+/**
+ * Implements a generator for Chebyshev polynomials.
+ */
 template<typename Number>
 struct Chebyshev {
 	Variable mVar;

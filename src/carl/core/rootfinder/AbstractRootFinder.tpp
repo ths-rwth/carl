@@ -6,6 +6,7 @@
 
 #include "AbstractRootFinder.h"
 #include "../logging.h"
+#include "../polynomialfunctions/RootBounds.h"
 
 #pragma once
 
@@ -42,7 +43,7 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 	}
 	if ((mInterval.lowerBoundType() == BoundType::INFTY) || (mInterval.upperBoundType() == BoundType::INFTY)) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "Generating artificial bound.");
-		Number bound = mPolynomial.cauchyBound();
+		Number bound = cauchyBound(mPolynomial);
 
 		if (mInterval.lowerBoundType() == BoundType::INFTY) {
 			mInterval.setLowerBoundType(BoundType::STRICT);

@@ -808,6 +808,7 @@ public:
 	 * This is 
 	 * @return 
 	 */
+	[[deprecated("use carl::cauchyBound() or an alternative from RootBounds.h instead")]]
 	Coefficient cauchyBound() const;
 	Coefficient modifiedCauchyBound() const;
 
