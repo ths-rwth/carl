@@ -2,7 +2,7 @@
 
 #include <carl/core/rootfinder/RootFinder.h>
 #include <carl/core/UnivariatePolynomial.h>
-#include <carl/core/util/Chebyshev.h>
+#include <carl/core/polynomialfunctions/Chebyshev.h>
 
 #include "../Common.h"
 
