@@ -33,7 +33,7 @@ TYPED_TEST(RootBoundTest, Lagrange) {
 	carl::Variable x = carl::freshRealVariable("x");
 	carl::UnivariatePolynomial<TypeParam> p(x, {12, 4, 9, 5, 0, 3});
 	TypeParam bound = carl::lagrangeBound(p);
-	EXPECT_EQ(bound, TypeParam(6));
+	EXPECT_TRUE(bound <= TypeParam(6));
 }
 
 TYPED_TEST(RootBoundTest, Chebyshev) {
@@ -43,5 +43,5 @@ TYPED_TEST(RootBoundTest, Chebyshev) {
 	
 	EXPECT_EQ(TypeParam("9371571/4096"), carl::cauchyBound(p));
 	EXPECT_EQ(TypeParam("6882064642385021251/562949953421312"), carl::hirstMaceyBound(p));
-	EXPECT_EQ(TypeParam("10"), carl::lagrangeBound(p));
+	EXPECT_TRUE(TypeParam("10") >= carl::lagrangeBound(p));
 }
