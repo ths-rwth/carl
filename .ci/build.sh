@@ -48,7 +48,7 @@ elif [[ ${TASK} == "doxygen" ]]; then
 	git add . || return 1
 	
 	# Commit and push
-	git commit -m "Updated documentation for carl" || return 1
+	git commit -q -m "Updated documentation for carl" || return 1
 	git push -f origin master || return 1
 
 elif [[ ${TASK} == "pycarl" ]]; then
