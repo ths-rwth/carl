@@ -50,6 +50,11 @@ namespace ran {
 			return interval.isPointInterval() && carl::isInteger(interval.lower());
 		}
 		
+		void setPolynomial(const Polynomial& p) {
+			polynomial = replaceVariable(p);
+			sturmSequence = polynomial.standardSturmSequence();
+		}
+		
 		Sign sgn(const Polynomial& p) const {
 			Polynomial tmp = replaceVariable(p);
 			if (polynomial == tmp) return Sign::ZERO;

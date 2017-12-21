@@ -322,13 +322,11 @@ public:
 		auto g = gmv.toUnivariatePolynomial();
 		if (isRootOf(g)) {
 			CARL_LOG_DEBUG("carl.ran", "Is a root of " << g);
-			mIR->polynomial = g;
-			mIR->sturmSequence = g.standardSturmSequence();
+			mIR->setPolynomial(g);
 		} else {
 			CARL_LOG_DEBUG("carl.ran", "Is not a root of " << g);
 			CARL_LOG_DEBUG("carl.ran", "Dividing " << mIR->polynomial << " by " << g);
-			mIR->polynomial = mIR->polynomial.divideBy(g.replaceVariable(IntervalContent::auxVariable)).quotient;
-			mIR->sturmSequence = mIR->polynomial.standardSturmSequence();
+			mIR->setPolynomial(mIR->polynomial.divideBy(g.replaceVariable(IntervalContent::auxVariable)).quotient);
 		}
 	}
 	
