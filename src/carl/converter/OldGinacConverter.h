@@ -113,7 +113,7 @@ namespace carl
             std::set<Variable> carlVars;
             poly.gatherVariables(carlVars);
 			for (auto var: carlVars) {
-                GiNaC::symbol vg(var.getName());
+                GiNaC::symbol vg(var.name());
                 if( carlToGinacVarMap.emplace(var, vg).second )
                 {
                     ginacToCarlVarMap.emplace(vg, var);
