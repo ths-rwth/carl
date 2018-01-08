@@ -30,7 +30,7 @@ class SortValue
         /// The sort defining the domain in which this value is.
         carl::Sort mSort;
         /// A unique id to identify this sort in the sort value manager.
-        std::size_t mId;
+        std::size_t mId = 0;
         
         /**
          * Constructs a sort value.
@@ -43,19 +43,7 @@ class SortValue
 
     public:
 
-        SortValue() noexcept:
-            mSort(),
-            mId(0)
-        {}
-        
-        /**
-         * Constructs a sort value by copying the given sort value.
-         * @param _sortValue The sort value to copy.
-         */
-        SortValue(const SortValue& _sortValue) noexcept:
-            mSort(_sortValue.sort()),
-            mId(_sortValue.id())
-        {}
+        SortValue() noexcept = default;
 
         /**
          * @return The sort of this value.
