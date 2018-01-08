@@ -28,8 +28,7 @@ class UFModel : private std::map<std::vector<SortValue>,SortValue>
 		UninterpretedFunction uf;
     public:
         
-        explicit UFModel(const UninterpretedFunction& uf):
-            std::map<std::vector<SortValue>, SortValue>(), uf(uf)
+        explicit UFModel(const UninterpretedFunction& uf): uf(uf)
         {}
 
         bool extend( const std::vector<SortValue>& _args, const SortValue& _value );

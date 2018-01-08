@@ -89,19 +89,15 @@ namespace carl
             // Member.
 
             /// A flag indicating whether this equality shall hold (if being false) or its negation (if being true), hence the inequality, shall hold.
-            bool mNegated;
+            bool mNegated = false;
             /// The left-hand side of this uninterpreted equality.
-            Arg mLhs;
+            Arg mLhs = UVariable(Variable::NO_VARIABLE, Sort());
             /// The right-hand side of this uninterpreted equality.
-            Arg mRhs;
+            Arg mRhs = UVariable(Variable::NO_VARIABLE, Sort());
 
         public:
             
-            UEquality():
-                mNegated( false ),
-                mLhs( UVariable(Variable::NO_VARIABLE, Sort()) ),
-                mRhs( UVariable(Variable::NO_VARIABLE, Sort()) )
-            {}
+            UEquality() = default;
             
 	    /**
              * Constructs an uninterpreted equality.

@@ -29,7 +29,7 @@ namespace carl
 		private:
 		
 			/// A unique id.
-			IDType mId;
+			IDType mId = 0;
 			
 			/**
 			 * Constructs an uninterpreted function.
@@ -44,17 +44,7 @@ namespace carl
 			/**
 			 * Default constructor.
 			 */
-			UninterpretedFunction():
-				mId( 0 )
-			{}
-			
-			/**
-			 * Constructs a uninterpreted function by copying the given uninterpreted function instance.
-			 * @param _uf The uninterpreted function to copy.
-			 */
-			UninterpretedFunction( const UninterpretedFunction& _uf ):
-				mId( _uf.id() )
-			{}
+			UninterpretedFunction() noexcept = default;
 			
 			/**
 			 * @return The unique id of this uninterpreted function instance.

@@ -42,10 +42,6 @@ class UFContent
         /// The uninterpreted function's codomain.
         Sort mCodomain;
 
-        UFContent() = delete;
-        UFContent(const UFContent&) = delete;
-		UFContent(UFContent&&) = delete;
-
         /**
          * Constructs the content of an uninterpreted function.
          * @param _name The name of the uninterpreted function to construct.
@@ -58,6 +54,9 @@ class UFContent
             mCodomain(_codomain)
         {}
     public:
+        UFContent() = delete;
+        UFContent(const UFContent&) = delete;
+        UFContent(UFContent&&) = delete;
         
         /**
          * @return The name of the uninterpreted function.
@@ -171,10 +170,7 @@ class UFManager : public Singleton<UFManager>
         /**
          * Constructs an uninterpreted functions manager.
          */
-        UFManager():
-            mUFIdMap(),
-            mUFs()
-        {
+        UFManager() {
             mUFs.emplace_back( nullptr ); // default value
         }
         ~UFManager() override {
