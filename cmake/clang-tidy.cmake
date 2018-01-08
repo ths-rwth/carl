@@ -12,9 +12,6 @@ else()
 	set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 	set(CLANG_TIDY_CHECKS "*")
 	
-	# Avoid https://bugs.llvm.org/show_bug.cgi?id=32966
-	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-readability-redundant-member-init")
-	
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-llvm-header-guard")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-llvm-include-order")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-llvm-namespace-comment")
