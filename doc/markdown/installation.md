@@ -41,6 +41,9 @@ We have tested carl successfully on the following platforms:
 - Ubuntu 14.04 LTS with several compilers on [Travis CI](https://travis-ci.org/smtrat/carl)
 - OS X 10.11 with several compilers on [Travis CI](https://travis-ci.org/smtrat/carl)
 
+We usually support at least all `clang` and `gcc` versions starting from those shipped with the latest Ubuntu LTS or Debian stable releases.
+As of now, this is `clang-3.8` and newer and `gcc-5` and newer.
+
 Advanced building topics
 --------------------------------------------
 - @subpage build_cmake

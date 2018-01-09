@@ -20,7 +20,3 @@ To simplify the installation process, all these libraries can be built by CArL a
 @code
 make resources
 @endcode
-
-CArL tries to make use of recent C++ language features. Therefore, the following compiler versions are required:
-- `g++` >= 5
-- `clang` >= 3.6
