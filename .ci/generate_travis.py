@@ -54,8 +54,6 @@ properties = {
 	"xcode8.3": {"os": "osx", "osx_image": "xcode8.3", "env": []},
 	"linux": {"os": "linux"},
 	
-	"clang-3.6": {"env": ["CC=clang-3.6 CXX=clang++-3.6"], "compiler": "clang++-3.6", "addons": addons(apt = (["llvm-toolchain-precise-3.6"], ["clang-3.6"]))},
-	"clang-3.7": {"env": ["CC=clang-3.7 CXX=clang++-3.7"], "compiler": "clang++-3.7", "addons": addons(apt = (["llvm-toolchain-precise-3.7"], ["clang-3.7"]))},
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addons(apt = (["llvm-toolchain-precise-3.8"], ["clang-3.8"]))},
 	"clang-3.9": {"env": ["CC=clang-3.9 CXX=clang++-3.9"], "compiler": "clang++-3.9", "addons": addons(apt = (["llvm-toolchain-trusty-3.9"], ["clang-3.9"]))},
 	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0", "addons": addons(apt = (["llvm-toolchain-trusty-4.0"], ["clang-4.0"]))},
@@ -94,8 +92,6 @@ def job(priority, properties):
 	}
 
 jobs = [
-	job("0-clang", ["build", "linux", "clang-3.6", "build.sh"]),
-	job("0-clang", ["build", "linux", "clang-3.7", "build.sh"]),
 	job("0-clang", ["build", "linux", "clang-3.8", "build.sh"]),
 	job("0-clang", ["build", "linux", "clang-3.9", "build.sh"]),
 	job("0-clang", ["build", "linux", "clang-4.0", "build.sh"]),

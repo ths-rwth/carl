@@ -68,24 +68,6 @@ matrix:
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
     - stage: build
       os: linux
-      compiler: clang++-3.6
-      env: CC=clang-3.6 CXX=clang++-3.6
-      script: source .ci/build.sh
-      addons:
-        apt:
-          sources: [*sources_base, llvm-toolchain-precise-3.6]
-          packages: [*packages_base, clang-3.6]
-    - stage: build
-      os: linux
-      compiler: clang++-3.7
-      env: CC=clang-3.7 CXX=clang++-3.7
-      script: source .ci/build.sh
-      addons:
-        apt:
-          sources: [*sources_base, llvm-toolchain-precise-3.7]
-          packages: [*packages_base, clang-3.7]
-    - stage: build
-      os: linux
       compiler: clang++-3.8
       env: CC=clang-3.8 CXX=clang++-3.8
       script: source .ci/build.sh
