@@ -30,7 +30,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		CARL_LOG_TRACE("carl.core.rootfinder", "p is 0 -> everything is a root");
 		return boost::none;
 	}
-	if (p.isConstant()) {
+	if (p.isNumber()) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "p is constant but not zero -> no root");
 		return std::vector<RealAlgebraicNumber<Number>>({});
 	}
@@ -40,6 +40,10 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 	
 	for (Variable v: tmp.gatherVariables()) {
 		if (v == p.mainVar()) continue;
+		if (m.count(v) == 0) {
+			CARL_LOG_TRACE("carl.core.rootfinder", "p still contains unassigned variable " << v);
+			return boost::none;
+		}
 		assert(m.count(v) > 0);
 		if (m.at(v).isNumeric()) {
 			tmp.substituteIn(v, Coeff(m.at(v).value()));
@@ -52,6 +56,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		return boost::none;
 	}
 	if (IRmap.empty()) {
+		assert(tmp.isUnivariate());
 		return realRoots(tmp, interval, pivoting);
 	} else {
 		CARL_LOG_TRACE("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
