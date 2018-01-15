@@ -12,6 +12,7 @@
 #include "../converter/OldGinacConverter.h"
 #endif
 #include "ConstraintPool.h"
+#include "../core/polynomialfunctions/Factorization.h"
 
 using namespace std;
 
@@ -247,21 +248,7 @@ namespace carl
     template<typename Pol>
     void ConstraintContent<Pol>::initFactorization() const 
     {
-        #ifdef CONSTRAINT_WITH_FACTORIZATION
-        #ifdef USE_GINAC
-        if( !mLhs.isLinear() && mLhs.nrTerms() <= MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION && mVariables.size() <= MAX_DIMENSION_FOR_FACTORIZATION
-            && maxDegree() <= MAX_DEGREE_FOR_FACTORIZATION && maxDegree() >= MIN_DEGREE_FOR_FACTORIZATION )
-        {
-            mFactorization = carl::factor( mLhs );
-        } else {
-			mFactorization.emplace( mLhs, 1 );
-		}
-        #else
-        mFactorization.emplace( mLhs, 1 );
-        #endif
-        #else
-        mFactorization.emplace( mLhs, 1 );
-        #endif
+		mFactorization = carl::factorization(mLhs);
     }
 
     template<typename Pol>

@@ -8,8 +8,6 @@ namespace carl {
 
 template<typename C, typename O, typename P>
 class MultivariatePolynomial;
-template<typename C>
-class UnivariatePolynomial;
 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> coprimePart(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q) {
