@@ -182,7 +182,7 @@ public:
    * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
    * factors "(x+1)", "(x+2)", and a constant factor "3" that is omited.
    */
-  std::vector<Poly> irreducibleFactors(const Poly& p) const {
+  std::vector<Poly> irreducibleFactorsOf(const Poly& p) const {
     std::vector<Poly> res;
     // warning: don't use 'const auto& cocoaFactors' or range based loops
 		// cocoa crashes with references
