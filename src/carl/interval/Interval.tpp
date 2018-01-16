@@ -964,11 +964,11 @@ Interval<Number> Interval<Number>::sqrt() const
         {
             if( mUpperBoundType == BoundType::INFTY )
             {
-                return Interval<Number>(BoostInterval(carl::constant_zero<Number>().get()), mLowerBoundType, mUpperBoundType);
+                return Interval<Number>(BoostInterval(carl::constant_zero<Number>().get()), BoundType::WEAK, mUpperBoundType);
             }
             else
             {
-                return Interval<Number>(boost::numeric::sqrt(BoostInterval(carl::constant_zero<Number>().get(),mContent.upper())), mLowerBoundType, mUpperBoundType);
+                return Interval<Number>(boost::numeric::sqrt(BoostInterval(carl::constant_zero<Number>().get(),mContent.upper())), BoundType::WEAK, mUpperBoundType);
             }
         }
 		return Interval<Number>(boost::numeric::sqrt(mContent), mLowerBoundType, mUpperBoundType);
@@ -994,11 +994,11 @@ Interval<Number> Interval<Number>::root(int deg) const
             {
                 if( mUpperBoundType == BoundType::INFTY )
                 {
-                    return Interval<Number>(BoostInterval(carl::constant_zero<Number>().get()), mLowerBoundType, mUpperBoundType);
+                    return Interval<Number>(BoostInterval(carl::constant_zero<Number>().get()), BoundType::WEAK, mUpperBoundType);
                 }
                 else
                 {
-                    return Interval<Number>(boost::numeric::nth_root(BoostInterval(carl::constant_zero<Number>().get(),mContent.upper()), deg), mLowerBoundType, mUpperBoundType);
+                    return Interval<Number>(boost::numeric::nth_root(BoostInterval(carl::constant_zero<Number>().get(),mContent.upper()), deg), BoundType::WEAK, mUpperBoundType);
                 }
             }
         }
