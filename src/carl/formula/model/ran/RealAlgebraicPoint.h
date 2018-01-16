@@ -65,12 +65,14 @@ public:
 	}
 
   /**
-   * Get a lower dimensional copy that contains only the first k components.
+   * Make a (lower dimensional) copy that contains only the first
+   * 'componentCount'-many components.
    */
-  RealAlgebraicPoint prefix(size_t k) const {
-    assert(k <= mNumbers.size());
-    std::vector<RealAlgebraicNumber<Number>> copy(k);
-    std::copy_n(mNumbers.begin(),k,copy.begin());
+  RealAlgebraicPoint subpoint(size_t componentCount) const {
+    assert(componentCount <= mNumbers.size());
+    std::vector<RealAlgebraicNumber<Number>> copy;
+    copy.reserve(componentCount);
+    std::copy_n(mNumbers.begin(), componentCount, copy.begin());
     return RealAlgebraicPoint(copy);
   }
 
