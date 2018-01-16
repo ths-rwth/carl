@@ -83,7 +83,7 @@ TEST(CoCoA, IrreducibleFactors) {
 
 	carl::CoCoAAdaptor<Poly> c({p1, p2});
 	{
-		auto factors = c.irreducibleFactors(p1);
+		auto factors = c.irreducibleFactorsOf(p1);
     std::map<Poly,int> res;
     for (Poly& p : factors)
       res[p] = 1;
@@ -96,7 +96,7 @@ TEST(CoCoA, IrreducibleFactors) {
 		EXPECT_EQ(it2->second, 1);
 	}
 	{
-		auto factors = c.irreducibleFactors(p2);
+		auto factors = c.irreducibleFactorsOf(p2);
     std::map<Poly,int> res;
     for (Poly& p : factors)
       res[p] = 1;
