@@ -12,13 +12,19 @@ template<typename C, typename O, typename P>
 class MultivariatePolynomial;
 
 namespace helper {
-	
+	/**
+	 * Returns a factors datastructure containing only the full polynomial as single factor.
+	 */
 	template<typename C, typename O, typename P>
 	Factors<MultivariatePolynomial<C,O,P>> trivialFactorization(const MultivariatePolynomial<C,O,P>& p) {
 		return { std::make_pair(p, 1) };
 	}
 }
 
+/**
+ * Try to factorize a multivariate polynomial..
+ * Uses CoCoALib and GiNaC, if available, depending on the coefficient type of the polynomial.
+ */
 template<typename C, typename O, typename P>
 Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomial<C,O,P>& p, bool includeConstants = true) {
 	if (p.totalDegree() <= 1) {
@@ -38,8 +44,8 @@ Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomia
 		[includeConstants](const auto& p){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p}); return c.factorize(p, includeConstants); },
 		[includeConstants](const auto& p){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p}); return c.factorize(p, includeConstants); }
 	#else
-		[includeConstants](const auto& p){ return trivialFactorization(p); },
-		[includeConstants](const auto& p){ return trivialFactorization(p); }
+		[includeConstants](const auto& p){ return helper::trivialFactorization(p); },
+		[includeConstants](const auto& p){ return helper::trivialFactorization(p); }
 	#endif
 	#if defined USE_GINAC
 		,
