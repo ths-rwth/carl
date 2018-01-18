@@ -177,21 +177,19 @@ public:
   }
 
 	/**
-   * Break down a polynomial into its unique, non-constant,irreducible factors
-   * without their exponents/multiplicities.
-   * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
-   * factors "(x+1)", "(x+2)", and a constant factor "3" that is omited.
-   */
-  std::vector<Poly> irreducibleFactorsOf(const Poly& p) const {
-    std::vector<Poly> res;
-    // warning: don't use 'const auto& cocoaFactors' or range based loops
-		// cocoa crashes with references
-		const auto cocoaFactors = CoCoA::factor(convert(p)).myFactors();
-		for (std::size_t i = 0; i < cocoaFactors.size(); ++i) {
-			res.emplace_back(convert(cocoaFactors[i]));
+	 * Break down a polynomial into its unique, non-constant,irreducible factors
+	 * without their exponents/multiplicities.
+	 * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
+	 * factors "(x+1)", "(x+2)", and a constant factor "3" that is omited.
+	 */
+	std::vector<Poly> irreducibleFactorsOf(const Poly& p) const {
+		std::vector<Poly> res;
+		auto cocoaFactors = CoCoA::factor(convert(p)).myFactors();
+		for (const auto& f: cocoaFactors) {
+			res.emplace_back(convert(f));
 		}
-    return res;
-  }
+		return res;
+	}
 
 	Poly squareFreePart(const Poly& p) const {
 		auto finfo = CoCoA::SqFreeFactor(convert(p));
