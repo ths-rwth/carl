@@ -87,7 +87,7 @@ include(install)
 
 if (CLANG_TIDY)
 	add_custom_target(tidy
-		COMMAND clang-tidy -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${carl_lib_sources}
+		COMMAND ${CLANG_TIDY} -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${carl_lib_sources}
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/carl/
 	)
 	file(GLOB dirs LIST_DIRECTORIES true RELATIVE "${CMAKE_SOURCE_DIR}/src/carl/" "*")
@@ -95,7 +95,7 @@ if (CLANG_TIDY)
 		if(IS_DIRECTORY "${CMAKE_SOURCE_DIR}/src/carl/${dir}")
 			file(GLOB_RECURSE sources_${dir} "${CMAKE_SOURCE_DIR}/src/carl/${dir}/*.cpp")
 			add_custom_target(tidy-${dir}
-				COMMAND clang-tidy -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${sources_${dir}}
+				COMMAND ${CLANG_TIDY} -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${sources_${dir}}
 				WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/carl/
 			)
 		endif()
