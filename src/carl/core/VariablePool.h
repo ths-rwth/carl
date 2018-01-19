@@ -120,7 +120,7 @@ public:
 			while (nextID(v.type()) < v.id()) {
 				getFreshVariable(v.type());
 			}
-			if (pv.second != "") {
+			if (!pv.second.empty()) {
 				getFreshVariable(pv.second, v.type());
 			} else {
 				getFreshVariable(v.type());

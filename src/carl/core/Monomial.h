@@ -115,8 +115,7 @@ namespace carl
 		 * @param exponents The variables and their exponents.
 		 */
 		Monomial(const std::initializer_list<std::pair<Variable, uint>>& exponents) :
-			mExponents(exponents),
-			mTotalDegree(0)
+			mExponents(exponents)
 		{
 			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, uint>& p1, const std::pair<Variable, uint>& p2){ return p1.first < p2.first; });
 			for (const auto& e: mExponents) mTotalDegree += e.second;
@@ -129,11 +128,9 @@ namespace carl
 		 * @param exponents The variables and their exponents.
 		 */
 		explicit Monomial(Content&& exponents) :
-			mExponents(std::move(exponents)),
-			mTotalDegree(0)
+			mExponents(std::move(exponents))
 		{
-			for(auto const& ve : mExponents)
-			{
+			for(auto const& ve : mExponents) {
 				mTotalDegree += ve.second;
 			}
 			calcHash();
@@ -142,11 +139,9 @@ namespace carl
 
 		explicit Monomial(std::size_t hash, Content exponents) :
 			mExponents(std::move(exponents)),
-			mTotalDegree(0),
 			mHash(hash)
 		{
-			for(auto const& ve : mExponents)
-			{
+			for(auto const& ve : mExponents) {
 				mTotalDegree += ve.second;
 			}
 			assert(isConsistent());

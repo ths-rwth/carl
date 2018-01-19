@@ -18,13 +18,13 @@ namespace carl {
 
 class IDGenerator {
 private:
-	std::size_t mNext;
+	std::size_t mNext = 1;
 	std::priority_queue<std::size_t> mFree;
 #ifdef THREAD_SAFE
 	mutable std::mutex mMutex;
 #endif
 public:
-	IDGenerator(): mNext(1), mFree() {}
+	IDGenerator() = default;
 	std::size_t get() {
 #ifdef THREAD_SAFE
 		std::lock_guard<std::mutex> lock(mMutex);
@@ -73,10 +73,10 @@ public:
 
 class IDGenerator {
 private:
-	std::size_t mNext;
+	std::size_t mNext = 1;
 	std::stack<std::size_t> mFree;
 public:
-	IDGenerator(): mNext(1) {}
+	IDGenerator() = default;
 	std::size_t get() {
 		std::size_t res = mNext;
 		if (mFree.empty()) ++mNext;
