@@ -122,7 +122,6 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
  */
 class Sink {
 public:
-	virtual ~Sink() noexcept = default;
 	/**
 	 * Abstract logging interface.
 	 * The intended usage is to write any log output to the output stream returned by this function.
@@ -172,7 +171,7 @@ public:
 	 * Constructor.
 	 * @param level Default minimal log level.
 	 */
-	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT): mData() {
+	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT) {
 		(*this)("", level);
 	}
 	/**
@@ -244,7 +243,6 @@ public:
 	/// Print information like log level, file etc.
 	bool printInformation = true;
 
-	virtual ~Formatter() noexcept = default;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
 	 * @param f Filter.
@@ -277,6 +275,7 @@ public:
 		os << channel << std::string(spacing, ' ') << filename << ":" << std::left << std::setw(4) << info.line << " ";
 		if (!info.func.empty()) os << info.func << "(): ";
 	}
+
 	/**
 	 * Prints the suffix of a log message, i.e. everything that goes after the message given by the user, to the output stream.
 	 * Usually, this is only a newline.
