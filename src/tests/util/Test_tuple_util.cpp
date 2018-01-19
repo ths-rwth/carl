@@ -22,7 +22,7 @@ TEST(TupleUtil, tail)
 TEST(TupleUtil, foreach) {
 	struct Visitor {
 		int operator()(int i) const { return i+1; }
-		int operator()(bool i) const { return 0; }
+		int operator()(bool i) const { return i ? 1 : 0; }
 	};
 	EXPECT_EQ(
 		std::make_tuple(2,3,0),
