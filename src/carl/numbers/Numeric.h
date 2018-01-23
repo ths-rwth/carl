@@ -26,7 +26,7 @@ namespace carl
     {   
     private:
         // Members:
-        ContentType mContent;
+        ContentType mContent = 0;
 
     public:
         

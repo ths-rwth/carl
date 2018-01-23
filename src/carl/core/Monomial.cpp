@@ -104,7 +104,7 @@ namespace carl
 				uint newExp = itleft->second - itright->second;
 				if(newExp > 0)
 				{
-					newExps.push_back(std::make_pair(itleft->first, newExp));
+					newExps.emplace_back(itleft->first, newExp);
 				}
 				itright++;
 			}
@@ -117,7 +117,7 @@ namespace carl
 			else
 			{
 				assert(itleft->first < itright->first);
-				newExps.push_back(*itleft);
+				newExps.emplace_back(*itleft);
 			}
 		}
 		// If there remain variables in the m, it fails.
@@ -167,7 +167,7 @@ namespace carl
 		uint expsum = 0;
 		for (auto& it: mExponents)
 		{
-			newExps.push_back( std::make_pair( it.first, uint(it.second * exp) ) );
+			newExps.emplace_back(it.first, uint(it.second * exp));
 			expsum += newExps.back().second;
 		}
 		return createMonomial(std::move(newExps), expsum);
@@ -250,7 +250,7 @@ namespace carl
                 if(itleft->first == itright->first)
                 {
                     uint newExp = std::min(itleft->second, itright->second);
-                    newExps.push_back(std::make_pair(itleft->first, newExp));
+                    newExps.emplace_back(itleft->first, newExp);
                     expsum += newExp;
                     ++itright;
                     ++itleft;
@@ -304,7 +304,7 @@ namespace carl
 			if(itleft->first == itright->first)
 			{
 				uint newExp = std::max(itleft->second, itright->second);
-				newExps.push_back(std::make_pair(itleft->first, newExp));
+				newExps.emplace_back(itleft->first, newExp);
 				expsum -= std::min(itleft->second, itright->second);
 				++itright;
 				++itleft;

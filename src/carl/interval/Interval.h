@@ -163,8 +163,8 @@ namespace carl
          **********************************************************************/
 
         BoostInterval mContent;
-        BoundType mLowerBoundType;
-        BoundType mUpperBoundType;
+        BoundType mLowerBoundType = BoundType::STRICT;
+        BoundType mUpperBoundType = BoundType::STRICT;
 
     public:
 
@@ -176,9 +176,7 @@ namespace carl
          * Default constructor which constructs the empty interval at point 0.
          */
         Interval() :
-	        mContent(carl::constant_zero<Number>().get()),
-	        mLowerBoundType(BoundType::STRICT),
-	        mUpperBoundType(BoundType::STRICT)
+	        mContent(carl::constant_zero<Number>().get())
 		{ }
 
         /**
@@ -1969,8 +1967,6 @@ namespace carl
      * at the upper bound of lhs.
      */
     template<typename Number>
-    inline bool operator<=(const Interval<Number>& lhs, const Number& rhs);
-    template<typename Number>
     inline bool operator<=(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs>=lhs;
@@ -1984,8 +1980,6 @@ namespace carl
      * at the lower bound of lhs.
      */
     template<typename Number>
-    inline bool operator>=(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    template<typename Number>
     inline bool operator>=(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs<=lhs;
@@ -1998,8 +1992,6 @@ namespace carl
      * @return True if the lefthand side is smaller than the righthand side.
      */
     template<typename Number>
-    inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    template<typename Number>
     inline bool operator<(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs>lhs;
@@ -2011,8 +2003,6 @@ namespace carl
      * @param rhs Righthand side.
      * @return True if the lefthand side is larger than the righthand side.
      */
-    template<typename Number>
-    inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
     template<typename Number>
     inline bool operator>(const Number& lhs, const Interval<Number>& rhs)
     {

@@ -61,6 +61,7 @@ option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 
 set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
 set_property(CACHE CLANG_SANITIZER PROPERTY STRINGS none address memory thread)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Build type." FORCE)
