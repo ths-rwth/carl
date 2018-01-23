@@ -109,7 +109,7 @@ matrix:
       script: source .ci/build.sh
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty]
+          sources: [*sources_base, llvm-toolchain-trusty-6.0]
           packages: [*packages_base, clang-6.0]
     - stage: build
       os: linux
