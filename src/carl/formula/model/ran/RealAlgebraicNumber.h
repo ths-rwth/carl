@@ -40,13 +40,19 @@
 #include "RealAlgebraicNumber_Interval.h"
 
 namespace carl {
+	
+enum class RANSampleHeuristic { Center, CenterInt, LeftInt, RightInt, Default = CenterInt };
 
 template<typename Number>
 class RealAlgebraicNumber {
 private:
-	friend std::hash<RealAlgebraicNumber<Number>>;
 	template<typename Num>
-	friend std::ostream& operator<<(std::ostream&, const RealAlgebraicNumber<Num>&);
+	friend RealAlgebraicNumber<Num> sampleBelow(const RealAlgebraicNumber<Num>&);
+	template<typename Num>
+	friend RealAlgebraicNumber<Num> sampleBetween(const RealAlgebraicNumber<Num>&, const RealAlgebraicNumber<Num>&, RANSampleHeuristic heuristic);
+	template<typename Num>
+	friend RealAlgebraicNumber<Num> sampleAbove(const RealAlgebraicNumber<Num>&);
+	
 	using IntervalContent = ran::IntervalContent<Number>;
 	using Polynomial = typename IntervalContent::Polynomial;
 
@@ -348,10 +354,6 @@ public:
 	std::pair<bool,bool> checkOrder(const RealAlgebraicNumber<Number>& n) const;
 private:
 	bool lessWhileUnequal(const RealAlgebraicNumber<Number>& n) const;
-public:
-	static RealAlgebraicNumber<Number> sampleBelow(const RealAlgebraicNumber<Number>& n);
-	static RealAlgebraicNumber<Number> sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper);
-	static RealAlgebraicNumber<Number> sampleAbove(const RealAlgebraicNumber<Number>& n);
 };
 
 template<typename Num>
