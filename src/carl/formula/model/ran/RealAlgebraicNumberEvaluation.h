@@ -208,6 +208,7 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	Variable v = p.mainVar();
 	UnivariatePolynomial<Coeff> tmp = p;
 	for (const auto& i: m) {
+		if (!tmp.has(i.first)) continue;
 		if (i.second.isNumeric()) {
 			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
 			tmp.substituteIn(i.first, Coeff(i.second.value()));
