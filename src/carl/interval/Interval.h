@@ -1241,6 +1241,51 @@ namespace carl
 		 * @return Some point within this interval.
 		 */
 		Number sampleSB(bool _includingBounds = true) const;
+		
+		/**
+         * Searches for some point in this interval, preferably near the left endpoint and with a small representation.
+		 * Checks the integer next to the left endpoint, uses the midpoint if it is outside.
+         * @return Some point within this interval.
+         */
+		Number sampleLeft() const {
+			Number res = carl::floor(lower()) + 1;
+			if (contains(res)) return res;
+			return center();
+		}
+		/**
+         * Searches for some point in this interval, preferably near the right endpoint and with a small representation.
+		 * Checks the integer next to the right endpoint, uses the midpoint if it is outside.
+         * @return Some point within this interval.
+         */
+		Number sampleRight() const {
+			Number res = carl::ceil(upper()) + 1;
+			if (contains(res)) return res;
+			return center();
+		}
+		/**
+		* Searches for some point in this interval, preferably near zero and with a small representation.
+		 * Checks the integer next to the left endpoint if the interval is semi-positive.
+		 * Checks the integer next to the right endpoint if the interval is semi-negative.
+		 * Uses zero otherwise.
+         * @return Some point within this interval.
+         */
+		Number sampleZero() const {
+			if (isSemiPositive()) return sampleLeft();
+			if (isSemiNegative()) return sampleRight();
+			return carl::constant_zero<Number>::get();
+		}
+		/**
+		* Searches for some point in this interval, preferably far aways from zero and with a small representation.
+		 * Checks the integer next to the right endpoint if the interval is semi-positive.
+		 * Checks the integer next to the left endpoint if the interval is semi-negative.
+		 * Uses zero otherwise.
+         * @return Some point within this interval.
+         */
+		Number sampleInfty() const {
+			if (isSemiPositive()) return sampleRight();
+			if (isSemiNegative()) return sampleLeft();
+			return carl::constant_zero<Number>::get();
+		}
 
         /**
          * Searches for some point in this interval, preferably near the midpoint and with a small representation and
