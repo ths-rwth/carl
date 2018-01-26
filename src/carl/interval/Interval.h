@@ -1248,6 +1248,9 @@ namespace carl
          * @return Some point within this interval.
          */
 		Number sampleLeft() const {
+			if (lowerBoundType() == BoundType::INFTY) {
+				return carl::floor(upper()) - 1;
+			}
 			Number res = carl::floor(lower()) + 1;
 			if (contains(res)) return res;
 			return center();
@@ -1258,7 +1261,10 @@ namespace carl
          * @return Some point within this interval.
          */
 		Number sampleRight() const {
-			Number res = carl::ceil(upper()) + 1;
+			if (upperBoundType() == BoundType::INFTY) {
+				return carl::ceil(lower()) + 1;
+			}
+			Number res = carl::ceil(upper()) - 1;
 			if (contains(res)) return res;
 			return center();
 		}
