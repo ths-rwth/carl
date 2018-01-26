@@ -41,7 +41,7 @@
 
 namespace carl {
 	
-enum class RANSampleHeuristic { Center, CenterInt, LeftInt, RightInt, Default = CenterInt };
+enum class RANSampleHeuristic { Center, CenterInt, LeftInt, RightInt, ZeroInt, InftyInt, Default = CenterInt };
 
 template<typename Number>
 class RealAlgebraicNumber {

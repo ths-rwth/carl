@@ -101,9 +101,13 @@ namespace carl {
 				case RANSampleHeuristic::CenterInt:
 					return RealAlgebraicNumber<Number>(i.sample(false), false);
 				case RANSampleHeuristic::LeftInt:
+					return RealAlgebraicNumber<Number>(i.sampleLeft(), false);
 				case RANSampleHeuristic::RightInt:
-					// TODO: Implement something meaningful here
-					return RealAlgebraicNumber<Number>(i.sample(false), false);
+					return RealAlgebraicNumber<Number>(i.sampleRight(), false);
+				case RANSampleHeuristic::ZeroInt:
+					return RealAlgebraicNumber<Number>(i.sampleZero(), false);
+				case RANSampleHeuristic::InftyInt:
+					return RealAlgebraicNumber<Number>(i.sampleInfty(), false);
 			}
 		}
 	}
