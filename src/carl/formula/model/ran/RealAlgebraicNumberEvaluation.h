@@ -166,8 +166,13 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 	// compute the result polynomial and the initial result interval
 	std::map<Variable, Interval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m, varToInterval);
+	assert(!varToInterval.empty());
+	poly = p.toUnivariatePolynomial(varToInterval.begin()->first);
 	CARL_LOG_DEBUG("carl.ran", "res = " << res);
+	CARL_LOG_DEBUG("carl.ran", "varToInterval = " << varToInterval);
+	CARL_LOG_DEBUG("carl.ran", "poly = " << poly);
 	Interval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
+	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
 
 	// the interval should include at least one root.
 	assert(!res.isZero());
