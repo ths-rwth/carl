@@ -207,7 +207,7 @@ public:
 	
 	template<typename Pol>
 	void assertFormula(const Formula<Pol>& formula) {
-		*this << "(assert " << formula << ")";
+		*this << "(assert " << formula << ")" << std::endl;
 	}
 	
 	template<typename Pol>

@@ -106,18 +106,14 @@ private:
 		if (m.second == 0) *this << "1";
 		else if (m.second == 1) *this << m.first;
 		else {
-			*this << "(*";
 			for (std::size_t i = 0; i < m.second; i++) *this << " " << m.first;
-			*this << ")";
 		}
 	}
 	void write(const Monomial& m) {
 		if (m.exponents().empty()) *this << "1";
 		else if (m.exponents().size() == 1) *this << m.exponents().front();
 		else {
-			*this << "(*";
 			for (const auto& e: m.exponents()) *this << " " << e;
-			*this << ")";
 		}
 	}
 	
@@ -126,11 +122,10 @@ private:
 		if (mp.isZero()) *this << "0";
 		else if (mp.nrTerms() == 1) *this << mp.lterm();
 		else {
-			*this << "(+";
 			for (auto it = mp.rbegin(); it != mp.rend(); it++) {
-				*this << " " << *it;
+				if (it != mp.rbegin()) *this << " + ";
+				*this << *it;
 			}
-			*this << ")";
 		}
 	}
 	
@@ -147,12 +142,12 @@ private:
 
 	template<typename Coeff>
 	void write(const Term<Coeff>& t) {
-		if (!t.monomial()) *this << t.coeff();
+		if (!t.monomial()) *this << "(" << t.coeff() << ")";
 		else {
 			if (carl::isOne(t.coeff())) {
 				*this << t.monomial();
 			} else {
-				*this << "(* " << t.coeff() << " " << t.monomial() << ")";
+				*this << "(" << t.coeff() << ") " << t.monomial();
 			}
 		}
 	}
@@ -161,14 +156,13 @@ private:
 	void write(const UnivariatePolynomial<Coeff>& up) {
 		if (up.isConstant()) *this << up.constantPart();
 		else {
-			*this << "(+";
 			for (std::size_t i = 0; i < up.coefficients().size(); i++) {
+				if (i > 0) *this << " + ";
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];
 				if (exp == 0) *this << " " << coeff;
-				else *this << " (* " << coeff << " " << Monomial(up.mainVar(), exp) << ")";
+				else *this << "(" << coeff << ") " << Monomial(up.mainVar(), exp);
 			}
-			*this << ")";
 		}
 	}
 
