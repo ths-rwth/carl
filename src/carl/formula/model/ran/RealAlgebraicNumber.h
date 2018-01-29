@@ -117,6 +117,24 @@ public:
 			refineToIntegrality();
 		}
 	}
+	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, const std::list<UnivariatePolynomial<Number>>& sturmSequence, bool isRoot = true):
+		mValue(carl::constant_zero<Number>::get()),
+		mIsRoot(isRoot),
+		mIR(std::make_shared<IntervalContent>(p.normalized(), i, sturmSequence)),
+		mTE(nullptr)
+	{
+		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
+		assert(i.isOpenInterval() || i.isPointInterval());
+		assert(p.countRealRoots(i) == 1);
+		if (mIR->polynomial.degree() == 1) {
+			Number a = mIR->polynomial.coefficients()[1];
+			Number b = mIR->polynomial.coefficients()[0];
+			switchToNR(-b / a);
+		} else {
+			if (i.contains(0)) refineAvoiding(0);
+			refineToIntegrality();
+		}
+	}
 
 	explicit RealAlgebraicNumber(const ThomEncoding<Number>& te, bool isRoot = true):
 		mValue(carl::constant_zero<Number>::get()),
@@ -234,6 +252,11 @@ public:
 		assert(!isNumeric());
 		assert(isInterval());
 		return mIR->polynomial;
+	}
+	const auto& getIRSturmSequence() const {
+		assert(!isNumeric());
+		assert(isInterval());
+		return mIR->sturmSequence;
 	}
 
 	RealAlgebraicNumber changeVariable(Variable::Arg v) const {
