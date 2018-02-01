@@ -236,7 +236,7 @@ namespace carl {
 		
 		/// Outputs `b` to `os` using the format `<explicit bits>[<default>]`.
 		friend std::ostream& operator<<(std::ostream& os, const Bitset& b) {
-			return os << b.mData << "[" << b.mDefault << "]";
+			return os << b.mData << '|' << b.mDefault;
 		}
 	};
 }
