@@ -21,7 +21,7 @@ namespace carl
 {
 
 template<typename GCDCalculation, typename C, typename O, typename P>
-MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculate() 
+MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculate()
 {
 	assert(!mp1.isZero());
 	assert(!mp2.isZero());
@@ -45,7 +45,7 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 
 	// And we do some simplifications for the input.
 	// In order to do so, we gather some information about the polynomials, as we most certainly need them later on.
-	
+
 	// We check for mutual trivial factorizations.
 
 	// And we check for linearly appearing variables. Notice that ay + b is irreducible and thus,
@@ -75,12 +75,12 @@ auto s = carl::createFunctionSelector<TypeSelector, types>(
 
 template<typename GCDCalculation, typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::customCalculation(const Polynomial& a, const Polynomial& b) {
-	return Polynomial(1);
 	Variable x = getMainVar(a, b);
 	if(x == Variable::NO_VARIABLE)
 	{
 		return Polynomial(1);
 	}
+	CARL_LOG_INEFFICIENT();
 	UnivReprPol A = a.toUnivariatePolynomial(x);
 	UnivReprPol B = b.toUnivariatePolynomial(x);
 	UnivReprPol GCD = (*static_cast<GCDCalculation*>(this))(A.normalized(),B.normalized());
