@@ -174,7 +174,7 @@ class Term {
          */
         std::size_t complexity() const {
             if (!mMonomial) return 1;
-            return mMonomial->complexity();
+            return mMonomial->complexity() + 1;
         }
 		
 		/**
