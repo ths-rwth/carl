@@ -70,10 +70,9 @@ public:
    */
   RealAlgebraicPoint subpoint(size_t componentCount) const {
     assert(componentCount <= mNumbers.size());
-    std::vector<RealAlgebraicNumber<Number>> copy;
-    copy.reserve(componentCount);
-    std::copy_n(mNumbers.begin(), componentCount, copy.begin());
-    return RealAlgebraicPoint(copy);
+    std::vector<RealAlgebraicNumber<Number>> copy(
+    	mNumbers.begin(), std::next(mNumbers.begin(), componentCount));
+    return RealAlgebraicPoint(std::move(copy));
   }
 
   /**
