@@ -792,20 +792,20 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		// -> next (safe here, but need to check for end() later)
 		neighbor++;
 		if (neighbor == currentSamples.end()) {
-			newSamples.push_front(RealAlgebraicNumber<Number>::sampleAbove(*insertIt));
+			newSamples.push_front(carl::sampleAbove(*insertIt));
 		} else if (neighbor->isRoot()) {
-			newSamples.push_front(RealAlgebraicNumber<Number>::sampleBetween(*insertIt, *neighbor));
+			newSamples.push_front(carl::sampleBetween(*insertIt, *neighbor));
 		}
 
 		// previous: left neighbor
 		neighbor = insertIt;
 		if (neighbor == currentSamples.begin()) {
-			newSamples.push_front(RealAlgebraicNumber<Number>::sampleBelow(*insertIt));
+			newSamples.push_front(carl::sampleBelow(*insertIt));
 		} else {
 			neighbor--;
 			// now neighbor is the left bound (can be safely determined now)
 			if (neighbor->isRoot()) {
-				newSamples.push_front(RealAlgebraicNumber<Number>::sampleBetween(*neighbor, *insertIt));
+				newSamples.push_front(carl::sampleBetween(*neighbor, *insertIt));
 			}
 		}
 

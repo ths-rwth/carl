@@ -50,25 +50,25 @@ auto tuple_tail(Tuple&& t) {
 template<typename Converter, typename Information, typename FOut, typename... TOut>
 class tuple_convert {
 private:
-	Information i;
+	Information mInfo;
 	tuple_convert<Converter, Information, TOut...> conv;
 public:
-	explicit tuple_convert(const Information& i): i(i), conv(i) {}
+	explicit tuple_convert(const Information& i): mInfo(i), conv(i) {}
 	template<typename Tuple>
 	std::tuple<FOut, TOut...> operator()(const Tuple& in) {
-		return std::tuple_cat(std::make_tuple(Converter::template convert<FOut>(std::get<0>(in), i)), conv(tuple_tail(in)));
+		return std::tuple_cat(std::make_tuple(Converter::template convert<FOut>(std::get<0>(in), mInfo)), conv(tuple_tail(in)));
 	}
 };
 
 template<typename Converter, typename Information, typename Out>
 class tuple_convert<Converter, Information, Out> {
 private:
-	Information i;
+	Information mInfo;
 public:
-	explicit tuple_convert(const Information& i): i(i) {}
+	explicit tuple_convert(const Information& i): mInfo(i) {}
 	template<typename In>
 	std::tuple<Out> operator()(const std::tuple<In>& in) {
-		return std::make_tuple(Converter::template convert<Out>(std::get<0>(in), i));
+		return std::make_tuple(Converter::template convert<Out>(std::get<0>(in), mInfo));
 	}
 };
 

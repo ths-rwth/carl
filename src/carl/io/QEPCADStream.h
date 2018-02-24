@@ -17,26 +17,28 @@
 
 namespace carl {
 
-class SMTLIBStream {
+class QEPCADStream {
 private:
 	std::stringstream mStream;
 	
-	void declare(Logic l) {
-		*this << "(set-logic " << l << ")" << std::endl;
-	}
-	void declare(Sort s) {
-		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
-	}
 	void declare(Variable v) {
-		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
+		*this << "(E " << v << ") ";
 	}
 
 	template<typename Pol>
 	void write(const Constraint<Pol>& c) {
-		if (c.relation() == Relation::NEQ) {
-			*this << "(not (= " << c.lhs() << " 0))";
-		} else {
-			*this << "(" << c.relation() << " " << c.lhs() << " 0)";
+		*this << c.lhs() << " " << c.relation() << " 0";
+	}
+	
+	template<typename Pol>
+	void write(const Formulas<Pol>& f, const std::string& op) {
+		bool first = true;
+		for (const auto& cur: f) {
+			if (!first) {
+				*this << " " << op << " ";
+			}
+			*this << cur;
+			first = false;
 		}
 	}
 	
@@ -44,21 +46,25 @@ private:
 	void write(const Formula<Pol>& f) {
 		switch (f.getType()) {
 			case FormulaType::AND:
-			case FormulaType::OR:
-			case FormulaType::IFF:
-			case FormulaType::XOR:
-			case FormulaType::IMPLIES:
-			case FormulaType::ITE:
-			{
-				*this << "(" << f.getType();
-				for (const auto& cur: f.subformulas()) {
-					*this << " " << cur;
-				}
-				*this << ")";
+				write(f.subformulas(), "/\\");
 				break;
-			}
+			case FormulaType::OR:
+				write(f.subformulas(), "\\/");
+				break;
+			case FormulaType::IFF:
+				write(f.subformulas(), "<==>");
+				break;
+			case FormulaType::XOR:
+				assert(false);
+				break;
+			case FormulaType::IMPLIES:
+				assert(f.subformulas().size() == 2);
+				write(f.subformulas(), "==>");
+				break;
+			case FormulaType::ITE:
+				assert(false);
 			case FormulaType::NOT:
-				*this << "(" << f.getType() << " " << f.subformula() << ")";
+				*this << "~ " << f.subformula();
 				break;
 			case FormulaType::BOOL:
 				*this << f.boolean();
@@ -73,21 +79,21 @@ private:
 				*this << f.variableAssignment();
 				break;
 			case FormulaType::BITVECTOR:
-				*this << f.bvConstraint();
+				CARL_LOG_ERROR("carl.qepcadstream", "Bitvectors are not supported by QEPCAD.");
 				break;
 			case FormulaType::TRUE:
 			case FormulaType::FALSE:
 				*this << f.getType();
 				break;
 			case FormulaType::UEQ:
-				*this << f.uequality();
+				CARL_LOG_ERROR("carl.qepcadstream", "Uninterpreted equalities are not supported by QEPCAD.");
 				break;
 			case FormulaType::PBCONSTRAINT:
-				*this << f.pbConstraint();
+				CARL_LOG_ERROR("carl.qepcadstream", "Pseudo-Boolean constraints are not supported by QEPCAD.");
 				break;
 			case FormulaType::EXISTS:
 			case FormulaType::FORALL:
-				CARL_LOG_ERROR("carl.smtlibstream", "Printing exists or forall is not implemented yet.");
+				CARL_LOG_ERROR("carl.qepcadstream", "Printing exists or forall is not implemented yet.");
 				break;
 		}
 	}
@@ -100,18 +106,14 @@ private:
 		if (m.second == 0) *this << "1";
 		else if (m.second == 1) *this << m.first;
 		else {
-			*this << "(*";
 			for (std::size_t i = 0; i < m.second; i++) *this << " " << m.first;
-			*this << ")";
 		}
 	}
 	void write(const Monomial& m) {
 		if (m.exponents().empty()) *this << "1";
 		else if (m.exponents().size() == 1) *this << m.exponents().front();
 		else {
-			*this << "(*";
 			for (const auto& e: m.exponents()) *this << " " << e;
-			*this << ")";
 		}
 	}
 	
@@ -120,18 +122,17 @@ private:
 		if (mp.isZero()) *this << "0";
 		else if (mp.nrTerms() == 1) *this << mp.lterm();
 		else {
-			*this << "(+";
 			for (auto it = mp.rbegin(); it != mp.rend(); it++) {
-				*this << " " << *it;
+				if (it != mp.rbegin()) *this << " + ";
+				*this << *it;
 			}
-			*this << ")";
 		}
 	}
 	
 	void write(Relation r) {
 		switch (r) {
 			case Relation::EQ:		*this << "="; break;
-			case Relation::NEQ:		*this << "<>"; break;
+			case Relation::NEQ:		*this << "/="; break;
 			case Relation::LESS:	*this << "<"; break;
 			case Relation::LEQ:		*this << "<="; break;
 			case Relation::GREATER:	*this << ">"; break;
@@ -141,12 +142,12 @@ private:
 
 	template<typename Coeff>
 	void write(const Term<Coeff>& t) {
-		if (!t.monomial()) *this << t.coeff();
+		if (!t.monomial()) *this << "(" << t.coeff() << ")";
 		else {
 			if (carl::isOne(t.coeff())) {
 				*this << t.monomial();
 			} else {
-				*this << "(* " << t.coeff() << " " << t.monomial() << ")";
+				*this << "(" << t.coeff() << ") " << t.monomial();
 			}
 		}
 	}
@@ -155,14 +156,13 @@ private:
 	void write(const UnivariatePolynomial<Coeff>& up) {
 		if (up.isConstant()) *this << up.constantPart();
 		else {
-			*this << "(+";
 			for (std::size_t i = 0; i < up.coefficients().size(); i++) {
+				if (i > 0) *this << " + ";
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];
 				if (exp == 0) *this << " " << coeff;
-				else *this << " (* " << coeff << " " << Monomial(up.mainVar(), exp) << ")";
+				else *this << "(" << coeff << ") " << Monomial(up.mainVar(), exp);
 			}
-			*this << ")";
 		}
 	}
 
@@ -186,50 +186,36 @@ private:
 	}
 	
 public:
-	SMTLIBStream(): mStream() {
+	QEPCADStream(): mStream() {
 	}
 
-	void initialize(Logic l, const Variables& vars) {
-		declare(l);
+	void initialize(const Variables& vars) {
 		for (auto v: vars) {
 			declare(v);
 		}
 	}
 	
 	template<typename Pol>
-	void initialize(Logic l, std::initializer_list<Formula<Pol>> formulas) {
+	void initialize(std::initializer_list<Formula<Pol>> formulas) {
 		Variables vars;
 		for (const auto& f: formulas) {
 			f.collectVariables(vars, true, true, true, true, true);
 		}
-		initialize(l, vars);
+		initialize(vars);
 	}
 	
 	template<typename Pol>
 	void assertFormula(const Formula<Pol>& formula) {
-		*this << "(assert " << formula << ")" << std::endl;
-	}
-	
-	template<typename Pol>
-	void minimize(const Pol& objective) {
-		*this << "(minimize " << objective << ")" << std::endl;
-	}
-	
-	void checkSat() {
-		*this << "(check-sat)" << std::endl;
-	}
-	
-	void getModel() {
-		*this << "(get-model)" << std::endl;
+		*this << formula;
 	}
 	
 	template<typename T>
-	SMTLIBStream& operator<<(T&& t) {
+	QEPCADStream& operator<<(T&& t) {
 		write(static_cast<const std::decay_t<T>&>(t));
 		return *this;
 	}
 	//
-	SMTLIBStream& operator<<(std::ostream& (*os)(std::ostream&)) {
+	QEPCADStream& operator<<(std::ostream& (*os)(std::ostream&)) {
 		write(os);
 		return *this;
 	}
@@ -239,37 +225,8 @@ public:
 	}
 };
 
-inline std::ostream& operator<<(std::ostream& os, const SMTLIBStream& ss) {
-	return os << ss.content();
-}
-
-namespace detail {
-
-template<typename Pol>
-struct SMTLIBContainer {
-	Logic mLogic;
-	std::initializer_list<Formula<Pol>> mFormulas;
-	bool mGetModel;
-	Pol mObjective;
-	SMTLIBContainer(Logic l, std::initializer_list<Formula<Pol>> f, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel) {}
-	SMTLIBContainer(Logic l, std::initializer_list<Formula<Pol>> f, const Pol& objective, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel), mObjective(objective) {}
-};
-template<typename Pol>
-std::ostream& operator<<(std::ostream& os, const SMTLIBContainer<Pol>& sc) {
-	SMTLIBStream sls;
-	sls.initialize(sc.mLogic, sc.mFormulas);
-	for (const auto& f: sc.mFormulas) sls.assertFormula(f);
-	if (!sc.mObjective.isZero()) sls.minimize(sc.mObjective);
-	sls.checkSat();
-	if (sc.mGetModel) sls.getModel();
-	return os << sls;
-}
-
-}
-
-template<typename Pol, typename... Args>
-detail::SMTLIBContainer<Pol> outputSMTLIB(Logic l, std::initializer_list<Formula<Pol>> formulas, Args&&... args) {
-	return detail::SMTLIBContainer<Pol>(l, formulas, std::forward<Args>(args)...);
+inline std::ostream& operator<<(std::ostream& os, const QEPCADStream& qs) {
+	return os << qs.content();
 }
 
 }

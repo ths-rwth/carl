@@ -163,8 +163,8 @@ namespace carl
          **********************************************************************/
 
         BoostInterval mContent;
-        BoundType mLowerBoundType;
-        BoundType mUpperBoundType;
+        BoundType mLowerBoundType = BoundType::STRICT;
+        BoundType mUpperBoundType = BoundType::STRICT;
 
     public:
 
@@ -176,9 +176,7 @@ namespace carl
          * Default constructor which constructs the empty interval at point 0.
          */
         Interval() :
-	        mContent(carl::constant_zero<Number>().get()),
-	        mLowerBoundType(BoundType::STRICT),
-	        mUpperBoundType(BoundType::STRICT)
+	        mContent(carl::constant_zero<Number>().get())
 		{ }
 
         /**
@@ -1243,6 +1241,57 @@ namespace carl
 		 * @return Some point within this interval.
 		 */
 		Number sampleSB(bool _includingBounds = true) const;
+		
+		/**
+         * Searches for some point in this interval, preferably near the left endpoint and with a small representation.
+		 * Checks the integer next to the left endpoint, uses the midpoint if it is outside.
+         * @return Some point within this interval.
+         */
+		Number sampleLeft() const {
+			if (lowerBoundType() == BoundType::INFTY) {
+				return carl::floor(upper()) - 1;
+			}
+			Number res = carl::floor(lower()) + 1;
+			if (contains(res)) return res;
+			return center();
+		}
+		/**
+         * Searches for some point in this interval, preferably near the right endpoint and with a small representation.
+		 * Checks the integer next to the right endpoint, uses the midpoint if it is outside.
+         * @return Some point within this interval.
+         */
+		Number sampleRight() const {
+			if (upperBoundType() == BoundType::INFTY) {
+				return carl::ceil(lower()) + 1;
+			}
+			Number res = carl::ceil(upper()) - 1;
+			if (contains(res)) return res;
+			return center();
+		}
+		/**
+		* Searches for some point in this interval, preferably near zero and with a small representation.
+		 * Checks the integer next to the left endpoint if the interval is semi-positive.
+		 * Checks the integer next to the right endpoint if the interval is semi-negative.
+		 * Uses zero otherwise.
+         * @return Some point within this interval.
+         */
+		Number sampleZero() const {
+			if (isSemiPositive()) return sampleLeft();
+			if (isSemiNegative()) return sampleRight();
+			return carl::constant_zero<Number>::get();
+		}
+		/**
+		* Searches for some point in this interval, preferably far aways from zero and with a small representation.
+		 * Checks the integer next to the right endpoint if the interval is semi-positive.
+		 * Checks the integer next to the left endpoint if the interval is semi-negative.
+		 * Uses zero otherwise.
+         * @return Some point within this interval.
+         */
+		Number sampleInfty() const {
+			if (isSemiPositive()) return sampleRight();
+			if (isSemiNegative()) return sampleLeft();
+			return carl::constant_zero<Number>::get();
+		}
 
         /**
          * Searches for some point in this interval, preferably near the midpoint and with a small representation and
@@ -1969,8 +2018,6 @@ namespace carl
      * at the upper bound of lhs.
      */
     template<typename Number>
-    inline bool operator<=(const Interval<Number>& lhs, const Number& rhs);
-    template<typename Number>
     inline bool operator<=(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs>=lhs;
@@ -1984,8 +2031,6 @@ namespace carl
      * at the lower bound of lhs.
      */
     template<typename Number>
-    inline bool operator>=(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    template<typename Number>
     inline bool operator>=(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs<=lhs;
@@ -1998,8 +2043,6 @@ namespace carl
      * @return True if the lefthand side is smaller than the righthand side.
      */
     template<typename Number>
-    inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    template<typename Number>
     inline bool operator<(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs>lhs;
@@ -2011,8 +2054,6 @@ namespace carl
      * @param rhs Righthand side.
      * @return True if the lefthand side is larger than the righthand side.
      */
-    template<typename Number>
-    inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
     template<typename Number>
     inline bool operator>(const Number& lhs, const Interval<Number>& rhs)
     {

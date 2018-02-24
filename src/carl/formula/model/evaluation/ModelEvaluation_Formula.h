@@ -29,15 +29,7 @@ namespace model {
 		CARL_LOG_DEBUG("carl.model.evaluation", "Evaluating " << f << " on " << m);
 		assert(f.getType() == FormulaType::VARCOMPARE);
 		const auto& vc = f.variableComparison();
-		auto it = m.find(vc.var());
-		if (it == m.end()) {
-			CARL_LOG_DEBUG("carl.model.evaluation", "Could not evaluate " << vc << " as " << vc.var() << " is not part of the model");
-			return;
-		}
-		const auto& value = m.evaluated(vc.var());
-		assert(value.isRational() || value.isRAN());
-		RealAlgebraicNumber<Rational> reference = value.isRational() ? RealAlgebraicNumber<Rational>(value.asRational()) : value.asRAN();
-		CARL_LOG_DEBUG("carl.model.evaluation", "Reference value: " << vc.var() << " == " << reference);
+		
 		ModelValue<Rational,Poly> cmp = vc.value();
 		if (cmp.isSubstitution()) {
 			// If assigned directly, the shared_ptr<Substitution> goes out of scope before the result is copied into cmp.
@@ -59,6 +51,17 @@ namespace model {
 		assert(cmp.isRational() || cmp.isRAN());
 		RealAlgebraicNumber<Rational> val = cmp.isRational() ? RealAlgebraicNumber<Rational>(cmp.asRational()) : cmp.asRAN();
 		CARL_LOG_DEBUG("carl.model.evaluation", "rhs is " << val);
+		
+		auto it = m.find(vc.var());
+		if (it == m.end()) {
+			CARL_LOG_DEBUG("carl.model.evaluation", "Could not evaluate " << vc << " as " << vc.var() << " is not part of the model");
+			return;
+		}
+		const auto& value = m.evaluated(vc.var());
+		assert(value.isRational() || value.isRAN());
+		RealAlgebraicNumber<Rational> reference = value.isRational() ? RealAlgebraicNumber<Rational>(value.asRational()) : value.asRAN();
+		CARL_LOG_DEBUG("carl.model.evaluation", "Reference value: " << vc.var() << " == " << reference);
+		
 		f = Formula<Poly>(FormulaType::FALSE);
 		CARL_LOG_DEBUG("carl.model.evaluation", "Comparison: " << reference << " " << vc.relation() << " " << val);
 		switch (vc.relation()) {

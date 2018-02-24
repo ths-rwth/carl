@@ -166,20 +166,26 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 	// compute the result polynomial and the initial result interval
 	std::map<Variable, Interval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m, varToInterval);
+	assert(!varToInterval.empty());
+	poly = p.toUnivariatePolynomial(varToInterval.begin()->first);
 	CARL_LOG_DEBUG("carl.ran", "res = " << res);
+	CARL_LOG_DEBUG("carl.ran", "varToInterval = " << varToInterval);
+	CARL_LOG_DEBUG("carl.ran", "poly = " << poly);
 	Interval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
+	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
 
+	auto sturmSeq = res.standardSturmSequence();
 	// the interval should include at least one root.
 	assert(!res.isZero());
 	assert(
 		res.sgn(interval.lower()) == Sign::ZERO ||
 		res.sgn(interval.upper()) == Sign::ZERO ||
-		res.countRealRoots(interval) >= 1
+		res.countRealRoots(sturmSeq, interval) >= 1
 	);
 	while (
 		res.sgn(interval.lower()) == Sign::ZERO ||
 		res.sgn(interval.upper()) == Sign::ZERO ||
-		res.countRealRoots(interval) != 1) {
+		res.countRealRoots(sturmSeq, interval) != 1) {
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (auto it = m.begin(); it != m.end(); it++) {
 			it->second.refine();
@@ -193,8 +199,8 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 		}
 		interval = IntervalEvaluation::evaluate(poly, varToInterval);
 	}
-	CARL_LOG_DEBUG("carl.ran", "Result is " << RealAlgebraicNumber<Number>(res, interval));
-	return RealAlgebraicNumber<Number>(res, interval);
+	CARL_LOG_DEBUG("carl.ran", "Result is " << RealAlgebraicNumber<Number>(res, interval, sturmSeq));
+	return RealAlgebraicNumber<Number>(res, interval, sturmSeq);
 }
 
 
@@ -208,6 +214,13 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	Variable v = p.mainVar();
 	UnivariatePolynomial<Coeff> tmp = p;
 	for (const auto& i: m) {
+		if (!tmp.has(i.first)) {
+			if (p.has(i.first)) {
+				// Variable vanished, add it to varToInterval
+				varToInterval[i.first] = i.second.getInterval();
+			}
+			continue;
+		}
 		if (i.second.isNumeric()) {
 			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
 			tmp.substituteIn(i.first, Coeff(i.second.value()));

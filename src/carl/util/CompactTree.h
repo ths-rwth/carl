@@ -208,7 +208,7 @@ namespace carl
 
     template<class E, bool FI>
     CompactTree<E, FI>::CompactTree( size_t initialCapacity ):
-        _array( static_cast<E*>(0) - 1 ),
+        _array( static_cast<E*>(nullptr) - 1 ),
         _lastLeaf( 0 ),
         _capacityEnd( Node( 0 ).next( initialCapacity ))
     {
@@ -346,13 +346,13 @@ namespace carl
         assert( !FI || (sizeof(E) & (sizeof(E) - 1)) == 0 );
         if( capacity() == 0 )
         {
-            assert( _array == static_cast<E*>(0) - 1 );
+            assert( _array == static_cast<E*>(nullptr) - 1 );
             assert( _capacityEnd == Node( 0 ));
             assert( _lastLeaf == Node( 0 ));
         }
         else
         {
-            assert( _array != static_cast<E*>(0) - 1 );
+            assert( _array != static_cast<E*>(nullptr) - 1 );
             assert( _capacityEnd > Node( 0 ));
             assert( _lastLeaf <= _capacityEnd );
         }

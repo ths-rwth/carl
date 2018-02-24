@@ -18,9 +18,9 @@ namespace carl
 	
     class BitVector {
 	public:
-		BitVector(): mBits() {}
+		BitVector() = default;
 		
-		explicit BitVector(unsigned pos): mBits() {
+		explicit BitVector(unsigned pos) {
 			setBit(pos);
 		}
 		

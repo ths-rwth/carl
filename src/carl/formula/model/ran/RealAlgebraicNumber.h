@@ -40,13 +40,19 @@
 #include "RealAlgebraicNumber_Interval.h"
 
 namespace carl {
+	
+enum class RANSampleHeuristic { Center, CenterInt, LeftInt, RightInt, ZeroInt, InftyInt, Default = RightInt };
 
 template<typename Number>
 class RealAlgebraicNumber {
 private:
-	friend std::hash<RealAlgebraicNumber<Number>>;
 	template<typename Num>
-	friend std::ostream& operator<<(std::ostream&, const RealAlgebraicNumber<Num>&);
+	friend RealAlgebraicNumber<Num> sampleBelow(const RealAlgebraicNumber<Num>&);
+	template<typename Num>
+	friend RealAlgebraicNumber<Num> sampleBetween(const RealAlgebraicNumber<Num>&, const RealAlgebraicNumber<Num>&, RANSampleHeuristic heuristic);
+	template<typename Num>
+	friend RealAlgebraicNumber<Num> sampleAbove(const RealAlgebraicNumber<Num>&);
+	
 	using IntervalContent = ran::IntervalContent<Number>;
 	using Polynomial = typename IntervalContent::Polynomial;
 
@@ -97,6 +103,24 @@ public:
 		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(p.normalized(), i)),
+		mTE(nullptr)
+	{
+		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
+		assert(i.isOpenInterval() || i.isPointInterval());
+		assert(p.countRealRoots(i) == 1);
+		if (mIR->polynomial.degree() == 1) {
+			Number a = mIR->polynomial.coefficients()[1];
+			Number b = mIR->polynomial.coefficients()[0];
+			switchToNR(-b / a);
+		} else {
+			if (i.contains(0)) refineAvoiding(0);
+			refineToIntegrality();
+		}
+	}
+	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, const std::list<UnivariatePolynomial<Number>>& sturmSequence, bool isRoot = true):
+		mValue(carl::constant_zero<Number>::get()),
+		mIsRoot(isRoot),
+		mIR(std::make_shared<IntervalContent>(p.normalized(), i, sturmSequence)),
 		mTE(nullptr)
 	{
 		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
@@ -229,6 +253,11 @@ public:
 		assert(isInterval());
 		return mIR->polynomial;
 	}
+	const auto& getIRSturmSequence() const {
+		assert(!isNumeric());
+		assert(isInterval());
+		return mIR->sturmSequence;
+	}
 
 	RealAlgebraicNumber changeVariable(Variable::Arg v) const {
 		if (isNumeric()) return *this;
@@ -348,10 +377,6 @@ public:
 	std::pair<bool,bool> checkOrder(const RealAlgebraicNumber<Number>& n) const;
 private:
 	bool lessWhileUnequal(const RealAlgebraicNumber<Number>& n) const;
-public:
-	static RealAlgebraicNumber<Number> sampleBelow(const RealAlgebraicNumber<Number>& n);
-	static RealAlgebraicNumber<Number> sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper);
-	static RealAlgebraicNumber<Number> sampleAbove(const RealAlgebraicNumber<Number>& n);
 };
 
 template<typename Num>

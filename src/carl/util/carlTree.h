@@ -163,6 +163,10 @@ template<typename T, typename I, bool r>
 bool operator!=(const BaseIterator<T,I,r>& i1, const BaseIterator<T,I,r>& i2) {
 	return i1.current != i2.current;
 }
+template<typename T, typename I, bool r>
+bool operator<(const BaseIterator<T,I,r>& i1, const BaseIterator<T,I,r>& i2) {
+	return i1.current < i2.current;
+}
 
 /**
  * Iterator class for pre-order iterations over all elements.

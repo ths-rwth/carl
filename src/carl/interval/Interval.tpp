@@ -812,9 +812,8 @@ void Interval<Number>::inverse_assign()
         }
 
 template<typename Number>
-bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) const
-	{
-		if( this->isInfinite() )
+bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) const {
+        if( this->isInfinite() )
         {
             a = emptyInterval();
             return false;
@@ -1475,7 +1474,7 @@ template<typename Number>
                 }
                 // check for subset before contains because we may want to get
                 // the difference from ourselves which is empty.
-		if( this->isSubset(rhs) )
+                if( this->isSubset(rhs) )
                 {
                     resultA = emptyInterval();
                     return false;
