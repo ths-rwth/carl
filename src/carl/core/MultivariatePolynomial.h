@@ -225,8 +225,7 @@ public:
 	}
 
 	/**
-	 * Checks if the polynomial is zero.
-	 * @return If this is zero.
+	 * Check if the polynomial is zero.
 	 */
 	bool isZero() const;
 	/**
@@ -235,19 +234,15 @@ public:
      */
 	bool isOne() const;
 	/**
-	 * Checks if the polynomial is constant.
-	 * @return If this is constant.
+	 * Check if the polynomial is constant.
 	 */
 	bool isConstant() const;
 	/**
-	 * Checks if the polynomial is linear.
-	 * @return If this is linear.
+	 * Check if the polynomial is linear.
 	 */
 	bool isLinear() const;
 	/**
-	 * Checks if the polynomial is a number.
-	 * This is basically the same as being a constant.
-	 * @return If this is a number.
+	 * Check if the polynomial is a number, i.e., a constant.
 	 */
 	bool isNumber() const
 	{
@@ -268,8 +263,7 @@ public:
     std::vector<std::pair<Coeff,MultivariatePolynomial<Coeff,Ordering,Policies>>> sosDecomposition( bool _notTrivial = false ) const;
 
 	/**
-	 * Calculates the number of terms.
-	 * @return the number of terms
+	 * Calculate the number of terms.
 	 */
 	size_t nrTerms() const
 	{
@@ -297,14 +291,12 @@ public:
     }
     
 	/**
-	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
-	 * @return 
+	 * Give the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 */
 	const Term<Coeff>& trailingTerm() const;
 	Term<Coeff>& trailingTerm();
 	/**
-	 * Checks if the polynomial has a constant term that is not zero.
-	 * @return If there is a constant term unequal to zero.
+	 * Check if the polynomial has a constant term that is not zero.
 	 */
 	bool hasConstantTerm() const;
     
@@ -314,8 +306,7 @@ public:
     bool integerValued() const;
     
 	/**
-	 * Retrieves the constant term of this polynomial or zero, if there is no constant term.
-	 * @return Constant term.
+	 * Retrieve the constant term of this polynomial or zero, if there is no constant term.
 	 */
 	const Coeff& constantPart() const;
 	
@@ -596,7 +587,14 @@ public:
 	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 	
 	MultivariatePolynomial<typename IntegralType<Coeff>::type, Ordering, Policies> toIntegerDomain() const;
-	
+
+	/**
+	 * Convert a univariate polynomial that is currently (mis)represented by a
+	 * 'MultivariatePolynomial' into a more appropiate 'UnivariatePolynomial'
+	 * representation.
+	 * Note that the current polynomial must mention one and only one variable,
+	 * i.e., be indeed univariate.
+	 */
 	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
 	UnivariatePolynomial<MultivariatePolynomial> toUnivariatePolynomial(Variable::Arg mainVar) const;
 	
