@@ -38,7 +38,11 @@ namespace model {
 			auto res = cmp.asSubstitution()->evaluate(m);
 			if (res.isBool() && !res.asBool()) {
 				CARL_LOG_DEBUG("carl.model.evaluation", "MVRoot does not exist, returning false");
-				f = Formula<Poly>(FormulaType::FALSE);
+				if (vc.negated()) {
+					f = Formula<Poly>(FormulaType::TRUE);
+				} else {
+					f = Formula<Poly>(FormulaType::FALSE);
+				}
 				return;
 			}
 			CARL_LOG_DEBUG("carl.model.evaluation", "Evaluated substitution " << cmp << " -> " << res);
