@@ -362,6 +362,9 @@ namespace carl {
             std::size_t hash() const {
                 return mHash;
             }
+			std::size_t id() const {
+				return mId;
+			}
             
             bool isNary() const
             {

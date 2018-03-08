@@ -25,6 +25,7 @@ namespace carl
         mpPolynomialCache(nullptr)
     {
         VariablePool::getInstance();
+		MonomialPool::getInstance();
         if( needs_cache<Pol>::value )
         {
             mpPolynomialCache = std::shared_ptr<typename Pol::CACHE>(new typename Pol::CACHE());
@@ -36,7 +37,6 @@ namespace carl
 		 * Thereby, the MonomialPool gets destroyed after the ConstraintPool.
 		 * Thereby, destroying the constraints (and the Monomials contained) works correctly.
 		 */
-		MonomialPool::getInstance();
         mConstraints.reserve( _capacity );
         mConstraints.insert( mConsistentConstraint );
         mConstraints.insert( mInconsistentConstraint );

@@ -40,9 +40,8 @@ struct SortContent {
 	 * @param _name The name of the sort content to construct.
 	 */
 	explicit SortContent(std::string _name) noexcept
-		: name(std::move(_name)),
-		  parameters(),
-		  indices() {}
+		: name(std::move(_name))
+		{}
 
 	/**
 	 * Constructs a sort content.
@@ -51,17 +50,16 @@ struct SortContent {
 	 */
 	explicit SortContent(std::string _name, const std::vector<Sort>& _parameters)
 		: name(std::move(_name)),
-		  parameters(std::make_unique<std::vector<Sort>>(_parameters)),
-		  indices() {}
+		  parameters(std::make_unique<std::vector<Sort>>(_parameters))
+		{}
 	explicit SortContent(std::string _name, std::vector<Sort>&& _parameters)
 		: name(std::move(_name)),
-		  parameters(std::make_unique<std::vector<Sort>>(std::move(_parameters))),
-		  indices() {}
+		  parameters(std::make_unique<std::vector<Sort>>(std::move(_parameters)))
+		{}
 
 	SortContent(const SortContent& sc)
-		: name(sc.name),
-		  parameters(),
-		  indices() {
+		: name(sc.name)
+	{
 		if (sc.parameters) parameters = std::make_unique<std::vector<Sort>>(*sc.parameters);
 		if (sc.indices) indices = std::make_unique<std::vector<std::size_t>>(*sc.indices);
 	}
@@ -134,14 +132,7 @@ private:
 	/**
 	 * Constructs a sort manager.
 	 */
-	SortManager()
-		: mSorts(),
-		  mSortTypes(),
-		  mSortMap(),
-		  mDeclarations(),
-		  mDefinitions(),
-		  mIndexable(),
-		  mInterpreted() {
+	SortManager() {
 		clear();
 	}
 

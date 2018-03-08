@@ -15,7 +15,7 @@ namespace carl {
 	class Number<Interval<cln::cl_I>> : public BaseNumber<Interval<cln::cl_I>,Number<Interval<cln::cl_I>>> {
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
 		explicit Number(const Interval<cln::cl_I>& t): BaseNumber(t) {}
 		explicit Number(Interval<cln::cl_I>&& t): BaseNumber(t) {}
 		Number(const Number<Interval<cln::cl_I>>& n) = default;
@@ -130,9 +130,9 @@ namespace carl {
 
 		Number(): BaseNumber() {}
 		explicit Number(const Interval<mpq_class>& t): BaseNumber(t) {}
-		explicit Number(Interval<mpq_class>&& t): BaseNumber(t) {}
+		explicit Number(Interval<mpq_class>&& t): BaseNumber(std::move(t)) {}
 		Number(const Number<Interval<mpq_class>>& n) = default;
-		Number(Number<Interval<mpq_class>>&& n) noexcept : BaseNumber(std::move(n)) {}
+		Number(Number<Interval<mpq_class>>&& n) = default;
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
@@ -185,19 +185,16 @@ namespace carl {
 
 		Number(): BaseNumber() {}
 		explicit Number(const Interval<mpz_class>& t): BaseNumber(t) {}
-		explicit Number(Interval<mpz_class>&& t): BaseNumber(t) {}
+		explicit Number(Interval<mpz_class>&& t): BaseNumber(std::move(t)) {}
 		Number(const Number<Interval<mpz_class>>& n) = default;
-		Number(Number<Interval<mpz_class>>&& n) noexcept : BaseNumber(std::move(n)) {}
+		Number(Number<Interval<mpz_class>>&& n) = default;
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
 		//Number(unsigned long long int n) { mData = cln::cl_I(n);}
 
 		
-		Number<Interval<mpz_class>>& operator=(const Number<Interval<mpz_class>>& n) {
-			this->mData = n.mData;
-			return *this;
-		}
+		Number<Interval<mpz_class>>& operator=(const Number<Interval<mpz_class>>& n) = default;
 
 		template<typename Other>
 		Number<Interval<mpz_class>>& operator=(const Other& n) {
@@ -205,10 +202,7 @@ namespace carl {
 			return *this;
 		}
 
-		Number<Interval<mpz_class>>& operator=(Number<Interval<mpz_class>>&& n) noexcept {
-			this->mData = std::move(n.mData);
-			return *this;
-		}
+		Number<Interval<mpz_class>>& operator=(Number<Interval<mpz_class>>&& n) = default;
 
 		std::string toString() const {
 			return mData.toString();
@@ -238,21 +232,18 @@ namespace carl {
 	class Number<Interval<double>> : public BaseNumber<Interval<double>,Number<Interval<double>>> {
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
 		explicit Number(const Interval<double>& t): BaseNumber(t) {}
-		explicit Number(Interval<double>&& t): BaseNumber(t) {}
+		explicit Number(Interval<double>&& t): BaseNumber(std::move(t)) {}
 		Number(const Number<Interval<double>>& n) = default;
-		Number(Number<Interval<double>>&& n) noexcept : BaseNumber(std::move(n)) {}
+		Number(Number<Interval<double>>&& n) = default;
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
 		//Number(unsigned long long int n) { mData = cln::cl_I(n);}
 
 		
-		Number<Interval<double>>& operator=(const Number<Interval<double>>& n) {
-			this->mData = n.mData;
-			return *this;
-		}
+		Number<Interval<double>>& operator=(const Number<Interval<double>>& n) = default;
 
 		template<typename Other>
 		Number<Interval<double>>& operator=(const Other& n) {
@@ -260,10 +251,7 @@ namespace carl {
 			return *this;
 		}
 
-		Number<Interval<double>>& operator=(Number<Interval<double>>&& n) noexcept {
-			this->mData = std::move(n.mData);
-			return *this;
-		}
+		Number<Interval<double>>& operator=(Number<Interval<double>>&& n) = default;
 
 		std::string toString() const {
 			return mData.toString();
@@ -293,21 +281,18 @@ namespace carl {
 	class Number<Interval<int>> : public BaseNumber<Interval<int>,Number<Interval<int>>> {
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
 		explicit Number(const Interval<int>& t): BaseNumber(t) {}
-		explicit Number(Interval<int>&& t): BaseNumber(t) {}
+		explicit Number(Interval<int>&& t): BaseNumber(std::move(t)) {}
 		Number(const Number<Interval<int>>& n) = default;
-		Number(Number<Interval<int>>&& n) noexcept : BaseNumber(std::move(n)) {}
+		Number(Number<Interval<int>>&& n) = default;
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
 		//Number(unsigned long long int n) { mData = cln::cl_I(n);}
 
 		
-		Number<Interval<int>>& operator=(const Number<Interval<int>>& n) {
-			this->mData = n.mData;
-			return *this;
-		}
+		Number<Interval<int>>& operator=(const Number<Interval<int>>& n) = default;
 
 		template<typename Other>
 		Number<Interval<int>>& operator=(const Other& n) {
@@ -315,10 +300,7 @@ namespace carl {
 			return *this;
 		}
 
-		Number<Interval<int>>& operator=(Number<Interval<int>>&& n) noexcept {
-			this->mData = std::move(n.mData);
-			return *this;
-		}
+		Number<Interval<int>>& operator=(Number<Interval<int>>&& n) = default;
 
 		std::string toString() const {
 			return mData.toString();

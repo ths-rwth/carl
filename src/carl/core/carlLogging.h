@@ -382,7 +382,7 @@ public:
 	 */
 	void log(LogLevel level, const std::string& channel, const std::stringstream& ss, const RecordInfo& info) {
 		std::lock_guard<std::mutex> lock(mMutex);
-		for (auto t: mData) {
+		for (auto& t: mData) {
 			if (!std::get<1>(t.second).check(channel, level)) continue;
 			std::get<2>(t.second)->prefix(std::get<0>(t.second)->log(), mTimer, channel, level, info);
 			std::get<0>(t.second)->log() << ss.str();
