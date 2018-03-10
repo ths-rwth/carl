@@ -50,6 +50,8 @@ option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF 
 export_option(USE_CLN_NUMBERS)
 option( USE_COCOA "Use CoCoALib" OFF )
 export_option(USE_COCOA)
+option( USE_BLISS "Use bliss" OFF )
+export_option(USE_BLISS)
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 export_option(USE_MPFR_FLOAT)
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )

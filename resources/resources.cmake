@@ -120,6 +120,21 @@ if(USE_GINAC)
 endif()
 
 
+##### bliss
+if(USE_BLISS)
+	if(NOT FORCE_SHIPPED_RESOURCES)
+		load_library(carl BLISS 0.73)
+	endif()
+	if(BLISS_FOUND)
+		message(STATUS "Use system version of bliss ${BLISS_VERSION}")
+	else()
+		set(BLISS_VERSION "0.73")
+		include(resources/bliss.cmake)
+		message(STATUS "Use shipped version of bliss ${BLISS_VERSION}")
+#	endif()
+endif()
+
+
 ##### GTest
 #if(NOT FORCE_SHIPPED_RESOURCES)
 #	load_library(carl GTest 1.6)
