@@ -131,7 +131,7 @@ if(USE_BLISS)
 		set(BLISS_VERSION "0.73")
 		include(resources/bliss.cmake)
 		message(STATUS "Use shipped version of bliss ${BLISS_VERSION}")
-#	endif()
+	endif()
 endif()
 
 
