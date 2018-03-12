@@ -24,16 +24,17 @@ Symmetries findSymmetries(const Formula<Poly>& f) {
 }
 
 template<typename Poly>
-Formula<Poly> breakSymmetries(const Symmetries& symmetries) {
+Formula<Poly> breakSymmetries(const Symmetries& symmetries, bool onlyFirst = true) {
 	Formulas<Poly> res;
 	for (const auto& s: symmetries) {
 		res.emplace_back(symmetry::lexLeaderConstraint<Poly>(s));
+		if (onlyFirst) return res.back();
 	}
 	return Formula<Poly>(FormulaType::AND, std::move(res));
 }
 
 template<typename Poly>
-Formula<Poly> breakSymmetries(const Formula<Poly>& f) {
+Formula<Poly> breakSymmetries(const Formula<Poly>& f, bool onlyFirst = true) {
 	return breakSymmetries<Poly>(findSymmetries(f));
 }
 

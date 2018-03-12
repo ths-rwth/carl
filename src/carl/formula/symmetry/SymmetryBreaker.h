@@ -34,12 +34,17 @@ Formula<Poly> createComparison(Variable x, Variable y, Relation rel) {
 
 template<typename Poly>
 Formula<Poly> lexLeaderConstraint(const Symmetry& vars) {
+	constexpr bool eliminateTrue = true;
 	Formulas<Poly> eq;
 	Formulas<Poly> res;
+	std::set<std::pair<Variable,Variable>> inEq;
 	for (const auto& v: vars) {
+		if (v.first == v.second) continue;
+		if (eliminateTrue && inEq.find(v) != inEq.end()) continue;
 		Formula<Poly> cur = createComparison<Poly>(v.first, v.second, Relation::LEQ);
 		res.emplace_back(Formula<Poly>(FormulaType::IMPLIES, Formula<Poly>(FormulaType::AND, eq), cur));
 		eq.emplace_back(createComparison<Poly>(v.first, v.second, Relation::EQ));
+		if (eliminateTrue) inEq.emplace(v.second, v.first);
 	}
 	return Formula<Poly>(FormulaType::AND, std::move(res));
 }
