@@ -1,6 +1,5 @@
 #pragma once
 
-#ifdef USE_BLISS
 
 namespace carl {
 namespace formula {
@@ -10,6 +9,8 @@ using Symmetries = std::vector<Symmetry>;
 
 }
 }
+
+#ifdef USE_BLISS
 
 #include "SymmetryFinder.h"
 #include "SymmetryBreaker.h"
@@ -40,5 +41,29 @@ Formula<Poly> breakSymmetries(const Formula<Poly>& f, bool onlyFirst = true) {
 
 }
 }
+
+#else
+
+namespace carl {
+namespace formula {
+
+template<typename Poly>
+Symmetries findSymmetries(const Formula<Poly>& f) {
+	return Symmetries();
+}
+
+template<typename Poly>
+Formula<Poly> breakSymmetries(const Symmetries& symmetries, bool onlyFirst = true) {
+	return Formula<Poly>(FormulaType::TRUE);
+}
+
+template<typename Poly>
+Formula<Poly> breakSymmetries(const Formula<Poly>& f, bool onlyFirst = true) {
+	return Formula<Poly>(FormulaType::TRUE);
+}
+
+}
+}
+
 
 #endif
