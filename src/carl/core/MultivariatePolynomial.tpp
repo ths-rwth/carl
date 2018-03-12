@@ -377,45 +377,38 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
 template<typename Coeff, typename Ordering, typename Policies>
 Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness( bool _fullEffort ) const
 {
-	if( isLinear() )
+	if (isLinear()) {
+		CARL_LOG_DEBUG("carl.core", "Linear and hence " << Definiteness::NON);
 		return Definiteness::NON;
+	}
 	auto term = mTerms.rbegin();
-	if( term == mTerms.rend() ) return Definiteness::NON;
+	if (term == mTerms.rend()) return Definiteness::NON;
 	Definiteness result = term->definiteness();
+	CARL_LOG_DEBUG("carl.core", "Got " << result << " from first term " << *term);
 	++term;
-	if( term == mTerms.rend() ) return result;
-	if( result > Definiteness::NON )
-	{
-		for( ; term != mTerms.rend(); ++term )
-		{
+	if (term == mTerms.rend()) return result;
+	if (result > Definiteness::NON) {
+		for (; term != mTerms.rend(); ++term) {
 			Definiteness termDefin = (term)->definiteness();
-			if( termDefin > Definiteness::NON )
-			{
+			if (termDefin > Definiteness::NON) {
 				if( termDefin > result ) result = termDefin;
-			}
-			else
-            {
+			} else {
+                result = Definiteness::NON;
+                break;
+            }
+		}
+	} else if (result < Definiteness::NON) {
+		for (; term != mTerms.rend(); ++term) {
+			Definiteness termDefin = (term)->definiteness();
+			if (termDefin < Definiteness::NON) {
+				if( termDefin < result ) result = termDefin;
+			} else {
                 result = Definiteness::NON;
                 break;
             }
 		}
 	}
-	else if( result < Definiteness::NON )
-	{
-		for( ; term != mTerms.rend(); ++term )
-		{
-			Definiteness termDefin = (term)->definiteness();
-			if( termDefin < Definiteness::NON )
-			{
-				if( termDefin > result ) result = termDefin;
-			}
-			else
-            {
-                result = Definiteness::NON;
-                break;
-            }
-		}
-	}
+	CARL_LOG_DEBUG("carl.core", "Eventually got " << result);
     if( _fullEffort && result == Definiteness::NON && totalDegree() == 2 )
     {
         assert( !isConstant() );
