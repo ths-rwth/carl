@@ -1,0 +1,64 @@
+6,7c6
+< CFLAGS += -O9
+< #CFLAGS += -DBLISS_DEBUG
+---
+> CFLAGS += -O4
+15,16d13
+< GMPOBJS = $(addsuffix g,  $(OBJS))
+< 
+18d14
+< #LIB += /usr/lib/ccmalloc.o -ldl
+23a20,22
+> SONAME=libbliss.so
+> SOMINOR=0
+> SOFULL=$(SONAME).$(SOMINOR)
+25,32c24
+< gmp:	LIB += -lgmp
+< gmp:	CFLAGS += -DBLISS_USE_GMP
+< 
+< normal:	bliss
+< gmp:	bliss_gmp
+< 
+< 
+< all:: lib bliss
+---
+> all:: libbliss.a libbliss.so
+34c26
+< %.o %.og:	%.cc
+---
+> %.o:	%.cc
+37c29
+< lib: $(OBJS)
+---
+> libbliss.a: $(OBJS)
+42,51c34,48
+< lib_gmp: $(GMPOBJS)
+< 	rm -f $(BLISSLIB)
+< 	$(AR) cr $(BLISSLIB) $(GMPOBJS)
+< 	$(RANLIB) $(BLISSLIB)
+< 
+< bliss: bliss.o lib $(OBJS)
+< 	$(CC) $(CFLAGS) -o bliss bliss.o $(OBJS) $(LIB)
+< 
+< bliss_gmp: bliss.og lib_gmp $(GMPOBJS)
+< 	$(CC) $(CFLAGS) -o bliss bliss.og $(GMPOBJS) $(LIB)
+---
+> libbliss.so: ${OBJS}
+> 	$(CC) -shared -Wl,-soname,$(SONAME) $(LIB) -o $(SOFULL) $^
+> 	ln -sf $(SOFULL) $(SONAME)
+> 	ln -sf $(SOFULL) libbliss.so
+> 
+> install: libbliss.a libbliss.so
+> 	mkdir -p $(DESTDIR)/lib
+> 	cp libbliss.a $(DESTDIR)/lib
+> 	cp $(SOFULL) $(DESTDIR)/lib
+> 	cd $(DESTDIR)/lib && \
+> 		ln -sf $(SOFULL) $(SONAME) && \
+> 		ln -sf $(SOFULL) libbliss.so
+> 	mkdir -p $(DESTDIR)/include/bliss
+> 	cp *.h $(DESTDIR)/include/bliss
+> 	cp *.hh $(DESTDIR)/include/bliss
+55c52
+< 	rm -f bliss $(BLISSLIB) $(OBJS) bliss.o $(GMPOBJS) bliss.og
+---
+> 	rm -f bliss $(BLISSLIB) $(OBJS) bliss.o *.so*
