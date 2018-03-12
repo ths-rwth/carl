@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef USE_BLISS
+
 namespace carl {
 namespace formula {
 
@@ -37,3 +39,5 @@ Formula<Poly> breakSymmetries(const Formula<Poly>& f) {
 
 }
 }
+
+#endif

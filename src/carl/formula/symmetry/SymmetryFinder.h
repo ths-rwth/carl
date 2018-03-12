@@ -1,9 +1,6 @@
 #pragma once
 
 #include "../../config.h"
-
-#ifdef USE_BLISS
-
 #include "../Formula.h"
 
 #include <bliss/graph.hh>
@@ -165,5 +162,3 @@ public:
 }
 }
 }
-
-#endif
