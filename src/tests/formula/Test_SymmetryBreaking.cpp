@@ -4,8 +4,6 @@
 #include <carl/formula/Formula.h>
 #include <carl/formula/symmetry/symmetry.h>
 
-#include <bliss/graph.hh>
-
 #include "../Common.h"
 
 typedef carl::MultivariatePolynomial<Rational> Pol;
