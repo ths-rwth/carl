@@ -33,11 +33,7 @@ TEST(Symmetry, BlissBase)
 	FormulaT fB(Constr(lhsB, carl::Relation::EQ));
 	FormulaT f(carl::FormulaType::AND, {fA, fB});
 	
-	Constr symmA = Constr(Rational(1)*x - Rational(1)*y, carl::Relation::LEQ);
-	Constr symmB = Constr(Rational(1)*y - Rational(1)*x, carl::Relation::LEQ);
-	Constr symmC = Constr(Rational(1)*y - Rational(1)*x, carl::Relation::EQ);
-	FormulaT symmD = FormulaT(carl::FormulaType::IMPLIES, FormulaT(symmC), FormulaT(symmB));
-	FormulaT symm(carl::FormulaType::AND, {FormulaT(symmA), symmD});
+	FormulaT symm(Constr(Rational(1)*x - Rational(1)*y, carl::Relation::LEQ));
 	
 	auto res2 = carl::formula::breakSymmetries(f);
 	EXPECT_EQ(res2, symm);
