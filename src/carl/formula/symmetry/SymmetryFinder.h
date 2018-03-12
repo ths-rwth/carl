@@ -101,7 +101,6 @@ class GraphBuilder {
 		return vert;
 	}
 	unsigned addFormula(const Formula<Poly>& f) {
-		std::cout << "Adding " << f << std::endl;
 		unsigned vert = mGraph.add_vertex(mColor(f.getType()));
 		switch (f.getType()) {
 			case carl::FormulaType::ITE:
@@ -141,7 +140,6 @@ public:
 	GraphBuilder(const Formula<Poly>& f) {
 		collectVariables(f);
 		addFormula(f);
-		mGraph.write_dot("test2.dot");
 	}
 	Symmetries symmetries() {
 		bliss::Stats stats;
