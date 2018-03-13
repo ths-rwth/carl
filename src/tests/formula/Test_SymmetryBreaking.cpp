@@ -30,8 +30,12 @@ TEST(Symmetry, BlissBase)
 	FormulaT fA(Constr(lhsA, carl::Relation::EQ));
 	FormulaT fB(Constr(lhsB, carl::Relation::EQ));
 	FormulaT f(carl::FormulaType::AND, {fA, fB});
-	
+
+#ifdef USE_BLISS
 	FormulaT symm(Constr(Rational(1)*x - Rational(1)*y, carl::Relation::LEQ));
+#else
+	FormulaT symm(carl::FormulaType::TRUE);
+#endif
 	
 	auto res2 = carl::formula::breakSymmetries(f);
 	EXPECT_EQ(res2, symm);
