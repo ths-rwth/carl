@@ -13,14 +13,14 @@ namespace carl
 
 template<typename Coefficient>
 Term<Coefficient>::Term() :
-	mCoeff(carl::constant_zero<Coefficient>().get()), mMonomial()
+	mCoeff(carl::constant_zero<Coefficient>().get())
 {
 	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c) :
-	mCoeff(c), mMonomial()
+	mCoeff(c)
 {
 	assert(this->isConsistent());
 }

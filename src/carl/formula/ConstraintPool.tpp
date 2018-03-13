@@ -25,6 +25,7 @@ namespace carl
         mpPolynomialCache(nullptr)
     {
         VariablePool::getInstance();
+		MonomialPool::getInstance();
         if( needs_cache<Pol>::value )
         {
             mpPolynomialCache = std::shared_ptr<typename Pol::CACHE>(new typename Pol::CACHE());
@@ -36,13 +37,13 @@ namespace carl
 		 * Thereby, the MonomialPool gets destroyed after the ConstraintPool.
 		 * Thereby, destroying the constraints (and the Monomials contained) works correctly.
 		 */
-		MonomialPool::getInstance();
         mConstraints.reserve( _capacity );
         mConstraints.insert( mConsistentConstraint );
         mConstraints.insert( mInconsistentConstraint );
         mConsistentConstraint->mUsages = 1; // avoids deleting it
         mInconsistentConstraint->mUsages = 1; // avoids deleting it
         mIdAllocator = 3;
+		CARL_LOG_DEBUG("carl.pool", "ConstraintPool constructed");
     }
 
     template<typename Pol>
@@ -86,12 +87,15 @@ namespace carl
     const ConstraintContent<Pol>* ConstraintPool<Pol>::create( const Pol& _lhs, Relation _rel )
     {
         CONSTRAINT_POOL_LOCK_GUARD
-        if( _lhs.isConstant() )
+        if( _lhs.isConstant() ) {
+			CARL_LOG_DEBUG("carl.formula.constraint", _lhs << " is constant, we simply evaluate.");
             return evaluate( _lhs.constantPart(), _rel ) ? mConsistentConstraint : mInconsistentConstraint;
+		}
         if( _lhs.totalDegree() == 1 && (_rel != Relation::EQ && _rel != Relation::NEQ) && _lhs.isUnivariate() )
         {
             if( carl::isNegative( _lhs.lcoeff() ) )
             {
+				CARL_LOG_DEBUG("carl.formula.constraint", "Normalizing leading coefficient of linear poly.");
                 switch( _rel )
                 {
                     case Relation::LESS: _rel = Relation::GREATER; break;
@@ -100,6 +104,7 @@ namespace carl
                     default: assert( _rel == Relation::GEQ); _rel = Relation::LEQ; break;
                 }
             }
+			CARL_LOG_DEBUG("carl.formula.constraint", "Rewriting to bound: " << _lhs.getSingleVariable() << " " << _rel << " " << (-_lhs.constantPart())/_lhs.lcoeff());
             return create( _lhs.getSingleVariable(), _rel, (-_lhs.constantPart())/_lhs.lcoeff() );
         }
         return addConstraintToPool( createNormalizedConstraint( _lhs, _rel ) );
@@ -197,6 +202,7 @@ namespace carl
     template<typename Pol>
     ConstraintContent<Pol>* ConstraintPool<Pol>::createNormalizedConstraint( const Pol& _lhs, const Relation _rel ) const
     {
+		CARL_LOG_DEBUG("carl.formula.constraint", "Normalizing " << _lhs << " " << _rel << " 0");
         if( _rel == Relation::GREATER )
         {
             Pol lhs = _lhs.isZero() ? Pol( typename Pol::NumberType( 0 ) ) : _lhs.coprimeCoefficients();
@@ -204,6 +210,7 @@ namespace carl
             {
                 lhs = -lhs;
             }
+			CARL_LOG_DEBUG("carl.formula.constraint", "-> " << lhs << " < 0");
             return new ConstraintContent<Pol>( std::move(lhs), Relation::LESS );
         }
         else if( _rel == Relation::GEQ )
@@ -213,6 +220,7 @@ namespace carl
             {
                 lhs = -lhs;
             }
+			CARL_LOG_DEBUG("carl.formula.constraint", "-> " << lhs << " <= 0");
             return new ConstraintContent<Pol>( std::move(lhs), Relation::LEQ );
         }
         else
@@ -226,6 +234,7 @@ namespace carl
             {
                 lhs = -lhs;
             }
+			CARL_LOG_DEBUG("carl.formula.constraint", "-> " << lhs << " " << _rel << " 0");
             return new ConstraintContent<Pol>( std::move(lhs), _rel );
         }
     }
@@ -233,8 +242,10 @@ namespace carl
     template<typename Pol>
     const ConstraintContent<Pol>* ConstraintPool<Pol>::addConstraintToPool( ConstraintContent<Pol>* _constraint )
     {
+		CARL_LOG_DEBUG("carl.formula.constraint", "Adding " << *_constraint);
         mLastConstructedConstraintWasKnown = false;
         unsigned constraintConsistent = _constraint->isConsistent();
+		CARL_LOG_DEBUG("carl.formula.constraint", "Consistent? " << constraintConsistent);
 //        cout << *_constraint << " is consistent: " << constraintConsistent << endl;
 		///@todo Use appropriate constant instead of 2.
         if( constraintConsistent == 2 ) // Constraint contains variables.

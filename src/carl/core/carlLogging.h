@@ -122,6 +122,8 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
  */
 class Sink {
 public:
+	virtual ~Sink() noexcept = default;
+
 	/**
 	 * Abstract logging interface.
 	 * The intended usage is to write any log output to the output stream returned by this function.
@@ -242,6 +244,8 @@ class Formatter {
 public:
 	/// Print information like log level, file etc.
 	bool printInformation = true;
+
+	virtual ~Formatter() noexcept = default;
 
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
@@ -382,7 +386,7 @@ public:
 	 */
 	void log(LogLevel level, const std::string& channel, const std::stringstream& ss, const RecordInfo& info) {
 		std::lock_guard<std::mutex> lock(mMutex);
-		for (auto t: mData) {
+		for (auto& t: mData) {
 			if (!std::get<1>(t.second).check(channel, level)) continue;
 			std::get<2>(t.second)->prefix(std::get<0>(t.second)->log(), mTimer, channel, level, info);
 			std::get<0>(t.second)->log() << ss.str();

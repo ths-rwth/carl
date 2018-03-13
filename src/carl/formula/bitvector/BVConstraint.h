@@ -20,9 +20,9 @@ namespace carl
 
 	private:
 		/// The hash value.
-		std::size_t mHash;
+		std::size_t mHash = 0;
 		/// The unique id.
-		std::size_t mId;
+		std::size_t mId = 0;
 
 		/// The relation for comparing left- and right-hand side.
 		BVCompareRelation mRelation;
@@ -33,8 +33,7 @@ namespace carl
 
 
 		explicit BVConstraint(bool _consistent = true) :
-			mHash(0), mId(0), mRelation(_consistent ? BVCompareRelation::EQ : BVCompareRelation::NEQ),
-			mLhs(), mRhs()
+			mRelation(_consistent ? BVCompareRelation::EQ : BVCompareRelation::NEQ)
 		{}
 
 		/**
@@ -45,7 +44,7 @@ namespace carl
 		 */
 		BVConstraint(const BVCompareRelation& _relation,
 			const BVTerm& _lhs, const BVTerm& _rhs) :
-			mHash((toId(_relation) << 10) ^ (_lhs.hash() << 5) ^ _rhs.hash()), mId(0),
+			mHash((toId(_relation) << 10) ^ (_lhs.hash() << 5) ^ _rhs.hash()),
 			mRelation(_relation), mLhs(_lhs), mRhs(_rhs)
 		{
 			assert(_lhs.width() == _rhs.width());

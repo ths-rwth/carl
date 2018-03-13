@@ -19,7 +19,7 @@ namespace carl {
 	class Number<long int> : public BaseNumber<long int,Number<long int>> {
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
 		explicit Number(const long int t) {mData = t; }
 		Number(const Number<long int>& n) = default;
 		Number(Number<long int>&& n) noexcept : BaseNumber(n) {}
@@ -30,10 +30,8 @@ namespace carl {
 		
 
 
-		Number<long int>& operator=(const Number<long int>& n) {
-			this->mData = n.mData;
-			return *this;
-		}
+		Number<long int>& operator=(const Number<long int>& n) = default;
+		Number<long int>& operator=(Number<long int>&& n) noexcept = default;
 
 		template<typename Other>
 		Number<long int>& operator=(const Other& n) {
@@ -41,23 +39,10 @@ namespace carl {
 			return *this;
 		}
 
-		Number<long int>& operator=(Number<long int>&& n) noexcept {
-			this->mData = std::move(n.mData);
-			return *this;
-		}
-
-
-
 
 		std::string toString(bool) const {
 			return std::to_string(mData);
 		}
-
-	
-
-
-
-
 
 		/**
 		 * Check if a number is integral.

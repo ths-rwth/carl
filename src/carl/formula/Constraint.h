@@ -721,7 +721,7 @@ namespace carl
             Pol coefficient( const Variable& _var, uint _degree ) const;
             
             Constraint negation() const {
-                CARL_LOG_DEBUG("carl.formula", "negation of " << *this << " is " << Constraint(lhs(), carl::inverse(relation())));
+                CARL_LOG_DEBUG("carl.formula.constraint", "negation of " << *this << " is " << Constraint(lhs(), carl::inverse(relation())));
                 return Constraint(lhs(), carl::inverse(relation()));
             }
 

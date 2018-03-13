@@ -26,7 +26,6 @@ endif()
 ##### Note that the resources may have dependencies among each other.
 ###############
 
-
 ##### GMP / GMPXX
 if(NOT FORCE_SHIPPED_RESOURCES)
 	load_library(carl GMP 5.1)
@@ -55,6 +54,35 @@ else()
 	message(STATUS "Use shipped version of Boost ${BOOST_VERSION}")
 endif()
 
+##### Eigen3
+if(NOT FORCE_SHIPPED_RESOURCES)
+	load_library(carl EIGEN3 3.3)
+endif()
+if(EIGEN3_FOUND)
+	message(STATUS "Use system version of Eigen3 ${EIGEN3_VERSION}")
+else()
+	set(EIGEN3_VERSION "3.3.4")
+	set(EIGEN3_ZIPHASH "e337acc279874bc6a56da4d973a723fb")
+	include(resources/eigen3.cmake)
+	unset(EIGEN3_ZIPHASH)
+	message(STATUS "Use shipped version of Eigen3 ${EIGEN3_VERSION}")
+endif()
+
+##### bliss
+if(USE_BLISS)
+	if(NOT FORCE_SHIPPED_RESOURCES)
+		load_library(carl BLISS 0.73)
+	endif()
+	if(BLISS_FOUND)
+		message(STATUS "Use system version of bliss ${BLISS_VERSION}")
+	else()
+		set(BLISS_VERSION "0.73")
+		include(resources/bliss.cmake)
+		message(STATUS "Use shipped version of bliss ${BLISS_VERSION}")
+	endif()
+else()
+	message(STATUS "Usage of bliss is disabled")
+endif()
 
 ##### CLN
 if(USE_CLN_NUMBERS)
@@ -69,6 +97,8 @@ if(USE_CLN_NUMBERS)
 		message(STATUS "Use shipped version of CLN ${CLN_VERSION}")
 	endif()
 	set_target_properties(CLN_STATIC PROPERTIES LINK_INTERFACE_LIBRARIES "GMP_STATIC")
+else()
+	message(STATUS "Usage of CLN is disabled")
 endif()
 
 
@@ -87,23 +117,9 @@ if(USE_COCOA)
 		unset(COCOA_TGZHASH)
 		message(STATUS "Use shipped version of CoCoA ${COCOA_VERSION}")
 	endif()
-endif()
-
-
-##### Eigen3
-if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl EIGEN3 3.3)
-endif()
-if(EIGEN3_FOUND)
-	message(STATUS "Use system version of Eigen3 ${EIGEN3_VERSION}")
 else()
-	set(EIGEN3_VERSION "3.3.4")
-	set(EIGEN3_ZIPHASH "e337acc279874bc6a56da4d973a723fb")
-	include(resources/eigen3.cmake)
-	unset(EIGEN3_ZIPHASH)
-	message(STATUS "Use shipped version of Eigen3 ${EIGEN3_VERSION}")
+	message(STATUS "Usage of CoCoA is disabled")
 endif()
-
 
 ##### GiNaC
 if(USE_GINAC)
@@ -117,6 +133,8 @@ if(USE_GINAC)
 		include(resources/ginac.cmake)
 		message(STATUS "Use shipped version of GiNaC ${GINAC_VERSION}")
 	endif()
+else()
+	message(STATUS "Usage of GiNaC is disabled")
 endif()
 
 

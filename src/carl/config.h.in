@@ -7,4 +7,5 @@
 #cmakedefine LOGGING
 #cmakedefine LOGGING_DISABLE_INEFFICIENT
 #cmakedefine THREAD_SAFE
+#cmakedefine USE_BLISS
 #cmakedefine USE_COCOA

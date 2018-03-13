@@ -117,7 +117,7 @@ namespace carl {
 
 		std::string toString(unsigned = 0, bool = false, bool = true) const {
 			std::stringstream ss;
-			ss << "(" << var() << " " << (negated() ? "!" : "") << relation() << " " << mValue << ")";
+			ss << "(" << var() << " " << (negated() ? "! " : "") << relation() << " " << mValue << ")";
 			return ss.str();
 		}
 	};
