@@ -206,6 +206,10 @@ public:
 			channel = (n == std::string::npos) ? "" : channel.substr(0, n);
 			it = mData.find(channel);
 		}
+		if (it == mData.end()) {
+			std::cout << "Did not find something for \"" << channel << "\"" << std::endl;
+			return true;
+		}
 		assert(it != mData.end());
 		return level >= it->second;
 	}
