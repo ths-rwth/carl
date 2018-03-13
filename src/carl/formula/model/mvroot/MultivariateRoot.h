@@ -42,7 +42,7 @@ private:
 public:
 	MultivariateRoot(const Poly& p, std::size_t k): mPoly(p), mK(k)
 	{
-		assert(mK > 0);
+		assert(mK > 0); // Begin counting at 1, so the first root has rootNumber k = 1.
 	}
 
 	std::size_t k() const noexcept {
