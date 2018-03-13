@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <iostream>
+
 namespace carl
 {
 	/**
@@ -23,4 +25,19 @@ namespace carl
 		/// Indicates that \f$y > 0 \forall y \in Y\f$.
 		POSITIVE = 4
 	};
+	
+	inline std::ostream& operator<<(std::ostream& os, Definiteness d) {
+		switch (d) {
+			case Definiteness::NEGATIVE:
+				return os << "negative";
+			case Definiteness::NEGATIVE_SEMI:
+				return os << "seminegative";
+			case Definiteness::NON:
+				return os << "none";
+			case Definiteness::POSITIVE_SEMI:
+				return os << "semipositive";
+			case Definiteness::POSITIVE:
+				return os << "positive";
+		}
+	}
 }
