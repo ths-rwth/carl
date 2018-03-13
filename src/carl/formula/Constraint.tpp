@@ -62,6 +62,7 @@ namespace carl
             mLhs *= -1;
             mRelation = Relation::LEQ;
         }
+		CARL_LOG_DEBUG("carl.formula.constraint", "Created " << *this);
         initLazy(); // TODO: this must unfortunately be done here and basically collects the variables. The reason is that without the variables, we cannot do the integer normalization.
         if( hasIntegerValuedVariable() && !hasRealValuedVariable() )
         {
@@ -79,6 +80,7 @@ namespace carl
             }
         }
         mLhsDefinitess = mLhs.definiteness( FULL_EFFORT_FOR_DEFINITENESS_CHECK );
+		CARL_LOG_DEBUG("carl.formula.constraint", "definiteness: " << mLhsDefinitess);
     }
 
     template<typename Pol>
@@ -88,6 +90,7 @@ namespace carl
             return carl::evaluate( mLhs.constantPart(), mRelation ) ? 1 : 0;
         else
         {
+			CARL_LOG_DEBUG("carl.formula.constraint", "Checking " << mRelation << " against " << mLhsDefinitess);
             switch( mRelation )
             {
                 case Relation::EQ:
@@ -329,7 +332,9 @@ namespace carl
     template<typename Pol>
     Constraint<Pol>::Constraint( const Pol& _lhs, Relation _rel ):
         Constraint( ConstraintPool<Pol>::getInstance().create( _lhs, _rel ) )
-    {}
+    {
+		CARL_LOG_DEBUG("carl.formula.constraint", _lhs << " " << _rel << " 0  ->  " << *this);
+	}
 
     template<typename Pol>
     template<typename P, EnableIf<needs_cache<P>>>
