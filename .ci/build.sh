@@ -2,7 +2,7 @@
 
 mkdir -p build || return 1
 cd build/ || return 1
-cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
+cmake -D DEVELOPER=ON -D USE_BLISS -D USE_CLN_NUMBERS=ON -D USE_COCOA=ON -D USE_GINAC=ON ../ || return 1
 
 if [ -z "$MAKE_PARALLEL" ]; then
 	MAKE_PARALLEL="-j2"
@@ -19,7 +19,7 @@ elif [[ ${TASK} == "coverity" ]]; then
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
 elif [[ ${TASK} == "sonarcloud" ]]; then
 	
-	cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON -D COVERAGE=ON ../ || return 1
+	cmake -D COVERAGE=ON ../ || return 1
 	
 	WRAPPER="build-wrapper-linux-x86-64 --out-dir ../bw-output"
 	$WRAPPER make ${MAKE_PARALLEL} lib_carl || return 1

@@ -211,9 +211,6 @@ matrix:
   allow_failures:
     - stage: build
       os: linux
-      env: CC=clang-6.0 CXX=clang++-6.0
-    - stage: build
-      os: linux
       env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
     - stage: build
       os: linux
