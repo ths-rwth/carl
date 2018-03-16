@@ -200,6 +200,7 @@ Coefficient Term<Coefficient>::evaluate(const std::map<Variable, Coefficient>& m
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) const
 {
+	assert(carl::isOne(coeff()));
 	Monomial::Arg tmp = Monomial::calcLcmAndDivideBy(monomial(), m);
 	if(tmp == nullptr)
 	{
