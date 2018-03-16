@@ -3,7 +3,7 @@ ExternalProject_Add(
     URL "http://www.tcs.hut.fi/Software/bliss/bliss-${BLISS_VERSION}.zip"
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE 1
-	PATCH_COMMAND cp ${CMAKE_SOURCE_DIR}/resources/bliss/CMakeLists.txt .
+	PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/resources/bliss/CMakeLists.txt <SOURCE_DIR>
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 )
 
