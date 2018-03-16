@@ -64,6 +64,7 @@ namespace io
 					return "Real";
 				default:
 					assert(false);
+					return "???";
 			}
 		}
 		
@@ -86,11 +87,11 @@ namespace io
 		{
 			if(mConstantsAsParameterlessFunctions)
 			{
-				return "(declare-fun " + carl::VariablePool::getInstance().getName(v, true) + " () " + tosmt2string(v.getType()) + ")";
+				return "(declare-fun " + v.name() + " () " + tosmt2string(v.type()) + ")";
 			}
 			else
 			{		
-				return "(declare-const " + carl::VariablePool::getInstance().getName(v, true) + " " + tosmt2string(v.getType()) + ")";
+				return "(declare-const " + v.name() + " " + tosmt2string(v.type()) + ")";
 			}
 			
 		}

@@ -32,17 +32,17 @@ int main (int argc, char** argv)
 	std::map<Variable, Interval<double>> map;
 
 	for(auto i : allVarInPolynome) {
-  	  if (i.getId() == 1)
+  	  if (i.id() == 1)
   	  {
   	  	Interval<double> ix (-2, 2);
   	  	map[i] = ix;
   	  }
-  	  if (i.getId() == 2)
+  	  if (i.id() == 2)
   	  {
   	  	Interval<double> iy (0, 1);
   	  	map[i] = iy;
   	  }
-  	  if (i.getId() == 3)
+  	  if (i.id() == 3)
   	  {
   	  	Interval<double> iz (0, 1);
   	  	map[i] = iz;

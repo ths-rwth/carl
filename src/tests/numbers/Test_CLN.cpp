@@ -1,5 +1,6 @@
-#include "gtest/gtest.h"
-#include "../../carl/numbers/numbers.h"
+#include <gtest/gtest.h>
+#include <carl/core/logging.h>
+#include <carl/numbers/numbers.h>
 
 #ifndef THREAD_SAFE
 #ifdef USE_CLN_NUMBERS
