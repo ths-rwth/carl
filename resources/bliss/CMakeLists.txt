@@ -15,6 +15,9 @@ elseif (WIN32)
 	set(STATIC_EXT ".lib")
 endif()
 
+# Compiler options
+set(CMAKE_CXX_FLAGS "-Wall --pedantic -O4 -fPIC")
+
 # Collect source files
 file(GLOB_RECURSE sources "*.cc")
 file(GLOB_RECURSE headers "*.h*")
