@@ -8,8 +8,8 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(BLISS-EP INSTALL_DIR)
 
-add_imported_library(BLISS SHARED "${INSTALL_DIR}/lib/libbliss.so" "${INSTALL_DIR}/include")
-add_imported_library(BLISS STATIC "${INSTALL_DIR}/lib/libbliss.a" "${INSTALL_DIR}/include")
+add_imported_library(BLISS SHARED "${INSTALL_DIR}/lib/libbliss${DYNAMIC_EXT}" "${INSTALL_DIR}/include")
+add_imported_library(BLISS STATIC "${INSTALL_DIR}/lib/libbliss${STATIC_EXT}" "${INSTALL_DIR}/include")
 
 add_dependencies(BLISS_SHARED BLISS-EP)
 add_dependencies(BLISS_STATIC BLISS-EP)
