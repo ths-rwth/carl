@@ -32,22 +32,24 @@ namespace carl
 	//enum class NumbLib { CLN, GMPPlusPlus };
 	class InvalidInputStringException : public std::runtime_error
 	{
-		typedef const char* cstring;
+		using cstring = const char*;
 		
 		/// Substring where the problem is.
 		const std::string mSubstring;
-		/// Inputstring
-		std::string mInputString;
+		/// Error message
+		std::string mErrorString;
 	public:
-		InvalidInputStringException(const std::string& msg, const std::string& substring, const std::string& inputString = "") : std::runtime_error(msg),
-		mSubstring(substring), mInputString(inputString)
+		InvalidInputStringException(const std::string& msg, std::string substring, const std::string& inputString = ""):
+			std::runtime_error(msg), mSubstring(std::move(substring))
 		{
-			
+			setInputString(inputString);
 		}
 		
 		void setInputString(const std::string& inputString) 
 		{
-			mInputString = inputString;
+			std::stringstream strstr;
+			strstr << std::runtime_error::what() << " at " << mSubstring << " in " << inputString;
+			mErrorString = strstr.str();
 		}
 		
 #ifdef __VS
@@ -56,9 +58,7 @@ namespace carl
 		virtual cstring what() const noexcept override
 #endif
 		{
-			std::stringstream strstr;
-			strstr << std::runtime_error::what() << " at " << mSubstring << " in " << mInputString;
-			return strstr.str().c_str();
+			return mErrorString.c_str();
 		}		
 	};
 	
