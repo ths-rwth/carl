@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.2)
 
 file(STRINGS defs.hh version REGEX "const version = \".*\";")
 string(REGEX MATCH "[0-9]+\\.[0-9]+" version "${version}")
@@ -20,6 +20,7 @@ set(CMAKE_CXX_FLAGS "-Wall --pedantic -O4 -fPIC")
 
 # Collect source files
 file(GLOB_RECURSE sources "*.cc")
+list(REMOVE_ITEM sources ${CMAKE_CURRENT_SOURCE_DIR}/bliss.cc)
 file(GLOB_RECURSE headers "*.h*")
 
 # Shared library
