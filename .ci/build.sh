@@ -13,8 +13,6 @@ if [[ ${TASK} == "dependencies" ]]; then
 	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
 	
 elif [[ ${TASK} == "coverity" ]]; then
-	MAKE_PARALLEL="-j1"
-	
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
 elif [[ ${TASK} == "sonarcloud" ]]; then
