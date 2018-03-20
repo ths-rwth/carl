@@ -16,7 +16,7 @@ namespace carl {
 		_out << ufc.name() << "(";
 		bool first = true;
 		for (const auto& dom: ufc.domain()) {
-			if (!first) {
+			if (first) {
 				_out << " ";
 				first = false;
 			}
