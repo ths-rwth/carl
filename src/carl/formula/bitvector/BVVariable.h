@@ -13,19 +13,16 @@ namespace carl {
 
 	class BVVariable {
 	private:
-		Variable mVar;
+		Variable mVar = Variable::NO_VARIABLE;
 		Sort mSort;
-		std::size_t mWidth;
+		std::size_t mWidth = 0;
 
 	public:
 
-		BVVariable():
-			mVar(Variable::NO_VARIABLE), mSort(), mWidth(0)
-		{
-		}
+		BVVariable() = default;
 
 		BVVariable(Variable _variable, const Sort& _sort):
-			mVar(_variable), mSort(_sort), mWidth(0)
+			mVar(_variable), mSort(_sort)
 		{
 			assert(SortManager::getInstance().getType(_sort) == VariableType::VT_BITVECTOR);
 

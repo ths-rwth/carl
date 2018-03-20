@@ -25,9 +25,7 @@ namespace carl
         explicit BVValue(Base&& value): mValue(std::move(value)) {}
 
     public:
-        BVValue() : mValue()
-        {
-        }
+        BVValue() = default;
 
         explicit BVValue(std::size_t _width, uint _value = 0) :
             BVValue(std::array<uint,1>({{_value}}))
@@ -100,7 +98,7 @@ namespace carl
         {
         }
 
-        operator const Base&() const
+        explicit operator const Base&() const
         {
             return mValue;
         }
@@ -244,7 +242,7 @@ namespace carl
             Base concatenation(mValue);
             concatenation.resize(width() + _other.width());
             concatenation <<= _other.width();
-            Base otherResized = _other;
+            Base otherResized = static_cast<Base>(_other);
             otherResized.resize(concatenation.size());
             concatenation |= otherResized;
             return BVValue(std::move(concatenation));
@@ -405,7 +403,7 @@ namespace carl
 
             Base quotient(width());
             std::size_t quotientIndex = 0;
-            Base divisor = _other;
+            Base divisor = static_cast<Base>(_other);
             Base remainder(mValue);
 
             while(! divisor[divisor.size()-1] && remainder > divisor) {
@@ -436,24 +434,19 @@ namespace carl
     };
 }
 
-namespace std
-{
+namespace std {
     /**
      * Implements std::hash for bit vector values.
      * TODO: Make more efficient (currently uses dynamic_bitset<> conversion to string).
      * See also: https://stackoverflow.com/q/3896357, https://svn.boost.org/trac/boost/ticket/2841
      */
-    template <>
-    struct hash<carl::BVValue>
-    {
-        public:
-
+    template<>
+    struct hash<carl::BVValue> {
         /**
          * @param _value The bit vector value to get the hash for.
          * @return The hash of the given bit vector value.
          */
-        size_t operator()(const carl::BVValue& _value) const
-        {
+        std::size_t operator()(const carl::BVValue& _value) const {
             return std::hash<std::string>()(_value.toString());
         }
     };

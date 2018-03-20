@@ -227,7 +227,7 @@ namespace carl
 	private:
 		BVTermType mType;
 		
-		boost::variant<BVVariable,BVValue,BVUnaryContent,BVBinaryContent,BVExtractContent> mContent;
+		boost::variant<BVVariable,BVValue,BVUnaryContent,BVBinaryContent,BVExtractContent> mContent = BVValue();
 		
 		template<typename T>
 		T& getContent() {
@@ -251,14 +251,14 @@ namespace carl
 		BVExtractContent& getExtract() { return getContent<BVExtractContent>(); }
 		const BVExtractContent& getExtract() const { return getContent<BVExtractContent>(); }
 
-		std::size_t mWidth;
-		std::size_t mId;
+		std::size_t mWidth = 0;
+		std::size_t mId = 0;
 		std::size_t mHash;
 
 	public:
 
 		BVTermContent() :
-		mType(BVTermType::CONSTANT), mContent(BVValue()), mWidth(0), mId(0), mHash(carl::variant_hash(mContent))
+		mType(BVTermType::CONSTANT), mHash(carl::variant_hash(mContent))
 		{
 		}
 
@@ -270,14 +270,14 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVVariable& _variable) :
-		mType(_type), mContent(_variable), mWidth(_variable.width()), mId(0),
+		mType(_type), mContent(_variable), mWidth(_variable.width()),
 		mHash(carl::variant_hash(mContent))
 		{
 			assert(_type == BVTermType::VARIABLE);
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _index = 0) :
-			mType(_type), mContent(BVUnaryContent(_operand, _index)), mWidth(0), mId(0),
+			mType(_type), mContent(BVUnaryContent(_operand, _index)),
 			mHash(carl::variant_hash(mContent))
 		{
 			assert(typeIsUnary(_type));
@@ -297,7 +297,7 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm& _first, const BVTerm& _second) :
-			mType(_type), mContent(BVBinaryContent(_first, _second)), mWidth(0), mId(0),
+			mType(_type), mContent(BVBinaryContent(_first, _second)),
 			mHash(carl::variant_hash(mContent))
 		{
 			assert(typeIsBinary(_type));
@@ -312,7 +312,7 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _highest, const size_t _lowest) :
-			mType(_type), mContent(BVExtractContent(_operand, _highest, _lowest)), mWidth(_highest - _lowest + 1), mId(0),
+			mType(_type), mContent(BVExtractContent(_operand, _highest, _lowest)), mWidth(_highest - _lowest + 1),
 			mHash(carl::variant_hash(mContent))
 		{
 			assert(_type == BVTermType::EXTRACT);
@@ -366,8 +366,8 @@ namespace carl
 		 */
 		std::string toString(const std::string& _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
 		{
-            if(isInvalid()) {
-                return _init + "%invalid%";
+			if(isInvalid()) {
+				return _init + "%invalid%";
 			}
 			else if (mType == BVTermType::CONSTANT) {
 				return _init + getValue().toString();
