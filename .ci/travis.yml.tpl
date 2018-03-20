@@ -36,7 +36,9 @@ matrix:
   {%- if job.env|length > 0 %}
       env: {{ job.env|join(' ') }}
   {%- endif %}
+  {%- if job.script %}
       script: {{ job.script|join(' ') }}
+  {%- endif %}
   {%- if job.addons %}
       addons:
     {%- if job.addons.apt %}
