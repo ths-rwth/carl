@@ -31,7 +31,7 @@ def addons(apt = None, coverity = False, sonarcloud = False):
 		res["coverity_scan"]["description"] = "CArL"
 		res["coverity_scan"]["properties"] = {
 			"notification_email": "gereon.kremer@cs.rwth-aachen.de",
-			"build_command_prepend": "cov-configure --template --comptype gcc --compiler `which $CXX`",
+			"build_command_prepend": "cov-configure --template --comptype gcc --compiler $CXX",
 			"build_command": ".ci/build.sh MAKE_PARALLEL=-j1",
 			"branch_pattern": "master",
 		}
