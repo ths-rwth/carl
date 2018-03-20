@@ -123,6 +123,7 @@ bool SampleSet<Number>::simplify(const RealAlgebraicNumber<Number>& from, RealAl
 		mSamples.erase(from);
 		mSamples.insert(to);
 		auto it = std::find(mHeap.begin(), mHeap.end(), from);
+		assert(it != mHeap.end());
 		*it = to;
 		assert(this->isConsistent());
 		return true;
