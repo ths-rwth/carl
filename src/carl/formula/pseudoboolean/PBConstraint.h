@@ -15,7 +15,7 @@ namespace carl {
 		template<typename Poly>
 		friend std::ostream& operator<<(std::ostream& os, const PBConstraint<Poly>& pbc);
     private:
-        Relation relation;
+        Relation relation = Relation::EQ;
         Number rhs;
         std::vector<std::pair<Number,Variable>> lhs;
     public:
