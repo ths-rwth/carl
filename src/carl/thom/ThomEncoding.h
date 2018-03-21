@@ -53,7 +53,7 @@ public:
 		Variable mainVar,
 		std::shared_ptr<ThomEncoding<Number>> point = nullptr
 	):
-		mSc(), mP(), mMainVar(mainVar), mPoint(std::move(point)), mSd(), mRelevant()
+		mMainVar(mainVar), mPoint(std::move(point))
 	{
 		Polynomial p = Polynomial(mainVar) - n;
 		std::list<ThomEncoding<Number>> roots = realRootsThom(p, mainVar, point);
@@ -67,8 +67,7 @@ public:
 	ThomEncoding(
 		const ThomEncoding<Number>& te,
 		std::shared_ptr<ThomEncoding<Number>> point
-	):
-		mSc(), mP(), mMainVar(), mPoint(), mSd(), mRelevant()
+	)
 	{
 		CARL_LOG_ASSERT("carl.thom", te.mP.isUnivariate(), "");
 		CARL_LOG_ASSERT("carl.thom", te.mPoint == nullptr, "");

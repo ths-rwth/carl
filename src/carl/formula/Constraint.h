@@ -109,15 +109,15 @@ namespace carl
         
         private:
             /// A unique id.
-            std::size_t mID;
-            /// The hash value.
-            std::size_t mHash;
+            std::size_t mID = 0;
             /// A unique id.
-            mutable std::size_t mUsages;
+            mutable std::size_t mUsages = 0;
             /// The relation symbol comparing the polynomial considered by this constraint to zero.
-            Relation mRelation;
+            Relation mRelation = Relation::EQ;
             /// The polynomial which is compared by this constraint to zero.
             Pol mLhs;
+			/// The hash value.
+			std::size_t mHash;
             /// The factorization of the polynomial considered by this constraint.
             mutable Factors<Pol> mFactorization;
             /// A container which includes all variables occurring in the polynomial considered by this constraint.
@@ -125,7 +125,7 @@ namespace carl
             /// A map which stores information about properties of the variables in this constraint.
             mutable VarInfoMap<Pol> mVarInfoMap;
             /// Definiteness of the polynomial in this constraint.
-            mutable Definiteness mLhsDefinitess;
+            mutable Definiteness mLhsDefinitess = Definiteness::NON;
             /// Mutex for access to variable information map.
             mutable std::mutex mVarInfoMapMutex;
             /// Mutex for access to the factorization.

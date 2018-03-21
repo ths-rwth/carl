@@ -32,28 +32,15 @@ namespace carl
     
     template<typename Pol>
     ConstraintContent<Pol>::ConstraintContent():
-        mID( 0 ),
-        mHash( CONSTRAINT_HASH( Pol( typename Pol::NumberType( 0 ) ), Relation::EQ, Pol ) ),
-        mUsages( 0 ),
-        mRelation( Relation::EQ ),
-        mLhs( typename Pol::NumberType( 0 ) ),
-        mFactorization(),
-        mVariables(),
-        mVarInfoMap(),
-        mLhsDefinitess( Definiteness::NON )
+        mHash( CONSTRAINT_HASH( mLhs, mRelation, Pol ) )
     {}
 
     template<typename Pol>
     ConstraintContent<Pol>::ConstraintContent( Pol&& _lhs, Relation _rel, std::size_t _id ):
         mID( _id ),
-        mHash( CONSTRAINT_HASH( _lhs, _rel, Pol ) ),
-        mUsages( 0 ),
         mRelation( _rel ),
         mLhs( std::move(_lhs) ),
-        mFactorization(),
-        mVariables(),
-        mVarInfoMap(),
-        mLhsDefinitess( Definiteness::NON )
+		mHash( CONSTRAINT_HASH( mLhs, mRelation, Pol ) )
     {
         if (mRelation == Relation::GREATER) {
             mLhs *= -1;

@@ -81,29 +81,18 @@ private:
 	}
 
 public:
-	RealAlgebraicNumber():
-		mValue(carl::constant_zero<Number>::get()),
-		mIsRoot(true),
-		mIR(),
-		mTE()
-	{}
+	RealAlgebraicNumber() = default;
 	explicit RealAlgebraicNumber(const Number& n, bool isRoot = true):
 		mValue(n),
-		mIsRoot(isRoot),
-		mIR(),
-		mTE()
+		mIsRoot(isRoot)
 	{}
 	explicit RealAlgebraicNumber(Variable var, bool isRoot = true):
-		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
-		mIR(std::make_shared<IntervalContent>(Polynomial(var), Interval<Number>::zeroInterval())),
-		mTE(nullptr)
+		mIR(std::make_shared<IntervalContent>(Polynomial(var), Interval<Number>::zeroInterval()))
 	{}
 	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, bool isRoot = true):
-		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
-		mIR(std::make_shared<IntervalContent>(p.normalized(), i)),
-		mTE(nullptr)
+		mIR(std::make_shared<IntervalContent>(p.normalized(), i))
 	{
 		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
 		assert(i.isOpenInterval() || i.isPointInterval());
@@ -118,10 +107,8 @@ public:
 		}
 	}
 	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, const std::list<UnivariatePolynomial<Number>>& sturmSequence, bool isRoot = true):
-		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
-		mIR(std::make_shared<IntervalContent>(p.normalized(), i, sturmSequence)),
-		mTE(nullptr)
+		mIR(std::make_shared<IntervalContent>(p.normalized(), i, sturmSequence))
 	{
 		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
 		assert(i.isOpenInterval() || i.isPointInterval());
@@ -137,9 +124,7 @@ public:
 	}
 
 	explicit RealAlgebraicNumber(const ThomEncoding<Number>& te, bool isRoot = true):
-		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
-		mIR(nullptr),
 		mTE(std::make_shared<ThomEncoding<Number>>(te))
 	{}
 

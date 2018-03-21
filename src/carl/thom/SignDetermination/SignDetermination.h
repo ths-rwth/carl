@@ -38,21 +38,14 @@ private:
 	std::list<Alpha> mAda;
 	std::list<uint> mAdaHelper;
 	Eigen::MatrixXf mMatrix;
-	bool mNeedsUpdate;
+	bool mNeedsUpdate = false;
 	
 	
 	
 public:
 	template<typename InputIt>
-	SignDetermination(InputIt zeroSet_first, InputIt zeroSet_last) : 
-		mP(),
-		mTaQ(zeroSet_first, zeroSet_last),
-		mSigns(),
-		mProducts(),
-		mAda(),
-		mAdaHelper(),
-		mMatrix(),
-		mNeedsUpdate(false)
+	SignDetermination(InputIt zeroSet_first, InputIt zeroSet_last) :
+		mTaQ(zeroSet_first, zeroSet_last)
 	{}
 
 	
