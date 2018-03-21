@@ -38,7 +38,7 @@ namespace carl
         /**
          * Default constructor.
          */
-        Numeric();
+        Numeric() = default;
         Numeric( const T& /*unused*/ ); // NOLINT
         Numeric( ContentType /*unused*/, bool /*unused*/ = false ); // NOLINT
         Numeric( const Numeric<T>& /*unused*/ );
@@ -113,7 +113,7 @@ namespace carl
             return this->toRational();
         }
         
-        operator typename IntegralType<T>::type () const
+        explicit operator typename IntegralType<T>::type () const
         {
             if( std::abs( this->mContent ) < HIGHTEST_INTEGER_VALUE )
                 return typename IntegralType<T>::type( this->mContent );

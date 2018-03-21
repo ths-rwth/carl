@@ -176,7 +176,7 @@ private:
 	}
 
 public:
-	~SortManager() noexcept = default;
+	~SortManager() noexcept override = default;
 
 	void clear() {
 		mSorts.clear();

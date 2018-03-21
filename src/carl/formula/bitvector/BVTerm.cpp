@@ -14,7 +14,7 @@ namespace carl
     }
 
     BVTerm::BVTerm(BVTermType _type, BVValue _value) :
-    mpContent(BVTermPool::getInstance().create(_type, _value))
+    mpContent(BVTermPool::getInstance().create(_type, std::move(_value)))
     {
     }
 

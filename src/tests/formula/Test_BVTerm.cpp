@@ -13,6 +13,7 @@ TEST(BVTerm, Empty)
 TEST(BVTerm, Constant)
 {
 	carl::BVValue val(8, 0);
+	EXPECT_EQ(8, val.width());
 	carl::BVTerm bvt(carl::BVTermType::CONSTANT, val);
 	EXPECT_EQ(8, bvt.width());
 	EXPECT_EQ(carl::BVTermType::CONSTANT, bvt.type());

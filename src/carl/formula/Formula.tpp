@@ -30,7 +30,7 @@ namespace carl
         if( _bitvectorVars )
         {
             assert( bvVars != nullptr );
-            for (const auto& v: *bvVars) _vars.insert(v);
+            for (const auto& v: *bvVars) _vars.insert(v.variable());
             delete bvVars;
         }
         if( considerUninterpreted )

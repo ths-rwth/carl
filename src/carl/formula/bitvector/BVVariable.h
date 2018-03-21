@@ -35,7 +35,7 @@ namespace carl {
 		Variable variable() const {
 			return mVar;
 		}
-		operator Variable() const {
+		explicit operator Variable() const {
 			return mVar;
 		}
 
@@ -45,13 +45,6 @@ namespace carl {
         const Sort& sort() const {
             return mSort;
         }
-
-		bool operator==(const BVVariable& _other) const {
-			return mVar == _other.mVar;
-		}
-		bool operator<(const BVVariable& _other) const {
-			return mVar < _other.mVar;
-		}
 
 		std::size_t width() const {
 			return mWidth;
@@ -74,6 +67,25 @@ namespace carl {
 			return os << v.variable();
 		}
 	};
+
+	inline bool operator==(const BVVariable& lhs, const BVVariable& rhs) {
+		return lhs.variable() == rhs.variable();
+	}
+	inline bool operator==(const BVVariable& lhs, const Variable& rhs) {
+		return lhs.variable() == rhs;
+	}
+	inline bool operator==(const Variable& lhs, const BVVariable& rhs) {
+		return lhs == rhs.variable();
+	}
+	inline bool operator<(const BVVariable& lhs, const BVVariable& rhs) {
+		return lhs.variable() < rhs.variable();
+	}
+	inline bool operator<(const BVVariable& lhs, const Variable& rhs) {
+		return lhs.variable() < rhs;
+	}
+	inline bool operator<(const Variable& lhs, const BVVariable& rhs) {
+		return lhs < rhs.variable();
+	}
 } // end namespace carl
 
 namespace std {
@@ -87,7 +99,7 @@ namespace std {
          * @return The hash of the given bitvector variable.
          */
         std::size_t operator()(const carl::BVVariable& v) const {
-            return std::hash<carl::Variable>()(v);
+            return std::hash<carl::Variable>()(v.variable());
         }
     };
 }

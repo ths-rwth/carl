@@ -8,8 +8,6 @@
 namespace carl
 {
     BVTermPool::BVTermPool():
-		Singleton<BVTermPool>(),
-		Pool<BVTermContent>(),
 		mpInvalid(add(new Term))
     {
     }
@@ -19,9 +17,9 @@ namespace carl
         return this->mpInvalid;
     }
 
-    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVValue& _value)
+    BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, BVValue&& _value)
     {
-        return this->add(new Term(_type, _value));
+        return this->add(new Term(_type, std::move(_value)));
     }
 
     BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVVariable& _variable)

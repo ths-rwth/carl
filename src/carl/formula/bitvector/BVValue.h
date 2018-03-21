@@ -41,8 +41,7 @@ namespace carl
             }
         }
 #endif
-        BVValue(std::size_t _width, const mpz_class& _value) :
-        	mValue()
+        BVValue(std::size_t _width, const mpz_class& _value)
         {
             // Obtain an mpz_t copy of _value
             mpz_t value;

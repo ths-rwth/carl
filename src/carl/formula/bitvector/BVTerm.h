@@ -126,7 +126,7 @@ namespace carl
 
 		friend std::ostream& operator<<(std::ostream& _out, const BVTerm& _term)
 		{
-			return(_out << _term.toString());
+			return _out << _term.toString();
 		}
 
 		std::size_t hash() const;
@@ -225,7 +225,7 @@ namespace carl
 		friend class BVTerm;
 
 	private:
-		BVTermType mType;
+		BVTermType mType = BVTermType::CONSTANT;
 		
 		boost::variant<BVVariable,BVValue,BVUnaryContent,BVBinaryContent,BVExtractContent> mContent = BVValue();
 		
@@ -258,12 +258,12 @@ namespace carl
 	public:
 
 		BVTermContent() :
-		mType(BVTermType::CONSTANT), mHash(carl::variant_hash(mContent))
+		mHash(carl::variant_hash(mContent))
 		{
 		}
 
-		BVTermContent(BVTermType _type, BVValue _value) :
-			mType(_type), mContent(_value), mWidth(_value.width()), mId(0),
+		BVTermContent(BVTermType _type, BVValue&& _value) :
+			mType(_type), mContent(std::move(_value)), mWidth(getValue().width()),
 			mHash(carl::variant_hash(mContent))
 		{
 			assert(_type == BVTermType::CONSTANT);

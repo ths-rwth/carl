@@ -30,7 +30,7 @@ namespace carl
 
 		ConstTermPtr create();
 
-		ConstTermPtr create(BVTermType _type, const BVValue& _value);
+		ConstTermPtr create(BVTermType _type, BVValue&& _value);
 
 		ConstTermPtr create(BVTermType _type, const BVVariable& _variable);
 

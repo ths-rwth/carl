@@ -56,14 +56,6 @@ namespace carl
             return id;
         }
     }
-    
-    /**
-     * Default constructor.
-     */
-    template<typename T>
-    Numeric<T>::Numeric():
-        mContent( 0 )
-    {}
 
     /**
      * Constructing from a Rational.

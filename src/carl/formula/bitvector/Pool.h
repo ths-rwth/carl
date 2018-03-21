@@ -27,7 +27,7 @@ namespace carl
 
 		// Members:
 		/// id allocator
-		unsigned mIdAllocator;
+		unsigned mIdAllocator = 1;
 		/// The formula pool.
 		FastPointerSet<Element> mPool;
 		/// Mutex to avoid multiple access to the pool
@@ -43,13 +43,8 @@ namespace carl
 		 * Constructor of the pool.
 		 * @param _capacity Expected necessary capacity of the pool.
 		 */
-		explicit Pool(unsigned _capacity = 10000) :
-			mIdAllocator(1),
-			mPool(),
-			mMutexPool()
-		{
+		explicit Pool(unsigned _capacity = 10000) {
 			mPool.reserve(_capacity);
-
 		}
 
 		~Pool()
