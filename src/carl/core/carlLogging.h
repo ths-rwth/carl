@@ -281,7 +281,7 @@ public:
 		std::size_t spacing = 1;
 		if (channelwidth + 15 > channel.size() + filename.size()) spacing = channelwidth + 15 - channel.size() - filename.size();
 		os << channel << std::string(spacing, ' ') << filename << ":" << std::left << std::setw(4) << info.line << " ";
-		std::resetiosflags(std::ios::adjustfield);
+		os << std::resetiosflags(std::ios::adjustfield);
 		if (!info.func.empty()) os << info.func << "(): ";
 	}
 
