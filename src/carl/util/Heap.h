@@ -42,8 +42,8 @@ namespace carl
     {
         public:
             class c_iterator;
-            typedef C                             Configuration;
-            typedef typename Configuration::Entry Entry;
+            using Configuration = C;
+            using Entry = typename Configuration::Entry;
 
             explicit Heap( const Configuration& configuration ):
 				_tree(),
@@ -111,8 +111,8 @@ namespace carl
             size_t getMemoryUse() const;
 
         private:
-            typedef CompactTree<Entry, Configuration::fastIndex> Tree;
-            typedef typename Tree::Node                      Node;
+            using Tree = CompactTree<Entry, Configuration::fastIndex>;
+            using Node = typename Tree::Node;
 
             Node moveHoleDown( Node hole );
             void moveValueDown( Node pos, Entry value );

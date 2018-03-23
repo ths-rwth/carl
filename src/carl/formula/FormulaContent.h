@@ -107,7 +107,6 @@ namespace carl {
             mVariables( std::move(_vars) ), 
             mFormula( std::move(_formula) )
         {}
-        ~QuantifierContent() {}
 
         /**
          * Checks this content of a quantified formula and the given content of a quantified formula is equal.
@@ -236,13 +235,13 @@ namespace carl {
              * @param _true Specifies whether to create the formula (true) or (false).
              * @param _id A unique id of the formula to create.
              */
-            FormulaContent(FormulaType _type, size_t _id = 0);
+            FormulaContent(FormulaType _type, std::size_t _id = 0);
 
             /**
              * Constructs a formula being a variable.
              * @param _variable 
              */
-            FormulaContent(carl::Variable::Arg _variable);
+            FormulaContent(Variable _variable);
             
             FormulaContent(Formula<Pol>&& _lhs, Relation _rel);
 

@@ -39,16 +39,7 @@ class Term {
 		/**
 		 * Default constructor. Constructs a term of value zero.
 		 */
-		Term();
-		
-		Term(const Term& t): mCoeff(t.mCoeff), mMonomial(t.mMonomial) {
-			assert(isConsistent());
-		}
-		Term(Term&& t): mCoeff(std::move(t.mCoeff)), mMonomial(std::move(t.mMonomial)) {
-			assert(isConsistent());
-		}
-		Term& operator=(const Term& t) = default;
-		Term& operator=(Term&& t) = default;
+		Term() = default;
 		/**
 		 * Constructs a term of value \f$ c \f$.
 		 * @param c Coefficient.

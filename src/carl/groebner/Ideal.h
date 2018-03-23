@@ -25,40 +25,29 @@ class Ideal
 private:
     std::vector<Polynomial> mGenerators;
 
-    sortByLeadingTerm<Polynomial> mTermOrder;
+    sortByLeadingTerm<Polynomial> mTermOrder = sortByLeadingTerm<Polynomial>(mGenerators);
 
     std::unordered_set<size_t> mEliminated;
-    Datastructure<Polynomial> mDivisorLookup;
+    Datastructure<Polynomial> mDivisorLookup = Datastructure<Polynomial>(mGenerators, mEliminated, mTermOrder);
 public:
 
-    Ideal() : 
-        mGenerators(), 
-        mTermOrder(mGenerators), 
-        mEliminated(), 
-        mDivisorLookup(mGenerators, mEliminated, mTermOrder)
-    {
+    Ideal() = default;
 
-    }
-
-    Ideal(const Polynomial& p1, const Polynomial& p2) : 
-        mGenerators(), 
-        mTermOrder(mGenerators), 
-        mEliminated(), 
+    Ideal(const Polynomial& p1, const Polynomial& p2):
+        mTermOrder(mGenerators),
         mDivisorLookup(mGenerators, mEliminated, mTermOrder)
     {
         addGenerator(p1);
         addGenerator(p2);
     }
-	
-	
 
     virtual ~Ideal() = default;
 	
-	Ideal(const Ideal& rhs) : 
-	mGenerators(rhs.mGenerators), 
-    mTermOrder(mGenerators), 
-    mEliminated(rhs.mEliminated), 
-    mDivisorLookup(mGenerators, mEliminated, mTermOrder)
+	Ideal(const Ideal& rhs):
+		mGenerators(rhs.mGenerators), 
+	    mTermOrder(mGenerators), 
+	    mEliminated(rhs.mEliminated), 
+	    mDivisorLookup(mGenerators, mEliminated, mTermOrder)
 	{
 		removeEliminated();
 		mDivisorLookup.reset();

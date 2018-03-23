@@ -30,20 +30,20 @@ private:
         using Polynomial = MultivariatePolynomial<Number>;
         
         // for the univariate case
-        UnivariatePolynomial<Number> mZ;
-        UnivariatePolynomial<Number> mDer;
+        UnivariatePolynomial<Number> mZ = UnivariatePolynomial<Number>(Variable::NO_VARIABLE);
+        UnivariatePolynomial<Number> mDer = UnivariatePolynomial<Number>(Variable::NO_VARIABLE);
         
         // for the multivariate case
         MultiplicationTable<Number> mTab;
-        bool mTrivialGb;
+        bool mTrivialGb = false;
         
         mutable std::map<Polynomial, QueryResultType> mCache;
         
 public:
-        TarskiQueryManager() : mZ(Variable::NO_VARIABLE), mDer(Variable::NO_VARIABLE), mTab(), mTrivialGb(false), mCache() {}
+        TarskiQueryManager() = default;
         
         template<typename InputIt>
-        TarskiQueryManager(InputIt first, InputIt last) : TarskiQueryManager() {
+        TarskiQueryManager(InputIt first, InputIt last) {
                 CARL_LOG_TRACE("carl.thom.tarski.manager", "setting up a taq manager on " << std::vector<Polynomial>(first, last));
                 // univariate manager
                 if(std::distance(first, last) == 1 && first->isUnivariate()) {

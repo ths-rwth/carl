@@ -84,8 +84,7 @@ std::vector<typename GroebnerBase<Number>::Monomial> GroebnerBase<Number>::mon()
         CARL_LOG_FUNC("carl.thom.groebner", "groebner base: " << this->get());
         CARL_LOG_ASSERT("carl.thom.groebner", this->hasFiniteMon(), "tried to compute mon of non-zerodimensional system"); 
         std::set<Variable> varsset = this->gatherVariables();
-        std::vector<Variable> vars;
-        for(const auto& v : varsset) vars.push_back(v);
+        std::vector<Variable> vars(varsset.begin(), varsset.end());
         std::vector<typename GroebnerBase<Number>::Monomial> lmons = this->cor();
         std::vector<uint> degrees;
         for(const auto& v : vars) {

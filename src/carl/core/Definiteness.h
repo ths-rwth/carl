@@ -39,5 +39,6 @@ namespace carl
 			case Definiteness::POSITIVE:
 				return os << "positive";
 		}
+		return os;
 	}
 }

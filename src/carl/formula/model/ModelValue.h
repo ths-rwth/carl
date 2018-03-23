@@ -83,10 +83,6 @@ namespace carl
 		 * Default constructor.
 		 */
 		ModelValue() = default;
-		ModelValue(const ModelValue& mv) = default;
-		ModelValue(ModelValue&& mv) = default;
-		ModelValue& operator=(const ModelValue& mv) = default;
-		ModelValue& operator=(ModelValue&& mv) = default;
 
 		/**
 		 * Initializes the Assignment from some valid type of the underlying variant.

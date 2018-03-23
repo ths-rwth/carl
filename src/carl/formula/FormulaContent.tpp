@@ -19,16 +19,14 @@ namespace carl {
 	}
 
     template<typename Pol>
-    FormulaContent<Pol>::FormulaContent(carl::Variable::Arg _variable):
+    FormulaContent<Pol>::FormulaContent(Variable _variable):
+		mHash(std::hash<Variable>()(_variable)), // TODO: subtract the id of the boolean variable with the smallest id
 #ifdef __VS
-		mHash((std::size_t)_variable.id()) // TODO: subtract the id of the boolean variable with the smallest id
-		{
-		mpVariableVS = new carl::Variable(_variable);
+		mpVariableVS(new Variable(_variable))
 #else
-		mHash((std::size_t)_variable.id()), // TODO: subtract the id of the boolean variable with the smallest id
 		mVariable(_variable)
-	{
 #endif
+	{
 		switch (_variable.type()) {
 			case VariableType::VT_BOOL:
 				mType = BOOL;
@@ -420,13 +418,13 @@ namespace carl {
         {
             result += stringOfType;
 #ifdef __VS
-			for (auto subFormula = mpSubformulasVS->begin(); subFormula != mpSubformulasVS->end(); ++subFormula)
+			for (const auto& subFormula: mpSubformulasVS)
 #else
-			for (auto subFormula = mSubformulas.begin(); subFormula != mSubformulas.end(); ++subFormula)
+			for (const auto& subFormula: mSubformulas)
 #endif
             {
                 result += (_oneline ? " " : "\n");
-                result += subFormula->toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
+                result += subFormula.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
             }
         }
         result += ")";
