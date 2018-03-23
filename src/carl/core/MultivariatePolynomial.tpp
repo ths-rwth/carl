@@ -1233,34 +1233,6 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::SPolynomial(
-																const MultivariatePolynomial<Coeff, Ordering, Policies>& p,
-																const MultivariatePolynomial<Coeff, Ordering, Policies>& q)
-{
-	assert(p.nrTerms() != 0);
-	assert(q.nrTerms() != 0);
-	assert(p.isConsistent());
-	assert(q.isConsistent());
-
-	if( p.nrTerms() == 1 && q.nrTerms() == 1 )
-	{
-		return MultivariatePolynomial();
-	}
-	else if( p.nrTerms() == 1 )
-	{
-		return -(p.lterm().calcLcmAndDivideBy( q.lmon() ) * q.tail());
-	}
-	else if( q.nrTerms() == 1 )
-	{
-		return (q.lterm().calcLcmAndDivideBy( p.lmon() ) * p.tail());
-	}
-	else
-	{
-		return (p.tail() * q.lterm().calcLcmAndDivideBy(p.lmon())) - (q.tail() * p.lterm().calcLcmAndDivideBy( q.lmon() ));
-	}
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
 {
 	assert(this->isConsistent());
@@ -1277,18 +1249,6 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
 	mTermAdditionManager.readTerms(id, mTerms);
 	if (!newlterm.isZero()) mTerms.push_back(newlterm);
 	assert(this->isConsistent());
-}
-
-
-template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::squareFreePart() const {
-	return carl::squareFreePart(*this);
-}
-
-
-template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::coprimePart(const MultivariatePolynomial<Coeff,Ordering,Policies>& q) const {
-	return carl::coprimePart(*this, q);
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

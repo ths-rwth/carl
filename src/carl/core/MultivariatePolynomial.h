@@ -19,6 +19,7 @@
 #include "../numbers/numbers.h"
 #include "../util/TermAdditionManager.h"
 #include "polynomialfunctions/SquareFreePart.h"
+#include "polynomialfunctions/SPolynomial.h"
 #include "polynomialfunctions/CoprimePart.h"
 #include "polynomialfunctions/SoSDecomposition.h"
 
@@ -567,19 +568,28 @@ public:
 	 * @param q
 	 * @return 
 	 */
-	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
+	[[deprecated("use carl::SPolynomial(p,q) instead.")]]
+	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q) {
+		return carl::SPolynomial(p,q);
+	}
 	
 	/**
 	* Calculates the squarefree part of the Polynomial. Only works with CoCoA.
 	* @return
 	*/
-	MultivariatePolynomial squareFreePart() const;
+	[[deprecated("use carl::squareFreePart(p) instead.")]]
+	MultivariatePolynomial squareFreePart() const {
+		return carl::squareFreePart(*this);
+	}
 	/**
 	* Calculates the part ofthe Polynomial, that is coprime to q. Only works with CoCoA.
 	* @param q
 	* @return
 	*/
-	MultivariatePolynomial coprimePart(const MultivariatePolynomial& q) const;
+	[[deprecated("use carl::coprimePart(p,q) instead.")]]
+	MultivariatePolynomial coprimePart(const MultivariatePolynomial& q) const {
+		return carl::coprimePart(*this, q);
+	}
 
 	void square();
 
