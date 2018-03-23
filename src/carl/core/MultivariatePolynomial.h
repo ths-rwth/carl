@@ -20,6 +20,7 @@
 #include "../util/TermAdditionManager.h"
 #include "polynomialfunctions/SquareFreePart.h"
 #include "polynomialfunctions/CoprimePart.h"
+#include "polynomialfunctions/SoSDecomposition.h"
 
 
 namespace carl
@@ -260,7 +261,9 @@ public:
      * @return The sum-of-squares (sos) decomposition ((q1,p1), .., (qn,pn)) with this = q1*p1^2+..+qn*pn^2, qi being positive rational numbers and pi being polynomials.
      *          If the result is empty, no sos could be found (which does not mean, that there exists no one).
      */
-    std::vector<std::pair<Coeff,MultivariatePolynomial<Coeff,Ordering,Policies>>> sosDecomposition( bool _notTrivial = false ) const;
+    auto sosDecomposition(bool not_trivial = false) const {
+		return carl::SoSDecomposition(*this, not_trivial);
+	}
 
 	/**
 	 * Calculate the number of terms.
