@@ -13,11 +13,11 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> SoSDecomposition(const M
 			if (!carl::isNegative(term->coeff())) {
 				assert(!carl::isZero(term->coeff()));
 				if (term->isConstant()) {
-					result.emplace_back(term->coeff(), constant_one<C>::get());
+					result.emplace_back(term->coeff(), MultivariatePolynomial<C,O,P>(constant_one<C>::get()));
 				} else {
 					auto resMonomial = term->monomial()->sqrt();
 					if (resMonomial == nullptr) break;
-					result.emplace_back(term->coeff(), resMonomial);
+					result.emplace_back(term->coeff(), MultivariatePolynomial<C,O,P>(resMonomial));
 				}
 			} else {
 				break;
@@ -56,7 +56,7 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> SoSDecomposition(const M
 			result.emplace_back(lcoeffIter->second.constantPart(), MultivariatePolynomial<C,O,P>(var)+qr);
 			rem -= qr.pow(2)*lcoeffIter->second.constantPart();
 		} else {
-			result.emplace_back(lcoeffIter->second.constantPart(), var);
+			result.emplace_back(lcoeffIter->second.constantPart(), MultivariatePolynomial<C,O,P>(var));
 		}
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Add " << result.back().first << " * (" << result.back().second << ")^2");
 	}
@@ -64,7 +64,7 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> SoSDecomposition(const M
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__);
 		return {};
 	} else if(!carl::isZero(rem.constantPart())) {
-		result.emplace_back(rem.constantPart(), constant_one<C>::get());
+		result.emplace_back(rem.constantPart(), MultivariatePolynomial<C,O,P>(constant_one<C>::get()));
 	}
 	CARL_LOG_TRACE("carl.core.sos_decomposition", "Add " << result.back().first << " * (" << result.back().second << ")^2");
 	return result;
