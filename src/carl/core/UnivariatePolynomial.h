@@ -14,6 +14,8 @@
 #include "Variable.h"
 #include "VariableInformation.h"
 
+#include "polynomialfunctions/Resultant.h"
+
 #include <functional>
 #include <list>
 #include <map>
@@ -43,9 +45,6 @@ namespace carl
 
 enum class PolynomialComparisonOrder {
 	CauchyBound, LowDegree, Memory, Default = LowDegree
-};
-enum class SubresultantStrategy {
-	Generic, Lazard, Ducos, Default = Lazard
 };
 	
 /**
@@ -971,24 +970,36 @@ public:
 	 * @param strategy Strategy.
 	 * @return Subresultants of p and q.
 	 */
-	static const std::list<UnivariatePolynomial> subresultants(
-			const UnivariatePolynomial& pol1,
-			const UnivariatePolynomial& pol2,
+	[[deprecated("use carl::subresultants() instead")]]
+	static std::list<UnivariatePolynomial> subresultants(
+			const UnivariatePolynomial& p,
+			const UnivariatePolynomial& q,
 			SubresultantStrategy strategy = SubresultantStrategy::Default
-	);
+	) {
+		return carl::subresultants(p, q, strategy);
+	}
 
+	[[deprecated("use carl::principalSubresultantsCoefficients() instead")]]
 	static const std::vector<UnivariatePolynomial> principalSubresultantsCoefficients(
 			const UnivariatePolynomial& p,
 			const UnivariatePolynomial& q,
 			SubresultantStrategy strategy = SubresultantStrategy::Default
-	);
+	) {
+		return carl::principalSubresultantsCoefficients(p, q, strategy);
+	}
 
+	[[deprecated("use carl::resultant() instead")]]
 	UnivariatePolynomial<Coefficient> resultant(
 			const UnivariatePolynomial<Coefficient>& p,
 			SubresultantStrategy strategy = SubresultantStrategy::Default
-	) const;
+	) const {
+		return carl::resultant(*this, p, strategy);
+	}
 
-	UnivariatePolynomial<Coefficient> discriminant(SubresultantStrategy strategy = SubresultantStrategy::Default) const;
+	[[deprecated("use carl::discriminant() instead")]]
+	UnivariatePolynomial<Coefficient> discriminant(SubresultantStrategy strategy = SubresultantStrategy::Default) const {
+		return carl::discriminant(*this, strategy);
+	}
 
 	/// @name Equality comparison operators
 	/// @{
