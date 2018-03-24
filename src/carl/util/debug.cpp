@@ -50,16 +50,18 @@ namespace carl {
 		void* frames[3];
 		int cnt = backtrace(frames, sizeof(frames) / sizeof(void*));
 		if (cnt == 0) return "<unknown, maybe corrupt>";
-		char** symbols = backtrace_symbols(frames, cnt);
+		std::unique_ptr<char*, void(*)(void*)> symbols {
+			backtrace_symbols(frames, cnt),
+			std::free
+		};
 
 		std::stringstream out;
 		Dl_info info = {};
 		if (dladdr(frames[2], &info) != 0 && info.dli_sname != nullptr) {
 			out << demangle(info.dli_sname) << std::endl;
 		} else {
-			out << "??? " << demangle(symbols[2]) << std::endl;
+			out << "??? " << demangle(symbols.get()[2]) << std::endl;
 		}
-		free(symbols);
 		return out.str();
 	}
 #endif

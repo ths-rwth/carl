@@ -36,7 +36,7 @@ Formula<Poly> breakSymmetries(const Symmetries& symmetries, bool onlyFirst = tru
 
 template<typename Poly>
 Formula<Poly> breakSymmetries(const Formula<Poly>& f, bool onlyFirst = true) {
-	return breakSymmetries<Poly>(findSymmetries(f));
+	return breakSymmetries<Poly>(findSymmetries(f), onlyFirst);
 }
 
 }
