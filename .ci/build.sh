@@ -66,9 +66,7 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	python setup.py test || return 1
 	
 elif [[ ${TASK} == "tidy" ]]; then
-	
-	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
-	/usr/bin/time make ${MAKE_PARALLEL} || return 1
+
 	/usr/bin/time make tidy || return 1
 
 elif [[ ${TASK} == "addons" ]]; then
