@@ -31,9 +31,6 @@ namespace carl
         std::recursive_mutex mMutex;
         std::shared_ptr<typename Poly::CACHE> mpPolynomialCache;
     public:
-        
-        OldGinacConverter() : Singleton<OldGinacConverter<Poly>>() {}
-            
         ~OldGinacConverter() = default;
         
         void setPolynomialCache( const std::shared_ptr<typename Poly::CACHE>& _cache )
