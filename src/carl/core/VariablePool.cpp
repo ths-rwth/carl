@@ -12,14 +12,7 @@
 namespace carl
 {
 
-VariablePool::VariablePool() noexcept:
-    Singleton(),
-    mNextIDs(),
-	freshVarMutex(),
-	setNameMutex(),
-    mVariableNames(),
-    mVariablePrefix()
-{
+VariablePool::VariablePool() noexcept {
 	CARL_LOG_INFO("carl.varpool", "Constructor called");
 	clear();
 	setPrefix();

@@ -319,8 +319,6 @@ namespace carl
 			assert(_highest < _operand.width() && _highest >= _lowest);
 		}
 
-		~BVTermContent() = default;
-
 		std::size_t width() const {
 			return mWidth;
 		}

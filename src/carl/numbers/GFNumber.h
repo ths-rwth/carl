@@ -19,16 +19,12 @@ namespace carl
 template<typename IntegerType>
 class GFNumber
 {
-	IntegerType mN;
-	const GaloisField<IntegerType>* mGf;
+	IntegerType mN = carl::constant_zero<IntegerType>::get();
+	const GaloisField<IntegerType>* mGf = nullptr;
 	
 	public:
 
-	GFNumber():
-		mN(carl::constant_zero<IntegerType>::get()),
-		mGf(nullptr)
-	{
-	}
+	GFNumber() = default;
 	explicit GFNumber(IntegerType n, const GaloisField<IntegerType>* gf = nullptr):
 		mN(gf == nullptr ? n : gf->symmetricModulo(n)),
 		mGf(gf)
@@ -40,8 +36,6 @@ class GFNumber
 		mGf(gf)
 	{
 	}
-	
-	GFNumber& operator=(const GFNumber&) = default;
 
 	const GaloisField<IntegerType>* gf() const
 	{

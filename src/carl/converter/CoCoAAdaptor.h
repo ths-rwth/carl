@@ -5,10 +5,10 @@
 #include "../core/Variable.h"
 #include "../util/Common.h"
 
-#include <map>
 #include <algorithm>
+#include <cstdlib>
 #include <iterator>
-#include <stdlib.h>
+#include <map>
 
 #ifdef USE_COCOA
 

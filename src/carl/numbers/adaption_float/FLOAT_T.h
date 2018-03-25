@@ -100,7 +100,7 @@ namespace carl
 		sint bInt = *reinterpret_cast<const sint*>(&B);
 		if (bInt < 0)
 			bInt = static_cast<sint>(0x8000000000000000) - bInt;
-		uint intDiff = static_cast<uint>(std::abs(aInt - bInt));
+		auto intDiff = static_cast<uint>(std::abs(aInt - bInt));
 		return intDiff <= maxUlps;
 	}
 

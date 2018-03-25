@@ -66,7 +66,7 @@ private:
 		return Ordering::less(t[t1], t[t2]);
 	}
 public:
-	TermAdditionManager(): mData(), mNextId(), mMutex() {
+	TermAdditionManager() {
         MonomialPool::getInstance();
 		mNextId = createNewEntry();
 	}

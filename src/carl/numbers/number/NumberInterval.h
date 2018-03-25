@@ -71,7 +71,7 @@ namespace carl {
 	class Number<Interval<cln::cl_RA>> : public BaseNumber<Interval<cln::cl_RA>,Number<Interval<cln::cl_RA>>> {
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
 		explicit Number(const Interval<cln::cl_RA>& t): BaseNumber(t) {}
 		explicit Number(Interval<cln::cl_RA>&& t): BaseNumber(t) {}
 		Number(const Number<Interval<cln::cl_RA>>& n) = default;
@@ -128,7 +128,7 @@ namespace carl {
 	class Number<Interval<mpq_class>> : public BaseNumber<Interval<mpq_class>,Number<Interval<mpq_class>>> {
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
 		explicit Number(const Interval<mpq_class>& t): BaseNumber(t) {}
 		explicit Number(Interval<mpq_class>&& t): BaseNumber(std::move(t)) {}
 		Number(const Number<Interval<mpq_class>>& n) = default;
@@ -183,7 +183,7 @@ namespace carl {
 	class Number<Interval<mpz_class>> : public BaseNumber<Interval<mpz_class>,Number<Interval<mpz_class>>> {
 	public:
 
-		Number(): BaseNumber() {}
+		Number() = default;
 		explicit Number(const Interval<mpz_class>& t): BaseNumber(t) {}
 		explicit Number(Interval<mpz_class>&& t): BaseNumber(std::move(t)) {}
 		Number(const Number<Interval<mpz_class>>& n) = default;
