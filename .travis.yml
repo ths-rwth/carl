@@ -50,11 +50,6 @@ matrix:
     - stage: dependencies
       os: linux
       compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=coverity
-      script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
-    - stage: dependencies
-      os: linux
-      compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=pycarl
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
@@ -166,12 +161,12 @@ matrix:
           packages: [*packages_base, clang-5.0]
     - stage: build
       os: linux
-      compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=coverity
+      compiler: clang++-5.0
+      env: CC=clang-5.0 CXX=clang++-5.0 TASK=coverity
       addons:
         apt:
-          sources: [*sources_base]
-          packages: [*packages_base]
+          sources: [*sources_base, llvm-toolchain-trusty-5.0, *sources_base]
+          packages: [*packages_base, clang-5.0, *packages_base]
         coverity_scan:
           project:
             name: "smtrat/carl"
@@ -213,7 +208,7 @@ matrix:
       env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
     - stage: build
       os: linux
-      env: CC=gcc-6 CXX=g++-6 TASK=coverity
+      env: CC=clang-5.0 CXX=clang++-5.0 TASK=coverity
     - stage: build
       os: linux
       env: CC=clang-5.0 CXX=clang++-5.0 TASK=sonarcloud
