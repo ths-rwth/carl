@@ -32,7 +32,7 @@ def addons(apt = None, coverity = False, sonarcloud = False):
 		res["coverity_scan"]["properties"] = {
 			"notification_email": "gereon.kremer@cs.rwth-aachen.de",
 			"build_command_prepend": "cov-configure --template --comptype gcc --compiler $CXX",
-			"build_command": ".ci/build.sh",
+			"build_command": "travis_wait 30 .ci/build.sh",
 			"branch_pattern": "master",
 		}
 	if sonarcloud:
