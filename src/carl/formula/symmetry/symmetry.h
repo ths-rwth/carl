@@ -4,7 +4,15 @@
 namespace carl {
 namespace formula {
 
+/**
+ * A symmetry \f$\sigma\f$ represents a bijection on a set of variables.
+ * For every entry in the vector we have \f$\sigma(e.first) = e.second\f$.
+ */
 using Symmetry = std::vector<std::pair<Variable,Variable>>;
+
+/**
+ * Represents a list of symmetries.
+ */
 using Symmetries = std::vector<Symmetry>;
 
 }

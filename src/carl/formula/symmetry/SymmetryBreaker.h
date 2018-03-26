@@ -32,6 +32,9 @@ Formula<Poly> createComparison(Variable x, Variable y, Relation rel) {
 	return Formula<Poly>(FormulaType::TRUE);
 }
 
+/**
+ * Creates symmetry breaking constraints from the passed symmetries in the spirit of @cite Crawford1996.
+ */
 template<typename Poly>
 Formula<Poly> lexLeaderConstraint(const Symmetry& vars) {
 	constexpr bool eliminateTrue = true;
