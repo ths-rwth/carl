@@ -173,7 +173,7 @@ matrix:
             description: "CArL"
           notification_email: "gereon.kremer@cs.rwth-aachen.de"
           build_command_prepend: "cov-configure --template --comptype gcc --compiler $CXX"
-          build_command: "travis_wait 30 .ci/build.sh"
+          build_command: ".ci/build.sh"
           branch_pattern: "master"
     - stage: build
       os: linux
