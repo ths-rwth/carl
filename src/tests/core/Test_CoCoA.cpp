@@ -4,6 +4,8 @@
 
 #include <carl/converter/CoCoAAdaptor.h>
 #include <carl/core/MultivariatePolynomial.h>
+#include <carl/core/polynomialfunctions/CoprimePart.h>
+#include <carl/core/polynomialfunctions/SquareFreePart.h>
 
 #include <random>
 #include <map>
@@ -142,14 +144,14 @@ TEST(CoCoA, SquareFreeBase)
 	Poly onePoly = (x+mpq_class(1)-x);
 	std::vector<Poly> polyvec({p,q});
 	{
-		Poly sqareFreeBase = c.makeCoprimeWith(r.squareFreePart(),p);
+		Poly sqareFreeBase = c.makeCoprimeWith(carl::squareFreePart(r), p);
 		sqareFreeBase = c.makeCoprimeWith(sqareFreeBase,q);
 		EXPECT_EQ(sqareFreeBase, res);
 		EXPECT_EQ(c.gcd(p,sqareFreeBase), onePoly);
 		EXPECT_EQ(c.gcd(q,sqareFreeBase), onePoly);
 	}
 	{
-		Poly sqareFreeBase = r.squareFreePart().coprimePart(p).coprimePart(q);
+		Poly sqareFreeBase = carl::coprimePart(carl::coprimePart(carl::squareFreePart(r), p), q);
 		EXPECT_EQ(sqareFreeBase, res);
 	}
 }

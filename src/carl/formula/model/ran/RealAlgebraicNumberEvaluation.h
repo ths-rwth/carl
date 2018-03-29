@@ -15,6 +15,8 @@
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicPoint.h"
 
+#include <carl/core/polynomialfunctions/Resultant.h>
+
 #include "../../../core/MultivariatePolynomial.h"
 #include "../../../interval/IntervalEvaluation.h"
 #include "../../../thom/ThomEvaluation.h"
@@ -229,7 +231,7 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
 			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
 			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp.switchVariable(i.first));
-			tmp = tmp.switchVariable(i.first).resultant(p2);
+			tmp = carl::resultant(tmp.switchVariable(i.first), p2);
 			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
 			varToInterval[i.first] = i.second.getInterval();
 		} else {

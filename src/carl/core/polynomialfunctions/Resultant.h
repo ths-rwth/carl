@@ -1,18 +1,35 @@
 #pragma once
 
-#include "../UnivariatePolynomial.h"
+#include <list>
+#include <vector>
 
 namespace carl {
-
 enum class SubresultantStrategy {
 	Generic, Lazard, Ducos, Default = Lazard
 };
 
 template<typename Coeff>
+class UnivariatePolynomial;
+
+template<typename Coeff>
+std::list<UnivariatePolynomial<Coeff>> subresultants(const UnivariatePolynomial<Coeff>&, const UnivariatePolynomial<Coeff>&, SubresultantStrategy = SubresultantStrategy::Default);
+template<typename Coeff>
+std::vector<UnivariatePolynomial<Coeff>> principalSubresultantsCoefficients(const UnivariatePolynomial<Coeff>&, const UnivariatePolynomial<Coeff>&, SubresultantStrategy = SubresultantStrategy::Default);
+template<typename Coeff>
+UnivariatePolynomial<Coeff> resultant(const UnivariatePolynomial<Coeff>&, const UnivariatePolynomial<Coeff>&, SubresultantStrategy = SubresultantStrategy::Default);
+template<typename Coeff>
+UnivariatePolynomial<Coeff> discriminant(const UnivariatePolynomial<Coeff>&, SubresultantStrategy = SubresultantStrategy::Default);
+}
+
+#include "../UnivariatePolynomial.h"
+
+namespace carl {
+
+template<typename Coeff>
 std::list<UnivariatePolynomial<Coeff>> subresultants(
 		const UnivariatePolynomial<Coeff>& pol1,
 		const UnivariatePolynomial<Coeff>& pol2,
-		SubresultantStrategy strategy = SubresultantStrategy::Default
+		SubresultantStrategy strategy
 ) {
 	/* The algorithm consists of three parts:
 	 * Part 1: Initialization, i.e. preparation of the input so that the requirements of the core algorithm in parts 2 and 3 are met.
@@ -238,7 +255,7 @@ template<typename Coeff>
 std::vector<UnivariatePolynomial<Coeff>> principalSubresultantsCoefficients(
 		const UnivariatePolynomial<Coeff>& p,
 		const UnivariatePolynomial<Coeff>& q,
-		SubresultantStrategy strategy = SubresultantStrategy::Default
+		SubresultantStrategy strategy
 ) {
 	// Attention: Mathematica / Wolframalpha has one entry less (the last one) which is identical to p!
 	std::list<UnivariatePolynomial<Coeff>> subres = subresultants(p, q, strategy);
@@ -255,7 +272,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> resultant(
 		const UnivariatePolynomial<Coeff>& p,
 		const UnivariatePolynomial<Coeff>& q,
-		SubresultantStrategy strategy = SubresultantStrategy::Default
+		SubresultantStrategy strategy
 ) {
 	assert(p.mainVar() == q.mainVar());
 	if (p.isZero() || q.isZero()) return UnivariatePolynomial<Coeff>(p.mainVar());
@@ -271,7 +288,7 @@ UnivariatePolynomial<Coeff> resultant(
 template<typename Coeff>
 UnivariatePolynomial<Coeff> discriminant(
 	const UnivariatePolynomial<Coeff>& p,
-	SubresultantStrategy strategy = SubresultantStrategy::Default
+	SubresultantStrategy strategy
 ) {
 	UnivariatePolynomial<Coeff> res = resultant(p, p.derivative(), strategy);
 	if (p.isLinearInMainVar()) return res;

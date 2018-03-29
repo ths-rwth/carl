@@ -1,4 +1,7 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
+
+#include <carl/core/polynomialfunctions/Resultant.h>
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/Resultant.h"
@@ -35,7 +38,7 @@ TEST(Resultant, det)
     Resultant calc;
 
     auto r1 = calc.resultant_det(p, q);
-    auto r2 = p.resultant(q);
+    auto r2 = carl::resultant(p, q);
     auto r3 = calc.resultant_z3(p,q);
 
     //EXPECT_EQ(r2, r1);

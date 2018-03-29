@@ -26,6 +26,8 @@
  */
 #pragma once
 #include "Buchberger.h"
+
+#include <carl/core/polynomialfunctions/SPolynomial.h>
 //
 //
 namespace carl
@@ -68,7 +70,7 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 			// Calculates the S-Polynomial
             assert( pGb->getGenerators()[critPair.mP1].nrTerms() != 0 );
             assert( pGb->getGenerators()[critPair.mP2].nrTerms() != 0 );
-			Polynomial spol = Polynomial::SPolynomial(pGb->getGenerators()[critPair.mP1], pGb->getGenerators()[critPair.mP2]);
+			Polynomial spol = carl::SPolynomial(pGb->getGenerators()[critPair.mP1], pGb->getGenerators()[critPair.mP2]);
 			spol.setReasons(pGb->getGenerators()[critPair.mP1].getReasons() | pGb->getGenerators()[critPair.mP2].getReasons());
 			CARL_LOG_DEBUG("carl.gb.buchberger", "SPol: " << spol);
 			// Schedules the S-polynomial for reduction
