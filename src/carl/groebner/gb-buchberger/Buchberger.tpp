@@ -27,7 +27,7 @@
 #pragma once
 #include "Buchberger.h"
 
-#include <carl/core/polynomialfunctions/SPolynomial.h>
+#include "../../core/polynomialfunctions/SPolynomial.h"
 //
 //
 namespace carl
