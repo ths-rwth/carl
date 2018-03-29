@@ -100,7 +100,7 @@ namespace carl {
 				return Poly(ran.getIRPolynomial().replaceVariable(mVar));
 			} else {
 				const auto& mr = boost::get<MR>(mValue);
-				return mr.poly(mVar);
+				return Poly(mVar) - mr.poly(mVar);
 			}
 		}
 		VariableComparison negation() const {
