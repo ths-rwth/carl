@@ -4,7 +4,6 @@
 #include <carl/core/polynomialfunctions/Resultant.h>
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
-#include "carl/core/Resultant.h"
 #include "carl/util/platform.h"
 
 #include <random>
@@ -35,11 +34,9 @@ TEST(Resultant, det)
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> q(x, {(Rational)0, (Rational)0, (Rational)0, (Rational)0, (Rational)1});
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> res(x, MultivariatePolynomial<Rational>(Term<Rational>(t)*t*t*t));
 
-    Resultant calc;
-
-    auto r1 = calc.resultant_det(p, q);
+    auto r1 = carl::resultant_debug::resultant_det(p, q);
     auto r2 = carl::resultant(p, q);
-    auto r3 = calc.resultant_z3(p,q);
+    auto r3 = carl::resultant_debug::resultant_z3(p,q);
 
     //EXPECT_EQ(r2, r1);
     //EXPECT_EQ(r3, r1);

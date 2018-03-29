@@ -4,7 +4,7 @@
 
 #include "framework/Benchmark.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include "carl/core/Resultant.h"
+#include "carl/core/polynomialfunctions/Resultant.h"
 #include "BenchmarkTest.h"
 #include "framework/BenchmarkGenerator.h"
 
@@ -225,7 +225,7 @@ namespace carl {
 		CUMP<Coeff> operator()(const std::tuple<CUMP<Coeff>,CUMP<Coeff>>& args) {
 			//carl::Resultant calc;
 			//return std::forward<const CUMP<Coeff>>(calc.resultant_z3(std::get<0>(args), std::get<1>(args)));
-			return std::forward<const CUMP<Coeff>>(std::get<0>(args).resultant(std::get<1>(args)));
+			return std::forward<const CUMP<Coeff>>(carl::resultant(std::get<0>(args), std::get<1>(args)));
 		}
         #ifdef USE_GINAC
 		GMP operator()(const std::tuple<GMP,GMP,GVAR>& args) {

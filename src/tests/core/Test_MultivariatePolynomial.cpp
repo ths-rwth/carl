@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "carl/core/UnivariatePolynomial.h"
+#include "carl/core/polynomialfunctions/SPolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/Interval.h"
 #include <list>
@@ -430,7 +431,7 @@ TEST(MultivariatePolynomial, SPolynomial)
     Variable y = freshRealVariable("y");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     MultivariatePolynomial<Rational> g1({(Rational)3*x*x*x*x*y, (Rational)1*y*y});
-    EXPECT_EQ((unsigned)3,MultivariatePolynomial<Rational>::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
+    EXPECT_EQ((unsigned)3, carl::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
     //MultivariatePolynomial<Rational> s1({(Rational)-1*x*x});
     //EXPECT_EQ(s1, MultivariatePolynomial::SPolynomial(f1.normalize(), g1.normalize()));
 
@@ -438,7 +439,7 @@ TEST(MultivariatePolynomial, SPolynomial)
     MultivariatePolynomial<Rational> f2({(Rational)1*x*x*x, (Rational)-2*x*y} );
 	MultivariatePolynomial<Rational> g2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
 	MultivariatePolynomial<Rational> s2({(Rational)-1*x*x});
-	EXPECT_EQ(s2, MultivariatePolynomial<Rational>::SPolynomial(f2, g2));
+	EXPECT_EQ(s2, carl::SPolynomial(f2, g2));
 }
 
 TEST(MultivariatePolynomial, GatherVariables)
