@@ -19,7 +19,7 @@ namespace carl {
 		explicit Number(const Interval<cln::cl_I>& t): BaseNumber(t) {}
 		explicit Number(Interval<cln::cl_I>&& t): BaseNumber(t) {}
 		Number(const Number<Interval<cln::cl_I>>& n) = default;
-		Number(Number<Interval<cln::cl_I>>&& n) noexcept = default;
+		Number(Number<Interval<cln::cl_I>>&& n) = default;
 		//explicit Number(const std::string& s) { mData = cln::cl_I(s.c_str()); }
 		//Number(int n) : BaseNumber(n) {}
 		//Number(long long int n) { mData = cln::cl_I(n); }
@@ -34,7 +34,7 @@ namespace carl {
 			return *this;
 		}
 
-		Number<Interval<cln::cl_I>>& operator=(Number<Interval<cln::cl_I>>&& n) noexcept = default;
+		Number<Interval<cln::cl_I>>& operator=(Number<Interval<cln::cl_I>>&& n) = default;
 
 		std::string toString() const {
 			return mData.toString();
@@ -141,7 +141,7 @@ namespace carl {
 			return *this;
 		}
 
-		Number<Interval<mpq_class>>& operator=(Number<Interval<mpq_class>>&& n) noexcept = default;
+		Number<Interval<mpq_class>>& operator=(Number<Interval<mpq_class>>&& n) = default;
 
 		std::string toString() const {
 			return mData.toString();
