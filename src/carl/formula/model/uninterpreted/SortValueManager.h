@@ -23,11 +23,8 @@ namespace carl {
 /**
  * Implements a manager for sort values, containing the actual contents of these sort and allocating their ids.
  */
-class SortValueManager : public Singleton<SortValueManager>
-{
-    
-        friend Singleton<SortValueManager>;
-        
+class SortValueManager : public Singleton<SortValueManager> {
+    friend Singleton<SortValueManager>;
     private:
         // Members.
 
@@ -37,9 +34,7 @@ class SortValueManager : public Singleton<SortValueManager>
         /**
          * Constructs a sort value manager.
          */
-        SortValueManager():
-            mSortValueIDMap()
-        {}
+        SortValueManager() = default;
 
     public:
 
