@@ -165,8 +165,8 @@ matrix:
       env: CC=clang-5.0 CXX=clang++-5.0 TASK=coverity
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-5.0, *sources_base]
-          packages: [*packages_base, clang-5.0, *packages_base]
+          sources: [*sources_base, llvm-toolchain-trusty-5.0]
+          packages: [*packages_base, clang-5.0]
         coverity_scan:
           project:
             name: "smtrat/carl"
@@ -182,8 +182,8 @@ matrix:
       script: source .ci/build.sh
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-5.0, *sources_base]
-          packages: [*packages_base, clang-5.0, *packages_base]
+          sources: [*sources_base, llvm-toolchain-trusty-5.0]
+          packages: [*packages_base, clang-5.0]
         sonarcloud:
           organization: "smtrat-github"
           token:
