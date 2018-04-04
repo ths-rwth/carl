@@ -1053,99 +1053,99 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<typename C, typename O, typename P, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator+(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) += lhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(const Term<C>& lhs, const Term<C>& rhs) {
-		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(const Term<C>& lhs, const Monomial::Arg& rhs) {
-		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(const Term<C>& lhs, Variable::Arg rhs) {
-		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator+(const Term<C>& lhs, const C& rhs) {
-		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator+(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(rhs) += lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) += lhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(const Monomial::Arg& lhs, const Term<C>& rhs) {
-		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) += lhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
-		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(const Monomial::Arg& lhs, Variable::Arg rhs) {
-		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator+(const Monomial::Arg& lhs, const C& rhs) {
-		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(rhs) += lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) += lhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, const Term<C>& rhs) {
-		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) += lhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, const Monomial::Arg& rhs) {
-		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, Variable::Arg rhs) {
-		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) += rhs;
 	}
     template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
     inline MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, const C& rhs) {
-        return std::move(MultivariatePolynomial<C>(lhs) += rhs);
+        return MultivariatePolynomial<C,O,P>(lhs) += rhs;
     }
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator+(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(rhs) += lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) += lhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(const C& lhs, const Term<C>& rhs) {
-		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) += lhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator+(const C& lhs, const Monomial::Arg& rhs) {
-		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) += lhs;
 	}
 	template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator+(const C& lhs, Variable::Arg rhs) {
-		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) += lhs;
 	}
 
 	template<typename C, typename O, typename P>
@@ -1168,99 +1168,99 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) -= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) -= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) -= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) -= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<typename C, typename O, typename P, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) -= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator-(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move( -(rhs - lhs) );
+		return -(rhs - lhs);
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator-(const Term<C>& lhs, const Term<C>& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator-(const Term<C>& lhs, const Monomial::Arg& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator-(const Term<C>& lhs, Variable::Arg rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator-(const Term<C>& lhs, const C& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator-(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move( -(rhs - lhs) );
+		return -(rhs - lhs);
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator-(const Monomial::Arg& lhs, const Term<C>& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator-(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator-(const Monomial::Arg& lhs, Variable::Arg rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator-(const Monomial::Arg& lhs, const C& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator-(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move( -(rhs - lhs) );
+		return -(rhs - lhs);
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator-(Variable::Arg lhs, const Term<C>& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator-(Variable::Arg lhs, const Monomial::Arg& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate>
 	inline MultivariatePolynomial<C,O,P> operator-(Variable::Arg lhs, Variable::Arg rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator-(Variable::Arg lhs, const C& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<typename C, typename O, typename P, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator-(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move( -(rhs - lhs) );
+		return -(rhs - lhs);
 	}
 	template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator-(const C& lhs, const Term<C>& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator-(const C& lhs, const Monomial::Arg& rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	template<MPOpTemplate, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator-(const C& lhs, Variable::Arg rhs) {
-		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
+		return MultivariatePolynomial<C,O,P>(lhs) -= rhs;
 	}
 	/// @}
 	
@@ -1274,39 +1274,39 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) *= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) *= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) *= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) *= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) *= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) *= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) *= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) *= rhs;
 	}
 	template<typename C, typename O, typename P, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) *= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) *= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) *= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) *= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) *= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) *= rhs;
 	}
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(lhs) *= rhs);
+		return MultivariatePolynomial<C,O,P>(lhs) *= rhs;
 	}
 	template<typename C, typename O, typename P, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator*(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return std::move(MultivariatePolynomial<C,O,P>(rhs) *= lhs);
+		return MultivariatePolynomial<C,O,P>(rhs) *= lhs;
 	}
 
 	template<typename C, typename O, typename P>
@@ -1325,7 +1325,7 @@ public:
 	 */
 	template<typename C, typename O, typename P, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-        return std::move(MultivariatePolynomial<C,O,P>(lhs) /= rhs);
+        return MultivariatePolynomial<C,O,P>(lhs) /= rhs;
     }
 	/// @}
     template<typename C, typename O, typename P>
