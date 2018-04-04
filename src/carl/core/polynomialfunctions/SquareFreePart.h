@@ -39,7 +39,7 @@ MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>
 	return s(p);
 }
 
-template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>>>
+template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>
 UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p) {
 	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
 	if (p.isZero()) return p;
@@ -48,7 +48,7 @@ UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p)
 	return normalized.divideBy(UnivariatePolynomial<Coeff>::gcd(normalized, normalized.derivative())).quotient;
 }
 
-template<typename Coeff, DisableIf<is_subset_of_rationals<Coeff>>>
+template<typename Coeff, DisableIf<is_subset_of_rationals<Coeff>> = dummy>
 UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p) {
 	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
 	return carl::squareFreePart(MultivariatePolynomial<Coeff>(p)).toUnivariatePolynomial(p.mainVar());
