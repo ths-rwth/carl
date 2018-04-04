@@ -737,9 +737,7 @@ public:
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
-	template<typename C=Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
-	UnivariatePolynomial squareFreePart() const;
-	template<typename C=Coefficient, DisableIf<is_subset_of_rationals<C>> = dummy>
+	[[deprecated("use carl::squareFreePart(p) instead.")]]
 	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;

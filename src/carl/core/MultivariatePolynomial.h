@@ -18,7 +18,6 @@
 #include "VariableInformation.h"
 #include "../numbers/numbers.h"
 #include "../util/TermAdditionManager.h"
-#include "polynomialfunctions/SquareFreePart.h"
 #include "polynomialfunctions/SPolynomial.h"
 #include "polynomialfunctions/CoprimePart.h"
 #include "polynomialfunctions/SoSDecomposition.h"
@@ -578,9 +577,7 @@ public:
 	* @return
 	*/
 	[[deprecated("use carl::squareFreePart(p) instead.")]]
-	MultivariatePolynomial squareFreePart() const {
-		return carl::squareFreePart(*this);
-	}
+	MultivariatePolynomial squareFreePart() const;
 	/**
 	* Calculates the part ofthe Polynomial, that is coprime to q. Only works with CoCoA.
 	* @param q

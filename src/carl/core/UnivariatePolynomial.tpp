@@ -575,18 +575,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
-	if (this->isZero()) return *this;
-	if (this->isLinearInMainVar()) return *this;
-	UnivariatePolynomial normalized = this->coprimeCoefficients().template convert<Coeff>();
-	return normalized.divideBy(UnivariatePolynomial::gcd(normalized, normalized.derivative())).quotient;
-}
-
-template<typename Coeff>
-template<typename C, DisableIf<is_subset_of_rationals<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
-	return carl::squareFreePart(MultivariatePolynomial<NumberType>(*this)).toUnivariatePolynomial(mainVar());
+	return carl::squareFreePart(*this);
 }
 
 template<typename Coefficient>

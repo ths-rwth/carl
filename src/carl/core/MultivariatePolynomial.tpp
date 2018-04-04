@@ -1233,6 +1233,11 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::squareFreePart() const {
+	return carl::squareFreePart(*this);
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
 {
 	assert(this->isConsistent());

@@ -1,15 +1,12 @@
 #pragma once
 
-#include "../logging.h"
 #include "../../converter/CoCoAAdaptor.h"
 #include "../../numbers/FunctionSelector.h"
+#include "../logging.h"
+#include "../MultivariatePolynomial.h"
+#include "../UnivariatePolynomial.h"
 
 namespace carl {
-
-template<typename C, typename O, typename P>
-class MultivariatePolynomial;
-template<typename C>
-class UnivariatePolynomial;
 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>& p) {
@@ -40,6 +37,21 @@ MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>
 	#endif
 	);
 	return s(p);
+}
+
+template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>>>
+UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p) {
+	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
+	if (p.isZero()) return p;
+	if (p.isLinearInMainVar()) return p;
+	UnivariatePolynomial<Coeff> normalized = p.coprimeCoefficients().template convert<Coeff>();
+	return normalized.divideBy(UnivariatePolynomial<Coeff>::gcd(normalized, normalized.derivative())).quotient;
+}
+
+template<typename Coeff, DisableIf<is_subset_of_rationals<Coeff>>>
+UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p) {
+	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
+	return carl::squareFreePart(MultivariatePolynomial<Coeff>(p)).toUnivariatePolynomial(p.mainVar());
 }
 
 }
