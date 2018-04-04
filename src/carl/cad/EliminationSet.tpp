@@ -6,6 +6,8 @@
 #include "EliminationSet.h"
 #include "CADLogging.h"
 
+#include "../core/polynomialfunctions/SquareFreePart.h"
+
 namespace carl {
 namespace cad {
 
@@ -534,8 +536,8 @@ template<typename Coefficient>
 void EliminationSet<Coefficient>::makeSquarefree() {
 	EliminationSet<Coefficient> squarefreeSet(this->polynomialOwner, this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
-		DOT_EDGE("elimination", p, p->squareFreePart(), "label=\"squarefree\"");
-		squarefreeSet.insert(p->squareFreePart(), this->getParentsOf(p));
+		DOT_EDGE("elimination", p, carl::squareFreePart(*p), "label=\"squarefree\"");
+		squarefreeSet.insert(carl::squareFreePart(*p), this->getParentsOf(p));
 	}
 	std::swap(*this, squarefreeSet);
 }

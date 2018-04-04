@@ -7,6 +7,7 @@
 #include "AbstractRootFinder.h"
 #include "../logging.h"
 #include "../polynomialfunctions/RootBounds.h"
+#include "../polynomialfunctions/SquareFreePart.h"
 
 #pragma once
 
@@ -20,7 +21,7 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		bool tryTrivialSolver
 	) :
 		mOriginalPolynomial(_polynomial),
-		mPolynomial(_polynomial.squareFreePart()),
+		mPolynomial(carl::squareFreePart(_polynomial)),
 		mInterval(_interval),
 		mFinished(false)
 {
