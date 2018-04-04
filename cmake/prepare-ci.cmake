@@ -4,7 +4,7 @@ configure_file( ${CMAKE_SOURCE_DIR}/.ci/sonarcloud.properties.in ${CMAKE_BINARY_
 
 
 
-find_package(PythonInterp 3 REQUIRED)
+find_package(PythonInterp 3)
 if(PYTHONINTERP_FOUND)
 	add_custom_target(.travis.yml)
 	add_custom_command(
