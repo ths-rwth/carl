@@ -6,7 +6,7 @@ cmake -D DEVELOPER=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=ON -D USE_COCOA=ON -D U
 
 function keep_waiting() {
   while true; do
-    echo -e "\a"
+    echo -e "."
     sleep 60
   done
 }
@@ -17,13 +17,17 @@ fi
 
 if [[ ${TASK} == "dependencies" ]]; then
 	
+	keep_waiting &
 	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
+	kill $!
 	
 elif [[ ${TASK} == "coverity" ]]; then
+
 	keep_waiting &
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
-	kill %1
+	kill $!
+
 elif [[ ${TASK} == "sonarcloud" ]]; then
 	
 	cmake -D COVERAGE=ON ../ || return 1
