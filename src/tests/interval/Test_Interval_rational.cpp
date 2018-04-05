@@ -309,3 +309,12 @@ TYPED_TEST(IntervalRationalTest, mul_assign)
 	i *= j;
 	EXPECT_EQ(i, res);
 }
+
+TYPED_TEST(IntervalRationalTest, isSubset) {
+	
+	Interval<TypeParam> e = Interval<TypeParam>::emptyInterval();
+	Interval<TypeParam> i1(TypeParam(-1), TypeParam(1));
+	Interval<TypeParam> i2(TypeParam(2), TypeParam(3));
+	EXPECT_TRUE(e.isSubset(i1));
+	EXPECT_TRUE(e.isSubset(i2));
+}
