@@ -14,6 +14,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #include <cassert>
 #include <cmath>
 #include <limits>
+#include <type_traits>
 
 namespace carl {
 
@@ -39,8 +40,23 @@ inline bool isNegative(sint n) {
 	return n < 0;
 }
 
+inline bool isNaN(double d) {
+	if (std::is_same<decltype(std::isnan(d)), bool>::value) {
+		return std::isnan(d);
+	} else if (std::is_same<decltype(std::isnan(d)), int>::value) {
+		return std::isnan(d) != 0;
+	}
+}
+inline bool isInf(double d) {
+	if (std::is_same<decltype(std::isinf(d)), bool>::value) {
+		return std::isinf(d);
+	} else if (std::is_same<decltype(std::isinf(d)), int>::value) {
+		return std::isinf(d) != 0;
+	}
+}
+
 inline bool isNumber(double d) {
-	return !std::isnan(d) && !std::isinf(d);
+	return !isNaN(d) && !isInf(d);
 }
 
 inline bool isInteger(double d) {
