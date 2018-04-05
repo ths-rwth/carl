@@ -256,7 +256,7 @@ MultivariatePolynomial<Number> evaluatePolynomial(
 			tmp.substituteIn(i.first, Coeff(i.second.value()));
 		} else if (i.second.isInterval()) {
 			UnivariatePolynomial<Coeff> p2(i.first, i.second.getPolynomial().template convert<Coeff>().coefficients());
-			tmp = tmp.switchVariable(i.first).resultant(p2);
+			tmp = carl::resultant(tmp.switchVariable(i.first), p2);
 		} else {
 			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
 		}

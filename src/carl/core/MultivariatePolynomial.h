@@ -571,13 +571,7 @@ public:
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q) {
 		return carl::SPolynomial(p,q);
 	}
-	
-	/**
-	* Calculates the squarefree part of the Polynomial. Only works with CoCoA.
-	* @return
-	*/
-	[[deprecated("use carl::squareFreePart(p) instead.")]]
-	MultivariatePolynomial squareFreePart() const;
+
 	/**
 	* Calculates the part ofthe Polynomial, that is coprime to q. Only works with CoCoA.
 	* @param q

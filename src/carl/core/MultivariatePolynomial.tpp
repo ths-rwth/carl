@@ -14,7 +14,6 @@
 #include "../numbers/numbers.h"
 
 #include "polynomialfunctions/CoprimePart.h"
-#include "polynomialfunctions/SquareFreePart.h"
 
 #include <algorithm>
 #include <memory>
@@ -1230,11 +1229,6 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	MultivariatePolynomial result(std::move(tmpTerms), true, mOrdered);
     assert(result.isConsistent());
 	return result;
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::squareFreePart() const {
-	return carl::squareFreePart(*this);
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

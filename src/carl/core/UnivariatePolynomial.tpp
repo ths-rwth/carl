@@ -15,7 +15,6 @@
 #include "MultivariateGCD.h"
 #include "MultivariatePolynomial.h"
 #include "Sign.h"
-#include "polynomialfunctions/SquareFreePart.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -572,11 +571,6 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 //		if(b.isConstant()) return b;
 //	}
 	else return gcd_recursive(b, a.remainder(b));
-}
-
-template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
-	return carl::squareFreePart(*this);
 }
 
 template<typename Coefficient>

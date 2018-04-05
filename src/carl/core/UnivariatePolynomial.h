@@ -736,9 +736,6 @@ public:
 	 */
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
-
-	[[deprecated("use carl::squareFreePart(p) instead.")]]
-	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
