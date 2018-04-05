@@ -1417,9 +1417,9 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePoly
 #endif
 	static std::vector<const C*> coeffs;
 #ifdef __VS
-    coeffs.resize(MonomialPool::getInstance().nextID());
+    coeffs.resize(MonomialPool::getInstance().size());
 #else
-	coeffs.reserve(MonomialPool::getInstance().nextID());
+	coeffs.reserve(MonomialPool::getInstance().size());
 #endif
 	memset(&coeffs[0], 0, sizeof(typename std::vector<const C*>::value_type)*coeffs.capacity());
 	for (const auto& t: lhs.mTerms) {

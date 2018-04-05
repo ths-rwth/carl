@@ -89,7 +89,7 @@ public:
         #ifdef SWAP_TERMS
         //memset(&terms[0], 0, sizeof(TermPtr)*terms.size());
         #endif
-        std::size_t greatestIdPlusOne = MonomialPool::getInstance().nextID();
+        std::size_t greatestIdPlusOne = MonomialPool::getInstance().largestID() + 1;
 		if( std::get<0>(data).size() < greatestIdPlusOne ) std::get<0>(data).resize(greatestIdPlusOne);
 		//memset(&std::get<0>(data)[0], 0, sizeof(IDType)*std::get<0>(data).size());
 		std::get<3>(data) = constant_zero<Coeff>::get();

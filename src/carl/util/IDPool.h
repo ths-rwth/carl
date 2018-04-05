@@ -10,44 +10,47 @@ namespace carl {
 	class IDPool {
 	private:
 		Bitset mFreeIDs = Bitset(true);
+		std::size_t mLargestID = 0;
 #ifdef THREAD_SAFE
 		std::mutex mMutex;
+#define IDPOOL_LOCK std::lock_guard<std::mutex> lock(mMutex)
+#else
+#define IDPOOL_LOCK
 #endif
 	public:
-		std::size_t nextID() const {
-#ifdef THREAD_SAFE
-			std::lock_guard<std::mutex> lock(mMutex);
-#endif
-			return mFreeIDs.find_first();
+		std::size_t size() const {
+			IDPOOL_LOCK;
+			return mFreeIDs.size();
+		}
+		std::size_t largestID() const {
+			IDPOOL_LOCK;
+			return mLargestID;
 		}
 		std::size_t get() {
-#ifdef THREAD_SAFE
-			std::lock_guard<std::mutex> lock(mMutex);
-#endif
+			IDPOOL_LOCK;
 			std::size_t pos = mFreeIDs.find_first();
 			if (pos == Bitset::npos) {
 				pos = mFreeIDs.size();
 				mFreeIDs.resize((mFreeIDs.num_blocks() + 1) * Bitset::bits_per_block);
 			}
 			mFreeIDs.reset(pos);
+			if (pos > mLargestID) return mLargestID;
 			return pos;
 		}
 		void free(std::size_t id) {
-#ifdef THREAD_SAFE
-			std::lock_guard<std::mutex> lock(mMutex);
-#endif
+			IDPOOL_LOCK;
 			assert(id < mFreeIDs.size());
 			mFreeIDs.set(id);
 		}
 		void clear() {
-#ifdef THREAD_SAFE
-			std::lock_guard<std::mutex> lock(mMutex);
-#endif
+			IDPOOL_LOCK;
 			mFreeIDs = Bitset(true);
 		}
 		friend std::ostream& operator<<(std::ostream& os, const IDPool& p) {
 			return os << "Free: " << p.mFreeIDs;
 		}
+
+#undef IDPOOL_LOCK
 	};
 
 }

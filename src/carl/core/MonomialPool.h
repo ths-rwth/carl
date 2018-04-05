@@ -7,6 +7,7 @@
 
 #include "../config.h"
 #include "../util/Common.h"
+#include "../util/IDPool.h"
 #include "../util/IDGenerator.h"
 #include "../util/Singleton.h"
 #include "Monomial.h"
@@ -70,7 +71,7 @@ namespace carl{
 		private:
 			// Members:
 			/// id allocator
-			IDGenerator mIDs;
+			IDPool mIDs;
 			//size_t mIdAllocator;
 			/// The pool.
 			std::unordered_set<PoolEntry, MonomialPool::hash, MonomialPool::equal> mPool;
@@ -95,11 +96,17 @@ namespace carl{
 			 * @param _capacity Expected necessary capacity of the pool.
 			 */
 			explicit MonomialPool( std::size_t _capacity = 10000 ):
-				Singleton<MonomialPool>(),
-				mIDs(),
-				mPool(_capacity),
-				mMutex()
-			{}
+				mPool(_capacity)
+			{
+				mIDs.get();
+				assert(mIDs.largestID() == 0);
+				VariablePool::getInstance();
+				CARL_LOG_DEBUG("carl.pool", "Monomialpool constructed");
+			}
+			
+			~MonomialPool() {
+				CARL_LOG_DEBUG("carl.pool", "Monomialpool destructed");
+			}
 
 			Monomial::Arg add( MonomialPool::PoolEntry&& pe, exponent totalDegree = 0 );
 		public:
@@ -151,8 +158,8 @@ namespace carl{
 			std::size_t size() const {
 				return mPool.size();
 			}
-			std::size_t nextID() const {
-				return mIDs.nextID();
+			std::size_t largestID() const {
+				return mIDs.largestID();
 			}
 	};
 } // end namespace carl
