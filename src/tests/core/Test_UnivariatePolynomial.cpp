@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "carl/core/polynomialfunctions/Resultant.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 
@@ -7,6 +8,7 @@
 #include "carl/util/debug.h"
 #include "carl/interval/Interval.h"
 #include "carl/util/platform.h"
+
 
 #include <random>
 #include <cmath>
@@ -351,12 +353,12 @@ TEST(UnivariatePolynomial, resultant)
 	// r3 = y^4
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> r3(x, MultivariatePolynomial<Rational>(Term<Rational>(y)*y*y*y));
 
-	EXPECT_EQ(r1, p1.resultant(p2));
-	EXPECT_EQ(r1, p2.resultant(p1));
-	EXPECT_EQ(r2, p1.resultant(p3));
-	EXPECT_EQ(r2, p3.resultant(p1));
-	EXPECT_EQ(r3, p2.resultant(p3));
-	EXPECT_EQ(r3, p3.resultant(p2));
+	EXPECT_EQ(r1, carl::resultant(p1, p2));
+	EXPECT_EQ(r1, carl::resultant(p2, p1));
+	EXPECT_EQ(r2, carl::resultant(p1, p3));
+	EXPECT_EQ(r2, carl::resultant(p3, p1));
+	EXPECT_EQ(r3, carl::resultant(p2, p3));
+	EXPECT_EQ(r3, carl::resultant(p3, p2));
 }
 
 TEST(UnivariatePolynomial, resultant2)
@@ -374,7 +376,7 @@ TEST(UnivariatePolynomial, resultant2)
 
 	//std::cout << "resultant[" << p << ", " << q << "] = " << p.resultant(q) << std::endl;
 
-	EXPECT_EQ(r, p.resultant(q));
+	EXPECT_EQ(r, carl::resultant(p, q));
 }
 
 TEST(UnivariatePolynomial, resultant3)
@@ -390,7 +392,7 @@ TEST(UnivariatePolynomial, resultant3)
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> q(a, {mt.pow(4), mt.pow(2), mt.pow(2), one});
 	//UnivariatePolynomial<MultivariatePolynomial<Rational>> r(b, MultivariatePolynomial<Rational>(Term<Rational>(t)*t*t*t));
 
-	std::cout << "resultant[" << p << ", " << q << "] =\n\t" << p.resultant(q) << std::endl;
+	std::cout << "resultant[" << p << ", " << q << "] =\n\t" << carl::resultant(p, q) << std::endl;
 
 	//EXPECT_EQ(r, p.resultant(q));
 }
@@ -408,7 +410,7 @@ TEST(UnivariatePolynomial, resultant4)
     UnivariatePolynomial<MultivariatePolynomial<Rational>> q(m, {31, 16, 2});
     UnivariatePolynomial<MultivariatePolynomial<Rational>> res(r, {833, -124, 4});
 
-    EXPECT_EQ(res, p.resultant(q));
+    EXPECT_EQ(res, carl::resultant(p, q));
 }
 
 TEST(UnivariatePolynomial, PrincipalSubresultantCoefficient)
@@ -426,7 +428,7 @@ TEST(UnivariatePolynomial, PrincipalSubresultantCoefficient)
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> res3(x, {one});
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> res4(x, {one});
 	
-	auto r = UnivariatePolynomial<MultivariatePolynomial<Rational>>::principalSubresultantsCoefficients(p,q);
+	auto r = carl::principalSubresultantsCoefficients(p, q);
 	
 	EXPECT_EQ(4, r.size());
 	EXPECT_EQ(res1, r[0]);
