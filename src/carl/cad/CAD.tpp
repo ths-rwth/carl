@@ -17,6 +17,7 @@
 #include "../formula/model/ran/RealAlgebraicNumberSettings.h"
 #include "../core/rootfinder/RootFinder.h"
 #include "../thom/ThomRootFinder.h"
+#include "../core/polynomialfunctions/SquareFreePart.h"
 
 #define PERFORM_PARTIAL_CHECK false
 
@@ -604,7 +605,7 @@ void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable
 	Variable var = v.front();
 	if (!mVariables.empty()) var = mVariables.first();
 
-	UPolynomial* up = new UPolynomial(p.toUnivariatePolynomial(var).squareFreePart());
+	UPolynomial* up = new UPolynomial(carl::squareFreePart(p.toUnivariatePolynomial(var)));
 	CARL_LOG_TRACE("carl.cad", "Adding" << std::endl << "original   " << p.toUnivariatePolynomial(var) << std::endl << "simplified " << *up);
 	if (polynomials.isScheduled(up)) {
 		// same polynomial was already considered in scheduled polynomials
