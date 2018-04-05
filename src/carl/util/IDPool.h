@@ -14,12 +14,12 @@ namespace carl {
 		std::mutex mMutex;
 #endif
 	public:
-        IDPool() : mFreeIDs(true) {}
-        IDPool& operator=(const IDPool& _idPool) {
-            this->mFreeIDs = _idPool.mFreeIDs;
-            return *this;
-        }
-
+		std::size_t nextID() const {
+#ifdef THREAD_SAFE
+			std::lock_guard<std::mutex> lock(mMutex);
+#endif
+			return mFreeIDs.find_first();
+		}
 		std::size_t get() {
 #ifdef THREAD_SAFE
 			std::lock_guard<std::mutex> lock(mMutex);
@@ -38,6 +38,12 @@ namespace carl {
 #endif
 			assert(id < mFreeIDs.size());
 			mFreeIDs.set(id);
+		}
+		void clear() {
+#ifdef THREAD_SAFE
+			std::lock_guard<std::mutex> lock(mMutex);
+#endif
+			mFreeIDs = Bitset(true);
 		}
 		friend std::ostream& operator<<(std::ostream& os, const IDPool& p) {
 			return os << "Free: " << p.mFreeIDs;
