@@ -376,6 +376,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
 template<typename Coeff, typename Ordering, typename Policies>
 Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness( bool _fullEffort ) const
 {
+	// Todo: handle constant polynomials
 	if (isLinear()) {
 		CARL_LOG_DEBUG("carl.core", "Linear and hence " << Definiteness::NON);
 		return Definiteness::NON;
@@ -1416,12 +1417,8 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePoly
 	std::lock_guard<std::mutex> lock(mutex);
 #endif
 	static std::vector<const C*> coeffs;
-#ifdef __VS
-    coeffs.resize(MonomialPool::getInstance().size());
-#else
-	coeffs.reserve(MonomialPool::getInstance().size());
-#endif
-	memset(&coeffs[0], 0, sizeof(typename std::vector<const C*>::value_type)*coeffs.capacity());
+	coeffs.resize(MonomialPool::getInstance().largestID() + 1);
+	memset(&coeffs[0], 0, sizeof(typename std::vector<const C*>::value_type)*coeffs.size());
 	for (const auto& t: lhs.mTerms) {
 		std::size_t id = 0;
 		if (t.monomial()) id = t.monomial()->id();
