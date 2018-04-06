@@ -178,6 +178,7 @@ public:
             }
 		}
 		std::swap(t, terms);
+		t.clear();
         #else
         terms.clear();
         if (!isZero(std::get<3>(data))) {
@@ -194,6 +195,7 @@ public:
                 *i = nullptr;
             }
 		}
+		t.clear();
         #endif
 		TAM_LOCK_GUARD
 		std::get<2>(data) = false;

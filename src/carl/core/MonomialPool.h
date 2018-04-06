@@ -156,7 +156,7 @@ namespace carl{
 			}
 
 			std::size_t size() const {
-				return mPool.size();
+				return mIDs.size();
 			}
 			std::size_t largestID() const {
 				return mIDs.largestID();
