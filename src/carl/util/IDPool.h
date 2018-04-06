@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../core/logging.h"
 #include "../config.h"
 #include "Bitset.h"
 
@@ -34,13 +35,15 @@ namespace carl {
 				mFreeIDs.resize((mFreeIDs.num_blocks() + 1) * Bitset::bits_per_block);
 			}
 			mFreeIDs.reset(pos);
-			if (pos > mLargestID) return mLargestID;
+			if (pos > mLargestID) mLargestID = pos;
+			CARL_LOG_DEBUG("carl.util.idpool", pos << " from pool " << static_cast<const void*>(this));
 			return pos;
 		}
 		void free(std::size_t id) {
 			IDPOOL_LOCK;
 			assert(id < mFreeIDs.size());
 			mFreeIDs.set(id);
+			CARL_LOG_DEBUG("carl.util.idpool", id << " from pool " << static_cast<const void*>(this));
 		}
 		void clear() {
 			IDPOOL_LOCK;
