@@ -57,4 +57,10 @@ jobs = [
 	job("6-addons", ["build", "linux", "g++-6", "task.addons", "j1", "build.sh", "mayfail"]),
 ]
 
-render_template(jobs)
+cached = [
+	"$HOME/usr/",
+	"$HOME/.sonar/cache",
+	"build/resources",
+]
+
+render_template(jobs, cached)

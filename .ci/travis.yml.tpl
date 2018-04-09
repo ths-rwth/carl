@@ -5,9 +5,9 @@ dist: trusty
 cache:
   apt: true
   directories:
-    - $HOME/usr/
-    - $HOME/.sonar/cache
-    - build/resources
+{%- for cache in cached %}
+    - {{ cache }}
+{%- endfor %}
 
 addons:
   apt:

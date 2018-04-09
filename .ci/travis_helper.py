@@ -69,14 +69,14 @@ def propertymapper(j):
 		res = datamerge(res, properties[p])
 	return res
 
-def render_template(jobs, template = "travis.yml.tpl", filename = "../.travis.yml"):
+def render_template(jobs, cached, template = "travis.yml.tpl", filename = "../.travis.yml"):
 	"""Applies the propertymapper to the list of jobs and renders the jobs into the given template."""
 	jobs = map(propertymapper, jobs)
 	jobs = sorted(jobs, key = lambda x: (-len(x["stage"]),x["priority"]))
 	
 	j2_env = Environment(loader = FileSystemLoader(os.path.dirname(__file__)), keep_trailing_newline = True)
 	tpl = j2_env.get_template(template)
-	res = tpl.render(jobs = jobs)
+	res = tpl.render(cached = cached, jobs = jobs)
 
 	open(filename, "w").write(res)
 
