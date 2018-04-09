@@ -13,7 +13,7 @@ namespace carl {
 		Bitset mFreeIDs = Bitset(true);
 		std::size_t mLargestID = 0;
 #ifdef THREAD_SAFE
-		std::mutex mMutex;
+		mutable std::mutex mMutex;
 #define IDPOOL_LOCK std::lock_guard<std::mutex> lock(mMutex)
 #else
 #define IDPOOL_LOCK
