@@ -2,7 +2,7 @@
 
 mkdir -p build || return 1
 cd build/ || return 1
-cmake -D DEVELOPER=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=ON -D USE_COCOA=ON -D USE_GINAC=ON ../ || return 1
+cmake -D DEVELOPER=ON -D THREAD_SAFE=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=ON -D USE_COCOA=ON -D USE_GINAC=ON ../ || return 1
 
 function keep_waiting() {
   while true; do
