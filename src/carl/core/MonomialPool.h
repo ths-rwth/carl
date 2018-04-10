@@ -22,7 +22,6 @@ namespace carl{
 	{
 		friend class Singleton<MonomialPool>;
 		public:
-#ifdef PRUNE_MONOMIAL_POOL
 			struct PoolEntry {
 				Monomial::Content content;
 				std::size_t hash;
@@ -35,18 +34,6 @@ namespace carl{
 					assert(monomial.expired());
 				}
 			};
-#else
-			struct PoolEntry {
-				Monomial::Content content;
-				std::size_t hash;
-				mutable Monomial::Arg monomial;
-				PoolEntry(std::size_t h, const Monomial::Content& c, const Monomial::Arg& m): content(c), hash(h), monomial(m) {}
-				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h), monomial() {
-				}
-				explicit PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)), monomial() {
-				}
-			};
-#endif
 			struct hash {
 				std::size_t operator()(const PoolEntry& p) const {
 					return p.hash;
@@ -55,15 +42,9 @@ namespace carl{
 			struct equal {
 				bool operator()(const PoolEntry& p1, const PoolEntry& p2) const {
 					if (p1.hash != p2.hash) return false;
-#ifdef PRUNE_MONOMIAL_POOL
 					if (p1.monomial.lock() && p2.monomial.lock()) {
 						return p1.monomial.lock() == p2.monomial.lock();
 					}
-#else
-					if (p1.monomial && p2.monomial) {
-						return p1.monomial == p2.monomial;
-					}
-#endif
 					return p1.content == p2.content;
 				}
 			};
@@ -131,7 +112,6 @@ namespace carl{
 			
 			Monomial::Arg create( std::vector<std::pair<Variable, exponent>>&& _exponents );
 
-#ifdef PRUNE_MONOMIAL_POOL
 			void free(const Monomial* m) {
 				if (m == nullptr) return;
 				if (m->id() == 0) return;
@@ -143,8 +123,6 @@ namespace carl{
 					mPool.erase(it);
 				}
 			}
-#endif
-
 
 			/**
 			 * Clears everything already created in this pool.
