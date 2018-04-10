@@ -363,3 +363,19 @@ TEST(Formula, ConstraintSimplication)
         EXPECT_EQ(ref, FormulaT(FormulaType::NOT, FormulaT(-Pol(x), Relation::GREATER)));
     }
 }
+
+TEST(Formula, Uniqueness)
+{
+	//(X !> (IR ]-594743/343, -1189485/686[, __r^2 + -1031250000/343 R))
+	Variable X = freshRealVariable("X");
+	Variable r = MultivariateRoot<Pol>::var();
+	
+	Interval<Rational> ir(Rational(-594743)/343, BoundType::STRICT, Rational(-1189485)/686, BoundType::STRICT);
+	UnivariatePolynomial<Rational> up(r, {Rational(-1031250000)/343, Rational(0), Rational(1)});
+	RealAlgebraicNumber<Rational> ran(up, ir, true);
+	VariableComparison<Pol> vc(X, ran, Relation::GREATER, true);
+	
+	FormulaT f1 = FormulaT(vc);
+	FormulaT f2 = FormulaT(vc);
+	EXPECT_EQ(f1, f2);
+}
