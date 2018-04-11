@@ -63,6 +63,22 @@ TEST(IntervalEvaluation, Monomial)
 
 TEST(IntervalEvaluation, Term)
 {
+    std::map<Variable, Interval<Rational>> map;
+    Variable a = freshRealVariable("a");
+    Variable b = freshRealVariable("b");
+	//MultivariatePolynomial<Rational> p({(Rational)1*a*a*b*b});
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> p(b,
+		{MultivariatePolynomial<Rational>(), MultivariatePolynomial<Rational>(),
+		MultivariatePolynomial<Rational>(a*a)});
+	Interval<Rational> i1(Rational(0), carl::BoundType::INFTY, Rational(0),
+		carl::BoundType::INFTY);
+	Interval<Rational> i2(Rational(0), carl::BoundType::INFTY, Rational(0),
+		carl::BoundType::INFTY);
+	map[a] = i1;
+	map[b] = i2;
+	auto res = IntervalEvaluation::evaluate( p, map );
+	
+	std::cout << p << " on " << map << " = " << res << std::endl;
 }
 
 
