@@ -149,7 +149,7 @@ template<typename Numeric, typename Coeff, DisableIf<std::is_same<Numeric, Coeff
 inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
 	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
 	assert(map.count(p.mainVar()) > 0);
-	Interval<Numeric> res = Interval<Numeric>::emptyInterval();
+	Interval<Numeric> res = Interval<Numeric>(carl::constant_zero<Numeric>().get());
 	const Interval<Numeric>& varValue = map.at(p.mainVar());
 	Interval<Numeric> exp(1);
 	for (unsigned i = 0; i <= p.degree(); i++) {
