@@ -8,6 +8,8 @@
  */
 
 #include <type_traits>
+#include <boost/mpl/less.hpp>
+#include <boost/mpl/pop_front.hpp>
 #include <boost/mpl/sort.hpp>
 #include <boost/mpl/unique.hpp>
 #include <boost/mpl/vector.hpp>
