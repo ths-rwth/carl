@@ -38,7 +38,11 @@ enum class IntegerHandling {
     /// Backtrack within the sampling phase.
     BACKTRACK,
 	/// Do not care about integers
-	NONE
+	NONE,
+	SPLIT_SOLUTION,
+	SPLIT_LAZY,
+	SPLIT_EARLY,
+	GUESS_AND_SPLIT
 };
 inline std::ostream& operator<<(std::ostream& os, const IntegerHandling& ih) {
 	switch (ih) {
@@ -46,6 +50,10 @@ inline std::ostream& operator<<(std::ostream& os, const IntegerHandling& ih) {
 		case IntegerHandling::SPLIT_PATH: return os << "Split path";
 		case IntegerHandling::BACKTRACK: return os << "Backtrack";
 		case IntegerHandling::NONE: return os << "None";
+		case IntegerHandling::SPLIT_SOLUTION: return os << "Split on solution";
+		case IntegerHandling::SPLIT_LAZY: return os << "Split lazy";
+		case IntegerHandling::SPLIT_EARLY: return os << "Split early";
+		case IntegerHandling::GUESS_AND_SPLIT: return os << "Guess";
 	}
 	return os;
 }
