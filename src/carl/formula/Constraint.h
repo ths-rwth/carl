@@ -756,7 +756,7 @@ namespace carl
              *
              * @return True if this constraint is pseudo-boolean. False otherwise.
              */
-            bool isPseudoBoolean();
+            bool isPseudoBoolean() const;
 
             /**
              * Prints the properties of this constraints on the given stream.

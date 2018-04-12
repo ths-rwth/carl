@@ -750,7 +750,7 @@ namespace carl
 	}
 
 	template<typename Pol>
-	bool Constraint<Pol>::isPseudoBoolean() {
+	bool Constraint<Pol>::isPseudoBoolean() const {
 		std::set<carl::Variable> variables = lhs().gatherVariables();
 		for (const auto& var : variables) {
 			if (var.getType() != carl::VariableType::VT_BOOL) {
