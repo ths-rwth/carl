@@ -163,6 +163,13 @@ namespace carl
 					return f->mVariableAssignment < f->mNegation->mVariableAssignment;
 #endif
 				}
+				if (f->mType == FormulaType::UEQ) {
+#ifdef __VS
+					return *f->mpUIEqualityVS < *f->mNegation->mpUIEqualityVS;
+#else
+					return f->mUIEquality < f->mNegation->mUIEquality;
+#endif
+				}
 				return f->mType != FormulaType::NOT;
 				assert(false);
 				return true;
@@ -174,7 +181,7 @@ namespace carl
                     CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f->mNegation);
                     return f->mNegation;
                 }
-                if (f->mType == FormulaType::CONSTRAINT || f->mType == FormulaType::VARCOMPARE || f->mType == FormulaType::VARASSIGN) {
+                if (f->mType == FormulaType::CONSTRAINT || f->mType == FormulaType::UEQ || f->mType == FormulaType::VARCOMPARE || f->mType == FormulaType::VARASSIGN) {
                     if (isBaseFormula(f)) {
                         CARL_LOG_TRACE("carl.formula", "Base formula of " << static_cast<const void*>(f) << " / " << *f << " is " << *f);
                         return f;
@@ -205,6 +212,12 @@ namespace carl
 					return new FormulaContent<Pol>(f->mpVariableAssignmentVS->negation());
 #else
 					return new FormulaContent<Pol>(f->mVariableAssignment.negation());
+#endif
+				} else if (f->mType == FormulaType::UEQ) {
+#ifdef __VS
+					return new FormulaContent<Pol>(f->mpUIEqualityVS.negation());
+#else
+					return new FormulaContent<Pol>(f->mUIEquality.negation());
 #endif
 				} else {
                     return new FormulaContent<Pol>(NOT, std::move(Formula<Pol>(f)));
@@ -581,7 +594,7 @@ namespace carl
                 assert( tmp != nullptr );
                 assert( tmp->mUsages < std::numeric_limits<size_t>::max() );
                 ++tmp->mUsages;
-                if (tmp->mUsages == 1 && (tmp->mType == FormulaType::CONSTRAINT || tmp->mType == FormulaType::VARCOMPARE || tmp->mType == FormulaType::VARASSIGN)) {
+                if (tmp->mUsages == 1 && (tmp->mType == FormulaType::CONSTRAINT || tmp->mType == FormulaType::UEQ || tmp->mType == FormulaType::VARCOMPARE || tmp->mType == FormulaType::VARASSIGN)) {
                     CARL_LOG_TRACE("carl.formula", "Is a constraint, increasing again");
                     ++tmp->mUsages;
                 }

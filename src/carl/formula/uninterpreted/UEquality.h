@@ -296,7 +296,11 @@ namespace carl
             /**
              * @return An approximation of the complexity of this uninterpreted equality.
              */
-            size_t complexity() const;
+            std::size_t complexity() const;
+			
+			UEquality negation() const {
+				return UEquality(lhs(), rhs(), !negated());
+			}
             
             /**
              * @param _ueq The uninterpreted equality to compare with.
