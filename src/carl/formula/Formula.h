@@ -595,6 +595,7 @@ namespace carl
              * @return A constant reference to the pseudoboolean constraint represented by this formula. Note, that
              *          this formula has to be of type PBCONSTRAINT, if you invoke this method.
              */
+            [[deprecated("PBConstraints are normal constraints with Boolean variables now.")]]
             const PBConstraint<Pol>& pbConstraint() const
             {
                 assert( mpContent->mType == FormulaType::PBCONSTRAINT );

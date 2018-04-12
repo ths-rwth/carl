@@ -748,6 +748,17 @@ namespace carl
 		_substitutionValue = -lhs().constantPart() / lhs().lterm().coeff();
 		return true;
 	}
+
+	template<typename Pol>
+	bool Constraint<Pol>::isPseudoBoolean() {
+		std::set<carl::Variable> variables = lhs().gatherVariables();
+		for (const auto& var : variables) {
+			if (var.getType() != carl::VariableType::VT_BOOL) {
+				return false;
+			}
+		}
+		return true;
+	}
     
     template<typename Pol>
     ostream& operator<<( ostream& _out, const Constraint<Pol>& _constraint )

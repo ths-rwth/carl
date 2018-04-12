@@ -751,7 +751,13 @@ namespace carl
             {
                 return mpContent->toString( _unequalSwitch, _infix, _friendlyVarNames);
             }
-            
+            /**
+             * Determines whether the constraint is pseudo-boolean.
+             *
+             * @return True if this constraint is pseudo-boolean. False otherwise.
+             */
+            bool isPseudoBoolean();
+
             /**
              * Prints the properties of this constraints on the given stream.
              * @param _out The stream to print on.
