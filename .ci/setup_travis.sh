@@ -23,7 +23,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
 	brew update --quiet
-	brew install cln doxygen eigen llvm
+	brew install doxygen llvm
 
 	if [[ ${CXX} == "g++-5" ]]; then
 		brew install gcc@5
