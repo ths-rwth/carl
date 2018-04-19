@@ -181,8 +181,6 @@ macro(load_library group name version)
         endif()
 
         unset(${LIBNAME}_LIBRARY CACHE)
-    else()
-        message("-- Library ${name} was not found.")
     endif()
 endmacro(load_library)
 

@@ -7,12 +7,12 @@ elseif( WIN32 )
 	set( Boost_b2_Command b2.exe )
 endif()
 
-string(REPLACE "." "_" BOOST_VERSION_FILENAME ${BOOST_VERSION})
+string(REPLACE "." "_" BOOST_VERSION_FILENAME ${Boost_VERSION})
 
 ExternalProject_Add(
 	Boost-EP
-	URL https://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_${BOOST_VERSION_FILENAME}.zip/download
-	URL_MD5 ${BOOST_ZIPHASH}
+	URL https://sourceforge.net/projects/boost/files/boost/${Boost_VERSION}/boost_${BOOST_VERSION_FILENAME}.zip/download
+	URL_MD5 ${Boost_ZIPHASH}
 	BUILD_IN_SOURCE 1
 	DOWNLOAD_NO_PROGRESS 1
 	UPDATE_COMMAND ""
