@@ -15,9 +15,6 @@ addons:
       - ubuntu-toolchain-r-test
     packages: &packages_base
       - g++-6
-      - libcln-dev
-      - libgmp-dev
-      - libgtest-dev
       - openjdk-7-jdk
       - time
       - uuid-dev
