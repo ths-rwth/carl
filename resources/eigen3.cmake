@@ -1,13 +1,4 @@
 ExternalProject_Add(
-    Eigen3-old-EP
-    URL "https://bitbucket.org/eigen/eigen/get/${EIGEN3_VERSION}.zip"
-	URL_MD5 ${EIGEN3_ZIPHASH}
-	DOWNLOAD_NO_PROGRESS 1
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_Fortran_COMPILER=nofortran
-	LOG_INSTALL 1
-)
-
-ExternalProject_Add(
     Eigen3-EP
 	HG_REPOSITORY "https://bitbucket.org/eigen/eigen"
 	HG_TAG ${EIGEN3_VERSION}
