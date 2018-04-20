@@ -1,3 +1,12 @@
+if(USE_COTIRE)
+	message(STATUS "cotire is enabled")
+else()
+	message(STATUS "cotire is disabled")
+	function(cotire)
+	endfunction(cotire)
+	return()
+endif()
+
 # - cotire (compile time reducer)
 #
 # See the cotire manual for usage hints.

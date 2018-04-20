@@ -119,18 +119,7 @@ else()
 	message(STATUS "Building static: no")
 endif()
 
-
-if(USE_COTIRE)
-	# We use cotire, simply include it
-	message(STATUS "using cotire")
-	include(cotire)
-else()
-	# We do not use cotire, create dummy function.
-	message(STATUS "not using cotire")
-	function(cotire)
-	endfunction(cotire)
-endif()
-
+include(cotire)
 
 # RPATH settings
 # don't skip the full RPATH for the build tree
