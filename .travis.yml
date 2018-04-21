@@ -16,6 +16,7 @@ addons:
     packages: &packages_base
       - g++-6
       - openjdk-7-jdk
+      - texinfo
       - time
       - uuid-dev
 
