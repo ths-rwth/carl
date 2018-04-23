@@ -3,6 +3,7 @@ ExternalProject_Add(
 	HG_REPOSITORY "https://bitbucket.org/eigen/eigen"
 	HG_TAG ${EIGEN3_VERSION}
 	DOWNLOAD_NO_PROGRESS 1
+	UPDATE_COMMAND "" # due to https://gitlab.kitware.com/cmake/cmake/issues/17229
 	PATCH_COMMAND hg graft dbab66d00651bf050d1426334a39b627abe7216e
 	COMMAND hg graft ba14974d054ae9ae4ba88e5e58012fa6c2729c32
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DPKGCONFIG_INSTALL_DIR=<INSTALL_DIR>/lib/pkgconfig
