@@ -9,9 +9,9 @@ ExternalProject_Add(
     CLN-EP
     GIT_REPOSITORY "git://www.ginac.de/cln.git"
 	GIT_TAG "cln_${CLN_TAG}"
-	DOWNLOAD_NO_PROGRESS 1
-	BUILD_IN_SOURCE 1
-	CONFIGURE_COMMAND ${AUTORECONF} -iv COMMAND ./configure --prefix=<INSTALL_DIR>
+	UPDATE_COMMAND ""
+	CONFIGURE_COMMAND cd <SOURCE_DIR> && autoreconf -iv
+	COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
 )
 
 ExternalProject_Get_Property(CLN-EP INSTALL_DIR)
