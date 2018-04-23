@@ -141,11 +141,11 @@ matrix:
       script: source .ci/build.sh
     - stage: build
       os: osx
-      osx_image: xcode8.1
+      osx_image: xcode9.1
       script: source .ci/build.sh
     - stage: build
       os: osx
-      osx_image: xcode8.2
+      osx_image: xcode9.2
       script: source .ci/build.sh
     - stage: build
       os: osx

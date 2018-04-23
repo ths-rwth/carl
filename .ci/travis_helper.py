@@ -39,8 +39,8 @@ properties = {
 	"xcode8.2": {"os": "osx", "osx_image": "xcode8.2", "env": []},
 	"xcode8.3": {"os": "osx", "osx_image": "xcode8.3", "env": []},
 	"xcode9": {"os": "osx", "osx_image": "xcode9", "env": []},
-	"xcode9.1": {"os": "osx", "osx_image": "xcode8.1", "env": []},
-	"xcode9.2": {"os": "osx", "osx_image": "xcode8.2", "env": []},	
+	"xcode9.1": {"os": "osx", "osx_image": "xcode9.1", "env": []},
+	"xcode9.2": {"os": "osx", "osx_image": "xcode9.2", "env": []},	
 	"xcode9.3": {"os": "osx", "osx_image": "xcode9.3", "env": []},
 	"linux": {"os": "linux"},
 
