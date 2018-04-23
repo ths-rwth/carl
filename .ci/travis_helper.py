@@ -38,6 +38,10 @@ properties = {
 	"xcode7.3": {"os": "osx", "osx_image": "xcode7.3", "env": []},
 	"xcode8.2": {"os": "osx", "osx_image": "xcode8.2", "env": []},
 	"xcode8.3": {"os": "osx", "osx_image": "xcode8.3", "env": []},
+	"xcode9": {"os": "osx", "osx_image": "xcode9", "env": []},
+	"xcode9.1": {"os": "osx", "osx_image": "xcode8.1", "env": []},
+	"xcode9.2": {"os": "osx", "osx_image": "xcode8.2", "env": []},	
+	"xcode9.3": {"os": "osx", "osx_image": "xcode9.3", "env": []},
 	"linux": {"os": "linux"},
 
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-precise-3.8"], ["clang-3.8"])},
