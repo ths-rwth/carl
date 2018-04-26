@@ -37,6 +37,8 @@ export_target(DEP_TARGETS EIGEN3)
 export_target_recursive(DEP_TARGETS Boost_SHARED INTERFACE_LINK_LIBRARIES)
 export_target_recursive(DEP_TARGETS Boost_STATIC INTERFACE_LINK_LIBRARIES)
 
+export_target(DEP_TARGETS Doxygen::doxygen)
+
 set(EXP_OPTIONS "")
 foreach(option ${EXPORTED_OPTIONS})
 	set(EXP_OPTIONS "${EXP_OPTIONS}\nset(CARL_${option} \"${${option}}\")")
