@@ -753,7 +753,7 @@ namespace carl
 	bool Constraint<Pol>::isPseudoBoolean() const {
 		std::set<carl::Variable> variables = lhs().gatherVariables();
 		for (const auto& var : variables) {
-			if (var.getType() != carl::VariableType::VT_BOOL) {
+			if (var.type() != carl::VariableType::VT_BOOL) {
 				return false;
 			}
 		}
