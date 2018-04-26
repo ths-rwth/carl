@@ -159,6 +159,7 @@ endif()
 include(clang-tidy)
 include(coverage)
 
+add_subdirectory(doxygen-conf)
 add_subdirectory(src)
 
 include(export)

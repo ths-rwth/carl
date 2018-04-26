@@ -4,6 +4,7 @@ ExternalProject_Add(
 	Doxygen-EP
 	GIT_REPOSITORY "https://github.com/doxygen/doxygen.git"
 	GIT_TAG Release_${DOXYGEN_TAG}
+	UPDATE_COMMAND ""
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 )
 
