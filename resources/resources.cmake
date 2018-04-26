@@ -170,9 +170,7 @@ endif()
 
 ##### Doxygen
 #find_package(Doxygen)
-if(DOXYGEN_FOUND)
-	add_subdirectory(doxygen-conf)
-else()
+if(NOT DOXYGEN_FOUND)
 	set(DOXYGEN_VERSION "1.8.14")
 	include(resources/doxygen.cmake)
 endif()

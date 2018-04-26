@@ -13,4 +13,4 @@ ExternalProject_Get_Property(Doxygen-EP INSTALL_DIR)
 add_executable(Doxygen::doxygen IMPORTED GLOBAL)
 set_target_properties(Doxygen::doxygen PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/bin/doxygen")
 
-add_dependencies(Doxygen::doxygen Doxygen-EP)
+add_dependencies(resources Doxygen-EP)
