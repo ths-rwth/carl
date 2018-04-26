@@ -82,13 +82,11 @@ STRING(REGEX REPLACE ";" " " DOXYGEN_INPUT_LIST "${DOXYGEN_SOURCE_DIR}" )
 # Generate doxygen.conf
 # # # # # # # # # # # #
 
-get_target_property(DOXYGEN_BIN Doxygen::doxygen IMPORTED_LOCATION)
-
 configure_file(doxygen.conf.in ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 
 # Target for running doxygen
 add_custom_target(doc-doxygen
-	${DOXYGEN_BIN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
+	COMMAND Doxygen::doxygen ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
 	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf Doxygen::doxygen
 )
 
