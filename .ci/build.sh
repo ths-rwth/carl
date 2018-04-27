@@ -40,7 +40,7 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	cd ../ && sonar-scanner -X -Dproject.settings=build/sonarcloud.properties && cd build/
 elif [[ ${TASK} == "doxygen" ]]; then
 	
-	cmake -D DOCUMENTATION_CREATE_PDF=ON ../
+	cmake -D DOCUMENTATION_CREATE_PDF=ON -D BUILD_DOXYGEN=ON ../
 	
 	make doc || return 1
 	

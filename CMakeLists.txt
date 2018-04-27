@@ -56,6 +56,7 @@ OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." 
 export_option(USE_MPFR_FLOAT)
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
+option( BUILD_DOXYGEN "Build the static library as well" OFF )
 export_option(BUILD_STATIC)
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
