@@ -52,6 +52,7 @@ properties = {
 	"g++-5": {"env": ["CC=gcc-5 CXX=g++-5"], "compiler": "g++-5", "addons": addon_apt([],["g++-5"])},
 	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6"},
 	"g++-7": {"env": ["CC=gcc-7 CXX=g++-7"], "compiler": "g++-7", "addons": addon_apt([],["g++-7"])},
+	"g++-8": {"env": ["CC=gcc-8 CXX=g++-8"], "compiler": "g++-8", "addons": addon_apt([],["g++-8"])},
 
 	"task.coverity": {"env": ["TASK=coverity"]},
 	"task.sonarcloud": {"env": ["TASK=sonarcloud"]},
