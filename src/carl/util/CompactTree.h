@@ -11,6 +11,8 @@
 #include <ostream>
 #include <cassert>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnull-pointer-arithmetic"
 
 namespace carl
 {
@@ -376,3 +378,5 @@ namespace carl
         assert( isValid() );
     }
 }
+
+#pragma clang diagnostic pop
