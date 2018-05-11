@@ -1806,6 +1806,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 {
 	///@todo Check if this works with ordering.
 	if (carl::isZero(rhs.coeff())) return *this;
+	CARL_LOG_TRACE("carl.core", *this << " -= " << rhs);
 	if (Policies::searchLinear)
 	{
 		typename TermsType::iterator it(mTerms.begin());
@@ -1814,19 +1815,24 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 			// TODO consider comparing the shared pointers.
 			if ((*it).monomial() != nullptr) {
 				CompareResult cmpres(Ordering::compare((*it), rhs));
-				if( cmpres == CompareResult::GREATER ) break;
+				if( mOrdered && cmpres == CompareResult::GREATER ) break;
 				if( cmpres == CompareResult::EQUAL )
 				{
 					// new coefficient would be zero, simply removing is enough.
 					if((*it).coeff() == rhs.coeff())
 					{
-						mTerms.erase(it);
+						it = mTerms.erase(it);
+						if (it == mTerms.end()) {
+							// We removed the leading term.
+							makeMinimallyOrdered<false,true>();
+						}
 					}
 					// we have to create a new term object.
 					else
 					{
 						it->coeff() -= rhs.coeff();
 					}
+					CARL_LOG_TRACE("carl.core", "-> " << *this);
 					assert(this->isConsistent());
 					return *this;
 				}
@@ -1835,6 +1841,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		}
 		// no equal monomial does occur. We can simply insert.
 		mTerms.insert(it,-rhs);
+		CARL_LOG_TRACE("carl.core", "-> " << *this);
 		assert(this->isConsistent());
 		return *this;
 	}
@@ -1861,13 +1868,17 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		{
 			if ((*it).monomial() != nullptr) {
 				CompareResult cmpres(Ordering::compare((*it).monomial(), rhs));
-				if( cmpres == CompareResult::GREATER ) break;
+				if( mOrdered && cmpres == CompareResult::GREATER ) break;
 				if( cmpres == CompareResult::EQUAL )
 				{
 					// new coefficient would be zero, simply removing is enough.
 					if(carl::isOne((*it).coeff()))
 					{
-						mTerms.erase(it);
+						it = mTerms.erase(it);
+						if (it == mTerms.end()) {
+							// We removed the leading term.
+							makeMinimallyOrdered<false,true>();
+						}
 					}
 					// we have to create a new term object.
 					else
@@ -2138,17 +2149,20 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::makeMinimallyOrdered(typ
 
 template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff, Ordering, Policies>::isConsistent() const {
+	std::set<Monomial::Arg> monomials;
 	for (unsigned i = 0; i < this->mTerms.size(); i++) {
 		//assert(this->mTerms[i]);
 		assert(!this->mTerms[i].isZero());
 		if (i > 0) {
 			assert(this->mTerms[i].tdeg() > 0);
 		}
+		auto it = monomials.insert(mTerms[i].monomial());
+		assert(it.second);
 	}
 	if (mOrdered) {
 		for (unsigned i = 1; i < this->mTerms.size(); i++) {
 			if (!Ordering::less(mTerms[i-1], mTerms[i])) {
-				std::cout << "Error for " << mTerms[i-1] << " < " << mTerms[i] << std::endl;
+				CARL_LOG_ERROR("carl.core", "Ordering error for " << *this << ": " << mTerms[i-1] << " < " << mTerms[i]);
 			}
 			assert(Ordering::less(mTerms[i-1], mTerms[i]));
 		}
@@ -2159,7 +2173,7 @@ bool MultivariatePolynomial<Coeff, Ordering, Policies>::isConsistent() const {
 		{
 			for (unsigned i = 0; i < this->mTerms.size() - 1; i++) {
 				if (!Ordering::less(mTerms[i], lterm())) {
-					std::cout << "Error for " << mTerms[i] << " < " << lterm() << std::endl;
+					CARL_LOG_ERROR("carl.core", "Ordering error for " << *this << ": " << mTerms[i] << " < " << lterm());
 				}
 				assert(Ordering::less(mTerms[i], lterm()));
 			}
