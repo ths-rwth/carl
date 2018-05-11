@@ -1841,6 +1841,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		}
 		// no equal monomial does occur. We can simply insert.
 		mTerms.insert(it,-rhs);
+		makeMinimallyOrdered<false,true>();
 		CARL_LOG_TRACE("carl.core", "-> " << *this);
 		assert(this->isConsistent());
 		return *this;
@@ -1893,6 +1894,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		}
 		// no equal monomial does occur. We can simply insert.
 		mTerms.insert(it,Term<Coeff>(-carl::constant_one<Coeff>().get(), rhs));
+		makeMinimallyOrdered<false,true>();
 		assert(this->isConsistent());
 		return *this;
 	}
