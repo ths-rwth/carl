@@ -63,7 +63,7 @@ endif()
 print_resource_info("GMP / GMPXX" GMP_SHARED ${GMP_VERSION})
 
 ##### Boost
-set(BOOST_COMPONENTS "filesystem;system;program_options;regex")
+set(BOOST_COMPONENTS "filesystem;system;program_options;regex;unit_test_framework")
 set(Boost_USE_DEBUG_RUNTIME "OFF")
 if(NOT FORCE_SHIPPED_RESOURCES)
 	load_library(carl Boost 1.58 COMPONENTS ${BOOST_COMPONENTS})
@@ -169,7 +169,11 @@ if(COMPARE_WITH_Z3)
 endif()
 
 ##### Doxygen
-#find_package(Doxygen)
+find_package(Doxygen)
+if(DOXYGEN_FOUND AND ${CMAKE_VERSION} VERSION_LESS "3.9.0")
+	add_executable(Doxygen::doxygen IMPORTED GLOBAL)
+	set_target_properties(Doxygen::doxygen PROPERTIES IMPORTED_LOCATION "${DOXYGEN_EXECUTABLE}")
+endif()
 if(NOT DOXYGEN_FOUND AND BUILD_DOXYGEN)
 	set(DOXYGEN_VERSION "1.8.14")
 	include(resources/doxygen.cmake)

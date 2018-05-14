@@ -581,7 +581,7 @@ namespace carl
     }
 	
     template<typename P>
-    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute( Variable _var, const FactorizedPolynomial<P>& _value ) const
+    void FactorizedPolynomial<P>::substituteIn( Variable _var, const FactorizedPolynomial<P>& _value )
     {
         if( !existsFactorization( *this ) )
             return *this;
@@ -721,10 +721,10 @@ namespace carl
     }
 	
     template<typename P>
-    void FactorizedPolynomial<P>::substituteIn( Variable _var, const FactorizedPolynomial<P>& _value )
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute( Variable var, const FactorizedPolynomial<P>& value ) const
     {
         FactorizedPolynomial<P> res( *this );
-        res.substitute( _var, _value );
+        res.substitute( var, value );
         return res;
     }
     
