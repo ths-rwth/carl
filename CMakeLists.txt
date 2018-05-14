@@ -161,7 +161,9 @@ endif()
 include(clang-tidy)
 include(coverage)
 
-add_subdirectory(doxygen-conf)
+if (TARGET Doxygen::doxygen)
+	add_subdirectory(doxygen-conf)
+endif()
 add_subdirectory(src)
 
 include(export)
