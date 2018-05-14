@@ -231,12 +231,6 @@ matrix:
       env: CC=gcc-6 CXX=g++-6 TASK=addons
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
   allow_failures:
-    - stage: dependencies
-      os: linux
-      env: CC=gcc-8 CXX=g++-8
-    - stage: build
-      os: linux
-      env: CC=gcc-8 CXX=g++-8
     - stage: build
       os: linux
       env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
