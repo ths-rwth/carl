@@ -552,15 +552,15 @@ namespace carl
 		
 		/**
          * Replace the given variable by the given value.
-         * @return A new factorized polynomial without resulting from this substitution.
+         * @return A new factorized polynomial resulting from this substitution.
          */
-        FactorizedPolynomial<P> substitute(Variable _var, const FactorizedPolynomial<P>& _value) const;
+        FactorizedPolynomial<P> substitute(Variable var, const FactorizedPolynomial<P>& value) const;
 
         /**
          * Replace all variables by a value given in their map.
          * @return A new factorized polynomial without the variables in map.
          */
-        FactorizedPolynomial<P> substitute(const std::map<Variable, FactorizedPolynomial<P>>& _substitutions) const;
+        FactorizedPolynomial<P> substitute(const std::map<Variable, FactorizedPolynomial<P>>& substitutions) const;
 
         /**
          * Replace all variables by a value given in their map.
@@ -573,12 +573,12 @@ namespace carl
          * @return A new factorized polynomial without the variables in map.
          */
         template<typename SubstitutionType = CoeffType>
-        FactorizedPolynomial<P> substitute(const std::map<Variable, SubstitutionType>& _substitutions) const;
+        FactorizedPolynomial<P> substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
         
         /**
-         * Replace the given variable by the given polynomial within this multivariate polynomial.
+         * Replace the given variable by the given polynomial within this factorized polynomial.
          */
-        void substituteIn(Variable _var, const FactorizedPolynomial<P>& _value);
+        void substituteIn(Variable var, const FactorizedPolynomial<P>& value);
         
         /**
          * Calculates the square of this factorized polynomial if it is a square.
