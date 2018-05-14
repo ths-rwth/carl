@@ -19,7 +19,7 @@ namespace carl {
     
     /// 
     /**
-     * The possible types of a formula.
+     * Represent the type of a formula to allow faster/specialized processing.
      *
      * For each (supported) SMTLIB theory, we have
      * - Constants

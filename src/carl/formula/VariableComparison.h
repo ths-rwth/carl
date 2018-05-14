@@ -15,13 +15,11 @@
 
 namespace carl {
   /**
-   * Represent an algebraic constraint/(in)equality of the form
-   * 'root(p(x,y,z), i) < a'
-   * where p is a multivariate polynomial, i is a root index and 'a'
-   * just any variable.  This generalizes a constraint/(in)equality of the form
-   * 'root(p(x), i) < a', basically comparing 'a' to an algebraic real (that
-   * uses a univariate polynomial),  to a multivariate one, where you still
-   * need to plug in values for 'y' and 'z' to get the univariate polynomial.
+   * Represent a sum type/variant of an (in)equality between a
+   * variable on the left-hand side
+   * and multivariateRoot or algebraic real on the right-hand side.
+   * This is basically a special purpose atomic SMT formula.
+   * The lhs-variable must does not appear on the rhs.
    */
 	template<typename Poly>
 	class VariableComparison {
@@ -79,6 +77,12 @@ namespace carl {
 		bool isEquality() const {
 			return negated() ? relation() == Relation::NEQ : relation() == Relation::EQ;
 		}
+
+		/**
+		 * Convert this variable comparison "v < root(..)" into a simpler
+		 * polynomial (in)equality against zero "p(..) < 0" if that is possible.
+		 * @return boost::none if conversion impossible.
+		 */
 		boost::optional<Constraint<Poly>> asConstraint() const {
 			Relation rel = negated() ? inverse(mRelation) : mRelation;
 			if (boost::get<RAN>(&mValue) == nullptr) {

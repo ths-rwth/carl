@@ -53,9 +53,11 @@ namespace carl
 	}
 	
 	/**
-	 * This class represents some value that is assigned to some variable.
-	 * It is implemented as subclass of a boost::variant.
-	 * Possible value types are bool, vs::SqrtEx and carl::RealAlgebraicNumberPtr.
+	 * Represent a sum type/variant over the different kinds of values that
+	 * can be assigned to the different kinds of variables that exist in
+	 * CARL and to use them in a more uniform way,
+	 * e.g. a plain "bool", "infinity", a "carl::RealAlgebraicNumber",
+	 * a (bitvector) "carl::BVValue" etc.
 	 */
 	template<typename Rational, typename Poly>
 	class ModelValue {
@@ -85,7 +87,7 @@ namespace carl
 		ModelValue() = default;
 
 		/**
-		 * Initializes the Assignment from some valid type of the underlying variant.
+		 * Initialize the Assignment from some valid type of the underlying variant.
 		 */
 		template<typename T, typename T2 = typename std::enable_if<convertible_to_variant<T, Super>::value, T>::type>
 		ModelValue(const T& _t): mData(_t) {}

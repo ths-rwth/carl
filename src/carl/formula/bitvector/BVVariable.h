@@ -1,8 +1,3 @@
-/**
- * @file UVariable.h
- * @author Andreas Krueger <andreas.krueger@rwth-aachen.de>
- */
-
 #pragma once
 
 #include "../../core/Variable.h"
@@ -11,6 +6,9 @@
 
 namespace carl {
 
+	/**
+	 * Represent a BitVector-Variable
+	 */
 	class BVVariable {
 	private:
 		Variable mVar = Variable::NO_VARIABLE;
@@ -58,7 +56,7 @@ namespace carl {
 		}
 
 		/**
-		 * Prints the given bit vector variable on the given output stream.
+		 * Print the given bit vector variable on the given output stream.
 		 * @param os The output stream to print on.
 		 * @param v The bit vector variable to print.
 		 * @return The output stream after printing the given bit vector variable on it.
@@ -90,7 +88,7 @@ namespace carl {
 
 namespace std {
     /**
-     * Implements std::hash for bitvector variables.
+     * Implement std::hash for bitvector variables.
      */
     template<>
     struct hash<carl::BVVariable> {

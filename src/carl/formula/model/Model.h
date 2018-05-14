@@ -9,14 +9,16 @@ namespace carl
 {
 	/**
 	 * Represent a collection of assignments/mappings from variables to values.
-	 * A variable can be assigned to different values that are represented by a ModelValue.
-	 * Most notably, a value may be a substitution based on the values of other variables.
-	 * If a variable that is used by a substitution for another variable is erased from the model, this substitution is evaluated and replaced by the result.
+	 * We use a ModelVariable to abstract over the different kinds of variables
+	 * in CARL, and a ModelValue to abstract over the different kinds of values
+	 * for these variables.
+	 * Most notably, a value can be a "carl::ModelSubstitution" whose value depends
+	 * on the values of other variables in the Model. If such other variables are
+	 * erased from the model, this substitution is evaluated and replaced by the result.
 	 */
 	template<typename Rational, typename Poly>
 	class Model {
 	public:
-		//using Map = std::unordered_map<ModelVariable,ModelValue>;
 		using key_type = ModelVariable;
 		using mapped_type = ModelValue<Rational,Poly>;
 		using Map = std::map<key_type,mapped_type>;
@@ -148,6 +150,11 @@ namespace carl
 				}
 			}
 		}
+		/**
+		 * Return the ModelValue for the given key, evaluated if it's a ModelSubstitution and evaluatable,
+		 * otherwise return it raw.
+		 * @param key The model must contain an assignment with the given key.
+		 */
 		const ModelValue<Rational,Poly>& evaluated(const typename Map::key_type& key) const {
 			const auto& it = at(key);
 			if (it.isSubstitution()) return it.asSubstitution()->evaluate(*this);

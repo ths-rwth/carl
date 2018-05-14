@@ -17,13 +17,18 @@ namespace carl {
 	template<typename Rational, typename Poly> class ModelMVRootSubstitution;
 	template<typename Rational, typename Poly> class ModelPolynomialSubstitution;
 
+	/**
+	 * Represent a expression for a ModelValue with variables as placeholders,
+	 * where the final expression's value depends on the bindings/values of these
+	 * variables. The values are given in the (abstract) form of a "carl::Model".
+	 */
 	template<typename Rational, typename Poly>
 	class ModelSubstitution {
 	private:
 		mutable boost::optional<ModelValue<Rational, Poly>> mCachedValue;
 		
 	protected:
-		/// Evaluates this substitution with respect to the given model.
+		/// Evaluate this substitution with respect to the given model.
 		virtual ModelValue<Rational, Poly> evaluateSubstitution(const Model<Rational, Poly>& model) const = 0;
 	public:
 		ModelSubstitution() = default;
@@ -39,17 +44,17 @@ namespace carl {
 			mCachedValue = boost::none;
 		}
 		
-		/// Checks whether this substitution needs the given model variable.
+		/// Check if this substitution needs the given model variable.
 		virtual bool dependsOn(const ModelVariable&) const {
 			return true;
 		}
-		/// Prints this substitution to the given output stream.
+		/// Print this substitution to the given output stream.
 		virtual void print(std::ostream& os) const {
 			os << "substitution";
 		}
-		/// Multiplies this model substitution by a rational.
+		/// Multiply this model substitution by a rational.
 		virtual void multiplyBy( const Rational& _number ) = 0;
-		/// Adds a rational to this model substitution.
+		/// Add a rational to this model substitution.
 		virtual void add( const Rational& _number ) = 0;
 		
 		virtual Formula<Poly> representingFormula( const ModelVariable& mv ) = 0;

@@ -11,6 +11,12 @@
 namespace carl
 {
 
+	/**
+	 * Represent a sum type/variant over the different kinds of variables that
+	 * exist in CARL to use them in a more uniform way,
+	 * e.g. an (algebraic) "carl::Variable", an (uninterpreted) "carl::UVariable",
+	 * an "carl::UninterpretedFunction" etc.
+	 */
 	class ModelVariable {
         /**
          * Base type we are deriving from.
@@ -23,7 +29,7 @@ namespace carl
 		friend bool operator==(const ModelVariable& lhs, const ModelVariable& rhs);
 
         /**
-         * Initializes the ModelVariable from some valid type of the underlying variant.
+         * Initialize the ModelVariable from some valid type of the underlying variant.
          */
         template<typename T, typename T2 = typename std::enable_if<convertible_to_variant<T, Base>::value, T>::type>
         ModelVariable(const T& _t): mData(_t)

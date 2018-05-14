@@ -38,7 +38,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		return std::vector<RealAlgebraicNumber<Number>>({});
 	}
 
-  // We want to simplify 'poly', but it's const.
+  // We want to simplify 'poly', but it's const, so make a copy.
 	UnivariatePolynomial<Coeff> polyCopy(poly);
 	std::map<Variable, RealAlgebraicNumber<Number>> IRmap;
 

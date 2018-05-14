@@ -99,7 +99,7 @@ namespace carl
     }
     
     /**
-     * Class to create a constraint object.
+     * Represent a polynomial (in)equality against zero.
      */
     template<typename Pol>
     class ConstraintContent
@@ -333,7 +333,10 @@ namespace carl
     }
 
     /**
-     * The constraint class.
+     * Represent a polynomial (in)equality against zero. Such an (in)equality
+     * can be seen as an atomic formula/atom for the theory of real arithmetic.
+     * Actually, this is just a (possibly) thread-safe wrapper with convenient
+     * functions around the "ConstraintContent" class.
      */
     template<typename Pol>
     class Constraint
@@ -344,7 +347,7 @@ namespace carl
             
             // Members.
 
-            /// The content of this constraint.
+            /// The real (in)equality is stored here.
             const ConstraintContent<Pol>* mpContent;
             
             explicit Constraint( const ConstraintContent<Pol>* _content );

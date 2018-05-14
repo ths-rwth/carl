@@ -37,7 +37,8 @@ namespace carl
     class FormulaPool;
     
     /**
-     * The formula class representing a SMT formula.
+     * Represent an SMT formula, which can be an atom for some background
+     * theory or a boolean combination of (sub)formulas.
      */
     template<typename Pol>
     class Formula
