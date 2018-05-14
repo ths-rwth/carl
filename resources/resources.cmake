@@ -169,7 +169,7 @@ if(COMPARE_WITH_Z3)
 endif()
 
 ##### Doxygen
-#find_package(Doxygen)
+find_package(Doxygen)
 if(NOT DOXYGEN_FOUND AND BUILD_DOXYGEN)
 	set(DOXYGEN_VERSION "1.8.14")
 	include(resources/doxygen.cmake)
