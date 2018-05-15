@@ -571,6 +571,65 @@ TEST(FactorizedPolynomial, Evaluation)
     EXPECT_EQ( Rational(54), result );
 }
 
+TEST(FactorizedPolynomial, Substitution)
+{
+    carl::VariablePool::getInstance().clear();
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Pol pc(-3);
+    Pol p1({(Rational)6*x});
+    Pol p2({x});
+    Pol p3({(Rational)5*y});
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpc( pc, pCache );
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+    FPol fp3( p3, pCache );
+    FPol fp4 = fp1 * fp2;
+    FPol fp5 = fp4 * fp3;
+
+    std::map<carl::Variable, Rational> substitution;
+    substitution[x] = 3;
+
+    FPol result = fpc.substitute(substitution);
+    EXPECT_TRUE( result.isConstant() );
+    EXPECT_EQ( Rational(-3), result.constantPart() );
+    EXPECT_EQ( Rational(-3), result );
+    result = fp1.substitute(substitution);
+    EXPECT_EQ( Rational(18), result );
+    result = fp2.substitute(substitution);
+    EXPECT_EQ( Rational(3), result );
+    result = fp3.substitute(substitution);
+    EXPECT_EQ( fp3, result );
+    result = fp4.substitute(substitution);
+    EXPECT_EQ( Rational(54), result );
+    result = fp5.substitute(substitution);
+    EXPECT_EQ( Rational(54)*fp3, result );
+
+    std::map<carl::Variable, Rational> substitution2;
+    substitution2[y] = 5;
+    result = fp5.substitute(substitution2);
+    EXPECT_EQ( Rational(150)*fp2*fp2, result );
+
+    std::map<carl::Variable, Rational> substitution3;
+    substitution3[x] = -2;
+    substitution3[y] = 0;
+    result = fp1.substitute(substitution3);
+    EXPECT_EQ( Rational(-12), result );
+    result = fp2.substitute(substitution3);
+    EXPECT_EQ( Rational(-2), result );
+    result = fp3.substitute(substitution3);
+    EXPECT_EQ( Rational(0), result );
+    result = fp4.substitute(substitution3);
+    EXPECT_EQ( Rational(24), result );
+    result = fp5.substitute(substitution3);
+    EXPECT_EQ( Rational(0), result );
+    substitution3[y] = 3;
+    result = fp5.substitute(substitution3);
+    EXPECT_EQ( Rational(360), result );
+}
+
 TEST(FactorizedPolynomial, Derivation)
 {
     carl::VariablePool::getInstance().clear();
