@@ -98,6 +98,11 @@ protected:
 	bool operator()(const bool lhs, const bool rhs) {
 		return lhs == rhs;
 	}
+	#ifdef USE_COCOA
+	bool operator()(const CoMP& lhs, const CoMP& rhs) {
+		return lhs == rhs;
+	}
+	#endif
     #ifdef USE_GINAC
 	bool operator()(const GMP& lhs, const GMP& rhs) {
 		return lhs == rhs;
@@ -142,12 +147,12 @@ private:
 	std::size_t runSamples(std::vector<R>& res, const Src& src) {
 		carl::Timer timer;
 		for (const auto& cur: src) {
-			res.push_back(std::move(executor(cur)));
+			res.emplace_back(executor(cur));
 		}
 		return timer.passed();
 	}
 public:
-	Benchmark(const BenchmarkInformation& bi, const std::string& name): ci(new ConversionInformation), reference(bi, ci), bi(bi), name(name) {
+	Benchmark(const BenchmarkInformation& bi, const std::string& name): ci(new ConversionInformation(bi.variables)), reference(bi, ci), bi(bi), name(name) {
 		results.reserve(reference.size());
 		std::cout << "Reference " << name << " ... ";
 		std::cout.flush();

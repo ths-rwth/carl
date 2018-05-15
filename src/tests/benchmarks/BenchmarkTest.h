@@ -19,6 +19,9 @@ protected:
     
 	BenchmarkTest(): file({
 		"CArL"
+#ifdef USE_COCOA
+		,"CoCoA"
+#endif
 #ifdef USE_GINAC
 		,"GiNaC"
 #endif

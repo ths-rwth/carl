@@ -86,8 +86,13 @@ namespace carl {
 	struct AdditionExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
-			return std::forward<const CMP<Coeff>>(std::get<0>(args) + std::get<1>(args));
+			return std::get<0>(args) + std::get<1>(args);
 		}
+		#ifdef USE_COCOA
+		CoMP operator()(const std::tuple<CoMP,CoMP>& args) {
+			return std::forward<const CoMP>(std::get<0>(args) + std::get<1>(args));
+		}
+		#endif
         #ifdef USE_GINAC
 		GMP operator()(const std::tuple<GMP,GMP>& args) {
 			return std::forward<const GMP>(GiNaC::expand(std::get<0>(args) + std::get<1>(args)));
@@ -106,6 +111,11 @@ namespace carl {
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
 			return std::forward<const CMP<Coeff>>(std::get<0>(args) * std::get<1>(args));
 		}
+		#ifdef USE_COCOA
+		CoMP operator()(const std::tuple<CoMP,CoMP>& args) {
+			return std::forward<const CoMP>(std::get<0>(args) * std::get<1>(args));
+		}
+		#endif
         #ifdef USE_GINAC
 		GMP operator()(const std::tuple<GMP,GMP>& args) {
 			return std::forward<const GMP>(GiNaC::expand(std::get<0>(args) * std::get<1>(args)));
@@ -127,6 +137,11 @@ namespace carl {
 			std::get<0>(args).divideBy(std::get<1>(args), res);
 			return std::forward<const CMP<Coeff>>(res);
 		}
+		#ifdef USE_COCOA
+		CoMP operator()(const std::tuple<CoMP,CoMP>& args) {
+			return std::forward<const CoMP>(std::get<0>(args) / std::get<1>(args));
+		}
+		#endif
         #ifdef USE_GINAC
 		GMP operator()(const std::tuple<GMP,GMP>& args) {
 			GMP res;
@@ -189,6 +204,11 @@ namespace carl {
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,unsigned>& args) {
 			return std::forward<const CMP<Coeff>>(std::get<0>(args).pow(std::get<1>(args)));
 		}
+        #ifdef USE_COCOA
+		CoMP operator()(const std::tuple<CoMP,unsigned>& args) {
+			return std::forward<const CoMP>(CoCoA::power(std::get<0>(args), std::get<1>(args)));
+		}
+        #endif
         #ifdef USE_GINAC
 		GMP operator()(const std::tuple<GMP,unsigned>& args) {
 			return std::forward<const GMP>(GiNaC::expand(GiNaC::pow(std::get<0>(args), std::get<1>(args))));
@@ -302,8 +322,7 @@ TEST_F(BenchmarkTest, ReleaseCheck)
 #endif
 }
 
-#ifdef USE_CLN_NUMBERS
-typedef cln::cl_RA Coeff;
+typedef mpq_class Coeff;
 
 TEST_F(BenchmarkTest, Addition)
 {
@@ -312,6 +331,9 @@ TEST_F(BenchmarkTest, Addition)
 	for (bi.degree = 15; bi.degree < 25; bi.degree += 2) {
         Benchmark<AdditionGenerator<Coeff>, AdditionExecutor, CMP<Coeff>> bench(bi, "CArL");
 		//bench.compare<CMP<mpq_class>, TupleConverter<CMP<mpq_class>,CMP<mpq_class>>>("CArL GMP");
+		#ifdef USE_COCOA
+		bench.compare<CoMP, TupleConverter<CoMP,CoMP>>("CoCoA");
+		#endif
         #ifdef USE_GINAC
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
         #endif
@@ -332,6 +354,9 @@ TEST_F(BenchmarkTest, Multiplication)
 		#ifdef USE_Z3_NUMBERS
 		bench.compare<CMP<rational>, TupleConverter<CMP<rational>,CMP<rational>>>("CArL rational");
 		#endif
+		#ifdef USE_COCOA
+		bench.compare<CoMP, TupleConverter<CoMP,CoMP>>("CoCoA");
+		#endif
         #ifdef USE_GINAC
 		if (bi.degree <= 10)
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
@@ -349,6 +374,9 @@ TEST_F(BenchmarkTest, Division)
 	bi.n = 1000;
 	for (bi.degree = 10; bi.degree < 16; bi.degree++) {
 		Benchmark<DivisionGenerator<Coeff>, DivisionExecutor, CMP<Coeff>> bench(bi, "CArL");
+		#ifdef USE_COCOA
+		bench.compare<CoMP, TupleConverter<CoMP,CoMP>>("CoCoA");
+		#endif
         #ifdef USE_GINAC
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
         #endif
@@ -381,6 +409,9 @@ TEST_F(BenchmarkTest, Power)
 	bi.n = 1000;
 	for (bi.degree = 5; bi.degree < 10; bi.degree++) {
 		Benchmark<PowerGenerator<Coeff>, PowerExecutor, CMP<Coeff>> bench(bi, "CArL");
+		#ifdef USE_COCOA
+		bench.compare<CoMP, TupleConverter<CoMP,unsigned>>("CoCoA");
+        #endif
         #ifdef USE_GINAC
 		if (bi.degree <= 7)
 		bench.compare<GMP, TupleConverter<GMP,unsigned>>("GiNaC");
@@ -453,7 +484,6 @@ TEST_F(BenchmarkTest, Compare)
 		file.push(bench.result(), bi.degree);
 	}
 }
-#endif
 
 TEST(Benchmark, BuildPDF)
 {
