@@ -576,11 +576,6 @@ namespace carl
         FactorizedPolynomial<P> substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
         
         /**
-         * Replace the given variable by the given polynomial within this factorized polynomial.
-         */
-        void substituteIn(Variable var, const FactorizedPolynomial<P>& value);
-        
-        /**
          * Calculates the square of this factorized polynomial if it is a square.
          * @param _result Used to store the result in.
          * @return true, if this factorized polynomial is a square; false, otherwise.
