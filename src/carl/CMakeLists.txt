@@ -68,7 +68,7 @@ if(BUILD_STATIC)
 
 	target_link_libraries(lib_carl_static PUBLIC EIGEN3 GMPXX_STATIC GMP_STATIC Boost_STATIC ${CMAKE_DL_LIBS} pthread)
 	if(USE_BLISS)
-		target_link_libraries(lib_carl PUBLIC BLISS_STATIC)
+		target_link_libraries(lib_carl_static PUBLIC BLISS_STATIC)
 	endif()
 	if(USE_CLN_NUMBERS)
 		target_link_libraries(lib_carl_static PUBLIC CLN_STATIC)
