@@ -110,6 +110,7 @@ TEST(FactorizedPolynomial, Construction)
     Pol c3 = sp.parseMultivariatePolynomial<Rational>("-2");
     Pol c4 = sp.parseMultivariatePolynomial<Rational>("0");
     Pol fx = sp.parseMultivariatePolynomial<Rational>("x");
+    Pol fz = sp.parseMultivariatePolynomial<Rational>("z");
     Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
     Pol fB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
     Pol f1 = sp.parseMultivariatePolynomial<Rational>("-1*x + 3*y");
@@ -126,6 +127,7 @@ TEST(FactorizedPolynomial, Construction)
     FPol fc3( (Rational) -2 );
     FPol fc4( (Rational) 0 );
     FPol fpx( fx, pCache );
+    FPol fpz( fz, pCache);
     FPol fpA( fA, pCache );
     FPol fpB( fB, pCache );
     FPol fp2( f2, pCache );
@@ -137,24 +139,16 @@ TEST(FactorizedPolynomial, Construction)
     FPol fp9 = fpA * fpA;
 
     //Common divisor
-    std::cout << "Common divisor of " << fpA << " and " << fpB;
     FPol fpCD = commonDivisor( fpA, fpB );
-    std::cout << ": " << fpCD << std::endl;
-    std::cout << "Common divisor of " << fpA << " and " << fc1;
     FPol fpAc1 = commonDivisor( fpA, fc1 );
-    std::cout << ": " << fpAc1 << std::endl;
     EXPECT_EQ( fc1, fpAc1 );
-    std::cout << "Common divisor of " << fc2 << " and " << fpB;
     FPol fpc2B = commonDivisor( fc2, fpB );
-    std::cout << ": " << fpc2B << std::endl;
     EXPECT_EQ( fc1, fpc2B );
 
     //GCD
     FPol fpRestA0;
     FPol fpRestB0;
-    std::cout << "GCD of " << fp8 << " and " << fp9 << ": ";
     FPol fpGCD0 = gcd( fp8, fp9, fpRestA0, fpRestB0 );
-    std::cout << fpGCD0 << " with rest " << fpRestA0 << " and " << fpRestB0 << std::endl;
     EXPECT_EQ( fp8, fpRestA0 * fpGCD0 );
     EXPECT_EQ( fp9, fpRestB0 * fpGCD0 );
     EXPECT_EQ( computePolynomial(fp8), computePolynomial(fpRestA0 * fpGCD0) );
@@ -162,74 +156,52 @@ TEST(FactorizedPolynomial, Construction)
 
     FPol fpRestA;
     FPol fpRestB;
-    std::cout << "GCD of " << fpA << " and " << fpB << ": ";
     FPol fpGCD = gcd( fpA, fpB, fpRestA, fpRestB );
-    std::cout << fpGCD << " with rest " << fpRestA << " and " << fpRestB << std::endl;
     EXPECT_EQ( fpA, fpRestA * fpGCD );
     EXPECT_EQ( fpB, fpRestB * fpGCD );
 
     FPol fpRest3;
     FPol fpRest4;
-    std::cout << "GCD of " << fp3 << " and " << fp4 << ": ";
     FPol fpGCDB = gcd( fp3, fp4, fpRest3, fpRest4 );
-    std::cout << fpGCDB << " with rest " << fpRest3 << " and " << fpRest4 << std::endl;
     EXPECT_EQ( fp3, fpRest3 * fpGCDB );
     EXPECT_EQ( fp4, fpRest4 * fpGCDB );
 
     //Common Multiple
-    std::cout << "Common multiple of " << fpA << " and " << fpB << ": ";
     FPol fpCM = commonMultiple( fpA, fpB );
-    std::cout << fpCM  << std::endl;
-    std::cout << "Common multiple of " << fpA << " and " << fc3 << ": ";
+    EXPECT_EQ( fpB, fpCM );
     FPol fpAc3 = commonMultiple( fpA, fc3 );
-    std::cout << fpAc3  << std::endl;
-    std::cout << "Common multiple of " << fc2 << " and " << fpB << ": ";
+    EXPECT_EQ( fpAc3, fpA * -fc3 );
     FPol fpc3B = commonMultiple( fc2, fpB );
-    std::cout << fpc3B  << std::endl;
+    EXPECT_EQ( fpc3B, fpB * fc2 );
 
     //Quotient
-    std::cout<< "Quotient: " << fpB << " / " << fpA << ": ";
     FPol fpQuo = quotient( fpB, fpA );
-    std::cout << fpQuo << std::endl;
-    std::cout<< "Quotient: " << fpB << " / " << fc3 << ": ";
+    EXPECT_EQ( fpQuo, fpz );
     FPol fpBc3 = quotient( fpB, fc3 );
-    std::cout << fpBc3 << std::endl;
-    std::cout<< "Quotient: " << fc4 << " / " << fpA << ": ";
+    EXPECT_EQ( fpBc3.constantPart(), -1/2 );
+    EXPECT_EQ( fpBc3.polynomial(), fB );
     FPol fpc4A = quotient( fc4, fpA );
-    std::cout << fpc4A << std::endl;
-    std::cout<< "Quotient: " << fpA << " / " << fc1 << ": ";
+    EXPECT_EQ( fpc4A, fc4 );
     FPol fpAc1b = quotient( fpA, fc1 );
-    std::cout << fpAc1b << std::endl;
     EXPECT_EQ( fpAc1b, fpA );
 
     //LCM
     Pol fLCM = lcm( fA, fB );
     FPol fpLCM = lcm( fpA, fpB );
-    std::cout<< "LCM of " << fpA << " and " << fpB << ": " << fpLCM << std::endl;
     EXPECT_EQ( fLCM, computePolynomial( fpLCM ) );
 
     //Multiplication
     Pol fMul = fA * fB;
-    std::cout<< fpA << " * " << fpB << ": ";
     FPol fpMul = fpA * fpB;
-    std::cout << fpMul << std::endl;
     EXPECT_EQ( fMul, computePolynomial( fpMul ) );
     Pol fMul2 = fA * c2;
-    std::cout << fpA << " * " << fc2 << ": ";
     FPol fpMul2 = fpA * fc2;
-    std::cout << fpMul2 << std::endl;
     EXPECT_EQ( fMul2, computePolynomial( fpMul2 ) );
     Pol fMul3 = c4 * fB;
-    std::cout << fc4 << " * " << fpB << ": ";
     FPol fpMul3 = fc4 * fpB;
-    std::cout << fpMul3 << std::endl;
     EXPECT_EQ( fMul3, computePolynomial( fpMul3 ) );
-    std::cout << "fMul4 = " << c2 << " * " << c3 << " = ";
     Pol fMul4 = c2 * c3;
-    std::cout << fMul4 << std::endl;
-    std::cout << "fpMul4 = " << fc2 << " * " << fc3 << " = ";
     FPol fpMul4 = fc2 * fc3;
-    std::cout << fpMul4 << std::endl;
     EXPECT_EQ( fMul4, computePolynomial( fpMul4 ) );
 
     //Some test
@@ -240,28 +212,23 @@ TEST(FactorizedPolynomial, Construction)
     ftest *= fp7;
     ftest *= fp7;
     ftest *= fp2;
-    std::cout << "fp5 = " << fp5 << std::endl;
-    std::cout << "fp7 = " << fp7 << std::endl;
-    std::cout << "ftest = " << ftest << std::endl;
     fres *= ftest;
-    std::cout << "fres = " << fres << std::endl;
     EXPECT_EQ( (f5*f7.pow(5)*f2), computePolynomial( fres ) );
 
     //Addition
     Pol fAdd = fA + fB;
     FPol fpAdd = fpA + fpB;
-    std::cout<< fpA << " + " << fpB << ": " << fpAdd << std::endl;
     EXPECT_EQ( fAdd, computePolynomial( fpAdd ) );
 
     //Subtraction
     Pol fSub = fA - fB;
     FPol fpSub = fpA - fpB;
-    std::cout<< fpA << " - " << fpB << ": " << fpSub << std::endl;
     EXPECT_EQ( fSub, computePolynomial( fpSub ) );
 
     //Unary minus
-    std::cout<< "-(" << fpA << ") = " << (-fpA) << std::endl;
-    std::cout << "-(" << fpB << ") = " << (-fpB) << std::endl;
+    FPol fpAMinus = -fpA;
+    FPol fpAMinus2 = -fpAMinus;
+    EXPECT_EQ( fpA, fpAMinus2 );
 }
 
 TEST(FactorizedPolynomial, Coefficient)
@@ -295,14 +262,18 @@ TEST(FactorizedPolynomial, CommonDivisor)
 
     Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
     Pol fB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
+    Pol fz = sp.parseMultivariatePolynomial<Rational>("z");
 
     std::shared_ptr<CachePol> pCache( new CachePol );
     FPol fpA( fA, pCache );
     FPol fpB( fB, pCache );
+    FPol fpz( fz, pCache );
+    FPol fpB2 = fpA * fpz;
 
-    std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": ";
     FPol fpC = commonDivisor( fpA, fpB );
-    std::cout << fpC << std::endl << std::endl;
+    EXPECT_EQ(fpC, (Rational)1);
+    FPol fpD = commonDivisor( fpA, fpB2 );
+    EXPECT_EQ(fpD, fpA);
 }
 
 TEST(FactorizedPolynomial, GCD)
@@ -337,9 +308,7 @@ TEST(FactorizedPolynomial, GCD)
     EXPECT_EQ( pRestB, computePolynomial( fpRestB ) );
     FPol fgRestA;
     FPol fgRestB;
-    std::cout << "GCD of " << fg1 << " and " << fg2 << ": ";
     FPol fgGCD = gcd( fg1, fg2, fgRestA, fgRestB );
-    std::cout << fgGCD << " with rest " << fgRestA << " and " << fgRestB << std::endl;
     EXPECT_EQ( g1, computePolynomial( fgRestA ) * computePolynomial( fgGCD ) );
     EXPECT_EQ( g2, computePolynomial( fgRestB ) * computePolynomial( fgGCD ) );
 
@@ -367,6 +336,9 @@ TEST(FactorizedPolynomial, GCD)
     FPol fpolRest1;
     FPol fpolRest2;
     FPol fpolGCD = gcd( fpol1, fpol2, fpolRest1, fpolRest2);
+    EXPECT_EQ( computePolynomial( fpol1 ), computePolynomial( fpolRest1 ) * computePolynomial( fpolGCD ) );
+    EXPECT_EQ( computePolynomial( fpol2 ), computePolynomial( fpolRest2 ) * computePolynomial( fpolGCD ) );
+    EXPECT_EQ( fpolGCD, ft3 );
 }
 
 TEST(FactorizedPolynomial, Flattening)
@@ -418,9 +390,9 @@ TEST(FactorizedPolynomial, Flattening2)
     FPol fpA( pA, pCache );
     FPol fpB = fpA * fpA;
     FPol fpC = fpB * fpB;
-    std::cout << fpA << ", " << fpB << ", " << fpC << std::endl;
     fpC.factorization();
-    std::cout << fpC << std::endl;
+    EXPECT_EQ( fpC.factorization().size(), 1 );
+    EXPECT_EQ( fpC.factorization().begin()->second, 4 );
 }
 
 TEST(FactorizedPolynomial, LCM)
@@ -528,7 +500,6 @@ TEST(FactorizedPolynomial, Destructor)
     FPol fp4 = fp3 * fp2;
 
     FPol* pfp5 = new FPol( fp1 * fp1 );
-    std::cout << std::endl << *pfp5 << std::endl << std::endl;
     delete pfp5;
 
     Pol pQuot = p4.quotient(p3);
@@ -604,7 +575,7 @@ TEST(FactorizedPolynomial, Derivation)
 {
     carl::VariablePool::getInstance().clear();
     Variable x = freshRealVariable("x");
-    
+
     FPol c(3);
     FPol der = c.derivative(x);
     EXPECT_EQ( der, FPol({Rational(0)}) );
