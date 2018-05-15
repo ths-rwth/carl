@@ -10,7 +10,10 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(Doxygen-EP INSTALL_DIR)
 
-add_executable(Doxygen::doxygen IMPORTED GLOBAL)
+# If find_package succeeded but found an old version, the target is already created.
+if(NOT TARGET Doxygen::doxygen)
+	add_executable(Doxygen::doxygen IMPORTED GLOBAL)
+endif()
 set_target_properties(Doxygen::doxygen PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/bin/doxygen")
 
 add_dependencies(Doxygen::doxygen Doxygen-EP)
