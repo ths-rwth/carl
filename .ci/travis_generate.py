@@ -52,7 +52,7 @@ jobs = [
 	job("2-macos", ["build", "xcode9.3", "build.sh"]),
 	job("3-docs", ["build", "linux", "g++-6", "task.doxygen", "j1", "build.sh"]),
 	job("4-tidy", ["build", "linux", "clang-5.0", "task.tidy", "build.sh", "mayfail"]),
-	#job("5-checker", ["dependencies", "linux", "g++-6", "task.coverity", "j1", "build.sh"]),
+	job("5-checker", ["dependencies", "linux", "clang-5.0", "task.coverity", "build.sh"]),
 	job("5-checker", ["build", "linux", "clang-5.0", "task.coverity", "addon.coverity", "mayfail"]),
 	#job("5-checker", ["dependencies", "linux", "clang-6.0", "task.sonarcloud", "j1", "build.sh"]),
 	job("5-checker", ["build", "linux", "clang-5.0", "task.sonarcloud", "addon.sonarcloud", "build.sh", "mayfail"]),

@@ -58,6 +58,15 @@ matrix:
           packages: [*packages_base, g++-8]
     - stage: dependencies
       os: linux
+      compiler: clang++-5.0
+      env: CC=clang-5.0 CXX=clang++-5.0 TASK=coverity
+      script: TASK=dependencies source .ci/build.sh
+      addons:
+        apt:
+          sources: [*sources_base, llvm-toolchain-trusty-5.0]
+          packages: [*packages_base, clang-5.0, libstdc++-8-dev]
+    - stage: dependencies
+      os: linux
       compiler: g++-6
       env: CC=gcc-6 CXX=g++-6 TASK=pycarl
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
