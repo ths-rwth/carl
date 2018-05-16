@@ -14,8 +14,6 @@ addons:
     sources: &sources_base
       - ubuntu-toolchain-r-test
     packages: &packages_base
-      - g++-6
-      - openjdk-7-jdk
       - texinfo
       - time
       - uuid-dev
@@ -40,9 +38,11 @@ matrix:
   {%- if job.addons %}
       addons:
     {%- if job.addons.apt %}
+      {%- set sources = ["*sources_base"] + job.addons.apt.sources %}
+      {%- set packages = ["*packages_base"] + job.addons.apt.packages %}
         apt:
-          sources: [{{ job.addons.apt.sources|join(', ') }}]
-          packages: [{{ job.addons.apt.packages|join(', ') }}]
+          sources: [{{ sources|join(', ') }}]
+          packages: [{{ packages|join(', ') }}]
     {%- endif %}
     {%- if job.addons.coverity_scan %}
         coverity_scan:
