@@ -632,7 +632,7 @@ TEST(MultivariatePolynomialTest, Resultant)
     Variable x = freshRealVariable("x0");
     Variable y = freshRealVariable("x1");
 	typedef Rational T;
-	carl::CIPtr ci = carl::CIPtr(new ConversionInformation());
+	carl::CIPtr ci = carl::CIPtr(new ConversionInformation({x,y}));
 
 	MultivariatePolynomial<Rational> p = x*x + x*(y*y+T(4)) + y*y + T(18);
 	MultivariatePolynomial<Rational> q = x*x + x*(T(4)*y+T(8)) + T(2)*y*y+y+T(19);
