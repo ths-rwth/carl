@@ -106,20 +106,6 @@ namespace carl
 		{
             return mLhs.isInvalid() && mRhs.isInvalid();
         }
-		bool isTrue() const {
-			if (mLhs == mRhs) {
-				return true;
-			} else if (mLhs.isConstant() && mRhs.isConstant()) {
-				return mLhs.value() == mRhs.value();
-			} else return false;
-		}
-		bool isFalse() const {
-			if (mLhs == mRhs) {
-				return false;
-			} else if (mLhs.isConstant() && mRhs.isConstant()) {
-				return !(mLhs.value() == mRhs.value());
-			} else return false;
-		}
 
 		bool isAlwaysConsistent() const
 		{
