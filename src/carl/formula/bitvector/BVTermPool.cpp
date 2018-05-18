@@ -64,9 +64,30 @@ namespace carl
         // Catch expressions leading to an "undefined" result (i.e., division by zero)
         // As of SMT-LIB 2.6, this is defined as #b111...
         if (_second.isConstant() && _second.value().isZero()) {
-            if(_type == BVTermType::DIV_S || _type == BVTermType::DIV_U || _type == BVTermType::MOD_S1 || _type == BVTermType::MOD_S2 || _type == BVTermType::MOD_U) {
-                return create(BVTermType::CONSTANT, ~BVValue(_first.width(), 0));
-            }
+			switch (_type) {
+				case BVTermType::DIV_U:
+					return create(BVTermType::CONSTANT, ~BVValue(_first.width(), 0));
+				case BVTermType::DIV_S:
+					if (_first.isConstant()) {
+						if (_first.value().isZero()) {
+							// Zero -> 1
+							return create(BVTermType::CONSTANT, BVValue(_first.width(), 1));
+						} else if (_first.value()[_first.width()-1]) {
+							// Negative -> 1
+							return create(BVTermType::CONSTANT, BVValue(_first.width(), 1));
+						} else {
+							// Positive -> _first
+							return _first.mpContent;
+						}
+					}
+					break;
+				case BVTermType::MOD_S1:
+				case BVTermType::MOD_S2:
+				case BVTermType::MOD_U:
+					return _first.mpContent;
+				default:
+					break;
+			}
         }
 
         // Evaluate term if both terms arguments are constant

@@ -105,6 +105,7 @@ namespace carl
 
 	class BVTerm
 	{
+		friend BVTermPool;
 	private:
 		const BVTermContent * mpContent;
 
