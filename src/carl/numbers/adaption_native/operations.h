@@ -28,7 +28,7 @@ inline bool isZero(sint n) {
 	return n == 0;
 }
 inline bool isZero(double n) {
-	return n == 0;
+	return std::fpclassify(n) == FP_ZERO;
 }
 inline bool isOne(sint n) {
 	return n == 1;
