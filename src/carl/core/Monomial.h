@@ -228,7 +228,7 @@ namespace carl
 				mExponents.begin(), mExponents.end(),
 				[](const auto& e){ return e.first.type() != VariableType::VT_INT; }
 			);
-			return res != mExponents.end();
+			return res == mExponents.end();
         }
         
 		/**
