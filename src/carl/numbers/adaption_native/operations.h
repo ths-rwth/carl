@@ -61,7 +61,7 @@ inline bool isNumber(double d) {
 
 inline bool isInteger(double d) {
 	double tmp;
-	return std::modf(d, &tmp) == 0.0;
+	return std::fpclassify(std::modf(d, &tmp)) == FP_ZERO;
 }
 
 inline bool isInteger(sint /*unused*/) {
