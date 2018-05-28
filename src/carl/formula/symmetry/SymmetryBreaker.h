@@ -27,7 +27,7 @@ Formula<Poly> createComparison(Variable x, Variable y, Relation rel) {
 		case VariableType::VT_REAL:
 			return Formula<Poly>(Constraint<Poly>(Poly(x) - y, rel));
 		default:
-			CARL_LOG_ERROR("carl.formula.symmetry", "Tried to break symmetry on unsupported variable type " << x.type());
+			CARL_LOG_INFO("carl.formula.symmetry", "Tried to break symmetry on unsupported variable type " << x.type());
 	}
 	return Formula<Poly>(FormulaType::TRUE);
 }
