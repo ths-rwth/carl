@@ -11,7 +11,14 @@ namespace carl {
 namespace formula {
 namespace symmetry {
 
-enum class SpecialColors { VarExp };
+/**
+ * Special colors for structure nodes.
+ * - If: condition from ite
+ * - Then: first case from ite
+ * - Else: second case from ite
+ * - VarExp: pair of variable and exponent in terms
+ */
+enum class SpecialColors { If, Then, Else, VarExp };
 
 template<typename Number>
 class ColorGenerator {
@@ -100,7 +107,18 @@ class GraphBuilder {
 	unsigned addFormula(const Formula<Poly>& f) {
 		unsigned vert = mGraph.add_vertex(mColor(f.getType()));
 		switch (f.getType()) {
-			case carl::FormulaType::ITE:
+			case carl::FormulaType::ITE: {
+				unsigned ifvert = mGraph.add_vertex(mColor(SpecialColors::If));
+				mGraph.add_edge(vert, ifvert);
+				mGraph.add_edge(ifvert, addFormula(f.condition()));
+				unsigned thenvert = mGraph.add_vertex(mColor(SpecialColors::Then));
+				mGraph.add_edge(vert, thenvert);
+				mGraph.add_edge(thenvert, addFormula(f.firstCase()));
+				unsigned elsevert = mGraph.add_vertex(mColor(SpecialColors::Else));
+				mGraph.add_edge(vert, elsevert);
+				mGraph.add_edge(elsevert, addFormula(f.secondCase()));
+				break;
+			}
 			case carl::FormulaType::EXISTS:
 			case carl::FormulaType::FORALL:
 			case carl::FormulaType::TRUE:
