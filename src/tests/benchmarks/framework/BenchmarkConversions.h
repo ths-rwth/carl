@@ -3,6 +3,9 @@
 
 #include "../config.h"
 #include "carl/converter/CArLConverter.h"
+#ifdef USE_COCOA
+#include "carl/converter/CoCoAAdaptor.h"
+#endif
 #ifdef USE_GINAC
 #include "carl/converter/GiNaCConverter.h"
 #endif
@@ -21,6 +24,9 @@ namespace carl {
  */
 struct ConversionInformation {
 	CArLConverter carl;
+	#ifdef USE_COCOA
+	CoCoAAdaptor<CMP<mpq_class>> cocoa;
+	#endif
     #ifdef USE_GINAC
 	std::map<carl::Variable, GiNaC::ex> ginacVariables;
 	GiNaCConverter ginac;
@@ -28,6 +34,12 @@ struct ConversionInformation {
     #ifdef COMPARE_WITH_Z3
 	Z3Converter z3;
     #endif
+	
+	ConversionInformation(const std::vector<Variable>& vars)
+	#ifdef USE_COCOA
+	: cocoa(vars) 
+	#endif
+	{}
 };
 typedef std::shared_ptr<ConversionInformation> CIPtr;
 
@@ -61,6 +73,26 @@ inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const C
 }
 #endif
 #endif
+
+#ifdef USE_COCOA
+//template<>
+//inline CoMP Conversion::convert<CoMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
+//	return ci->cocoa.convert(m);
+//}
+template<>
+inline CoMP Conversion::convert<CoMP, CMP<mpq_class>>(const CMP<mpq_class>& m, const CIPtr& ci) {
+	return ci->cocoa.convert(m);
+}
+//template<>
+//inline CoVAR Conversion::convert<CoVAR, carl::Variable>(const carl::Variable& v, const CIPtr& ci) {
+//	return ci->cocoa.convert(v);
+//}
+//template<>
+//inline CoMP Conversion::convert<CoMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
+//	return ci->cocoa.convert(m);
+//}
+#endif
+
 #ifdef USE_GINAC
 template<>
 inline GMP Conversion::convert<GMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
@@ -71,8 +103,12 @@ inline GMP Conversion::convert<GMP, CMP<mpq_class>>(const CMP<mpq_class>& m, con
 	return ci->ginac(m);
 }
 template<>
-inline GVAR Conversion::convert<GiNaC::symbol, carl::Variable>(const carl::Variable& v, const CIPtr& ci) {
+inline GVAR Conversion::convert<GVAR, carl::Variable>(const carl::Variable& v, const CIPtr& ci) {
 	return ci->ginac(v);
+}
+template<>
+inline GMP Conversion::convert<GMP, CUMP<mpq_class>>(const CUMP<mpq_class>& m, const CIPtr& ci) {
+	return ci->ginac(m);
 }
 template<>
 inline GMP Conversion::convert<GMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {

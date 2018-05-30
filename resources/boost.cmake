@@ -8,6 +8,7 @@ elseif( WIN32 )
 endif()
 
 string(REPLACE "." "_" BOOST_VERSION_FILENAME ${Boost_VERSION})
+set(BOOST_OPTIONS --without-mpi --without-python --without-random --without-regex --without-serialization --without-wave)
 
 ExternalProject_Add(
 	Boost-EP
@@ -19,7 +20,7 @@ ExternalProject_Add(
 	PATCH_COMMAND ""
 	CONFIGURE_COMMAND ${Boost_Bootstrap_Command}
 	BUILD_COMMAND  ${Boost_b2_Command} -s NO_BZIP2=1 --variant=release headers
-	INSTALL_COMMAND ${Boost_b2_Command} -d0 -s NO_BZIP2=1 --variant=release --without-python --without-mpi install --prefix=<INSTALL_DIR>
+	INSTALL_COMMAND ${Boost_b2_Command} -d0 -s NO_BZIP2=1 --variant=release ${BOOST_OPTIONS} install --prefix=<INSTALL_DIR>
 )
 
 ExternalProject_Get_Property(Boost-EP INSTALL_DIR)

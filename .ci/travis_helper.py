@@ -24,8 +24,8 @@ def addon_apt(sources, packages):
 	"""Standard addon for apt."""
 	return {
 		"apt": {
-			"sources": ["*sources_base", *sources],
-			"packages": ["*packages_base", *packages]
+			"sources": sources,
+			"packages": packages
 		}
 	}
 
@@ -44,19 +44,19 @@ properties = {
 	"xcode9.3": {"os": "osx", "osx_image": "xcode9.3", "env": []},
 	"linux": {"os": "linux"},
 
-	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-precise-3.8"], ["clang-3.8"])},
-	"clang-3.9": {"env": ["CC=clang-3.9 CXX=clang++-3.9"], "compiler": "clang++-3.9", "addons": addon_apt(["llvm-toolchain-trusty-3.9"], ["clang-3.9"])},
-	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0", "addons": addon_apt(["llvm-toolchain-trusty-4.0"], ["clang-4.0"])},
-	"clang-5.0": {"env": ["CC=clang-5.0 CXX=clang++-5.0"], "compiler": "clang++-5.0", "addons": addon_apt(["llvm-toolchain-trusty-5.0"], ["clang-5.0"])},
-	"clang-6.0": {"env": ["CC=clang-6.0 CXX=clang++-6.0"], "compiler": "clang++-6.0", "addons": addon_apt(["llvm-toolchain-trusty-6.0"], ["clang-6.0"])},
+	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-precise-3.8"], ["clang-3.8", "libstdc++-6-dev"])},
+	"clang-3.9": {"env": ["CC=clang-3.9 CXX=clang++-3.9"], "compiler": "clang++-3.9", "addons": addon_apt(["llvm-toolchain-trusty-3.9"], ["clang-3.9", "libstdc++-8-dev"])},
+	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0", "addons": addon_apt(["llvm-toolchain-trusty-4.0"], ["clang-4.0", "libstdc++-8-dev"])},
+	"clang-5.0": {"env": ["CC=clang-5.0 CXX=clang++-5.0"], "compiler": "clang++-5.0", "addons": addon_apt(["llvm-toolchain-trusty-5.0"], ["clang-5.0", "libstdc++-8-dev"])},
+	"clang-6.0": {"env": ["CC=clang-6.0 CXX=clang++-6.0"], "compiler": "clang++-6.0", "addons": addon_apt(["llvm-toolchain-trusty-6.0"], ["clang-6.0", "libstdc++-8-dev"])},
 	"g++-5": {"env": ["CC=gcc-5 CXX=g++-5"], "compiler": "g++-5", "addons": addon_apt([],["g++-5"])},
-	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6"},
+	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6", "addons": addon_apt([],["g++-6"])},
 	"g++-7": {"env": ["CC=gcc-7 CXX=g++-7"], "compiler": "g++-7", "addons": addon_apt([],["g++-7"])},
 	"g++-8": {"env": ["CC=gcc-8 CXX=g++-8"], "compiler": "g++-8", "addons": addon_apt([],["g++-8"])},
 
 	"task.coverity": {"env": ["TASK=coverity"]},
 	"task.sonarcloud": {"env": ["TASK=sonarcloud"]},
-	"task.doxygen": {"env": ["TASK=doxygen"], "addons": addon_apt([],["doxygen", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra", "latex-xcolor", "ghostscript"])},
+	"task.doxygen": {"env": ["TASK=doxygen"], "addons": addon_apt([],["doxygen", "ghostscript", "latex-xcolor", "pgf", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra"])},
 	"task.pycarl": {"env": ["TASK=pycarl"], "addons": addon_apt([],["python3"])},
 	"task.addons": {"env": ["TASK=addons"]},
 	"task.tidy": {"env": ["TASK=tidy"]},

@@ -23,7 +23,7 @@ private:
 	std::vector<Variable> mSymbolBack;
 	CoCoA::ring mQ = CoCoA::RingQQ();
 	CoCoA::SparsePolyRing mRing;
-
+public:
 	CoCoA::BigInt convert(const mpz_class& n) const {
 		return CoCoA::BigInt(n.get_mpz_t());
 	}
@@ -116,8 +116,8 @@ private:
 	}
 
 public:
-	explicit CoCoAAdaptor(const std::vector<Poly>& polys):
-		mSymbolBack(collectVariables(polys)),
+	explicit CoCoAAdaptor(const std::vector<Variable>& vars):
+		mSymbolBack(vars),
 		mRing(CoCoA::NewPolyRing(mQ, long(mSymbolBack.size())))
 	{
 		auto indets = CoCoA::indets(mRing);
@@ -126,6 +126,9 @@ public:
 			mSymbolThere.emplace(mSymbolBack[i], indets[i]);
 		}
 	}
+	CoCoAAdaptor(const std::vector<Poly>& polys):
+		CoCoAAdaptor(collectVariables(polys))
+	{}
 	CoCoAAdaptor(const std::initializer_list<Poly>& polys):
 		CoCoAAdaptor(std::vector<Poly>(polys))
 	{}

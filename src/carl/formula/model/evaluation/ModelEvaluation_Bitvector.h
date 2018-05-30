@@ -59,8 +59,8 @@ namespace model {
 	template<typename Rational, typename Poly>
 	void evaluate(ModelValue<Rational,Poly>& res, BVConstraint& bvc, const Model<Rational,Poly>& m) {
 		substituteIn(bvc, m);
-		if (bvc.isTrue()) res = true;
-		else if (bvc.isFalse()) res = false;
+		if (bvc.isAlwaysConsistent()) res = true;
+		else if (bvc.isAlwaysInconsistent()) res = false;
 		else {
 			CARL_LOG_ERROR("carl.model.evaluation", "Evaluation of bitvector constraint " << bvc << " was not possible.");
 			assert(false);

@@ -174,8 +174,8 @@ namespace model {
 			}
 			case FormulaType::BITVECTOR: {
 				BVConstraint bvc = substitute(f.bvConstraint(), m);
-				if (bvc.isTrue()) f = Formula<Poly>(FormulaType::TRUE);
-				else if (bvc.isFalse()) f = Formula<Poly>(FormulaType::FALSE);
+				if (bvc.isAlwaysConsistent()) f = Formula<Poly>(FormulaType::TRUE);
+				else if (bvc.isAlwaysInconsistent()) f = Formula<Poly>(FormulaType::FALSE);
 				else f = Formula<Poly>(bvc);
 				break;
 			}

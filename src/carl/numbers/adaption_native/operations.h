@@ -28,7 +28,7 @@ inline bool isZero(sint n) {
 	return n == 0;
 }
 inline bool isZero(double n) {
-	return n == 0;
+	return std::fpclassify(n) == FP_ZERO;
 }
 inline bool isOne(sint n) {
 	return n == 1;
@@ -61,7 +61,7 @@ inline bool isNumber(double d) {
 
 inline bool isInteger(double d) {
 	double tmp;
-	return std::modf(d, &tmp) == 0.0;
+	return std::fpclassify(std::modf(d, &tmp)) == FP_ZERO;
 }
 
 inline bool isInteger(sint /*unused*/) {
