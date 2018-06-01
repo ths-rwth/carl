@@ -68,12 +68,21 @@ public:
    * Make a (lower dimensional) copy that contains only the first
    * 'componentCount'-many components.
    */
-  RealAlgebraicPoint subpoint(size_t componentCount) const {
+  RealAlgebraicPoint prefixPoint(size_t componentCount) const {
     assert(componentCount <= mNumbers.size());
     std::vector<RealAlgebraicNumber<Number>> copy(
     	mNumbers.begin(), std::next(mNumbers.begin(), componentCount));
     return RealAlgebraicPoint(std::move(copy));
   }
+
+	/**
+   * Make a (lower dimensional) copy that contains only the first
+   * 'componentCount'-many components.
+   */
+   [[deprecated("Use prefixPoint instead")]]
+	RealAlgebraicPoint subpoint(size_t componentCount) const {
+     return prefixPoint(componentCount);
+	}
 
   /**
    * Create a new point with another given component added at the end of this
