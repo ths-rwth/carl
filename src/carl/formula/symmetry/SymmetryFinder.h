@@ -30,6 +30,7 @@ private:
 	std::map<carl::FormulaType, unsigned> mFT;
 	std::map<Number, unsigned> mConst;
 	std::map<SpecialColors, unsigned> mSpecial;
+	std::map<std::size_t, unsigned> mIndexes;
 	
 	template<typename T>
 	unsigned findOrInsert(std::map<T,unsigned>& container, const T& value) {
@@ -55,6 +56,9 @@ public:
 	}
 	unsigned operator()(SpecialColors v) {
 		return findOrInsert(mSpecial, v);
+	}
+	unsigned operator()(std::size_t v) {
+		return findOrInsert(mIndexes, v);
 	}
 };
 
@@ -131,6 +135,16 @@ class GraphBuilder {
 				mGraph.add_edge(vert, addFormula(f.subformula()));
 				break;
 			case carl::FormulaType::IMPLIES:
+			{
+				std::size_t cur = 1;
+				for (const auto& sf: f.subformulas()) {
+					unsigned idvert = mGraph.add_vertex(mColor(cur));
+					mGraph.add_edge(vert, idvert);
+					mGraph.add_edge(idvert, addFormula(sf));
+					cur++;
+				}
+				break;
+			}
 			case carl::FormulaType::AND:
 			case carl::FormulaType::OR:
 			case carl::FormulaType::XOR:
