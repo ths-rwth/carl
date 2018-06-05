@@ -155,17 +155,17 @@ public:
 
 	/**
 	 * Break down a polynomial into its irreducible factors together with
-   * their exponents/multiplicities.
-   * E.g. "x^3 + 4 x^2 + 5 x + 2" factorizes into "(x+1)^2 * (x+2)^1"
-   * where "(x+1)", "(x+2)" are the irreducible factors and "2" and "1" are
-   * their exponents.
-   *
-   * @param includeConstantFlag One of those factors is a constant-polynomial
-   * (degree 0), which is included by default but can be left out by setting
-   * the flag 'includeConstantFlag' to false, e.g., for root computations.
-   *
-   * @return A map whose keys are the irreducible factors and whose values are
-   * the exponents.
+	 * their exponents/multiplicities.
+	 * E.g. "x^3 + 4 x^2 + 5 x + 2" factorizes into "(x+1)^2 * (x+2)^1"
+	 * where "(x+1)", "(x+2)" are the irreducible factors and "2" and "1" are
+	 * their exponents.
+	 *
+	 * @param includeConstants One of those factors is a constant-polynomial
+	 * (degree 0), which is included by default but can be left out by setting
+	 * the flag 'includeConstantFlag' to false, e.g., for root computations.
+	 *
+	 * @return A map whose keys are the irreducible factors and whose values are
+	 * the exponents.
 	 */
 	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
 		auto finfo = CoCoA::factor(convert(p));
@@ -176,8 +176,8 @@ public:
 		for (std::size_t i = 0; i < finfo.myFactors().size(); ++i) {
 			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
 		}
-    return res;
-  }
+		return res;
+	}
 
 	/**
 	 * Break down a polynomial into its unique, non-constant,irreducible factors

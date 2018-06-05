@@ -19,6 +19,31 @@ namespace helper {
 	Factors<MultivariatePolynomial<C,O,P>> trivialFactorization(const MultivariatePolynomial<C,O,P>& p) {
 		return { std::make_pair(p, 1) };
 	}
+	
+	template<typename C, typename O, typename P>
+	void sanitizeFactors(const MultivariatePolynomial<C,O,P>& reference, Factors<MultivariatePolynomial<C,O,P>>& factors) {
+		MultivariatePolynomial<C,O,P> p(1);
+		for (const auto& f: factors) {
+			p *= f.first.pow(f.second);
+		}
+		if (p == reference) return;
+		if (p == -reference) {
+			CARL_LOG_WARN("carl.core.factorize", "The factorization had an incorrect sign, correct it.");
+			CARL_LOG_WARN("carl.core.factorize", reference << " -> " << factors);
+			MultivariatePolynomial<C,O,P> factor(-1);
+			auto it = std::find_if(factors.begin(), factors.end(), [](const auto& f){ return f.first.isConstant(); });
+			if (it != factors.end()) {
+				assert(it->second == 1);
+				factor *= it->first;
+				factors.erase(it);
+			}
+			factors.emplace(factor, 1);
+			return;
+		}
+		CARL_LOG_WARN("carl.core.factorize", "The factorization was incorrect, return trivial factorization.");
+		CARL_LOG_WARN("carl.core.factorize", reference << " -> " << factors);
+		return trivialFactorization(reference);
+	}
 }
 
 /**
@@ -53,7 +78,9 @@ Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomia
 		[includeConstants](const auto& p){ return ginacFactorization(p); }
 	#endif
 	);
-	return s(p);
+	auto factors = s(p);
+	helper::sanitizeFactors(p, factors);
+	return factors;
 }
 
 }
