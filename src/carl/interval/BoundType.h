@@ -9,36 +9,42 @@
 
 #pragma once
 
-namespace carl
-{
-    enum class BoundType {
-                /// the given bound is compared by a strict ordering relation
-                STRICT=0,
-                /// the given bound is compared by a weak ordering relation
-                WEAK=1,
-                /// the given bound is interpreted as minus or plus infinity depending on whether it is the left or the right bound
-                INFTY=2
-            };
-    
-	inline static BoundType getWeakestBoundType( BoundType type1, BoundType type2 )
-	{
-		if (type1 == BoundType::INFTY || type2 == BoundType::INFTY) return BoundType::INFTY;
-		if (type1 == BoundType::WEAK || type2 == BoundType::WEAK) return BoundType::WEAK;
-		return BoundType::STRICT;
-	}
-	inline static BoundType getStrictestBoundType( BoundType type1, BoundType type2 )
-	{
-		if (type1 == BoundType::INFTY || type2 == BoundType::INFTY) return BoundType::INFTY;
-		if (type1 == BoundType::STRICT || type2 == BoundType::STRICT) return BoundType::STRICT;
-		return BoundType::WEAK;
-	}
-        
-        inline static BoundType getOtherBoundType( BoundType type ) 
-        {
-            return (type == BoundType::INFTY)
-                    ? BoundType::INFTY
-                    : (type == BoundType::WEAK) ? BoundType::STRICT : BoundType::WEAK;
-                
-        }
+namespace carl {
+enum class BoundType {
+	/// the given bound is compared by a strict ordering relation
+	STRICT = 0,
+	/// the given bound is compared by a weak ordering relation
+	WEAK = 1,
+	/// the given bound is interpreted as minus or plus infinity depending on whether it is the left or the right bound
+	INFTY = 2
+};
+
+inline static BoundType getWeakestBoundType(BoundType type1, BoundType type2) {
+	if (type1 == BoundType::INFTY || type2 == BoundType::INFTY) return BoundType::INFTY;
+	if (type1 == BoundType::WEAK || type2 == BoundType::WEAK) return BoundType::WEAK;
+	return BoundType::STRICT;
+}
+inline static BoundType getStrictestBoundType(BoundType type1, BoundType type2) {
+	if (type1 == BoundType::INFTY || type2 == BoundType::INFTY) return BoundType::INFTY;
+	if (type1 == BoundType::STRICT || type2 == BoundType::STRICT) return BoundType::STRICT;
+	return BoundType::WEAK;
 }
 
+inline static BoundType getOtherBoundType(BoundType type) {
+	if (type == BoundType::INFTY) return BoundType::INFTY;
+	if (type == BoundType::WEAK) return BoundType::STRICT;
+	return BoundType::WEAK;
+}
+
+} // namespace carl
+
+namespace std {
+/// Specialization of `std::hash` for BoundType.
+template<>
+struct hash<carl::BoundType> {
+	/// Calculates the hash of a BoundType.
+	std::size_t operator()(carl::BoundType bt) const {
+		return static_cast<std::size_t>(bt);
+	}
+};
+} // namespace std
