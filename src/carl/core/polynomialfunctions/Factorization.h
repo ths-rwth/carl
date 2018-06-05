@@ -42,7 +42,7 @@ namespace helper {
 		}
 		CARL_LOG_WARN("carl.core.factorize", "The factorization was incorrect, return trivial factorization.");
 		CARL_LOG_WARN("carl.core.factorize", reference << " -> " << factors);
-		return trivialFactorization(reference);
+		factors = trivialFactorization(reference);
 	}
 }
 
