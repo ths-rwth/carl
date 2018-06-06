@@ -1,18 +1,27 @@
 #pragma once
 
-#include <boost/functional/hash.hpp>
 #include <utility>
 #include <vector>
 
 namespace carl {
+
+/**
+ * Add a value to the given hash seed.
+ * This method is a copy of boost::hash_combine().
+ * It is reimplemented here to avoid including all of boost/functional/hash.hpp for this single line of code.
+ */
+inline void hash_combine(std::size_t& seed, std::size_t value) {
+	seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
+}
+
 template<typename T>
 inline void hash_add(std::size_t& seed, const T& value) {
-	boost::hash_combine(seed, std::hash<T>()(value));
+	carl::hash_combine(seed, std::hash<T>()(value));
 }
 
 template<>
 inline void hash_add(std::size_t& seed, const std::size_t& value) {
-	boost::hash_combine(seed, value);
+	carl::hash_combine(seed, value);
 }
 
 template<typename First, typename... Tail>
