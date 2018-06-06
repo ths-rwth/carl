@@ -12,9 +12,30 @@
 
 #ifdef USE_COCOA
 
-#include "CoCoA/library.H"
+//#include "CoCoA/library.H"
+#include <CoCoA/BigInt.H>
+#include <CoCoA/BigRat.H>
+#include <CoCoA/factorization.H>
+#include <CoCoA/ring.H>
+#include <CoCoA/RingQQ.H>
+#include <CoCoA/SparsePolyRing.H>
 
 namespace carl {
+/**
+ * This namespace contains wrapper for all heavy CoCoALib methods.
+ * They are implemented in a separate source file, attempting to reduce the 
+ * amount of code included from CoCoALib.
+ */
+namespace cocoawrapper {
+	/// Calls CoCoA::gcd(p,q).
+	CoCoA::RingElem gcd(const CoCoA::RingElem& p, const CoCoA::RingElem& q);
+	/// Calls CoCoA::factor(p).
+	CoCoA::factorization<CoCoA::RingElem> factor(const CoCoA::RingElem& p);
+	/// Calls CoCoA::ReducedGBasis(CoCoA::ideal(p)).
+	std::vector<CoCoA::RingElem> ReducedGBasis(const std::vector<CoCoA::RingElem>& p);
+	/// Calls CoCoA::SqFreeFactor(p).
+	CoCoA::factorization<CoCoA::RingElem> SqFreeFactor(const CoCoA::RingElem& p);
+}
 
 template<typename Poly>
 class CoCoAAdaptor {
@@ -145,12 +166,12 @@ public:
 	}
 	
 	Poly gcd(const Poly& p1, const Poly& p2) const {
-		return convert(CoCoA::gcd(convert(p1), convert(p2)));
+		return convert(cocoawrapper::gcd(convert(p1), convert(p2)));
 	}
 
 	Poly makeCoprimeWith(const Poly& p1, const Poly& p2) const {
 		CoCoA::RingElem res = convert(p1);
-		return convert(res / CoCoA::gcd(res, convert(p2)));
+		return convert(res / cocoawrapper::gcd(res, convert(p2)));
 	}
 
 	/**
@@ -168,7 +189,7 @@ public:
 	 * the exponents.
 	 */
 	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
-		auto finfo = CoCoA::factor(convert(p));
+		auto finfo = cocoawrapper::factor(convert(p));
 		Factors<Poly> res;
 		if (includeConstants && !CoCoA::IsOne(finfo.myRemainingFactor())) {
 			res.emplace(convert(finfo.myRemainingFactor()), 1);
@@ -187,7 +208,7 @@ public:
 	 */
 	std::vector<Poly> irreducibleFactorsOf(const Poly& p) const {
 		std::vector<Poly> res;
-		auto cocoaFactors = CoCoA::factor(convert(p)).myFactors();
+		auto cocoaFactors = cocoawrapper::factor(convert(p)).myFactors();
 		for (const auto& f: cocoaFactors) {
 			res.emplace_back(convert(f));
 		}
@@ -195,7 +216,7 @@ public:
 	}
 
 	Poly squareFreePart(const Poly& p) const {
-		auto finfo = CoCoA::SqFreeFactor(convert(p));
+		auto finfo = cocoawrapper::SqFreeFactor(convert(p));
 		Poly res(1);
 		for (const auto& f: finfo.myFactors()) {
 			res *= convert(f);
@@ -204,7 +225,7 @@ public:
 	}
 
 	auto GBasis(const std::vector<Poly>& p) const {
-		return convert(CoCoA::ReducedGBasis(CoCoA::ideal(convert(p))));
+		return convert(cocoawrapper::ReducedGBasis(convert(p)));
 	}
 };
 
