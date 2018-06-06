@@ -14,7 +14,9 @@
 #include "config.h"
 #include "logging.h"
 
-#include "../converter/CoCoAAdaptor.h"
+#ifdef USE_COCOA
+#include <CoCoA/GlobalManager.H>
+#endif
 
 #include <iomanip>
 #include <iostream>
