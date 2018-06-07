@@ -6,7 +6,6 @@
 
 #include <boost/mpl/begin_end.hpp>
 #include <boost/mpl/find.hpp>
-#include <boost/mpl/size.hpp>
 #include <boost/mpl/vector.hpp>
 
 namespace carl {
@@ -53,8 +52,8 @@ namespace function_selector {
 	 */
 	template<typename TypeSelector, typename TypeVector, typename... Functions>
 	class FunctionSelector {
-		friend auto createFunctionSelector<TypeSelector, TypeVector, Functions...>(Functions&&...);
-		static_assert(sizeof...(Functions) == boost::mpl::size<TypeVector>::value, "Functions and TypeVector must have the same size.");
+		friend auto createFunctionSelector<TypeSelector, typename TypeVector::types, Functions...>(Functions&&...);
+		static_assert(sizeof...(Functions) == TypeVector::size, "Functions and TypeVector must have the same size.");
 	private:
 		std::tuple<Functions...> mFunctions;
 	public:
@@ -62,14 +61,27 @@ namespace function_selector {
 		template<typename... Args>
 		auto operator()(Args&&... args) const {
 			using T = typename TypeSelector::template type<Args...>;
-			using it = typename boost::mpl::find<TypeVector,T>::type;
-			static_assert(!std::is_same<it, typename boost::mpl::end<TypeVector>::type>::value, "Obtained type T was not found in TypeVector.");
+			using it = typename TypeVector::template find<T>;
+			static_assert(!std::is_same<it, typename TypeVector::end>::value, "Obtained type T was not found in TypeVector.");
 			return std::get<it::pos::value>(mFunctions)(std::forward<Args>(args)...);
 		}
 	};
 	
+	/**
+	 * Wraps the given list of types into a mpl::vector.
+	 * Directly defines helper on this vector:
+	 * - end()
+	 * - find<T>()
+	 * - size()
+	 */
 	template<typename... Args>
-	using wrap_types = boost::mpl::vector<Args...>;
+	struct wrap_types {
+		using types = boost::mpl::vector<Args...>;
+		using end = typename boost::mpl::end<types>::type;
+		template<typename T>
+		using find = typename boost::mpl::find<types,T>::type;
+		static constexpr std::size_t size = sizeof...(Args);
+	};
 	
 	using NaryTypeSelector = NaryTypeSelectorWrapper<carl::UnderlyingNumberType>;
 }
