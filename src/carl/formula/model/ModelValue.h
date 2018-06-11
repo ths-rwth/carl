@@ -79,6 +79,16 @@ namespace carl
 				return Super(createSubstitution<Rational,Poly>(mr).asSubstitution());
 			}
 		};
+		template<typename F, typename Return = void>
+		struct VariantCaller: boost::static_visitor<Return> {
+			F mCallback;
+			VariantCaller(F&& f): mCallback(std::forward<F>(f)) {}
+			template<typename T>
+			auto operator()(const T& t) const {
+				return mCallback(t);
+			}
+		};
+		
 		
 	public:
 		/**
@@ -115,6 +125,11 @@ namespace carl
 		ModelValue& operator=(const MultivariateRoot<Poly>& mr) {
 			mData = createSubstitution<Rational,Poly>(mr).asSubstitution();
 			return *this;
+		}
+		
+		template<typename F, typename Return = void>
+		Return visit(F&& f) const {
+			return boost::apply_visitor(VariantCaller<F, Return>(std::forward<F>(f)), mData);
 		}
 
 		/**
