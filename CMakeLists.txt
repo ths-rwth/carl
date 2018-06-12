@@ -28,7 +28,7 @@ set( PROJECT_DESCRIPTION "Computer ARithmetic Library")
 set( carl_NAME "CArL" )
 set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
-message(STATUS "Version: ${PROJECT_FULLNAME} ${PROJECT_VERSION}")
+message(STATUS "Version: ${PROJECT_FULLNAME} ${PROJECT_VERSION_FULL}")
 
 # # # # # # # # # # # # # # # # # # # # # #
 # B. Options
