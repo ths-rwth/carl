@@ -33,12 +33,13 @@ private:
 	using Number = typename UnderlyingNumberType<Pol>::type;
 	std::ifstream mIn;
 
-	std::vector<std::pair<Number,carl::Variable>> convert(const std::vector<std::pair<int,carl::Variable>>& poly) const {
-		std::vector<std::pair<Number,carl::Variable>> res;
+	carl::MultivariatePolynomial<Number> convert(const std::vector<std::pair<int,carl::Variable>>& poly) const {
+		Pol lhs;
 		for (const auto& term: poly) {
-			res.emplace_back(Number(term.first), term.second);
+			lhs += Pol(Number(term.first)) * Pol(term.second);
 		}
-		return res;
+
+		return lhs;
 	}
 
 public:
@@ -51,10 +52,10 @@ public:
 		if (!file) return boost::none;
 		Formulas<Pol> constraints;
 		for (const auto& cons: file->constraints) {
-			auto pol = convert(std::get<0>(cons));
+			auto lhs = convert(std::get<0>(cons));
 			Relation rel = std::get<1>(cons);
 			Number rhs = std::get<2>(cons);
-			PBConstraint<Pol> pbc(pol, rel, rhs);
+			Constraint<Pol> pbc(lhs - Pol(rhs), rel);
 			constraints.emplace_back(std::move(pbc));
 		}
 		Formula<Pol> resC(FormulaType::AND, std::move(constraints));
