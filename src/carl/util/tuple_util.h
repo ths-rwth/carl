@@ -84,7 +84,7 @@ namespace detail {
 
 /**
  * Invokes a callable object f on a tuple of arguments.
- * This is basically std::apply (available with C++17).
+ * This is basically `std::apply` (available with C++17).
  */
 template<typename F, typename Tuple>
 auto tuple_apply(F&& f, Tuple&& t) {
@@ -109,6 +109,32 @@ namespace detail {
 template<typename F, typename Tuple>
 auto tuple_foreach(F&& f, Tuple&& t) {
 	return detail::tuple_foreach_impl(std::forward<F>(f), std::forward<Tuple>(t), std::make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type>::value>{});
+}
+
+namespace detail {
+	/**
+	 * Helper functor for carl::tuple_accumulate that actually does the work.
+	 */
+	template<typename Tuple, typename T, typename F>
+	struct tuple_accumulate_impl {
+		template<std::size_t I, typename std::enable_if<0 < I, void>::type* = nullptr>
+		T call(Tuple&& t, T&& init, F&& f) {
+			return std::forward<F>(f)(call<I-1>(t, init, f), std::get<I-1>(t));
+		}
+		template<std::size_t I, typename std::enable_if<0 == I, void>::type* = nullptr>
+		T call(Tuple&& t, T&& init, F&& f) {
+			return init;
+		}
+	};
+}
+
+/**
+ * Implements a functional fold (similar to `std::accumulate`) for `std::tuple`.
+ * Combines all tuple elements using a combinator function `f` and an initial value `init`.
+ */
+template<typename Tuple, typename T, typename F>
+T tuple_accumulate(Tuple&& t, T&& init, F&& f) {
+	return detail::tuple_accumulate_impl<Tuple,T,F>().call<std::tuple_size<Tuple>::value>(t, init, f);
 }
 
 }
