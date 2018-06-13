@@ -33,10 +33,20 @@ private:
 	using Number = typename UnderlyingNumberType<Pol>::type;
 	std::ifstream mIn;
 
-	carl::MultivariatePolynomial<Number> convert(const std::vector<std::pair<int,carl::Variable>>& poly) const {
+	std::map<carl::Variable, carl::Variable> variableCache; // maps old int variables to bool
+
+	carl::MultivariatePolynomial<Number> convert(const std::vector<std::pair<int,carl::Variable>>& poly) {
 		Pol lhs;
 		for (const auto& term: poly) {
-			lhs += Pol(Number(term.first)) * Pol(term.second);
+			auto it = variableCache.find(term.second);
+			if (it == variableCache.end()) {
+				// We haven't seen this variable, yet. Create a new map entry for it.
+				carl::Variable boolVar = carl::freshBooleanVariable();
+				variableCache[term.second] = boolVar;
+			}
+
+			const carl::Variable& booleanVariable = variableCache[term.second];
+			lhs += Pol(Number(term.first)) * Pol(booleanVariable);
 		}
 
 		return lhs;
