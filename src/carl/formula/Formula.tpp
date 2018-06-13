@@ -849,6 +849,16 @@ namespace carl
                         resultSubformulas.push_back( currentFormula );
                     break;
                 }
+				case FormulaType::VARASSIGN:
+				{
+					resultSubformulas.push_back( currentFormula );
+					break;
+				}
+				case FormulaType::VARCOMPARE:
+				{
+					resultSubformulas.push_back( currentFormula );
+					break;
+				}
                 case FormulaType::BITVECTOR:
                 {
                     resultSubformulas.push_back( currentFormula );
@@ -1141,6 +1151,16 @@ namespace carl
                                 }
                                 break;
                             }
+							case FormulaType::VARASSIGN:
+							{
+								subsubformulas.push_back( currentSubformula );
+								break;
+							}
+							case FormulaType::VARCOMPARE:
+							{
+								subsubformulas.push_back( currentSubformula );
+								break;
+							}
                             case FormulaType::BITVECTOR:
                             {
                                 ///@todo Anything more to do here?
