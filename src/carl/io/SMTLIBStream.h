@@ -12,6 +12,7 @@
 #include "../formula/model/Model.h"
 #include "../formula/Sort.h"
 #include "../numbers/numbers.h"
+#include "../util/tuple_util.h"
 
 #include <iostream>
 #include <sstream>
@@ -230,9 +231,6 @@ private:
 	}
 	
 public:
-	SMTLIBStream(): mStream() {
-	}
-
 	void initialize(Logic l, const Variables& vars) {
 		declare(l);
 		for (auto v: vars) {
@@ -309,27 +307,29 @@ std::ostream& operator<<(std::ostream& os, const SMTLIBScriptContainer<Pol>& sc)
 	return os << sls;
 }
 
-template<typename Rational, typename Poly>
-struct SMTLIBModelContainer {
-	Model<Rational,Poly> mModel;
-	SMTLIBModelContainer(const Model<Rational,Poly>& model): mModel(model) {}
-};
-template<typename Rational, typename Poly>
-std::ostream& operator<<(std::ostream& os, const SMTLIBModelContainer<Rational,Poly>& sc) {
-	SMTLIBStream sls;
-	sls << sc.mModel;
-	return os << sls;
-}
-
 }
 
 template<typename Pol, typename... Args>
 detail::SMTLIBScriptContainer<Pol> outputSMTLIB(Logic l, std::initializer_list<Formula<Pol>> formulas, Args&&... args) {
 	return detail::SMTLIBScriptContainer<Pol>(l, formulas, std::forward<Args>(args)...);
 }
-template<typename Rational, typename Poly>
-detail::SMTLIBModelContainer<Rational,Poly> outputSMTLIB(const Model<Rational,Poly>& model) {
-	return detail::SMTLIBModelContainer<Rational,Poly>(model);
+
+namespace detail {
+	template<typename... Args>
+	struct SMTLIBOutputContainer {
+		std::tuple<Args...> mData;
+	};
+	template<typename... Args>
+	std::ostream& operator<<(std::ostream& os, const SMTLIBOutputContainer<Args...>& soc) {
+		SMTLIBStream sls;
+		carl::tuple_accumulate(soc.mData, sls, [](auto& sls, const auto& t){ return sls << t; });
+		return os << sls;
+	}
+}
+
+template<typename... Args>
+detail::SMTLIBOutputContainer<Args...> asSMTLIB(Args&&... args) {
+	return detail::SMTLIBOutputContainer<Args...>(std::forward<Args>(args)...);
 }
 
 }
