@@ -58,6 +58,8 @@ public:
 	{}
 	
 	boost::optional<std::pair<Formula<Pol>,Pol>> parse() {
+		if (!mIn.is_open()) return boost::none;
+
 		auto file = parseOPBFile(mIn);
 		if (!file) return boost::none;
 		Formulas<Pol> constraints;
