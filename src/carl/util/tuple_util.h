@@ -119,11 +119,14 @@ namespace detail {
 	struct tuple_accumulate_impl {
 		template<std::size_t I, typename std::enable_if<0 < I, void>::type* = nullptr>
 		T call(Tuple&& t, T&& init, F&& f) {
-			return std::forward<F>(f)(call<I-1>(t, init, f), std::get<I-1>(t));
+			return std::forward<F>(f)(call<I-1>(t, init, std::forward<F>(f)), std::get<I-1>(t));
 		}
 		template<std::size_t I, typename std::enable_if<0 == I, void>::type* = nullptr>
 		T call(Tuple&& t, T&& init, F&& f) {
 			return init;
+		}
+		T operator()(Tuple&& t, T&& init, F&& f) {
+			return call<std::tuple_size<typename std::decay<Tuple>::type>::value>(t, init, std::forward<F>(f));
 		}
 	};
 }
@@ -134,7 +137,7 @@ namespace detail {
  */
 template<typename Tuple, typename T, typename F>
 T tuple_accumulate(Tuple&& t, T&& init, F&& f) {
-	return detail::tuple_accumulate_impl<Tuple,T,F>().call<std::tuple_size<Tuple>::value>(t, init, f);
+	return detail::tuple_accumulate_impl<Tuple,T,F>()(t, init, std::forward<F>(f));
 }
 
 }

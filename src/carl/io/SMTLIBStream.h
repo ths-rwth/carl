@@ -318,11 +318,12 @@ namespace detail {
 	template<typename... Args>
 	struct SMTLIBOutputContainer {
 		std::tuple<Args...> mData;
+		SMTLIBOutputContainer(Args&&... args): mData(std::forward<Args>(args)...) {}
 	};
 	template<typename... Args>
 	std::ostream& operator<<(std::ostream& os, const SMTLIBOutputContainer<Args...>& soc) {
 		SMTLIBStream sls;
-		carl::tuple_accumulate(soc.mData, sls, [](auto& sls, const auto& t){ return sls << t; });
+		carl::tuple_accumulate(soc.mData, sls, [](auto& sls, const auto& t) -> auto& { return sls << t; });
 		return os << sls;
 	}
 }
