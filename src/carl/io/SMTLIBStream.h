@@ -122,7 +122,7 @@ private:
 				assert(false);
 			}
 			*this << "\t\t";
-			value.visit([this](const auto& v){ write(v); });
+			value.visit([this](const auto& v){ this->write(v); });
 			*this << std::endl << "\t)" << std::endl;
 		}
 		*this << ")" << std::endl;
