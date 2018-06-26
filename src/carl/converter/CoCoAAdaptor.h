@@ -18,6 +18,8 @@
 #include <CoCoA/factorization.H>
 #include <CoCoA/ring.H>
 #include <CoCoA/RingQQ.H>
+#include <CoCoA/SparsePolyIter.H>
+#include <CoCoA/SparsePolyOps-RingElem.H>
 #include <CoCoA/SparsePolyRing.H>
 
 namespace carl {
@@ -46,13 +48,13 @@ private:
 	CoCoA::SparsePolyRing mRing;
 public:
 	CoCoA::BigInt convert(const mpz_class& n) const {
-		return CoCoA::BigInt(n.get_mpz_t());
+		return CoCoA::BigIntFromMPZ(n.get_mpz_t());
 	}
 	mpz_class convert(const CoCoA::BigInt& n) const {
 		return mpz_class(CoCoA::mpzref(n));
 	}
 	CoCoA::BigRat convert(const mpq_class& n) const {
-		return CoCoA::BigRat(n.get_mpq_t());
+		return CoCoA::BigRatFromMPQ(n.get_mpq_t());
 	}
 	mpq_class convert(const CoCoA::BigRat& n) const {
 		return mpq_class(CoCoA::mpqref(n));

@@ -10,7 +10,7 @@ ExternalProject_Add(
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES
 	CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC
-	BUILD_COMMAND make lib
+	BUILD_COMMAND make library doc
 	INSTALL_COMMAND ${CMAKE_COMMAND} -E touch <SOURCE_DIR>/examples/index.html
 	COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include
 	COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/lib
