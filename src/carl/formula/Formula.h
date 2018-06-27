@@ -822,7 +822,8 @@ namespace carl
                 return !(carl::PROP_CONTAINS_BITVECTOR <= properties()) 
                     && !(carl::PROP_CONTAINS_UNINTERPRETED_EQUATIONS <= properties())
                     && !(carl::PROP_CONTAINS_INTEGER_VALUED_VARS <= properties())
-                    && !(carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties());
+                    && !(carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties())
+                    && !(carl::PROP_CONTAINS_PSEUDOBOOLEAN <= properties());
             }
 
             /**

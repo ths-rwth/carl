@@ -380,6 +380,8 @@ namespace carl
             _properties |= PROP_CONTAINS_INTEGER_VALUED_VARS;
         if( _constraint.hasRealValuedVariable() )
             _properties |= PROP_CONTAINS_REAL_VALUED_VARS;
+        if( _constraints.isPseudoBoolean() )
+            _properties |= PROP_CONTAINS_PSEUDOBOOLEAN;
     }
     
     template<typename Pol>
