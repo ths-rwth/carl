@@ -65,6 +65,7 @@ namespace carl
                 if( ret.second )
                 {
                     assert( content().mFactorization.empty() );
+                    CARL_LOG_DEBUG("carl.core.factorizedpolynomial", "Adding single factor ( " << poly << " )^1");
                     content().mFactorization.insert( std::make_pair( *this, 1 ) );
                 }
                 else
