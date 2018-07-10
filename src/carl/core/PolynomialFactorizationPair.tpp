@@ -489,6 +489,9 @@ namespace carl
                         polA = *factorA.content().mpPolynomial;
                         polB = *factorB.content().mpPolynomial;
                         polGCD = carl::gcd( polA, polB );
+                        if (carl::isNegative(polGCD.lcoeff())) {
+                            polGCD = -polGCD;
+                        }
                         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": GCD of " << polA << " and " << polB << ": " << polGCD);
                     }
 
