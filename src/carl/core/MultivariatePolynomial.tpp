@@ -322,6 +322,7 @@ const Coeff& MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
 template<typename Coeff, typename Ordering, typename Policies>
 std::size_t MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 {
+	if (isZero()) return 0;
 	assert(!mTerms.empty());
 	if (Ordering::degreeOrder) {
 		return this->lterm().tdeg();
