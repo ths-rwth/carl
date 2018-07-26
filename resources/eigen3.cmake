@@ -1,11 +1,11 @@
 ExternalProject_Add(
     Eigen3-EP
-	HG_REPOSITORY "https://bitbucket.org/eigen/eigen"
-	HG_TAG ${EIGEN3_VERSION}
+	GIT_REPOSITORY "https://github.com/eigenteam/eigen-git-mirror.git"
+	GIT_TAG ${EIGEN3_VERSION}
 	DOWNLOAD_NO_PROGRESS 1
 	UPDATE_COMMAND "" # due to https://gitlab.kitware.com/cmake/cmake/issues/17229
-	PATCH_COMMAND hg graft dbab66d00651bf050d1426334a39b627abe7216e
-	COMMAND hg graft ba14974d054ae9ae4ba88e5e58012fa6c2729c32
+	PATCH_COMMAND git cherry-pick eb592735746d935612caf658ab800e929c4ca6f4
+	COMMAND git cherry-pick f65188960c52da20392d88296cbaeb341d635834
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DPKGCONFIG_INSTALL_DIR=<INSTALL_DIR>/lib/pkgconfig
 	LOG_INSTALL 1
 )
