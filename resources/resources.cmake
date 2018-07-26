@@ -52,7 +52,7 @@ endif()
 ###############
 
 ##### GMP / GMPXX
-if(NOT FORCE_SHIPPED_RESOURCES)
+if((NOT FORCE_SHIPPED_RESOURCES) AND (NOT FORCE_SHIPPED_GMP))
 	load_library(carl GMP 5.1)
 	load_library(carl GMPXX 5.1)
 endif()
