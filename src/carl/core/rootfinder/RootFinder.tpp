@@ -64,8 +64,8 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		return realRoots(polyCopy, interval, pivoting);
 	} else {
 		CARL_LOG_TRACE("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
-		std::map<Variable, Interval<Number>> varToInterval;
-		UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluateCoefficients(polyCopy, IRmap, varToInterval);
+		assert(IRmap.find(polyCopy.mainVar()) == IRmap.end());
+		UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(polyCopy, IRmap);
 		if (evaledpoly.isZero()) return boost::none;
 		CARL_LOG_TRACE("carl.core.rootfinder", "Calling on " << evaledpoly);
 		auto res = realRoots(evaledpoly, interval, pivoting);
