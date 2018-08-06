@@ -230,8 +230,10 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
 			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
 			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
-			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp.switchVariable(i.first));
-			tmp = carl::resultant(tmp.switchVariable(i.first), p2);
+			CARL_LOG_DEBUG("carl.ran", "Simplifying " << tmp.switchVariable(i.first) << " with " << p2);
+			tmp = tmp.switchVariable(i.first);
+			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp);
+			tmp = carl::resultant(tmp, p2);
 			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
 			varToInterval[i.first] = i.second.getInterval();
 		} else {
