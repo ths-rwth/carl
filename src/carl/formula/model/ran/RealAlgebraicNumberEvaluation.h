@@ -243,27 +243,36 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	return tmp.switchVariable(v).toNumberCoefficients();
 }
 
-template<typename Number>
-MultivariatePolynomial<Number> evaluatePolynomial(
-		const MultivariatePolynomial<Number>& p,
+template<typename Number,  typename Coeff>
+UnivariatePolynomial<Number> evaluatePolynomial(
+		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m
 ) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
-	using Coeff = MultivariatePolynomial<Number>;
-	UnivariatePolynomial<Coeff> tmp = p.toUnivariatePolynomial(m.begin()->first);
+	Variable v = p.mainVar();
+	UnivariatePolynomial<Coeff> tmp = p;
 	for (const auto& i: m) {
+		if (!tmp.has(i.first)) {
+			// Variable vanished, skip it
+			continue;
+		}
 		if (i.second.isNumeric()) {
+			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
 			tmp.substituteIn(i.first, Coeff(i.second.value()));
 		} else if (i.second.isInterval()) {
-			UnivariatePolynomial<Coeff> p2(i.first, i.second.getPolynomial().template convert<Coeff>().coefficients());
+			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
+			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
+			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
+			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp.switchVariable(i.first));
 			tmp = carl::resultant(tmp.switchVariable(i.first), p2);
+			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
 		} else {
 			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
 		}
 		CARL_LOG_DEBUG("carl.ran", "Substituted " << i.first << " -> " << i.second << ", result: " << tmp);
 	}
 	CARL_LOG_DEBUG("carl.ran", "Result: " << MultivariatePolynomial<Number>(tmp));
-	return MultivariatePolynomial<Number>(tmp);
+	return tmp.switchVariable(v).toNumberCoefficients();
 }
 
 
