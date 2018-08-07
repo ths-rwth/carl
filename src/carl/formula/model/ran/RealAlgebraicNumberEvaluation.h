@@ -231,7 +231,7 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
 			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
 			CARL_LOG_DEBUG("carl.ran", "Simplifying " << tmp.switchVariable(i.first) << " with " << p2);
-			tmp = tmp.switchVariable(i.first);
+			tmp = tmp.switchVariable(i.first).prem(p2);
 			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp);
 			tmp = carl::resultant(tmp, p2);
 			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
@@ -266,7 +266,9 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
 			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
 			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp.switchVariable(i.first));
-			tmp = carl::resultant(tmp.switchVariable(i.first), p2);
+			tmp = tmp.switchVariable(i.first).prem(p2);
+			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp);
+			tmp = carl::resultant(tmp, p2);
 			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
 		} else {
 			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
