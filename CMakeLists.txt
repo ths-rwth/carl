@@ -21,7 +21,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # Include own macros.
 include( carlmacros )
 
-set_version(18 06)
+set_version(18 08)
 
 set( PROJECT_FULLNAME "carl")
 set( PROJECT_DESCRIPTION "Computer ARithmetic Library")
