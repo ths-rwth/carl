@@ -3,6 +3,8 @@
 #include "../../formula/model/Model.h"
 #include "../../formula/model/evaluation/ModelEvaluation.h"
 
+#ifdef USE_COCOA
+
 #include <CoCoA/library.H>
 
 namespace carl {
@@ -153,3 +155,5 @@ public:
 };
 
 }
+
+#endif
