@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
 
 
-#include <carl/core/polynomialfunctions/LazardEvaluation.h>
+#include "carl/core/polynomialfunctions/LazardEvaluation.h"
 #include "carl/core/UnivariatePolynomial.h"
 
 #include "../Common.h"
 
+#ifdef USE_COCOA
 TEST(LazardEvaluation, Test)
 {
 	using Poly = carl::MultivariatePolynomial<Rational>;
@@ -35,3 +36,4 @@ TEST(LazardEvaluation, Test)
 	
 	EXPECT_EQ(-Poly(z), le.getLiftingPoly());
 }
+#endif
