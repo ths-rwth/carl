@@ -21,6 +21,7 @@ namespace carl{
 	class MonomialPool : public Singleton<MonomialPool>
 	{
 		friend class Singleton<MonomialPool>;
+		friend std::ostream& operator<<(std::ostream& os, const MonomialPool& mp);
 		public:
 			struct PoolEntry {
 				Monomial::Content content;
@@ -139,6 +140,14 @@ namespace carl{
 				return mIDs.largestID();
 			}
 	};
+	
+	inline std::ostream& operator<<(std::ostream& os, const MonomialPool& mp) {
+		os << "MonomialPool of size " << mp.size() << std::endl;
+		for (const auto& entry: mp.mPool) {
+			os << "\t" << entry.content << " / " << entry.hash << std::endl;
+		}
+		return os;
+	}
 } // end namespace carl
 
 namespace carl {
