@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Singleton.h"
+#include "../config.h"
 
 #include <chrono>
 #include <iostream>
