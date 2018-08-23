@@ -342,6 +342,10 @@ template<typename Number>
 		std::list<Interval<Number> > result;
 		if(n == 0)
 		{
+			assert(false);
+			result.emplace_back(emptyInterval());
+			return result;
+		} else if ( n == 1) {
 			result.push_back(*this);
 			return result;
 		}
@@ -354,14 +358,14 @@ template<typename Number>
         tmp.setUpperBoundType(BoundType::STRICT);
         result.push_back(tmp);
 
+        tmp.setLowerBoundType(BoundType::WEAK);
         for( unsigned i = 1; i < (n-1); ++i )
         {
-            tmp.set(diameter*i, diameter*(i+1));
-	    tmp.setUpperBoundType(BoundType::STRICT);
+        	tmp += diameter;
             result.push_back(tmp);
         }
 
-        tmp.set(diameter*(n-1),diameter*n);
+        tmp += diameter;
         tmp.setUpperBoundType(mUpperBoundType);
         result.push_back(tmp);
 		return result;
