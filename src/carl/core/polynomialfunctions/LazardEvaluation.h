@@ -14,7 +14,7 @@ namespace detail_lazard {
 		struct ConversionInfo {
 			CoCoA::SparsePolyRing mRing;
 			std::map<Variable, CoCoA::RingElem> mSymbolThere;
-			std::vector<Variable> mSymbolBack;
+			std::map<std::pair<long,std::size_t>, Variable> mSymbolBack;
 		};
 		
 		CoCoA::BigRat convert(const mpq_class& n) const {
@@ -44,7 +44,8 @@ namespace detail_lazard {
 					std::size_t tdeg = 0;
 					for (std::size_t i = 0; i < exponents.size(); ++i) {
 						if (exponents[i] == 0) continue;
-						monContent.emplace_back(ci.mSymbolBack[i], exponents[i]);
+						const auto& ring = CoCoA::owner(p);
+						monContent.emplace_back(ci.mSymbolBack.at(std::make_pair(CoCoA::RingID(ring),i)), exponents[i]);
 						tdeg += std::size_t(exponents[i]);
 					}
 					res += coeff * createMonomial(std::move(monContent), tdeg);
@@ -75,15 +76,14 @@ private:
 	
 	detail_lazard::CoCoAConverter cc;
 	std::map<Variable, CoCoA::RingElem> mSymbolsThere;
-	std::vector<Variable> mSymbolsBack;
+	std::map<std::pair<long,std::size_t>, Variable> mSymbolsBack;
 	
 	Poly mLiftingPoly;
-	std::vector<Poly> mReductors;
 	
 	auto buildPolyRing(Variable v, const RealAlgebraicNumber<Rational>& r) {
 		CoCoA::SparsePolyRing ring = CoCoA::NewPolyRing(mQ, {CoCoA::NewSymbol()});
 		mSymbolsThere.emplace(v, CoCoA::indets(ring)[0]);
-		mSymbolsBack.emplace_back(v);
+		mSymbolsBack.emplace(std::make_pair(CoCoA::RingID(ring), 0), v);
 		return detail_lazard::CoCoAConverter::ConversionInfo({
 			ring, mSymbolsThere, mSymbolsBack
 		});
@@ -92,7 +92,7 @@ private:
 	bool evaluatesToZero(const CoCoA::RingElem& p, const detail_lazard::CoCoAConverter::ConversionInfo& ci) const {
 		auto mp = cc.convertMV<Poly>(p, ci);
 		auto res = carl::model::evaluate(mp, mModel);
-		CARL_LOG_TRACE("carl.lazard", "Evaluated " << p << " -> " << mp << " -> " << res);
+		CARL_LOG_DEBUG("carl.lazard", "Evaluated " << p << " -> " << mp << " -> " << res);
 		assert(res.isRational() || res.isRAN());
 		if (res.isRational()) return carl::isZero(res.asRational());
 		return carl::isZero(res.asRAN());
@@ -102,29 +102,38 @@ private:
 		mQ = CoCoA::NewQuotientRing(ring, CoCoA::ideal(p));
 	}
 	
-	boost::optional<Poly> getSubstitution(Variable v, const RealAlgebraicNumber<Rational>& r) {
+	/**
+	 * Analyzes whether we have to construct a field extension.
+	 * We may have one of two cases:
+	 * - We can eliminate v by substitution with some term
+	 * - We create a new field extension and may have to reduce the lifting polynomial
+	 *
+	 * In the first case, we return true and the term to substitute with.
+	 * In the second case, we return false and the reduction polynomial.
+	 */
+	std::pair<bool,Poly> getSubstitution(Variable v, const RealAlgebraicNumber<Rational>& r) {
 		if (r.isNumeric()) {
-			CARL_LOG_TRACE("carl.lazard", "Is numeric: " << v << " -> " << r);
-			return Poly(r.value());
+			CARL_LOG_DEBUG("carl.lazard", "Is numeric: " << v << " -> " << r);
+			return std::make_pair(true, Poly(r.value()));
 		}
-		Poly res;
 		detail_lazard::CoCoAConverter::ConversionInfo ci = buildPolyRing(v, r);
 		CoCoA::RingElem p = cc.convertUV(r.getIRPolynomial().replaceVariable(v), ci);
 		auto factorization = CoCoA::factor(p);
-		CARL_LOG_TRACE("carl.lazard", "Factorization of " << p << " on " << ci.mRing << ": " << factorization);
+		CARL_LOG_DEBUG("carl.lazard", "Factorization of " << p << " on " << ci.mRing << ": " << factorization);
 		for (const auto& f: factorization.myFactors()) {
 			if (evaluatesToZero(f, ci)) {
+				CARL_LOG_DEBUG("carl.lazard", "Factor " << f << " is zero in assignment.");
 				if (CoCoA::deg(f) == 1) {
 					auto cf = -(f - CoCoA::LF(f));
-					return cc.convertMV<Poly>(cf, ci);
+					return std::make_pair(true, cc.convertMV<Poly>(cf, ci));
 				} else {
-					mReductors.emplace_back(cc.convertMV<Poly>(f, ci));
 					extendRing(ci.mRing, f);
-					return boost::none;
+					return std::make_pair(false, cc.convertMV<Poly>(f, ci));
 				}
 			}
 		}
-		return res;
+		assert(false);
+		return std::make_pair(false, Poly());
 	}
 	
 public:
@@ -132,20 +141,26 @@ public:
 	
 	void substitute(Variable v, const RealAlgebraicNumber<Rational>& r) {
 		mModel.emplace(v, r);
-		auto subs = getSubstitution(v, r);
-		if (subs) {
-			CARL_LOG_DEBUG("carl.lazard", "Substituting " << v << " by " << *subs);
-			Poly newPoly = mLiftingPoly.substitute(v, *subs);
-			while (newPoly.isZero()) {
-				mLiftingPoly = mLiftingPoly.quotient(v - *subs);
-				newPoly = mLiftingPoly.substitute(v, *subs);
-				CARL_LOG_DEBUG("carl.lazard", "Reducing to " << mLiftingPoly);
-			}
-			mLiftingPoly = newPoly;
+		auto red = getSubstitution(v, r);
+		Poly newPoly;
+		if (red.first) {
+			CARL_LOG_DEBUG("carl.lazard", "Substituting " << v << " by " << red.second);
+			newPoly = mLiftingPoly.substitute(v, red.second);
 		} else {
-			CARL_LOG_DEBUG("carl.lazard", "Reducing " << v << " by " << mReductors.back());
-			mLiftingPoly = mLiftingPoly.remainder(mReductors.back());
+			CARL_LOG_DEBUG("carl.lazard", "Obtained reductor " << red.second);
+			newPoly = mLiftingPoly.remainder(red.second);
 		}
+		while (newPoly.isZero()) {
+			if (red.first) {
+				mLiftingPoly = mLiftingPoly.quotient(v - red.second);
+				newPoly = mLiftingPoly.substitute(v, red.second);
+			} else {
+				mLiftingPoly = mLiftingPoly.quotient(red.second);
+				newPoly = mLiftingPoly.remainder(red.second);
+			}
+			CARL_LOG_DEBUG("carl.lazard", "Reducing to " << mLiftingPoly);
+		}
+		mLiftingPoly = newPoly;
 		CARL_LOG_DEBUG("carl.lazard", "Remaining poly: " << mLiftingPoly);
 	}
 	
