@@ -244,7 +244,7 @@ public:
 		return mIR->sturmSequence;
 	}
 
-	RealAlgebraicNumber changeVariable(Variable::Arg v) const {
+	RealAlgebraicNumber changeVariable(Variable v) const {
 		if (isNumeric()) return *this;
 		assert(isInterval());
 		return RealAlgebraicNumber<Number>(mIR->polynomial.replaceVariable(v), mIR->interval, mIsRoot);
