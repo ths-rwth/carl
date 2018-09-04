@@ -4,6 +4,7 @@
 #include "../core/Term.h"
 #include "../core/Variable.h"
 #include "../util/Common.h"
+#include "../util/TimingCollector.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -168,7 +169,10 @@ public:
 	}
 	
 	Poly gcd(const Poly& p1, const Poly& p2) const {
-		return convert(cocoawrapper::gcd(convert(p1), convert(p2)));
+		auto start = CARL_TIME_START();
+		auto res = convert(cocoawrapper::gcd(convert(p1), convert(p2)));
+		CARL_TIME_FINISH("cocoa.gcd", start);
+		return res;
 	}
 
 	Poly makeCoprimeWith(const Poly& p1, const Poly& p2) const {
@@ -191,6 +195,7 @@ public:
 	 * the exponents.
 	 */
 	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
+		auto start = CARL_TIME_START();
 		auto finfo = cocoawrapper::factor(convert(p));
 		Factors<Poly> res;
 		if (includeConstants && !CoCoA::IsOne(finfo.myRemainingFactor())) {
@@ -199,6 +204,7 @@ public:
 		for (std::size_t i = 0; i < finfo.myFactors().size(); ++i) {
 			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
 		}
+		CARL_TIME_FINISH("cocoa.factorize", start);
 		return res;
 	}
 
@@ -227,7 +233,10 @@ public:
 	}
 
 	auto GBasis(const std::vector<Poly>& p) const {
-		return convert(cocoawrapper::ReducedGBasis(convert(p)));
+		auto start = CARL_TIME_START();
+		auto res = convert(cocoawrapper::ReducedGBasis(convert(p)));
+		CARL_TIME_FINISH("cocoa.gbasis", start);
+		return res;
 	}
 };
 
