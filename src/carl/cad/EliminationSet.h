@@ -47,12 +47,12 @@ private:
      */
 	struct PolynomialPairIsLess {
 		std::less<UPolynomial> less;
-		unsigned int length(const PolynomialPair& p) {
+		unsigned int length(const PolynomialPair& p) const {
 			if (p.first == nullptr && p.second == nullptr) return 0;
 			if (p.first == nullptr || p.second == nullptr) return 1;
 			return 2;
 		}
-		bool operator()(const PolynomialPair& a, const PolynomialPair& b) {
+		bool operator()(const PolynomialPair& a, const PolynomialPair& b) const {
 			unsigned int l1 = this->length(a), l2 = this->length(b);
 			if (l1 < l2) return true;
 			if (l2 < l1) return false;
