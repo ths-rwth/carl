@@ -42,6 +42,8 @@ properties = {
 	"xcode9.1": {"os": "osx", "osx_image": "xcode9.1", "env": []},
 	"xcode9.2": {"os": "osx", "osx_image": "xcode9.2", "env": []},	
 	"xcode9.3": {"os": "osx", "osx_image": "xcode9.3", "env": []},
+	"xcode9.4": {"os": "osx", "osx_image": "xcode9.4", "env": []},
+	"xcode10": {"os": "osx", "osx_image": "xcode10", "env": []},
 	"linux": {"os": "linux"},
 
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-precise-3.8"], ["clang-3.8", "libstdc++-6-dev"])},
