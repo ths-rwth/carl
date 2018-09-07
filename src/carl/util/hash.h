@@ -32,15 +32,6 @@ inline void hash_add(std::size_t& seed, const std::size_t& value) {
 }
 
 /**
- * Variadic version of `hash_add` to add an arbitrary number of values to the seed.
- */
-template<typename First, typename... Tail>
-inline void hash_add(std::size_t& seed, const First& value, Tail&&... tail) {
-	carl::hash_add(seed, value);
-	carl::hash_add(seed, std::forward<Tail>(tail)...);
-}
-
-/**
  * Add hash of both elements of a `std::pair` to the seed.
  */
 template<typename T1, typename T2>
@@ -55,6 +46,15 @@ inline void hash_add(std::size_t& seed, const std::pair<T1, T2>& p) {
 template<typename T>
 inline void hash_add(std::size_t& seed, const std::vector<T>& v) {
 	for (const auto& t: v) carl::hash_add(seed, t);
+}
+
+/**
+ * Variadic version of `hash_add` to add an arbitrary number of values to the seed.
+ */
+template<typename First, typename... Tail>
+inline void hash_add(std::size_t& seed, const First& value, Tail&&... tail) {
+	carl::hash_add(seed, value);
+	carl::hash_add(seed, std::forward<Tail>(tail)...);
 }
 
 /**
