@@ -100,7 +100,7 @@ matrix:
       addons:
         apt:
           sources: [*sources_base, llvm-toolchain-trusty-3.9]
-          packages: [*packages_base, clang-3.9, libstdc++-8-dev]
+          packages: [*packages_base, clang-3.9, libstdc++-6-dev]
     - stage: build
       os: linux
       compiler: clang++-4.0
@@ -109,7 +109,7 @@ matrix:
       addons:
         apt:
           sources: [*sources_base, llvm-toolchain-trusty-4.0]
-          packages: [*packages_base, clang-4.0, libstdc++-8-dev]
+          packages: [*packages_base, clang-4.0, libstdc++-6-dev]
     - stage: build
       os: linux
       compiler: clang++-5.0
