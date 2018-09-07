@@ -332,7 +332,7 @@ bool operator<(const Coeff& lhs, const Term<Coeff>& rhs) {
 template<typename Coeff>
 const Term<Coeff> operator/(const Term<Coeff>& lhs, uint rhs)
 {
-	return Term<Coeff>(lhs.coeff()/rhs, lhs.monomial());
+	return Term<Coeff>(lhs.coeff()/carl::fromInt<Coeff>(rhs), lhs.monomial());
 }
 
 template<typename Coeff>
