@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from jinja2 import *
+from jinja2 import Environment, FileSystemLoader
 import os
 
 def datamerge(a, b):
@@ -42,11 +42,13 @@ properties = {
 	"xcode9.1": {"os": "osx", "osx_image": "xcode9.1", "env": []},
 	"xcode9.2": {"os": "osx", "osx_image": "xcode9.2", "env": []},	
 	"xcode9.3": {"os": "osx", "osx_image": "xcode9.3", "env": []},
+	"xcode9.4": {"os": "osx", "osx_image": "xcode9.4", "env": []},
+	"xcode10": {"os": "osx", "osx_image": "xcode10", "env": []},
 	"linux": {"os": "linux"},
 
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-precise-3.8"], ["clang-3.8", "libstdc++-6-dev"])},
-	"clang-3.9": {"env": ["CC=clang-3.9 CXX=clang++-3.9"], "compiler": "clang++-3.9", "addons": addon_apt(["llvm-toolchain-trusty-3.9"], ["clang-3.9", "libstdc++-8-dev"])},
-	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0", "addons": addon_apt(["llvm-toolchain-trusty-4.0"], ["clang-4.0", "libstdc++-8-dev"])},
+	"clang-3.9": {"env": ["CC=clang-3.9 CXX=clang++-3.9"], "compiler": "clang++-3.9", "addons": addon_apt(["llvm-toolchain-trusty-3.9"], ["clang-3.9", "libstdc++-6-dev"])},
+	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0", "addons": addon_apt(["llvm-toolchain-trusty-4.0"], ["clang-4.0", "libstdc++-6-dev"])},
 	"clang-5.0": {"env": ["CC=clang-5.0 CXX=clang++-5.0"], "compiler": "clang++-5.0", "addons": addon_apt(["llvm-toolchain-trusty-5.0"], ["clang-5.0", "libstdc++-8-dev"])},
 	"clang-6.0": {"env": ["CC=clang-6.0 CXX=clang++-6.0"], "compiler": "clang++-6.0", "addons": addon_apt(["llvm-toolchain-trusty-6.0"], ["clang-6.0", "libstdc++-8-dev"])},
 	"g++-5": {"env": ["CC=gcc-5 CXX=g++-5"], "compiler": "g++-5", "addons": addon_apt([],["g++-5"])},

@@ -9,7 +9,8 @@ ExternalProject_Add(
 	URL_MD5 ${COCOA_TGZHASH}
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES
-	CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC
+	PATCH_COMMAND find <SOURCE_DIR> -type f | xargs sed -i "s/auto_ptr/unique_ptr/g"
+	CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC\ -std=c++14
 	BUILD_COMMAND make library doc
 	INSTALL_COMMAND ${CMAKE_COMMAND} -E touch <SOURCE_DIR>/examples/index.html
 	COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include
