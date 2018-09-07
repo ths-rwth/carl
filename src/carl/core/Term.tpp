@@ -336,9 +336,16 @@ const Term<Coeff> operator/(const Term<Coeff>& lhs, uint rhs)
 }
 
 template<typename Coeff>
-std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
-{
-	return (os << rhs.toString(true, true));
+std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs) {
+	if (rhs.monomial()) {
+		if (!carl::isOne(rhs.coeff())) {
+			os << rhs.coeff() << "*";
+		}
+		os << rhs.monomial();
+	} else {
+		os << rhs.coeff();
+	}
+	return os;
 }
 
 template<typename Coeff>
