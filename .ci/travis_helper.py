@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from jinja2 import *
+from jinja2 import Environment, FileSystemLoader
 import os
 
 def datamerge(a, b):
