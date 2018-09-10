@@ -2,7 +2,7 @@ get_target_property(GMP_LIB GMP_STATIC IMPORTED_LOCATION)
 set(GMP_LIB_ARG "--with-libgmp=${GMP_LIB}")
 
 if(APPLE)
-	set(SEDCMD sed -i \".bak\")
+	set(SEDCMD sed -i ".bak")
 else()
 	set(SEDCMD sed -i)
 endif()
