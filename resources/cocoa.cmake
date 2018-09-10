@@ -1,5 +1,5 @@
-	get_target_property(GMP_LIB GMP_STATIC IMPORTED_LOCATION)
-	set(GMP_LIB_ARG "--with-libgmp=${GMP_LIB}")
+get_target_property(GMP_LIB GMP_STATIC IMPORTED_LOCATION)
+set(GMP_LIB_ARG "--with-libgmp=${GMP_LIB}")
 
 ExternalProject_Add(
     CoCoALib-EP
@@ -9,7 +9,7 @@ ExternalProject_Add(
 	BUILD_IN_SOURCE YES
 	PATCH_COMMAND find <SOURCE_DIR> -type f | xargs sed -i "s/auto_ptr/unique_ptr/g"
 	CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC\ -std=c++14
-	BUILD_COMMAND make library doc
+	BUILD_COMMAND make library
 	INSTALL_COMMAND ${CMAKE_COMMAND} -E touch <SOURCE_DIR>/examples/index.html
 	COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include
 	COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/lib
