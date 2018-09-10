@@ -485,7 +485,7 @@ namespace carl
                 }
                 else
                 {
-                    assert( boost::apply_visitor(UTerm::IsUFInstance(), _lhs) && boost::apply_visitor(UTerm::IsUFInstance(), _rhs) );
+                    assert( _lhs.isUFInstance() && _rhs.isUFInstance() );
                     if( _lhs.asUFInstance() < _rhs.asUFInstance() )
                         return add( new FormulaContent<Pol>( UEquality( _lhs.asUFInstance(), _rhs.asUFInstance(), _negated, true ) ) );
                     if( _rhs.asUFInstance() < _lhs.asUFInstance() )

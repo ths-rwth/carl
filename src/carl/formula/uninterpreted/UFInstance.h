@@ -81,7 +81,7 @@ namespace carl
 
             /**
              * @return The string representation of this uninterpreted function instance.
-             */ //TODO replace by <<
+             */ 
             std::string toString(bool infix, bool friendlyNames) const;
 
             /**

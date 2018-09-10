@@ -294,7 +294,7 @@ namespace carl
                 }
                 if( eq.rhs().isUVariable() )
                 {
-                    auto iter = _model.find( eq.rhs(().asUVariable() );
+                    auto iter = _model.find( eq.rhs().asUVariable() );
                     if( iter == _model.end() )
                         return 2;
                     assert( iter->second.isSortValue() );
