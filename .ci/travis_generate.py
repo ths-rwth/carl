@@ -31,9 +31,6 @@ properties.update({
 })
 
 jobs = [
-	job("0-clang", ["build", "linux", "clang-3.8", "build.sh"]),
-	job("0-clang", ["build", "linux", "clang-3.9", "build.sh"]),
-	job("0-clang", ["build", "linux", "clang-4.0", "build.sh"]),
 	job("0-clang", ["build", "linux", "clang-5.0", "build.sh"]),
 	job("0-clang", ["build", "linux", "clang-6.0", "build.sh"]),
 	job("1-gcc", ["dependencies", "linux", "g++-7", "build.sh"]),
