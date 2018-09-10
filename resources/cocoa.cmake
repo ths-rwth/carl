@@ -1,13 +1,19 @@
 get_target_property(GMP_LIB GMP_STATIC IMPORTED_LOCATION)
 set(GMP_LIB_ARG "--with-libgmp=${GMP_LIB}")
 
+if(APPLE)
+	set(SEDCMD sed -i \".bak\")
+else()
+	set(SEDCMD sed -i)
+endif()
+
 ExternalProject_Add(
     CoCoALib-EP
 	URL "http://cocoa.dima.unige.it/cocoalib/tgz/CoCoALib-${COCOA_VERSION}.tgz"
 	URL_MD5 ${COCOA_TGZHASH}
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES
-	PATCH_COMMAND find <SOURCE_DIR> -type f | xargs sed -i "s/auto_ptr/unique_ptr/g"
+	PATCH_COMMAND find <SOURCE_DIR> -type f | xargs ${SEDCMD} "s/auto_ptr/unique_ptr/g"
 	CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC\ -std=c++14
 	BUILD_COMMAND make library
 	INSTALL_COMMAND ${CMAKE_COMMAND} -E touch <SOURCE_DIR>/examples/index.html
