@@ -9,34 +9,34 @@
 #include <string>
 
 namespace carl {
-	std::ostream& UFManager::print(std::ostream& _out, const UninterpretedFunction& _uf) const {
-		assert(_uf.id() != 0);
-		assert(_uf.id() < mUFs.size());
-		const UFContent& ufc = *mUFs[_uf.id()];
-		_out << ufc.name() << "(";
+	std::ostream& UFManager::print(std::ostream& out, const UninterpretedFunction& uf) const {
+		assert(uf.id() != 0);
+		assert(uf.id() < mUFs.size());
+		const UFContent& ufc = *mUFs[uf.id()];
+		out << ufc.name() << "(";
 		bool first = true;
 		for (const auto& dom: ufc.domain()) {
 			if (first) {
-				_out << " ";
+				out << " ";
 				first = false;
 			}
-			_out << dom;
+			out << dom;
 		}
-		_out << ") " << ufc.codomain();
-		return _out;
+		out << ") " << ufc.codomain();
+		return out;
 	}
-	
-	UninterpretedFunction UFManager::newUF(const UFContent* _ufc) {
-		auto iter = mUFIdMap.find(_ufc);
+
+	UninterpretedFunction UFManager::newUF(const UFContent* ufc) {
+		auto iter = mUFIdMap.find(ufc);
 		// Check if this uninterpreted function content has already been created
 		if (iter != mUFIdMap.end()) {
-			delete _ufc;
+			delete ufc;
 			return UninterpretedFunction(iter->second);
 		}
 		// Create the uninterpreted function
-		mUFIdMap.emplace(_ufc, mUFs.size());
+		mUFIdMap.emplace(ufc, mUFs.size());
 		UninterpretedFunction uf(mUFs.size());
-		mUFs.push_back(_ufc);
+		mUFs.push_back(ufc);
 		return uf;
 	}
 }

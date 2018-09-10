@@ -9,65 +9,50 @@
 #include "UFInstanceManager.h"
 
 namespace carl
-{   
-    std::ostream& UFInstanceManager::print( std::ostream& _out, const UFInstance& _ufi, bool _infix, bool _friendlyNames ) const
-    {
-        assert( _ufi.id() != 0 );
-        assert( _ufi.id() < mUFInstances.size() );
-        const UFInstanceContent& ufic = *mUFInstances[_ufi.id()];
-        if( _infix )
-        {
-            _out << _ufi.uninterpretedFunction().name() << "(";
+{
+    std::ostream& UFInstanceManager::print(std::ostream& out, const UFInstance& ufi, bool infix, bool friendlyNames) const {
+        assert(ufi.id() != 0);
+        assert(ufi.id() < mUFInstances.size());
+        const UFInstanceContent& ufic = *mUFInstances[ufi.id()];
+        if(infix) {
+            out << ufi.uninterpretedFunction().name() << "(";
+        } else {
+            out << "(" << ufic.uninterpretedFunction().name();
         }
-        else
-        {
-            _out << "(" << ufic.uninterpretedFunction().name();
-        }
-        for( auto iter = _ufi.args().begin(); iter != _ufi.args().end(); ++iter )
-        {
-            if( _infix )
-            {
-                if( iter != _ufi.args().begin() )
-                {
-                    _out << ", ";
+        for(auto iter = ufi.args().begin(); iter != ufi.args().end(); ++iter) {
+            if(infix) {
+                if(iter != ufi.args().begin()) {
+                    out << ", ";
                 }
+            } else {
+                out << " ";
             }
-            else
-            {
-                _out << " ";
-            }
-            _out << iter->toString( _friendlyNames );
+            out << (&iter);//->toString( _friendlyNames );
         }
-        _out << ")";
-        return _out;
+        out << ")";
+        return out;
     }
-    
-    UFInstance UFInstanceManager::newUFInstance( const UFInstanceContent* _ufic )
-    {
-        auto iter = mUFInstanceIdMap.find( _ufic );
+
+    UFInstance UFInstanceManager::newUFInstance(const UFInstanceContent* ufic) {
+        auto iter = mUFInstanceIdMap.find(ufic);
         // Check if this uninterpreted function content has already been created
-        if( iter != mUFInstanceIdMap.end() )
-        {
-            delete _ufic;
-            return UFInstance( iter->second );
+        if(iter != mUFInstanceIdMap.end()) {
+            delete ufic;
+            return UFInstance(iter->second);
         }
         // Create the uninterpreted function instance
-        mUFInstanceIdMap.emplace( _ufic, mUFInstances.size() );
-        UFInstance ufi( mUFInstances.size() );
-        mUFInstances.push_back( _ufic );
+        mUFInstanceIdMap.emplace(ufic, mUFInstances.size());
+        UFInstance ufi(mUFInstances.size());
+        mUFInstances.push_back(ufic);
         return ufi;
     }
-    
-    bool UFInstanceManager::argsCorrect( const UFInstanceContent& _ufic )
-    {
-        if( !(_ufic.uninterpretedFunction().domain().size() == _ufic.args().size()) )
-        {
+
+    bool UFInstanceManager::argsCorrect(const UFInstanceContent& ufic) {
+        if(!(ufic.uninterpretedFunction().domain().size() == ufic.args().size())) {
             return false;
         }
-        for( size_t i = 0; i < _ufic.uninterpretedFunction().domain().size(); ++i )
-        {
-            if( !(_ufic.uninterpretedFunction().domain().at(i) == _ufic.args().at(i).domain()) )
-            {
+        for(std::size_t i = 0; i < ufic.uninterpretedFunction().domain().size(); ++i) {
+            if(!(ufic.uninterpretedFunction().domain().at(i) == ufic.args().at(i).domain())) {
                 return false;
             }
         }

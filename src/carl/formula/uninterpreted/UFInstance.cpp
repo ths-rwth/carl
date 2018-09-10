@@ -17,25 +17,21 @@
 
 namespace carl
 {
-    const UninterpretedFunction& UFInstance::uninterpretedFunction() const
-    {
-       return UFInstanceManager::getInstance().getUninterpretedFunction( *this );
+    const UninterpretedFunction& UFInstance::uninterpretedFunction() const {
+       return UFInstanceManager::getInstance().getUninterpretedFunction(*this);
     }
 
-    const std::vector<UVariable>& UFInstance::args() const	
-    {
-       return UFInstanceManager::getInstance().getArgs( *this );
+    const std::vector<UTerm>& UFInstance::args() const {
+       return UFInstanceManager::getInstance().getArgs(*this);
     }
-    
-    std::string UFInstance::toString( bool _infix, bool _friendlyNames ) const
-    {
+
+    std::string UFInstance::toString(bool infix, bool friendlyNames) const {
         std::stringstream ss;
-        UFInstanceManager::getInstance().print( ss, *this, _infix, _friendlyNames );
+        UFInstanceManager::getInstance().print(ss, *this, infix, friendlyNames);
         return ss.str();
     }
-    
-    std::ostream& operator<<( std::ostream& _os, const UFInstance& _ufun )
-    {
-        return UFInstanceManager::getInstance().print( _os, _ufun );
+
+    std::ostream& operator<<(std::ostream& os, const UFInstance& ufun) {
+        return UFInstanceManager::getInstance().print(os, ufun);
     }
 }

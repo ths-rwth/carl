@@ -15,23 +15,19 @@
 
 namespace carl
 {
-    const std::string& UninterpretedFunction::name() const
-    {
-       return UFManager::getInstance().getName( *this );
+    const std::string& UninterpretedFunction::name() const {
+       return UFManager::getInstance().getName(*this);
     }
 
-    const std::vector<Sort>& UninterpretedFunction::domain() const
-    {
-       return UFManager::getInstance().getDomain( *this );
+    const std::vector<Sort>& UninterpretedFunction::domain() const {
+       return UFManager::getInstance().getDomain(*this);
     }
 
-    const Sort& UninterpretedFunction::codomain() const
-    {
-       return UFManager::getInstance().getCodomain( *this );
+    const Sort& UninterpretedFunction::codomain() const {
+       return UFManager::getInstance().getCodomain(*this);
     }
-    
-    std::ostream& operator<<( std::ostream& _os, const UninterpretedFunction& _ufun )
-    {
-        return UFManager::getInstance().print( _os, _ufun );
+
+    std::ostream& operator<<(std::ostream& os, const UninterpretedFunction& ufun) {
+        return UFManager::getInstance().print(os, ufun);
     }
 }

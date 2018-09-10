@@ -19,41 +19,36 @@ namespace carl
 	/**
 	 * Implements an uninterpreted function.
 	 */
-	class UninterpretedFunction
-	{
+	class UninterpretedFunction {
 		public:
 			friend class UFManager;
 			/// A unique id to identify this uninterpreted function in it's manager.
 			using IDType = std::size_t;
-		
+
 		private:
-		
 			/// A unique id.
 			IDType mId = 0;
-			
+
 			/**
 			 * Constructs an uninterpreted function.
-			 * @param _id
+			 * @param id
 			 */
-			explicit UninterpretedFunction( IDType _id ):
-				mId( _id )
-			{}
-			
+			explicit UninterpretedFunction(IDType id):
+				mId(id) {}
+
 		public:
-			
 			/**
 			 * Default constructor.
 			 */
 			UninterpretedFunction() noexcept = default;
-			
+
 			/**
 			 * @return The unique id of this uninterpreted function instance.
 			 */
-			IDType id() const
-			{
+			IDType id() const {
 				return mId;
 			}
-			
+
 			/**
 			 * @return The name of this uninterpreted function.
 			 */
@@ -68,32 +63,30 @@ namespace carl
 			 * @return The codomain of this uninterpreted function.
 			 */
 			const Sort& codomain() const;
-			
+
 			/**
-			 * @param _ufun The uninterpreted function to compare with.
+			 * @param ufun The uninterpreted function to compare with.
 			 * @return true, if this and the given uninterpreted function are equal.
 			 */
-			bool operator==( const UninterpretedFunction& _ufun ) const
-			{
-				return mId == _ufun.id();
+			bool operator==(const UninterpretedFunction& ufun) const {
+				return mId == ufun.id();
 			}
-			
+
 			/**
-			 * @param _ufun The uninterpreted function to compare with.
+			 * @param ufun The uninterpreted function to compare with.
 			 * @return true, if this uninterpreted function is less than the given one.
 			 */
-			bool operator<( const UninterpretedFunction& _ufun ) const
-			{
-				return mId < _ufun.id();
+			bool operator<(const UninterpretedFunction& ufun) const {
+				return mId < ufun.id();
 			}
-			
+
 			/**
 			 * Prints the given uninterpreted function on the given output stream.
-			 * @param _os The output stream to print on.
-			 * @param _ufun The uninterpreted function to print.
+			 * @param os The output stream to print on.
+			 * @param ufun The uninterpreted function to print.
 			 * @return The output stream after printing the given uninterpreted function on it.
 			 */
-			friend std::ostream& operator<<( std::ostream& _os, const UninterpretedFunction& _ufun );
+			friend std::ostream& operator<<(std::ostream& os, const UninterpretedFunction& ufun);
 	};
 } // end namespace carl
 
@@ -106,11 +99,11 @@ namespace std
 	template<>
 	struct hash<carl::UninterpretedFunction> {
 		/**
-		 * @param _uf The uninterpreted function to get the hash for.
+		 * @param uf The uninterpreted function to get the hash for.
 		 * @return The hash of the given uninterpreted function.
 		 */
-		std::size_t operator()( const carl::UninterpretedFunction& _uf ) const {
-			return std::size_t(_uf.id());
+		std::size_t operator()(const carl::UninterpretedFunction& uf) const {
+			return carl::hash_all(uf.id());
 		}
 	};
 }
