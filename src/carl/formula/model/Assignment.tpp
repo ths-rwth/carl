@@ -93,7 +93,7 @@ namespace carl
     {
       auto iter = _model.find( _ufi.uninterpretedFunction() );
       if( iter == _model.end() )
-          return defaultSortValue(_ufi.codomain());
+          return defaultSortValue(_ufi.uninterpretedFunction().codomain());
       assert( iter->second.isUFModel() );
       const UFModel& ufm = iter->second.asUFModel();
       std::vector<SortValue> inst;
@@ -102,7 +102,7 @@ namespace carl
           if(arg.isUVariable()) {
             auto iterB = _model.find( arg.asUVariable() );
             if( iterB == _model.end() )
-                return defaultSortValue(_ufi.codomain());
+                return defaultSortValue(_ufi.uninterpretedFunction().codomain());
             assert( iterB->second.isSortValue() );
             inst.push_back( iterB->second.asSortValue() );
           } else if(arg.isUFInstance()) {
