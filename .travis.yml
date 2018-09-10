@@ -22,15 +22,6 @@ matrix:
   include:
     - stage: dependencies
       os: linux
-      compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6
-      script: TASK=dependencies source .ci/build.sh
-      addons:
-        apt:
-          sources: [*sources_base]
-          packages: [*packages_base, g++-6]
-    - stage: dependencies
-      os: linux
       compiler: g++-7
       env: CC=gcc-7 CXX=g++-7
       script: TASK=dependencies source .ci/build.sh
@@ -58,22 +49,22 @@ matrix:
           packages: [*packages_base, clang-5.0, libstdc++-8-dev]
     - stage: dependencies
       os: linux
-      compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=pycarl
+      compiler: g++-7
+      env: CC=gcc-7 CXX=g++-7 TASK=pycarl
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, g++-6, python3]
+          packages: [*packages_base, g++-7, python3]
     - stage: dependencies
       os: linux
-      compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=addons
+      compiler: g++-7
+      env: CC=gcc-7 CXX=g++-7 TASK=addons
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, g++-6]
+          packages: [*packages_base, g++-7]
     - stage: build
       os: linux
       compiler: clang++-3.8
@@ -119,15 +110,6 @@ matrix:
         apt:
           sources: [*sources_base, llvm-toolchain-trusty-6.0]
           packages: [*packages_base, clang-6.0, libstdc++-8-dev]
-    - stage: build
-      os: linux
-      compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6
-      script: MAKE_PARALLEL=-j1 source .ci/build.sh
-      addons:
-        apt:
-          sources: [*sources_base]
-          packages: [*packages_base, g++-6]
     - stage: build
       os: linux
       compiler: g++-7
@@ -180,13 +162,13 @@ matrix:
       script: source .ci/build.sh
     - stage: build
       os: linux
-      compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=doxygen
+      compiler: g++-7
+      env: CC=gcc-7 CXX=g++-7 TASK=doxygen
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, g++-6, doxygen, ghostscript, latex-xcolor, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra]
+          packages: [*packages_base, g++-7, doxygen, ghostscript, latex-xcolor, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra]
     - stage: build
       os: linux
       compiler: clang++-5.0
@@ -227,22 +209,22 @@ matrix:
             secure: "nIGn6M7vkwD6HAKgS94QZIIU+A+dWOgqXzJ7lnAdGLXUx3cStVMO1LuOANttGyeGSJNj8Fa+YzwCx5EMQDvZW/b8cuoRld+I4gbmszUB6BXwQ6JJvpFczHrPpwyeo2LKrBN549aBCtOaLzw7rVPDzcdC6T39IvxpPXVCMTTjoq7Mp12HSWS8Ra8YIsOnJfYKVSxjCwcY9ICac70zpA6uKuWBNL13EBM+IpLACLFDKMcaIdb2CGyRvtbt7u8BOU9mjulRtpg1Ndc3eGEIIJJXM8lQTA+iMB6iapGWYbMB5Gwifrwy59UTgNbdR/6sWP5E5kxBGxn1lyp9VP6ChSS/b3Szhh0jUWaqBxoAK0Kh4KBeW7eeLvaUALuPmoNneGUZACrbNDq6aVzHUgwEKQTxF0reDkG3ZaEU+1NCukvLaI58OBxenb5bMOlEWzUMSMMuNO0MgVKXc3Nvr4oEm0USP6Ixky1AUTKTVDY87HHuQ+kCM/L5MQUQTwtQPuWF1zkDry+6A2LNABySla9AAtxlUth7rGvLwaTz2o3yMOIohQb12r8LqXnjESVcENk0f0gbyqeqM7aPcXAyqc6YDW9LBDSsWWa9SqxEfwz2zktzsWfKfCZWi4Fn7CaPdHGsGlSaGsXGovrT1DbyQPiTND0R1cinfrOqZBgwjWOB6JTol+g="
     - stage: build
       os: linux
-      compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=pycarl
+      compiler: g++-7
+      env: CC=gcc-7 CXX=g++-7 TASK=pycarl
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, g++-6, python3]
+          packages: [*packages_base, g++-7, python3]
     - stage: build
       os: linux
-      compiler: g++-6
-      env: CC=gcc-6 CXX=g++-6 TASK=addons
+      compiler: g++-7
+      env: CC=gcc-7 CXX=g++-7 TASK=addons
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, g++-6]
+          packages: [*packages_base, g++-7]
   allow_failures:
     - stage: build
       os: linux
@@ -255,10 +237,10 @@ matrix:
       env: CC=clang-5.0 CXX=clang++-5.0 TASK=sonarcloud
     - stage: build
       os: linux
-      env: CC=gcc-6 CXX=g++-6 TASK=pycarl
+      env: CC=gcc-7 CXX=g++-7 TASK=pycarl
     - stage: build
       os: linux
-      env: CC=gcc-6 CXX=g++-6 TASK=addons
+      env: CC=gcc-7 CXX=g++-7 TASK=addons
 
 before_install:
   - cd .ci/ && source setup_travis.sh && cd ../
