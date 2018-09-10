@@ -1,7 +1,5 @@
-if (TARGET GMP-EP)
 	get_target_property(GMP_LIB GMP_STATIC IMPORTED_LOCATION)
 	set(GMP_LIB_ARG "--with-libgmp=${GMP_LIB}")
-endif()
 
 ExternalProject_Add(
     CoCoALib-EP
