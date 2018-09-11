@@ -9,20 +9,9 @@
 
 namespace carl
 {
-    std::size_t UEquality::complexity() const {
-        std::size_t result = 0;
-        if(mLhs.isUVariable()) {
-            ++result;
-        } else {
-            result += mLhs.asUFInstance().args().size();
-        }
-        if(mRhs.isUVariable()) {
-            ++result;
-        } else {
-            result += mRhs.asUFInstance().args().size();
-        }
-        return result;
-    }
+	std::size_t UEquality::complexity() const {
+		return 1 + mLhs.complexity() + mRhs.complexity();
+	}
 
     bool UEquality::operator==(const UEquality& ueq) const {
         if(mNegated != ueq.negated()) {
@@ -152,24 +141,7 @@ namespace carl
         }
     }
 
-    std::ostream& operator<<(std::ostream& os, const UEquality& ueq) {
-        if(ueq.negated()) {
-            os << "(!= ";
-        } else {
-            os << "(= ";
-        }
-        if(ueq.lhs().isUVariable()) {
-            os << ueq.lhs().asUVariable();
-        } else {
-            os << ueq.lhs().asUFInstance();
-        }
-        os << " ";
-        if(ueq.rhs().isUVariable()) {
-            os << ueq.rhs().asUVariable();
-        } else {
-            os << ueq.rhs().asUFInstance();
-        }
-        os << ")";
-        return os;
-    }
+	std::ostream& operator<<(std::ostream& os, const UEquality& ueq) {
+		return os << ueq.lhs() << (ueq.negated() ? " != " : " == ") << ueq.rhs();
+	}
 } // end namespace carl

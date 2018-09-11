@@ -15,38 +15,45 @@ namespace carl
 {
 	bool UTerm::isUVariable() const {
 		return std::visit(overloaded {
-			[](const UVariable& var) { return true; },
-			[](const UFInstance& ufi) { return false; },
+			[](const UVariable&) { return true; },
+			[](const UFInstance&) { return false; },
 		}, mTerm);
 	}
 	bool UTerm::isUFInstance() const {
 		return std::visit(overloaded {
-			[](const UVariable& var) { return false; },
-			[](const UFInstance& ufi) { return true; },
+			[](const UVariable&) { return false; },
+			[](const UFInstance&) { return true; },
 		}, mTerm);
 	}
 
 	const Sort& UTerm::domain() const {
 		return std::visit(overloaded {
-			[](const UVariable& var) -> auto& { return var.domain(); },
-			[](const UFInstance& ufi) -> auto& { return ufi.uninterpretedFunction().codomain(); },
+			[](const UVariable& var) -> const auto& { return var.domain(); },
+			[](const UFInstance& ufi) -> const auto& { return ufi.uninterpretedFunction().codomain(); },
+		}, mTerm);
+	}
+
+	std::size_t UTerm::complexity() const {
+		return std::visit(overloaded {
+			[](const UVariable& var) { return static_cast<std::size_t>(1); },
+			[](const UFInstance& ufi) { return ufi.complexity(); },
 		}, mTerm);
 	}
 
 	bool operator==(const UTerm& lhs, const UTerm& rhs) {
 		return std::visit(overloaded {
-			[](const UVariable& varL, const UVariable& varR) { return varL.variable().id() == varR.variable().id(); },
-			[](const UFInstance& ufiL, const UFInstance& ufiR) { return ufiL.id() == ufiR.id(); },
-			[](const auto& termL, const auto& termR) { return false; },
+			[](const UVariable& lhs, const UVariable& rhs) { return lhs.variable().id() == rhs.variable().id(); },
+			[](const UFInstance& lhs, const UFInstance& rhs) { return lhs.id() == rhs.id(); },
+			[](const auto&, const auto&) { return false; },
 		}, lhs.asVariant(), rhs.asVariant());
 	}
 
 	bool operator<(const UTerm& lhs, const UTerm& rhs) {
 		return std::visit(overloaded {
-			[](const UVariable& varL, const UVariable& varR) { return varL.variable().id() < varR.variable().id(); },
-			[](const UFInstance& ufiL, const UFInstance& ufiR) { return ufiL.id() < ufiR.id(); },
-			[](const UVariable& varL, const UFInstance& ufiR) { return true; },
-			[](const auto& termL, const auto& termR) { return false; },
+			[](const UVariable& lhs, const UVariable& rhs) { return lhs.variable().id() < rhs.variable().id(); },
+			[](const UFInstance& lhs, const UFInstance& rhs) { return lhs.id() < rhs.id(); },
+			[](const UVariable&, const UFInstance&) { return true; },
+			[](const auto&, const auto&) { return false; },
 		}, lhs.asVariant(), rhs.asVariant());
 	}
 

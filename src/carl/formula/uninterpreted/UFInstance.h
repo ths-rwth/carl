@@ -63,6 +63,8 @@ namespace carl
              */
             const std::vector<UTerm>& args() const;
 
+			std::size_t complexity() const;
+
             /**
              * @param ufun The uninterpreted function instance to compare with.
              * @return true, if this and the given uninterpreted function instance are equal.

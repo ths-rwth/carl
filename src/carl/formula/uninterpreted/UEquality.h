@@ -177,14 +177,14 @@ namespace carl
 
             void collectUVariables(std::set<UVariable>& uvars) const;
 
-            /**
-             * Prints the given uninterpreted equality on the given output stream.
-             * @param os The output stream to print on.
-             * @param ueq The uninterpreted equality to print.
-             * @return The output stream after printing the given uninterpreted equality on it.
-             */
-            friend std::ostream& operator<<(std::ostream& os, const UEquality& ueq);
     };
+	/**
+	 * Prints the given uninterpreted equality on the given output stream.
+	 * @param os The output stream to print on.
+	 * @param ueq The uninterpreted equality to print.
+	 * @return The output stream after printing the given uninterpreted equality on it.
+	 */
+	std::ostream& operator<<(std::ostream& os, const UEquality& ueq);
 } // end namespace carl
 
 namespace std

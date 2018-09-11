@@ -67,6 +67,8 @@ namespace carl
 		 * @return The domain of this uninterpreted term.
 		 */
 		const Sort& domain() const;
+
+		std::size_t complexity() const;
 	};
 
 

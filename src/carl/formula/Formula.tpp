@@ -400,57 +400,57 @@ namespace carl
     template<typename Pol>
     string Formula<Pol>::toRedlogFormat( bool _withVariables ) const
     {
-        string result = "";
+        stringstream result;
         string oper = formulaTypeToString( getType() );
         switch( getType() )
         {
             // unary cases
             case FormulaType::TRUE:
-                result += " " + oper + " ";
+                result << " " << oper << " ";
                 break;
             case FormulaType::FALSE:
-                result += " " + oper + " ";
+                result << " " << oper << " ";
                 break;
             case FormulaType::NOT:
-                result += " " + oper + "( " + subformula().toRedlogFormat( _withVariables ) + " )";
+                result << " " << oper << "( " << subformula().toRedlogFormat( _withVariables ) << " )";
                 break;
             case FormulaType::CONSTRAINT:
-                result += constraint().toString( 1 );
+                result << constraint();
                 break;
             case FormulaType::BOOL:
-                result += VariablePool::getInstance().getName( boolean(), true ) + " = 1";
+                result << boolean() << " = 1";
                 break;
             case FormulaType::IMPLIES:
-                result += "( " + premise().toRedlogFormat( _withVariables ) + " " + oper + " " + premise().toRedlogFormat( _withVariables ) + " )";
+                result << "( " << premise().toRedlogFormat( _withVariables ) << " " << oper << " " << premise().toRedlogFormat( _withVariables ) << " )";
                 break;
             default:
             {
                 // recursive print of the subformulas
                 if( _withVariables )
                 { // add the variables
-                    result += "( ex( {";
-                    result += variableListToString( "," );
-                    result += "}, (";
+                    result << "( ex( {";
+                    result << variableListToString( "," );
+                    result << "}, (";
                     // Make pseudo Booleans.
                     std::set<Variable> boolVars;
                     booleanVars(boolVars);
                     for (auto v: boolVars) {
-                        result += "(" + v.name() + " = 0 or " + v.name() + " = 1) and ";
+                        result << "(" + v.name() << " = 0 or " << v.name() << " = 1) and ";
                     }
                 }
                 else
-                    result += "( ";
+                    result << "( ";
                 typename Formulas<Pol>::const_iterator it = subformulas().begin();
                 // do not quantify variables again.
-                result += it->toRedlogFormat( false );
+                result << it->toRedlogFormat( false );
                 for( ++it; it != subformulas().end(); ++it ) // do not quantify variables again.
-                    result += " " + oper + " " + it->toRedlogFormat( false );
+                    result << " " << oper << " " << it->toRedlogFormat( false );
                 if( _withVariables )
-                    result += " ) )";
-                result += " )";
+                    result << " ) )";
+                result << " )";
             }
         }
-        return result;
+        return result.str();
     }
 
     template<typename Pol>

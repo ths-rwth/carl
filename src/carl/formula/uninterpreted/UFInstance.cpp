@@ -12,6 +12,7 @@
 #include "UVariable.h"
 
 #include <iostream>
+#include <numeric>
 #include <sstream>
 #include <vector>
 
@@ -24,6 +25,16 @@ namespace carl
     const std::vector<UTerm>& UFInstance::args() const {
        return UFInstanceManager::getInstance().getArgs(*this);
     }
+
+	std::size_t UFInstance::complexity() const {
+		const auto& a = args();
+		return std::accumulate(
+			a.begin(), a.end(), static_cast<std::size_t>(1),
+			[](std::size_t c, const auto& term){
+				return c + term.complexity();
+			}
+		);
+	}
 
     std::string UFInstance::toString(bool infix, bool friendlyNames) const {
         std::stringstream ss;
