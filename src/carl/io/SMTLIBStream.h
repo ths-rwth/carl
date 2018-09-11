@@ -23,17 +23,7 @@ namespace carl {
 class SMTLIBStream {
 private:
 	std::stringstream mStream;
-	
-	void declare(Logic l) {
-		*this << "(set-logic " << l << ")" << std::endl;
-	}
-	void declare(Sort s) {
-		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
-	}
-	void declare(Variable v) {
-		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
-	}
-	
+
 	void write(const mpz_class& n) { *this << carl::toString(n, false); }
 	void write(const mpq_class& n) { *this << carl::toString(n, false); }
 #ifdef USE_CLN_NUMBERS
@@ -231,11 +221,21 @@ private:
 	}
 	
 public:
+	void declare(Logic l) {
+		*this << "(set-logic " << l << ")" << std::endl;
+	}
+	void declare(Sort s) {
+		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
+	}
+	void declare(Variable v) {
+		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
+	}
+	void declare(const Variables& vars) {
+		for (auto v: vars) declare(v);
+	}
 	void initialize(Logic l, const Variables& vars) {
 		declare(l);
-		for (auto v: vars) {
-			declare(v);
-		}
+		declare(vars);
 	}
 	
 	template<typename Pol>
@@ -245,6 +245,10 @@ public:
 			f.collectVariables(vars, true, true, true, true, true);
 		}
 		initialize(l, vars);
+	}
+
+	void setInfo(const std::string& name, const std::string& value) {
+		*this << "(set-info :" << name << " " << value << ")" << std::endl;
 	}
 	
 	template<typename Pol>
@@ -261,6 +265,10 @@ public:
 		*this << "(check-sat)" << std::endl;
 	}
 	
+	void getAssertions() {
+		*this << "(get-assertions)" << std::endl;
+	}
+
 	void getModel() {
 		*this << "(get-model)" << std::endl;
 	}
@@ -270,10 +278,14 @@ public:
 		write(static_cast<const std::decay_t<T>&>(t));
 		return *this;
 	}
-	//
+	
 	SMTLIBStream& operator<<(std::ostream& (*os)(std::ostream&)) {
 		write(os);
 		return *this;
+	}
+
+	auto str() const {
+		return mStream.str();
 	}
 	
 	auto content() const {
