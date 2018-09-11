@@ -33,27 +33,27 @@ inline bool isZero(const cln::cl_RA& n) {
 }
 
 inline bool isOne(const cln::cl_I& n) {
-	return n == carl::constant_one<cln::cl_I>().get();
+	return n == constant_one<cln::cl_I>::get();
 }
 
 inline bool isOne(const cln::cl_RA& n) {
-	return n  == carl::constant_one<cln::cl_RA>().get();
+	return n  == constant_one<cln::cl_RA>::get();
 }
 
 inline bool isPositive(const cln::cl_I& n) {
-	return n > carl::constant_zero<cln::cl_RA>().get();
+	return n > constant_zero<cln::cl_RA>::get();
 }
 
 inline bool isPositive(const cln::cl_RA& n) {
-	return n > carl::constant_zero<cln::cl_RA>().get();
+	return n > constant_zero<cln::cl_RA>::get();
 }
 
 inline bool isNegative(const cln::cl_I& n) {
-	return n < carl::constant_zero<cln::cl_RA>().get();
+	return n < constant_zero<cln::cl_RA>::get();
 }
 
 inline bool isNegative(const cln::cl_RA& n) {
-	return n < carl::constant_zero<cln::cl_RA>().get();
+	return n < constant_zero<cln::cl_RA>::get();
 }
 
 /**
