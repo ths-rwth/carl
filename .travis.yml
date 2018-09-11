@@ -85,6 +85,15 @@ matrix:
           packages: [*packages_base, clang-6.0, libstdc++-8-dev]
     - stage: build
       os: linux
+      compiler: clang++-7.0
+      env: CC=clang-7 CXX=clang++-7
+      script: source .ci/build.sh
+      addons:
+        apt:
+          sources: [*sources_base, llvm-toolchain-trusty-7]
+          packages: [*packages_base, clang-7, libstdc++-8-dev]
+    - stage: build
+      os: linux
       compiler: g++-7
       env: CC=gcc-7 CXX=g++-7
       script: MAKE_PARALLEL=-j1 source .ci/build.sh

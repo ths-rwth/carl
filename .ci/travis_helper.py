@@ -51,6 +51,7 @@ properties = {
 	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0", "addons": addon_apt(["llvm-toolchain-trusty-4.0"], ["clang-4.0", "libstdc++-6-dev"])},
 	"clang-5.0": {"env": ["CC=clang-5.0 CXX=clang++-5.0"], "compiler": "clang++-5.0", "addons": addon_apt(["llvm-toolchain-trusty-5.0"], ["clang-5.0", "libstdc++-8-dev"])},
 	"clang-6.0": {"env": ["CC=clang-6.0 CXX=clang++-6.0"], "compiler": "clang++-6.0", "addons": addon_apt(["llvm-toolchain-trusty-6.0"], ["clang-6.0", "libstdc++-8-dev"])},
+	"clang-7.0": {"env": ["CC=clang-7 CXX=clang++-7"], "compiler": "clang++-7.0", "addons": addon_apt(["llvm-toolchain-trusty-7"], ["clang-7", "libstdc++-8-dev"])},
 	"g++-5": {"env": ["CC=gcc-5 CXX=g++-5"], "compiler": "g++-5", "addons": addon_apt([],["g++-5"])},
 	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6", "addons": addon_apt([],["g++-6"])},
 	"g++-7": {"env": ["CC=gcc-7 CXX=g++-7"], "compiler": "g++-7", "addons": addon_apt([],["g++-7"])},
