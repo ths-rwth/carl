@@ -42,6 +42,16 @@
 namespace carl {
 	
 enum class RANSampleHeuristic { Center, CenterInt, LeftInt, RightInt, ZeroInt, InftyInt, Default = RightInt };
+inline std::ostream& operator<<(std::ostream& os, RANSampleHeuristic sh) {
+	switch (sh) {
+		case RANSampleHeuristic::Center: return os << "Center";
+		case RANSampleHeuristic::CenterInt: return os << "CenterInt";
+		case RANSampleHeuristic::LeftInt: return os << "LeftInt";
+		case RANSampleHeuristic::RightInt: return os << "RightInt";
+		case RANSampleHeuristic::ZeroInt: return os << "ZeroInt";
+		case RANSampleHeuristic::InftyInt: return os << "InftyInt";
+	}
+}
 
 template<typename Number>
 class RealAlgebraicNumber {
