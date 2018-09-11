@@ -126,6 +126,18 @@ namespace carl
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
     }
+	
+    template<typename P>
+    FactorizedPolynomial<P>::FactorizedPolynomial( FactorizedPolynomial<P>&& rhs ):
+        mCacheRef( rhs.mCacheRef ),
+        mpCache( rhs.mpCache ),
+        mCoefficient( rhs.mCoefficient )
+    {
+        ASSERT_CACHE_REF_LEGAL( (*this) );
+        rhs.mCacheRef = CACHE::NO_REF;
+        rhs.mpCache = nullptr;
+        rhs.mCoefficient = 0;
+    }
     
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _pair):
@@ -181,6 +193,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator=( const FactorizedPolynomial<P>& _fpoly )
     {
+        CARL_LOG_DEBUG("carl.core.factorizedpolynomial", "Copying " << _fpoly);
         ASSERT_CACHE_EQUAL( mpCache, _fpoly.pCache() );
         mCoefficient = _fpoly.mCoefficient;
         if( mCacheRef != _fpoly.cacheRef() )
@@ -204,10 +217,13 @@ namespace carl
         }
         else if( mpCache != nullptr )
         {
+            mpCache->dereg(mCacheRef);
+            mCacheRef = _fpoly.cacheRef();
             mpCache->reg( mCacheRef );
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
         assert(computePolynomial(*this) == computePolynomial(_fpoly));
+        CARL_LOG_DEBUG("carl.core.factorizedpolynomial", "Done.");
         return *this;
     }
     
