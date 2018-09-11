@@ -1145,15 +1145,6 @@ namespace carl
             static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoAsts, bool _inConjunction );
     };
 
-    /**
-     * Prints the given formula on the given stream.
-     * @param _out The stream to print the given formula on.
-     * @param _formula The formula to print.
-     * @return The stream after printing the given formula on it.
-     */
-    template<typename Poly>
-    std::ostream& operator<<( std::ostream& _out, const Formula<Poly>& _formula );
-
 	/**
 	 * This class provides a generic visitor for the above Formula class.
 	 */
