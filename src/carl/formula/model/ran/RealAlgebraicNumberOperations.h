@@ -108,6 +108,9 @@ namespace carl {
 					return RealAlgebraicNumber<Number>(i.sampleZero(), false);
 				case RANSampleHeuristic::InftyInt:
 					return RealAlgebraicNumber<Number>(i.sampleInfty(), false);
+				default:
+					CARL_LOG_WARN("carl.ran", "Using unknown sampling heuristic " << heuristic << ", fallback to sample.");
+					return RealAlgebraicNumber<Number>(i.sample(false), false);
 			}
 		}
 	}
