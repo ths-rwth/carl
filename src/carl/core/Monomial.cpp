@@ -11,9 +11,8 @@
 namespace carl
 {
 	Monomial::~Monomial() {
-#ifdef PRUNE_MONOMIAL_POOL
+		CARL_LOG_TRACE("carl.core.monomial", "Freeing " << *this);
 		MonomialPool::getInstance().free(this);
-#endif
 	}
 	Monomial::Arg Monomial::dropVariable(Variable v) const
 	{

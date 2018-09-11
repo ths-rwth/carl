@@ -9,7 +9,6 @@
 
 namespace carl
 {
-#ifdef PRUNE_MONOMIAL_POOL
 	Monomial::Arg MonomialPool::add( MonomialPool::PoolEntry&& pe, exponent totalDegree) {
 		MONOMIAL_POOL_LOCK_GUARD
 		auto iter = mPool.insert(std::move(pe));
@@ -46,28 +45,7 @@ namespace carl
 			return iter.first->monomial.lock();
 		}
 	}
-#else
-	Monomial::Arg MonomialPool::add( MonomialPool::PoolEntry&& pe, exponent totalDegree) {
-		MONOMIAL_POOL_LOCK_GUARD
-		auto iter = mPool.insert(pe);
-		if (iter.second) {
-			if (iter.first->monomial == nullptr) {
-				if (totalDegree == 0) {
-					iter.first->monomial.reset(new Monomial(iter.first->hash, iter.first->content));
-				} else {
-					iter.first->monomial.reset(new Monomial(iter.first->hash, iter.first->content, totalDegree));
-				}
-			}
-			iter.first->monomial->mId = mIDs.get();
-		}
-		return iter.first->monomial;
-	}
-
-	Monomial::Arg MonomialPool::add( const Monomial::Arg& _monomial ) {
-		assert(_monomial->id() == 0);
-		return MonomialPool::add(std::move(PoolEntry(_monomial->hash(), _monomial->exponents(), _monomial)));
-	}
-#endif
+	
 	Monomial::Arg MonomialPool::add( Monomial::Content&& c, exponent totalDegree) {
 		return MonomialPool::add(PoolEntry(std::move(c)), totalDegree);
 	}
