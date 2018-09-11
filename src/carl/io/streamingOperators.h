@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <forward_list>
 #include <iostream>
 #include <list>
