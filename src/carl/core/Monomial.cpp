@@ -57,24 +57,25 @@ namespace carl
 			}
 			else
 			{
-				res = MonomialPool::getInstance().create( std::move(newExps), uint(mTotalDegree - 1) );
+				res = createMonomial(std::move(newExps), exponent(mTotalDegree - 1));
 			}
 			
+			CARL_LOG_TRACE("carl.core.monomial", *this << " / " << v << " = " << res);
 			return true;
 		}
 	}
 	
 	bool Monomial::divide(const Monomial::Arg& m, Monomial::Arg& res) const
 	{
-		CARL_LOG_FUNC("carl.core.monomial", *this << ", " << m);
 		if (!m) {
 			res = carl::createMonomial(Content(mExponents), mTotalDegree);
+			CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " = " << res);
 			return true;
 		}
 		if(m->mTotalDegree > mTotalDegree || m->mExponents.size() > mExponents.size())
 		{
 			// Division will fail.
-			CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
+			CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " fails");
 			return false;
 		}
 		Content newExps;
@@ -89,7 +90,7 @@ namespace carl
 				// Insert remaining part
 				newExps.insert(newExps.end(), itleft, mExponents.end());
 				res = MonomialPool::getInstance().create( std::move(newExps), uint(mTotalDegree - m->mTotalDegree) );
-				CARL_LOG_TRACE("carl.core.monomial", "Result: " << res);
+				CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " = " << res);
 				return true;
 			}
 			// Variable is present in both monomials.
@@ -98,7 +99,7 @@ namespace carl
 				if (itleft->second < itright->second)
 				{
 					// Underflow, itright->exp was larger than itleft->exp.
-					CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
+					CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " fails");
 					return false;
 				}
 				uint newExp = itleft->second - itright->second;
@@ -111,7 +112,7 @@ namespace carl
 			// Variable is not present in lhs, division fails.
 			else if(itleft->first > itright->first) 
 			{
-				CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
+				CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " fails");
 				return false;
 			}
 			else
@@ -123,17 +124,17 @@ namespace carl
 		// If there remain variables in the m, it fails.
 		if(itright != m->mExponents.end())
 		{
-			CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
+			CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " fails");
 			return false;
 		}
 		if (newExps.empty())
 		{
-			CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
+			CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " fails");
 			res = nullptr;
 			return true;
 		}
 		res = MonomialPool::getInstance().create( std::move(newExps), uint(mTotalDegree - m->mTotalDegree) );
-		CARL_LOG_TRACE("carl.core.monomial", "Result: " << res);
+		CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " = " << res);
 		return true;
 	}
 	
@@ -363,7 +364,6 @@ namespace carl
 	
 	Monomial::Arg operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
 	{
-		CARL_LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
 		if(!lhs)
 			return rhs;
 		if(!rhs)
@@ -406,14 +406,15 @@ namespace carl
 		else if( itright != rhs->end() )
 			newExps.insert(newExps.end(), itright, rhs->end());
 		Monomial::Arg result = createMonomial(std::move(newExps), lhs->tdeg() + rhs->tdeg());
-		CARL_LOG_TRACE("carl.core.monomial", "Result: " << result);
+		CARL_LOG_TRACE("carl.core.monomial", lhs << " * " << rhs << " = " << result);
+		if (result) assert(lhs->tdeg() + rhs->tdeg() == result->tdeg());
 		return result;
 	}
 
 	Monomial::Arg operator*(const Monomial::Arg& lhs, Variable rhs)
 	{
 		if (!lhs) {
-			return MonomialPool::getInstance().create(rhs, 1);
+			return createMonomial(rhs, 1);
 		}
 		Monomial::Content newExps;
 		// Linear, as we expect small monomials.
@@ -431,7 +432,12 @@ namespace carl
 			}
 		}
 		if (!inserted) newExps.emplace_back(rhs, 1);
-		return MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + 1 );
+		
+		Monomial::Arg result = createMonomial(std::move(newExps), lhs->tdeg() + 1);
+		CARL_LOG_TRACE("carl.core.monomial", lhs << " * " << rhs << " = " << result);
+		assert(result);
+		assert(lhs->tdeg() + 1 == result->tdeg());
+		return result;
 	}
 	
 	Monomial::Arg operator*(Variable lhs, const Monomial::Arg& rhs) {
@@ -440,20 +446,13 @@ namespace carl
 	
 	Monomial::Arg operator*(Variable lhs, Variable rhs)
 	{
-		Monomial::Content newExps;
-		if( lhs < rhs )
-		{
-			newExps.emplace_back( lhs, 1 );
-			newExps.emplace_back( rhs, 1 );
+		if (lhs == rhs) {
+			// Return lhs^2
+			return createMonomial(Monomial::Content({{lhs, 2}}), exponent(2));
 		}
-		else if( lhs > rhs )
-		{
-			newExps.emplace_back( rhs, 1 );
-			newExps.emplace_back( lhs, 1 );
-		}
-		else
-			newExps.emplace_back( lhs, 2 );
-		return MonomialPool::getInstance().create( std::move(newExps), 2 );
+		if (lhs > rhs) std::swap(lhs, rhs);
+		// Return lhs * rhs
+		return createMonomial(Monomial::Content({{lhs, 1}, {rhs, 1}}), exponent(2));
 	}
 	
 	Monomial::Arg pow(Variable v, std::size_t exp) {
