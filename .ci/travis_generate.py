@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from travis_helper import *
+from travis_helper import job, properties, render_template
 
 def addon_coverity():
 	return {
@@ -15,7 +15,6 @@ def addon_coverity():
 			}
 		}
 	}
-	return res
 
 def addon_sonarcloud():
 	return {
