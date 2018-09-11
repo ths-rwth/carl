@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../core/logging.h"
+
+#include <iostream>
+
 namespace carl {
     // Forward declaration.
     template<typename Pol>
@@ -393,29 +397,14 @@ namespace carl {
             }
 
             bool operator==(const FormulaContent& _content) const;
-            
-            /**
-             * Gives the string representation of this formula content.
-             * @param _withActivity A flag which indicates whether to add the formula's activity to the result.
-             * @param _resolveUnequal A switch which indicates how to represent the relation symbol for unequal. 
-             *                         (for further description see documentation of Constraint::toString( .. ))
-             * @param _init The initial string of every row of the result.
-             * @param _oneline A flag indicating whether the formula shall be printed on one line.
-             * @param _infix A flag indicating whether to print the formula in infix or prefix notation.
-             * @param _friendlyNames A flag that indicates whether to print the variables with their internal representation (false)
-             *                        or with their dedicated names.
-             * @return The resulting string representation of this formula.
-             */
-            std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true ) const; 
-            
     };
-/**
-     * The output operator of a formula.
-     * @param os The stream to print on.
-     * @param f
-     */
-    template<typename P>
-    std::ostream& operator<<(std::ostream& os, const FormulaContent<P>& f) {
+	/**
+	 * The output operator of a formula.
+	 * @param os The stream to print on.
+	 * @param f
+	 */
+	template<typename P>
+	std::ostream& operator<<(std::ostream& os, const FormulaContent<P>& f) {
 		switch (f.mType) {
 			case FormulaType::FALSE:
 				return os << formulaTypeToString(f.mType);
@@ -449,13 +438,13 @@ namespace carl {
 				assert(f.isNary());
 				return os << "(" << carl::stream_joined(" " + formulaTypeToString(f.mType) + " ", f.mSubformulas) << ")";
 		}
-    }
+	}
+
 	template<typename P>
-    std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>* _formula )
-    {
-		assert(_formula != nullptr);
-		return _out << *_formula;
-    }
+	std::ostream& operator<<(std::ostream& os, const FormulaContent<P>* fc) {
+		assert(fc != nullptr);
+		return os << *fc;
+	}
 	
 }
 
