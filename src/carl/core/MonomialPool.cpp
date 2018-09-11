@@ -10,6 +10,10 @@
 namespace carl
 {
 	Monomial::Arg MonomialPool::add( MonomialPool::PoolEntry&& pe, exponent totalDegree) {
+		CARL_LOG_TRACE("carl.core.monomial", pe.content << " / " << pe.hash << ", " << totalDegree);
+		for (const auto& pe: mPool) {
+			CARL_LOG_TRACE("carl.core.monomial", "\t" << pe.content << " / " << pe.hash << " / " << pe.monomial.lock().get());
+		}
 		MONOMIAL_POOL_LOCK_GUARD
 		auto iter = mPool.insert(std::move(pe));
 		Monomial::Arg res;
