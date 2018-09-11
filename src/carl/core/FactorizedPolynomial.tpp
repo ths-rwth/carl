@@ -1159,33 +1159,29 @@ namespace carl
     {
         if( existsFactorization( *this ) )
         {
-            std::string result;
+            std::stringstream result;
             if( _infix )
             {
                 if( mCoefficient != Coeff<P>( 1 ) )
                 {
-                    std::stringstream s;
-                    s << mCoefficient;
-                    result += s.str() + " * (";
+                    result << mCoefficient << " * (";
                 }
-                result += content().toString( true, _friendlyVarNames );
+                result << content();
                 if( mCoefficient != Coeff<P>( 1 ) )
-                    result += ")";
+                    result << ")";
             }
             else
             {
                 bool withCoeff = mCoefficient != Coeff<P>( 1 );
                 if( withCoeff )
                 {
-                    std::stringstream s;
-                    s << mCoefficient;
-                    result += "(* " + s.str() + " ";
+                    result << "(* " << mCoefficient << " ";
                 }
-                result += content().toString( false, _friendlyVarNames );
+                result << content();
                 if( withCoeff )
-                    result += ")";
+                    result << ")";
             }
-            return result;
+            return result.str();
         }
         std::stringstream s;
         s << mCoefficient;

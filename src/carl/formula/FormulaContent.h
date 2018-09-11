@@ -140,6 +140,8 @@ namespace carl {
     {
             friend class Formula<Pol>;
             friend class FormulaPool<Pol>;
+			template<typename P>
+			friend std::ostream& operator<<(std::ostream& os, const FormulaContent<P>& f);
         
         private:
             
@@ -409,18 +411,50 @@ namespace carl {
     };
 /**
      * The output operator of a formula.
-     * @param _out The stream to print on.
-     * @param _formula
+     * @param os The stream to print on.
+     * @param f
      */
     template<typename P>
-    std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>& _formula )
-    {
-        return (_out << _formula.toString());
+    std::ostream& operator<<(std::ostream& os, const FormulaContent<P>& f) {
+		switch (f.mType) {
+			case FormulaType::FALSE:
+				return os << formulaTypeToString(f.mType);
+			case FormulaType::TRUE:
+				return os << formulaTypeToString(f.mType);
+			case FormulaType::BOOL:
+				return os << f.mVariable;
+			case FormulaType::CONSTRAINT:
+				return os << f.mConstraint;
+			case FormulaType::VARASSIGN:
+				return os << f.mVariableComparison;
+			case FormulaType::VARCOMPARE:
+				return os << f.mVariableAssignment;
+			case FormulaType::BITVECTOR:
+				return os << f.mBVConstraint;
+			case FormulaType::UEQ:
+				return os << f.mUIEquality;
+			case FormulaType::PBCONSTRAINT:
+				return os << f.mPBConstraint;
+			case FormulaType::NOT:
+				return os << "!(" << f.mSubformula << ")";
+			case FormulaType::EXISTS:
+				os << "(exists";
+				for (auto v: f.mQuantifierContent.mVariables) os << " " << v;
+				return os << ")(" << f.mQuantifierContent.mFormula << ")";
+			case FormulaType::FORALL:
+				os << "(forall";
+				for (auto v: f.mQuantifierContent.mVariables) os << " " << v;
+				return os << ")(" << f.mQuantifierContent.mFormula << ")";
+			default:
+				assert(f.isNary());
+				return os << "(" << carl::stream_joined(" " + formulaTypeToString(f.mType) + " ", f.mSubformulas) << ")";
+		}
     }
 	template<typename P>
     std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>* _formula )
     {
-        return (_out << _formula->toString());
+		assert(_formula != nullptr);
+		return _out << *_formula;
     }
 	
 }

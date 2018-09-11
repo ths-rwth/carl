@@ -385,68 +385,6 @@ namespace carl
     }
 
     template<typename Pol>
-    std::string Formula<Pol>::toString( bool _withActivity, unsigned _resolveUnequal, const std::string _init, bool _oneline, bool _infix, bool _friendlyNames, bool _withVariableDefinition ) const
-    {
-        std::string result = "";
-        if( _withVariableDefinition )
-        {
-            std::stringstream os;
-
-            carl::SortManager::getInstance().exportDefinitions(os);
-
-            carl::FormulaVisitor<Formula<Pol>> visitor;
-            Variables vars;
-            std::set<UVariable> uvars;
-            std::set<BVVariable> bvvars;
-            visitor.visit(*this,
-                    [&](const Formula& _f)
-                    {
-                        switch(_f.getType())
-                        {
-                            case FormulaType::BOOL:
-                                vars.insert( _f.boolean() );
-                                break;
-                            case FormulaType::CONSTRAINT:
-                                for( auto var : _f.constraint().variables() ) vars.insert( var );
-                                break;
-                            case FormulaType::UEQ:
-                                _f.uequality().collectUVariables( uvars );
-                                break;
-                            case FormulaType::BITVECTOR:
-                                _f.bvConstraint().collectVariables(bvvars);
-                                break;
-                            default:
-                                break;
-                        }
-                    });
-            for( auto var : vars )
-                os << "(declare-fun " << var << " () " << var.type() << ")\n";
-            for( const auto& uvar : uvars )
-                os << "(declare-fun " << uvar.variable() << " () " << uvar.domain() << ")\n";
-            for( const auto& bvvar : bvvars )
-                os << "(declare-fun " << bvvar << " () " << bvvar.sort() << ")\n";
-            for (const auto& ufc: UFManager::getInstance().ufContents()) {
-                if (ufc == nullptr) continue;
-                os << "(declare-fun " << ufc->name() << " (";
-                for (const auto& s: ufc->domain()) os << s << " ";
-                os << ") " << ufc->codomain() << ")\n";
-            }
-            result += os.str();
-            result += "(assert ";
-        }
-        result += mpContent->toString( _withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames );
-        if( _withVariableDefinition )
-            result += ")\n";
-        return result;
-    }
-
-    template<typename Pol>
-    ostream& operator<<( ostream& _ostream, const Formula<Pol>& _formula )
-    {
-        return (_ostream << _formula.toString( false, 0, "", true, false, true ));
-    }
-
-    template<typename Pol>
     void Formula<Pol>::printProposition( ostream& _out, const string _init ) const
     {
         _out << _init;

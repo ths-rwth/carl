@@ -996,27 +996,15 @@ namespace carl
 
         public:
 
-            /**
-             * Gives the string representation of this formula.
-             * @param _withActivity A flag which indicates whether to add the formula's activity to the result.
-             * @param _resolveUnequal A switch which indicates how to represent the relation symbol for unequal.
-             *                         (for further description see documentation of Constraint::toString( .. ))
-             * @param _init The initial string of every row of the result.
-             * @param _oneline A flag indicating whether the formula shall be printed on one line.
-             * @param _infix A flag indicating whether to print the formula in infix or prefix notation.
-             * @param _friendlyNames A flag that indicates whether to print the variables with their internal representation (false)
-             *                        or with their dedicated names.
-             * @return The resulting string representation of this formula.
-             */
-            std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true, bool _withVariableDefinition = false ) const;
-
-            /**
-             * The output operator of a formula.
-             * @param _out The stream to print on.
-             * @param _formula
-             */
-            template<typename P>
-            friend std::ostream& operator<<( std::ostream& _out, const Formula<P>& _formula );
+			/**
+			 * The output operator of a formula.
+			 * @param _out The stream to print on.
+			 * @param _formula
+			 */
+			template<typename P>
+			friend std::ostream& operator<<(std::ostream& os, const Formula<P>& f) {
+				return os << *f.mpContent;
+			}
 
             /**
              * Prints the propositions of this formula.

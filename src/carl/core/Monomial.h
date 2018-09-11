@@ -505,14 +505,6 @@ namespace carl
 		}
 
 		/**
-		 * Returns the string representation of this monomial.
-		 * @param infix Flag if prefix or infix notation should be used.
-		 * @param friendlyVarNames Flag if friendly variable names should be used.
-		 * @return String representation.
-		 */
-		std::string toString(bool infix = true, bool friendlyVarNames = true) const;
-
-		/**
 		 * Calculates the least common multiple of two monomial pointers.
 		 * If both are valid objects, the gcd of both is calculated.
 		 * If only one is a valid object, this one is returned.
@@ -706,7 +698,7 @@ namespace carl
 	
 	Monomial::Arg operator*(Variable lhs, Variable rhs);
 	/// @}
-	
+
 
 	/**
 	 * Streaming operator for Monomial.

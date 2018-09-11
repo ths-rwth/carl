@@ -202,33 +202,6 @@ namespace carl
 		}
 	}
 	
-	std::string Monomial::toString(bool infix, bool friendlyVarNames) const
-	{
-		if(mExponents.empty()) return "1";
-		std::stringstream ss;
-		if (infix) {
-			for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
-				if (vp != mExponents.begin()) ss << "*";
-				ss << VariablePool::getInstance().getName(vp->first, friendlyVarNames);
-				if (vp->second > 1) ss << "^" << vp->second;
-			}
-		} else {
-			if (mExponents.size() > 1) ss << "(* ";
-			for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
-				if (vp != mExponents.begin()) ss << " ";
-				if (vp->second == 1) ss << VariablePool::getInstance().getName(vp->first, friendlyVarNames);
-				else {
-					std::string varName = VariablePool::getInstance().getName(vp->first, friendlyVarNames);
-					ss << "(*";
-					for (uint i = 0; i < vp->second; i++) ss << " " << varName;
-					ss << ")";
-				}
-			}
-			if (mExponents.size() > 1) ss << ")";
-		}
-		return ss.str();
-	}
-	
 	Monomial::Arg Monomial::gcd(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
 	{
             if(!lhs && !rhs) return nullptr;

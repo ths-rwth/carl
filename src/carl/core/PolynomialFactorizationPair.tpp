@@ -664,25 +664,14 @@ namespace carl
         return result;
     }
     
-    template<typename P>
-    std::string PolynomialFactorizationPair<P>::toString( bool _infix, bool _friendlyVarNames ) const
-    {
-        if( factorizedTrivially() )
-        {
-            assert( mpPolynomial != nullptr );
-            return mpPolynomial->toString( _infix, _friendlyVarNames );
-        }
-        else
-        {
-            return factorizationToString( factorization(), _infix, _friendlyVarNames );
-        }
-    }
-    
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
     {
-        _out << _pfPair.toString();
-        return _out;
+		if (_pfPair.factorizedTrivially()) {
+			return _out << _pfPair.polynomial();
+		} else {
+			return _out << factorizationToString(_pfPair.factorization());
+		}
     }
     
 } // namespace carl

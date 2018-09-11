@@ -322,9 +322,9 @@ namespace carl {
 		else if (mType == FormulaType::CONSTRAINT)
 			return (_init + mConstraint.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
 		else if (mType == FormulaType::VARCOMPARE)
-			return (_init + mVariableComparison.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
+			return "VC"; //(_init + mVariableComparison.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
 		else if (mType == FormulaType::VARASSIGN)
-			return (_init + mVariableAssignment.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
+			return "VA"; // (_init + mVariableAssignment.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
 		else if (mType == FormulaType::BITVECTOR) {
 			return (_init + mBVConstraint.toString(_init, _oneline, _infix, _friendlyNames) + activity);
 		}

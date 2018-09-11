@@ -588,8 +588,6 @@ public:
 	
 	MultivariatePolynomial naive_pow(unsigned exp) const;
 	
-	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
-	
 	MultivariatePolynomial<typename IntegralType<Coeff>::type, Ordering, Policies> toIntegerDomain() const;
 
 	/**
