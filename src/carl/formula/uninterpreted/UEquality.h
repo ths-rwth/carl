@@ -152,55 +152,63 @@ namespace carl
             /**
              * @return An approximation of the complexity of this uninterpreted equality.
              */
-            std::size_t complexity() const;
+            std::size_t complexity() const {
+				return 1 + mLhs.complexity() + mRhs.complexity();
+			}
 
-            /*
-             * @return The negation of the uninterpreted equality.
-             */
-      			UEquality negation() const {
-      				return UEquality(lhs(), rhs(), !negated());
-      			}
-
-            /**
-             * @param ueq The uninterpreted equality to compare with.
-             * @return true, if this and the given equality instance are equal.
-             */
-            bool operator==(const UEquality& ueq) const;
-
-            /**
-             * @param ueq The uninterpreted equality to compare with.
-             * @return true, if this uninterpreted equality is less than the given one.
-             */
-            bool operator<(const UEquality& ueq) const;
-
-            std::string toString(unsigned unequalSwitch, bool infix, bool friendlyNames ) const;
+			/*
+			 * @return The negation of the uninterpreted equality.
+			 */
+			UEquality negation() const {
+				return UEquality(lhs(), rhs(), !negated());
+			}
 
             void collectUVariables(std::set<UVariable>& uvars) const;
 
     };
+
+	/**
+	 * @param ueq The uninterpreted equality to compare with.
+	 * @return true, if this and the given equality instance are equal.
+	 */
+	inline bool operator==(const UEquality& lhs, const UEquality& rhs) {
+		return std::forward_as_tuple(lhs.negated(), lhs.lhs(), lhs.rhs()) == std::forward_as_tuple(rhs.negated(), rhs.lhs(), rhs.rhs());
+	}
+
+	/**
+	 * @param lhs The left hand side.
+	 * @param lhs The right hand side.
+	 * @return true, if the left equality is less than the right one.
+	 */
+	inline bool operator<(const UEquality& lhs, const UEquality& rhs) {
+		return std::forward_as_tuple(lhs.negated(), lhs.lhs(), lhs.rhs()) < std::forward_as_tuple(rhs.negated(), rhs.lhs(), rhs.rhs());
+	}
+
 	/**
 	 * Prints the given uninterpreted equality on the given output stream.
 	 * @param os The output stream to print on.
 	 * @param ueq The uninterpreted equality to print.
 	 * @return The output stream after printing the given uninterpreted equality on it.
 	 */
-	std::ostream& operator<<(std::ostream& os, const UEquality& ueq);
+	inline std::ostream& operator<<(std::ostream& os, const UEquality& ueq) {
+		return os << ueq.lhs() << (ueq.negated() ? " != " : " == ") << ueq.rhs();
+	}
 } // end namespace carl
 
 namespace std
 {
-    /**
-     * Implements std::hash for uninterpreted equalities.
-     */
-    template<>
-    struct hash<carl::UEquality> {
-      public:
-        /**
-         * @param ueq The uninterpreted equality to get the hash for.
-         * @return The hash of the given uninterpreted equality.
-         */
-        size_t operator()(const carl::UEquality& ueq) const {
-            return carl::hash_all(ueq.lhs(), ueq.rhs());
-        }
-    };
+	/**
+	 * Implements std::hash for uninterpreted equalities.
+	 */
+	template<>
+	struct hash<carl::UEquality> {
+	public:
+		/**
+		 * @param ueq The uninterpreted equality to get the hash for.
+		 * @return The hash of the given uninterpreted equality.
+		 */
+		std::size_t operator()(const carl::UEquality& ueq) const {
+			return carl::hash_all(ueq.negated(), ueq.lhs(), ueq.rhs());
+		}
+	};
 }

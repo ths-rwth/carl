@@ -35,7 +35,7 @@ namespace carl
 
 	std::size_t UTerm::complexity() const {
 		return std::visit(overloaded {
-			[](const UVariable& var) { return static_cast<std::size_t>(1); },
+			[](const UVariable&) { return static_cast<std::size_t>(1); },
 			[](const UFInstance& ufi) { return ufi.complexity(); },
 		}, mTerm);
 	}

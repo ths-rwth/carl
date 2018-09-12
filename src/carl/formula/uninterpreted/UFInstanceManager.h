@@ -205,7 +205,7 @@ class UFInstanceManager : public Singleton<UFInstanceManager> {
     		 * @param friendlyNames Whether to use the friendly names for printing.
          * @return The output stream after printing the given uninterpreted function instance on it.
          */ 
-        std::ostream& print(std::ostream& out, const UFInstance& ufi, bool infix = false, bool friendlyNames = true) const;
+        std::ostream& print(std::ostream& out, const UFInstance& ufi, bool infix = false) const;
 
         /**
          * Gets the uninterpreted function instance with the given name, domain, arguments and codomain.

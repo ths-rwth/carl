@@ -36,9 +36,9 @@ namespace carl
 		);
 	}
 
-    std::string UFInstance::toString(bool infix, bool friendlyNames) const {
+    std::string UFInstance::toString(bool infix) const {
         std::stringstream ss;
-        UFInstanceManager::getInstance().print(ss, *this, infix, friendlyNames);
+        UFInstanceManager::getInstance().print(ss, *this, infix);
         return ss.str();
     }
 

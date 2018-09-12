@@ -10,7 +10,7 @@
 
 namespace carl
 {
-    std::ostream& UFInstanceManager::print(std::ostream& out, const UFInstance& ufi, bool infix, bool friendlyNames) const {
+    std::ostream& UFInstanceManager::print(std::ostream& out, const UFInstance& ufi, bool infix) const {
         assert(ufi.id() != 0);
         assert(ufi.id() < mUFInstances.size());
         const UFInstanceContent& ufic = *mUFInstances[ufi.id()];

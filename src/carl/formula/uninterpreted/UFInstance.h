@@ -84,7 +84,7 @@ namespace carl
             /**
              * @return The string representation of this uninterpreted function instance.
              */ 
-            std::string toString(bool infix, bool friendlyNames) const;
+            std::string toString(bool infix) const;
 
             /**
              * Prints the given uninterpreted function instance on the given output stream.
