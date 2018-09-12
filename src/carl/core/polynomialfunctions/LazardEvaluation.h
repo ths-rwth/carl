@@ -80,7 +80,7 @@ private:
 	
 	Poly mLiftingPoly;
 	
-	auto buildPolyRing(Variable v, const RealAlgebraicNumber<Rational>& r) {
+	auto buildPolyRing(Variable v) {
 		CoCoA::SparsePolyRing ring = CoCoA::NewPolyRing(mQ, {CoCoA::NewSymbol()});
 		mSymbolsThere.emplace(v, CoCoA::indets(ring)[0]);
 		mSymbolsBack.emplace(std::make_pair(CoCoA::RingID(ring), 0), v);
@@ -116,7 +116,7 @@ private:
 			CARL_LOG_DEBUG("carl.lazard", "Is numeric: " << v << " -> " << r);
 			return std::make_pair(true, Poly(r.value()));
 		}
-		detail_lazard::CoCoAConverter::ConversionInfo ci = buildPolyRing(v, r);
+		detail_lazard::CoCoAConverter::ConversionInfo ci = buildPolyRing(v);
 		CoCoA::RingElem p = cc.convertUV(r.getIRPolynomial().replaceVariable(v), ci);
 		auto factorization = CoCoA::factor(p);
 		CARL_LOG_DEBUG("carl.lazard", "Factorization of " << p << " on " << ci.mRing << ": " << factorization);
