@@ -45,6 +45,8 @@ namespace carl
     {
         friend class FormulaPool<Pol>;
         friend class FormulaContent<Pol>;
+		template<typename P>
+		friend std::ostream& operator<<(std::ostream& os, const Formula<P>& f);
 
         public:
             /// A constant iterator to a sub-formula of a formula.
@@ -996,16 +998,6 @@ namespace carl
 
         public:
 
-			/**
-			 * The output operator of a formula.
-			 * @param _out The stream to print on.
-			 * @param _formula
-			 */
-			template<typename P>
-			friend std::ostream& operator<<(std::ostream& os, const Formula<P>& f) {
-				return os << *f.mpContent;
-			}
-
             /**
              * Prints the propositions of this formula.
              * @param _out The stream to print on.
@@ -1144,6 +1136,16 @@ namespace carl
              */
             static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoAsts, bool _inConjunction );
     };
+
+	/**
+	 * The output operator of a formula.
+	 * @param _out The stream to print on.
+	 * @param _formula
+	 */
+	template<typename P>
+	inline std::ostream& operator<<(std::ostream& os, const Formula<P>& f) {
+		return os << *f.mpContent;
+	}
 
 	/**
 	 * This class provides a generic visitor for the above Formula class.
