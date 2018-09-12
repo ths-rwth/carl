@@ -1,5 +1,3 @@
-set(CMAKE_CXX_STANDARD 17)
-
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # Matches "Clang" and "AppleClang"
 	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5)
 		message(FATAL_ERROR " clang version must be at least 3.5!")

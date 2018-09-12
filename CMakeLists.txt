@@ -1,40 +1,27 @@
+cmake_minimum_required (VERSION 3.8 FATAL_ERROR)
 
-# # # # # # # # # # # # # # # # # # # # # #
-# A. Project properties.
-# B. Options.
-# C. Find system tools and libraries.
-# D. Write information files.
-# E. Invoke subdirectories.
-# F. Export Compile Information
-# G. CPack
-# # # # # # # # # # # # # # # # # # # # # #
-
-cmake_minimum_required (VERSION 3.2 FATAL_ERROR)
-
-# # # # # # # # # # # # # # # # # # # # # #
-# A. Project properties
-# # # # # # # # # # # # # # # # # # # # # #
 project(carl CXX)
+set(CMAKE_CXX_STANDARD 17)
 
 # path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 # Include own macros.
-include( carlmacros )
+include(carlmacros)
 
 set_version(18 08)
 
-set( PROJECT_FULLNAME "carl")
-set( PROJECT_DESCRIPTION "Computer ARithmetic Library")
-set( carl_NAME "CArL" )
-set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
+set(PROJECT_FULLNAME "carl")
+set(PROJECT_DESCRIPTION "Computer ARithmetic Library")
+set(carl_NAME "CArL" )
+set(carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
 message(STATUS "Version: ${PROJECT_FULLNAME} ${PROJECT_VERSION_FULL}")
 
 # # # # # # # # # # # # # # # # # # # # # #
-# B. Options
+# CMake Options
 # # # # # # # # # # # # # # # # # # # # # #
 
-# options
 option( DEVELOPER "Compile with extra warnings" OFF )
 option( ALLWARNINGS "Compile with even more warnings" OFF )
 option( LOGGING "Enable logging within the carl library" OFF )
@@ -140,20 +127,9 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
 # # # # # # # # # # # # # # # # # # # # # #
-# C. Find system tools and libraries.
-#
-# 1. Required libraries for core.
-# 2. Optional libraries for core.
-# 3. Development and debug libraries.
+# Required libraries
 # # # # # # # # # # # # # # # # # # # # # #
-
-# # # # # # # # # # # # # # # # # # # # # #
-# C.1. Required libraries for core.
-# # # # # # # # # # # # # # # # # # # # # #
-
 include(resources/resources.cmake)
-
-# we only search for this libraries in the system, if we do not force using the shipped resources.
 
 enable_testing()
 
@@ -162,20 +138,29 @@ if (NOT WIN32)
 	list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
 endif()
 
+# Configure static analysis
 include(clang-tidy)
 include(coverage)
 
+# Configure documentation
 if (TARGET Doxygen::doxygen)
 	add_subdirectory(doxygen-conf)
 endif()
+
+# Include actual library
 add_subdirectory(src)
 
+# Configure export
 include(export)
 
+# Configure bindings
 if (BINDINGS_PYTHON)
 	add_subdirectory(bindings/pycarl)
 endif()
 
+# Configure addons
 include(resources/addons/addons.cmake)
+
+# Configure packaging and CI
 include(packaging)
 include(prepare-ci)
