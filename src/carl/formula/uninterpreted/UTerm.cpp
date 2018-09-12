@@ -13,19 +13,6 @@
 
 namespace carl
 {
-	bool UTerm::isUVariable() const {
-		return std::visit(overloaded {
-			[](const UVariable&) { return true; },
-			[](const UFInstance&) { return false; },
-		}, mTerm);
-	}
-	bool UTerm::isUFInstance() const {
-		return std::visit(overloaded {
-			[](const UVariable&) { return false; },
-			[](const UFInstance&) { return true; },
-		}, mTerm);
-	}
-
 	const Sort& UTerm::domain() const {
 		return std::visit(overloaded {
 			[](const UVariable& var) -> const auto& { return var.domain(); },

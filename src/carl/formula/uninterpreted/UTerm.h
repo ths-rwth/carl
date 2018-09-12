@@ -41,12 +41,16 @@ namespace carl
 		/**
 		 * @return true, if the stored term is a UVariable.
 		 */
-		bool isUVariable() const;
+		bool isUVariable() const {
+			return std::holds_alternative<UVariable>(mTerm);
+		}
 
 		/**
 		 * @return true, if the stored term is a UFInstance.
 		 */
-		bool isUFInstance() const;
+		bool isUFInstance() const {
+			return std::holds_alternative<UFInstance>(mTerm);
+		}
 
 		/**
 		 * @return The stored term as UVariable.
