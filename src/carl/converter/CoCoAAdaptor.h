@@ -4,6 +4,7 @@
 #include "../core/Term.h"
 #include "../core/Variable.h"
 #include "../util/Common.h"
+#include "../util/TimingCollector.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -12,9 +13,32 @@
 
 #ifdef USE_COCOA
 
-#include "CoCoA/library.H"
+//#include "CoCoA/library.H"
+#include <CoCoA/BigInt.H>
+#include <CoCoA/BigRat.H>
+#include <CoCoA/factorization.H>
+#include <CoCoA/ring.H>
+#include <CoCoA/RingQQ.H>
+#include <CoCoA/SparsePolyIter.H>
+#include <CoCoA/SparsePolyOps-RingElem.H>
+#include <CoCoA/SparsePolyRing.H>
 
 namespace carl {
+/**
+ * This namespace contains wrapper for all heavy CoCoALib methods.
+ * They are implemented in a separate source file, attempting to reduce the 
+ * amount of code included from CoCoALib.
+ */
+namespace cocoawrapper {
+	/// Calls CoCoA::gcd(p,q).
+	CoCoA::RingElem gcd(const CoCoA::RingElem& p, const CoCoA::RingElem& q);
+	/// Calls CoCoA::factor(p).
+	CoCoA::factorization<CoCoA::RingElem> factor(const CoCoA::RingElem& p);
+	/// Calls CoCoA::ReducedGBasis(CoCoA::ideal(p)).
+	std::vector<CoCoA::RingElem> ReducedGBasis(const std::vector<CoCoA::RingElem>& p);
+	/// Calls CoCoA::SqFreeFactor(p).
+	CoCoA::factorization<CoCoA::RingElem> SqFreeFactor(const CoCoA::RingElem& p);
+}
 
 template<typename Poly>
 class CoCoAAdaptor {
@@ -25,13 +49,13 @@ private:
 	CoCoA::SparsePolyRing mRing;
 public:
 	CoCoA::BigInt convert(const mpz_class& n) const {
-		return CoCoA::BigInt(n.get_mpz_t());
+		return CoCoA::BigIntFromMPZ(n.get_mpz_t());
 	}
 	mpz_class convert(const CoCoA::BigInt& n) const {
 		return mpz_class(CoCoA::mpzref(n));
 	}
 	CoCoA::BigRat convert(const mpq_class& n) const {
-		return CoCoA::BigRat(n.get_mpq_t());
+		return CoCoA::BigRatFromMPQ(n.get_mpq_t());
 	}
 	mpq_class convert(const CoCoA::BigRat& n) const {
 		return mpq_class(CoCoA::mpqref(n));
@@ -145,30 +169,34 @@ public:
 	}
 	
 	Poly gcd(const Poly& p1, const Poly& p2) const {
-		return convert(CoCoA::gcd(convert(p1), convert(p2)));
+		auto start = CARL_TIME_START();
+		auto res = convert(cocoawrapper::gcd(convert(p1), convert(p2)));
+		CARL_TIME_FINISH("cocoa.gcd", start);
+		return res;
 	}
 
 	Poly makeCoprimeWith(const Poly& p1, const Poly& p2) const {
 		CoCoA::RingElem res = convert(p1);
-		return convert(res / CoCoA::gcd(res, convert(p2)));
+		return convert(res / cocoawrapper::gcd(res, convert(p2)));
 	}
 
 	/**
 	 * Break down a polynomial into its irreducible factors together with
-   * their exponents/multiplicities.
-   * E.g. "x^3 + 4 x^2 + 5 x + 2" factorizes into "(x+1)^2 * (x+2)^1"
-   * where "(x+1)", "(x+2)" are the irreducible factors and "2" and "1" are
-   * their exponents.
-   *
-   * @param includeConstantFlag One of those factors is a constant-polynomial
-   * (degree 0), which is included by default but can be left out by setting
-   * the flag 'includeConstantFlag' to false, e.g., for root computations.
-   *
-   * @return A map whose keys are the irreducible factors and whose values are
-   * the exponents.
+	 * their exponents/multiplicities.
+	 * E.g. "x^3 + 4 x^2 + 5 x + 2" factorizes into "(x+1)^2 * (x+2)^1"
+	 * where "(x+1)", "(x+2)" are the irreducible factors and "2" and "1" are
+	 * their exponents.
+	 *
+	 * @param includeConstants One of those factors is a constant-polynomial
+	 * (degree 0), which is included by default but can be left out by setting
+	 * the flag 'includeConstantFlag' to false, e.g., for root computations.
+	 *
+	 * @return A map whose keys are the irreducible factors and whose values are
+	 * the exponents.
 	 */
 	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
-		auto finfo = CoCoA::factor(convert(p));
+		auto start = CARL_TIME_START();
+		auto finfo = cocoawrapper::factor(convert(p));
 		Factors<Poly> res;
 		if (includeConstants && !CoCoA::IsOne(finfo.myRemainingFactor())) {
 			res.emplace(convert(finfo.myRemainingFactor()), 1);
@@ -176,8 +204,9 @@ public:
 		for (std::size_t i = 0; i < finfo.myFactors().size(); ++i) {
 			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
 		}
-    return res;
-  }
+		CARL_TIME_FINISH("cocoa.factorize", start);
+		return res;
+	}
 
 	/**
 	 * Break down a polynomial into its unique, irreducible factors
@@ -205,7 +234,7 @@ public:
 	 */
 	std::vector<Poly> nonConstIrreducibles(const Poly& p) const {
 		std::vector<Poly> res;
-		auto cocoaFactors = CoCoA::factor(convert(p)).myFactors();
+		auto cocoaFactors = cocoawrapper::factor(convert(p)).myFactors();
 		for (const auto& f: cocoaFactors) {
 			res.emplace_back(convert(f));
 		}
@@ -225,7 +254,7 @@ public:
 
 
 	Poly squareFreePart(const Poly& p) const {
-		auto finfo = CoCoA::SqFreeFactor(convert(p));
+		auto finfo = cocoawrapper::SqFreeFactor(convert(p));
 		Poly res(1);
 		for (const auto& f: finfo.myFactors()) {
 			res *= convert(f);
@@ -234,7 +263,10 @@ public:
 	}
 
 	auto GBasis(const std::vector<Poly>& p) const {
-		return convert(CoCoA::ReducedGBasis(CoCoA::ideal(convert(p))));
+		auto start = CARL_TIME_START();
+		auto res = convert(cocoawrapper::ReducedGBasis(convert(p)));
+		CARL_TIME_FINISH("cocoa.gbasis", start);
+		return res;
 	}
 };
 

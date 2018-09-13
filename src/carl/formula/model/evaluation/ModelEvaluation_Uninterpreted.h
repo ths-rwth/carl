@@ -17,7 +17,7 @@ namespace model {
 		assert(uvit != m.end());
 		res = uvit->second;
 	}
-	
+
 	/**
 	 * Evaluates a uninterpreted function instance to a ModelValue over a Model.
 	 */
@@ -27,27 +27,40 @@ namespace model {
 		assert(ufit != m.end());
 		assert(ufit->second.isUFModel());
 		std::vector<SortValue> args;
-		for (const auto& var: ufi.args()) {
-			auto it = m.find(var);
-			assert(it != m.end());
-			const ModelValue<Rational,Poly>& value = m.evaluated(var);
-			assert(value.isSortValue());
-			args.push_back(value.asSortValue());
+		for (const auto& term: ufi.args()) {
+			if(term.isUVariable()) {
+				auto it = m.find(term.asUVariable());
+				assert(it != m.end());
+				const ModelValue<Rational,Poly>& value = m.evaluated(term.asUVariable());
+				assert(value.isSortValue());
+				args.push_back(value.asSortValue());
+			} else if(term.isUFInstance()) {
+				ModelValue<Rational,Poly> value = ModelValue<Rational,Poly>();
+				evaluate(value, term.asUFInstance(), m);
+				assert(value.isSortValue());
+				args.push_back(value.asSortValue());
+			}
 		}
 		res = ufit->second.asUFModel().get(args);
 	}
-	
+
 	/**
 	 * Evaluates a uninterpreted variable to a ModelValue over a Model.
 	 */
 	template<typename Rational, typename Poly>
 	void evaluate(ModelValue<Rational,Poly>& res, const UEquality& ue, const Model<Rational,Poly>& m) {
 		ModelValue<Rational,Poly> lhs;
-		if (ue.lhsIsUV()) evaluate(lhs, ue.lhsAsUV(), m);
-		else if (ue.lhsIsUF()) evaluate(lhs, ue.lhsAsUF(), m);
+		if (ue.lhs().isUVariable()) {
+			evaluate(lhs, ue.lhs().asUVariable(), m);
+		} else if (ue.lhs().isUFInstance()) {
+			evaluate(lhs, ue.lhs().asUFInstance(), m);
+		}
 		ModelValue<Rational,Poly> rhs;
-		if (ue.rhsIsUV()) evaluate(rhs, ue.rhsAsUV(), m);
-		else if (ue.rhsIsUF()) evaluate(rhs, ue.rhsAsUF(), m);
+		if (ue.rhs().isUVariable()) {
+			evaluate(rhs, ue.rhs().asUVariable(), m);
+		} else if (ue.rhs().isUFInstance()) {
+			evaluate(rhs, ue.rhs().asUFInstance(), m);
+		}
 		assert(lhs.isSortValue());
 		assert(rhs.isSortValue());
 		assert(lhs.asSortValue().sort() == rhs.asSortValue().sort());

@@ -8,6 +8,7 @@
 #include "../../numbers/numbers.h"
 
 #include <boost/dynamic_bitset.hpp>
+#include <array>
 #include <limits>
 #include <memory>
 

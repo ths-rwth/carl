@@ -125,12 +125,6 @@ namespace carl {
 			auto newVars = boost::apply_visitor(VariableCollector(), mValue);
 			vars.insert(newVars.begin(), newVars.end());
 		}
-
-		std::string toString(unsigned = 0, bool = false, bool = true) const {
-			std::stringstream ss;
-			ss << "(" << var() << " " << (negated() ? "! " : "") << relation() << " " << mValue << ")";
-			return ss.str();
-		}
 	};
 
 	template<typename Poly>
@@ -146,7 +140,7 @@ namespace carl {
 	}
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableComparison<Poly>& vc) {
-		return os << vc.toString();
+		return os << "(" << vc.var() << " " << (vc.negated() ? "! " : "") << vc.relation() << " " << vc.value() << ")";
 	}
 }
 

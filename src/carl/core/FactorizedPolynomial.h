@@ -134,6 +134,7 @@ namespace carl
         explicit FactorizedPolynomial( const CoeffType& );
         explicit FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>&, bool _polyNormalized = false );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
+        FactorizedPolynomial( FactorizedPolynomial<P>&& );
         explicit FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _p);
         
         // Destructor.

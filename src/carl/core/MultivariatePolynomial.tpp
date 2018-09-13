@@ -322,6 +322,7 @@ const Coeff& MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
 template<typename Coeff, typename Ordering, typename Policies>
 std::size_t MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 {
+	if (isZero()) return 0;
 	assert(!mTerms.empty());
 	if (Ordering::degreeOrder) {
 		return this->lterm().tdeg();
@@ -2065,30 +2066,9 @@ MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs
 }
 
 template<typename C, typename O, typename P>
-std::ostream& operator<<( std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs )
-{
-	return (os << rhs.toString(true, true));
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool infix, bool friendlyVarNames) const
-{
-	///@todo sort for this?
-	if(mTerms.empty()) return "0";
-	if(mTerms.size() == 1) return this->mTerms.front().toString(infix, friendlyVarNames);
-	std::string result;
-	if( !infix ) result += "(+";
-	for (auto term = mTerms.rbegin(); term != mTerms.rend(); term++)
-	{
-		if(infix)
-		{
-			if(term != mTerms.rbegin()) result += "+";
-		}
-		else result += " ";
-		result += (*term).toString(infix, friendlyVarNames);
-	}
-	if( !infix ) result += ")";
-	return result;
+std::ostream& operator<<(std::ostream& os, const MultivariatePolynomial<C,O,P>& p) {
+	if (p.isZero()) return os << "0";
+	return os << carl::stream_joined(" + ", p);
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

@@ -52,7 +52,7 @@ endif()
 ###############
 
 ##### GMP / GMPXX
-if(NOT FORCE_SHIPPED_RESOURCES)
+if((NOT FORCE_SHIPPED_RESOURCES) AND (NOT FORCE_SHIPPED_GMP))
 	load_library(carl GMP 5.1)
 	load_library(carl GMPXX 5.1)
 endif()
@@ -121,11 +121,11 @@ endif()
 ##### CoCoALib
 if(USE_COCOA)
 	if(NOT FORCE_SHIPPED_RESOURCES)
-		load_library(carl CoCoA 0.99542)
+		load_library(carl CoCoA 0.99564)
 	endif()
 	if(NOT COCOA_FOUND)
-		set(COCOA_VERSION "0.99551")
-		set(COCOA_TGZHASH "0e75ba96e627f955adbb17c037d5bcdf")
+		set(COCOA_VERSION "0.99600")
+		set(COCOA_TGZHASH "e32a169ea252640649e2742856330110")
 		include(resources/cocoa.cmake)
 		unset(COCOA_TGZHASH)
 	endif()

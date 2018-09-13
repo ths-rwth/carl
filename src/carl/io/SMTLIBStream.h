@@ -9,7 +9,10 @@
 #include "../formula/Constraint.h"
 #include "../formula/Formula.h"
 #include "../formula/Logic.h"
+#include "../formula/model/Model.h"
 #include "../formula/Sort.h"
+#include "../numbers/numbers.h"
+#include "../util/tuple_util.h"
 
 #include <iostream>
 #include <sstream>
@@ -20,16 +23,13 @@ namespace carl {
 class SMTLIBStream {
 private:
 	std::stringstream mStream;
-	
-	void declare(Logic l) {
-		*this << "(set-logic " << l << ")" << std::endl;
-	}
-	void declare(Sort s) {
-		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
-	}
-	void declare(Variable v) {
-		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
-	}
+
+	void write(const mpz_class& n) { *this << carl::toString(n, false); }
+	void write(const mpq_class& n) { *this << carl::toString(n, false); }
+#ifdef USE_CLN_NUMBERS
+	void write(const cln::cl_I& n) { *this << carl::toString(n, false); }
+	void write(const cln::cl_RA& n) { *this << carl::toString(n, false); }
+#endif
 
 	template<typename Pol>
 	void write(const Constraint<Pol>& c) {
@@ -89,6 +89,41 @@ private:
 			case FormulaType::FORALL:
 				CARL_LOG_ERROR("carl.smtlibstream", "Printing exists or forall is not implemented yet.");
 				break;
+		}
+	}
+	
+	template<typename Rational, typename Poly>
+	void write(const Model<Rational,Poly>& model) {
+		*this << "(model" << std::endl;
+		for (const auto& m: model) {
+			auto value = m.second;
+			value = model.evaluated(m.first);
+			*this << "\t(define-fun " << m.first << " () ";
+			if (m.first.isVariable()) {
+				*this << m.first.asVariable().getType() << std::endl;
+			} else if (m.first.isBVVariable()) {
+				*this << m.first.asBVVariable().sort() << std::endl;
+			} else if (m.first.isUVariable()) {
+				*this << m.first.asUVariable().domain() << std::endl;
+			} else if (m.first.isFunction()) {
+				*this << value;
+			} else {
+				CARL_LOG_ERROR("carl.smtlibstream", "Encountered an unknown type of ModelVariable: " << m.first);
+				assert(false);
+			}
+			*this << "\t\t";
+			value.visit([this](const auto& v){ this->write(v); });
+			*this << std::endl << "\t)" << std::endl;
+		}
+		*this << ")" << std::endl;
+	}
+	
+	template<typename Rational, typename Poly>
+	void write(const ModelValue<Rational,Poly>& mv) {
+		if (mv.isBool()) {
+			*this << mv.asBool();
+		} else if (mv.isRational()) {
+			*this << mv.asRational();
 		}
 	}
 
@@ -186,14 +221,21 @@ private:
 	}
 	
 public:
-	SMTLIBStream(): mStream() {
+	void declare(Logic l) {
+		*this << "(set-logic " << l << ")" << std::endl;
 	}
-
+	void declare(Sort s) {
+		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
+	}
+	void declare(Variable v) {
+		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
+	}
+	void declare(const Variables& vars) {
+		for (auto v: vars) declare(v);
+	}
 	void initialize(Logic l, const Variables& vars) {
 		declare(l);
-		for (auto v: vars) {
-			declare(v);
-		}
+		declare(vars);
 	}
 	
 	template<typename Pol>
@@ -203,6 +245,10 @@ public:
 			f.collectVariables(vars, true, true, true, true, true);
 		}
 		initialize(l, vars);
+	}
+
+	void setInfo(const std::string& name, const std::string& value) {
+		*this << "(set-info :" << name << " " << value << ")" << std::endl;
 	}
 	
 	template<typename Pol>
@@ -219,6 +265,10 @@ public:
 		*this << "(check-sat)" << std::endl;
 	}
 	
+	void getAssertions() {
+		*this << "(get-assertions)" << std::endl;
+	}
+
 	void getModel() {
 		*this << "(get-model)" << std::endl;
 	}
@@ -228,10 +278,14 @@ public:
 		write(static_cast<const std::decay_t<T>&>(t));
 		return *this;
 	}
-	//
+	
 	SMTLIBStream& operator<<(std::ostream& (*os)(std::ostream&)) {
 		write(os);
 		return *this;
+	}
+
+	auto str() const {
+		return mStream.str();
 	}
 	
 	auto content() const {
@@ -246,16 +300,16 @@ inline std::ostream& operator<<(std::ostream& os, const SMTLIBStream& ss) {
 namespace detail {
 
 template<typename Pol>
-struct SMTLIBContainer {
+struct SMTLIBScriptContainer {
 	Logic mLogic;
 	std::initializer_list<Formula<Pol>> mFormulas;
 	bool mGetModel;
 	Pol mObjective;
-	SMTLIBContainer(Logic l, std::initializer_list<Formula<Pol>> f, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel) {}
-	SMTLIBContainer(Logic l, std::initializer_list<Formula<Pol>> f, const Pol& objective, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel), mObjective(objective) {}
+	SMTLIBScriptContainer(Logic l, std::initializer_list<Formula<Pol>> f, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel) {}
+	SMTLIBScriptContainer(Logic l, std::initializer_list<Formula<Pol>> f, const Pol& objective, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel), mObjective(objective) {}
 };
 template<typename Pol>
-std::ostream& operator<<(std::ostream& os, const SMTLIBContainer<Pol>& sc) {
+std::ostream& operator<<(std::ostream& os, const SMTLIBScriptContainer<Pol>& sc) {
 	SMTLIBStream sls;
 	sls.initialize(sc.mLogic, sc.mFormulas);
 	for (const auto& f: sc.mFormulas) sls.assertFormula(f);
@@ -268,8 +322,27 @@ std::ostream& operator<<(std::ostream& os, const SMTLIBContainer<Pol>& sc) {
 }
 
 template<typename Pol, typename... Args>
-detail::SMTLIBContainer<Pol> outputSMTLIB(Logic l, std::initializer_list<Formula<Pol>> formulas, Args&&... args) {
-	return detail::SMTLIBContainer<Pol>(l, formulas, std::forward<Args>(args)...);
+detail::SMTLIBScriptContainer<Pol> outputSMTLIB(Logic l, std::initializer_list<Formula<Pol>> formulas, Args&&... args) {
+	return detail::SMTLIBScriptContainer<Pol>(l, formulas, std::forward<Args>(args)...);
+}
+
+namespace detail {
+	template<typename... Args>
+	struct SMTLIBOutputContainer {
+		std::tuple<Args...> mData;
+		SMTLIBOutputContainer(Args&&... args): mData(std::forward<Args>(args)...) {}
+	};
+	template<typename... Args>
+	std::ostream& operator<<(std::ostream& os, const SMTLIBOutputContainer<Args...>& soc) {
+		SMTLIBStream sls;
+		carl::tuple_accumulate(soc.mData, sls, [](auto& sls, const auto& t) -> auto& { return sls << t; });
+		return os << sls;
+	}
+}
+
+template<typename... Args>
+detail::SMTLIBOutputContainer<Args...> asSMTLIB(Args&&... args) {
+	return detail::SMTLIBOutputContainer<Args...>(std::forward<Args>(args)...);
 }
 
 }

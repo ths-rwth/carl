@@ -11,8 +11,7 @@
 #include "AbstractRootFinder.h"
 #include "RootFinder.h"
 
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Eigenvalues>
+#include "EigenWrapper.h"
 
 namespace carl {
 namespace rootfinder {
@@ -226,28 +225,12 @@ template<typename Number>
 void EigenValueStrategy<Number>::operator()(const Interval<Number>& interval, RootFinder<Number>& finder) {
 	UnivariatePolynomial<Number> p = finder.getPolynomial();
 	
-	using Index = Eigen::MatrixXd::Index;
-	// Create companion matrix
-	uint degree = p.degree();
-	Eigen::MatrixXd m = Eigen::MatrixXd::Zero(Index(degree), Index(degree));
-	m(0, Index(degree)-1) = toDouble(Number(-p.coefficients()[0] / p.coefficients()[degree]));
-	for (uint i = 1; i < degree; ++i) {
-		m(Index(i), Index(i)-1) = 1;
-		m(Index(i), Index(degree)-1) = toDouble(Number(-p.coefficients()[i] / p.coefficients()[degree]));
+	std::vector<double> coeffs;
+	for (const auto& n: p.coefficients()) {
+		coeffs.emplace_back(toDouble(n));
 	}
-	
-	// Obtain eigenvalues
-	Eigen::VectorXcd eigenvalues = m.eigenvalues();
-	
-	// Save real parts to tmp
-	std::vector<double> tmp(std::size_t(eigenvalues.size()));
-	for (uint i = 0; i < std::size_t(eigenvalues.size()); ++i) {
-		if (eigenvalues[Index(i)].imag() > eigenvalues[Index(i)].real() / 4) tmp[i] = 0;
-		else tmp[i] = eigenvalues[Index(i)].real();
-	}
-	
 	// Build isolation
-	buildIsolation(std::move(tmp), interval, finder);
+	buildIsolation(eigen::root_approximation(coeffs), interval, finder);
 }
 
 }

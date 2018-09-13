@@ -33,12 +33,23 @@ private:
 	using Number = typename UnderlyingNumberType<Pol>::type;
 	std::ifstream mIn;
 
-	std::vector<std::pair<Number,carl::Variable>> convert(const std::vector<std::pair<int,carl::Variable>>& poly) const {
-		std::vector<std::pair<Number,carl::Variable>> res;
+	std::map<carl::Variable, carl::Variable> variableCache; // maps old int variables to bool
+
+	carl::MultivariatePolynomial<Number> convert(const std::vector<std::pair<int,carl::Variable>>& poly) {
+		Pol lhs;
 		for (const auto& term: poly) {
-			res.emplace_back(Number(term.first), term.second);
+			auto it = variableCache.find(term.second);
+			if (it == variableCache.end()) {
+				// We haven't seen this variable, yet. Create a new map entry for it.
+				carl::Variable boolVar = carl::freshBooleanVariable();
+				variableCache[term.second] = boolVar;
+			}
+
+			const carl::Variable& booleanVariable = variableCache[term.second];
+			lhs += Pol(Number(term.first)) * Pol(booleanVariable);
 		}
-		return res;
+
+		return lhs;
 	}
 
 public:
@@ -47,14 +58,16 @@ public:
 	{}
 	
 	boost::optional<std::pair<Formula<Pol>,Pol>> parse() {
+		if (!mIn.is_open()) return boost::none;
+
 		auto file = parseOPBFile(mIn);
 		if (!file) return boost::none;
 		Formulas<Pol> constraints;
 		for (const auto& cons: file->constraints) {
-			auto pol = convert(std::get<0>(cons));
+			auto lhs = convert(std::get<0>(cons));
 			Relation rel = std::get<1>(cons);
 			Number rhs = std::get<2>(cons);
-			PBConstraint<Pol> pbc(pol, rel, rhs);
+			Constraint<Pol> pbc(lhs - Pol(rhs), rel);
 			constraints.emplace_back(std::move(pbc));
 		}
 		Formula<Pol> resC(FormulaType::AND, std::move(constraints));

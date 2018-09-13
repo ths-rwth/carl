@@ -1,9 +1,9 @@
-/** 
+/**
  * @file   SFINAE.h
  * @author Sebastian Junges
  *
  * @since September 10, 2013
- * 
+ *
  */
 
 #pragma once
@@ -12,6 +12,9 @@
 
 namespace carl
 {
+
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 #ifndef __VS
 // from flamingdangerzone.com/cxx11/2012/05/29/type-traits-galore.html
@@ -40,7 +43,7 @@ template <typename Head, typename... Tail>
 struct all<Head, Tail...> : Conditional<Head::value, all<Tail...>, Bool<false>> {};
 #endif
 
-// http://flamingdangerzone.com/cxx11/2012/06/01/almost-static-if.html	
+// http://flamingdangerzone.com/cxx11/2012/06/01/almost-static-if.html
 namespace dtl
 {
 	enum class enabled {};
@@ -82,7 +85,7 @@ struct has_##methodname : std::false_type {}; \
 template<typename T, typename SFINAE = void> \
 struct has_##methodname : std::false_type {}; \
 template<typename T> \
-struct has_##methodname<T, typename Void<decltype( std::declval<T&>().methodname() )>::type> : std::true_type {}; 
+struct has_##methodname<T, typename Void<decltype( std::declval<T&>().methodname() )>::type> : std::true_type {};
 #endif
 
 has_method_struct(normalize)

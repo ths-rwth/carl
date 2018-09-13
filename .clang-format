@@ -1,5 +1,6 @@
 Language: Cpp
 BasedOnStyle: LLVM
+Standard: Cpp11
 
 AccessModifierOffset: -4
 AllowShortFunctionsOnASingleLine: Empty
@@ -7,8 +8,10 @@ AllowShortIfStatementsOnASingleLine: true
 AlwaysBreakTemplateDeclarations: true
 BreakStringLiterals: false
 ColumnLimit: 0
+FixNamespaceComments: true
 IndentWidth: 4
 PointerAlignment: Left
+SortIncludes: true
 SpaceAfterTemplateKeyword: false
 SpacesInContainerLiterals: false
 TabWidth: 4

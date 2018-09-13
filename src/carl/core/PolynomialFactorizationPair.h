@@ -205,6 +205,10 @@ namespace carl
         {
             return mHash;
         }
+
+		const auto& polynomial() const {
+			return *mpPolynomial;
+		}
         
         /**
          * @param _polyFactA The first polynomial factorization pair to compare.
@@ -259,13 +263,6 @@ namespace carl
          */
         template<typename P1>
         friend Factors<FactorizedPolynomial<P1>> factor( const PolynomialFactorizationPair<P1>& _pfPair, const typename P1::CoeffType&  );
-        
-        /**
-         * @param _infix
-         * @param _friendlyVarNames
-         * @return 
-         */
-        std::string toString( bool _infix = true, bool _friendlyVarNames = true ) const;
         
         /**
          * Prints the given polynomial-factorization pair on the given output stream.

@@ -65,6 +65,7 @@ namespace carl
                 if( ret.second )
                 {
                     assert( content().mFactorization.empty() );
+                    CARL_LOG_DEBUG("carl.core.factorizedpolynomial", "Adding single factor ( " << poly << " )^1");
                     content().mFactorization.insert( std::make_pair( *this, 1 ) );
                 }
                 else
@@ -125,6 +126,18 @@ namespace carl
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
     }
+	
+    template<typename P>
+    FactorizedPolynomial<P>::FactorizedPolynomial( FactorizedPolynomial<P>&& rhs ):
+        mCacheRef( rhs.mCacheRef ),
+        mpCache( rhs.mpCache ),
+        mCoefficient( rhs.mCoefficient )
+    {
+        ASSERT_CACHE_REF_LEGAL( (*this) );
+        rhs.mCacheRef = CACHE::NO_REF;
+        rhs.mpCache = nullptr;
+        rhs.mCoefficient = 0;
+    }
     
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _pair):
@@ -180,6 +193,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator=( const FactorizedPolynomial<P>& _fpoly )
     {
+        CARL_LOG_DEBUG("carl.core.factorizedpolynomial", "Copying " << _fpoly);
         ASSERT_CACHE_EQUAL( mpCache, _fpoly.pCache() );
         mCoefficient = _fpoly.mCoefficient;
         if( mCacheRef != _fpoly.cacheRef() )
@@ -203,10 +217,13 @@ namespace carl
         }
         else if( mpCache != nullptr )
         {
+            mpCache->dereg(mCacheRef);
+            mCacheRef = _fpoly.cacheRef();
             mpCache->reg( mCacheRef );
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
         assert(computePolynomial(*this) == computePolynomial(_fpoly));
+        CARL_LOG_DEBUG("carl.core.factorizedpolynomial", "Done.");
         return *this;
     }
     
@@ -1158,33 +1175,29 @@ namespace carl
     {
         if( existsFactorization( *this ) )
         {
-            std::string result;
+            std::stringstream result;
             if( _infix )
             {
                 if( mCoefficient != Coeff<P>( 1 ) )
                 {
-                    std::stringstream s;
-                    s << mCoefficient;
-                    result += s.str() + " * (";
+                    result << mCoefficient << " * (";
                 }
-                result += content().toString( true, _friendlyVarNames );
+                result << content();
                 if( mCoefficient != Coeff<P>( 1 ) )
-                    result += ")";
+                    result << ")";
             }
             else
             {
                 bool withCoeff = mCoefficient != Coeff<P>( 1 );
                 if( withCoeff )
                 {
-                    std::stringstream s;
-                    s << mCoefficient;
-                    result += "(* " + s.str() + " ";
+                    result << "(* " << mCoefficient << " ";
                 }
-                result += content().toString( false, _friendlyVarNames );
+                result << content();
                 if( withCoeff )
-                    result += ")";
+                    result << ")";
             }
-            return result;
+            return result.str();
         }
         std::stringstream s;
         s << mCoefficient;

@@ -238,54 +238,55 @@ namespace carl
         if( _infix )
         {
             bool complexNum = hasSqrt() && !mConstantPart.isConstant();
-            std::string result;
+            std::stringstream result;
             if( complexNum && !mDenominator.isOne() )
-                result += "(";
+                result << "(";
             if( hasSqrt() )
             {
                 if( mConstantPart.isConstant() )
-                    result += mConstantPart.toString( true, _friendlyNames );
+                    result << mConstantPart;
                 else
-                    result += "(" + mConstantPart.toString( true, _friendlyNames ) + ")";
-                result += "+";
+                    result << "(" << mConstantPart << ")";
+                result << "+";
                 if( mFactor.isConstant() )
-                    result += mFactor.toString( true, _friendlyNames );
+                    result << mFactor;
                 else
-                    result += "(" + mFactor.toString( true, _friendlyNames ) + ")";
-                result += "*sqrt(" + mRadicand.toString( true, _friendlyNames ) + ")";
+                    result << "(" << mFactor << ")";
+                result << "*sqrt(" << mRadicand << ")";
             }
             else
             {
                 if( mConstantPart.isConstant() || mDenominator.isOne())
-                    result += mConstantPart.toString( true, _friendlyNames );
+                    result << mConstantPart;
                 else
-                    result += "(" + mConstantPart.toString( true, _friendlyNames ) + ")";
+                    result << "(" << mConstantPart << ")";
             }
             if (!mDenominator.isOne())
             {
                 if( complexNum )
-                    result += ")";
-                result += "/";
+                    result << ")";
+                result << "/";
                 if( mDenominator.isConstant() )
-                    result += mDenominator.toString( true, _friendlyNames );
+                    result << mDenominator;
                 else
-                    result += "(" + mDenominator.toString( true, _friendlyNames ) + ")";
+                    result << "(" << mDenominator << ")";
             }
-            return result;
+            return result.str();
         }
         else
         {
-            std::string result = "(/ (+ ";
-            result += mConstantPart.toString( false, _friendlyNames );
-            result +=  " (* ";
-            result +=  mFactor.toString( false, _friendlyNames );
-            result +=  " ";
-            result +=  "(sqrt ";
-            result +=  mRadicand.toString( false, _friendlyNames );
-            result +=  "))) ";
-            result +=  mDenominator.toString( false, _friendlyNames );
-            result +=  ")";
-            return result;
+            std::stringstream result;
+			result << "(/ (+ ";
+            result << mConstantPart;
+            result << " (* ";
+            result << mFactor;
+            result << " ";
+            result << "(sqrt ";
+            result << mRadicand;
+            result << "))) ";
+            result << mDenominator;
+            result << ")";
+            return result.str();
         }
     }
     

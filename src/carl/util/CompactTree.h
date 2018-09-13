@@ -8,11 +8,13 @@
 
 
 #pragma once
+
+#include "platform.h"
+
 #include <ostream>
 #include <cassert>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnull-pointer-arithmetic"
+CLANG_WARNING_DISABLE("-Wnull-pointer-arithmetic")
 
 namespace carl
 {
@@ -379,4 +381,4 @@ namespace carl
     }
 }
 
-#pragma clang diagnostic pop
+CLANG_WARNING_RESET

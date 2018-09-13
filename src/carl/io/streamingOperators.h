@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <forward_list>
 #include <iostream>
 #include <list>
@@ -211,6 +212,33 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
 		os << it;
 	}
 	return os << "]";
+}
+
+namespace detail {
+	template<typename T>
+	struct stream_joined_impl {
+		std::string glue;
+		const T& values;
+	};
+	template<typename T>
+	std::ostream& operator<<(std::ostream& os, const stream_joined_impl<T>& sji) {
+		auto it = sji.values.begin();
+		if (it == sji.values.end()) return os;
+		os << *it;
+		for (++it; it != sji.values.end(); ++it) os << sji.glue << *it;
+		return os;
+	}
+}
+/**
+ * Allows to easily output some container with all elements separated by some string.
+ * Usage: `os << stream_joined(" ", container)`.
+ * @param glue The intermediate string.
+ * @param v The container to be printed.
+ * @return A temporary object that implements `operator<<()`.
+ */
+template<typename T>
+inline auto stream_joined(const std::string& glue, const T& v) {
+	return detail::stream_joined_impl<T>{glue, v};
 }
 
 }

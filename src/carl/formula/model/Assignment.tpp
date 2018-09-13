@@ -45,7 +45,7 @@ namespace carl
         }
         return result;
     }
-    
+
 	template<typename Rational, typename Poly>
     unsigned satisfies( const Model<Rational,Poly>& _assignment, const Formula<Poly>& _formula )
     {
@@ -63,7 +63,7 @@ namespace carl
         }
         return satisfies( _assignment, rationalAssigns, bvAssigns, _formula );
     }
-    
+
 	template<typename Rational, typename Poly>
     bool isPartOf( const std::map<Variable,Rational>& _assignment, const Model<Rational,Poly>& _model )
     {
@@ -73,7 +73,7 @@ namespace carl
         {
             if( modIter->first < assIter->first )
             {
-                ++assIter; 
+                ++assIter;
             }
             else if( assIter->first < modIter->first )
             {
@@ -82,12 +82,37 @@ namespace carl
             else
             {
                 ++assIter;
-                ++modIter;  
+                ++modIter;
             }
         }
         return assIter == _assignment.end();
     }
-    
+
+  template<typename Rational, typename Poly>
+    SortValue satisfiesUF( const Model<Rational,Poly>& _model, const UFInstance _ufi )
+    {
+      auto iter = _model.find( _ufi.uninterpretedFunction() );
+      if( iter == _model.end() )
+          return defaultSortValue(_ufi.uninterpretedFunction().codomain());
+      assert( iter->second.isUFModel() );
+      const UFModel& ufm = iter->second.asUFModel();
+      std::vector<SortValue> inst;
+      for( const carl::UTerm& arg : _ufi.args() )
+      {
+          if(arg.isUVariable()) {
+            auto iterB = _model.find( arg.asUVariable() );
+            if( iterB == _model.end() )
+                return defaultSortValue(_ufi.uninterpretedFunction().codomain());
+            assert( iterB->second.isSortValue() );
+            inst.push_back( iterB->second.asSortValue() );
+          } else if(arg.isUFInstance()) {
+            inst.push_back(satisfiesUF(_model, arg.asUFInstance()));
+          }
+      }
+      SortValue sv = ufm.get( inst );
+      return sv;
+    }
+
 	template<typename Rational, typename Poly>
     unsigned satisfies( const Model<Rational,Poly>& _model, const std::map<Variable,Rational>& _assignment, const std::map<carl::BVVariable, carl::BVTerm>& _bvAssigns, const Formula<Poly>& _formula )
     {
@@ -131,7 +156,7 @@ namespace carl
                         return 0;
                     default:
                         return 2;
-                }   
+                }
             }
             case carl::FormulaType::OR:
             {
@@ -252,9 +277,9 @@ namespace carl
                 std::size_t lhsResult = 0;
                 std::size_t rhsResult = 0;
                 // get sortvalue for lhs and rhs
-                if( eq.lhsIsUV() )
+                if( eq.lhs().isUVariable() )
                 {
-                    auto iter = _model.find( eq.lhsAsUV() );
+                    auto iter = _model.find( eq.lhs().asUVariable() );
                     if( iter == _model.end() )
                         return 2;
                     assert( iter->second.isSortValue() );
@@ -262,28 +287,14 @@ namespace carl
                 }
                 else
                 {
-                    auto iter = _model.find( eq.lhsAsUF().uninterpretedFunction() );
-                    if( iter == _model.end() )
-                        return 2;
-                    assert( iter->second.isUFModel() );
-                    const UFModel& ufm = iter->second.asUFModel();
-                    std::vector<SortValue> inst;
-                    for( const carl::UVariable& arg : eq.lhsAsUF().args() )
-                    {
-                        auto iterB = _model.find( arg() );
-                        if( iterB == _model.end() )
-                            return 2;
-                        assert( iterB->second.isSortValue() );
-                        inst.push_back( iterB->second.asSortValue() );
-                    }
-                    SortValue sv = ufm.get( inst );
+                    SortValue sv = satisfiesUF(_model, eq.lhs().asUFInstance());
                     if( sv == defaultSortValue( sv.sort() ) )
                         return 2;
                     lhsResult = sv.id();
                 }
-                if( eq.rhsIsUV() )
+                if( eq.rhs().isUVariable() )
                 {
-                    auto iter = _model.find( eq.rhsAsUV() );
+                    auto iter = _model.find( eq.rhs().asUVariable() );
                     if( iter == _model.end() )
                         return 2;
                     assert( iter->second.isSortValue() );
@@ -291,21 +302,7 @@ namespace carl
                 }
                 else
                 {
-                    auto iter = _model.find( eq.rhsAsUF().uninterpretedFunction() );
-                    if( iter == _model.end() )
-                        return 2;
-                    assert( iter->second.isUFModel() );
-                    const UFModel& ufm = iter->second.asUFModel();
-                    std::vector<SortValue> inst;
-                    for( const carl::UVariable& arg : eq.rhsAsUF().args() )
-                    {
-                        auto iterB = _model.find( arg() );
-                        if( iterB == _model.end() )
-                            return 2;
-                        assert( iterB->second.isSortValue() );
-                        inst.push_back( iterB->second.asSortValue() );
-                    }
-                    SortValue sv = ufm.get( inst );
+                    SortValue sv = satisfiesUF(_model, eq.rhs().asUFInstance());
                     if( sv == defaultSortValue( sv.sort() ) )
                         return 2;
                     rhsResult = sv.id();
@@ -321,13 +318,13 @@ namespace carl
             }
         }
     }
-    
+
 	template<typename Rational, typename Poly>
     void getDefaultModel( Model<Rational,Poly>& /*_defaultModel*/, const carl::UEquality& /*_constraint*/, bool /*_overwrite*/, size_t /*_seed*/ )
     {
         assert(false);
     }
-    
+
 	template<typename Rational, typename Poly>
     void getDefaultModel( Model<Rational,Poly>& _defaultModel, const carl::BVTerm& _bvTerm, bool _overwrite, size_t _seed )
     {
@@ -353,7 +350,7 @@ namespace carl
         else if( _bvTerm.type() == carl::BVTermType::EXTRACT )
             getDefaultModel( _defaultModel, _bvTerm.operand(), _overwrite, _seed );
     }
-    
+
 	template<typename Rational, typename Poly>
     void getDefaultModel( Model<Rational,Poly>& _defaultModel, const Constraint<Poly>& _constraint, bool /*_overwrite*/, size_t /*_seed*/ )
     {
@@ -370,7 +367,7 @@ namespace carl
             }
         }
     }
-    
+
 	template<typename Rational, typename Poly>
     void getDefaultModel( Model<Rational,Poly>& _defaultModel, const Formula<Poly>& _formula, bool _overwrite, size_t _seed )
     {
@@ -410,7 +407,7 @@ namespace carl
                     getDefaultModel(_defaultModel, subFormula, _overwrite, _seed);
         }
     }
-	
+
 	template<typename Rational, typename Poly>
 	Formula<Poly> representingFormula(const ModelVariable& mv, const Model<Rational,Poly>& model) {
 		auto it = model.find(mv);
@@ -442,4 +439,4 @@ namespace carl
 		assert(false);
 		return Formula<Poly>(FormulaType::FALSE);
 	}
-}    
+}

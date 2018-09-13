@@ -293,18 +293,6 @@ namespace carl
              */
             unsigned isConsistent() const;
             
-            /**
-             * Gives the string representation of this constraint.
-             * @param _unequalSwitch A switch to indicate which kind of unequal should be used.
-             *         For p != 0 with infix:  0: "p != 0", 1: "p <> 0", 2: "p /= 0"
-             *                    with prefix: 0: "(!= p 0)", 1: (or (< p 0) (> p 0)), 2: (not (= p 0))
-             * @param _infix An infix string which is printed right before the constraint.
-             * @param _friendlyVarNames A flag that indicates whether to print the variables with their internal representation (false)
-             *                           or with their dedicated names.
-             * @return The string representation of this constraint.
-             */
-            std::string toString( unsigned _unequalSwitch = 0, bool _infix = true, bool _friendlyVarNames = true ) const;
-            
     };
 	
 	/**
@@ -327,9 +315,8 @@ namespace carl
      * @return The given stream after printing.
      */
     template<typename P>
-    std::ostream& operator<<( std::ostream& _out, const ConstraintContent<P>& _cc )
-    {
-        return (_out << _cc.toString());
+    std::ostream& operator<<(std::ostream& os, const ConstraintContent<P>& cc) {
+		return os << cc.lhs() << " " << cc.relation() << " 0";
     }
 
     /**
@@ -739,21 +726,7 @@ namespace carl
             bool getSubstitution( Variable& _substitutionVariable, Pol& _substitutionTerm, bool _negated = false, const Variable& _exclude = carl::Variable::NO_VARIABLE ) const;
 			
 			bool getAssignment(Variable& _substitutionVariable, typename Pol::NumberType& _substitutionValue) const;
-            
-            /**
-             * Gives the string representation of this constraint.
-             * @param _unequalSwitch A switch to indicate which kind of unequal should be used.
-             *         For p != 0 with infix:  0: "p != 0", 1: "p <> 0", 2: "p /= 0"
-             *                    with prefix: 0: "(!= p 0)", 1: (or (< p 0) (> p 0)), 2: (not (= p 0))
-             * @param _infix An infix string which is printed right before the constraint.
-             * @param _friendlyVarNames A flag that indicates whether to print the variables with their internal representation (false)
-             *                           or with their dedicated names.
-             * @return The string representation of this constraint.
-             */
-            std::string toString( unsigned _unequalSwitch = 0, bool _infix = true, bool _friendlyVarNames = true ) const
-            {
-                return mpContent->toString( _unequalSwitch, _infix, _friendlyVarNames);
-            }
+
             /**
              * Determines whether the constraint is pseudo-boolean.
              *
@@ -1131,7 +1104,9 @@ namespace carl
      * @return The stream after printing the given constraint on it.
      */
     template<typename Poly>
-    std::ostream& operator<<( std::ostream& _out, const Constraint<Poly>& _constraint );
+    std::ostream& operator<<(std::ostream& os, const Constraint<Poly>& c) {
+		return os << c.lhs() << " " << c.relation() << " 0";
+	}
     
 }    // namespace carl
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "VariableComparison.h"
-#include "model/ran/RealAlgebraicNumber.h"
 #include "model/ModelValue.h"
 #include "../core/Relation.h"
 #include "../core/Variable.h"
@@ -18,8 +17,8 @@ namespace carl {
 	private:
 		Base mComparison;
 	public:	
-		VariableAssignment(Variable::Arg v, const RAN& value, bool negated = false): mComparison(v, value, Relation::EQ, negated) {}
-		VariableAssignment(Variable::Arg v, const Number& value, bool negated = false): mComparison(v, RAN(value), Relation::EQ, negated) {}
+		VariableAssignment(Variable v, const RAN& value, bool negated = false): mComparison(v, value, Relation::EQ, negated) {}
+		VariableAssignment(Variable v, const Number& value, bool negated = false): mComparison(v, RAN(value), Relation::EQ, negated) {}
 		
 		Variable var() const {
 			return mComparison.var();
@@ -28,6 +27,9 @@ namespace carl {
 			const auto& val = mComparison.value();
 			assert(boost::get<RAN>(&val) != nullptr);
 			return boost::get<RAN>(val);
+		}
+		const auto& baseValue() const {
+			return mComparison.value();
 		}
 		bool negated() const {
 			return mComparison.negated();
@@ -41,12 +43,6 @@ namespace carl {
 		void collectVariables(Variables& vars) const {
 			mComparison.collectVariables(vars);
 		}
-		
-		std::string toString(unsigned = 0, bool = false, bool = true) const {
-			std::stringstream ss;
-			ss << "(" << var() << (negated() ? " -!> " : " -> ") << value() << ")";
-			return ss.str();
-		}
 	};
 	
 	template<typename Poly>
@@ -59,7 +55,7 @@ namespace carl {
 	}
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableAssignment<Poly>& va) {
-		return os << va.toString();
+		return os << "(" << va.var() << (va.negated() ? " -!> " : " -> ") << va.baseValue() << ")";
 	}
 }
 

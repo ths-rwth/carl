@@ -77,7 +77,7 @@ TEST(RationalFunction, Construction)
 
 TEST(RationalFunction, Multiplication)
 {
-    carl::VariablePool::getInstance().clear();
+    //carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
@@ -96,7 +96,7 @@ TEST(RationalFunction, Multiplication)
     EXPECT_EQ(q1, r3.nominator());
     EXPECT_EQ(q2, r3.denominator());
 
-    Variable x = carl::VariablePool::getInstance().findVariableWithName("x");
+    Variable x = sp.variables().at("x");
     RFunc r4( x );
     r4 *= x;
     EXPECT_EQ(sp.parseMultivariatePolynomial<Rational>("x^2"), r4.nominator());
@@ -125,7 +125,7 @@ TEST(RationalFunction, Multiplication)
 
 
 //(1/4*PF)/((-1/4)*PF+1) * ((-1/4)*PF+1)/((-1/2)*PF+1)
-    carl::VariablePool::getInstance().clear();
+    //carl::VariablePool::getInstance().clear();
     Variable t = carl::freshRealVariable("t");
     Pol pf(t);
     Pol nomA( Rational(1)/Rational(4)*pf );
@@ -148,7 +148,7 @@ TEST(RationalFunction, Multiplication)
 
 TEST(RationalFunction, Division)
 {
-    carl::VariablePool::getInstance().clear();
+    //carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x"});
 
@@ -185,7 +185,7 @@ TEST(RationalFunction, Division)
 
 TEST(RationalFunction, Addition)
 {
-    carl::VariablePool::getInstance().clear();
+    //carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
@@ -218,7 +218,7 @@ TEST(RationalFunction, Addition)
 
 TEST(RationalFunction, Subtraction)
 {
-    carl::VariablePool::getInstance().clear();
+    //carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x"});
 
@@ -272,7 +272,7 @@ TEST(RationalFunction, Subtraction)
 
 TEST(RationalFunction, Hash)
 {
-    carl::VariablePool::getInstance().clear();
+    //carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x"});
 
@@ -289,7 +289,7 @@ TEST(RationalFunction, Hash)
 
 TEST(RationalFunction, Derivative)
 {
-	carl::VariablePool::getInstance().clear();
+	//carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
@@ -312,7 +312,7 @@ TEST(RationalFunction, Derivative)
 
 TEST(RationalFunction, Simplification)
 {
-    carl::VariablePool::getInstance().clear();
+    //carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y"});
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("2*x*y+(-2)*y+3");
@@ -344,7 +344,7 @@ TEST(RationalFunction, Simplification)
 
 TEST(RationalFunction, Evaluation)
 {
-    carl::VariablePool::getInstance().clear();
+    //carl::VariablePool::getInstance().clear();
     Variable x = freshRealVariable("x");
     Pol p1({Rational(3)*x});
     Pol p2(Rational(2));

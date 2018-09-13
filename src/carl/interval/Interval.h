@@ -27,6 +27,7 @@
 #include "../core/Variable.h"
 #include "../core/Sign.h"
 #include "../numbers/numbers.h"
+#include "../util/hash.h"
 #include "../util/platform.h"
 #include "../util/SFINAE.h"
 #include "BoundType.h"
@@ -35,7 +36,6 @@
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
 CLANG_WARNING_DISABLE("-Wunused-local-typedef")
-#include <boost/functional/hash.hpp>
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
 CLANG_WARNING_RESET
@@ -2168,8 +2168,7 @@ namespace carl
 
 }
 
-namespace std
-{
+namespace std {
 	/**
 	 * Specialization of `std::hash` for an interval.
 	 */
@@ -2180,16 +2179,11 @@ namespace std
 		 * @param interval An interval.
 		 * @return Hash of an interval.
 		 */
-		size_t operator()(const carl::Interval<Number>& interval) const
-        {
-        	size_t result = 0;
-        	boost::hash_combine(result, static_cast<size_t>(interval.lowerBoundType()));
-        	boost::hash_combine(result, static_cast<size_t>(interval.upperBoundType()));
-        	std::hash<Number> h;
-        	boost::hash_combine(result, h(interval.upper()));
-        	boost::hash_combine(result, h(interval.lower()));
-
-            return result;
+		std::size_t operator()(const carl::Interval<Number>& interval) const {
+			return carl::hash_all(
+				interval.lowerBoundType(), interval.upperBoundType(),
+				interval.lower(), interval.upper()
+			);
 		}
 	};
 } // namespace std

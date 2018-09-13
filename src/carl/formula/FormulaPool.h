@@ -21,15 +21,15 @@
 
 namespace carl
 {
-    
+
     template<typename Pol>
     class FormulaPool : public Singleton<FormulaPool<Pol>>
     {
         friend Singleton<FormulaPool>;
         friend Formula<Pol>;
-        
+
         private:
-            
+
             // Members:
             /// id allocator
             unsigned mIdAllocator;
@@ -45,7 +45,7 @@ namespace carl
             FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*> mTseitinVars;
             ///
             FastPointerMap<FormulaContent<Pol>,typename FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*>::iterator> mTseitinVarToFormula;
-            
+
             #ifdef THREAD_SAFE
             #define FORMULA_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock( mMutexPool );
             #define FORMULA_POOL_LOCK mMutexPool.lock();
@@ -55,17 +55,17 @@ namespace carl
             #define FORMULA_POOL_LOCK
             #define FORMULA_POOL_UNLOCK
             #endif
-            
+
         protected:
-            
+
             /**
              * Constructor of the formula pool.
              * @param _capacity Expected necessary capacity of the pool.
              */
             FormulaPool( unsigned _capacity = 10000 );
-            
+
             ~FormulaPool();
-    
+
             const FormulaContent<Pol>* trueFormula() const
             {
                 return mpTrue;
@@ -75,12 +75,12 @@ namespace carl
             {
                 return mpFalse;
             }
-            
+
         public:
             std::size_t size() const {
                 return mPool.size();
             }
-            
+
             void print() const
             {
                 std::cout << "Formula pool contains:" << std::endl;
@@ -107,7 +107,7 @@ namespace carl
                 }
                 std::cout << std::endl;
             }
-            
+
             Formula<Pol> getTseitinVar( const Formula<Pol>& _formula )
             {
                 auto iter = mTseitinVars.find( _formula.mpContent );
@@ -117,7 +117,7 @@ namespace carl
                 }
                 return trueFormula();
             }
-            
+
             Formula<Pol> createTseitinVar( const Formula<Pol>& _formula )
             {
                 auto iter = mTseitinVars.insert( std::make_pair( _formula.mpContent, nullptr ) );
@@ -130,7 +130,7 @@ namespace carl
                 }
                 return Formula<Pol>( iter.first->second );
             }
-            
+
         private:
 			bool isBaseFormula(const Constraint<Pol>& c) const {
 				return c < c.negation();
@@ -244,7 +244,7 @@ namespace carl
             const FormulaContent<Pol>* create(Variable::Arg _variable) {
                 return add(new FormulaContent<Pol>(_variable));
             }
-            
+
             /**
              * @param _constraint The constraint wrapped by this formula.
              * @return A formula with wrapping the given constraint.
@@ -288,7 +288,7 @@ namespace carl
             const FormulaContent<Pol>* create(const VariableAssignment<Pol>& _variableAssignment) {
 				return create(std::move(VariableAssignment<Pol>(_variableAssignment)));
             }
-            
+
             const FormulaContent<Pol>* create(BVConstraint&& _constraint) {
                 #ifdef SIMPLIFY_FORMULA
                 if (_constraint.isAlwaysConsistent()) return trueFormula();
@@ -302,8 +302,8 @@ namespace carl
 			const FormulaContent<Pol>* create(const PBConstraint<Pol>& _constraint) {
                 return create(std::move(PBConstraint<Pol>(_constraint)));
             }
-            
-            
+
+
             /**
              * Create formula representing a unary function.
              * @param _type Formula type specifying the function.
@@ -346,7 +346,7 @@ namespace carl
                 }
                 return nullptr;
             }
-            
+
             /**
              * Create formula representing a nary function.
              * @param _type Formula type specifying the function.
@@ -393,18 +393,18 @@ namespace carl
                 }
                 return nullptr;
             }
-    
+
             /**
              * Create formula representing an implication.
              * @param _subformulas
-             * @return 
+             * @return
              */
             const FormulaContent<Pol>* createImplication(Formulas<Pol>&& _subformulas);
-            
+
             const FormulaContent<Pol>* createNAry(FormulaType _type, Formulas<Pol>&& _subformulas);
 
             const FormulaContent<Pol>* createITE(Formulas<Pol>&& _subformulas);
-            
+
 			/**
 			 *
 			 * @param _type
@@ -420,7 +420,7 @@ namespace carl
 					return add( new FormulaContent<Pol>(_type, std::move(_vars), _term ) );
 				}
 			}
-            
+
             /**
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.
@@ -460,36 +460,36 @@ namespace carl
                 }
                 return create( FormulaType::XOR, std::move( subFormulas ) );
             }
-            
-			const FormulaContent<Pol>* create( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated )
+
+			const FormulaContent<Pol>* create( const UTerm& _lhs, const UTerm& _rhs, bool _negated )
 			{
                 #ifdef SIMPLIFY_FORMULA
-                if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
+                if(_lhs.isUVariable() && _rhs.isUVariable())
                 {
-                    if( boost::get<UVariable>(_lhs) < boost::get<UVariable>(_rhs) )
-                        return add( new FormulaContent<Pol>( UEquality( boost::get<UVariable>(_lhs), boost::get<UVariable>(_rhs), _negated, true ) ) );
-                    if( boost::get<UVariable>(_rhs) < boost::get<UVariable>(_lhs) )
-                        return add( new FormulaContent<Pol>( UEquality( boost::get<UVariable>(_rhs), boost::get<UVariable>(_lhs), _negated, true ) ) );
+                    if( _lhs.asUVariable() < _rhs.asUVariable() )
+                        return add( new FormulaContent<Pol>( UEquality( _lhs.asUVariable(), _rhs.asUVariable(), _negated, true ) ) );
+                    if( _rhs.asUVariable() < _lhs.asUVariable() )
+                        return add( new FormulaContent<Pol>( UEquality( _rhs.asUVariable(), _lhs.asUVariable(), _negated, true ) ) );
                     else if( _negated )
                         return falseFormula();
                     else
                         return trueFormula();
                 }
-				else if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) )
+		            else if( _lhs.isUVariable() && _rhs.isUFInstance() )
                 {
-                    return add( new FormulaContent<Pol>( UEquality( boost::get<UVariable>(_lhs), boost::get<UFInstance>(_rhs), _negated ) ) );
+                    return add( new FormulaContent<Pol>( UEquality( _lhs.asUVariable(), _rhs.asUFInstance(), _negated ) ) );
                 }
-                else if( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
+                else if( _lhs.isUFInstance() && _rhs.isUVariable() )
                 {
-                    return add( new FormulaContent<Pol>( UEquality( boost::get<UVariable>(_rhs), boost::get<UFInstance>(_lhs), _negated ) ) );
+                    return add( new FormulaContent<Pol>( UEquality( _rhs.asUVariable(), _lhs.asUFInstance(), _negated ) ) );
                 }
                 else
                 {
-                    assert( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) );
-                    if( boost::get<UFInstance>(_lhs) < boost::get<UFInstance>(_rhs) )
-                        return add( new FormulaContent<Pol>( UEquality( boost::get<UFInstance>(_lhs), boost::get<UFInstance>(_rhs), _negated, true ) ) );
-                    if( boost::get<UFInstance>(_rhs) < boost::get<UFInstance>(_lhs) )
-                        return add( new FormulaContent<Pol>( UEquality( boost::get<UFInstance>(_rhs), boost::get<UFInstance>(_lhs), _negated, true ) ) );
+                    assert( _lhs.isUFInstance() && _rhs.isUFInstance() );
+                    if( _lhs.asUFInstance() < _rhs.asUFInstance() )
+                        return add( new FormulaContent<Pol>( UEquality( _lhs.asUFInstance(), _rhs.asUFInstance(), _negated, true ) ) );
+                    if( _rhs.asUFInstance() < _lhs.asUFInstance() )
+                        return add( new FormulaContent<Pol>( UEquality( _rhs.asUFInstance(), _lhs.asUFInstance(), _negated, true ) ) );
                     else if( _negated )
                         return falseFormula();
                     else
@@ -504,12 +504,12 @@ namespace carl
 			{
 				return add( new FormulaContent<Pol>( std::move( eq ) ) );
 			}
-			
+
 			const FormulaContent<Pol>* create( PBConstraint<Pol>&& pbc )
 			{
 				return add( new FormulaContent<Pol>( std::move( pbc ) ) );
 			}
-            
+
             void free( const FormulaContent<Pol>* _elem )
             {
                 FORMULA_POOL_LOCK_GUARD
@@ -537,7 +537,7 @@ namespace carl
                     }
                 }
             }
-            
+
             bool freeTseitinVariable( const FormulaContent<Pol>* _toDelete )
             {
                 bool stillStoredAsTseitinVariable = false;
@@ -585,7 +585,7 @@ namespace carl
                 }
                 return stillStoredAsTseitinVariable;
             }
-            
+
             void reg( const FormulaContent<Pol>* _elem ) const
             {
                 FORMULA_POOL_LOCK_GUARD
@@ -600,7 +600,7 @@ namespace carl
                 }
 				CARL_LOG_TRACE("carl.formula", "Increased usage of " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << "(based on " << static_cast<const void*>(_elem) << ")" << " to " << tmp->mUsages);
             }
-            
+
         public:
             template<typename ArgType>
             void forallDo( void (*_func)( ArgType*, const Formula<Pol>& ), ArgType* _arg ) const
@@ -615,7 +615,7 @@ namespace carl
                     }
                 }
             }
-            
+
             template<typename ReturnType, typename ArgType>
             std::map<const Formula<Pol>,ReturnType> forallDo( ReturnType (*_func)( ArgType*, const Formula<Pol>& ), ArgType* _arg ) const
             {
@@ -633,24 +633,24 @@ namespace carl
                 }
                 return result;
             }
-            
+
             /**
              */
             bool formulasInverse( const Formula<Pol>& _subformulaA, const Formula<Pol>& _subformulaB );
-        
+
             /**
              * @param _type The type of the n-ary operator (n>1) of the formula to create.
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              * Note, that if you use this method to create a formula with the operator XOR
              * and you have collected the sub-formulas in a set, multiple occurrences of a
-             * sub-formula are condensed. You should only use it, if you can exlcude this 
+             * sub-formula are condensed. You should only use it, if you can exlcude this
              * possibility. Otherwise use the method newExclusiveDisjunction.
              */
             //const FormulaContent<Pol>* create( FormulaType _type, Formulas<Pol>&& _subformulas );
-            
+
     private:
-            
+
             /**
              * Inserts the given formula to the pool, if it does not yet occur in there.
              * @param _formula The formula to add to the pool.
@@ -658,7 +658,7 @@ namespace carl
              *         The position of the equivalent formula in the pool and false, otherwise.
              */
             std::pair<typename FastPointerSet<FormulaContent<Pol>>::iterator,bool> insert( FormulaContent<Pol>* _formula );
-            
+
             /**
              * Adds the given formula to the pool, if it does not yet occur in there.
              * Note, that this method uses the allocator which is locked before calling.
