@@ -216,7 +216,7 @@ public:
 	 */
 	std::vector<Poly> irreducibles(const Poly& p) const {
 		std::vector<Poly> res;
-		auto finfo = CoCoA::factor(convert(p));
+		auto finfo = cocoawrapper::factor(convert(p));
 		if (!CoCoA::IsOne(finfo.myRemainingFactor()))
 			res.emplace_back(convert(finfo.myRemainingFactor()));
 		auto cocoaFactors = finfo.myFactors();
