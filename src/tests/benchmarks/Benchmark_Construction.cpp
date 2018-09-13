@@ -76,7 +76,7 @@ namespace carl {
 		type operator()() const {
 			auto p1 = g.newMP<C>();
 			auto p2(p1);
-			std::random_shuffle(p1.getTerms().begin(), p1.getTerms().end());
+			std::shuffle(p1.getTerms().begin(), p1.getTerms().end(), std::mt19937(std::random_device()()));
 			p1.makeMinimallyOrdered();
 			return std::make_tuple(p1, p2);
 		}
