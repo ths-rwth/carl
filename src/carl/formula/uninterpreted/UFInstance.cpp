@@ -36,13 +36,11 @@ namespace carl
 		);
 	}
 
-    std::string UFInstance::toString(bool infix) const {
-        std::stringstream ss;
-        UFInstanceManager::getInstance().print(ss, *this, infix);
-        return ss.str();
-    }
-
-    std::ostream& operator<<(std::ostream& os, const UFInstance& ufun) {
-        return UFInstanceManager::getInstance().print(os, ufun);
-    }
+	std::ostream& operator<<(std::ostream& os, const UFInstance& ufun) {
+		assert(ufun.id() != 0);
+		os << ufun.uninterpretedFunction().name() << "(";
+		os << carl::stream_joined(", ", ufun.args());
+		os << ")";
+		return os;
+	}
 }

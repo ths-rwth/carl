@@ -198,16 +198,6 @@ class UFInstanceManager : public Singleton<UFInstanceManager> {
         }
 
         /**
-         * Prints the given uninterpreted function instance on the given output stream.
-         * @param out The output stream to print the given uninterpreted function instance on.
-         * @param ufi The uninterpreted function instance to print.
-    		 * @param infix If infix notation shall be used.
-    		 * @param friendlyNames Whether to use the friendly names for printing.
-         * @return The output stream after printing the given uninterpreted function instance on it.
-         */ 
-        std::ostream& print(std::ostream& out, const UFInstance& ufi, bool infix = false) const;
-
-        /**
          * Gets the uninterpreted function instance with the given name, domain, arguments and codomain.
          * @param uf The underlying function of the uninterpreted function instance to get.
          * @param args The arguments of the uninterpreted function instance to get.
