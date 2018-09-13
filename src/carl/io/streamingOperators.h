@@ -223,7 +223,7 @@ namespace detail {
 	template<typename T>
 	std::ostream& operator<<(std::ostream& os, const stream_joined_impl<T>& sji) {
 		auto it = sji.values.begin();
-		assert(it != sji.values.end());
+		if (it == sji.values.end()) return os;
 		os << *it;
 		for (++it; it != sji.values.end(); ++it) os << sji.glue << *it;
 		return os;
