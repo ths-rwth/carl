@@ -219,14 +219,6 @@ class UFManager : public Singleton<UFManager> {
         }
 
         /**
-         * Prints the given uninterpreted function on the given output stream.
-         * @param out The output stream to print the given uninterpreted function on.
-         * @param  uf The uninterpreted function to print.
-         * @return The output stream after printing the given uninterpreted function on it.
-         */ 
-        std::ostream& print(std::ostream& out, const UninterpretedFunction& uf) const;
-
-        /**
          * Gets the uninterpreted function with the given name, domain, arguments and codomain.
          * @param name The name of the uninterpreted function of the uninterpreted function to get.
          * @param domain The domain of the uninterpreted function of the uninterpreted function to get.

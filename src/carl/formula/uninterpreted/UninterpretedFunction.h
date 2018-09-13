@@ -9,6 +9,7 @@
 
 #include "../../util/hash.h"
 #include "../Sort.h"
+#include "../../io/streamingOperators.h"
 
 #include <iostream>
 #include <utility>
@@ -63,31 +64,37 @@ namespace carl
 			 * @return The codomain of this uninterpreted function.
 			 */
 			const Sort& codomain() const;
-
-			/**
-			 * @param ufun The uninterpreted function to compare with.
-			 * @return true, if this and the given uninterpreted function are equal.
-			 */
-			bool operator==(const UninterpretedFunction& ufun) const {
-				return mId == ufun.id();
-			}
-
-			/**
-			 * @param ufun The uninterpreted function to compare with.
-			 * @return true, if this uninterpreted function is less than the given one.
-			 */
-			bool operator<(const UninterpretedFunction& ufun) const {
-				return mId < ufun.id();
-			}
-
-			/**
-			 * Prints the given uninterpreted function on the given output stream.
-			 * @param os The output stream to print on.
-			 * @param ufun The uninterpreted function to print.
-			 * @return The output stream after printing the given uninterpreted function on it.
-			 */
-			friend std::ostream& operator<<(std::ostream& os, const UninterpretedFunction& ufun);
 	};
+
+
+	/**
+	 * @param ufun The uninterpreted function to compare with.
+	 * @return true, if this and the given uninterpreted function are equal.
+	 */
+	inline bool operator==(const UninterpretedFunction& lhs, const UninterpretedFunction& rhs) {
+		return lhs.id() == rhs.id();
+	}
+
+	/**
+	 * @param ufun The uninterpreted function to compare with.
+	 * @return true, if this uninterpreted function is less than the given one.
+	 */
+	inline bool operator<(const UninterpretedFunction& lhs, const UninterpretedFunction& rhs) {
+		return lhs.id() < rhs.id();
+	}
+
+	/**
+	 * Prints the given uninterpreted function on the given output stream.
+	 * @param os The output stream to print on.
+	 * @param ufun The uninterpreted function to print.
+	 * @return The output stream after printing the given uninterpreted function on it.
+	 */
+	inline std::ostream& operator<<(std::ostream& os, const UninterpretedFunction& ufun) {
+		os << ufun.name() << "(";
+		os << carl::stream_joined(", ", ufun.domain());
+		os << ") " << ufun.codomain();
+		return os;
+	}
 } // end namespace carl
 
 

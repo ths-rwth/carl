@@ -9,22 +9,6 @@
 #include <string>
 
 namespace carl {
-	std::ostream& UFManager::print(std::ostream& out, const UninterpretedFunction& uf) const {
-		assert(uf.id() != 0);
-		assert(uf.id() < mUFs.size());
-		const UFContent& ufc = *mUFs[uf.id()];
-		out << ufc.name() << "(";
-		bool first = true;
-		for (const auto& dom: ufc.domain()) {
-			if (first) {
-				out << " ";
-				first = false;
-			}
-			out << dom;
-		}
-		out << ") " << ufc.codomain();
-		return out;
-	}
 
 	UninterpretedFunction UFManager::newUF(const UFContent* ufc) {
 		auto iter = mUFIdMap.find(ufc);
