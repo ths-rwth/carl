@@ -1,12 +1,14 @@
+include(apple-llvm-toolchain)
+
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # Matches "Clang" and "AppleClang"
-	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5)
-		message(FATAL_ERROR " clang version must be at least 5!")
-	endif()
 	if (APPLE)
 		message(STATUS "Using clang ${CMAKE_CXX_COMPILER_VERSION} on apple")
-        set(CMAKE_MACOSX_RPATH 1)
+		set(CMAKE_MACOSX_RPATH 1)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -stdlib=libc++ -pthread")
 	else()
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5)
+			message(FATAL_ERROR " clang version must be at least 5!")
+		endif()
 		message(STATUS "Using clang ${CMAKE_CXX_COMPILER_VERSION}")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -pthread")
 	endif()
