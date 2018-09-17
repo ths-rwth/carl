@@ -218,8 +218,11 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	for (const auto& i: m) {
 		if (!tmp.has(i.first)) {
 			if (p.has(i.first)) {
-				// Variable vanished, add it to varToInterval
-				varToInterval[i.first] = i.second.getInterval();
+				CARL_LOG_DEBUG("carl.ran", i.first << " vanished from " << tmp << " but was present in " << p);
+				if (i.second.isInterval()) {
+					// Variable vanished, add it to varToInterval
+					varToInterval[i.first] = i.second.getInterval();
+				}
 			}
 			continue;
 		}
