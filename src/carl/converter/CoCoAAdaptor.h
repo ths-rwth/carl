@@ -144,6 +144,7 @@ public:
 		mSymbolBack(vars),
 		mRing(CoCoA::NewPolyRing(mQ, long(mSymbolBack.size())))
 	{
+		std::sort(mSymbolBack.begin(), mSymbolBack.end());
 		auto indets = CoCoA::indets(mRing);
 
 		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
@@ -161,6 +162,7 @@ public:
 		assert(ordering.size() == mSymbolBack.size());
 		assert(ordering.size() == mSymbolThere.size());
 		mSymbolBack = ordering;
+		std::sort(mSymbolBack.begin(), mSymbolBack.end());
 
 		auto indets = CoCoA::indets(mRing);
 		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
