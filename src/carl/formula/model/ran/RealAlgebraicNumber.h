@@ -50,6 +50,7 @@ inline std::ostream& operator<<(std::ostream& os, RANSampleHeuristic sh) {
 		case RANSampleHeuristic::RightInt: return os << "RightInt";
 		case RANSampleHeuristic::ZeroInt: return os << "ZeroInt";
 		case RANSampleHeuristic::InftyInt: return os << "InftyInt";
+		default: return os << "Invalid sample heuristic (" << static_cast<std::underlying_type<RANSampleHeuristic>::type>(sh) << ")";
 	}
 }
 
