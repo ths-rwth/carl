@@ -879,13 +879,10 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
-	FactorMap<Coefficient> factorization() const;
-
 	template<typename Integer>
 	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& poly, FactorMap<Coefficient>& linearFactors, const Integer& maxInt = 0 );
 
 	Coefficient syntheticDivision(const Coefficient& zeroOfDivisor);
-	std::map<uint, UnivariatePolynomial> squareFreeFactorization() const;
 
 	/**
 	 * Checks if zero is a real root of this polynomial.
