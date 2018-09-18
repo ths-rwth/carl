@@ -717,26 +717,6 @@ public:
 	 */
 	UnivariatePolynomial pow(std::size_t exp) const;
 
-	/**
-	 * Calculates the greatest common divisor of two polynomials.
-	 * @param a First polynomial.
-	 * @param b Second polynomial.
-	 * @return `gcd(a,b)`
-	 */
-	static UnivariatePolynomial gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
-	/**
-	 * Calculates the extended greatest common divisor `g` of two polynomials.
-	 * The output polynomials `s` and `t` are computed such that \f$g = s \cdot a + t \cdot b\f$.
-	 * @param a First polynomial.
-	 * @param b Second polynomial.
-	 * @param s First output polynomial.
-	 * @param t Second output polynomial.
-	 * @see @cite GCL92, Algorithm 2.2
-	 * @return `gcd(a,b)`
-	 */
-	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
-											 UnivariatePolynomial& s, UnivariatePolynomial& t);
-	
 	Coefficient evaluate(const Coefficient& value) const;
 	
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -1194,7 +1174,7 @@ private:
 	 * @return 
 	 */
 	UnivariatePolynomial remainder_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
-	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
+	
 	void stripLeadingZeroes() 
 	{
 		while(!isZero() && lcoeff() == Coefficient(0))

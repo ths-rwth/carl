@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "carl/core/polynomialfunctions/Resultant.h"
+#include "carl/core/polynomialfunctions/GCD.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 
@@ -90,27 +91,27 @@ TEST(UnivariatePolynomial, GCD)
 
 	UnivariatePolynomial<Rational> v(x, {(Rational)1, (Rational)1});
     UnivariatePolynomial<Rational> p(x, {(Rational)6, (Rational)7,(Rational)1});
-	UnivariatePolynomial<Rational> g = UnivariatePolynomial<Rational>::extended_gcd(p,v,s,t);
+	UnivariatePolynomial<Rational> g = carl::extended_gcd(p,v,s,t);
 	EXPECT_EQ(v,g);
 	EXPECT_EQ((Rational)0,s);
 	EXPECT_EQ((Rational)1,t);
-    g = UnivariatePolynomial<Rational>::extended_gcd(v,p,s,t);
+    g = carl::extended_gcd(v,p,s,t);
 	EXPECT_EQ(v,g);
 	EXPECT_EQ((Rational)1,s);
 	EXPECT_EQ((Rational)0,t);
-	g = UnivariatePolynomial<Rational>::gcd(v,p);
+	g = carl::gcd(v,p);
 	EXPECT_EQ(v,g);
-	g = UnivariatePolynomial<Rational>::gcd(p,v);
+	g = carl::gcd(p,v);
 	EXPECT_EQ(v,g);
 
 
     UnivariatePolynomial<Rational> q(x, {(Rational)-6, (Rational)-5,(Rational)1});
     //std::cout << "gcd" << UnivariatePolynomial<Rational>::gcd(p,q) << std::endl;
-    g = UnivariatePolynomial<Rational>::extended_gcd(p,q,s,t);
+    g = carl::extended_gcd(p,q,s,t);
     EXPECT_EQ(v,g);
 	EXPECT_EQ((Rational)1/(Rational)12,s);
     EXPECT_EQ((Rational)-1/(Rational)12,t);
-	g = UnivariatePolynomial<Rational>::gcd(p,q);
+	g = carl::gcd(p,q);
 	EXPECT_EQ(v,g);
 }
 
@@ -127,16 +128,16 @@ TYPED_TEST(UnivariatePolynomialIntTest, GCD)
 	UnivariatePolynomial<GFNumber<TypeParam>> a2 = A2.toFiniteDomain(gf5);
 	UnivariatePolynomial<GFNumber<TypeParam>> s1(x);
 	UnivariatePolynomial<GFNumber<TypeParam>> t1(x);
-    UnivariatePolynomial<GFNumber<TypeParam>> gp = UnivariatePolynomial<GFNumber<TypeParam>>::extended_gcd(a1,a2,s1,t1);
+    UnivariatePolynomial<GFNumber<TypeParam>> gp = carl::extended_gcd(a1,a2,s1,t1);
 	std::cout << t1 << std::endl;
 	std::cout << s1 << std::endl;
 	std::cout << gp << std::endl;
 
     UnivariatePolynomial<Rational> pola(x, {(Rational)-2, (Rational)5, (Rational)-5, (Rational)3});
 	UnivariatePolynomial<Rational> polb(x, {(Rational)5, (Rational)-10, (Rational)9});
-	UnivariatePolynomial<Rational> g = UnivariatePolynomial<Rational>::extended_gcd(pola,polb,s,t);
+	UnivariatePolynomial<Rational> g = carl::extended_gcd(pola,polb,s,t);
 	std::cout << g << std::endl;
-	g = UnivariatePolynomial<Rational>::gcd(pola,polb);
+	g = carl::gcd(pola,polb);
 	std::cout << g << std::endl;
 }
 

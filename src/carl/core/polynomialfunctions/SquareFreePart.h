@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GCD.h"
+
 #include "../../converter/CoCoAAdaptor.h"
 #include "../../numbers/FunctionSelector.h"
 #include "../logging.h"
@@ -45,7 +47,7 @@ UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p)
 	if (p.isZero()) return p;
 	if (p.isLinearInMainVar()) return p;
 	UnivariatePolynomial<Coeff> normalized = p.coprimeCoefficients().template convert<Coeff>();
-	return normalized.divideBy(UnivariatePolynomial<Coeff>::gcd(normalized, normalized.derivative())).quotient;
+	return normalized.divideBy(carl::gcd(normalized, normalized.derivative())).quotient;
 }
 
 template<typename Coeff, DisableIf<is_subset_of_rationals<Coeff>> = dummy>
