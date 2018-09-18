@@ -196,11 +196,11 @@ public:
 	 * @return A map whose keys are the irreducible factors and whose values are
 	 * the exponents.
 	 */
-	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
+	Factors<Poly> factorize(const Poly& p, bool includeConstant = true) const {
 		auto start = CARL_TIME_START();
 		auto finfo = cocoawrapper::factor(convert(p));
 		Factors<Poly> res;
-		if (includeConstants && !CoCoA::IsOne(finfo.myRemainingFactor())) {
+		if (includeConstant && !CoCoA::IsOne(finfo.myRemainingFactor())) {
 			res.emplace(convert(finfo.myRemainingFactor()), 1);
 		}
 		for (std::size_t i = 0; i < finfo.myFactors().size(); ++i) {
@@ -214,16 +214,12 @@ public:
 	 * Break down a polynomial into its unique, irreducible factors
 	 * without their exponents/multiplicities.
 	 * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
-	 * factors "(x+1)", "(x+2)", and a constant factor "3" that is included.
+	 * factors "(x+1)", "(x+2)", and a constant factor "3" that is included if includeConstant is true.
 	 */
-	std::vector<Poly> irreducibles(const Poly& p) const {
+	std::vector<Poly> irreducibleFactors(const Poly& p, bool includeConstant = true) const {
 		std::vector<Poly> res;
-		auto finfo = cocoawrapper::factor(convert(p));
-		if (!CoCoA::IsOne(finfo.myRemainingFactor()))
-			res.emplace_back(convert(finfo.myRemainingFactor()));
-		auto cocoaFactors = finfo.myFactors();
-		for (const auto& f: cocoaFactors) {
-			res.emplace_back(convert(f));
+		for (auto& f: factorize(p, includeConstant)) {
+			res.emplace_back(std::move(f.first));
 		}
 		return res;
 	}
@@ -234,6 +230,7 @@ public:
 	 * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
 	 * factors "(x+1)", "(x+2)", and a constant factor "3" that is omited.
 	 */
+	[[deprecated("Use irreducibleFactors() instead")]]
 	std::vector<Poly> nonConstIrreducibles(const Poly& p) const {
 		std::vector<Poly> res;
 		auto cocoaFactors = cocoawrapper::factor(convert(p)).myFactors();
@@ -249,7 +246,7 @@ public:
    * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
    * factors "(x+1)", "(x+2)", and a constant factor "3" that is omited.
    */
-  [[deprecated("Use irreducibles or nonConstIrreducibles instead")]]
+  [[deprecated("Use irreducibleFactors() instead")]]
   std::vector<Poly> irreducibleFactorsOf(const Poly& p) const {
     return nonConstIrreducibles(p);
   }
