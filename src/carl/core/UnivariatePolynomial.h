@@ -957,32 +957,6 @@ public:
 	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
 	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
 
-
-	/**
-	 * Implements subresultants algorithm with optimizations described in @cite Ducos00 .
-	 * @param p First polynomial.
-	 * @param q First polynomial.
-	 * @param strategy Strategy.
-	 * @return Subresultants of p and q.
-	 */
-	[[deprecated("use carl::subresultants() instead")]]
-	static std::list<UnivariatePolynomial> subresultants(
-			const UnivariatePolynomial& p,
-			const UnivariatePolynomial& q,
-			SubresultantStrategy strategy = SubresultantStrategy::Default
-	) {
-		return carl::subresultants(p, q, strategy);
-	}
-
-	[[deprecated("use carl::principalSubresultantsCoefficients() instead")]]
-	static const std::vector<UnivariatePolynomial> principalSubresultantsCoefficients(
-			const UnivariatePolynomial& p,
-			const UnivariatePolynomial& q,
-			SubresultantStrategy strategy = SubresultantStrategy::Default
-	) {
-		return carl::principalSubresultantsCoefficients(p, q, strategy);
-	}
-
 	[[deprecated("use carl::resultant() instead")]]
 	UnivariatePolynomial<Coefficient> resultant(
 			const UnivariatePolynomial<Coefficient>& p,
