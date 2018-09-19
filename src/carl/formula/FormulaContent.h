@@ -50,10 +50,7 @@ namespace carl {
 		BITVECTOR,
 		
 		// Uninterpreted Theory
-		UEQ,
-		
-		// Pseudoboolean
-		PBCONSTRAINT
+		UEQ
     };
 	
 	
@@ -81,7 +78,6 @@ namespace carl {
 			case FormulaType::VARASSIGN: return "varassign";
 			case FormulaType::BITVECTOR: return "bv";
 			case FormulaType::UEQ: return "ueq";
-			case FormulaType::PBCONSTRAINT: return "pbconstraint";
 			default:
 				CARL_LOG_ERROR("carl.formula", "Unknown formula type " << unsigned(_type));
 				return "???";
@@ -182,8 +178,6 @@ namespace carl {
                 BVConstraint* mpBVConstraintVS;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
                 UEquality* mpUIEqualityVS;
-				/// The pseudoboolean constraint.
-				PBConstraint<Pol>* mpPBConstraintVS;
                 /// The only sub-formula, in case this formula is an negation.
                 Formula<Pol>* mpSubformulaVS;
                 /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
@@ -207,8 +201,6 @@ namespace carl {
 				BVConstraint mBVConstraint;
 				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
 				UEquality mUIEquality;
-				/// The pseudoboolean constraint.
-				PBConstraint<Pol> mPBConstraint;
 				/// The only sub-formula, in case this formula is an negation.
 				Formula<Pol> mSubformula;
 				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
@@ -272,12 +264,6 @@ namespace carl {
              * @param _ueq The pointer to the constraint.
              */
             FormulaContent(UEquality&& _ueq);
-			
-			/**
-             * Constructs a formula being an pseudoboolean constraint.
-             * @param _pbc The pointer to the constraint.
-             */
-            FormulaContent(PBConstraint<Pol>&& _pbc);
 
             /**
              * Constructs a formula of the given type with a single subformula. This is usually a negation.
@@ -356,7 +342,6 @@ namespace carl {
 					case FormulaType::VARASSIGN: { mVariableAssignment.~VariableAssignment(); break; }
 					case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
 					case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
-					case FormulaType::PBCONSTRAINT: { mPBConstraint.~PBConstraint(); break; }
 #endif
                 }
 
@@ -391,7 +376,6 @@ namespace carl {
 					case FormulaType::VARASSIGN: return false;
                     case FormulaType::BITVECTOR: return false;
                     case FormulaType::UEQ: return false;
-					case FormulaType::PBCONSTRAINT: return false;
                 }
                 return false;
             }
@@ -422,8 +406,6 @@ namespace carl {
 				return os << f.mBVConstraint;
 			case FormulaType::UEQ:
 				return os << f.mUIEquality;
-			case FormulaType::PBCONSTRAINT:
-				return os << f.mPBConstraint;
 			case FormulaType::NOT:
 				return os << "!(" << f.mSubformula << ")";
 			case FormulaType::EXISTS:

@@ -102,13 +102,6 @@ namespace carl
                     uequality().collectUVariables(*_ueVars);
                 }
                 break;
-			case FormulaType::PBCONSTRAINT:
-				if (_booleanVars) {
-					for (auto var: pbConstraint().gatherVariables()) {
-						_vars.insert(var);
-					}
-				}
-				break;
             case FormulaType::NOT:
                 subformula().collectVariables_( _vars, _bvVars, _ueVars, _booleanVars, _realVars, _integerVars, _uninterpretedVars, _bitvectorVars );
                 break;
@@ -300,11 +293,6 @@ namespace carl
             case FormulaType::UEQ:
             {
                 _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_UNINTERPRETED_EQUATIONS;
-                break;
-            }
-            case FormulaType::PBCONSTRAINT:
-            {
-                _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_PSEUDOBOOLEAN;
                 break;
             }
             default:
@@ -1784,7 +1772,6 @@ namespace carl
 		case TRUE:
 		case FALSE:
 		case UEQ:
-		case PBCONSTRAINT:
 			break;
 		case EXISTS:
 		case FORALL: {
@@ -1847,7 +1834,6 @@ namespace carl
 		case TRUE:
 		case FALSE:
 		case UEQ:
-		case PBCONSTRAINT:
 			break;
 		case EXISTS:
 		case FORALL: {

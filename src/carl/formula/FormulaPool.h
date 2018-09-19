@@ -299,9 +299,6 @@ namespace carl
             const FormulaContent<Pol>* create(const BVConstraint& _constraint) {
                 return create(std::move(BVConstraint(_constraint)));
             }
-			const FormulaContent<Pol>* create(const PBConstraint<Pol>& _constraint) {
-                return create(std::move(PBConstraint<Pol>(_constraint)));
-            }
 
 
             /**
@@ -341,7 +338,6 @@ namespace carl
                         assert(false); break;
                     case BITVECTOR:
                     case UEQ:
-					case PBCONSTRAINT:
                         assert(false); break;
                 }
                 return nullptr;
@@ -387,8 +383,6 @@ namespace carl
                     case BITVECTOR:
                     // Uninterpreted Theory
                     case UEQ:
-					// Pseudoboolean
-					case PBCONSTRAINT:
                         assert(false); break;
                 }
                 return nullptr;
@@ -503,11 +497,6 @@ namespace carl
 			const FormulaContent<Pol>* create( UEquality&& eq )
 			{
 				return add( new FormulaContent<Pol>( std::move( eq ) ) );
-			}
-
-			const FormulaContent<Pol>* create( PBConstraint<Pol>&& pbc )
-			{
-				return add( new FormulaContent<Pol>( std::move( pbc ) ) );
 			}
 
             void free( const FormulaContent<Pol>* _elem )

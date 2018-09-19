@@ -20,7 +20,6 @@
 #include "uninterpreted/UFManager.h"
 #include "bitvector/BVConstraintPool.h"
 #include "bitvector/BVConstraint.h"
-#include "pseudoboolean/PBConstraint.h"
 #include "VariableAssignment.h"
 #include "VariableComparison.h"
 
@@ -123,10 +122,6 @@ namespace carl
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
 
-			explicit Formula( const PBConstraint<Pol>& _constraint ):
-                Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
-            {}
-
             explicit Formula( FormulaType _type, Formula&& _subformula ):
                 Formula(FormulaPool<Pol>::getInstance().create(_type, std::move(_subformula)))
             {}
@@ -190,10 +185,6 @@ namespace carl
 
             explicit Formula( const UEquality& _eq ):
                 Formula( FormulaPool<Pol>::getInstance().create( std::move( UEquality( _eq ) ) ) )
-            {}
-
-			explicit Formula( PBConstraint<Pol>&& _pbc ):
-                Formula( FormulaPool<Pol>::getInstance().create( std::move( _pbc ) ) )
             {}
 
             Formula( const Formula& _formula ):
@@ -591,21 +582,6 @@ namespace carl
                 return *mpContent->mpUIEqualityVS;
 #else
 				return mpContent->mUIEquality;
-#endif
-            }
-
-			/**
-             * @return A constant reference to the pseudoboolean constraint represented by this formula. Note, that
-             *          this formula has to be of type PBCONSTRAINT, if you invoke this method.
-             */
-            [[deprecated("PBConstraints are normal constraints with Boolean variables now.")]]
-            const PBConstraint<Pol>& pbConstraint() const
-            {
-                assert( mpContent->mType == FormulaType::PBCONSTRAINT );
-#ifdef __VS
-                return *mpContent->mpPBConstraintVS;
-#else
-				return mpContent->mPBConstraint;
 #endif
             }
 

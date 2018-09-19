@@ -82,9 +82,6 @@ private:
 			case FormulaType::UEQ:
 				*this << f.uequality();
 				break;
-			case FormulaType::PBCONSTRAINT:
-				*this << f.pbConstraint();
-				break;
 			case FormulaType::EXISTS:
 			case FormulaType::FORALL:
 				CARL_LOG_ERROR("carl.smtlibstream", "Printing exists or forall is not implemented yet.");
