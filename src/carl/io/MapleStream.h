@@ -84,9 +84,6 @@ private:
 			case FormulaType::UEQ:
 				CARL_LOG_ERROR("carl.maplestream", "Uninterpreted equalities are not supported by Maple.");
 				break;
-			case FormulaType::PBCONSTRAINT:
-				CARL_LOG_ERROR("carl.maplestream", "Pseudo-Boolean constraints are not supported by Maple.");
-				break;
 			case FormulaType::EXISTS:
 			case FormulaType::FORALL:
 				CARL_LOG_ERROR("carl.maplestream", "Printing exists or forall is not implemented yet.");
