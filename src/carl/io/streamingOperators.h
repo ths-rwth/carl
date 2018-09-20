@@ -28,6 +28,8 @@ template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::list<T>& l);
 template<typename Key, typename Value, typename Comparator>
 inline std::ostream& operator<<(std::ostream& os, const std::map<Key, Value, Comparator>& m);
+template<typename Key, typename Value, typename Comparator>
+inline std::ostream& operator<<(std::ostream& os, const std::multimap<Key, Value, Comparator>& m);
 template<typename U, typename V>
 inline std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p);
 template<typename T, typename C>
@@ -91,6 +93,25 @@ inline std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
  */
 template<typename Key, typename Value, typename Comparator>
 inline std::ostream& operator<<(std::ostream& os, const std::map<Key, Value, Comparator>& m) {
+	os << "{";
+	bool first = true;
+	for (const auto& it: m) {
+		if (!first) os << ", ";
+		first = false;
+		os << it.first << " : " << it.second;
+	}
+	return os << "}";
+}
+
+/**
+ * Output a std::multimap with arbitrary content.
+ * The format is `{<key>:<value>, <key>:<value>, ...}`
+ * @param os Output stream.
+ * @param m multimap to be printed.
+ * @return Output stream.
+ */
+template<typename Key, typename Value, typename Comparator>
+inline std::ostream& operator<<(std::ostream& os, const std::multimap<Key, Value, Comparator>& m) {
 	os << "{";
 	bool first = true;
 	for (const auto& it: m) {
