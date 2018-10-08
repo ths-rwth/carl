@@ -174,6 +174,8 @@ if(COMPARE_WITH_Z3 OR USE_Z3_NUMBERS)
 	#load_library(carl Z3 4.0)
 	set(Z3_VERSION "4.7.1")
 	include(resources/z3.cmake)
+	print_resource_info("Z3" BLISS_SHARED ${Z3_VERSION})
+	print_resource_info("Z3" BLISS_STATIC ${Z3_VERSION})
 endif()
 
 ##### Doxygen
