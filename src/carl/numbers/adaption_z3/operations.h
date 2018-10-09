@@ -30,6 +30,13 @@ inline bool isOne(const rational& n) {
 	return n.is_one();
 }
 
+inline auto getDenom(const rational& n) {
+	return denominator(n);
+}
+inline auto getNum(const rational& n) {
+	return numerator(n);
+}
+
 inline std::string toString(const rational& _number, bool _infix) {
 	return toString(_number.to_mpq(), _infix);
 }
