@@ -4,10 +4,10 @@
  */
 
 #pragma once
-#ifdef COMPARE_WITH_Z3
+#ifdef USE_Z3_NUMBERS
 #include <utility>
 
-#include "../numbers/adaption_z3/z3_include.h"
+#include "../numbers/adaption_z3/include.h"
 
 
 #include "carl/numbers/numbers.h"
@@ -21,11 +21,13 @@ namespace carl {
 class Z3Converter {
 private:
 	std::map<carl::Variable, polynomial::var> vars;
+	reslimit rl;
 	polynomial::numeral_manager nm;
 	polynomial::manager m;
 	mpz_manager<true> mpzm;
 public:
-	Z3Converter(): m(nm) {
+	Z3Converter(): 
+		m(rl, nm) {
 	}
 	/**
 	 * Converts a polynomial pointer to a polynomial reference.
