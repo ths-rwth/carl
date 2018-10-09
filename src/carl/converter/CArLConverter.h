@@ -21,7 +21,6 @@ public:
 		mpz_class num(ss2.str());
 		return carl::quotient(num, denom);
 	}
-#endif
 #ifdef USE_Z3_NUMBERS
 	mpz toZ3MPZ(const cln::cl_I& n) {
 		mpz res;
@@ -40,6 +39,7 @@ public:
 	rational toZ3Rational(const cln::cl_RA& n) {
 		return rational(toZ3MPQ(n));
 	}
+#endif
 #endif
 };
 
