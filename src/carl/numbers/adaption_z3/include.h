@@ -13,3 +13,5 @@ typedef unsigned digit_t;
 #include <util/mpq.h>
 #include <math/polynomial/polynomial.h>
 #include <util/vector.h>
+
+#undef alloc
