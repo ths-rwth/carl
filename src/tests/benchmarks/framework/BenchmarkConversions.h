@@ -74,6 +74,25 @@ inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const C
 #endif
 #endif
 
+#ifdef USE_Z3_NUMBERS
+template<>
+inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<rational>>(const CMP<rational>& p, const CIPtr& ci) {
+	CMP<mpq_class> res;
+	for (auto t: p) {
+		res += Term<mpq_class>(ci->carl.toGMP(t.coeff()), t.monomial());
+	}
+	return res;
+}
+template<>
+inline CMP<rational> Conversion::convert<CMP<rational>, CMP<mpq_class>>(const CMP<mpq_class>& p, const CIPtr& ci) {
+	CMP<rational> res;
+	for (auto t: p) {
+		res += Term<rational>(ci->carl.toZ3Rational(t.coeff()), t.monomial());
+	}
+	return res;
+}
+#endif
+
 #ifdef USE_COCOA
 //template<>
 //inline CoMP Conversion::convert<CoMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
@@ -115,7 +134,7 @@ inline GMP Conversion::convert<GMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m,
 	return ci->ginac(m);
 }
 #endif
-#ifdef COMPARE_WITH_Z3
+#ifdef USE_Z3_NUMBERS
 #ifdef USE_CLN_NUMBERS
 template<>
 ZMP Conversion::convert<ZMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
@@ -126,6 +145,7 @@ ZMP Conversion::convert<ZMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const 
 	return ci->z3(m);
 }
 #endif
+
 template<>
 ZMP Conversion::convert<ZMP, CMP<mpq_class>>(const CMP<mpq_class>& m, const CIPtr& ci) {
 	return ci->z3(m);
@@ -134,12 +154,14 @@ template<>
 ZMP Conversion::convert<ZMP, CMP<rational>>(const CMP<rational>& m, const CIPtr& ci) {
 	return ci->z3(m);
 }
-#ifdef USE_Z3_NUMBERS
+template<>
+ZMP Conversion::convert<ZMP, CUMP<mpq_class>>(const CUMP<mpq_class>& m, const CIPtr& ci) {
+	return ci->z3(m);
+}
 template<>
 ZMP Conversion::convert<ZMP, CUMP<rational>>(const CUMP<rational>& m, const CIPtr& ci) {
 	return ci->z3(m);
 }
-#endif
 template<>
 ZVAR Conversion::convert<ZVAR, CVAR>(const CVAR& v, const CIPtr& ci) {
 	return ci->z3(v);
