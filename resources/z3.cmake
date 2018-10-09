@@ -14,9 +14,10 @@ ExternalProject_Add(
 )
 
 ExternalProject_Get_Property(Z3-EP INSTALL_DIR)
+ExternalProject_Get_Property(Z3-EP SOURCE_DIR)
 
-add_imported_library(Z3 SHARED "${INSTALL_DIR}/lib/libz3${DYNAMIC_EXT}" "${INSTALL_DIR}/include")
-add_imported_library(Z3 STATIC "${INSTALL_DIR}/lib/libz3${STATIC_EXT}" "${INSTALL_DIR}/include")
+add_imported_library(Z3 SHARED "${INSTALL_DIR}/lib/libz3${DYNAMIC_EXT}" "${SOURCE_DIR}/src")
+add_imported_library(Z3 STATIC "${INSTALL_DIR}/lib/libz3${STATIC_EXT}" "${SOURCE_DIR}/src")
 
 add_dependencies(Z3_SHARED Z3-EP)
 add_dependencies(Z3_STATIC Z3-EP)
