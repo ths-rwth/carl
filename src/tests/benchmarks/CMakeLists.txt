@@ -6,10 +6,10 @@ add_executable( runBenchmarks
 #set(z3lib /usr/local/include/z3/build/libz3.so)
 #include_directories(/usr/local/include/z3/src/util/)
 
-if (COMPARE_WITH_Z3)
-    include_directories(${Z3_INCLUDE_DIRS})
-    target_link_libraries(runBenchmarks ${Z3_LIBRARIES})
-endif()
+#if (COMPARE_WITH_Z3)
+#    include_directories(${Z3_INCLUDE_DIRS})
+#    target_link_libraries(runBenchmarks ${Z3_LIBRARIES})
+#endif()
 
 target_link_libraries(runBenchmarks TestCommon)
 
