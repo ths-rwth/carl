@@ -644,8 +644,8 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
 
 #include "../benchmarks/framework/BenchmarkConversions.h"
 #include "../benchmarks/framework/Common.h"
-#ifdef COMPARE_WITH_Z3
-#include <z3/src/math/polynomial/polynomial.h>
+#ifdef USE_Z3_NUMBERS
+#include <carl/numbers/adaption_z3/include.h>
 #endif
 
 TEST(MultivariatePolynomialTest, Resultant)
@@ -660,13 +660,13 @@ TEST(MultivariatePolynomialTest, Resultant)
 	//_r_1^2 + (_r_2^2+4)*_r_1^1 + _r_2^2+18
 	//_r_1^2 + (4*_r_2+8)*_r_1^1 + 2*_r_2^3+_r_2+19
 
-#ifdef COMPARE_WITH_Z3
+#ifdef USE_Z3_NUMBERS
 	auto pz3 = carl::Conversion::convert<ZMP>(p, ci);
 	auto qz3 = carl::Conversion::convert<ZMP>(q, ci);
 	auto xz3 = carl::Conversion::convert<ZVAR>(x, ci);
 #endif
 	std::cout << p << ", " << q << std::endl;
-#ifdef COMPARE_WITH_Z3
+#ifdef USE_Z3_NUMBERS
 	std::cout << "#####  Z3  #####" << std::endl;
 	auto resz3 = resultant(pz3, qz3, xz3);
 	std::cout << "Result: " << resz3 << std::endl;
