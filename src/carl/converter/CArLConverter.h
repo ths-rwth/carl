@@ -41,6 +41,34 @@ public:
 	}
 #endif
 #endif
+#ifdef USE_Z3_NUMBERS
+	mpq_class toGMP(const rational& n) {
+		std::stringstream ss1;
+		ss1 << carl::getDenom(n);
+		mpz_class denom(ss1.str());
+		std::stringstream ss2;
+		ss2 << carl::getNum(n);
+		mpz_class num(ss2.str());
+		return carl::quotient(num, denom);
+	}
+	mpz toZ3MPZ(const mpz_class& n) {
+		mpz res;
+		std::stringstream ss;
+		ss << n;
+		mpzmanager().set(res, ss.str().c_str());
+		return res;
+	}
+	mpq toZ3MPQ(const mpq_class& n) {
+		mpz num = toZ3MPZ(getNum(n));
+		mpz den = toZ3MPZ(getDenom(n));
+		mpq res;
+		mpqmanager().set(res, num, den);
+		return res;
+	}
+	rational toZ3Rational(const mpq_class& n) {
+		return rational(toZ3MPQ(n));
+	}
+#endif
 };
 
 }
