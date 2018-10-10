@@ -15,7 +15,7 @@ typedef CoCoA::RingElem CoMP;
 #ifdef USE_GINAC
 typedef GiNaC::ex GMP;
 #endif
-#ifdef COMPARE_WITH_Z3
+#if defined(COMPARE_WITH_Z3) || defined(USE_Z3_NUMBERS)
 typedef polynomial::polynomial_ref ZMP;
 #endif
 
@@ -33,7 +33,7 @@ typedef CoCoA::RingElem CoVAR;
 #ifdef USE_GINAC
 typedef GiNaC::symbol GVAR;
 #endif
-#ifdef COMPARE_WITH_Z3
+#if defined(COMPARE_WITH_Z3) || defined(USE_Z3_NUMBERS)
 typedef polynomial::var ZVAR;
 #endif
 
