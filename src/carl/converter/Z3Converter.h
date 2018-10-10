@@ -54,16 +54,21 @@ public:
 		return rational(num / denom);
 	}
     #endif
+	inline mpz mpz_t_to_mpz(const mpz_t z) {
+		mpz val;
+		if (mpz_fits_slong_p(z)) {
+			mpzm.set(val, mpz_get_si(z));
+		} else {
+			std::stringstream ss;
+			ss << z;
+			mpzm.set(val, ss.str().c_str());
+		}
+		return val;
+	}
 	rational operator()(const mpq_class& n) {
-		std::stringstream ss1;
-		ss1 << n.get_den();
-		mpz denom;
-		mpzm.set(denom, ss1.str().c_str());
-		std::stringstream ss2;
-		ss2 << n.get_num();
-		mpz num;
-		mpzm.set(num, ss2.str().c_str());
-		return rational(num / denom);
+		mpz denom = mpz_t_to_mpz(n.get_den_mpz_t());
+		mpz num = mpz_t_to_mpz(n.get_num_mpz_t());
+		return rational(num / denom /*num, denom*/);
 	}
 	/**
 	 * Converts a variable.
