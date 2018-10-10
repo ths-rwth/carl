@@ -9,7 +9,7 @@
 #ifdef USE_GINAC
 #include "carl/converter/GiNaCConverter.h"
 #endif
-#ifdef COMPARE_WITH_Z3
+#if defined(COMPARE_WITH_Z3) || defined(USE_Z3_NUMBERS)
 #include "carl/converter/Z3Converter.h"
 #endif
 #include "carl/core/MultivariatePolynomial.h"
@@ -31,7 +31,7 @@ struct ConversionInformation {
 	std::map<carl::Variable, GiNaC::ex> ginacVariables;
 	GiNaCConverter ginac;
     #endif
-    #ifdef COMPARE_WITH_Z3
+    #if defined(COMPARE_WITH_Z3) || defined(USE_Z3_NUMBERS)
 	Z3Converter z3;
     #endif
 	
