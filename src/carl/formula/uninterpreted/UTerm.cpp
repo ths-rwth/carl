@@ -29,7 +29,7 @@ namespace carl
 
 	bool operator==(const UTerm& lhs, const UTerm& rhs) {
 		return std::visit(overloaded {
-			[](const UVariable& lhs, const UVariable& rhs) { return lhs.variable().id() == rhs.variable().id(); },
+			[](const UVariable& lhs, const UVariable& rhs) { return lhs == rhs; },
 			[](const UFInstance& lhs, const UFInstance& rhs) { return lhs.id() == rhs.id(); },
 			[](const auto&, const auto&) { return false; },
 		}, lhs.asVariant(), rhs.asVariant());
@@ -37,7 +37,7 @@ namespace carl
 
 	bool operator<(const UTerm& lhs, const UTerm& rhs) {
 		return std::visit(overloaded {
-			[](const UVariable& lhs, const UVariable& rhs) { return lhs.variable().id() < rhs.variable().id(); },
+			[](const UVariable& lhs, const UVariable& rhs) { return lhs < rhs; },
 			[](const UFInstance& lhs, const UFInstance& rhs) { return lhs.id() < rhs.id(); },
 			[](const UVariable&, const UFInstance&) { return true; },
 			[](const auto&, const auto&) { return false; },
