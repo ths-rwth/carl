@@ -135,6 +135,9 @@ namespace carl
 			bool isBaseFormula(const Constraint<Pol>& c) const {
 				return c < c.negation();
 			}
+			bool isBaseFormula(const UEquality& ueq) const {
+				return !ueq.negated();
+			}
 			bool isBaseFormula(const VariableComparison<Pol>& vc) const {
 				return vc < vc.negation();
 			}
@@ -496,7 +499,11 @@ namespace carl
 
 			const FormulaContent<Pol>* create( UEquality&& eq )
 			{
-				return add( new FormulaContent<Pol>( std::move( eq ) ) );
+				if (isBaseFormula(eq)) {
+                    return add(new FormulaContent<Pol>(std::move(eq)));
+                } else {
+                    return add(new FormulaContent<Pol>(eq.negation()))->mNegation;
+                }
 			}
 
             void free( const FormulaContent<Pol>* _elem )
