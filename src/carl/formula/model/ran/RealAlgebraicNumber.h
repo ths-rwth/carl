@@ -40,6 +40,10 @@
 #include "../../../thom/ThomEncoding.h"
 #include "RealAlgebraicNumber_Interval.h"
 
+#ifdef USE_Z3_RANS
+#include "adaption_z3/Z3Ran.h"
+#endif
+
 namespace carl {
 	
 enum class RANSampleHeuristic { Center, CenterInt, LeftInt, RightInt, ZeroInt, InftyInt, Default = RightInt };
@@ -76,6 +80,10 @@ private:
 	mutable std::shared_ptr<IntervalContent> mIR;
   // ThomEncoding
 	std::shared_ptr<ThomEncoding<Number>> mTE;
+	// z3 adaption
+	#ifdef USE_Z3_RANS
+	std::shared_ptr<Z3Ran<Number>> mZR;
+	#endif
 
 	void checkForSimplification() const {
 	  //make numeric if possible
@@ -140,6 +148,13 @@ public:
 		mTE(std::make_shared<ThomEncoding<Number>>(te))
 	{}
 
+	#ifdef USE_Z3_RANS
+	explicit RealAlgebraicNumber(const Z3Ran<Number>& zr, bool isRoot = true):
+		mIsRoot(isRoot),
+		mZR(std::make_shared<Z3Ran<Number>>(zr))
+	{}
+	#endif
+
 	RealAlgebraicNumber(const RealAlgebraicNumber& ran) = default;
 	RealAlgebraicNumber(RealAlgebraicNumber&& ran) = default;
 
@@ -173,6 +188,7 @@ public:
 		if (isNumeric()) return carl::isZero(mValue);
 		else if (isInterval()) return carl::isZero(mIR->interval);
 		else if (isThom()) return mTE->isZero();
+		else if (isZ3Ran()) return getZ3Ran().isZero();
 		else return false;
 	}
 
@@ -181,7 +197,7 @@ public:
 	 */
 	bool isNumeric() const {
 		checkForSimplification();
-		return !mIR && !mTE;
+		return !isInterval() && !isThom() && !isZ3Ran();
 	}
 	/**
 	 * Check if the underlying representation is an implict number
@@ -204,11 +220,25 @@ public:
 		return *mTE;
 	}
 
+	bool isZ3Ran() const {
+		#ifdef USE_Z3_RANS
+		return bool(mZR);
+		#else
+		return false;
+		#endif
+	}
+	const Z3Ran<Number>& getZ3Ran() const {
+		assert(isZ3Ran());
+		#ifdef USE_Z3_RANS
+		return *mZR;
+		#endif
+	}
 
 	bool isIntegral() const {
 		refineToIntegrality();
 		if (isNumeric()) return carl::isInteger(mValue);
 		else if (isInterval()) return mIR->isIntegral();
+		else if (isZ3Ran()) return getZ3Ran().isIntegral();
 		else return false;
 	}
 
@@ -216,13 +246,15 @@ public:
 		refineToIntegrality();
 		if (isNumeric()) return carl::floor(mValue);
 		else if (isInterval()) return carl::floor(mIR->interval.lower());
+		else if (isZ3Ran()) return carl::floor(getZ3Ran().lower());
 		return carl::constant_zero<Number>::get();
 	}
 	
 	Number branchingPoint() const {
 		if (isNumeric()) return mValue;
-		assert(isInterval());
-		return carl::sample(mIR->interval);
+		else if (isInterval()) return carl::sample(mIR->interval);
+		else if (isZ3Ran()) return getZ3Ran().branchingPoint();
+		assert(!isThom());
 	}
 
 	const Number& value() const noexcept {
@@ -231,32 +263,33 @@ public:
 	}
 
 	std::size_t getRefinementCount() const {
-		assert(!isNumeric() && !isThom());
 		assert(isInterval());
 		return mIR->refinementCount;
 	}
 	const Interval<Number>& getInterval() const {
+		if (isZ3Ran()) return getZ3Ran().getInterval();
 		assert(isInterval());
 		return mIR->interval;
 	}
 	const Number& lower() const {
+		if (isZ3Ran()) getZ3Ran().lower();
 		return getInterval().lower();
 	}
 	const Number& upper() const {
+		if (isZ3Ran()) getZ3Ran().upper();
 		return getInterval().upper();
 	}
 	const Polynomial& getIRPolynomial() const {
-		assert(!isNumeric());
-		assert(isInterval());
-		return mIR->polynomial;
+		if (isInterval()) return mIR->polynomial;
+		else if (isZ3Ran()) return getZ3Ran().getPolynomial();
+		assert(!isThom() && !isNumeric());
 	}
 	const auto& getIRSturmSequence() const {
-		assert(!isNumeric());
 		assert(isInterval());
 		return mIR->sturmSequence;
 	}
 
-	RealAlgebraicNumber changeVariable(Variable v) const {
+	RealAlgebraicNumber changeVariable(Variable v) const { // TODO variable wird doch in interval wieder ersetzt?? => sollte entfernt werden!
 		if (isNumeric()) return *this;
 		assert(isInterval());
 		return RealAlgebraicNumber<Number>(mIR->polynomial.replaceVariable(v), mIR->interval, mIsRoot);
@@ -272,6 +305,9 @@ public:
 		else if(isThom()) {
 			return mTE->sgnReprNum();
 		}
+		else if(isZ3Ran()) {
+			return getZ3Ran().sgn();
+		}
 		else return Sign::ZERO;
 	}
 
@@ -280,9 +316,12 @@ public:
 			return carl::sgn(p.evaluate(mValue));
 		} else if (isInterval()){
 			return mIR->sgn(p);
-		} else {
-			assert(isThom());
+		} else if (isThom()) {
 			return mTE->signOnPolynomial(MultivariatePolynomial<Number>(p));
+		} else if (isZ3Ran()) {
+			return getZ3Ran().sgn(p);
+		} else {
+			assert(false);
 		}
 	}
 
@@ -290,7 +329,15 @@ public:
 		if (isNumeric()) return carl::count_real_roots(p, Interval<Number>(value())) == 1;
 		else if (isInterval()) return carl::count_real_roots(p, mIR->interval) == 1;
 		else if (isThom()) return this->sgn(p) == Sign::ZERO;
-		else return false;
+		else if (isZ3Ran()) {
+			CARL_LOG_NOTIMPLEMENTED();
+			assert(false);
+			return false;
+		}
+		else {
+			assert(false);
+			return false;
+		}
 	}
 
 	/**
@@ -309,7 +356,8 @@ public:
 				if (isNumeric()) return i.contains(mValue);
 			}
 			return i.contains(mIR->interval);
-		} else if (isThom()) {
+		}
+		else if (isThom()) {
 			if(i.lowerBoundType() != BoundType::INFTY) {
 				if(i.lowerBoundType() == BoundType::STRICT && *mTE <= i.lower()) return false;
 				if(i.lowerBoundType() == BoundType::WEAK && *mTE < i.lower()) return false;
@@ -320,11 +368,19 @@ public:
 			}
 			return true;
 		}
-		else return false;
+		else if (isZ3Ran()) {
+			CARL_LOG_NOTIMPLEMENTED();
+			assert(false);
+			return false;
+		}
+		else {
+			assert(false);
+			return false;
+		}
 	}
 
 	bool refineAvoiding(const Number& n) const {
-		assert(!isNumeric());
+		assert(isInterval());
 		bool res = mIR->refineAvoiding(n);
 		checkForSimplification();
 		return res;
@@ -340,6 +396,7 @@ public:
 	}
 
 	void simplifyByPolynomial(Variable var, const MultivariatePolynomial<Number>& poly) const {
+		assert(isInterval());
 		UnivariatePolynomial<Number> irp(var, getIRPolynomial().template convert<Number>().coefficients());
 		CARL_LOG_DEBUG("carl.ran", "gcd(" << irp << ", " << poly << ")");
 		auto gmv = carl::gcd(MultivariatePolynomial<Number>(irp), poly);
@@ -365,6 +422,9 @@ public:
 			}
 			if (mIR->interval.isPositive()) return *this;
 			return RealAlgebraicNumber<Number>(mIR->polynomial.negateVariable(), mIR->interval.abs(), mIsRoot);
+		}
+		if (isZ3Ran()) {
+			return RealAlgebraicNumber<Number>(getZ3Ran().abs());
 		}
 		return RealAlgebraicNumber<Number>();
 	}

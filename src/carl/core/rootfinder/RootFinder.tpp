@@ -26,6 +26,10 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
+	#ifdef USE_Z3_RANS
+	return realRootsZ3(poly, varToRANMap, interval);
+	#endif
+
 	CARL_LOG_FUNC("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 	assert(varToRANMap.count(poly.mainVar()) == 0);
 
