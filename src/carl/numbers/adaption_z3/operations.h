@@ -14,11 +14,11 @@
 
 namespace carl {
 
-inline mpz_manager<true>& mpzmanager() {
+inline mpz_manager<true>& mpzmanager() { // TODO remove
 	static mpz_manager<true> m;
 	return m;
 }
-inline mpq_manager<true>& mpqmanager() {
+inline mpq_manager<true>& mpqmanager() { // TODO remove
 	static mpq_manager<true> m;
 	return m;
 }

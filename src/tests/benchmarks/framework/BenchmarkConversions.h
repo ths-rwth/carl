@@ -79,7 +79,7 @@ template<>
 inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<rational>>(const CMP<rational>& p, const CIPtr& ci) {
 	CMP<mpq_class> res;
 	for (auto t: p) {
-		res += Term<mpq_class>(ci->carl.toGMP(t.coeff()), t.monomial());
+		res += Term<mpq_class>(ci->z3.toGMP(t.coeff()), t.monomial());
 	}
 	return res;
 }
@@ -87,7 +87,7 @@ template<>
 inline CMP<rational> Conversion::convert<CMP<rational>, CMP<mpq_class>>(const CMP<mpq_class>& p, const CIPtr& ci) {
 	CMP<rational> res;
 	for (auto t: p) {
-		res += Term<rational>(ci->carl.toZ3Rational(t.coeff()), t.monomial());
+		res += Term<rational>(ci->z3.toZ3Rational(t.coeff()), t.monomial());
 	}
 	return res;
 }

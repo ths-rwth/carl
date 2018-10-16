@@ -10,6 +10,10 @@
 #include "../../../numbers/numbers.h"
 #include "RealAlgebraicNumber.h"
 
+#ifdef USE_Z3_RANS
+#include "adaption_z3/Z3RanOperations.h"
+#endif
+
 namespace carl {
 	template<typename Number>
 	inline bool isZero(const RealAlgebraicNumber<Number>& n) {
@@ -54,12 +58,15 @@ namespace carl {
 		} else if (n.isInterval()) {
 			CARL_LOG_TRACE("carl.ran", "Selecting from (-oo, " << n << ") -> " << (carl::ceil(n.lower()) - 1));
 			return RealAlgebraicNumber<Number>(carl::ceil(n.lower()) - 1, false);
-		} else {
+		} else if (n.isThom()) {
 			assert(n.isThom());
 			RealAlgebraicNumber<Number> res(*(n.mTE) + Number(-1), false);
 			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
 			return res;
+		} else if (n.isZ3Ran()) {
+			return sampleBelowZ3(n);
 		}
+		assert(false);
 	}
 	template<typename Number>
 	RealAlgebraicNumber<Number> sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper, RANSampleHeuristic heuristic = RANSampleHeuristic::Default) {
@@ -76,7 +83,7 @@ namespace carl {
 			}
 			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
 			return res;
-		} else {
+		} else if (lower.isNumeric() || upper.isNumeric() || lower.isInterval() || upper.isInterval()) {
 			Interval<Number> i;
 			if (lower.isNumeric()) i.set(lower.value(), lower.value());
 			else i.set(lower.upper(), lower.upper());
@@ -112,7 +119,10 @@ namespace carl {
 					CARL_LOG_WARN("carl.ran", "Using unknown sampling heuristic " << heuristic << ", fallback to sample.");
 					return RealAlgebraicNumber<Number>(sample(i, false), false);
 			}
+		} else if (lower.isZ3Ran() && upper.isZ3Ran()) {
+			return sampleBetweenZ3(lower, upper);
 		}
+		assert(false);
 	}
 	template<typename Number>
 	RealAlgebraicNumber<Number> sampleAbove(const RealAlgebraicNumber<Number>& n) {
@@ -123,12 +133,15 @@ namespace carl {
 		} else if (n.isInterval()) {
 			CARL_LOG_TRACE("carl.ran", "Selecting from (" << n << ", oo) -> " << (carl::floor(n.upper()) + 1));
 			return RealAlgebraicNumber<Number>(carl::floor(n.upper()) + 1, false);
-		} else {
+		} else if (n.isThom()) {
 			assert(n.isThom());
 			RealAlgebraicNumber<Number> res(*(n.mTE) + Number(1), false);
 			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
 			return res;
+		} else if (n.isZ3Ran()) {
+			return sampleAboveZ3(n);
 		}
+		assert(false);
 	}
 
 }

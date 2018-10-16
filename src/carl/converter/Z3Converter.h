@@ -4,128 +4,249 @@
  */
 
 #pragma once
-#ifdef USE_Z3_NUMBERS
+#if defined(USE_Z3_RANS) || defined(USE_Z3_NUMBERS)
 #include <utility>
 
 #include "../numbers/adaption_z3/include.h"
 
 
-#include "carl/numbers/numbers.h"
-#include "carl/core/Variable.h"
-#include "carl/core/Monomial.h"
-#include "carl/core/Term.h"
-#include "carl/core/MultivariatePolynomial.h"
+#include "../numbers/numbers.h"
+#include "../core/Variable.h"
+#include "../core/Monomial.h"
+#include "../core/Term.h"
+#include "../core/MultivariatePolynomial.h"
 
 namespace carl {
 
 class Z3Converter {
 private:
 	std::map<carl::Variable, polynomial::var> vars;
+	Variable auxVariable = freshRealVariable("__r");
+
 	reslimit rl;
-	polynomial::numeral_manager nm;
-	polynomial::manager m;
-	mpz_manager<true> mpzm;
+	//mpz_manager<true> mpz_man;
+	//mpq_manager<true> mpq_man;
+	//polynomial::numeral_manager num_man;
+	unsynch_mpq_manager mpq_man;
+	polynomial::manager poly_man;
+	algebraic_numbers::manager anum_man;
+
+	unsynch_mpq_manager& mpz_man;
+
+	// TODO refactor: remove operator()
 public:
 	Z3Converter(): 
-		m(rl, nm) {
+		poly_man(rl, mpq_man /*num_man*/), anum_man(rl, mpq_man), mpz_man(mpq_man) {
 	}
+
+	unsynch_mpq_manager& mpqMan() {
+		return mpq_man;
+	}
+
+	polynomial::manager& polyMan() {
+		return poly_man;
+	}
+
+	algebraic_numbers::manager& anumMan() {
+		return anum_man;
+	}
+
+	// conversions to Z3 types
+
 	/**
 	 * Converts a polynomial pointer to a polynomial reference.
      */
+	polynomial::polynomial_ref toZ3(polynomial::polynomial* p) {
+		return polynomial::polynomial_ref(p, this->poly_man);
+	}
 	polynomial::polynomial_ref operator()(polynomial::polynomial* p) {
-		return polynomial::polynomial_ref(p, this->m);
+		return toZ3(p);
 	}
 	/**
 	 * Converts a number.
      */
-	rational operator()(const rational& n) {
+	rational toZ3(const rational& n) {
 		return n;
 	}
-    #ifdef USE_CLN_NUMBERS
+	rational operator()(const rational& n) {
+		return toZ3(n);
+	}
+    #ifdef USE_CLN_NUMBERS  // TODO remove, deduplicate with carlconverter...
 	rational operator()(const cln::cl_RA& n) {
 		std::stringstream ss1;
 		ss1 << carl::getDenom(n);
 		mpz denom;
-		mpzm.set(denom, ss1.str().c_str());
+		mpz_man.set(denom, ss1.str().c_str());
 		std::stringstream ss2;
 		ss2 << carl::getNum(n);
 		mpz num;
-		mpzm.set(num, ss2.str().c_str());
+		mpz_man.set(num, ss2.str().c_str());
 		return rational(num / denom);
 	}
     #endif
-	inline mpz mpz_t_to_mpz(const mpz_t z) {
+	mpz toZ3MPZ(const mpz_t z) { // TODO proper conversion ...
 		mpz val;
 		if (mpz_fits_slong_p(z)) {
-			mpzm.set(val, mpz_get_si(z));
+			mpz_man.set(val, mpz_get_si(z));
 		} else {
 			std::stringstream ss;
 			ss << z;
-			mpzm.set(val, ss.str().c_str());
+			mpz_man.set(val, ss.str().c_str());
 		}
 		return val;
 	}
+	mpz toZ3MPZ(const mpz_class& n) {
+		return toZ3MPZ(n.get_mpz_t());
+	}
+	mpq toZ3MPQ(const mpq_class& n) {
+		mpz den = toZ3MPZ(n.get_den_mpz_t());
+		mpz num = toZ3MPZ(n.get_num_mpz_t());
+		mpq res;
+		mpq_man.set(res, num, den);
+		return res;
+	}
+	rational toZ3Rational(const mpq_class& n) {
+		return rational(toZ3MPQ(n));
+	}
+	rational toZ3(const mpq_class& n) {
+		return toZ3Rational(n);
+	}
 	rational operator()(const mpq_class& n) {
-		mpz denom = mpz_t_to_mpz(n.get_den_mpz_t());
-		mpz num = mpz_t_to_mpz(n.get_num_mpz_t());
-		return rational(num / denom /*num, denom*/);
+		return toZ3Rational(n);
 	}
 	/**
 	 * Converts a variable.
      */
-	polynomial::var operator()(const carl::Variable& v) {
+	polynomial::var toZ3(const carl::Variable& v) {
 		auto it = vars.find(v);
 		if (it == vars.end()) {
-			it = vars.insert(std::make_pair(v, m.mk_var())).first;
+			it = vars.insert(std::make_pair(v, poly_man.mk_var())).first;
 		}
 		return it->second;
+	}
+	polynomial::var operator()(const carl::Variable& v) {
+		return toZ3(v);
 	}
 	/**
 	 * Converts a variable and an exponent.
      */
+	polynomial::polynomial_ref toZ3(const std::pair<carl::Variable, carl::exponent>& p) {
+		return toZ3(this->poly_man.mk_polynomial(toZ3(p.first), p.second));
+	}
 	polynomial::polynomial_ref operator()(const std::pair<carl::Variable, carl::exponent>& p) {
-		return (*this)(this->m.mk_polynomial((*this)(p.first), p.second));
+		return toZ3(p);
 	}
 	/**
 	 * Converts a monomial.
      */
-	polynomial::polynomial_ref operator()(const carl::Monomial& m) {
-		polynomial::polynomial_ref res(this->m);
-		res = this->m.mk_const(rational(1));
+	polynomial::polynomial_ref toZ3(const carl::Monomial& m) {
+		polynomial::polynomial_ref res(this->poly_man);
+		res = this->poly_man.mk_const(rational(1));
 		for (auto it: m) {
-			res = res * (*this)(it);
+			res = res * toZ3(it);
 		}
 		return res;
 	}
+	polynomial::polynomial_ref operator()(const carl::Monomial& m) {
+		return toZ3(m);
+	}
 	template<typename Coeff>
-	polynomial::polynomial_ref operator()(const carl::Term<Coeff>& t) {
-		polynomial::polynomial_ref res(this->m);
-		res = (*this)(this->m.mk_const((*this)(t.coeff())));
-		if (t.monomial()) return res * (*this)(*(t.monomial()));
+	polynomial::polynomial_ref toZ3(const carl::Term<Coeff>& t) {
+		polynomial::polynomial_ref res(this->poly_man);
+		res = toZ3(this->poly_man.mk_const(toZ3(t.coeff())));
+		if (t.monomial()) return res * toZ3(*(t.monomial()));
 		else return res;
 	}
 	template<typename Coeff>
+	polynomial::polynomial_ref operator()(const carl::Term<Coeff>& t) {
+		return toZ3(t);
+	}
+	template<typename Coeff>
+	polynomial::polynomial_ref toZ3(const carl::MultivariatePolynomial<Coeff>& p) {
+		polynomial::polynomial_ref res(this->poly_man);
+		res = toZ3(this->poly_man.mk_zero());
+		for (auto t: p) res = res + toZ3(t);
+		this->poly_man.lex_sort(res);
+		return res;
+	}
+	template<typename Coeff>
 	polynomial::polynomial_ref operator()(const carl::MultivariatePolynomial<Coeff>& p) {
-		polynomial::polynomial_ref res(this->m);
-		res = (*this)(this->m.mk_zero());
-		for (auto t: p) res = res + (*this)(t);
-		this->m.lex_sort(res);
+		return toZ3(p);
+	}
+	template<typename Coeff>
+	polynomial::polynomial_ref toZ3(const carl::UnivariatePolynomial<Coeff>& p) {
+		polynomial::polynomial_ref res(this->poly_man);
+		res = toZ3(this->poly_man.mk_zero());
+		unsigned exp = 0;
+		polynomial::var mainvar = toZ3(p.mainVar());
+		for (auto t: p.coefficients()) {
+			res = res + toZ3(this->poly_man.mk_polynomial(mainvar, exp)) * toZ3(t);
+			exp++;
+		}
+		this->poly_man.lex_sort(res);
 		return res;
 	}
 	template<typename Coeff>
 	polynomial::polynomial_ref operator()(const carl::UnivariatePolynomial<Coeff>& p) {
-		polynomial::polynomial_ref res(this->m);
-		res = (*this)(this->m.mk_zero());
-		unsigned exp = 0;
-		polynomial::var mainvar = (*this)(p.mainVar());
-		for (auto t: p.coefficients()) {
-			res = res + (*this)(this->m.mk_polynomial(mainvar, exp)) * (*this)(t);
-			exp++;
+		return toZ3(p);
+	}
+
+	// conversions back to CArL types
+
+	template<typename Number>
+	Number toNumber(const mpz& m);
+
+	template<typename Number>
+	Number toNumber(const mpq& m);
+
+	template<typename Coeff>
+	UnivariatePolynomial<Coeff> toUnivPoly(const svector<mpz>& p, carl::Variable var) {
+		std::vector<Coeff> coeff;
+		for(size_t i = 0; i < p.size(); i++) {
+			Coeff c = toNumber<Coeff>(p[i]);
+			coeff.push_back(c);
 		}
-		this->m.lex_sort(res);
-		return res;
+		return UnivariatePolynomial<Coeff>(var, std::move(coeff));
+	}
+
+	template<typename Coeff>
+	UnivariatePolynomial<Coeff> toUnivPoly(const svector<mpz>& p) {
+		return toUnivPoly<Coeff>(p, auxVariable);
 	}
 };
+
+template<>
+inline mpz_class Z3Converter::toNumber<mpz_class>(const mpz& m) { // TODO proper conversion ..
+	if (mpz_man.is_int64(m)) {
+		int64_t val = mpz_man.get_int64(m);
+		return mpz_class(val);
+	} else {
+		std::string s = mpz_man.to_string(m);
+		return mpz_class(s);
+	}
+}
+
+template<>
+inline mpq_class Z3Converter::toNumber<mpq_class>(const mpz& m) {
+	return mpq_class(toNumber<mpz_class>(m));
+}
+
+template<>
+inline mpq_class Z3Converter::toNumber<mpq_class>(const mpq& m) {
+	mpz znum;
+	mpqMan().get_numerator(m, znum);
+	mpz zden;
+	mpqMan().get_denominator(m, zden);
+	mpz_class num = toNumber<mpz_class>(znum);
+	mpz_class den = toNumber<mpz_class>(zden);
+	return mpq_class(num, den);
+}
+
+
+inline Z3Converter& z3() {
+	static Z3Converter m;
+	return m;
+}
 
 }
 #endif

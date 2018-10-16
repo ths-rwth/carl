@@ -11,6 +11,12 @@ namespace carl {
 		CARL_LOG_FUNC("carl.ran", *this << ", " << n);
 		if (this == &n) return true;
 
+		if (this->isZ3Ran()) {
+			assert(n.isZ3Ran());
+			return getZ3Ran().equal(n.getZ3Ran());
+		}
+		assert(!isZ3Ran());
+
 		if(this->isThom() || n.isThom()) {
 			assert(!this->isInterval() && !n.isInterval());
 			if(this->isThom() && n.isThom()) {
@@ -91,7 +97,7 @@ namespace carl {
 					return upper() <= n.value();
 				}
 			}
-		} else {
+		} else if (isThom()) {
 			assert(isThom());
 			if(n.isNumeric()) {
 				bool res = *mTE < n.value();
@@ -103,6 +109,9 @@ namespace carl {
 				CARL_LOG_TRACE("carl.ran", "result is " << res);
 				return res;
 			}
+		} else if (isZ3Ran()) {
+			assert(n.isZ3Ran());
+			return getZ3Ran().less(n.getZ3Ran());
 		}
 
 		if (mIR == n.mIR) return false;
@@ -114,6 +123,7 @@ namespace carl {
 	
 	template<typename Number>
 	std::pair<bool,bool> RealAlgebraicNumber<Number>::checkOrder(const RealAlgebraicNumber<Number>& n) const {
+		assert(!isZ3Ran());
 		if (isNumeric()) {
 			if (n.isNumeric()) {
 				return std::make_pair(true, value() < n.value());
@@ -145,6 +155,7 @@ namespace carl {
 	
 	template<typename Number>
 	bool RealAlgebraicNumber<Number>::lessWhileUnequal(const RealAlgebraicNumber<Number>& n) const {
+		assert(!isZ3Ran());
 		assert(!equal(n));
 		
 		#define CHECK_ORDER() {\

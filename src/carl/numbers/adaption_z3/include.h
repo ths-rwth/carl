@@ -13,5 +13,7 @@ typedef unsigned digit_t;
 #include <util/mpq.h>
 #include <math/polynomial/polynomial.h>
 #include <util/vector.h>
+#include <math/polynomial/algebraic_numbers.h>
+#include <nlsat/nlsat_assignment.h>
 
 #undef alloc

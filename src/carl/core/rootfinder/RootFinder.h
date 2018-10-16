@@ -13,6 +13,10 @@
 #include <list>
 #include <map>
 
+#ifdef USE_Z3_RANS
+#include "../../formula/model/ran/adaption_z3/Z3RanRootFinder.h"
+#endif
+
 namespace carl {
 namespace rootfinder {
 
@@ -30,7 +34,11 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 ) {
 	CARL_LOG_DEBUG("carl.core.rootfinder", polynomial << " within " << interval);
+	#ifdef USE_Z3_RANS
+	auto r = realRootsZ3(polynomial, interval);
+	#else
 	auto r = Finder(polynomial, interval, pivoting).getAllRoots();
+	#endif
 	CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
 	return r;
 }

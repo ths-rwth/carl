@@ -22,6 +22,10 @@
 #include "../../../thom/ThomEvaluation.h"
 #include "../../../util/SFINAE.h"
 
+#ifdef USE_Z3_RANS
+#include "adaption_z3/Z3RanEvaluation.h"
+#endif
+
 namespace carl {
 namespace RealAlgebraicNumberEvaluation {
 
@@ -142,8 +146,12 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, co
 	assert(IRmap.size() > 0);
 	if(IRmap.begin()->second.isInterval()) {
 		return evaluateIR(pol, IRmap);
-	} else {
+	} else if (IRmap.begin()->second.isThom()) {
 		return evaluateTE(pol, IRmap);
+	} else if (IRmap.begin()->second.isZ3Ran()) {
+		return evaluateZ3(pol, IRmap);
+	} else {
+		assert(false);
 	}
 }
 
