@@ -192,7 +192,7 @@ namespace carl {
 		std::size_t find_next(std::size_t pos) const {
 			return mData.find_next(pos);
 		}
-		/// Returns an iterator to the first bits that is set to true.
+		/// Returns an iterator to the first bit that is set to true.
 		iterator begin() const {
 			return iterator(*this, find_first());
 		}
