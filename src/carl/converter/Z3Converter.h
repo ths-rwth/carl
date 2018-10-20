@@ -84,7 +84,11 @@ public:
 		return rational(num / denom);
 	}
     #endif
-	mpz toZ3MPZ(const mpz_t z) { // TODO proper conversion ...
+	mpz toZ3MPZ(const mpz_t z) {
+		mpz val;
+		mpz_man.set(val, z);
+		return val;
+		/*
 		mpz val;
 		if (mpz_fits_slong_p(z)) {
 			mpz_man.set(val, mpz_get_si(z));
@@ -94,6 +98,7 @@ public:
 			mpz_man.set(val, ss.str().c_str());
 		}
 		return val;
+		*/
 	}
 	mpz toZ3MPZ(const mpz_class& n) {
 		return toZ3MPZ(n.get_mpz_t());
@@ -216,7 +221,11 @@ public:
 };
 
 template<>
-inline mpz_class Z3Converter::toNumber<mpz_class>(const mpz& m) { // TODO proper conversion ..
+inline mpz_class Z3Converter::toNumber<mpz_class>(const mpz& m) {
+	mpz_t val;
+	mpz_man.get_mpz_t(m, val);
+	return mpz_class(val);
+	/*
 	if (mpz_man.is_int64(m)) {
 		int64_t val = mpz_man.get_int64(m);
 		return mpz_class(val);
@@ -224,6 +233,7 @@ inline mpz_class Z3Converter::toNumber<mpz_class>(const mpz& m) { // TODO proper
 		std::string s = mpz_man.to_string(m);
 		return mpz_class(s);
 	}
+	*/
 }
 
 template<>
