@@ -8,6 +8,7 @@
 #define _NO_OMP_
 #define uint64 unsigned long
 typedef unsigned digit_t;
+#define _MP_GMP
 
 #include <util/mpz.h>
 #include <util/mpq.h>

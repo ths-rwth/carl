@@ -1,0 +1,50 @@
+diff --git a/src/util/mpq.h b/src/util/mpq.h
+index f1b261278..6b9092ec3 100644
+--- a/src/util/mpq.h
++++ b/src/util/mpq.h
+@@ -744,6 +744,15 @@ public:
+         reset_denominator(a); 
+     }
+ 
++#ifdef _MP_GMP
++
++    void set(mpz & a, const mpz_t val) { mpz_manager<SYNCH>::set(a, val); }
++
++    void get_mpz_t(mpz const & a, mpz_t& res) const { return mpz_manager<SYNCH>::get_mpz_t(a, res); }
++#else
++    #error GMP not activated!
++#endif
++
+     mpq dup(const mpq & source) {
+         mpq temp;
+         set(temp, source);
+diff --git a/src/util/mpz.h b/src/util/mpz.h
+index 92c6d0d10..20dbf93d8 100644
+--- a/src/util/mpz.h
++++ b/src/util/mpz.h
+@@ -709,6 +709,25 @@ public:
+ 
+     void set(mpz & target, unsigned sz, digit_t const * digits);
+ 
++#ifdef _MP_GMP
++
++    void set(mpz & target, const mpz_t source) {
++        if (is_small(target)) {
++            target.m_ptr = allocate();
++        }
++        mpz_set(*target.m_ptr, source);
++    }
++
++    void get_mpz_t(mpz const & source, mpz_t& val) const {
++        if (is_int64(source)) {
++            mpz_set_si(val, get_int64(source));
++        } else {
++            mpz_set(val, *source.m_ptr);
++        }
++    }
++
++#endif
++
+     mpz dup(const mpz & source) {
+         mpz temp;
+         set(temp, source);
