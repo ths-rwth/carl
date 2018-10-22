@@ -1,3 +1,16 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index afea250cb..01b472ba1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -441,7 +441,7 @@ option(BUILD_LIBZ3_SHARED "Build libz3 as a shared library if true, otherwise bu
+ # Symbol visibility
+ ################################################################################
+ if (NOT MSVC)
+-  z3_add_cxx_flag("-fvisibility=hidden" REQUIRED)
++#  z3_add_cxx_flag("-fvisibility=hidden" REQUIRED)
+ endif()
+ 
+ ################################################################################
 diff --git a/src/util/mpq.h b/src/util/mpq.h
 index f1b261278..6b9092ec3 100644
 --- a/src/util/mpq.h
@@ -18,36 +31,22 @@ index f1b261278..6b9092ec3 100644
      mpq dup(const mpq & source) {
          mpq temp;
          set(temp, source);
-diff --git a/src/util/mpz.cpp b/src/util/mpz.cpp
-index 39ea428a7..757535505 100644
---- a/src/util/mpz.cpp
-+++ b/src/util/mpz.cpp
-@@ -351,6 +351,14 @@ void mpz_manager<SYNCH>::set(mpz & target, unsigned sz, digit_t const * digits)
-     }
- }
- 
-+template<bool SYNCH>
-+void mpz_manager<SYNCH>::set(mpz & target, const mpz_t source) {
-+    if (is_small(target)) {
-+        target.m_ptr = allocate();
-+    }
-+    mpz_set(*target.m_ptr, source);
-+}
-+
- #ifndef _MP_GMP
- template<bool SYNCH>
- template<bool SUB>
 diff --git a/src/util/mpz.h b/src/util/mpz.h
-index 92c6d0d10..e9464a81b 100644
+index 92c6d0d10..20dbf93d8 100644
 --- a/src/util/mpz.h
 +++ b/src/util/mpz.h
-@@ -709,6 +709,20 @@ public:
+@@ -709,6 +709,25 @@ public:
  
      void set(mpz & target, unsigned sz, digit_t const * digits);
  
 +#ifdef _MP_GMP
 +
-+    void set(mpz & target, const mpz_t source);
++    void set(mpz & target, const mpz_t source) {
++        if (is_small(target)) {
++            target.m_ptr = allocate();
++        }
++        mpz_set(*target.m_ptr, source);
++    }
 +
 +    void get_mpz_t(mpz const & source, mpz_t& val) const {
 +        if (is_int64(source)) {
