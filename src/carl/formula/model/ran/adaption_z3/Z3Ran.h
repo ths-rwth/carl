@@ -15,7 +15,7 @@ namespace carl {
     template<typename Number>
     class Z3Ran {
         private:
-            Z3RanContent * mContent;
+            Z3RanContent * mContent; // TODO use shared ptr
 
             mutable Number mLower;
             mutable Number mUpper;

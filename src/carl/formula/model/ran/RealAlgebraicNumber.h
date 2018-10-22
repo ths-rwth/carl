@@ -102,14 +102,17 @@ private:
 
 public:
 	RealAlgebraicNumber() = default;
+	#ifndef USE_Z3_RANS
 	explicit RealAlgebraicNumber(const Number& n, bool isRoot = true):
 		mValue(n),
 		mIsRoot(isRoot)
-	{
-		#ifdef USE_Z3_RANS
-		assert(false);
-		#endif
-	}
+	{}
+	#else
+	explicit RealAlgebraicNumber(const Number& n, bool isRoot = true):
+		mZR(std::make_shared<Z3Ran<Number>>(n)),
+		mIsRoot(isRoot)
+	{}
+	#endif
 	explicit RealAlgebraicNumber(Variable var, bool isRoot = true):
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(Polynomial(var), Interval<Number>::zeroInterval()))
