@@ -61,8 +61,16 @@ namespace carl {
 		const Interval<mpq_class>& interval = Interval<mpq_class>::unboundedInterval()
     );
 
+    /*
     template boost::optional<std::vector<RealAlgebraicNumber<mpq_class>>> realRootsZ3(
         const UnivariatePolynomial<mpq_class>& p,
+        const std::map<Variable, RealAlgebraicNumber<mpq_class>>& m,
+        const Interval<mpq_class>& interval = Interval<mpq_class>::unboundedInterval()
+    );
+    */
+
+    template boost::optional<std::vector<RealAlgebraicNumber<mpq_class>>> realRootsZ3(
+        const UnivariatePolynomial<MultivariatePolynomial<mpq_class>>& p,
         const std::map<Variable, RealAlgebraicNumber<mpq_class>>& m,
         const Interval<mpq_class>& interval = Interval<mpq_class>::unboundedInterval()
     );
