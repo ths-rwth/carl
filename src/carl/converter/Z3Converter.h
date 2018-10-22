@@ -7,7 +7,7 @@
 #if defined(USE_Z3_RANS) || defined(USE_Z3_NUMBERS)
 #include <utility>
 
-#include "../numbers/adaption_z3/include.h"
+#include "../numbers/adaption_z3/z3.h"
 
 
 #include "../numbers/numbers.h"
