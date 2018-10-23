@@ -29,9 +29,7 @@ namespace carl {
 
             explicit Z3Ran(const Number& r);
 
-            ~Z3Ran() {
-                delete mContent;
-            }
+            ~Z3Ran();
 
             Z3RanContent& content() const {
                 return *mContent;
