@@ -32,15 +32,17 @@ private:
 	polynomial::manager poly_man;
 	algebraic_numbers::manager anum_man;
 
-	unsynch_mpq_manager& mpz_man;
-
 	// TODO refactor: remove operator()
 public:
 	Z3Converter(): 
-		poly_man(rl, mpq_man /*num_man*/), anum_man(rl, mpq_man), mpz_man(mpq_man) {
+		poly_man(rl, mpq_man /*num_man*/), anum_man(rl, mpq_man) {
 	}
 
 	unsynch_mpq_manager& mpqMan() {
+		return mpq_man;
+	}
+
+	unsynch_mpq_manager& mpzMan() {
 		return mpq_man;
 	}
 
@@ -77,26 +79,26 @@ public:
 		std::stringstream ss1;
 		ss1 << carl::getDenom(n);
 		mpz denom;
-		mpz_man.set(denom, ss1.str().c_str());
+		mpzMan().set(denom, ss1.str().c_str());
 		std::stringstream ss2;
 		ss2 << carl::getNum(n);
 		mpz num;
-		mpz_man.set(num, ss2.str().c_str());
+		mpzMan().set(num, ss2.str().c_str());
 		return rational(num / denom);
 	}
     #endif
 	mpz toZ3MPZ(const mpz_t z) {
 		mpz val;
-		mpz_man.set(val, z);
+		mpzMan().set(val, z);
 		return val;
 		/*
 		mpz val;
 		if (mpz_fits_slong_p(z)) {
-			mpz_man.set(val, mpz_get_si(z));
+			mpzMan().set(val, mpz_get_si(z));
 		} else {
 			std::stringstream ss;
 			ss << z;
-			mpz_man.set(val, ss.str().c_str());
+			mpzMan().set(val, ss.str().c_str());
 		}
 		return val;
 		*/
@@ -224,14 +226,14 @@ public:
 template<>
 inline mpz_class Z3Converter::toNumber<mpz_class>(const mpz& m) {
 	mpz_t val;
-	mpz_man.get_mpz_t(m, val);
+	mpzMan().get_mpz_t(m, val);
 	return mpz_class(val);
 	/*
-	if (mpz_man.is_int64(m)) {
-		int64_t val = mpz_man.get_int64(m);
+	if (mpzMan().is_int64(m)) {
+		int64_t val = mpzMan().get_int64(m);
 		return mpz_class(val);
 	} else {
-		std::string s = mpz_man.to_string(m);
+		std::string s = mpzMan().to_string(m);
 		return mpz_class(s);
 	}
 	*/
