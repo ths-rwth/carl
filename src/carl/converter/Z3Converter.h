@@ -4,13 +4,14 @@
  */
 
 #pragma once
+
+#include "../numbers/numbers.h"
+
 #if defined(USE_Z3_RANS) || defined(USE_Z3_NUMBERS)
 #include <utility>
 
 #include "../numbers/adaption_z3/z3.h"
 
-
-#include "../numbers/numbers.h"
 #include "../core/Variable.h"
 #include "../core/Monomial.h"
 #include "../core/Term.h"
@@ -253,10 +254,9 @@ inline mpq_class Z3Converter::toNumber<mpq_class>(const mpq& m) {
 }
 
 
-inline Z3Converter& z3() {
-	static Z3Converter m;
-	return m;
-}
+// TODO this needs to be a global singleton!
+Z3Converter& z3();
+
 
 }
 #endif
