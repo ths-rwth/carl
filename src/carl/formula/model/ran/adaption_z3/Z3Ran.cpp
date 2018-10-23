@@ -21,6 +21,11 @@ namespace carl {
     }
 
     template<typename Number>
+    Z3Ran<Number>::~Z3Ran() {
+        delete mContent;
+    }
+
+    template<typename Number>
     bool Z3Ran<Number>::isZero() const {
         z3().anumMan().is_zero(content());
     }
