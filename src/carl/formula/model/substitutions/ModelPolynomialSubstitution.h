@@ -12,6 +12,9 @@ namespace carl {
 	public:
 		ModelPolynomialSubstitution(const Poly& p): ModelSubstitution<Rational,Poly>(), mPoly(p)
 		{}
+		const auto& getPoly() const {
+			return mPoly;
+		}
 		virtual void multiplyBy(const Rational& n) {
 			mPoly *= n;
 		}
