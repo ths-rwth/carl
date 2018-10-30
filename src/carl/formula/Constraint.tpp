@@ -684,10 +684,17 @@ namespace carl
     bool Constraint<Pol>::getAssignment(Variable& _substitutionVariable, typename Pol::NumberType& _substitutionValue) const {
 		if (relation() != Relation::EQ) return false;
 		if (lhs().nrTerms() > 2) return false;
-		if (lhs().nrTerms() == 2 && !lhs().trailingTerm().isConstant()) return false;
+		if (lhs().nrTerms() == 0) return false;
 		if (!lhs().lterm().isSingleVariable()) return false;
+		if (lhs().nrTerms() == 1) {
+			_substitutionVariable = lhs().lterm().getSingleVariable();
+			_substitutionValue = 0;
+			return true;
+		}
+		assert(lhs().nrTerms() == 2);
+		if (!lhs().trailingTerm().isConstant()) return false;
 		_substitutionVariable = lhs().lterm().getSingleVariable();
-		_substitutionValue = -lhs().constantPart() / lhs().lterm().coeff();
+		_substitutionValue = -lhs().trailingTerm().coeff() / lhs().lterm().coeff();
 		return true;
 	}
 
