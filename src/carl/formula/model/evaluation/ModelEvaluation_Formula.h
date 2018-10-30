@@ -157,7 +157,7 @@ namespace model {
 					else f = Formula<Poly>(FormulaType::FALSE);
 				} else {
 					assert(res.isSubstitution());
-					auto subs = res.asSubstitution();
+					const auto& subs = res.asSubstitution();
 					auto fsubs = static_cast<ModelFormulaSubstitution<Rational,Poly>*>(subs.get());
 					f = fsubs->getFormula();
 				}

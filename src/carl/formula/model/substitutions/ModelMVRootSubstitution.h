@@ -16,6 +16,9 @@ namespace carl {
 		{}
 		virtual void multiplyBy(const Rational&) {}
 		virtual void add(const Rational&) {}
+		virtual ModelSubstitutionPtr<Rational,Poly> clone() const {
+			return createSubstitutionPtr<Rational,Poly,ModelMVRootSubstitution>(mRoot);
+		}
 		virtual Formula<Poly> representingFormula( const ModelVariable& mv ) {
 			assert(mv.isVariable());
 			return Formula<Poly>(VariableComparison<Poly>(mv.asVariable(), mRoot, Relation::EQ));
