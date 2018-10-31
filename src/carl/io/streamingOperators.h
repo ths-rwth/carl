@@ -12,11 +12,13 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <optional>
 #include <set>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <variant>
 #include <vector>
 
 namespace carl {
@@ -30,6 +32,8 @@ template<typename Key, typename Value, typename Comparator>
 inline std::ostream& operator<<(std::ostream& os, const std::map<Key, Value, Comparator>& m);
 template<typename Key, typename Value, typename Comparator>
 inline std::ostream& operator<<(std::ostream& os, const std::multimap<Key, Value, Comparator>& m);
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, const std::optional<T>& o);
 template<typename U, typename V>
 inline std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p);
 template<typename T, typename C>
@@ -42,6 +46,8 @@ template<typename Key, typename Value, typename H, typename E, typename A>
 inline std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value, H, E, A>& m);
 template<typename T, typename H, typename K, typename A>
 inline std::ostream& operator<<(std::ostream& os, const std::unordered_set<T, H, K, A>& s);
+template<typename T, typename... Tail>
+inline std::ostream& operator<<(std::ostream& os, const std::variant<T, Tail...>& v);
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v);
 */
@@ -120,6 +126,19 @@ inline std::ostream& operator<<(std::ostream& os, const std::multimap<Key, Value
 		os << it.first << " : " << it.second;
 	}
 	return os << "}";
+}
+
+/**
+ * Output a std::optional with arbitrary content.
+ * Prints `empty` if the optional holds no value and forwards the call to the content otherwise.
+ * @param os Output stream.
+ * @param o optional to be printed.
+ * @return Output stream.
+ */
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, const std::optional<T>& o) {
+	if (o.has_value()) return os << *o;
+	return os << "empty";
 }
 
 /**
@@ -214,6 +233,18 @@ inline std::ostream& operator<<(std::ostream& os, const std::unordered_set<T, H,
 		os << it;
 	}
 	return os << "}";
+}
+
+/**
+ * Output a std::variant with arbitrary content.
+ * The call is simply forwarded to whatever content is currently stored in the variant.
+ * @param os Output stream.
+ * @param v variant to be printed.
+ * @return Output stream.
+ */
+template<typename T, typename... Tail>
+inline std::ostream& operator<<(std::ostream& os, const std::variant<T, Tail...>& v) {
+	return std::visit([&os](const auto& value) -> auto& { return os << value; }, v);
 }
 
 /**
