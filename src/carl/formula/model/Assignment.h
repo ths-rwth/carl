@@ -17,8 +17,6 @@
 #include "uninterpreted/SortValue.h"
 #include "uninterpreted/UFModel.h"
 
-#include <boost/variant.hpp>
-
 #include <map>
 
 namespace carl
