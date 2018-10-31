@@ -61,6 +61,10 @@ public:
 		return mValue;
 	}
 
+	const Base& base() const {
+		return mValue;
+	}
+
 	std::size_t width() const {
 		return mValue.size();
 	}
@@ -92,7 +96,7 @@ public:
 	BVValue repeat(std::size_t _n) const {
 		assert(_n > 0);
 		BVValue repeated(_n * width());
-
+		// Todo: Implement with shifts instead of copying every single bit.
 		for (std::size_t i = 0; i < repeated.width(); ++i) {
 			repeated[i] = (*this)[i % width()];
 		}
@@ -123,32 +127,9 @@ public:
 
 	BVValue operator+(const BVValue& _other) const;
 
-	BVValue operator&(const BVValue& _other) const {
-		assert(_other.width() == width());
-		return BVValue(mValue & Base(_other));
-	}
-
-	BVValue operator|(const BVValue& _other) const {
-		assert(_other.width() == width());
-		return BVValue(mValue | Base(_other));
-	}
-
-	BVValue operator^(const BVValue& _other) const {
-		assert(_other.width() == width());
-		return BVValue(mValue ^ Base(_other));
-	}
-
 	BVValue concat(const BVValue& _other) const;
 
 	BVValue operator*(const BVValue& _other) const;
-
-	BVValue operator%(const BVValue& _other) const {
-		return divideUnsigned(_other, true);
-	}
-
-	BVValue operator/(const BVValue& _other) const {
-		return divideUnsigned(_other);
-	}
 
 	BVValue divideSigned(const BVValue& _other) const;
 
@@ -156,36 +137,27 @@ public:
 
 	BVValue modSigned(const BVValue& _other) const;
 
-	BVValue operator<<(const BVValue& _other) const {
-		return shift(_other, true);
-	}
-
-	BVValue operator>>(const BVValue& _other) const {
-		return shift(_other, false, false);
-	}
-
 	BVValue rightShiftArithmetic(const BVValue& _other) const {
 		return shift(_other, false, true);
 	}
 
 	BVValue extract(std::size_t _highest, std::size_t _lowest) const;
 
-private:
 	BVValue shift(const BVValue& _other, bool _left, bool _arithmetic = false) const;
 
 	BVValue divideUnsigned(const BVValue& _other, bool _returnRemainder = false) const;
 };
 
 inline bool operator==(const BVValue& lhs, const BVValue& rhs) {
-	return static_cast<BVValue::Base>(lhs) == static_cast<BVValue::Base>(rhs);
+	return lhs.base() == rhs.base();
 }
 
 inline bool operator<(const BVValue& lhs, const BVValue& rhs) {
-	return static_cast<BVValue::Base>(lhs) < static_cast<BVValue::Base>(rhs);
+	return lhs.base() < rhs.base();
 }
 
 inline BVValue operator~(const BVValue& val) {
-	return BVValue(~static_cast<BVValue::Base>(val));
+	return BVValue(~val.base());
 }
 
 inline BVValue operator-(const BVValue& val) {
@@ -195,6 +167,37 @@ inline BVValue operator-(const BVValue& val) {
 inline BVValue operator-(const BVValue& lhs, const BVValue& rhs) {
 	assert(lhs.width() == rhs.width());
 	return lhs + (-rhs);
+}
+
+inline BVValue operator%(const BVValue& lhs, const BVValue& rhs) {
+	return lhs.divideUnsigned(rhs, true);
+}
+
+inline BVValue operator/(const BVValue& lhs, const BVValue& rhs) {
+	return lhs.divideUnsigned(rhs);
+}
+
+inline BVValue operator&(const BVValue& lhs, const BVValue& rhs) {
+	assert(lhs.width() == rhs.width());
+	return BVValue(lhs.base() & rhs.base());
+}
+
+inline BVValue operator|(const BVValue& lhs, const BVValue& rhs) {
+	assert(lhs.width() == rhs.width());
+	return BVValue(lhs.base() | rhs.base());
+}
+
+inline BVValue operator^(const BVValue& lhs, const BVValue& rhs) {
+	assert(lhs.width() == rhs.width());
+	return BVValue(lhs.base() ^ rhs.base());
+}
+
+inline BVValue operator<<(const BVValue& lhs, const BVValue& rhs) {
+	return lhs.shift(rhs, true);
+}
+
+inline BVValue operator>>(const BVValue& lhs, const BVValue& rhs) {
+	return lhs.shift(rhs, false, false);
 }
 
 inline std::ostream& operator<<(std::ostream& os, const BVValue& val) {
