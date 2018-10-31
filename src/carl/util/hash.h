@@ -69,7 +69,7 @@ inline std::size_t hash_all(Args&&... args) {
 }
 
 template<typename T>
-struct HashInserter {
+struct hash_inserter {
 	using difference_type = void;
 	using pointer = void;
 	using reference = void;
@@ -77,13 +77,13 @@ struct HashInserter {
 	using iterator_category = std::output_iterator_tag;
 
 	std::size_t& seed;
-	HashInserter& operator=(const T& t) {
+	hash_inserter& operator=(const T& t) {
 		hash_add(seed, t);
 		return *this;
 	}
-	HashInserter& operator*() { return *this; }
-	HashInserter& operator++() { return *this; }
-	HashInserter& operator++(int) { return *this; }
+	hash_inserter& operator*() { return *this; }
+	hash_inserter& operator++() { return *this; }
+	hash_inserter& operator++(int) { return *this; }
 };
 
 } // namespace carl

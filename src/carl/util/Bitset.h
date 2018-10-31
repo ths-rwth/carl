@@ -1,8 +1,9 @@
 #pragma once
 
-#include "hash.h"
+#include "boost_util.h"
 
 #include <iostream>
+
 #include <boost/dynamic_bitset.hpp>
 
 namespace carl {
@@ -245,15 +246,6 @@ namespace carl {
 }
 
 namespace std {
-
-template<typename Block, typename Allocator>
-struct hash<boost::dynamic_bitset<Block,Allocator>> {
-	std::size_t operator()(const boost::dynamic_bitset<Block,Allocator>& bs) const {
-		std::size_t seed = bs.size();
-		boost::to_block_range(bs, carl::HashInserter<Block>{ seed });
-		return seed;
-	}
-};
 
 template<>
 struct hash<carl::Bitset> {
