@@ -418,7 +418,7 @@ namespace carl
 	Formula<Poly> representingFormula(const ModelVariable& mv, const ModelValue<Rational,Poly>& val) {
 		if (val.isBool()) {
 			assert(mv.isVariable());
-			if (val.isBool()) return Formula<Poly>(mv.asVariable());
+			if (val.asBool()) return Formula<Poly>(mv.asVariable());
 			else return Formula<Poly>(FormulaType::NOT, Formula<Poly>(mv.asVariable()));
 		} else if (val.isRational()) {
 			assert(mv.isVariable());
