@@ -6,7 +6,7 @@
 #pragma once
 
 #include "../../numbers/numbers.h"
-#include "../../util/Bitset.h"
+#include "../../util/boost_util.h"
 
 #include <array>
 #include <boost/dynamic_bitset.hpp>
@@ -24,11 +24,12 @@ private:
 	template<std::size_t len>
 	explicit BVValue(const std::array<uint, len>& a)
 		: mValue(a.begin(), a.end()) {}
-	explicit BVValue(Base&& value)
-		: mValue(std::move(value)) {}
 
 public:
 	BVValue() = default;
+
+	explicit BVValue(Base&& value)
+		: mValue(std::move(value)) {}
 
 	explicit BVValue(std::size_t _width, uint _value = 0)
 		: BVValue(std::array<uint, 1>({{_value}})) {
@@ -74,14 +75,6 @@ public:
 		return mValue.none();
 	}
 
-	BVValue operator-() const {
-		return ~(*this) + BVValue(width(), 1);
-	}
-
-	BVValue operator~() const {
-		return BVValue(~mValue);
-	}
-
 	BVValue rotateLeft(std::size_t _n) const {
 		Base lowerPart(mValue);
 		Base upperPart(mValue);
@@ -118,18 +111,6 @@ public:
 		return BVValue(std::move(copy));
 	}
 
-	friend std::ostream& operator<<(std::ostream& _out, const BVValue& _value) {
-		return (_out << _value.toString());
-	}
-
-	bool operator==(const BVValue& _other) const {
-		return mValue == _other.mValue;
-	}
-
-	bool operator<(const BVValue& _other) const {
-		return mValue < _other.mValue;
-	}
-
 	Base::reference operator[](std::size_t _index) {
 		assert(_index < width());
 		return mValue[_index];
@@ -141,11 +122,6 @@ public:
 	}
 
 	BVValue operator+(const BVValue& _other) const;
-
-	BVValue operator-(const BVValue& _other) const {
-		assert(_other.width() == width());
-		return (*this) + (-_other);
-	}
 
 	BVValue operator&(const BVValue& _other) const {
 		assert(_other.width() == width());
@@ -199,13 +175,37 @@ private:
 
 	BVValue divideUnsigned(const BVValue& _other, bool _returnRemainder = false) const;
 };
+
+inline bool operator==(const BVValue& lhs, const BVValue& rhs) {
+	return static_cast<BVValue::Base>(lhs) == static_cast<BVValue::Base>(rhs);
+}
+
+inline bool operator<(const BVValue& lhs, const BVValue& rhs) {
+	return static_cast<BVValue::Base>(lhs) < static_cast<BVValue::Base>(rhs);
+}
+
+inline BVValue operator~(const BVValue& val) {
+	return BVValue(~static_cast<BVValue::Base>(val));
+}
+
+inline BVValue operator-(const BVValue& val) {
+	return ~val + BVValue(val.width(), 1);
+}
+
+inline BVValue operator-(const BVValue& lhs, const BVValue& rhs) {
+	assert(lhs.width() == rhs.width());
+	return lhs + (-rhs);
+}
+
+inline std::ostream& operator<<(std::ostream& os, const BVValue& val) {
+	return os << "#b" << static_cast<BVValue::Base>(val);
+}
+
 } // namespace carl
 
 namespace std {
 /**
  * Implements std::hash for bit vector values.
- * TODO: Make more efficient (currently uses dynamic_bitset<> conversion to string).
- * See also: https://stackoverflow.com/q/3896357, https://svn.boost.org/trac/boost/ticket/2841
  */
 template<>
 struct hash<carl::BVValue> {
