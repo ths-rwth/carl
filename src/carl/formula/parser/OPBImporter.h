@@ -4,10 +4,9 @@
 #include "../../core/Relation.h"
 #include "../Formula.h"
 
-#include <boost/optional.hpp>
-
 #include <iostream>
 #include <map>
+#include <optional>
 #include <tuple>
 #include <vector>
 
@@ -25,7 +24,7 @@ struct OPBFile {
 	OPBFile(OPBPolynomial obj, std::vector<OPBConstraint> cons): objective(std::move(obj)), constraints(std::move(cons)) {}
 };
 
-boost::optional<OPBFile> parseOPBFile(std::ifstream& in);
+std::optional<OPBFile> parseOPBFile(std::ifstream& in);
 
 template<typename Pol>
 class OPBImporter {
@@ -57,11 +56,11 @@ public:
 		mIn(filename)
 	{}
 	
-	boost::optional<std::pair<Formula<Pol>,Pol>> parse() {
-		if (!mIn.is_open()) return boost::none;
+	std::optional<std::pair<Formula<Pol>,Pol>> parse() {
+		if (!mIn.is_open()) return std::nullopt;
 
 		auto file = parseOPBFile(mIn);
-		if (!file) return boost::none;
+		if (!file) return std::nullopt;
 		Formulas<Pol> constraints;
 		for (const auto& cons: file->constraints) {
 			auto lhs = convert(std::get<0>(cons));

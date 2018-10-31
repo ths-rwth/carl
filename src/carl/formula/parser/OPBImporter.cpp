@@ -49,7 +49,7 @@ namespace carl {
 			mMain = (mObjective >> *(mConstraint > ";"))[qi::_val = px::bind(&OPBParser::createFile, px::ref(*this), qi::_1, qi::_2)];
 			qi::on_error<qi::fail>(mMain, errorHandler(qi::_1, qi::_2, qi::_3, qi::_4));
 		}
-		boost::optional<OPBFile> parse(std::istream& in) {
+		std::optional<OPBFile> parse(std::istream& in) {
 			in.unsetf(std::ios::skipws);
 			Skipper skipper;
 			BaseIteratorType basebegin(in);
@@ -60,13 +60,13 @@ namespace carl {
 				if (begin != end) {
 					std::cout << "Failed to parse:" << std::endl;
 					std::cout << "\"" << std::string(begin, end) << "\"" << std::endl;
-					return boost::none;
+					return std::nullopt;
 				}
 				return res;
 			} else {
 				std::cout << "Failed to parse:" << std::endl;
 				std::cout << "\"" << std::string(begin, end) << "\"" << std::endl;
-				return boost::none;
+				return std::nullopt;
 			}
 		}
 		
@@ -92,7 +92,7 @@ namespace carl {
 		px::function<ErrorHandler> errorHandler;
 	};
 
-	boost::optional<OPBFile> parseOPBFile(std::ifstream& in) {
+	std::optional<OPBFile> parseOPBFile(std::ifstream& in) {
 		OPBParser parser;
 		return parser.parse(in);
 	}
