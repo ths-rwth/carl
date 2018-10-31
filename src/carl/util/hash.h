@@ -67,4 +67,23 @@ inline std::size_t hash_all(Args&&... args) {
 	hash_add(seed, std::forward<Args>(args)...);
 	return seed;
 }
+
+template<typename T>
+struct HashInserter {
+	using difference_type = void;
+	using pointer = void;
+	using reference = void;
+	using value_type = void;
+	using iterator_category = std::output_iterator_tag;
+
+	std::size_t& seed;
+	HashInserter& operator=(const T& t) {
+		hash_add(seed, t);
+		return *this;
+	}
+	HashInserter& operator*() { return *this; }
+	HashInserter& operator++() { return *this; }
+	HashInserter& operator++(int) { return *this; }
+};
+
 } // namespace carl
