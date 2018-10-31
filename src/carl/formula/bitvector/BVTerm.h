@@ -432,16 +432,16 @@ namespace carl
 
 		std::size_t hash() const
 		{
-			return this->mHash;
+			return mHash;
 		}
 
 		bool operator==(const BVTermContent& rhs) const {
 			if(mId != 0 && rhs.mId != 0) return mId == rhs.mId;
-			return std::tie(mType, mHash, mWidth, mContent) == std::tie(rhs.mType, rhs.mHash, rhs.mWidth, mContent);
+			return std::tie(mType, mHash, mWidth, mContent) == std::tie(rhs.mType, rhs.mHash, rhs.mWidth, rhs.mContent);
 		}
 		bool operator<(const BVTermContent& rhs) const {
 			if(mId != 0 && rhs.mId != 0) return mId < rhs.mId;
-			return std::tie(mType, mHash, mWidth, mContent) < std::tie(rhs.mType, rhs.mHash, rhs.mWidth, mContent);
+			return std::tie(mType, mHash, mWidth, mContent) < std::tie(rhs.mType, rhs.mHash, rhs.mWidth, rhs.mContent);
 		}
 
 		/**
