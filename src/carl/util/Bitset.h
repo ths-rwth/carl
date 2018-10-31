@@ -1,7 +1,8 @@
 #pragma once
 
-#include <iostream>
+#include "hash.h"
 
+#include <iostream>
 #include <boost/dynamic_bitset.hpp>
 
 namespace carl {
@@ -17,6 +18,8 @@ namespace carl {
 	 */
 	class Bitset {
 	public:
+		friend struct std::hash<carl::Bitset>;
+
 		/// Underlying storage type.
 		using BaseType = boost::dynamic_bitset<>;
 		/// Sentinel element for iteration.
@@ -239,4 +242,24 @@ namespace carl {
 			return os << b.mData << '|' << b.mDefault;
 		}
 	};
+}
+
+namespace std {
+
+template<typename Block, typename Allocator>
+struct hash<boost::dynamic_bitset<Block,Allocator>> {
+	std::size_t operator()(const boost::dynamic_bitset<Block,Allocator>& bs) const {
+		std::size_t seed = bs.size();
+		boost::to_block_range(bs, carl::HashInserter<Block>{ seed });
+		return seed;
+	}
+};
+
+template<>
+struct hash<carl::Bitset> {
+	std::size_t operator()(const carl::Bitset& bs) const {
+		return std::hash<carl::Bitset::BaseType>()(bs.mData);
+	}
+};
+
 }
