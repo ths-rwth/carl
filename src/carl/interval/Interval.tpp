@@ -447,6 +447,9 @@ Interval<Number> Interval<Number>::convexHull(const Interval<Number>& interval) 
 template<typename Number>
 Interval<Number> Interval<Number>::add(const Interval<Number>& rhs) const
 {
+    if(this->isEmpty() || rhs.isEmpty()) {
+        return Interval<Number>::emptyInterval();
+    }
     assert(this->isConsistent());
     assert(rhs.isConsistent());
     return Interval<Number>( mContent + rhs.content(),
@@ -463,6 +466,8 @@ void Interval<Number>::add_assign(const Interval<Number>& rhs)
 template<typename Number>
 Interval<Number> Interval<Number>::sub(const Interval<Number>& rhs) const
 {
+    if(this->isEmpty()) return Interval<Number>::emptyInterval();
+    if(rhs.isEmpty()) return *this;
     assert(this->isConsistent());
     assert(rhs.isConsistent());
     return this->add(rhs.inverse());
@@ -477,9 +482,9 @@ void Interval<Number>::sub_assign(const Interval<Number>& rhs)
 template<typename Number>
 Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
 {
+    if( this->isEmpty() || rhs.isEmpty() ) return emptyInterval();
     assert(this->isConsistent());
     assert(rhs.isConsistent());
-    if( this->isEmpty() || rhs.isEmpty() ) return emptyInterval();
     BoundType lowerBoundType = BoundType::WEAK;
     BoundType upperBoundType = BoundType::WEAK;
     BoostInterval resultInterval;
