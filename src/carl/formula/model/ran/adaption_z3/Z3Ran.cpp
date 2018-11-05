@@ -7,22 +7,17 @@ namespace carl {
 
     template<typename Number>
     Z3Ran<Number>::Z3Ran() {
-        mContent = new Z3RanContent();
+        mContent = std::make_shared<Z3RanContent>();
     };
 
     template<typename Number>
-    Z3Ran<Number>::Z3Ran(Z3RanContent content) {
-        mContent = new Z3RanContent(content);
+    Z3Ran<Number>::Z3Ran(const Z3RanContent& content) { // TODO unneccessary copying??
+        mContent = std::make_shared<Z3RanContent>(content);
     }
 
     template<typename Number>
     Z3Ran<Number>::Z3Ran(const Number& r) : Z3Ran() {
         z3().anumMan().set(content(), z3().toZ3MPQ(r));
-    }
-
-    template<typename Number>
-    Z3Ran<Number>::~Z3Ran() {
-        delete mContent;
     }
 
     template<typename Number>
