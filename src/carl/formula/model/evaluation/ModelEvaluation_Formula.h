@@ -66,22 +66,22 @@ namespace model {
 		CARL_LOG_DEBUG("carl.model.evaluation", "Comparison: " << reference << " " << vc.relation() << " " << val);
 		switch (vc.relation()) {
 			case Relation::EQ:
-				if (reference == val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference == val) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::NEQ:
-				if (reference != val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference != val) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::LESS:
-				if (reference < val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference < val) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::LEQ:
-				if (reference <= val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference <= val) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::GREATER:
-				if (reference > val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference > val) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 			case Relation::GEQ:
-				if (reference >= val.changeVariable(vc.var())) f = Formula<Poly>(FormulaType::TRUE);
+				if (reference >= val) f = Formula<Poly>(FormulaType::TRUE);
 				break;
 		}
 		if (vc.negated()) {
