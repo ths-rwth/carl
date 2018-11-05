@@ -15,7 +15,7 @@ namespace carl {
     template<typename Number>
     class Z3Ran {
         private:
-            Z3RanContent * mContent; // TODO use shared ptr
+            std::shared_ptr<Z3RanContent> mContent;
 
             mutable Number mLower;
             mutable Number mUpper;
@@ -25,11 +25,9 @@ namespace carl {
         public:
             explicit Z3Ran();
 
-            explicit Z3Ran(Z3RanContent content);
+            explicit Z3Ran(const Z3RanContent& content);
 
             explicit Z3Ran(const Number& r);
-
-            ~Z3Ran();
 
             Z3RanContent& content() const {
                 return *mContent;
