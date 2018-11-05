@@ -46,9 +46,9 @@ namespace carl {
 
         std::vector<RealAlgebraicNumber<Number>> res;
         for (size_t i = 0; i < roots.size(); i++) {
-            Z3Ran<Number> z3ran(roots[i]);
-            if (z3ran.containedIn(interval)) {
-                res.push_back(RealAlgebraicNumber<Number>(std::move(z3ran))); 
+            Z3Ran<Number> zr(roots[i]);
+            if (zr.containedIn(interval)) {
+                res.push_back(RealAlgebraicNumber<Number>(std::move(zr))); 
             }
         }
         
