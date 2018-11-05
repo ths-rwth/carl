@@ -462,6 +462,7 @@ std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) 
 	if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";
 	else if (ran.isInterval()) return os << "(IR " << ran.getInterval() << ", " << ran.getIRPolynomial() << (ran.isRoot() ? " R" : "") << ")";
 	else if (ran.isThom()) return os << "(TE " << ran.getThomEncoding() << (ran.isRoot() ? " R" : "") << ")";
+	else if (ran.isZ3Ran()) return os << "(Z3 " << ran.getZ3Ran() << (ran.isRoot() ? " R" : "") << ")";
 	else return os << "(RAN)"; // should never be the case
 }
 

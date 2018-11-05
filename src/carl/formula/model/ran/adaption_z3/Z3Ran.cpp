@@ -148,7 +148,13 @@ namespace carl {
         return z3().anumMan().lt(content(),n.content());
     }
 
+    template<typename Number>
+    std::ostream& operator<<(std::ostream& os, const Z3Ran<Number>& zr) {
+        z3().anumMan().display_root(os, zr.content());
+        return os;
+    }
 
     template class Z3Ran<mpq_class>;
+    template std::ostream& operator<<(std::ostream& os, const Z3Ran<mpq_class>& zr);
 
 }

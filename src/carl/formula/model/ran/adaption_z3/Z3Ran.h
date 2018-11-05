@@ -62,4 +62,6 @@ namespace carl {
 	        bool less(const Z3Ran<Number>& n) const;
     };
 
+    template<typename Number>
+    std::ostream& operator<<(std::ostream& os, const Z3Ran<Number>& zr);    
 }
