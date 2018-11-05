@@ -7,7 +7,6 @@
 namespace carl {
 
     Z3Converter& z3() {
-        std::cout << "CALL TO Z3" << std::endl;
         // TODO put z3 init somewhere else...
         static bool initialized = false;
         if (!initialized) {
