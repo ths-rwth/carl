@@ -126,11 +126,12 @@ matrix:
       os: linux
       compiler: g++-7
       env: CC=gcc-7 CXX=g++-7 TASK=doxygen
+      if: branch = master
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
         apt:
           sources: [*sources_base]
-          packages: [*packages_base, g++-7, doxygen, ghostscript, latex-xcolor, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra]
+          packages: [*packages_base, g++-7, doxygen, ghostscript, latex-xcolor, lmodern, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra]
     - stage: build
       os: linux
       compiler: clang++-5.0
