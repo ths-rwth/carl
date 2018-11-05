@@ -123,6 +123,10 @@ matrix:
       osx_image: xcode10
       script: source .ci/build.sh
     - stage: build
+      os: osx
+      osx_image: xcode10.1
+      script: source .ci/build.sh
+    - stage: build
       os: linux
       compiler: g++-7
       env: CC=gcc-7 CXX=g++-7 TASK=doxygen
