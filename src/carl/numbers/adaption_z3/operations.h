@@ -14,14 +14,7 @@
 
 namespace carl {
 
-inline mpz_manager<true>& mpzmanager() { // TODO remove
-	static mpz_manager<true> m;
-	return m;
-}
-inline mpq_manager<true>& mpqmanager() { // TODO remove
-	static mpq_manager<true> m;
-	return m;
-}
+// TODO maybe move getter for managers here?
 
 inline bool isZero(const rational& n) {
 	return n.is_zero();
