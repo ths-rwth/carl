@@ -310,12 +310,6 @@ public:
 		return mIR->sturmSequence;
 	}
 
-	RealAlgebraicNumber changeVariable(Variable v) const { // TODO variable wird doch in interval wieder ersetzt?? => sollte entfernt werden!
-		if (isNumeric()) return *this;
-		assert(isInterval());
-		return RealAlgebraicNumber<Number>(mIR->polynomial.replaceVariable(v), mIR->interval, mIsRoot);
-	}
-
 	Sign sgn() const {
 		if (isNumeric()) {
 			return carl::sgn(mValue);
