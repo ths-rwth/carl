@@ -3,7 +3,7 @@
 
 #include "../../../../converter/Z3Converter.h"
 
-namespace carl {
+namespace carl { // TODO do all operations work if !is_rational ???
 
     template<typename Number>
     Z3Ran<Number>::Z3Ran() {
@@ -33,7 +33,11 @@ namespace carl {
     template<typename Number>
     const Number& Z3Ran<Number>::lower() const {
         mpq res;
-        z3().anumMan().get_lower(content(), res);
+        if (z3().anumMan().is_rational(content())) {
+            z3().anumMan().to_rational(content(), res);
+        } else {
+            z3().anumMan().get_lower(content(), res);
+        }
         mLower = z3().toNumber<Number>(res);
         return mLower;
     } 
@@ -41,16 +45,25 @@ namespace carl {
     template<typename Number>
     const Number& Z3Ran<Number>::upper() const {
         mpq res;
-        z3().anumMan().get_upper(content(), res);
+        if (z3().anumMan().is_rational(content())) {
+            z3().anumMan().to_rational(content(), res);
+        } else {
+            z3().anumMan().get_upper(content(), res);
+        }
         mUpper = z3().toNumber<Number>(res);
         return mUpper;
     } 
 
     template<typename Number>
-    const Interval<Number>& Z3Ran<Number>::getInterval() const {
-        const Number& lo = lower();
-        const Number& up = upper();
-        mInterval = Interval<Number>(lo, BoundType::STRICT, up, BoundType::STRICT);
+    const Interval<Number>& Z3Ran<Number>::getInterval() const { // TODO
+        if (z3().anumMan().is_rational(content())) {
+            const Number& val = lower();
+            mInterval = Interval<Number>(val, BoundType::WEAK, val, BoundType::WEAK);
+        } else {
+            const Number& lo = lower();
+            const Number& up = upper();
+            mInterval = Interval<Number>(lo, BoundType::STRICT, up, BoundType::STRICT);
+        }
         return mInterval;
     }
 
