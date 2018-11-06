@@ -38,15 +38,14 @@ private:
 	// TODO refactor: remove operator()
 public:
 
-	Z3Converter() : poly_man(rl, mpq_man), anum_man(rl, mpq_man) {
-		Z3Converter::initialize();
-	}
-
-	static void initialize() {
+	static void initialize() { // must be called before creating an instance
 		initialize_symbols();
         gparams::init();
         rational::initialize();
 	}
+
+	Z3Converter() :
+		poly_man(rl, mpq_man), anum_man(rl, mpq_man) {}
 
 	// z3 manager classes
 
