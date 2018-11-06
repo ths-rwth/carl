@@ -111,6 +111,9 @@ namespace carl { // TODO do all operations work if !is_rational ???
         polynomial::var var = z3().toZ3(p.mainVar());
         map.set(var, content());
         int rs = z3().anumMan().eval_sign_at(poly, map);
+        if (rs < 0) return Sign::NEGATIVE;
+        else if (rs == 0) return Sign::ZERO;
+        else /* rs > 0 */ return Sign::POSITIVE;
     }
 
     template<typename Number>
