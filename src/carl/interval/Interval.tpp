@@ -356,12 +356,12 @@ template<typename Number>
 
         for( unsigned i = 1; i < (n-1); ++i )
         {
-            tmp.set(diameter*i, diameter*(i+1));
-	    tmp.setUpperBoundType(BoundType::STRICT);
+            tmp += diameter;
+	        tmp.setUpperBoundType(BoundType::STRICT);
             result.push_back(tmp);
         }
 
-        tmp.set(diameter*(n-1),diameter*n);
+        tmp += diameter;
         tmp.setUpperBoundType(mUpperBoundType);
         result.push_back(tmp);
 		return result;

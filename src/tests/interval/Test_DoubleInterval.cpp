@@ -1112,6 +1112,25 @@ TEST(DoubleInterval, Split)
 	EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 4, BoundType::STRICT), *results.begin());
     results.pop_front();
 	EXPECT_EQ(DoubleInterval(4, BoundType::WEAK, 5, BoundType::STRICT), *results.begin());
+
+    DoubleInterval i6(12,BoundType::WEAK, 20, BoundType::WEAK);
+    results = i6.split(8);
+    EXPECT_EQ((unsigned)8, results.size());
+    EXPECT_EQ(DoubleInterval(12, BoundType::WEAK, 13, BoundType::STRICT), *results.begin());
+	results.pop_front();
+    EXPECT_EQ(DoubleInterval(13, BoundType::WEAK, 14, BoundType::STRICT), *results.begin());
+    results.pop_front();
+	EXPECT_EQ(DoubleInterval(14, BoundType::WEAK, 15, BoundType::STRICT), *results.begin());
+    results.pop_front();
+	EXPECT_EQ(DoubleInterval(15, BoundType::WEAK, 16, BoundType::STRICT), *results.begin());
+    results.pop_front();
+	EXPECT_EQ(DoubleInterval(16, BoundType::WEAK, 17, BoundType::STRICT), *results.begin());
+    results.pop_front();
+	EXPECT_EQ(DoubleInterval(17, BoundType::WEAK, 18, BoundType::STRICT), *results.begin());
+    results.pop_front();
+	EXPECT_EQ(DoubleInterval(18, BoundType::WEAK, 19, BoundType::STRICT), *results.begin());
+    results.pop_front();
+	EXPECT_EQ(DoubleInterval(19, BoundType::WEAK, 20, BoundType::WEAK), *results.begin());
 }
 
 TEST(DoubleInterval, Properties)
