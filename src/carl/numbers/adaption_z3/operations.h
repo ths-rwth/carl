@@ -14,8 +14,6 @@
 
 namespace carl {
 
-// TODO maybe move getter for managers here?
-
 inline bool isZero(const rational& n) {
 	return n.is_zero();
 }

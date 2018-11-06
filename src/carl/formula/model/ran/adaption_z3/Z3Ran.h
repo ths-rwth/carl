@@ -27,6 +27,8 @@ namespace carl {
 
             explicit Z3Ran(const Z3RanContent& content);
 
+            explicit Z3Ran(Z3RanContent&& content);
+
             explicit Z3Ran(const Number& r);
 
             Z3RanContent& content() const {

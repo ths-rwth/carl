@@ -16,5 +16,6 @@ typedef unsigned digit_t;
 #include <util/vector.h>
 #include <math/polynomial/algebraic_numbers.h>
 #include <nlsat/nlsat_assignment.h>
+#include <util/gparams.h>
 
 #undef alloc

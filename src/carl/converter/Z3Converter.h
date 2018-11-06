@@ -19,6 +19,12 @@
 
 namespace carl {
 
+/**
+ * Should not be instatiated directly. A singleton instance can
+ * be obtained via via carl::z3().
+ * 
+ * Maybe not thread-safe.
+ */
 class Z3Converter {
 private:
 	std::map<carl::Variable, polynomial::var> vars;
@@ -31,9 +37,18 @@ private:
 
 	// TODO refactor: remove operator()
 public:
-	Z3Converter(): 
-		poly_man(rl, mpq_man), anum_man(rl, mpq_man) {
+
+	Z3Converter() : poly_man(rl, mpq_man), anum_man(rl, mpq_man) {
+		Z3Converter::initialize();
 	}
+
+	static void initialize() {
+		initialize_symbols();
+        gparams::init();
+        rational::initialize();
+	}
+
+	// z3 manager classes
 
 	unsynch_mpq_manager& mpqMan() {
 		return mpq_man;
@@ -51,9 +66,26 @@ public:
 		return anum_man;
 	}
 
-	// conversions to Z3 types
+	// free z3 types
 
-	// TODO Z3.free()
+	void free(mpz& val) {
+		mpzMan().del(val);
+	}
+
+	void free(mpq& val) {
+		mpqMan().del(val);
+	}
+
+	void free(anum& val) {
+		anumMan().del(val);
+	}
+
+	// rationals and polynomial_refs are free'd automatically:
+	// rationals: scoped
+	// polynomial_ref: reference counting
+	// var: is an unisgned
+
+	// conversions to Z3 types
 
 	/**
 	 * Converts a polynomial pointer to a polynomial reference.
@@ -67,13 +99,12 @@ public:
 	/**
 	 * Converts a number.
      */
-	/*
 	rational toZ3(const rational& n) {
 		return n;
 	}
 	rational operator()(const rational& n) {
 		return toZ3(n);
-	}*/
+	}
     #ifdef USE_CLN_NUMBERS  // TODO remove, deduplicate with carlconverter...
 	rational operator()(const cln::cl_RA& n) {
 		std::stringstream ss1;
@@ -111,19 +142,17 @@ public:
 		mpz num = toZ3MPZ(n.get_num_mpz_t());
 		mpq res;
 		mpq_man.set(res, num, den);
+		free(den);
+		free(num);
 		return res;
 	}
-	/*
 	rational toZ3Rational(const mpq_class& n) {
 		return rational(toZ3MPQ(n));
-	}*/
-	//rational toZ3(const mpq_class& n) {
-	mpq toZ3(const mpq_class& n) {
-		//return toZ3Rational(n);
-		return toZ3MPQ(n);
 	}
-	//rational operator()(const mpq_class& n) {
-	mpq operator()(const mpq_class& n) {
+	rational toZ3(const mpq_class& n) {
+		return toZ3Rational(n);
+	}
+	rational operator()(const mpq_class& n) {
 		return toZ3(n);
 	}
 	/**
@@ -153,10 +182,7 @@ public:
      */
 	polynomial::polynomial_ref toZ3(const carl::Monomial& m) {
 		polynomial::polynomial_ref res(polyMan());
-		//res = polyMan().mk_const(rational(1));
-		mpq val;
-		mpqMan().set(val, 1);
-		res = polyMan().mk_const(val);
+		res = polyMan().mk_const(rational(1));
 		for (auto it: m) {
 			res = res * toZ3(it);
 		}
@@ -168,7 +194,8 @@ public:
 	template<typename Coeff>
 	polynomial::polynomial_ref toZ3(const carl::Term<Coeff>& t) {
 		polynomial::polynomial_ref res(polyMan());
-		res = toZ3(polyMan().mk_const(toZ3(t.coeff()))); // TODO der konvertiert die scheiße wieder in ein rational :°(
+		assert(getDenom(t.coeff()) == 1); // z3 polynomial coefficients must be integer // TODO test
+		res = toZ3(polyMan().mk_const(toZ3(t.coeff())));
 		if (t.monomial()) return res * toZ3(*(t.monomial()));
 		else return res;
 	}
@@ -262,7 +289,10 @@ inline mpq_class Z3Converter::toNumber<mpq_class>(const mpq& m) {
 	mpqMan().get_denominator(m, zden);
 	mpz_class num = toNumber<mpz_class>(znum);
 	mpz_class den = toNumber<mpz_class>(zden);
-	return mpq_class(num, den);
+	mpq_class res(num, den);
+	free(znum);
+	free(zden);
+	return res;
 }
 
 Z3Converter& z3();
