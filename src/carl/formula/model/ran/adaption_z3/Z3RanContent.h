@@ -4,7 +4,7 @@
 
 namespace carl {
 
-    class Z3RanContent { // TODO is unneccessary copying avoided??
+    class Z3RanContent {
         private:
             algebraic_numbers::anum mContent;
 
@@ -17,7 +17,15 @@ namespace carl {
                 z3().anumMan().set(mContent, content);
             }
 
+            Z3RanContent(algebraic_numbers::anum&& content) {
+                mContent = content;
+            }
+
             Z3RanContent(const Z3RanContent& content) : Z3RanContent(content.mContent) {
+            }
+
+            ~Z3RanContent() {
+                z3().free(mContent);
             }
 
             operator algebraic_numbers::anum&() {

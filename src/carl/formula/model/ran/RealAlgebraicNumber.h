@@ -170,7 +170,7 @@ public:
 	}
 
 	#ifdef USE_Z3_RANS
-	explicit RealAlgebraicNumber(const Z3Ran<Number>& zr, bool isRoot = true):
+	explicit RealAlgebraicNumber(const Z3Ran<Number>& zr, bool isRoot = true): // TODO provide also move constructor?
 		mIsRoot(isRoot),
 		mZR(std::make_shared<Z3Ran<Number>>(zr))
 	{}

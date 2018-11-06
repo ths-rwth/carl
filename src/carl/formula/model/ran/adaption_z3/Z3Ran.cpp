@@ -8,16 +8,23 @@ namespace carl { // TODO do all operations work if !is_rational ???
     template<typename Number>
     Z3Ran<Number>::Z3Ran() {
         mContent = std::make_shared<Z3RanContent>();
-    };
+    }
 
     template<typename Number>
-    Z3Ran<Number>::Z3Ran(const Z3RanContent& content) { // TODO unneccessary copying??
+    Z3Ran<Number>::Z3Ran(const Z3RanContent& content) {
         mContent = std::make_shared<Z3RanContent>(content);
     }
 
     template<typename Number>
+    Z3Ran<Number>::Z3Ran(Z3RanContent&& content) {
+        mContent = std::make_shared<Z3RanContent>(std::move(content));
+    }
+
+    template<typename Number>
     Z3Ran<Number>::Z3Ran(const Number& r) : Z3Ran() {
-        z3().anumMan().set(content(), z3().toZ3MPQ(r));
+        mpq val = z3().toZ3MPQ(r);
+        z3().anumMan().set(content(), val);
+        z3().free(val);
     }
 
     template<typename Number>
@@ -39,6 +46,7 @@ namespace carl { // TODO do all operations work if !is_rational ???
             z3().anumMan().get_lower(content(), res);
         }
         mLower = z3().toNumber<Number>(res);
+        z3().free(res);
         return mLower;
     } 
 
@@ -51,11 +59,12 @@ namespace carl { // TODO do all operations work if !is_rational ???
             z3().anumMan().get_upper(content(), res);
         }
         mUpper = z3().toNumber<Number>(res);
+        z3().free(res);
         return mUpper;
     } 
 
     template<typename Number>
-    const Interval<Number>& Z3Ran<Number>::getInterval() const { // TODO
+    const Interval<Number>& Z3Ran<Number>::getInterval() const { // TODO get interval ...
         if (z3().anumMan().is_rational(content())) {
             const Number& val = lower();
             mInterval = Interval<Number>(val, BoundType::WEAK, val, BoundType::WEAK);
@@ -88,6 +97,9 @@ namespace carl { // TODO do all operations work if !is_rational ???
         svector<mpz> res;
         z3().anumMan().get_polynomial(content(), res);
         mPolynomial = z3().toUnivPoly<Number>(res);
+        for (size_t i = 0; i < res.size(); i++) {
+            z3().free(res[i]);
+        }
         return *mPolynomial;
         // TODO use IntervalContent<Number>::auxVariable
     }
@@ -107,7 +119,7 @@ namespace carl { // TODO do all operations work if !is_rational ???
     template<typename Number>
     Sign Z3Ran<Number>::sgn(const UnivariatePolynomial<Number>& p) const {
         polynomial::polynomial_ref poly = z3().toZ3(p);
-        nlsat::assignment map(z3().anumMan());
+        nlsat::assignment map(z3().anumMan());  // map frees its elements automatically
         polynomial::var var = z3().toZ3(p.mainVar());
         map.set(var, content());
         int rs = z3().anumMan().eval_sign_at(poly, map);
@@ -145,7 +157,7 @@ namespace carl { // TODO do all operations work if !is_rational ???
             algebraic_numbers::anum res;
             z3().anumMan().set(res, content());
             z3().anumMan().neg(res);
-            return Z3Ran<Number>(res);
+            return Z3Ran<Number>(std::move(res));
         }
     }
 

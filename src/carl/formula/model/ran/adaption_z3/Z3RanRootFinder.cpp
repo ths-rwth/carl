@@ -10,18 +10,23 @@ namespace carl {
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval
     ) {
-        auto poly = z3().toZ3(polynomial);
+        polynomial::polynomial_ref poly = z3().toZ3(polynomial);
 
         anum_vector roots;
         z3().anumMan().isolate_roots(poly, roots);
 
         std::vector<RealAlgebraicNumber<Number>> res;
         for (size_t i = 0; i < roots.size(); i++) {
-            Z3Ran<Number> zr(roots[i]);
+            Z3Ran<Number> zr(std::move(roots[i]));
             if (zr.containedIn(interval)) {
-                res.push_back(RealAlgebraicNumber<Number>(std::move(zr))); 
+                res.push_back(RealAlgebraicNumber<Number>(zr)); // TODO move?
             }
         }
+
+        /* values have been moved...
+        for (size_t i = 0; i < roots.size(); i++) {
+            z3().free(roots[i]);
+        }*/
         
         return res;
     }
@@ -32,12 +37,12 @@ namespace carl {
         const std::map<Variable, RealAlgebraicNumber<Number>>& m,
         const Interval<Number>& interval
     ) {
-        auto poly = z3().toZ3(p);
+        polynomial::polynomial_ref poly = z3().toZ3(p);
 
-        nlsat::assignment map(z3().anumMan());
+        nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
         for(auto const &pair : m) {
             polynomial::var var = z3().toZ3(pair.first);
-            algebraic_numbers::anum val = pair.second.getZ3Ran().content();
+            const algebraic_numbers::anum& val = pair.second.getZ3Ran().content();
             map.set(var, val);
         }
 
@@ -46,11 +51,16 @@ namespace carl {
 
         std::vector<RealAlgebraicNumber<Number>> res;
         for (size_t i = 0; i < roots.size(); i++) {
-            Z3Ran<Number> zr(roots[i]);
+            Z3Ran<Number> zr(std::move(roots[i]));
             if (zr.containedIn(interval)) {
-                res.push_back(RealAlgebraicNumber<Number>(std::move(zr))); 
+                res.push_back(RealAlgebraicNumber<Number>(zr)); // TODO move?
             }
         }
+
+        /* values have been moved...
+        for (size_t i = 0; i < roots.size(); i++) {
+            z3().free(roots[i]);
+        }*/
         
         return res;
     }
