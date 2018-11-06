@@ -56,6 +56,9 @@ namespace carl {
 		virtual void multiplyBy( const Rational& _number ) = 0;
 		/// Add a rational to this model substitution.
 		virtual void add( const Rational& _number ) = 0;
+
+		/// Create a copy of this model substitution.
+		virtual ModelSubstitutionPtr<Rational,Poly> clone() const = 0;
 		
 		virtual Formula<Poly> representingFormula( const ModelVariable& mv ) = 0;
         
@@ -76,7 +79,7 @@ namespace carl {
 		return os;
 	}
 	template<typename Rational, typename Poly>
-	inline std::ostream& operator<<(std::ostream& os, const std::shared_ptr<ModelSubstitution<Rational,Poly>>& ms) {
+	inline std::ostream& operator<<(std::ostream& os, const ModelSubstitutionPtr<Rational,Poly>& ms) {
 		ms->print(os);
 		return os;
 	}
@@ -84,7 +87,11 @@ namespace carl {
 	
 	template<typename Rational, typename Poly, typename Substitution, typename... Args>
 	inline ModelValue<Rational,Poly> createSubstitution(Args&&... args) {
-		return ModelValue<Rational,Poly>(std::make_shared<Substitution>(std::forward<Args>(args)...));
+		return ModelValue<Rational,Poly>(std::make_unique<Substitution>(std::forward<Args>(args)...));
+	}
+	template<typename Rational, typename Poly, typename Substitution, typename... Args>
+	inline ModelSubstitutionPtr<Rational,Poly> createSubstitutionPtr(Args&&... args) {
+		return std::make_unique<Substitution>(std::forward<Args>(args)...);
 	}
 	template<typename Rational, typename Poly>
 	inline ModelValue<Rational,Poly> createSubstitution(const MultivariateRoot<Poly>& mr) {

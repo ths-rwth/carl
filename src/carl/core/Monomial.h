@@ -505,37 +505,6 @@ namespace carl
 		}
 
 		/**
-		 * Returns the string representation of this monomial.
-		 * @param infix Flag if prefix or infix notation should be used.
-		 * @param friendlyVarNames Flag if friendly variable names should be used.
-		 * @return String representation.
-		 */
-		std::string toString(bool infix = true, bool friendlyVarNames = true) const;
-
-		/**
-		 * Streaming operator for Monomial.
-		 * @param os Output stream. 
-		 * @param rhs Monomial.
-		 * @return `os`
-		 */
-		friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
-		{
-			return os << rhs.toString(true, true);
-		}
-		/**
-		 * Streaming operator for std::shared_ptr<Monomial>.
-		 * @param os Output stream.
-		 * @param rhs Monomial.
-		 * @return `os`
-		 */
-		friend std::ostream& operator<<( std::ostream& os, const Monomial::Arg& rhs )
-		{
-			if (rhs) return os << *rhs;
-			return os << "1";
-		}
-		
-		
-		/**
 		 * Calculates the least common multiple of two monomial pointers.
 		 * If both are valid objects, the gcd of both is calculated.
 		 * If only one is a valid object, this one is returned.
@@ -729,6 +698,35 @@ namespace carl
 	
 	Monomial::Arg operator*(Variable lhs, Variable rhs);
 	/// @}
+
+
+	/**
+	 * Streaming operator for Monomial.
+	 * @param os Output stream. 
+	 * @param rhs Monomial.
+	 * @return `os`
+	 */
+	inline std::ostream& operator<<(std::ostream& os, const Monomial& rhs) {
+		if (rhs.exponents().empty()) return os << "1";
+		bool first = true;
+		for (const auto& vp: rhs) {
+			if (first) first = false;
+			else os << "*";
+			os << vp.first;
+			if (vp.second > 1) os << "^" << vp.second;
+		}
+		return os;
+	}
+	/**
+	 * Streaming operator for std::shared_ptr<Monomial>.
+	 * @param os Output stream.
+	 * @param rhs Monomial.
+	 * @return `os`
+	 */
+	inline std::ostream& operator<<(std::ostream& os, const Monomial::Arg& rhs) {
+		if (rhs) return os << *rhs;
+		return os << "1";
+	}
 	
 	Monomial::Arg pow(Variable v, std::size_t exp);
 	inline Monomial::Arg pow(const Monomial::Arg& m, std::size_t exp) {

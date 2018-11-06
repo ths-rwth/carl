@@ -88,9 +88,6 @@ private:
 			case FormulaType::UEQ:
 				CARL_LOG_ERROR("carl.qepcadstream", "Uninterpreted equalities are not supported by QEPCAD.");
 				break;
-			case FormulaType::PBCONSTRAINT:
-				CARL_LOG_ERROR("carl.qepcadstream", "Pseudo-Boolean constraints are not supported by QEPCAD.");
-				break;
 			case FormulaType::EXISTS:
 			case FormulaType::FORALL:
 				CARL_LOG_ERROR("carl.qepcadstream", "Printing exists or forall is not implemented yet.");

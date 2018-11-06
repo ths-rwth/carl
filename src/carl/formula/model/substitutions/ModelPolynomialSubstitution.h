@@ -12,12 +12,20 @@ namespace carl {
 	public:
 		ModelPolynomialSubstitution(const Poly& p): ModelSubstitution<Rational,Poly>(), mPoly(p)
 		{}
+		const auto& getPoly() const {
+			return mPoly;
+		}
 		virtual void multiplyBy(const Rational& n) {
 			mPoly *= n;
 		}
 		virtual void add(const Rational& n) {
 			mPoly += n;
 		}
+
+		virtual ModelSubstitutionPtr<Rational,Poly> clone() const {
+			return createSubstitutionPtr<Rational,Poly,ModelPolynomialSubstitution>(mPoly);
+		}
+
 		virtual Formula<Poly> representingFormula( const ModelVariable& mv ) {
 			assert(mv.isVariable());
 			return Formula<Poly>(mPoly - mv.asVariable(), Relation::EQ);

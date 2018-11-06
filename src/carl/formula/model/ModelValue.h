@@ -22,9 +22,11 @@ namespace carl
 	template<typename Rational, typename Poly>
 	class ModelMVRootSubstitution;
 	template<typename Rational, typename Poly>
-	using ModelSubstitutionPtr = std::shared_ptr<ModelSubstitution<Rational,Poly>>;
+	using ModelSubstitutionPtr = std::unique_ptr<ModelSubstitution<Rational,Poly>>;
 	template<typename Rational, typename Poly, typename Substitution, typename... Args>
 	inline ModelValue<Rational,Poly> createSubstitution(Args&&... args);
+	template<typename Rational, typename Poly, typename Substitution, typename... Args>
+	inline ModelSubstitutionPtr<Rational,Poly> createSubstitutionPtr(Args&&... args);
 	template<typename Rational, typename Poly>
 	inline ModelValue<Rational,Poly> createSubstitution(const MultivariateRoot<Poly>& mr);
 
@@ -76,7 +78,10 @@ namespace carl
 				return Super(t);
 			}
 			Super operator()(const MultivariateRoot<Poly>& mr) const {
-				return Super(createSubstitution<Rational,Poly>(mr).asSubstitution());
+				return Super(createSubstitutionPtr<Rational,Poly,ModelMVRootSubstitution<Rational,Poly>>(mr));
+			}
+			Super operator()(const ModelSubstitutionPtr<Rational,Poly>& subs) const {
+				return Super(subs->clone());
 			}
 		};
 		template<typename F, typename Return = void>
@@ -89,23 +94,36 @@ namespace carl
 			}
 		};
 		
-		
 	public:
 		/**
 		 * Default constructor.
 		 */
 		ModelValue() = default;
 
+		ModelValue(const ModelValue& mv)
+			: mData(boost::apply_visitor(VariantExtractor(), mv.mData))
+		{}
+		ModelValue(ModelValue&& mv) = default;
+
 		/**
 		 * Initialize the Assignment from some valid type of the underlying variant.
 		 */
 		template<typename T, typename T2 = typename std::enable_if<convertible_to_variant<T, Super>::value, T>::type>
 		ModelValue(const T& _t): mData(_t) {}
+
+		template<typename T, typename T2 = typename std::enable_if<convertible_to_variant<T, Super>::value, T>::type>
+		ModelValue(T&& _t): mData(std::move(_t)) {}
 		
 		template<typename ...Args>
 		ModelValue(const boost::variant<Args...>& variant): mData(boost::apply_visitor(VariantExtractor(), variant)) {}
 		
 		ModelValue(const MultivariateRoot<Poly>& mr): mData(createSubstitution<Rational,Poly>(mr).asSubstitution()) {}
+
+		ModelValue& operator=(const ModelValue& mv) {
+			mData = boost::apply_visitor(VariantExtractor(), mv.mData);
+			return *this;
+		}
+		ModelValue& operator=(ModelValue&& mv) = default;
 		
 		/**
 		 * Assign some value to the underlying variant.

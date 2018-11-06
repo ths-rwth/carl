@@ -32,6 +32,9 @@ matrix:
   {%- if job.env|length > 0 %}
       env: {{ job.env|join(' ') }}
   {%- endif %}
+  {%- if job.if %}
+      if: {{ job.if }}
+  {%- endif %}
   {%- if job.script %}
       script: {{ job.script|join(' ') }}
   {%- endif %}

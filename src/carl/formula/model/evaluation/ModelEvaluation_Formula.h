@@ -4,7 +4,6 @@
 #include "../Model.h"
 
 #include "ModelEvaluation_Constraint.h"
-#include "ModelEvaluation_PBConstraint.h"
 
 #include "../../../core/logging.h"
 
@@ -158,7 +157,7 @@ namespace model {
 					else f = Formula<Poly>(FormulaType::FALSE);
 				} else {
 					assert(res.isSubstitution());
-					auto subs = res.asSubstitution();
+					const auto& subs = res.asSubstitution();
 					auto fsubs = static_cast<ModelFormulaSubstitution<Rational,Poly>*>(subs.get());
 					f = fsubs->getFormula();
 				}
@@ -189,11 +188,6 @@ namespace model {
 				} else {
 					CARL_LOG_WARN("carl.model.evaluation", "Could not evaluate " << f.uequality() << " as some variables are missing from the model.");
 				}
-				break;
-			}
-			case FormulaType::PBCONSTRAINT: {
-				/// TODO: We should store the substitution.
-				PBConstraint<Poly> pbc = substitute(f.pbConstraint(), m);
 				break;
 			}
 		}

@@ -81,6 +81,11 @@ template<typename T>
 inline bool evaluate(const T& t, Relation r) {
 	return evaluate(sgn(t), r);
 }
+
+template<typename T1, typename T2>
+inline bool evaluate(const T1& lhs, Relation r, const T2& rhs) {
+	return evaluate(sgn(lhs - rhs), r);
+}
 	
 }
 

@@ -4,6 +4,7 @@
 #include "../core/Term.h"
 #include "../core/Variable.h"
 #include "../util/Common.h"
+#include "../util/TimingCollector.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -143,6 +144,7 @@ public:
 		mSymbolBack(vars),
 		mRing(CoCoA::NewPolyRing(mQ, long(mSymbolBack.size())))
 	{
+		std::sort(mSymbolBack.begin(), mSymbolBack.end());
 		auto indets = CoCoA::indets(mRing);
 
 		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
@@ -160,6 +162,7 @@ public:
 		assert(ordering.size() == mSymbolBack.size());
 		assert(ordering.size() == mSymbolThere.size());
 		mSymbolBack = ordering;
+		std::sort(mSymbolBack.begin(), mSymbolBack.end());
 
 		auto indets = CoCoA::indets(mRing);
 		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
@@ -168,7 +171,10 @@ public:
 	}
 	
 	Poly gcd(const Poly& p1, const Poly& p2) const {
-		return convert(cocoawrapper::gcd(convert(p1), convert(p2)));
+		auto start = CARL_TIME_START();
+		auto res = convert(cocoawrapper::gcd(convert(p1), convert(p2)));
+		CARL_TIME_FINISH("cocoa.gcd", start);
+		return res;
 	}
 
 	Poly makeCoprimeWith(const Poly& p1, const Poly& p2) const {
@@ -190,14 +196,30 @@ public:
 	 * @return A map whose keys are the irreducible factors and whose values are
 	 * the exponents.
 	 */
-	Factors<Poly> factorize(const Poly& p, bool includeConstants = true) const {
+	Factors<Poly> factorize(const Poly& p, bool includeConstant = true) const {
+		auto start = CARL_TIME_START();
 		auto finfo = cocoawrapper::factor(convert(p));
 		Factors<Poly> res;
-		if (includeConstants && !CoCoA::IsOne(finfo.myRemainingFactor())) {
+		if (includeConstant && !CoCoA::IsOne(finfo.myRemainingFactor())) {
 			res.emplace(convert(finfo.myRemainingFactor()), 1);
 		}
 		for (std::size_t i = 0; i < finfo.myFactors().size(); ++i) {
 			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
+		}
+		CARL_TIME_FINISH("cocoa.factorize", start);
+		return res;
+	}
+
+	/**
+	 * Break down a polynomial into its unique, irreducible factors
+	 * without their exponents/multiplicities.
+	 * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
+	 * factors "(x+1)", "(x+2)", and a constant factor "3" that is included if includeConstant is true.
+	 */
+	std::vector<Poly> irreducibleFactors(const Poly& p, bool includeConstant = true) const {
+		std::vector<Poly> res;
+		for (auto& f: factorize(p, includeConstant)) {
+			res.emplace_back(std::move(f.first));
 		}
 		return res;
 	}
@@ -208,7 +230,8 @@ public:
 	 * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
 	 * factors "(x+1)", "(x+2)", and a constant factor "3" that is omited.
 	 */
-	std::vector<Poly> irreducibleFactorsOf(const Poly& p) const {
+	[[deprecated("Use irreducibleFactors() instead")]]
+	std::vector<Poly> nonConstIrreducibles(const Poly& p) const {
 		std::vector<Poly> res;
 		auto cocoaFactors = cocoawrapper::factor(convert(p)).myFactors();
 		for (const auto& f: cocoaFactors) {
@@ -216,6 +239,18 @@ public:
 		}
 		return res;
 	}
+
+  /**
+   * Break down a polynomial into its unique, non-constant,irreducible factors
+   * without their exponents/multiplicities.
+   * E.g. "3*x^3 + 12*x^2 + 15*x + 6" has the unique, non-constant, irreducible
+   * factors "(x+1)", "(x+2)", and a constant factor "3" that is omited.
+   */
+  [[deprecated("Use irreducibleFactors() instead")]]
+  std::vector<Poly> irreducibleFactorsOf(const Poly& p) const {
+    return nonConstIrreducibles(p);
+  }
+
 
 	Poly squareFreePart(const Poly& p) const {
 		auto finfo = cocoawrapper::SqFreeFactor(convert(p));
@@ -227,7 +262,10 @@ public:
 	}
 
 	auto GBasis(const std::vector<Poly>& p) const {
-		return convert(cocoawrapper::ReducedGBasis(convert(p)));
+		auto start = CARL_TIME_START();
+		auto res = convert(cocoawrapper::ReducedGBasis(convert(p)));
+		CARL_TIME_FINISH("cocoa.gbasis", start);
+		return res;
 	}
 };
 

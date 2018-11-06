@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Singleton.h"
+#include "../config.h"
 
 #include <chrono>
 #include <iostream>
@@ -9,11 +10,14 @@
 namespace carl {
 
 class TimingCollector: public Singleton<TimingCollector> {
-private:
-	/// The clock type used jere.
+public:
+	/// The clock type used here.
 	using clock = std::chrono::high_resolution_clock;
 	/// The duration type used here.
 	using duration = std::chrono::duration<std::size_t,std::milli>;
+	/// The type of a time point.
+	using time_point = clock::time_point;
+private:
 	struct TimingInformation {
 		std::size_t count = 0;
 		duration overall = duration::zero();
@@ -23,7 +27,7 @@ public:
 	const auto& data() const {
 		return mData;
 	}
-	auto start() const {
+	time_point start() const {
 		return clock::now();
 	}
 	void finish(const std::string& name, clock::time_point start) {
@@ -46,8 +50,8 @@ inline std::ostream& operator<<(std::ostream& os, const TimingCollector& tc) {
 #define CARL_TIME_START() carl::TimingCollector::getInstance().start()
 #define CARL_TIME_FINISH(name, start) carl::TimingCollector::getInstance().finish(name, start)
 #else
-#define CARL_TIME_START() 0
-#define CARL_TIME_FINISH(name, start) (void*)(start)
+#define CARL_TIME_START() TimingCollector::time_point()
+#define CARL_TIME_FINISH(name, start) static_cast<TimingCollector::time_point>(start)
 #endif
 
 }

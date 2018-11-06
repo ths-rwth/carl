@@ -25,6 +25,13 @@ UnivariatePolynomial<Coeff> discriminant(const UnivariatePolynomial<Coeff>&, Sub
 
 namespace carl {
 
+/**
+ * Implements a subresultants algorithm with optimizations described in @cite Ducos00 .
+ * @param pol1 First polynomial.
+ * @param pol2 First polynomial.
+ * @param strategy Strategy.
+ * @return Subresultants of pol1 and pol2.
+ */
 template<typename Coeff>
 std::list<UnivariatePolynomial<Coeff>> subresultants(
 		const UnivariatePolynomial<Coeff>& pol1,

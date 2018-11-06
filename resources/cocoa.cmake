@@ -1,6 +1,10 @@
-if (TARGET GMP-EP)
-	get_target_property(GMP_LIB GMP_STATIC IMPORTED_LOCATION)
-	set(GMP_LIB_ARG "--with-libgmp=${GMP_LIB}")
+get_target_property(GMP_LIB GMP_STATIC IMPORTED_LOCATION)
+set(GMP_LIB_ARG "--with-libgmp=${GMP_LIB}")
+
+if(APPLE)
+	set(SEDCMD sed -i ".bak")
+else()
+	set(SEDCMD sed -i)
 endif()
 
 ExternalProject_Add(
@@ -9,8 +13,9 @@ ExternalProject_Add(
 	URL_MD5 ${COCOA_TGZHASH}
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES
-	CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC
-	BUILD_COMMAND make library doc
+	PATCH_COMMAND sh ${CMAKE_SOURCE_DIR}/resources/cocoa/patch_auto_ptr.sh
+	CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --threadsafe-hack ${GMP_LIB_ARG} --with-cxxflags=-Wno-deprecated-declarations\ -fPIC\ -std=c++14
+	BUILD_COMMAND make library
 	INSTALL_COMMAND ${CMAKE_COMMAND} -E touch <SOURCE_DIR>/examples/index.html
 	COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include
 	COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/lib

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../core/logging.h"
+
+#include <iostream>
+
 namespace carl {
     // Forward declaration.
     template<typename Pol>
@@ -46,10 +50,7 @@ namespace carl {
 		BITVECTOR,
 		
 		// Uninterpreted Theory
-		UEQ,
-		
-		// Pseudoboolean
-		PBCONSTRAINT
+		UEQ
     };
 	
 	
@@ -77,7 +78,6 @@ namespace carl {
 			case FormulaType::VARASSIGN: return "varassign";
 			case FormulaType::BITVECTOR: return "bv";
 			case FormulaType::UEQ: return "ueq";
-			case FormulaType::PBCONSTRAINT: return "pbconstraint";
 			default:
 				CARL_LOG_ERROR("carl.formula", "Unknown formula type " << unsigned(_type));
 				return "???";
@@ -140,6 +140,8 @@ namespace carl {
     {
             friend class Formula<Pol>;
             friend class FormulaPool<Pol>;
+			template<typename P>
+			friend std::ostream& operator<<(std::ostream& os, const FormulaContent<P>& f);
         
         private:
             
@@ -176,8 +178,6 @@ namespace carl {
                 BVConstraint* mpBVConstraintVS;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
                 UEquality* mpUIEqualityVS;
-				/// The pseudoboolean constraint.
-				PBConstraint<Pol>* mpPBConstraintVS;
                 /// The only sub-formula, in case this formula is an negation.
                 Formula<Pol>* mpSubformulaVS;
                 /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
@@ -201,8 +201,6 @@ namespace carl {
 				BVConstraint mBVConstraint;
 				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
 				UEquality mUIEquality;
-				/// The pseudoboolean constraint.
-				PBConstraint<Pol> mPBConstraint;
 				/// The only sub-formula, in case this formula is an negation.
 				Formula<Pol> mSubformula;
 				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
@@ -266,12 +264,6 @@ namespace carl {
              * @param _ueq The pointer to the constraint.
              */
             FormulaContent(UEquality&& _ueq);
-			
-			/**
-             * Constructs a formula being an pseudoboolean constraint.
-             * @param _pbc The pointer to the constraint.
-             */
-            FormulaContent(PBConstraint<Pol>&& _pbc);
 
             /**
              * Constructs a formula of the given type with a single subformula. This is usually a negation.
@@ -350,7 +342,6 @@ namespace carl {
 					case FormulaType::VARASSIGN: { mVariableAssignment.~VariableAssignment(); break; }
 					case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
 					case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
-					case FormulaType::PBCONSTRAINT: { mPBConstraint.~PBConstraint(); break; }
 #endif
                 }
 
@@ -385,43 +376,57 @@ namespace carl {
 					case FormulaType::VARASSIGN: return false;
                     case FormulaType::BITVECTOR: return false;
                     case FormulaType::UEQ: return false;
-					case FormulaType::PBCONSTRAINT: return false;
                 }
                 return false;
             }
 
             bool operator==(const FormulaContent& _content) const;
-            
-            /**
-             * Gives the string representation of this formula content.
-             * @param _withActivity A flag which indicates whether to add the formula's activity to the result.
-             * @param _resolveUnequal A switch which indicates how to represent the relation symbol for unequal. 
-             *                         (for further description see documentation of Constraint::toString( .. ))
-             * @param _init The initial string of every row of the result.
-             * @param _oneline A flag indicating whether the formula shall be printed on one line.
-             * @param _infix A flag indicating whether to print the formula in infix or prefix notation.
-             * @param _friendlyNames A flag that indicates whether to print the variables with their internal representation (false)
-             *                        or with their dedicated names.
-             * @return The resulting string representation of this formula.
-             */
-            std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true ) const; 
-            
     };
-/**
-     * The output operator of a formula.
-     * @param _out The stream to print on.
-     * @param _formula
-     */
-    template<typename P>
-    std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>& _formula )
-    {
-        return (_out << _formula.toString());
-    }
+	/**
+	 * The output operator of a formula.
+	 * @param os The stream to print on.
+	 * @param f
+	 */
 	template<typename P>
-    std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>* _formula )
-    {
-        return (_out << _formula->toString());
-    }
+	std::ostream& operator<<(std::ostream& os, const FormulaContent<P>& f) {
+		switch (f.mType) {
+			case FormulaType::FALSE:
+				return os << formulaTypeToString(f.mType);
+			case FormulaType::TRUE:
+				return os << formulaTypeToString(f.mType);
+			case FormulaType::BOOL:
+				return os << f.mVariable;
+			case FormulaType::CONSTRAINT:
+				return os << f.mConstraint;
+			case FormulaType::VARASSIGN:
+				return os << f.mVariableComparison;
+			case FormulaType::VARCOMPARE:
+				return os << f.mVariableAssignment;
+			case FormulaType::BITVECTOR:
+				return os << f.mBVConstraint;
+			case FormulaType::UEQ:
+				return os << f.mUIEquality;
+			case FormulaType::NOT:
+				return os << "!(" << f.mSubformula << ")";
+			case FormulaType::EXISTS:
+				os << "(exists";
+				for (auto v: f.mQuantifierContent.mVariables) os << " " << v;
+				return os << ")(" << f.mQuantifierContent.mFormula << ")";
+			case FormulaType::FORALL:
+				os << "(forall";
+				for (auto v: f.mQuantifierContent.mVariables) os << " " << v;
+				return os << ")(" << f.mQuantifierContent.mFormula << ")";
+			default:
+				assert(f.isNary());
+				return os << "(" << carl::stream_joined(" " + formulaTypeToString(f.mType) + " ", f.mSubformulas) << ")";
+		}
+	}
+
+	template<typename P>
+	std::ostream& operator<<(std::ostream& os, const FormulaContent<P>* fc) {
+		assert(fc != nullptr);
+		return os << *fc;
+	}
 	
 }
 

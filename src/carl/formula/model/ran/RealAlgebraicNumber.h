@@ -42,6 +42,17 @@
 namespace carl {
 	
 enum class RANSampleHeuristic { Center, CenterInt, LeftInt, RightInt, ZeroInt, InftyInt, Default = RightInt };
+inline std::ostream& operator<<(std::ostream& os, RANSampleHeuristic sh) {
+	switch (sh) {
+		case RANSampleHeuristic::Center: return os << "Center";
+		case RANSampleHeuristic::CenterInt: return os << "CenterInt";
+		case RANSampleHeuristic::LeftInt: return os << "LeftInt";
+		case RANSampleHeuristic::RightInt: return os << "RightInt";
+		case RANSampleHeuristic::ZeroInt: return os << "ZeroInt";
+		case RANSampleHeuristic::InftyInt: return os << "InftyInt";
+		default: return os << "Invalid sample heuristic (" << static_cast<std::underlying_type<RANSampleHeuristic>::type>(sh) << ")";
+	}
+}
 
 template<typename Number>
 class RealAlgebraicNumber {
@@ -244,7 +255,7 @@ public:
 		return mIR->sturmSequence;
 	}
 
-	RealAlgebraicNumber changeVariable(Variable::Arg v) const {
+	RealAlgebraicNumber changeVariable(Variable v) const {
 		if (isNumeric()) return *this;
 		assert(isInterval());
 		return RealAlgebraicNumber<Number>(mIR->polynomial.replaceVariable(v), mIR->interval, mIsRoot);

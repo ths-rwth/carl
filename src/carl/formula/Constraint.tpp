@@ -240,64 +240,6 @@ namespace carl
     {
 		mFactorization = carl::factorization(mLhs);
     }
-
-    template<typename Pol>
-    string ConstraintContent<Pol>::toString( unsigned _unequalSwitch, bool _infix, bool _friendlyVarNames ) const
-    {
-        string result = "";
-        if( _infix )
-            result = mLhs.toString( true, _friendlyVarNames );
-        else
-            result += "(";
-        switch( mRelation )
-        {
-            case Relation::EQ:
-                result += "=";
-                break;
-            case Relation::NEQ:
-                if( _infix )
-                {
-                    if( _unequalSwitch == 1 )
-                        result += "<>";
-                    else if( _unequalSwitch == 2 )
-                        result += "/=";
-                    else // standard case
-                        result += "!=";
-                }
-                else
-                {
-                    if( _unequalSwitch == 0 ) // standard case
-                        result += "!=";
-                    else if( _unequalSwitch == 1 )
-                    {
-                        string lhsString = mLhs.toString( false, _friendlyVarNames );
-                        return "(or (< " + lhsString + " 0) (> " + lhsString + " 0))";
-                    }
-                    else
-                    {
-                        string lhsString = mLhs.toString( false, _friendlyVarNames );
-                        return "(not (= " + lhsString + " 0))";
-                    }
-                }
-                break;
-            case Relation::LESS:
-                result += "<";
-                break;
-            case Relation::GREATER:
-                result += ">";
-                break;
-            case Relation::LEQ:
-                result += "<=";
-                break;
-            case Relation::GEQ:
-                result += ">=";
-                break;
-            default:
-                result += "~";
-        }
-        result += (_infix ? "0" : (" " + mLhs.toString( false, _friendlyVarNames ) + " 0)"));
-        return result;
-    }
     
     template<typename Pol>
     Constraint<Pol>::Constraint( const ConstraintContent<Pol>* _content ):
@@ -742,10 +684,17 @@ namespace carl
     bool Constraint<Pol>::getAssignment(Variable& _substitutionVariable, typename Pol::NumberType& _substitutionValue) const {
 		if (relation() != Relation::EQ) return false;
 		if (lhs().nrTerms() > 2) return false;
-		if (lhs().nrTerms() == 2 && !lhs().trailingTerm().isConstant()) return false;
+		if (lhs().nrTerms() == 0) return false;
 		if (!lhs().lterm().isSingleVariable()) return false;
+		if (lhs().nrTerms() == 1) {
+			_substitutionVariable = lhs().lterm().getSingleVariable();
+			_substitutionValue = 0;
+			return true;
+		}
+		assert(lhs().nrTerms() == 2);
+		if (!lhs().trailingTerm().isConstant()) return false;
 		_substitutionVariable = lhs().lterm().getSingleVariable();
-		_substitutionValue = -lhs().constantPart() / lhs().lterm().coeff();
+		_substitutionValue = -lhs().trailingTerm().coeff() / lhs().lterm().coeff();
 		return true;
 	}
 
@@ -759,12 +708,6 @@ namespace carl
 		}
 		return true;
 	}
-    
-    template<typename Pol>
-    ostream& operator<<( ostream& _out, const Constraint<Pol>& _constraint )
-    {
-        return (_out << _constraint.toString());
-    }
 
     template<typename Pol>
     void Constraint<Pol>::printProperties( ostream& _out ) const

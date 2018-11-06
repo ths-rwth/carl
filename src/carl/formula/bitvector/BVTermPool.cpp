@@ -4,6 +4,7 @@
  */
 
 #include "BVTermPool.h"
+#include "BVTermContent.h"
 
 namespace carl
 {

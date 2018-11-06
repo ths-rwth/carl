@@ -42,10 +42,16 @@ namespace carl{
 			};
 			struct equal {
 				bool operator()(const PoolEntry& p1, const PoolEntry& p2) const {
-					if (p1.hash != p2.hash) return false;
+					CARL_LOG_TRACE("carl.core.monomial", p1.content << " / " << p1.hash << " / " << p1.monomial.lock().get() << " == " << p2.content << " / " << p2.hash << " / " << p2.monomial.lock().get());
+					if (p1.hash != p2.hash) {
+						CARL_LOG_TRACE("carl.core.monomial", "No due to hash");
+						return false;
+					}
 					if (p1.monomial.lock() && p2.monomial.lock()) {
+						CARL_LOG_TRACE("carl.core.monomial", "Comparing pointers");
 						return p1.monomial.lock() == p2.monomial.lock();
 					}
+					CARL_LOG_TRACE("carl.core.monomial", "Comparing content");
 					return p1.content == p2.content;
 				}
 			};
@@ -114,14 +120,18 @@ namespace carl{
 			Monomial::Arg create( std::vector<std::pair<Variable, exponent>>&& _exponents );
 
 			void free(const Monomial* m) {
+				CARL_LOG_TRACE("carl.core.monomial", "Freeing " << m);
 				if (m == nullptr) return;
 				if (m->id() == 0) return;
 				MONOMIAL_POOL_LOCK_GUARD;
 				PoolEntry pe(m->mHash, m->mExponents);
 				auto it = mPool.find(pe);
 				if (it != mPool.end()) {
+					CARL_LOG_TRACE("carl.core.monomial", "Found " << it->content << " / " << it->hash);
 					mIDs.free(m->id());
 					mPool.erase(it);
+				} else {
+					CARL_LOG_TRACE("carl.core.monomial", "Not found in pool.");
 				}
 			}
 

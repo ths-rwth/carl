@@ -91,10 +91,7 @@ namespace carl
     template<typename Pol>
     bool FormulaPool<Pol>::formulasInverse( const Formula<Pol>& _subformulaA, const Formula<Pol>& _subformulaB )
     {
-        if( _subformulaA.mpContent == mpTrue && _subformulaB.mpContent == mpFalse )
-            return true;
-        assert( !( _subformulaA.getType() == FormulaType::NOT && _subformulaA.subformula() == _subformulaB ) );
-        return _subformulaB.getType() == FormulaType::NOT && _subformulaB.subformula() == _subformulaA;
+		return _subformulaA.negated() == _subformulaB;
     }
     
     template<typename Pol>
@@ -146,6 +143,7 @@ namespace carl
 //        std::cout << std::endl;
         if( _subformulas.size() == 1 )
         {
+			CARL_LOG_TRACE("carl.formula", "Only a single subformula, eliminating " << _type);
             return _subformulas[0].mpContent;
         }
         if( _type != FormulaType::IFF )

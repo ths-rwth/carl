@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from travis_helper import *
+from travis_helper import job, properties, render_template
 
 def addon_coverity():
 	return {
@@ -15,7 +15,6 @@ def addon_coverity():
 			}
 		}
 	}
-	return res
 
 def addon_sonarcloud():
 	return {
@@ -31,35 +30,27 @@ properties.update({
 })
 
 jobs = [
-	job("0-clang", ["build", "linux", "clang-3.8", "build.sh"]),
-	job("0-clang", ["build", "linux", "clang-3.9", "build.sh"]),
-	job("0-clang", ["build", "linux", "clang-4.0", "build.sh"]),
 	job("0-clang", ["build", "linux", "clang-5.0", "build.sh"]),
 	job("0-clang", ["build", "linux", "clang-6.0", "build.sh"]),
-	job("1-gcc", ["dependencies", "linux", "g++-5", "build.sh"]),
-	job("1-gcc", ["build", "linux", "g++-5", "j1", "build.sh"]),
-	job("1-gcc", ["dependencies", "linux", "g++-6", "build.sh"]),
-	job("1-gcc", ["build", "linux", "g++-6", "j1", "build.sh"]),
+	job("0-clang", ["build", "linux", "clang-7.0", "build.sh", "mayfail"]),
 	job("1-gcc", ["dependencies", "linux", "g++-7", "build.sh"]),
 	job("1-gcc", ["build", "linux", "g++-7", "j1", "build.sh"]),
 	job("1-gcc", ["dependencies", "linux", "g++-8", "build.sh"]),
 	job("1-gcc", ["build", "linux", "g++-8", "j1", "build.sh"]),
-	job("2-macos", ["build", "xcode7.3", "build.sh"]),
-	job("2-macos", ["build", "xcode8.3", "build.sh"]),
-	job("2-macos", ["build", "xcode9", "build.sh"]),
-	job("2-macos", ["build", "xcode9.1", "build.sh"]),
-	job("2-macos", ["build", "xcode9.2", "build.sh"]),
 	job("2-macos", ["build", "xcode9.3", "build.sh"]),
-	job("3-docs", ["build", "linux", "g++-6", "task.doxygen", "j1", "build.sh"]),
+	job("2-macos", ["build", "xcode9.4", "build.sh"]),
+	job("2-macos", ["build", "xcode10", "build.sh"]),
+	job("2-macos", ["build", "xcode10.1", "build.sh"]),
+	job("3-docs", ["build", "linux", "g++-7", "task.doxygen", "j1", "build.sh"]),
 	job("4-tidy", ["build", "linux", "clang-5.0", "task.tidy", "build.sh", "mayfail"]),
 	job("5-checker", ["dependencies", "linux", "clang-5.0", "task.coverity", "build.sh"]),
 	job("5-checker", ["build", "linux", "clang-5.0", "task.coverity", "addon.coverity", "mayfail"]),
 	#job("5-checker", ["dependencies", "linux", "clang-6.0", "task.sonarcloud", "j1", "build.sh"]),
 	job("5-checker", ["build", "linux", "clang-5.0", "task.sonarcloud", "addon.sonarcloud", "build.sh", "mayfail"]),
-	job("6-addons", ["dependencies", "linux", "g++-6", "task.pycarl", "j1", "build.sh"]),
-	job("6-addons", ["build", "linux", "g++-6", "task.pycarl", "j1", "build.sh", "mayfail"]),
-	job("6-addons", ["dependencies", "linux", "g++-6", "task.addons", "j1", "build.sh"]),
-	job("6-addons", ["build", "linux", "g++-6", "task.addons", "j1", "build.sh", "mayfail"]),
+	job("6-addons", ["dependencies", "linux", "g++-7", "task.pycarl", "j1", "build.sh"]),
+	job("6-addons", ["build", "linux", "g++-7", "task.pycarl", "j1", "build.sh", "mayfail"]),
+	job("6-addons", ["dependencies", "linux", "g++-7", "task.addons", "j1", "build.sh"]),
+	job("6-addons", ["build", "linux", "g++-7", "task.addons", "j1", "build.sh", "mayfail"]),
 ]
 
 cached = [

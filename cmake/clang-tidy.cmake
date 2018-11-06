@@ -27,12 +27,18 @@ else()
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-cppcoreguidelines-pro-type-member-init") # as of https://llvm.org/bugs/show_bug.cgi?id=31039
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-cppcoreguidelines-pro-type-reinterpret-cast")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-cppcoreguidelines-pro-type-vararg")
+	# Fuchsia
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-fuchsia-default-arguments")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-fuchsia-overloaded-operator")
 	# Google
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-namespace-comments")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-braces-around-statements,-readability-braces-around-statements")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-todo")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-runtime-int")
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-runtime-references")
+	# HICPP
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-hicpp-braces-around-statements")
+
 	set(CLANG_TIDY_CHECKS "-checks='${CLANG_TIDY_CHECKS}'")
 	#message(STATUS "Enabled checks for clang-tidy: ${CLANG_TIDY_CHECKS}")
 endif()

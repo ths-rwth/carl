@@ -10,342 +10,205 @@
 
 #include "UVariable.h"
 #include "UFInstance.h"
-#include <boost/variant.hpp>
+#include "UTerm.h"
 
 namespace carl
 {
     /**
-     * Implements an uninterpreted equality, that is an equality of either 
+     * Implements an uninterpreted equality, that is an equality of either
      *     two uninterpreted function instances,
      *     two uninterpreted variables,
-     *     or an uninterpreted function instance and an uninterpreted variable. 
+     *     or an uninterpreted function instance and an uninterpreted variable.
      */
-    class UEquality
-    {
-        public:
-            /// The type of the left and right-hand side of an uninterpreted equality.
-            using Arg = boost::variant<UVariable, UFInstance>;
-
-            /**
-             * Checks whether the given argument is an uninterpreted variable.
-             */
-            struct IsUVariable: public boost::static_visitor<bool> 
-            {
-                /**
-                 * @param An uninterpreted variable.
-                 * @return true
-                 */
-                bool operator()(const UVariable& /*unused*/) const
-                {
-                    return true;
-                }
-                
-                /**
-                 * @param An uninterpreted function instance.
-                 * @return false
-                 */
-                bool operator()(const UFInstance& /*unused*/) const 
-                {
-                    return false;
-                }
-                
-                bool operator()(const Arg& arg) const
-                {
-                    return boost::apply_visitor(*this, arg);
-                }
-            };
-
-            /**
-             * Checks whether the given argument is an uninterpreted function instance.
-             */
-            struct IsUFInstance: public boost::static_visitor<bool> 
-            {
-                /**
-                 * @param An uninterpreted variable.
-                 * @return false
-                 */
-                bool operator()(const UVariable& /*unused*/) const
-                {
-                    return false;
-                }
-                
-                /**
-                 * @param An uninterpreted function instance.
-                 * @return true
-                 */
-                bool operator()(const UFInstance& /*unused*/) const 
-                {
-                    return true;
-                }
-                
-                bool operator()(const Arg& arg) const
-                {
-                    return boost::apply_visitor(*this, arg);
-                }
-            };
-
+    class UEquality {
         private:
-
-            // Member.
-
             /// A flag indicating whether this equality shall hold (if being false) or its negation (if being true), hence the inequality, shall hold.
             bool mNegated = false;
             /// The left-hand side of this uninterpreted equality.
-            Arg mLhs = UVariable(Variable::NO_VARIABLE, Sort());
+            UTerm mLhs = UTerm(UVariable(Variable::NO_VARIABLE, Sort()));
             /// The right-hand side of this uninterpreted equality.
-            Arg mRhs = UVariable(Variable::NO_VARIABLE, Sort());
+            UTerm mRhs = UTerm(UVariable(Variable::NO_VARIABLE, Sort()));
 
         public:
-            
             UEquality() = default;
-            
-	    /**
-             * Constructs an uninterpreted equality.
-             * @param _negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
-             * @param _uvarA An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
-             * @param _uvarB An uninterpreted variable, which is going to be the right-hand side of this uninterpreted equality.
-             */
-            UEquality(Arg _uvarA, Arg _uvarB, bool _negated):
-                mNegated(_negated),
-				mLhs(std::move(_uvarA)),
-				mRhs(std::move(_uvarB))
-			{
-				if( lhsIsUV() && rhsIsUV() )
-                {
-                    assert( lhsAsUV().domain() == rhsAsUV().domain() );
-                    if( rhsAsUV() < lhsAsUV() )
-                        std::swap( mLhs, mRhs );
-                }
-				else if( lhsIsUV() && rhsIsUF() )
-                {
-                    assert( lhsAsUV().domain() == rhsAsUF().uninterpretedFunction().codomain() );
-                }
-                else if( lhsIsUF() && rhsIsUV() )
-                {
-                    assert( lhsAsUF().uninterpretedFunction().codomain() == rhsAsUV().domain() );
-                    std::swap( mLhs, mRhs );
-                }
-                else if( lhsIsUF() && rhsIsUF() )
-                {
-                    assert( lhsAsUF().uninterpretedFunction().codomain() == rhsAsUF().uninterpretedFunction().codomain() );
-                    if( rhsAsUF() < lhsAsUF() )
-                        std::swap( mLhs, mRhs );
-                }
-                
-			}
 
             /**
              * Constructs an uninterpreted equality.
-             * @param _negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
-             * @param _uvarA An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
-             * @param _uvarB An uninterpreted variable, which is going to be the right-hand side of this uninterpreted equality.
+             * @param negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
+             * @param uvarA An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
+             * @param uvarB An uninterpreted variable, which is going to be the right-hand side of this uninterpreted equality.
              */
-            UEquality( const UVariable& _uvarA, const UVariable& _uvarB, bool _negated, bool _orderCorrect = false ):
-                mNegated( _negated ),
-                mLhs( _uvarA ),
-                mRhs( _uvarB )
-            {
-                assert( _uvarA.domain() == _uvarB.domain() );
-                if( !_orderCorrect && rhsAsUV() < lhsAsUV() )
-                        std::swap( mLhs, mRhs );
+            UEquality(UTerm uvarA, UTerm uvarB, bool negated):
+                mNegated(negated),
+	              mLhs(std::move(uvarA)),
+		            mRhs(std::move(uvarB)) {
+	              if(mLhs.isUVariable() && mRhs.isUVariable()) {
+                    assert(mLhs.asUVariable().domain() == mRhs.asUVariable().domain());
+                    if(mRhs.asUVariable() < mLhs.asUVariable()) {
+                        std::swap(mLhs, mRhs);
+                    }
+                } else if(mLhs.isUVariable() && mRhs.isUFInstance()) {
+                    assert(mLhs.asUVariable().domain() == mRhs.asUFInstance().uninterpretedFunction().codomain());
+                } else if(mLhs.isUFInstance() && mRhs.isUVariable()) {
+                    assert(mLhs.asUFInstance().uninterpretedFunction().codomain() == mRhs.asUVariable().domain());
+                    std::swap(mLhs, mRhs);
+                } else if(mLhs.isUFInstance() && mRhs.isUFInstance()) {
+                    assert(mLhs.asUFInstance().uninterpretedFunction().codomain() == mRhs.asUFInstance().uninterpretedFunction().codomain());
+                    if(mRhs.asUFInstance() < mLhs.asUFInstance()) {
+                        std::swap(mLhs, mRhs);
+                    }
+                }
             }
-            
+
             /**
              * Constructs an uninterpreted equality.
-             * @param _negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
-             * @param _uvar An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
-             * @param _ufun An uninterpreted function instance, which is going to be the right-hand side of this uninterpreted equality.
+             * @param negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
+             * @param uvarA An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
+             * @param uvarB An uninterpreted variable, which is going to be the right-hand side of this uninterpreted equality.
              */
-            UEquality( const UVariable& _uvar, const UFInstance& _ufun, bool _negated ):
-                mNegated( _negated ),
-                mLhs( _uvar ),
-                mRhs( _ufun )
-            {
-                assert( _uvar.domain() == _ufun.uninterpretedFunction().codomain() );
+            UEquality(const UVariable& uvarA, const UVariable& uvarB, bool negated, bool orderCorrect = false):
+                mNegated(negated),
+                mLhs(uvarA),
+                mRhs(uvarB) {
+                assert(uvarA.domain() == uvarB.domain());
+                if(!orderCorrect && mRhs.asUVariable() < mLhs.asUVariable()) {
+                    std::swap(mLhs, mRhs);
+                }
             }
-            
+
             /**
              * Constructs an uninterpreted equality.
-             * @param _negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
-             * @param _ufun An uninterpreted function instance, which is going to be the left-hand side of this uninterpreted equality.
-             * @param _uvar An uninterpreted variable, which is going to be the right-hand side of this uninterpreted equality.
+             * @param negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
+             * @param uvar An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
+             * @param ufun An uninterpreted function instance, which is going to be the right-hand side of this uninterpreted equality.
              */
-            UEquality( const UFInstance& _ufun, const UVariable& _uvar, bool _negated ):
-                mNegated( _negated ),
-                mLhs( _uvar ),
-                mRhs( _ufun )
-            {
-                assert( _uvar.domain() == _ufun.uninterpretedFunction().codomain() );
+            UEquality(const UVariable& uvar, const UFInstance& ufun, bool negated):
+                mNegated(negated),
+                mLhs(uvar),
+                mRhs(ufun) {
+                assert(uvar.domain() == ufun.uninterpretedFunction().codomain());
             }
-            
+
             /**
              * Constructs an uninterpreted equality.
-             * @param _negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
-             * @param _ufunA An uninterpreted function instance, which is going to be the left-hand side of this uninterpreted equality.
-             * @param _ufunB An uninterpreted function instance, which is going to be the right-hand side of this uninterpreted equality.
+             * @param negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
+             * @param ufun An uninterpreted function instance, which is going to be the left-hand side of this uninterpreted equality.
+             * @param uvar An uninterpreted variable, which is going to be the right-hand side of this uninterpreted equality.
              */
-            UEquality( const UFInstance& _ufunA, const UFInstance& _ufunB, bool _negated, bool _orderCorrect = false ):
-                mNegated( _negated ),
-                mLhs( _ufunA ),
-                mRhs( _ufunB )
-            {
-                assert( _ufunA.uninterpretedFunction().codomain() == _ufunB.uninterpretedFunction().codomain() );
-                if( !_orderCorrect && rhsAsUF() < lhsAsUF() )
-                    std::swap( mLhs, mRhs );
+            UEquality(const UFInstance& ufun, const UVariable& uvar, bool negated):
+                mNegated(negated),
+                mLhs(uvar),
+                mRhs(ufun) {
+                assert(uvar.domain() == ufun.uninterpretedFunction().codomain());
             }
-            
+
+            /**
+             * Constructs an uninterpreted equality.
+             * @param negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
+             * @param ufunA An uninterpreted function instance, which is going to be the left-hand side of this uninterpreted equality.
+             * @param ufunB An uninterpreted function instance, which is going to be the right-hand side of this uninterpreted equality.
+             */
+            UEquality(const UFInstance& ufunA, const UFInstance& ufunB, bool negated, bool orderCorrect = false):
+                mNegated(negated),
+                mLhs(ufunA),
+                mRhs(ufunB) {
+                assert(ufunA.uninterpretedFunction().codomain() == ufunB.uninterpretedFunction().codomain());
+                if(!orderCorrect && mRhs.asUFInstance() < mLhs.asUFInstance()) {
+                    std::swap(mLhs, mRhs);
+                }
+            }
+
             /**
              * Copies the given uninterpreted equality.
-             * @param _ueq The uninterpreted equality to copy.
-             * @param _invert true, if the inverse of the given uninterpreted equality shall be constructed. (== -> != resp. != -> ==)
+             * @param ueq The uninterpreted equality to copy.
+             * @param invert true, if the inverse of the given uninterpreted equality shall be constructed. (== -> != resp. != -> ==)
              */
-            UEquality( const UEquality& _ueq, bool _invert = false ):
-                mNegated( _invert ? !_ueq.mNegated : _ueq.mNegated ),
-                mLhs( _ueq.mLhs ),
-                mRhs( _ueq.mRhs )
-            {}
-            
+            UEquality(const UEquality& ueq, bool invert = false):
+                mNegated(invert ? !ueq.mNegated : ueq.mNegated),
+                mLhs(ueq.mLhs),
+                mRhs(ueq.mRhs) {}
+
             /**
              * @return true, if the negation of this equation shall hold, that is, it is actually an inequality.
              */
-            bool negated() const
-            {
+            bool negated() const {
                 return mNegated;
             }
-            
+
             /**
              * @return The left-hand side of this equality.
              */
-            const Arg& lhs() const
-            {
+            const UTerm& lhs() const {
                 return mLhs;
             }
-            
+
             /**
              * @return The right-hand side of this equality.
              */
-            const Arg& rhs() const
-            {
+            const UTerm& rhs() const {
                 return mRhs;
             }
 
             /**
-             * @return true, if the left-hand side is an uninterpreted variable.
-             */
-            bool lhsIsUV() const 
-            {
-                return boost::apply_visitor(IsUVariable(), mLhs);
-            }
-
-            /**
-             * @return true, if the right-hand side is an uninterpreted variable.
-             */
-            bool rhsIsUV() const 
-            {
-                return boost::apply_visitor(IsUVariable(), mRhs);
-            }
-
-            /**
-             * @return true, if the left-hand side is an uninterpreted function instance.
-             */
-            bool lhsIsUF() const 
-            {
-                return boost::apply_visitor(IsUFInstance(), mLhs);
-            }
-
-            /**
-             * @return true, if the right-hand side is an uninterpreted function instance.
-             */
-            bool rhsIsUF() const 
-            {
-                return boost::apply_visitor(IsUFInstance(), mRhs);
-            }
-
-            /**
-             * @return The left-hand side, which must be an uninterpreted variable.
-             */
-            const UVariable& lhsAsUV() const 
-            {
-                return boost::get<UVariable>(mLhs);
-            }
-
-            /**
-             * @return The right-hand side, which must be an uninterpreted variable.
-             */
-            const UVariable& rhsAsUV() const 
-            {
-                return boost::get<UVariable>(mRhs);
-            }
-
-            /**
-             * @return The left-hand side, which must be an uninterpreted function instance.
-             */
-            const UFInstance& lhsAsUF() const 
-            {
-                return boost::get<UFInstance>(mLhs);
-            }
-
-            /**
-             * @return The right-hand side, which must be an uninterpreted function instance.
-             */
-            const UFInstance& rhsAsUF() const 
-            {
-                return boost::get<UFInstance>(mRhs);
-            }
-            
-            /**
              * @return An approximation of the complexity of this uninterpreted equality.
              */
-            std::size_t complexity() const;
-			
+            std::size_t complexity() const {
+				return 1 + mLhs.complexity() + mRhs.complexity();
+			}
+
+			/*
+			 * @return The negation of the uninterpreted equality.
+			 */
 			UEquality negation() const {
 				return UEquality(lhs(), rhs(), !negated());
 			}
-            
-            /**
-             * @param _ueq The uninterpreted equality to compare with.
-             * @return true, if this and the given equality instance are equal.
-             */
-            bool operator==( const UEquality& _ueq ) const;
-            
-            /**
-             * @param _ueq The uninterpreted equality to compare with.
-             * @return true, if this uninterpreted equality is less than the given one.
-             */
-            bool operator<( const UEquality& _ueq ) const;
-            
-            std::string toString( unsigned _unequalSwitch, bool _infix, bool _friendlyNames ) const;
-            
-            void collectUVariables( std::set<UVariable>& _uvars ) const;
 
-            /**
-             * Prints the given uninterpreted equality on the given output stream.
-             * @param _os The output stream to print on.
-             * @param _ueq The uninterpreted equality to print.
-             * @return The output stream after printing the given uninterpreted equality on it.
-             */
-            friend std::ostream& operator<<( std::ostream& _os, const UEquality& _ueq );
+            void collectUVariables(std::set<UVariable>& uvars) const;
+
     };
+
+	/**
+	 * @param ueq The uninterpreted equality to compare with.
+	 * @return true, if this and the given equality instance are equal.
+	 */
+	inline bool operator==(const UEquality& lhs, const UEquality& rhs) {
+		return std::forward_as_tuple(lhs.negated(), lhs.lhs(), lhs.rhs()) == std::forward_as_tuple(rhs.negated(), rhs.lhs(), rhs.rhs());
+	}
+
+	/**
+	 * @param lhs The left hand side.
+	 * @param lhs The right hand side.
+	 * @return true, if the left equality is less than the right one.
+	 */
+	inline bool operator<(const UEquality& lhs, const UEquality& rhs) {
+		return std::forward_as_tuple(lhs.negated(), lhs.lhs(), lhs.rhs()) < std::forward_as_tuple(rhs.negated(), rhs.lhs(), rhs.rhs());
+	}
+
+	/**
+	 * Prints the given uninterpreted equality on the given output stream.
+	 * @param os The output stream to print on.
+	 * @param ueq The uninterpreted equality to print.
+	 * @return The output stream after printing the given uninterpreted equality on it.
+	 */
+	inline std::ostream& operator<<(std::ostream& os, const UEquality& ueq) {
+		return os << ueq.lhs() << (ueq.negated() ? " != " : " == ") << ueq.rhs();
+	}
 } // end namespace carl
 
 namespace std
 {
-    /**
-     * Implements std::hash for uninterpreted equalities.
-     */
-    template<>
-    struct hash<carl::UEquality>
-    {
-    public:
-        /**
-         * @param _ueq The uninterpreted equality to get the hash for.
-         * @return The hash of the given uninterpreted equality.
-         */
-        size_t operator()( const carl::UEquality& _ueq ) const 
-        {
-            size_t result = _ueq.lhsIsUV() ? std::hash<carl::UVariable>()( _ueq.lhsAsUV() ) : std::hash<carl::UFInstance>()( _ueq.lhsAsUF() );
-            result ^= _ueq.rhsIsUV() ? std::hash<carl::UVariable>()( _ueq.rhsAsUV() ) : std::hash<carl::UFInstance>()( _ueq.rhsAsUF() );
-            return result;
-        }
-    };
+	/**
+	 * Implements std::hash for uninterpreted equalities.
+	 */
+	template<>
+	struct hash<carl::UEquality> {
+	public:
+		/**
+		 * @param ueq The uninterpreted equality to get the hash for.
+		 * @return The hash of the given uninterpreted equality.
+		 */
+		std::size_t operator()(const carl::UEquality& ueq) const {
+			return carl::hash_all(ueq.negated(), ueq.lhs(), ueq.rhs());
+		}
+	};
 }

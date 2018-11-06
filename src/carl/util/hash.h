@@ -32,15 +32,6 @@ inline void hash_add(std::size_t& seed, const std::size_t& value) {
 }
 
 /**
- * Variadic version of `hash_add` to add an arbitrary number of values to the seed.
- */
-template<typename First, typename... Tail>
-inline void hash_add(std::size_t& seed, const First& value, Tail&&... tail) {
-	carl::hash_add(seed, value);
-	carl::hash_add(seed, std::forward<Tail>(tail)...);
-}
-
-/**
  * Add hash of both elements of a `std::pair` to the seed.
  */
 template<typename T1, typename T2>
@@ -58,6 +49,15 @@ inline void hash_add(std::size_t& seed, const std::vector<T>& v) {
 }
 
 /**
+ * Variadic version of `hash_add` to add an arbitrary number of values to the seed.
+ */
+template<typename First, typename... Tail>
+inline void hash_add(std::size_t& seed, const First& value, Tail&&... tail) {
+	carl::hash_add(seed, value);
+	carl::hash_add(seed, std::forward<Tail>(tail)...);
+}
+
+/**
  * Hashes an arbitrary number of values.
  * Uses `hash_add` with a seed of `0`.
  */
@@ -67,4 +67,23 @@ inline std::size_t hash_all(Args&&... args) {
 	hash_add(seed, std::forward<Args>(args)...);
 	return seed;
 }
+
+template<typename T>
+struct hash_inserter {
+	using difference_type = void;
+	using pointer = void;
+	using reference = void;
+	using value_type = void;
+	using iterator_category = std::output_iterator_tag;
+
+	std::size_t& seed;
+	hash_inserter& operator=(const T& t) {
+		hash_add(seed, t);
+		return *this;
+	}
+	hash_inserter& operator*() { return *this; }
+	hash_inserter& operator++() { return *this; }
+	hash_inserter& operator++(int) { return *this; }
+};
+
 } // namespace carl

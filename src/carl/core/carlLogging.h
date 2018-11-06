@@ -199,7 +199,7 @@ public:
 	 * @param level LogLevel.
 	 * @return If the message shall be forwarded.
 	 */
-	bool check(std::string channel, LogLevel level) noexcept {
+	bool check(std::string channel, LogLevel level) const noexcept {
 		auto it = mData.find(channel);
 		while (!channel.empty() && it == mData.end()) {
 			auto n = channel.rfind('.');
@@ -383,6 +383,18 @@ public:
 		}
 	}
 	/**
+	 * Checks whether a log message would be visible for some sink.
+	 * If this is not the case, we do not need to render it at all.
+	 * @param level LogLevel.
+	 * @param channel Channel name.
+	 */
+	bool visible(LogLevel level, const std::string& channel) const noexcept {
+		for (const auto& t: mData) {
+			if (std::get<1>(t.second).check(channel, level)) return true;
+		}
+		return true;
+	}
+	/**
 	 * Logs a message.
 	 * @param level LogLevel.
 	 * @param channel Channel name.
@@ -419,9 +431,16 @@ inline Logger& logger() {
 /// Create a record info without function name.
 #define __CARL_LOG_RECORD_NOFUNC ::carl::logging::RecordInfo{__FILE__, "", __LINE__}
 /// Basic logging macro.
-#define __CARL_LOG(level, channel, expr) { std::stringstream __ss; __ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, __ss, __CARL_LOG_RECORD); }
+#define __CARL_LOG(level, channel, expr) { \
+	if (::carl::logging::Logger::getInstance().visible(level, channel)) { \
+		std::stringstream __ss; __ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, __ss, __CARL_LOG_RECORD); \
+	}}
+
 /// Basic logging macro without function name.
-#define __CARL_LOG_NOFUNC(level, channel, expr) { std::stringstream __ss; __ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, __ss, __CARL_LOG_RECORD_NOFUNC); }
+#define __CARL_LOG_NOFUNC(level, channel, expr) { \
+	if (::carl::logging::Logger::getInstance().visible(level, channel)) { \
+		std::stringstream __ss; __ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, __ss, __CARL_LOG_RECORD_NOFUNC); \
+	}}
 
 /// Intended to be called when entering a function. Format: `<function name>(<args>)`.
 #define __CARL_LOG_FUNC(channel, args) __CARL_LOG_NOFUNC(::carl::logging::LogLevel::LVL_TRACE, channel, __func__ << "(" << args << ")");

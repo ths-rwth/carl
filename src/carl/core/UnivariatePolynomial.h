@@ -200,23 +200,18 @@ public:
 	
 	/**
 	 * Creates a polynomial of value one with the same main variable.
-	 * Applies if the Coefficient are GFNumber values.
 	 * @return One.
 	 */
-	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>> = dummy>
-	UnivariatePolynomial one() const
-	{
-		return UnivariatePolynomial(mMainVar, C(1, lcoeff().gf()));
-	}
-	/**
-	 * Creates a polynomial of value one with the same main variable.
-	 * Applies if the Coefficient are not GFNumber values.
-	 * @return One.
-	 */
-	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
-	UnivariatePolynomial one() const
-	{
-		return UnivariatePolynomial(mMainVar, C(1));
+	UnivariatePolynomial one() const {
+		if constexpr (carl::is_instantiation_of<GFNumber, Coefficient>::value) {
+			if (isZero()) {
+				return UnivariatePolynomial(mMainVar, Coefficient(1));
+			} else {
+				return UnivariatePolynomial(mMainVar, Coefficient(1, lcoeff().gf()));
+			}
+		} else {
+			return UnivariatePolynomial(mMainVar, Coefficient(1));
+		}
 	}
 	
 	/**
@@ -226,8 +221,8 @@ public:
 	 */
 	const Coefficient& lcoeff() const
 	{
-		assert(this->mCoefficients.size() > 0);
-		return this->mCoefficients.back();
+		assert(mCoefficients.size() > 0);
+		return mCoefficients.back();
 	}
 	/**
 	 * Returns the trailing coefficient.
@@ -235,8 +230,8 @@ public:
 	 * @return The trailing coefficient.
 	 */
 	const Coefficient& tcoeff() const {
-		assert(this->mCoefficients.size() > 0);
-		return this->mCoefficients.front();
+		assert(mCoefficients.size() > 0);
+		return mCoefficients.front();
 	}
 
 	/**
@@ -245,83 +240,57 @@ public:
 	 */
 	bool isConstant() const
 	{
-		assert(this->isConsistent());
+		assert(isConsistent());
 		return mCoefficients.size() <= 1;
 	}
 	
 	bool isLinearInMainVar() const
 	{
-		assert(this->isConsistent());
+		assert(isConsistent());
 		return mCoefficients.size() <= 2;
 	}
 
 	/**
 	 * Checks whether the polynomial is only a number.
-	 * Applies if the coefficients are numbers.
 	 * @return If polynomial is a number.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	bool isNumber() const
 	{
-		return this->isConstant();
-	}
-	/**
-	 * Checks whether the polynomial is only a number.
-	 * Applies if the coefficients are not numbers.
-	 * Calls isNumber() on the constant coefficient recursively.
-	 * @return If polynomial is a number.
-	 */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	bool isNumber() const
-	{
-		if (this->isZero()) return true;
-		return this->isConstant() && this->lcoeff().isNumber();
+		if constexpr (carl::is_number<Coefficient>::value) {
+			return isConstant();
+		} else {
+			if (isZero()) return true;
+			return isConstant() && lcoeff().isNumber();
+		}
 	}
 
 	/**
 	 * Returns the constant part of this polynomial.
-	 * Applies, if the coefficients are numbers.
 	 * @return Constant part.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
 	{
-		if (this->isZero()) return NumberType(0);
-		return this->tcoeff();
-	}
-	/**
-	 * Returns the constant part of this polynomial.
-	 * Applies, if the coefficients are not numbers.
-	 * Calls constantPart() on the trailing coefficient recursively.
-	 * @return Constant part.
-	 */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	NumberType constantPart() const
-	{
-		if (this->isZero()) return NumberType(0);
-		return this->tcoeff().constantPart();
+		if (isZero()) return NumberType(0);
+		if constexpr (carl::is_number<Coefficient>::value) {
+			return tcoeff();
+		} else {
+			return tcoeff().constantPart();
+		}
 	}
 
 	/**
 	 * Checks if the polynomial is univariate, that means if only one variable occurs.
-	 * Applies, if the coefficients are numbers.
 	 * @return true.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	bool isUnivariate() const {
-		return true;
-	}
-	/**
-	 * Checks if the polynomial is univariate, that means if only one variable occurs.
-	 * Applies, if the coefficients are not numbers.
-	 * @return If polynomial is univariate.
-	 */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	bool isUnivariate() const {
-		for (auto c: this->coefficients()) {
-			if (!c.isNumber()) return false;
+		if constexpr (carl::is_number<Coefficient>::value) {
+			return true;
+		} else {
+			for (const auto& c: coefficients()) {
+				if (!c.isNumber()) return false;
+			}
+			return true;
 		}
-		return true;
 	}
 
 	/**
@@ -331,42 +300,31 @@ public:
 	 * @return Degree.
 	 */
 	uint degree() const {
-		assert(!this->isZero());
+		assert(!isZero());
 		return uint(mCoefficients.size()-1);
 	}
 	
 	/**
 	 * Returns the total degree of the polynomial, that is the maximum degree of any monomial.
-	 * Applies, if the coefficients are numbers. In this case, the total degree is the degree.
 	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
 	 * @see @cite GCL92, page 38
 	 * @return Total degree.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	uint totalDegree() const {
-		return this->degree();
-	}
-	/**
-	 * Returns the total degree of the polynomial, that is the maximum degree of any monomial.
-	 * Applies, if the coefficients are not numbers.
-	 * In this case, the total degree of all coefficients must be considered.
-	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
-	 * @see @cite GCL92, page 48
-	 * @return Total degree.
-	 */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	uint totalDegree() const {
-		assert(!this->isZero());
-		uint max = 0;
-		for (std::size_t deg = 0; deg < this->mCoefficients.size(); deg++) {
-			if (!this->mCoefficients[deg].isZero()) {
-				uint tdeg = deg + this->mCoefficients[deg].totalDegree();
-				if (tdeg > max) max = tdeg;
+		if constexpr (carl::is_number<Coefficient>::value) {
+			return degree();
+		} else {
+			if (isZero()) return 0;
+			uint max = 0;
+			for (std::size_t deg = 0; deg < mCoefficients.size(); deg++) {
+				if (!mCoefficients[deg].isZero()) {
+					uint tdeg = deg + mCoefficients[deg].totalDegree();
+					if (tdeg > max) max = tdeg;
+				}
 			}
+			return max;
 		}
-		return max;
 	}
-	
 	
 	/**
 	* @return An approximation of the complexity of this polynomial.
@@ -408,119 +366,71 @@ public:
 	/**
 	 * Switches the main variable using a purely syntactical restructuring.
 	 * The resulting polynomial will be algebraicly identical, but have the given variable as its main variable.
-	 * Applies, if the coefficients are numbers.
 	 * @param newVar New main variable.
 	 * @return Restructured polynomial.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	UnivariatePolynomial<MultivariatePolynomial<NumberType>> switchVariable(Variable newVar) const {
-		assert(this->isConsistent());
-		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
-	}
-	/**
-	 * Switches the main variable using a purely syntactical restructuring.
-	 * The resulting polynomial will be algebraicly identical, but have the given variable as its main variable.
-	 * Applies, if the coefficients are not numbers.
-	 * @param newVar New main variable.
-	 * @return Restructured polynomial.
-	 */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial switchVariable(Variable newVar) const {
-		assert(this->isConsistent());
+		assert(isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
 	
 	/**
 	 * Replaces the main variable.
-	 * Applies, if the coefficients are numbers.
 	 * @param newVar New main variable.
 	 * @return New polynomial.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	UnivariatePolynomial replaceVariable(Variable newVar) const {
-		return UnivariatePolynomial<Coefficient>(newVar, this->mCoefficients);
-	}
-	/**
-	 * Replaces the main variable.
-	 * Applies, if the coefficients are not numbers.
-	 * @param newVar New main variable.
-	 * @return New polynomial.
-	 */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial replaceVariable(Variable newVar) const {
-		return MultivariatePolynomial<NumberType>(*this).substitute(this->mainVar(), MultivariatePolynomial<NumberType>(newVar)).toUnivariatePolynomial(newVar);
+		if constexpr (carl::is_number<Coefficient>::value) {
+			return UnivariatePolynomial<Coefficient>(newVar, mCoefficients);
+		} else {
+			return MultivariatePolynomial<NumberType>(*this).substitute(mainVar(), MultivariatePolynomial<NumberType>(newVar)).toUnivariatePolynomial(newVar);
+		}
 	}
 
 	/**
 	 * Gathers all variables that occur in the polynomial.
-	 * Applies, if the coefficients are numbers.
 	 * @return Set of variables.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	std::set<Variable> gatherVariables() const {
-		return std::set<Variable>({this->mainVar()});
-	}
-	/**
-	 * Gathers all variables that occur in the polynomial.
-	 * Applies, if the coefficients are not numbers.
-	 * @return Set of variables.
-	 */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	std::set<Variable> gatherVariables() const {
-		std::set<Variable> res({this->mainVar()});
-		for (auto c: this->mCoefficients) {
-			auto tmp = c.gatherVariables();
-			res.insert(tmp.begin(), tmp.end());
+		if constexpr (carl::is_number<Coefficient>::value) {
+			return std::set<Variable>({mainVar()});
+		} else {
+			std::set<Variable> res({this->mainVar()});
+			for (auto c: this->mCoefficients) {
+				auto tmp = c.gatherVariables();
+				res.insert(tmp.begin(), tmp.end());
+			}
+			return res;
 		}
-		return res;
 	}
 	
 	/**
 	 * Gathers all variables that occur in the polynomial.
-	 * Applies, if the coefficients are numbers.
 	 * @return Set of variables.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	void gatherVariables(std::set<Variable>& vars) const {
-		vars = {this->mainVar()};
-	}
-	/**
-	 * Gathers all variables that occur in the polynomial.
-	 * Applies, if the coefficients are not numbers.
-	 * @return Set of variables.
-	 */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	void gatherVariables(std::set<Variable>& set) const {
-		set = {this->mainVar()};
-		for (auto c: this->mCoefficients) {
-			auto tmp = c.gatherVariables();
-			set.insert(tmp.begin(), tmp.end());
+		vars = {mainVar()};
+		if constexpr (!carl::is_number<Coefficient>::value) {
+			for (auto c: this->mCoefficients) {
+				auto tmp = c.gatherVariables();
+				vars.insert(tmp.begin(), tmp.end());
+			}
 		}
 	}
 
 	/**
 	 * Checks if the given variable occurs in the polynomial.
-	 * Applies, if the coefficients are numbers.
 	 * @param v Variable.
 	 * @return If v occurs in the polynomial.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	bool has(Variable v) const {
-		return v == this->mainVar();
-	}
-	/**
-	 * Checks if the given variable occurs in the polynomial.
-	 * Applies, if the coefficients are not numbers.
-	 * @param v Variable.
-	 * @return If v occurs in the polynomial.
-	 */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	bool has(Variable v) const {
-		bool hasVar = v == this->mainVar();
-		for (auto c: this->mCoefficients) {
-			hasVar = hasVar || c.has(v);
+		if (v == mainVar()) return true;
+		if constexpr (!carl::is_number<Coefficient>::value) {
+			for (const auto& c: mCoefficients) {
+				if (c.has(v)) return true;
+			}
 		}
-		return hasVar;
+		return false;
 	}
 
 	/**
@@ -717,26 +627,6 @@ public:
 	 */
 	UnivariatePolynomial pow(std::size_t exp) const;
 
-	/**
-	 * Calculates the greatest common divisor of two polynomials.
-	 * @param a First polynomial.
-	 * @param b Second polynomial.
-	 * @return `gcd(a,b)`
-	 */
-	static UnivariatePolynomial gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
-	/**
-	 * Calculates the extended greatest common divisor `g` of two polynomials.
-	 * The output polynomials `s` and `t` are computed such that \f$g = s \cdot a + t \cdot b\f$.
-	 * @param a First polynomial.
-	 * @param b Second polynomial.
-	 * @param s First output polynomial.
-	 * @param t Second output polynomial.
-	 * @see @cite GCL92, Algorithm 2.2
-	 * @return `gcd(a,b)`
-	 */
-	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
-											 UnivariatePolynomial& s, UnivariatePolynomial& t);
-	
 	Coefficient evaluate(const Coefficient& value) const;
 	
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -835,15 +725,13 @@ public:
 	 * @param i number of the coefficient
 	 * @return numeric content part of i'th coefficient.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType numericContent(std::size_t i) const
 	{
-		return this->mCoefficients[i];
-	}
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	NumberType numericContent(std::size_t i) const
-	{
-		return this->mCoefficients[i].numericContent();
+		if constexpr (carl::is_number<Coefficient>::value) {
+			return this->mCoefficients[i];
+		} else {
+			return this->mCoefficients[i].numericContent();
+		}
 	}
 
 	/**
@@ -853,15 +741,13 @@ public:
 	 * If the coefficients are polynomials, this is the unit part of the leading coefficient.s
 	 * @return unit part of the polynomial.
 	 */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType numericUnit() const
 	{
-		return (this->lcoeff() >= Coefficient(0) ? NumberType(1) : NumberType(-1));
-	}
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	NumberType numericUnit() const
-	{
-		return this->lcoeff().numericUnit();
+		if constexpr (carl::is_number<Coefficient>::value) {
+			return (this->lcoeff() >= Coefficient(0) ? NumberType(1) : NumberType(-1));
+		} else {
+			return this->lcoeff().numericUnit();
+		}
 	}
 
 	/**
@@ -899,13 +785,10 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
-	FactorMap<Coefficient> factorization() const;
-
 	template<typename Integer>
 	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& poly, FactorMap<Coefficient>& linearFactors, const Integer& maxInt = 0 );
 
 	Coefficient syntheticDivision(const Coefficient& zeroOfDivisor);
-	std::map<uint, UnivariatePolynomial> squareFreeFactorization() const;
 
 	/**
 	 * Checks if zero is a real root of this polynomial.
@@ -956,32 +839,6 @@ public:
 	 */
 	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
 	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
-
-
-	/**
-	 * Implements subresultants algorithm with optimizations described in @cite Ducos00 .
-	 * @param p First polynomial.
-	 * @param q First polynomial.
-	 * @param strategy Strategy.
-	 * @return Subresultants of p and q.
-	 */
-	[[deprecated("use carl::subresultants() instead")]]
-	static std::list<UnivariatePolynomial> subresultants(
-			const UnivariatePolynomial& p,
-			const UnivariatePolynomial& q,
-			SubresultantStrategy strategy = SubresultantStrategy::Default
-	) {
-		return carl::subresultants(p, q, strategy);
-	}
-
-	[[deprecated("use carl::principalSubresultantsCoefficients() instead")]]
-	static const std::vector<UnivariatePolynomial> principalSubresultantsCoefficients(
-			const UnivariatePolynomial& p,
-			const UnivariatePolynomial& q,
-			SubresultantStrategy strategy = SubresultantStrategy::Default
-	) {
-		return carl::principalSubresultantsCoefficients(p, q, strategy);
-	}
 
 	[[deprecated("use carl::resultant() instead")]]
 	UnivariatePolynomial<Coefficient> resultant(
@@ -1220,7 +1077,7 @@ private:
 	 * @return 
 	 */
 	UnivariatePolynomial remainder_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
-	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
+	
 	void stripLeadingZeroes() 
 	{
 		while(!isZero() && lcoeff() == Coefficient(0))

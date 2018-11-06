@@ -1,6 +1,8 @@
 
 #include "RealAlgebraicNumber.h"
 
+#include "../../../core/polynomialfunctions/GCD.h"
+
 #pragma once
 
 namespace carl {
@@ -48,7 +50,7 @@ namespace carl {
 		} else {
 			assert(getIRPolynomial() != n.getIRPolynomial());
 			assert(getIRPolynomial().mainVar() == n.getIRPolynomial().mainVar());
-			auto g = UnivariatePolynomial<Number>::gcd(getIRPolynomial(), n.getIRPolynomial());
+			auto g = carl::gcd(getIRPolynomial(), n.getIRPolynomial());
 			if (!isRootOf(g)) return false;
 			mIR->polynomial = g;
 			mIR->sturmSequence = g.standardSturmSequence();

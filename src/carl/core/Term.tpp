@@ -332,13 +332,20 @@ bool operator<(const Coeff& lhs, const Term<Coeff>& rhs) {
 template<typename Coeff>
 const Term<Coeff> operator/(const Term<Coeff>& lhs, uint rhs)
 {
-	return Term<Coeff>(lhs.coeff()/rhs, lhs.monomial());
+	return Term<Coeff>(lhs.coeff()/carl::fromInt<Coeff>(rhs), lhs.monomial());
 }
 
 template<typename Coeff>
-std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
-{
-	return (os << rhs.toString(true, true));
+std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs) {
+	if (rhs.monomial()) {
+		if (!carl::isOne(rhs.coeff())) {
+			os << rhs.coeff() << "*";
+		}
+		os << rhs.monomial();
+	} else {
+		os << rhs.coeff();
+	}
+	return os;
 }
 
 template<typename Coeff>
@@ -346,61 +353,6 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<const Term<Coef
 {
 	if (rhs) return os << *rhs;
 	else return os << "nullptr";
-}
-
-template<typename Coefficient>
-template<typename C, DisableIf<is_interval<C>>>
-std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
-{ 
-	if(mMonomial)
-	{
-		if(mCoeff != CoefficientType(1))
-		{
-			std::stringstream s;
-			if(!infix) s << " ";
-			s << carl::toString(mCoeff,infix); //change to mCoeff.toString() at some point
-			if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
-			else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
-		}
-		else
-		{
-			if(infix) return mMonomial->toString(true, friendlyVarNames);
-			else return mMonomial->toString(infix, friendlyVarNames);
-		}
-	}
-	else 
-	{
-		std::stringstream s;
-		s << carl::toString(mCoeff, infix ); //change to mCoeff.toString()
-		return s.str();
-	}
-}
-
-template<typename Coefficient>
-template<typename C, EnableIf<is_interval<C>>>
-std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
-{ 
-	if(mMonomial)
-	{
-		if(!mCoeff.isOne())
-		{
-			std::stringstream s;
-			s << mCoeff;
-			if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
-			else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
-		}
-		else
-		{
-			if(infix) return mMonomial->toString(true, friendlyVarNames);
-			else return mMonomial->toString(infix, friendlyVarNames);
-		}
-	}
-	else 
-	{
-		std::stringstream s;
-		s << mCoeff;
-		return s.str();
-	}
 }
 
 template<typename Coefficient>

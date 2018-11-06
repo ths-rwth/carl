@@ -11,11 +11,11 @@ namespace model {
 	 * Substitutes a variable with a rational within a polynomial.
 	 */
 	template<typename Rational>
-	void substituteIn(MultivariatePolynomial<Rational>& p, Variable::Arg var, const Rational& r) {
+	void substituteIn(MultivariatePolynomial<Rational>& p, Variable var, const Rational& r) {
 		p.substituteIn(var, MultivariatePolynomial<Rational>(r));
 	}
 	template<typename Poly, typename Rational>
-	void substituteIn(UnivariatePolynomial<Poly>& p, Variable::Arg var, const Rational& r) {
+	void substituteIn(UnivariatePolynomial<Poly>& p, Variable var, const Rational& r) {
 		p.substituteIn(var, Poly(r));
 	}
 
@@ -24,12 +24,24 @@ namespace model {
 	 * Only works if the real algebraic number is actually numeric.
 	 */
 	template<typename Rational>
-	void substituteIn(MultivariatePolynomial<Rational>& p, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
+	void substituteIn(MultivariatePolynomial<Rational>& p, Variable var, const RealAlgebraicNumber<Rational>& r) {
 		if (r.isNumeric()) substituteIn(p, var, r.value());
 	}
 	template<typename Poly, typename Rational>
-	void substituteIn(UnivariatePolynomial<Poly>& p, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
+	void substituteIn(UnivariatePolynomial<Poly>& p, Variable var, const RealAlgebraicNumber<Rational>& r) {
 		if (r.isNumeric()) substituteIn(p, var, r.value());
+	}
+
+	/**
+	 * Substitutes a variable with a polynomial within a polynomial.
+	 */
+	template<typename Rational>
+	void substituteIn(MultivariatePolynomial<Rational>& p, Variable var, const MultivariatePolynomial<Rational>& r) {
+		p.substituteIn(var, r);
+	}
+	template<typename Poly, typename Rational>
+	void substituteIn(UnivariatePolynomial<Poly>& p, Variable var, const Poly& r) {
+		p.substituteIn(var, r);
 	}
 
 	/**
@@ -46,6 +58,12 @@ namespace model {
 				substituteIn(p, var, value.asRational());
 			} else if (value.isRAN()) {
 				substituteIn(p, var, value.asRAN());
+			} else if (value.isSubstitution()) {
+				const auto& subs = value.asSubstitution();
+				auto polysub = dynamic_cast<const ModelPolynomialSubstitution<Rational,Poly>*>(subs.get());
+				if (polysub != nullptr) {
+					substituteIn(p, var, polysub->getPoly());
+				}
 			}
 		}
 	}

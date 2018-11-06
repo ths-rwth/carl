@@ -97,6 +97,13 @@ namespace carl {
 			if (!boost::get<RAN>(mValue).isNumeric()) return boost::none;
 			return Constraint<Poly>(Poly(mVar) - Poly(boost::get<RAN>(mValue).value()), rel);
 		}
+
+		/**
+		 * Return a polynomial containing the lhs-variable that has a same root
+		 * for the this lhs-variable as the value that rhs represent, e.g. if this
+		 * variable comparison is 'v < 3' then a defining polynomial could be 'v-3',
+		 * because it has the same root for variable v, i.e., v=3.
+		 */
 		Poly definingPolynomial() const {
 			if (boost::get<RAN>(&mValue) != nullptr) {
 				const auto& ran = boost::get<RAN>(mValue);
@@ -118,12 +125,6 @@ namespace carl {
 			auto newVars = boost::apply_visitor(VariableCollector(), mValue);
 			vars.insert(newVars.begin(), newVars.end());
 		}
-
-		std::string toString(unsigned = 0, bool = false, bool = true) const {
-			std::stringstream ss;
-			ss << "(" << var() << " " << (negated() ? "! " : "") << relation() << " " << mValue << ")";
-			return ss.str();
-		}
 	};
 
 	template<typename Poly>
@@ -139,7 +140,7 @@ namespace carl {
 	}
 	template<typename Poly>
 	std::ostream& operator<<(std::ostream& os, const VariableComparison<Poly>& vc) {
-		return os << vc.toString();
+		return os << "(" << vc.var() << " " << (vc.negated() ? "! " : "") << vc.relation() << " " << vc.value() << ")";
 	}
 }
 

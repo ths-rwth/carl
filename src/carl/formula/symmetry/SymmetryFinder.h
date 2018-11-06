@@ -160,7 +160,6 @@ class GraphBuilder {
 			case carl::FormulaType::VARASSIGN:
 			case carl::FormulaType::BITVECTOR:
 			case carl::FormulaType::UEQ:
-			case carl::FormulaType::PBCONSTRAINT:
 				break;
 		}
 		return vert;
