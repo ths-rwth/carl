@@ -76,6 +76,10 @@ if(NOT Boost_FOUND)
 endif()
 print_resource_info("Boost" Boost_SHARED ${Boost_VERSION})
 
+if(Boost_VERSION VERSION_GREATER_EQUAL "106500")
+	set(BOOST_HAS_STACKTRACE "1")
+endif()
+
 ##### Eigen3
 if(NOT FORCE_SHIPPED_RESOURCES)
 	load_library(carl EIGEN3 3.3)

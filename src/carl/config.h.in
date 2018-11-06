@@ -10,3 +10,4 @@
 #cmakedefine THREAD_SAFE
 #cmakedefine USE_BLISS
 #cmakedefine USE_COCOA
+#cmakedefine BOOST_HAS_STACKTRACE

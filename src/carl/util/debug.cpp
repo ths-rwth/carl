@@ -2,6 +2,12 @@
 
 #include "../core/logging.h"
 
+#include <boost/core/demangle.hpp>
+
+#ifdef BOOST_HAS_STACKTRACE
+#include <boost/stacktrace.hpp>
+#endif
+
 #include <memory>
 #include <sstream>
 
@@ -13,17 +19,27 @@
 
 namespace carl {
 
+std::string demangle(const char* name) {
+	return boost::core::demangle(name);
+}
+
+#ifdef BOOST_HAS_STACKTRACE
+	void printStacktrace() {
+		std::cerr << boost::stacktrace::stacktrace();
+	}
+
+	std::string callingFunction() {
+		std::stringstream ss;
+		ss << boost::stacktrace::stacktrace(1,1);
+		return ss.str();
+	}
+#else
+
 #if defined __VS
 	//Windows
 	void printStacktrace(bool interaction) {
 		//TODO implement for windows
 	}
-
-	std::string demangle(const char* name) {
-		//TODO implement for windows
-		return "Not implemented";
-	}
-
 	std::string callingFunction() {
 		//TODO implement for windows
 		return "Not implemented";
@@ -35,15 +51,6 @@ namespace carl {
 		cmd << "gdb --pid=" << getpid() << " -ex bt";
 		if (!interaction) cmd << " --batch --quiet";
 		system(cmd.str().c_str()); // NOLINT
-	}
-
-	std::string demangle(const char* name) {
-		int status = -4;
-		std::unique_ptr<char, void(*)(void*)> res {
-			abi::__cxa_demangle(name, nullptr, nullptr, &status),
-			std::free
-		};
-		return (status == 0) ? res.get() : name ;
 	}
 
 	std::string callingFunction() {
@@ -64,6 +71,8 @@ namespace carl {
 		}
 		return out.str();
 	}
+#endif
+
 #endif
 
 #ifndef NDEBUG

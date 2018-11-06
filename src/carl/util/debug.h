@@ -28,7 +28,7 @@ namespace carl {
 /**
  * Uses GDB to print a stack trace.
  */
-void printStacktrace(bool interaction = false);
+void printStacktrace();
 
 std::string demangle(const char* name);
 
