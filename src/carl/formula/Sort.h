@@ -63,11 +63,20 @@ class Sort {
 };
 
 /**
-* @param _sort The sort to compare with.
-* @return true, if this sort equals the given one.
+* @param lhs The left sort.
+* @param rhs The right sort.
+* @return true, if the sorts are the same.
 */
 inline bool operator==(const Sort& lhs, const Sort& rhs) {
 	return lhs.id() == rhs.id();
+}
+/**
+* @param lhs The left sort.
+* @param rhs The right sort.
+* @return true, if the sorts are different.
+*/
+inline bool operator!=(const Sort& lhs, const Sort& rhs) {
+	return lhs.id() != rhs.id();
 }
 
 /**
