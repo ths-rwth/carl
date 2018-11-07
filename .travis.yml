@@ -1,5 +1,4 @@
 language: generic
-sudo: false
 dist: trusty
 
 cache:
@@ -193,9 +192,6 @@ matrix:
           sources: [*sources_base]
           packages: [*packages_base, g++-7]
   allow_failures:
-    - stage: build
-      os: linux
-      env: CC=clang-7 CXX=clang++-7
     - stage: build
       os: linux
       env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
