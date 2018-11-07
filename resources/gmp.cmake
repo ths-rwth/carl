@@ -16,16 +16,19 @@ if(UNIX)
 elseif(WIN32)
 	ExternalProject_Add(
 		GMP-EP
-		URL "http://mpir.org/mpir-3.0.0.zip"
-		URL_MD5 0ac60c2e6e183d401d1f876ca177cdb7
+		GIT_REPOSITORY "https://github.com/BrianGladman/mpir.git"
 		DOWNLOAD_NO_PROGRESS 1
 		CONFIGURE_COMMAND ""
 		BUILD_IN_SOURCE YES
 		BUILD_COMMAND cd build.vc15
-		COMMAND ./msbuild.bat gc dll x64 RELEASE
-		COMMAND ./msbuild.bat gc dll x64 DEBUG
-		COMMAND ./msbuild.bat gc lib x64 RELEASE
-		COMMAND ./msbuild.bat gc lib x64 DEBUG
+		# First two calls fail, see for example https://travis-ci.org/smtrat/carl-windows/builds/451301207#L264
+		# After that, it builds fine...
+		COMMAND ./msbuild.bat gc DLL x64 RELEASE
+		COMMAND ./msbuild.bat gc DLL x64 DEBUG
+		COMMAND ./msbuild.bat gc LIB x64 RELEASE
+		COMMAND ./msbuild.bat gc LIB x64 DEBUG
+		COMMAND ./msbuild.bat gc DLL x64 RELEASE
+		COMMAND ./msbuild.bat gc DLL x64 DEBUG
 		INSTALL_COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/lib
 		COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include
 		COMMAND cp <SOURCE_DIR>/dll/x64/${CMAKE_BUILD_TYPE}/mpir${DYNAMIC_EXT} <INSTALL_DIR>/lib/gmp${DYNAMIC_EXT}
