@@ -80,6 +80,8 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	
 elif [[ ${TASK} == "tidy" ]]; then
 
+	cmake -D DEVELOPER=ON -D THREAD_SAFE=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=OFF -D USE_COCOA=ON -D USE_GINAC=OFF ../ || return 1
+	
 	/usr/bin/time make tidy || return 1
 
 elif [[ ${TASK} == "addons" ]]; then

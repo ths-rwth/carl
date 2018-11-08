@@ -38,6 +38,9 @@ else()
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-runtime-references")
 	# HICPP
 	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-hicpp-braces-around-statements")
+	# this triggers on every assert()
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-hicpp-no-array-decay")
+	
 
 	set(CLANG_TIDY_CHECKS "-checks='${CLANG_TIDY_CHECKS}'")
 	#message(STATUS "Enabled checks for clang-tidy: ${CLANG_TIDY_CHECKS}")
