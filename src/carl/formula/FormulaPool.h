@@ -461,40 +461,12 @@ namespace carl
 			const FormulaContent<Pol>* create( const UTerm& _lhs, const UTerm& _rhs, bool _negated )
 			{
                 #ifdef SIMPLIFY_FORMULA
-                if(_lhs.isUVariable() && _rhs.isUVariable())
-                {
-                    if( _lhs.asUVariable() < _rhs.asUVariable() )
-                        return add( new FormulaContent<Pol>( UEquality( _lhs.asUVariable(), _rhs.asUVariable(), _negated, true ) ) );
-                    if( _rhs.asUVariable() < _lhs.asUVariable() )
-                        return add( new FormulaContent<Pol>( UEquality( _rhs.asUVariable(), _lhs.asUVariable(), _negated, true ) ) );
-                    else if( _negated )
-                        return falseFormula();
-                    else
-                        return trueFormula();
-                }
-		            else if( _lhs.isUVariable() && _rhs.isUFInstance() )
-                {
-                    return add( new FormulaContent<Pol>( UEquality( _lhs.asUVariable(), _rhs.asUFInstance(), _negated ) ) );
-                }
-                else if( _lhs.isUFInstance() && _rhs.isUVariable() )
-                {
-                    return add( new FormulaContent<Pol>( UEquality( _rhs.asUVariable(), _lhs.asUFInstance(), _negated ) ) );
-                }
-                else
-                {
-                    assert( _lhs.isUFInstance() && _rhs.isUFInstance() );
-                    if( _lhs.asUFInstance() < _rhs.asUFInstance() )
-                        return add( new FormulaContent<Pol>( UEquality( _lhs.asUFInstance(), _rhs.asUFInstance(), _negated, true ) ) );
-                    if( _rhs.asUFInstance() < _lhs.asUFInstance() )
-                        return add( new FormulaContent<Pol>( UEquality( _rhs.asUFInstance(), _lhs.asUFInstance(), _negated, true ) ) );
-                    else if( _negated )
-                        return falseFormula();
-                    else
-                        return trueFormula();
-                }
-                #else
-                return add( new FormulaContent<Pol>( UEquality( _lhs, _rhs, _negated ) ) );
-                #endif
+				if (_lhs == _rhs) {
+					if (_negated) return falseFormula();
+					else return trueFormula();
+				}
+				#endif
+				return add(new FormulaContent<Pol>(UEquality(_lhs, _rhs, _negated)));
 			}
 
 			const FormulaContent<Pol>* create( UEquality&& eq )
