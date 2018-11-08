@@ -10,17 +10,16 @@
 
 namespace carl {
 
-	UninterpretedFunction UFManager::newUF(const UFContent* ufc) {
-		auto iter = mUFIdMap.find(ufc);
+	UninterpretedFunction UFManager::newUF(std::unique_ptr<UFContent>&& ufc) {
+		auto iter = mUFIdMap.find(ufc.get());
 		// Check if this uninterpreted function content has already been created
 		if (iter != mUFIdMap.end()) {
-			delete ufc;
 			return UninterpretedFunction(iter->second);
 		}
 		// Create the uninterpreted function
-		mUFIdMap.emplace(ufc, mUFs.size());
+		mUFIdMap.emplace(ufc.get(), mUFs.size());
 		UninterpretedFunction uf(mUFs.size());
-		mUFs.push_back(ufc);
+		mUFs.push_back(std::move(ufc));
 		return uf;
 	}
 }

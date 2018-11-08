@@ -41,6 +41,7 @@ class UFContent {
         /// The uninterpreted function's codomain.
         Sort mCodomain;
 
+    public:
         /**
          * Constructs the content of an uninterpreted function.
          * @param name The name of the uninterpreted function to construct.
@@ -50,8 +51,8 @@ class UFContent {
         explicit UFContent(std::string&& name, std::vector<Sort>&& domain, Sort codomain):
             mName(std::move(name)),
             mDomain(std::move(domain)),
-            mCodomain(codomain) {}
-    public:
+            mCodomain(codomain)
+        {}
         UFContent() = delete;
         UFContent(const UFContent&) = delete;
         UFContent(UFContent&&) = delete;
@@ -157,7 +158,7 @@ class UFManager : public Singleton<UFManager> {
         /// Stores all instantiated uninterpreted function's contents and maps them to their unique id.
         FastPointerMap<UFContent, UninterpretedFunction::IDType> mUFIdMap;
         /// Maps the unique ids to the instantiated uninterpreted function's content.
-        std::vector<const UFContent*> mUFs;
+        std::vector<std::unique_ptr<UFContent>> mUFs;
 
         /**
          * Constructs an uninterpreted functions manager.
@@ -167,7 +168,6 @@ class UFManager : public Singleton<UFManager> {
         }
         ~UFManager() override {
             mUFIdMap.clear();
-            for (auto& ptr: mUFs) delete ptr;
             mUFs.clear();
         }
 
@@ -178,10 +178,10 @@ class UFManager : public Singleton<UFManager> {
          * @param sc The uninterpreted function's content to store.
          * @return The uninterpreted function corresponding to the given content.
          */
-        UninterpretedFunction newUF(const UFContent* sc);
+        UninterpretedFunction newUF(std::unique_ptr<UFContent>&& sc);
 
     public:
-        const std::vector<const UFContent*>& ufContents() const {
+        const std::vector<std::unique_ptr<UFContent>>& ufContents() const {
             return mUFs;
         }
         const FastPointerMap<UFContent, UninterpretedFunction::IDType>& ufIDMap() const {
@@ -226,8 +226,7 @@ class UFManager : public Singleton<UFManager> {
          * @return The resulting uninterpreted function.
          */
         UninterpretedFunction newUninterpretedFunction(std::string&& name, std::vector<Sort>&& domain, Sort codomain) {
-            auto result = new UFContent(std::move(name), std::move(domain), codomain);
-            return newUF(result);
+            return newUF(std::make_unique<UFContent>(std::move(name), std::move(domain), codomain));
         }
 };
 
