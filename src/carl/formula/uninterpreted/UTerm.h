@@ -77,7 +77,6 @@ namespace carl
 
 		std::size_t complexity() const;
 	};
-	static_assert(std::is_trivially_copyable<UTerm>::value, "UTerm should be trivially copyable.");
 	static_assert(std::is_literal_type<UTerm>::value, "UTerm should be a literal type.");
 
 	/**

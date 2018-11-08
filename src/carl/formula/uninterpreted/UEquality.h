@@ -93,7 +93,6 @@ namespace carl
 
     };
 
-	static_assert(std::is_trivially_copyable<UEquality>::value, "UEquality should be trivially copyable.");
 	static_assert(std::is_literal_type<UEquality>::value, "UEquality should be a literal type.");
 
 	/**
