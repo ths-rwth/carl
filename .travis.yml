@@ -137,13 +137,13 @@ matrix:
           packages: [*packages_base, g++-7, doxygen, ghostscript, latex-xcolor, lmodern, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra]
     - stage: build
       os: linux
-      compiler: clang++-5.0
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
+      compiler: clang++-7.0
+      env: CC=clang-7 CXX=clang++-7 TASK=tidy
       script: source .ci/build.sh
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-5.0]
-          packages: [*packages_base, clang-5.0, libstdc++-8-dev]
+          sources: [*sources_base, llvm-toolchain-trusty-7]
+          packages: [*packages_base, clang-7, libstdc++-8-dev]
     - stage: build
       os: linux
       compiler: clang++-5.0
@@ -194,7 +194,7 @@ matrix:
   allow_failures:
     - stage: build
       os: linux
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=tidy
+      env: CC=clang-7 CXX=clang++-7 TASK=tidy
     - stage: build
       os: linux
       env: CC=clang-5.0 CXX=clang++-5.0 TASK=coverity
