@@ -23,18 +23,16 @@ namespace carl
 	class UninterpretedFunction {
 		public:
 			friend class UFManager;
-			/// A unique id to identify this uninterpreted function in it's manager.
-			using IDType = std::size_t;
 
 		private:
 			/// A unique id.
-			IDType mId = 0;
+			std::size_t mId = 0;
 
 			/**
 			 * Constructs an uninterpreted function.
 			 * @param id
 			 */
-			explicit UninterpretedFunction(IDType id):
+			explicit UninterpretedFunction(std::size_t id):
 				mId(id) {}
 
 		public:
@@ -46,7 +44,7 @@ namespace carl
 			/**
 			 * @return The unique id of this uninterpreted function instance.
 			 */
-			IDType id() const {
+			std::size_t id() const {
 				return mId;
 			}
 
@@ -63,9 +61,11 @@ namespace carl
 			/**
 			 * @return The codomain of this uninterpreted function.
 			 */
-			const Sort& codomain() const;
+			Sort codomain() const;
 	};
-
+	static_assert(std::is_trivially_copyable<UninterpretedFunction>::value, "UninterpretedFunction should be trivially copyable.");
+	static_assert(std::is_literal_type<UninterpretedFunction>::value, "UninterpretedFunction should be a literal type.");
+	static_assert(sizeof(UninterpretedFunction) == sizeof(std::size_t), "UninterpretedFunction should be as large as its id");
 
 	/**
 	 * @param ufun The uninterpreted function to compare with.

@@ -58,14 +58,14 @@ namespace carl
 		/**
 		 * @return The stored term as UVariable.
 		 */
-		const UVariable& asUVariable() const {
+		UVariable asUVariable() const {
 			assert(isUVariable());
 			return std::get<UVariable>(mTerm);
 		}
 		/**
 		 * @return The stored term as UFInstance.
 		 */
-		const UFInstance& asUFInstance() const {
+		UFInstance asUFInstance() const {
 			assert(isUFInstance());
 			return std::get<UFInstance>(mTerm);
 		}
@@ -73,7 +73,7 @@ namespace carl
 		/**
 		 * @return The domain of this uninterpreted term.
 		 */
-		const Sort& domain() const;
+		Sort domain() const;
 
 		std::size_t complexity() const;
 	};
@@ -116,8 +116,8 @@ namespace std
 		 */
 		std::size_t operator()(const carl::UTerm& ut) const {
 			return std::visit(carl::overloaded {
-				[](const carl::UVariable& var) { return carl::hash_all(var); },
-				[](const carl::UFInstance& ufi) { return carl::hash_all(ufi); },
+				[](carl::UVariable var) { return carl::hash_all(var); },
+				[](carl::UFInstance ufi) { return carl::hash_all(ufi); },
 			}, ut.asVariant());
 		}
 	};

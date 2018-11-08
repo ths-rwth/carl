@@ -53,7 +53,7 @@ public:
 	/**
 	 * @return The domain of this uninterpreted variable.
 	 */
-	const Sort& domain() const {
+	Sort domain() const {
 		return mDomain;
 	}
 };
@@ -67,7 +67,7 @@ static_assert(sizeof(UVariable) == sizeof(Variable) + sizeof(Sort), "UVariable s
  * @param uvar The uninterpreted variable to print.
  * @return The output stream after printing the given uninterpreted variable on it.
  */
-inline std::ostream& operator<<(std::ostream& os, const UVariable& uvar) {
+inline std::ostream& operator<<(std::ostream& os, UVariable uvar) {
 	return os << uvar.variable();
 }
 
@@ -76,7 +76,7 @@ inline std::ostream& operator<<(std::ostream& os, const UVariable& uvar) {
  * @param rhs The right variable.
  * @return true, if the variable are equal.
  */
-bool inline operator==(const UVariable& lhs, const UVariable& rhs) {
+bool inline operator==(UVariable lhs, UVariable rhs) {
 	return lhs.variable() == rhs.variable();
 }
 
@@ -85,7 +85,7 @@ bool inline operator==(const UVariable& lhs, const UVariable& rhs) {
  * @param rhs The right variable.
  * @return true, if the left variable is smaller.
  */
-bool inline operator<(const UVariable& lhs, const UVariable& rhs) {
+bool inline operator<(UVariable lhs, UVariable rhs) {
 	return lhs.variable() < rhs.variable();
 }
 
@@ -103,7 +103,7 @@ public:
 	 * @param uvar The uninterpreted variable to get the hash for.
 	 * @return The hash of the given uninterpreted variable.
 	 */
-	std::size_t operator()(const carl::UVariable& uvar) const {
+	std::size_t operator()(carl::UVariable uvar) const {
 		return carl::hash_all(uvar.variable());
 	}
 };

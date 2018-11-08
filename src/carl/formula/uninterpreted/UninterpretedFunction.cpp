@@ -23,7 +23,7 @@ namespace carl
 		return UFManager::getInstance().getDomain(*this);
 	}
 
-	const Sort& UninterpretedFunction::codomain() const {
+	Sort UninterpretedFunction::codomain() const {
 		return UFManager::getInstance().getCodomain(*this);
 	}
 }

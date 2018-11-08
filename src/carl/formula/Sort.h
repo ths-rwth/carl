@@ -19,22 +19,19 @@ namespace carl {
  */
 class Sort {
     public:
-        /// The type if the unique id to identify a sort in the sort manager.
-        using IDType = std::size_t;
-    
         friend class SortManager;
 
     private:
         // Members.
 
         /// A unique id to identify this sort in the sort manager.
-        IDType mId = 0;
+        std::size_t mId = 0;
 
         /**
          * Constructs a sort.
          * @param _id The id of the sort to construct.
          */
-        explicit Sort(IDType id): mId(id) {}
+        explicit Sort(std::size_t id): mId(id) {}
 
     public:
 		
@@ -48,7 +45,7 @@ class Sort {
         /**
          * @return The id of this sort.
          */
-        IDType id() const
+        std::size_t id() const
         {
             return mId;
         }
@@ -64,14 +61,14 @@ class Sort {
 
 static_assert(std::is_trivially_copyable<Sort>::value, "Sort should be trivially copyable.");
 static_assert(std::is_literal_type<Sort>::value, "Sort should be a literal type.");
-static_assert(sizeof(Sort) == sizeof(Sort::IDType), "Sort should be as large as its id type");
+static_assert(sizeof(Sort) == sizeof(std::size_t), "Sort should be as large as its id type");
 
 /**
 * @param lhs The left sort.
 * @param rhs The right sort.
 * @return true, if the sorts are the same.
 */
-inline bool operator==(const Sort& lhs, const Sort& rhs) {
+inline bool operator==(Sort lhs, Sort rhs) {
 	return lhs.id() == rhs.id();
 }
 /**
@@ -79,7 +76,7 @@ inline bool operator==(const Sort& lhs, const Sort& rhs) {
 * @param rhs The right sort.
 * @return true, if the sorts are different.
 */
-inline bool operator!=(const Sort& lhs, const Sort& rhs) {
+inline bool operator!=(Sort lhs, Sort rhs) {
 	return lhs.id() != rhs.id();
 }
 
@@ -87,11 +84,9 @@ inline bool operator!=(const Sort& lhs, const Sort& rhs) {
 * @param _sort The sort to compare with.
 * @return true, if this sort is less than the given one.
 */
-inline bool operator<(const Sort& lhs, const Sort& rhs) {
+inline bool operator<(Sort lhs, Sort rhs) {
 	return lhs.id() < rhs.id();
 }
-
-static_assert(std::is_trivially_copyable<Sort>::value, "Sort should be trivially copyable.");
 
 } // end namespace carl
 
@@ -106,7 +101,7 @@ namespace std {
          * @return The hash of the given sort.
          */
         std::size_t operator()(const carl::Sort& _sort) const {
-            return std::size_t(_sort.id());
+            return _sort.id();
         }
     };
 } // end namespace std

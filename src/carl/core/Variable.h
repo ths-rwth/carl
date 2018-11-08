@@ -240,7 +240,7 @@ public:
 	/// Instance of an invalid variable.
 	static const Variable NO_VARIABLE;
 };
-//static_assert(std::is_trivially_copyable<Variable>::value, "Variable should be trivially copyable.");
+static_assert(std::is_trivially_copyable<Variable>::value, "Variable should be trivially copyable.");
 static_assert(std::is_literal_type<Variable>::value, "Variable should be a literal type.");
 
 } // namespace carl
