@@ -222,7 +222,7 @@ public:
 	 */
 	friend std::ostream& operator<<(std::ostream& os, const Filter& f) {
 		os << "Filter:" << std::endl;
-		for (auto it: f.mData) os << "\t\"" << it.first << "\" -> " << it.second << std::endl;
+		for (const auto& it: f.mData) os << "\t\"" << it.first << "\" -> " << it.second << std::endl;
 		return os;
 	}
 };
@@ -392,7 +392,7 @@ public:
 		for (const auto& t: mData) {
 			if (std::get<1>(t.second).check(channel, level)) return true;
 		}
-		return true;
+		return false;
 	}
 	/**
 	 * Logs a message.

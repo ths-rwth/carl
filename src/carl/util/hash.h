@@ -83,7 +83,7 @@ struct hash_inserter {
 	}
 	hash_inserter& operator*() { return *this; }
 	hash_inserter& operator++() { return *this; }
-	hash_inserter& operator++(int) { return *this; }
+	hash_inserter operator++(int) { return *this; }
 };
 
 } // namespace carl
