@@ -28,11 +28,14 @@ namespace carl
 		 */
 		UTerm() = default;
 
+		UTerm(UVariable v): mTerm(v) {}
+		UTerm(UFInstance ufi): mTerm(ufi) {}
+
 		/**
 		 * Constructs an uninterpreted term.
 		 * @param term
 		 */
-		UTerm(const Super& term): mTerm(term) {}
+		explicit UTerm(const Super& term): mTerm(term) {}
 
 		const auto& asVariant() const {
 			return mTerm;
@@ -74,7 +77,8 @@ namespace carl
 
 		std::size_t complexity() const;
 	};
-
+	static_assert(std::is_trivially_copyable<UTerm>::value, "UTerm should be trivially copyable.");
+	static_assert(std::is_literal_type<UTerm>::value, "UTerm should be a literal type.");
 
 	/**
 	 * @param lhs The uninterpreted term to the left.

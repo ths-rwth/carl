@@ -62,6 +62,10 @@ class Sort {
         friend std::ostream& operator<<(std::ostream& _os, const Sort& _sort);
 };
 
+static_assert(std::is_trivially_copyable<Sort>::value, "Sort should be trivially copyable.");
+static_assert(std::is_literal_type<Sort>::value, "Sort should be a literal type.");
+static_assert(sizeof(Sort) == sizeof(Sort::IDType), "Sort should be as large as its id type");
+
 /**
 * @param lhs The left sort.
 * @param rhs The right sort.

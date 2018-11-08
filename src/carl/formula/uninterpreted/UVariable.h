@@ -19,7 +19,7 @@ namespace carl {
 class UVariable {
 private:
 	/// The according variable, hence, the actual content of this class.
-	Variable mVar;
+	Variable mVar = Variable::NO_VARIABLE;
 	/// The domain.
 	Sort mDomain;
 
@@ -28,9 +28,7 @@ public:
 	 * Default constructor.
 	 * The resulting object will not be a valid variable, but a dummy object.
 	 */
-	UVariable()
-		: mVar(Variable::NO_VARIABLE),
-		  mDomain() {}
+	UVariable() = default;
 
 	explicit UVariable(Variable var)
 		: mVar(var),
@@ -59,8 +57,9 @@ public:
 		return mDomain;
 	}
 };
-
-
+static_assert(std::is_trivially_copyable<UVariable>::value, "UVariable should be trivially copyable.");
+static_assert(std::is_literal_type<UVariable>::value, "UVariable should be a literal type.");
+static_assert(sizeof(UVariable) == sizeof(Variable) + sizeof(Sort), "UVariable should be as large as a Variable and a Sort");
 
 /**
  * Prints the given uninterpreted variable on the given output stream.

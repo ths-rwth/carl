@@ -37,6 +37,7 @@ namespace carl
             explicit UFInstance(std::size_t id) noexcept: mId(id) {}
 
         public:
+			UFInstance() = default;
             /**
              * @return The unique id of this uninterpreted function instance.
              */
@@ -56,6 +57,10 @@ namespace carl
 
 			std::size_t complexity() const;
     };
+
+	static_assert(std::is_trivially_copyable<UFInstance>::value, "UFInstance should be trivially copyable.");
+	static_assert(std::is_literal_type<UFInstance>::value, "UFInstance should be a literal type.");
+	static_assert(sizeof(UFInstance) == sizeof(std::size_t), "UFInstance should be as large as its id");
 
 	/**
 	 * @param lhs The left function instance.
