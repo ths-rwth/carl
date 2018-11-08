@@ -40,10 +40,15 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	cd ../ && sonar-scanner -X -Dproject.settings=build/sonarcloud.properties && cd build/
 elif [[ ${TASK} == "doxygen" ]]; then
 	
+	echo -en "travis_fold:start:reconfige\r"
 	cmake -D DOCUMENTATION_CREATE_PDF=ON -D BUILD_DOXYGEN=ON ../
+	echo -en "travis_fold:end:reconfigure\r"
 	
+	echo -en "travis_fold:start:build-doc\r"
 	make doc || return 1
+	echo -en "travis_fold:end:build-doc\r"
 	
+	echo -en "travis_fold:start:commit\r"
 	git config --global user.email "gereon.kremer@cs.rwth-aachen.de"
 	git config --global user.name "Travis doxygen daemon"
 	
@@ -61,6 +66,7 @@ elif [[ ${TASK} == "doxygen" ]]; then
 	# Commit and push
 	git commit -q -m "Updated documentation for carl" || return 1
 	git push -f origin master || return 1
+	echo -en "travis_fold:end:commit\r"
 
 elif [[ ${TASK} == "pycarl" ]]; then
 	
