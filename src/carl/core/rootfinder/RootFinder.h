@@ -13,9 +13,7 @@
 #include <list>
 #include <map>
 
-#ifdef USE_Z3_RANS
 #include "../../formula/model/ran/adaption_z3/Z3RanRootFinder.h"
-#endif
 
 namespace carl {
 namespace rootfinder {

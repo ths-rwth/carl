@@ -1,8 +1,9 @@
-#include "Z3RanRootFinder.h"
-#include "Z3RanContent.h"
-
 #include "../../../../converter/Z3Converter.h"
 
+#ifdef USE_Z3_RANS
+
+#include "Z3RanRootFinder.h"
+#include "Z3RanContent.h"
 
 namespace carl {
     template<typename Coeff, typename Number>
@@ -85,3 +86,5 @@ namespace carl {
         const Interval<mpq_class>& interval = Interval<mpq_class>::unboundedInterval()
     );
 }
+
+#endif

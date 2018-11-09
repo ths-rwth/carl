@@ -12,3 +12,5 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #cmakedefine USE_CLN_NUMBERS
 #cmakedefine USE_Z3_NUMBERS
 #cmakedefine USE_Z3_RANS
+
+// TODO where to place these cmakedefines?

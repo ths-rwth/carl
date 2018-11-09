@@ -22,9 +22,7 @@
 #include "../../../thom/ThomEvaluation.h"
 #include "../../../util/SFINAE.h"
 
-#ifdef USE_Z3_RANS
 #include "adaption_z3/Z3RanEvaluation.h"
-#endif
 
 namespace carl {
 namespace RealAlgebraicNumberEvaluation {

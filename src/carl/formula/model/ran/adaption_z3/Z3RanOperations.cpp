@@ -1,7 +1,9 @@
+#include "../../../../converter/Z3Converter.h"
+
+#ifdef USE_Z3_RANS
+
 #include "Z3RanOperations.h"
 #include "Z3RanContent.h"
-
-#include "../../../../converter/Z3Converter.h"
 
 namespace carl {
 
@@ -32,3 +34,5 @@ template RealAlgebraicNumber<mpq_class> sampleBetweenZ3(const RealAlgebraicNumbe
 template RealAlgebraicNumber<mpq_class> sampleAboveZ3(const RealAlgebraicNumber<mpq_class>& n);
 
 }
+
+#endif

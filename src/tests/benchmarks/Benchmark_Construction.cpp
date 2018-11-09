@@ -458,7 +458,7 @@ TEST_F(BenchmarkTest, Resultant)
 		bench.compare<GMP, ResultantConverter<GMP,GVAR>>("GiNaC");
         #endif
         #ifdef COMPARE_WITH_Z3
-		for (auto v: bi.variables) bench.getCI()->z3(v);
+		for (auto v: bi.variables) z3().toZ3(v);
 		bench.compare<ZMP, ResultantConverter<ZMP,ZVAR>>("Z3");
         #endif
 		file.push(bench.result(), bi.degree);
