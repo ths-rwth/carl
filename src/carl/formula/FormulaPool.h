@@ -244,7 +244,7 @@ namespace carl
              * @param _booleanVar The Boolean variable wrapped by this formula.
              * @return A formula with wrapping the given Boolean variable.
              */
-            const FormulaContent<Pol>* create(Variable::Arg _variable) {
+            const FormulaContent<Pol>* create(Variable _variable) {
                 return add(new FormulaContent<Pol>(_variable));
             }
 

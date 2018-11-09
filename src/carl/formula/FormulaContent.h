@@ -399,9 +399,9 @@ namespace carl {
 			case FormulaType::CONSTRAINT:
 				return os << f.mConstraint;
 			case FormulaType::VARASSIGN:
-				return os << f.mVariableComparison;
-			case FormulaType::VARCOMPARE:
 				return os << f.mVariableAssignment;
+			case FormulaType::VARCOMPARE:
+				return os << f.mVariableComparison;
 			case FormulaType::BITVECTOR:
 				return os << f.mBVConstraint;
 			case FormulaType::UEQ:
