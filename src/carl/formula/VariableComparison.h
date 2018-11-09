@@ -8,10 +8,9 @@
 #include "../numbers/numbers.h"
 #include "../util/hash.h"
 
-#include <boost/optional.hpp>
-#include <boost/variant.hpp>
-
+#include <optional>
 #include <tuple>
+#include <variant>
 
 namespace carl {
   /**
@@ -29,27 +28,11 @@ namespace carl {
 		using RAN = RealAlgebraicNumber<Number>;
 	private:
 		Variable mVar;
-		boost::variant<MR, RAN> mValue;
+		std::variant<MR, RAN> mValue;
 		Relation mRelation;
 		bool mNegated;
-		//struct ValueToModelValue: public boost::static_visitor<ModelValue<Number,Poly>> {
-		//	ModelValue<Number,Poly> operator()(const MR& mr) const {
-		//		return mr;
-		//	}
-		//	ModelValue<Number,Poly> operator()(const RAN& ran) const {
-		//		return ran;
-		//	}
-		//};
-		struct VariableCollector: boost::static_visitor<Variables> {
-			Variables operator()(const MR& mr) const {
-				return mr.gatherVariables();
-			}
-			Variables operator()(const RAN&) const {
-				return Variables();
-			}
-		};
 	public:
-		VariableComparison(Variable v, const boost::variant<MR, RAN>& value, Relation rel, bool neg): mVar(v), mValue(value), mRelation(rel), mNegated(neg) {}
+		VariableComparison(Variable v, const std::variant<MR, RAN>& value, Relation rel, bool neg): mVar(v), mValue(value), mRelation(rel), mNegated(neg) {}
 		VariableComparison(Variable v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {
 			if (value.isUnivariate()) {
 			  // If the value of type MultivariateRoot is really just univariate, we convert it to an algebraic real.
@@ -71,7 +54,7 @@ namespace carl {
 		bool negated() const {
 			return mNegated;
 		}
-		const boost::variant<MR, RAN>& value() const {
+		const std::variant<MR, RAN>& value() const {
 			return mValue;
 		}
 		bool isEquality() const {
@@ -81,21 +64,21 @@ namespace carl {
 		/**
 		 * Convert this variable comparison "v < root(..)" into a simpler
 		 * polynomial (in)equality against zero "p(..) < 0" if that is possible.
-		 * @return boost::none if conversion impossible.
+		 * @return std::nullopt if conversion impossible.
 		 */
-		boost::optional<Constraint<Poly>> asConstraint() const {
+		std::optional<Constraint<Poly>> asConstraint() const {
 			Relation rel = negated() ? inverse(mRelation) : mRelation;
-			if (boost::get<RAN>(&mValue) == nullptr) {
-				const MR& mr = boost::get<MR>(mValue);
-				if (mr.poly().degree(mr.var()) != 1) return boost::none;
-				if (mr.k() != 1) return boost::none;
+			if (std::holds_alternative<MR>(mValue)) {
+				const MR& mr = std::get<MR>(mValue);
+				if (mr.poly().degree(mr.var()) != 1) return std::nullopt;
+				if (mr.k() != 1) return std::nullopt;
 				auto lcoeff = mr.poly().coeff(mr.var(), 1);
-				if (!lcoeff.isConstant()) return boost::none;
+				if (!lcoeff.isConstant()) return std::nullopt;
 				auto ccoeff = mr.poly().coeff(mr.var(), 0);
 				return Constraint<Poly>(Poly(mVar) + ccoeff / lcoeff, rel);
 			}
-			if (!boost::get<RAN>(mValue).isNumeric()) return boost::none;
-			return Constraint<Poly>(Poly(mVar) - Poly(boost::get<RAN>(mValue).value()), rel);
+			if (!std::get<RAN>(mValue).isNumeric()) return std::nullopt;
+			return Constraint<Poly>(Poly(mVar) - Poly(std::get<RAN>(mValue).value()), rel);
 		}
 
 		/**
@@ -105,12 +88,12 @@ namespace carl {
 		 * because it has the same root for variable v, i.e., v=3.
 		 */
 		Poly definingPolynomial() const {
-			if (boost::get<RAN>(&mValue) != nullptr) {
-				const auto& ran = boost::get<RAN>(mValue);
+			if (std::holds_alternative<RAN>(mValue)) {
+				const auto& ran = std::get<RAN>(mValue);
 				if (ran.isNumeric()) return Poly(mVar) - ran.value();
 				return Poly(ran.getIRPolynomial().replaceVariable(mVar));
 			} else {
-				const auto& mr = boost::get<MR>(mValue);
+				const auto& mr = std::get<MR>(mValue);
 				return mr.poly(mVar);
 			}
 		}
@@ -122,7 +105,10 @@ namespace carl {
 		}
 		void collectVariables(Variables& vars) const {
 			vars.insert(mVar);
-			auto newVars = boost::apply_visitor(VariableCollector(), mValue);
+			auto newVars = std::visit(overloaded {
+					[](const MR& mr) { return mr.gatherVariables(); },
+					[](const RAN&) { return Variables(); }
+				}, mValue);
 			vars.insert(newVars.begin(), newVars.end());
 		}
 	};
@@ -148,7 +134,7 @@ namespace std {
 	template<typename Pol>
 	struct hash<carl::VariableComparison<Pol>> {
 		std::size_t operator()(const carl::VariableComparison<Pol>& vc) const {
-			return carl::hash_all(vc.var(), variant_hash(vc.value()), vc.relation(), vc.negated());
+			return carl::hash_all(vc.var(), vc.value(), vc.relation(), vc.negated());
 		}
 	};
 }

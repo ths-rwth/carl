@@ -24,9 +24,8 @@ namespace carl {
 			return mComparison.var();
 		}
 		const RAN& value() const {
-			const auto& val = mComparison.value();
-			assert(boost::get<RAN>(&val) != nullptr);
-			return boost::get<RAN>(val);
+			assert(std::holds_alternative<RAN>(mComparison.value()));
+			return std::get<RAN>(mComparison.value());
 		}
 		const auto& baseValue() const {
 			return mComparison.value();
