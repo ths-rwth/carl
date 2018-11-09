@@ -1,6 +1,6 @@
 #include "Z3Converter.h"
 
-#if defined(USE_Z3_RANS) || defined(USE_Z3_NUMBERS)
+#if defined(USE_Z3_RANS) || defined(USE_Z3_NUMBERS) || defined(COMPARE_WITH_Z3)
 
 namespace carl {
 

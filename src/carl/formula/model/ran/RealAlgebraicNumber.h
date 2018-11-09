@@ -39,10 +39,7 @@
 
 #include "../../../thom/ThomEncoding.h"
 #include "RealAlgebraicNumber_Interval.h"
-
-#ifdef USE_Z3_RANS
 #include "adaption_z3/Z3Ran.h"
-#endif
 
 namespace carl {
 	

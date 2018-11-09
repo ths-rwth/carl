@@ -1,7 +1,9 @@
+#include "../../../../converter/Z3Converter.h"
+
+#ifdef USE_Z3_RANS
+
 #include "Z3Ran.h"
 #include "Z3RanContent.h"
-
-#include "../../../../converter/Z3Converter.h"
 
 namespace carl { // TODO do all operations work if !is_rational ???
 
@@ -181,3 +183,5 @@ namespace carl { // TODO do all operations work if !is_rational ???
     template std::ostream& operator<<(std::ostream& os, const Z3Ran<mpq_class>& zr);
 
 }
+
+#endif

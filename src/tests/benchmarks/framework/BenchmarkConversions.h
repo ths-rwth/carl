@@ -31,9 +31,6 @@ struct ConversionInformation {
 	std::map<carl::Variable, GiNaC::ex> ginacVariables;
 	GiNaCConverter ginac;
     #endif
-    #if defined(COMPARE_WITH_Z3) || defined(USE_Z3_NUMBERS)
-	Z3Converter z3;
-    #endif
 	
 	ConversionInformation(const std::vector<Variable>& vars)
 	#ifdef USE_COCOA
@@ -79,7 +76,7 @@ template<>
 inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<rational>>(const CMP<rational>& p, const CIPtr& ci) {
 	CMP<mpq_class> res;
 	for (auto t: p) {
-		res += Term<mpq_class>(ci->z3.toGMP(t.coeff()), t.monomial());
+		res += Term<mpq_class>(z3().toNumber<mpq_class>(t.coeff()), t.monomial());
 	}
 	return res;
 }
@@ -87,7 +84,7 @@ template<>
 inline CMP<rational> Conversion::convert<CMP<rational>, CMP<mpq_class>>(const CMP<mpq_class>& p, const CIPtr& ci) {
 	CMP<rational> res;
 	for (auto t: p) {
-		res += Term<rational>(ci->z3.toZ3Rational(t.coeff()), t.monomial());
+		res += Term<rational>(z3().toZ3Rational(t.coeff()), t.monomial());
 	}
 	return res;
 }
@@ -138,33 +135,33 @@ inline GMP Conversion::convert<GMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m,
 #ifdef USE_CLN_NUMBERS
 template<>
 ZMP Conversion::convert<ZMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
-	return ci->z3(m);
+	return z3().toZ3(m);
 }
 template<>
 ZMP Conversion::convert<ZMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
-	return ci->z3(m);
+	return z3().toZ3(m);
 }
 #endif
 
 template<>
 ZMP Conversion::convert<ZMP, CMP<mpq_class>>(const CMP<mpq_class>& m, const CIPtr& ci) {
-	return ci->z3(m);
+	return z3().toZ3(m);
 }
 template<>
 ZMP Conversion::convert<ZMP, CMP<rational>>(const CMP<rational>& m, const CIPtr& ci) {
-	return ci->z3(m);
+	return z3().toZ3(m);
 }
 template<>
 ZMP Conversion::convert<ZMP, CUMP<mpq_class>>(const CUMP<mpq_class>& m, const CIPtr& ci) {
-	return ci->z3(m);
+	return z3().toZ3(m);
 }
 template<>
 ZMP Conversion::convert<ZMP, CUMP<rational>>(const CUMP<rational>& m, const CIPtr& ci) {
-	return ci->z3(m);
+	return z3().toZ3(m);
 }
 template<>
 ZVAR Conversion::convert<ZVAR, CVAR>(const CVAR& v, const CIPtr& ci) {
-	return ci->z3(v);
+	return z3().toZ3(v);
 }
 #endif
 

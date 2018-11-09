@@ -1,7 +1,9 @@
+#include "../../../../converter/Z3Converter.h"
+
+#ifdef USE_Z3_RANS
+
 #include "Z3RanEvaluation.h"
 #include "Z3RanContent.h"
-
-#include "../../../../converter/Z3Converter.h"
 
 namespace carl {
 
@@ -22,3 +24,5 @@ namespace carl {
     template RealAlgebraicNumber<mpq_class> evaluateZ3(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, RealAlgebraicNumber<mpq_class>>& evalMap);
 
 }
+
+#endif

@@ -10,9 +10,7 @@
 #include "../../../numbers/numbers.h"
 #include "RealAlgebraicNumber.h"
 
-#ifdef USE_Z3_RANS
 #include "adaption_z3/Z3RanOperations.h"
-#endif
 
 namespace carl {
 	template<typename Number>

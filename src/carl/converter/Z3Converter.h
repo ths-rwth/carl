@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include "config.h"
 #include "../numbers/numbers.h"
 
-#if defined(USE_Z3_RANS) || defined(USE_Z3_NUMBERS)
+#if defined(USE_Z3_RANS) || defined(USE_Z3_NUMBERS) || defined(COMPARE_WITH_Z3)
+
 #include <utility>
 
 #include "../numbers/adaption_z3/z3.h"
@@ -35,7 +37,6 @@ private:
 	polynomial::manager poly_man;
 	algebraic_numbers::manager anum_man;
 
-	// TODO refactor: remove operator()
 public:
 
 	static void initialize() { // must be called before creating an instance
@@ -92,20 +93,14 @@ public:
 	polynomial::polynomial_ref toZ3(polynomial::polynomial* p) {
 		return polynomial::polynomial_ref(p, polyMan());
 	}
-	polynomial::polynomial_ref operator()(polynomial::polynomial* p) {
-		return toZ3(p);
-	}
 	/**
 	 * Converts a number.
      */
 	rational toZ3(const rational& n) {
 		return n;
 	}
-	rational operator()(const rational& n) {
-		return toZ3(n);
-	}
     #ifdef USE_CLN_NUMBERS  // TODO remove, deduplicate with carlconverter...
-	rational operator()(const cln::cl_RA& n) {
+	rational toZ3(const cln::cl_RA& n) {
 		std::stringstream ss1;
 		ss1 << carl::getDenom(n);
 		mpz denom;
@@ -151,9 +146,6 @@ public:
 	rational toZ3(const mpq_class& n) {
 		return toZ3Rational(n);
 	}
-	rational operator()(const mpq_class& n) {
-		return toZ3(n);
-	}
 	/**
 	 * Converts a variable.
      */
@@ -164,17 +156,11 @@ public:
 		}
 		return it->second;
 	}
-	polynomial::var operator()(const carl::Variable& v) {
-		return toZ3(v);
-	}
 	/**
 	 * Converts a variable and an exponent.
      */
 	polynomial::polynomial_ref toZ3(const std::pair<carl::Variable, carl::exponent>& p) {
 		return toZ3(polyMan().mk_polynomial(toZ3(p.first), p.second));
-	}
-	polynomial::polynomial_ref operator()(const std::pair<carl::Variable, carl::exponent>& p) {
-		return toZ3(p);
 	}
 	/**
 	 * Converts a monomial.
@@ -187,9 +173,6 @@ public:
 		}
 		return res;
 	}
-	polynomial::polynomial_ref operator()(const carl::Monomial& m) {
-		return toZ3(m);
-	}
 	template<typename Coeff>
 	polynomial::polynomial_ref toZ3(const carl::Term<Coeff>& t) {
 		polynomial::polynomial_ref res(polyMan());
@@ -199,20 +182,12 @@ public:
 		else return res;
 	}
 	template<typename Coeff>
-	polynomial::polynomial_ref operator()(const carl::Term<Coeff>& t) {
-		return toZ3(t);
-	}
-	template<typename Coeff>
 	polynomial::polynomial_ref toZ3(const carl::MultivariatePolynomial<Coeff>& p) {
 		polynomial::polynomial_ref res(polyMan());
 		res = toZ3(polyMan().mk_zero());
 		for (auto t: p) res = res + toZ3(t);
 		polyMan().lex_sort(res);
 		return res;
-	}
-	template<typename Coeff>
-	polynomial::polynomial_ref operator()(const carl::MultivariatePolynomial<Coeff>& p) {
-		return toZ3(p);
 	}
 	template<typename Coeff>
 	polynomial::polynomial_ref toZ3(const carl::UnivariatePolynomial<Coeff>& p) {
@@ -227,10 +202,6 @@ public:
 		polyMan().lex_sort(res);
 		return res;
 	}
-	template<typename Coeff>
-	polynomial::polynomial_ref operator()(const carl::UnivariatePolynomial<Coeff>& p) {
-		return toZ3(p);
-	}
 
 	// conversions back to CArL types
 
@@ -239,6 +210,9 @@ public:
 
 	template<typename Number>
 	Number toNumber(const mpq& m);
+
+	template<typename Number>
+	Number toNumber(const rational& m);
 
 	template<typename Coeff>
 	UnivariatePolynomial<Coeff> toUnivPoly(const svector<mpz>& p, carl::Variable var) {
@@ -292,6 +266,12 @@ inline mpq_class Z3Converter::toNumber<mpq_class>(const mpq& m) {
 	free(znum);
 	free(zden);
 	return res;
+}
+
+template<>
+inline mpq_class Z3Converter::toNumber<mpq_class>(const rational& m) {
+	const mpq& res = m.to_mpq();
+	return toNumber<mpq_class>(res);
 }
 
 Z3Converter& z3();
