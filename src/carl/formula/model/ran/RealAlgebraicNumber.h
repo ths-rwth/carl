@@ -40,6 +40,7 @@
 #include "../../../thom/ThomEncoding.h"
 #include "RealAlgebraicNumber_Interval.h"
 #include "adaption_z3/Z3Ran.h"
+#include "../../../numbers/config.h"
 
 namespace carl {
 	
