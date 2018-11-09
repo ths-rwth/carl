@@ -1,10 +1,21 @@
 #!/usr/bin/env bash
 
-echo -en "travis_fold:start:configure\r"
+function fold_start {
+	echo -en "travis_fold:start:$1\r"
+}
+function fold_end {
+	echo -en "travis_fold:end:$1\r"
+}
+function fold {
+	fold_start "$1"
+	${@:2}
+	fold_end "$1"
+}
+
 mkdir -p build || return 1
 cd build/ || return 1
-cmake -D DEVELOPER=ON -D THREAD_SAFE=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=ON -D USE_COCOA=ON -D USE_GINAC=ON ../ || return 1
-echo -en "travis_fold:end:configure\r"
+
+fold "configure" cmake -D DEVELOPER=ON -D THREAD_SAFE=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=ON -D USE_COCOA=ON -D USE_GINAC=ON ../ || return 1
 
 function keep_waiting() {
   while true; do
@@ -20,20 +31,14 @@ fi
 if [[ ${TASK} == "dependencies" ]]; then
 	
 	keep_waiting &
-	echo -en "travis_fold:start:build-resources\r"
-	/usr/bin/time make ${MAKE_PARALLEL} resources || return 1
-	echo -en "travis_fold:end:build-resources\r"
+	fold "build-resources" /usr/bin/time make ${MAKE_PARALLEL} resources || return 1
 	kill $!
 	
 elif [[ ${TASK} == "coverity" ]]; then
 
 	keep_waiting &
-	echo -en "travis_fold:start:build\r"
-	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
-	echo -en "travis_fold:end:build\r"
-	echo -en "travis_fold:start:build-tests\r"
-	/usr/bin/time make ${MAKE_PARALLEL} || return 1
-	echo -en "travis_fold:end:build-tests\r"
+	fold "build" /usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
+	fold "build-tests" /usr/bin/time make ${MAKE_PARALLEL} || return 1
 	kill $!
 
 elif [[ ${TASK} == "sonarcloud" ]]; then
@@ -41,28 +46,18 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	cmake -D COVERAGE=ON ../ || return 1
 	
 	WRAPPER="build-wrapper-linux-x86-64 --out-dir ../bw-output"
-	echo -en "travis_fold:start:build\r"
-	$WRAPPER make ${MAKE_PARALLEL} lib_carl || return 1
-	echo -en "travis_fold:end:build\r"
-	echo -en "travis_fold:start:build-tests\r"
-	$WRAPPER make ${MAKE_PARALLEL} || return 1
-	echo -en "travis_fold:end:build\r"
-	echo -en "travis_fold:start:collect-coverage\r"
-	make coverage-collect
-	echo -en "travis_fold:end:collect-coverage\r"
+	fold "build" $WRAPPER make ${MAKE_PARALLEL} lib_carl || return 1
+	fold "build-tests" $WRAPPER make ${MAKE_PARALLEL} || return 1
+	fold "collect-coverage" make coverage-collect
 	
 	cd ../ && sonar-scanner -X -Dproject.settings=build/sonarcloud.properties && cd build/
 elif [[ ${TASK} == "doxygen" ]]; then
 	
-	echo -en "travis_fold:start:reconfigure\r"
-	cmake -D DOCUMENTATION_CREATE_PDF=ON -D BUILD_DOXYGEN=ON ../
-	echo -en "travis_fold:end:reconfigure\r"
+	fold "reconfigure" cmake -D DOCUMENTATION_CREATE_PDF=ON -D BUILD_DOXYGEN=ON ../
 	
-	echo -en "travis_fold:start:build-doc\r"
-	make doc || return 1
-	echo -en "travis_fold:end:build-doc\r"
+	fold "build-doc" make doc || return 1
 	
-	echo -en "travis_fold:start:commit\r"
+	fold_start "commit"
 	git config --global user.email "gereon.kremer@cs.rwth-aachen.de"
 	git config --global user.name "Travis doxygen daemon"
 	
@@ -80,7 +75,7 @@ elif [[ ${TASK} == "doxygen" ]]; then
 	# Commit and push
 	git commit -q -m "Updated documentation for carl" || return 1
 	git push -f origin master || return 1
-	echo -en "travis_fold:end:commit\r"
+	fold_end "commit"
 
 elif [[ ${TASK} == "pycarl" ]]; then
 	
@@ -100,17 +95,13 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	
 elif [[ ${TASK} == "tidy" ]]; then
 
-	echo -en "travis_fold:start:reconfigure\r"
-	cmake -D DEVELOPER=ON -D THREAD_SAFE=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=OFF -D USE_COCOA=ON -D USE_GINAC=OFF ../ || return 1
-	echo -en "travis_fold:end:reconfigure\r"
+	fold "reconfigure" cmake -D DEVELOPER=ON -D THREAD_SAFE=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=OFF -D USE_COCOA=ON -D USE_GINAC=OFF ../ || return 1
 	
 	/usr/bin/time make tidy || return 1
 
 elif [[ ${TASK} == "addons" ]]; then
 	
-	echo -en "travis_fold:start:reconfigure\r"
-	cmake -D BUILD_ADDONS=ON -D BUILD_ADDON_PARSER=ON -D BUILD_ADDON_PYCARL=ON -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
-	echo -en "travis_fold:end:reconfigure\r"
+	fold "reconfigure" cmake -D BUILD_ADDONS=ON -D BUILD_ADDON_PARSER=ON -D BUILD_ADDON_PYCARL=ON -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
 	
 	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
