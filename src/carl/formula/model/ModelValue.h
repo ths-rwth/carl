@@ -36,6 +36,10 @@ namespace carl
 	struct InfinityValue {
 		bool positive = false;
 	};
+
+	inline bool operator==(InfinityValue lhs, InfinityValue rhs) {
+		return lhs.positive == rhs.positive;
+	}
 	
 	inline std::ostream& operator<<(std::ostream& os, const InfinityValue& iv) {
 		return os << (iv.positive ? "+" : "-") << "infinity";
