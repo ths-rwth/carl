@@ -2,7 +2,6 @@
 
 #include "../logging.h"
 #include "../../converter/CoCoAAdaptor.h"
-#include "../../numbers/FunctionSelector.h"
 
 namespace carl {
 
@@ -14,29 +13,21 @@ MultivariatePolynomial<C,O,P> coprimePart(const MultivariatePolynomial<C,O,P>& p
 	if (p.isConstant() || q.isConstant()) {
 		return p;
 	}
-	using TypeSelector = carl::function_selector::NaryTypeSelector;
 
-	using types = carl::function_selector::wrap_types<
-		mpz_class,mpq_class
-#if defined USE_GINAC
-		,cln::cl_I,cln::cl_RA
-#endif
-	>;
-
-	auto s = carl::createFunctionSelector<TypeSelector, types>(
+	auto s = overloaded {
 	#if defined USE_COCOA
-		[](const auto& p, const auto& q){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p, q}); return c.makeCoprimeWith(p, q); },
-		[](const auto& p, const auto& q){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p, q}); return c.makeCoprimeWith(p, q); }
+		[](const MultivariatePolynomial<mpq_class,O,P>& p, const MultivariatePolynomial<mpq_class,O,P>& q){ CoCoAAdaptor<MultivariatePolynomial<mpq_class,O,P>> c({p, q}); return c.makeCoprimeWith(p, q); },
+		[](const MultivariatePolynomial<mpz_class,O,P>& p, const MultivariatePolynomial<mpz_class,O,P>& q){ CoCoAAdaptor<MultivariatePolynomial<mpz_class,O,P>> c({p, q}); return c.makeCoprimeWith(p, q); }
 	#else
-		[](const auto& p, const auto& q){ return p; },
-		[](const auto& p, const auto& q){ return p; }
+		[](const MultivariatePolynomial<mpq_class,O,P>& p, const MultivariatePolynomial<mpq_class,O,P>& q){ return p; },
+		[](const MultivariatePolynomial<mpz_class,O,P>& p, const MultivariatePolynomial<mpz_class,O,P>& q){ return p; }
 	#endif
 	#if defined USE_GINAC
 		,
-		[](const auto& p, const auto& q){ return p; },
-		[](const auto& p, const auto& q){ return p; }
+		[](const MultivariatePolynomial<cln::cl_RA,O,P>& p, const MultivariatePolynomial<cln::cl_RA,O,P>& q){ return p; },
+		[](const MultivariatePolynomial<cln::cl_I,O,P>& p, const MultivariatePolynomial<cln::cl_I,O,P>& q){ return p; }
 	#endif
-	);
+	};
 	return s(p, q);
 }
 

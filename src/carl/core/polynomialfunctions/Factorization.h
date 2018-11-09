@@ -3,7 +3,6 @@
 #include "../logging.h"
 #include "../../converter/CoCoAAdaptor.h"
 #include "../../converter/OldGinacConverter.h"
-#include "../../numbers/FunctionSelector.h"
 #include "../../util/Common.h"
 
 namespace carl {
@@ -55,29 +54,22 @@ Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomia
 	if (p.totalDegree() <= 1) {
 		return helper::trivialFactorization(p);
 	}
-	using TypeSelector = carl::function_selector::NaryTypeSelector;
 
-	using types = carl::function_selector::wrap_types<
-		mpz_class,mpq_class
-#if defined USE_GINAC
-		,cln::cl_I,cln::cl_RA
-#endif
-	>;
-
-	auto s = carl::createFunctionSelector<TypeSelector, types>(
+	auto s = overloaded {
 	#if defined USE_COCOA
-		[includeConstants](const auto& p){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p}); return c.factorize(p, includeConstants); },
-		[includeConstants](const auto& p){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p}); return c.factorize(p, includeConstants); }
+		[includeConstants](const MultivariatePolynomial<mpq_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpq_class,O,P>> c({p}); return c.factorize(p, includeConstants); },
+		[includeConstants](const MultivariatePolynomial<mpz_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpz_class,O,P>> c({p}); return c.factorize(p, includeConstants); }
 	#else
-		[includeConstants](const auto& p){ return helper::trivialFactorization(p); },
-		[includeConstants](const auto& p){ return helper::trivialFactorization(p); }
+		[includeConstants](const MultivariatePolynomial<mpq_class,O,P>& p){ return helper::trivialFactorization(p); },
+		[includeConstants](const MultivariatePolynomial<mpz_class,O,P>& p){ return helper::trivialFactorization(p); }
 	#endif
 	#if defined USE_GINAC
 		,
-		[includeConstants](const auto& p){ return ginacFactorization(p); },
-		[includeConstants](const auto& p){ return ginacFactorization(p); }
+		[includeConstants](const MultivariatePolynomial<cln::cl_RA,O,P>& p){ return ginacFactorization(p); },
+		[includeConstants](const MultivariatePolynomial<cln::cl_I,O,P>& p){ return ginacFactorization(p); }
 	#endif
-	);
+	};
+
 	auto factors = s(p);
 	helper::sanitizeFactors(p, factors);
 	return factors;
@@ -92,29 +84,21 @@ std::vector<MultivariatePolynomial<C,O,P>> irreducibleFactors(const Multivariate
 	if (p.totalDegree() <= 1) {
 		return {p};
 	}
-	using TypeSelector = carl::function_selector::NaryTypeSelector;
 
-	using types = carl::function_selector::wrap_types<
-		mpz_class,mpq_class
-#if defined USE_GINAC
-		,cln::cl_I,cln::cl_RA
-#endif
-	>;
-
-	auto s = carl::createFunctionSelector<TypeSelector, types>(
+	auto s = overloaded {
 	#if defined USE_COCOA
-		[includeConstants](const auto& p){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p}); return c.irreducibleFactors(p, includeConstants); },
-		[includeConstants](const auto& p){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p}); return c.irreducibleFactors(p, includeConstants); }
+		[includeConstants](const MultivariatePolynomial<mpq_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpq_class,O,P>> c({p}); return c.irreducibleFactors(p, includeConstants); },
+		[includeConstants](const MultivariatePolynomial<mpz_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpz_class,O,P>> c({p}); return c.irreducibleFactors(p, includeConstants); }
 	#else
-		[includeConstants](const auto& p){ return std::vector<MultivariatePolynomial<C,O,P>>({p}); },
-		[includeConstants](const auto& p){ return std::vector<MultivariatePolynomial<C,O,P>>({p}); }
+		[includeConstants](const MultivariatePolynomial<mpq_class,O,P>& p){ return std::vector<MultivariatePolynomial<mpq_class,O,P>>({p}); },
+		[includeConstants](const MultivariatePolynomial<mpz_class,O,P>& p){ return std::vector<MultivariatePolynomial<mpz_class,O,P>>({p}); }
 	#endif
 	#if defined USE_GINAC
 		,
-		[includeConstants](const auto& p){ return std::vector<MultivariatePolynomial<C,O,P>>({p}); },
-		[includeConstants](const auto& p){ return std::vector<MultivariatePolynomial<C,O,P>>({p}); }
+		[includeConstants](const MultivariatePolynomial<cln::cl_RA,O,P>& p){ return std::vector<MultivariatePolynomial<C,O,P>>({p}); },
+		[includeConstants](const MultivariatePolynomial<cln::cl_I,O,P>& p){ return std::vector<MultivariatePolynomial<C,O,P>>({p}); }
 	#endif
-	);
+	};
 	return s(p);
 }
 

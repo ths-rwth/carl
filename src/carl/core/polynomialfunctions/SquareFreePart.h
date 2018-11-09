@@ -3,7 +3,6 @@
 #include "GCD.h"
 
 #include "../../converter/CoCoAAdaptor.h"
-#include "../../numbers/FunctionSelector.h"
 #include "../logging.h"
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"
@@ -15,29 +14,20 @@ MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>
 	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
 	if (p.isConstant() || p.isLinear()) return p;
 
-	using TypeSelector = carl::function_selector::NaryTypeSelector;
-
-	using types = carl::function_selector::wrap_types<
-		mpz_class,mpq_class
-#if defined USE_GINAC
-		,cln::cl_I,cln::cl_RA
-#endif
-	>;
-
-	auto s = carl::createFunctionSelector<TypeSelector, types>(
+	auto s = overloaded {
 	#if defined USE_COCOA
-		[](const auto& p){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p}); return c.squareFreePart(p); },
-		[](const auto& p){ CoCoAAdaptor<MultivariatePolynomial<C,O,P>> c({p}); return c.squareFreePart(p); }
+		[](const MultivariatePolynomial<mpq_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpq_class,O,P>> c({p}); return c.squareFreePart(p); },
+		[](const MultivariatePolynomial<mpz_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpz_class,O,P>> c({p}); return c.squareFreePart(p); }
 	#else
-		[](const auto& p){ return p; },
-		[](const auto& p){ return p; }
+		[](const MultivariatePolynomial<mpq_class,O,P>& p){ return p; },
+		[](const MultivariatePolynomial<mpz_class,O,P>& p){ return p; }
 	#endif
 	#if defined USE_GINAC
 		,
-		[](const auto& p){ return p; },
-		[](const auto& p){ return p; }
+		[](const MultivariatePolynomial<cln::cl_RA,O,P>& p){ return p; },
+		[](const MultivariatePolynomial<cln::cl_I,O,P>& p){ return p; }
 	#endif
-	);
+	};
 	return s(p);
 }
 

@@ -14,7 +14,6 @@
 #include "MultivariatePolynomial.h"
 #include "VariablesInformation.h"
 
-#include "../numbers/FunctionSelector.h"
 #include "../converter/CoCoAAdaptor.h"
 
 namespace carl
@@ -50,26 +49,21 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 
 	// And we check for linearly appearing variables. Notice that ay + b is irreducible and thus,
 	// gcd(p, ay + b) is either ay + b or 1.
-	using TypeSelector = carl::function_selector::NaryTypeSelector;
-#if defined USE_GINAC
-using types = carl::function_selector::wrap_types<mpz_class,mpq_class,cln::cl_I,cln::cl_RA>;
-#else
-using types = carl::function_selector::wrap_types<mpz_class,mpq_class>;
-#endif
-auto s = carl::createFunctionSelector<TypeSelector, types>(
+
+auto s = overloaded {
 #if defined USE_COCOA
-	[](const auto& n1, const auto& n2){ CoCoAAdaptor<Polynomial> c({n1, n2}); return c.gcd(n1,n2); },
-	[](const auto& n1, const auto& n2){ CoCoAAdaptor<Polynomial> c({n1, n2}); return c.gcd(n1,n2); }
+	[](const MultivariatePolynomial<mpq_class,O,P>& n1, const MultivariatePolynomial<mpq_class,O,P>& n2){ CoCoAAdaptor<MultivariatePolynomial<mpq_class,O,P>> c({n1, n2}); return c.gcd(n1,n2); },
+	[](const MultivariatePolynomial<mpz_class,O,P>& n1, const MultivariatePolynomial<mpz_class,O,P>& n2){ CoCoAAdaptor<MultivariatePolynomial<mpz_class,O,P>> c({n1, n2}); return c.gcd(n1,n2); }
 #else
-	[this](const auto& n1, const auto& n2){ return this->customCalculation(n1,n2); },
-	[this](const auto& n1, const auto& n2){ return this->customCalculation(n1,n2); }
+	[this](const MultivariatePolynomial<mpq_class,O,P>& n1, const MultivariatePolynomial<mpq_class,O,P>& n2){ return this->customCalculation(n1,n2); },
+	[this](const MultivariatePolynomial<mpz_class,O,P>& n1, const MultivariatePolynomial<mpz_class,O,P>& n2){ return this->customCalculation(n1,n2); }
 #endif
 #if defined USE_GINAC
 	,
-	[](const auto& n1, const auto& n2){ return ginacGcd<Polynomial>( n1, n2 ); },
-	[](const auto& n1, const auto& n2){ return ginacGcd<Polynomial>( n1, n2 ); }
+	[](const MultivariatePolynomial<cln::cl_RA,O,P>& n1, const MultivariatePolynomial<cln::cl_RA,O,P>& n2){ return ginacGcd<MultivariatePolynomial<cln::cl_RA,O,P>>( n1, n2 ); },
+	[](const MultivariatePolynomial<cln::cl_I,O,P>& n1, const MultivariatePolynomial<cln::cl_I,O,P>& n2){ return ginacGcd<MultivariatePolynomial<cln::cl_I,O,P>>( n1, n2 ); }
 #endif
-);
+};
 	return s(mp1, mp2);
 }
 
