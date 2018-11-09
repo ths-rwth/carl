@@ -31,11 +31,9 @@ namespace model {
 		
 		ModelValue<Rational,Poly> cmp = vc.value();
 		if (cmp.isSubstitution()) {
-			// If assigned directly, the shared_ptr<Substitution> goes out of scope before the result is copied into cmp.
-			// Therefore, we start by copying the data and overwriting it afterwards.
 			CARL_LOG_DEBUG("carl.model.evaluation", "Evaluating " << cmp.asSubstitution() << " on " << m);
-			auto res = cmp.asSubstitution()->evaluate(m);
-			if (res.isBool() && !res.asBool()) {
+			cmp = cmp.asSubstitution()->evaluate(m);
+			if (cmp.isBool() && !cmp.asBool()) {
 				CARL_LOG_DEBUG("carl.model.evaluation", "MVRoot does not exist, returning false");
 				if (vc.negated()) {
 					f = Formula<Poly>(FormulaType::TRUE);
@@ -44,8 +42,7 @@ namespace model {
 				}
 				return;
 			}
-			CARL_LOG_DEBUG("carl.model.evaluation", "Evaluated substitution " << cmp << " -> " << res);
-			cmp = res;
+			CARL_LOG_DEBUG("carl.model.evaluation", "Evaluated substitution to " << cmp);
 		}
 		if (cmp.isSubstitution()) {
 			CARL_LOG_DEBUG("carl.model.evaluation", "MVRoot is still a substitution, cannot evaluate.");
