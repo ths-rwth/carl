@@ -8,7 +8,7 @@
 #include "../numbers/numbers.h"
 #include "../util/hash.h"
 #include "FactorizedPolynomial.h"
-#include "MultivariateGCD.h"
+#include "polynomialfunctions/GCD.h"
 
 #include <boost/optional.hpp>
 

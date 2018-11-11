@@ -12,7 +12,7 @@
 #include "Definiteness.h"
 #include "FactorizedPolynomial.h"
 #include "logging.h"
-#include "MultivariateGCD.h"
+#include "polynomialfunctions/GCD.h"
 
 namespace carl
 {

@@ -1,7 +1,7 @@
 
 #include "RealAlgebraicNumber.h"
 
-#include "../../../core/polynomialfunctions/GCD.h"
+#include "../../../core/polynomialfunctions/GCD_univariate.h"
 
 #pragma once
 

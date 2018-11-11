@@ -12,7 +12,6 @@
 #include "../util/platform.h"
 #include "../util/SFINAE.h"
 #include "logging.h"
-#include "MultivariateGCD.h"
 #include "MultivariatePolynomial.h"
 #include "Sign.h"
 

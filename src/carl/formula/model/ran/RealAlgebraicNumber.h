@@ -30,7 +30,7 @@
 
 #include "../../../core/Sign.h"
 #include "../../../core/UnivariatePolynomial.h"
-#include "../../../core/MultivariateGCD.h"
+#include "../../../core/polynomialfunctions/GCD.h"
 #include "../../../core/MultivariatePolynomial.h"
 #include "../../../interval/Interval.h"
 

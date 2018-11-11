@@ -1363,5 +1363,4 @@ namespace std
 	};
 } // namespace std
 
-#include "MultivariateGCD.h"
 #include "MultivariatePolynomial.tpp"

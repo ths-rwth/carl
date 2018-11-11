@@ -1,3 +1,4 @@
+#pragma once
 /** 
  * @file:   RationalFunction.tpp
  * @author: Sebastian Junges
@@ -8,7 +9,7 @@
 
 #include "RationalFunction.h"
 
-#pragma once
+#include "polynomialfunctions/LCM.h"
 
 namespace carl {
 

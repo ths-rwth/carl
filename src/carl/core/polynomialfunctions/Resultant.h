@@ -1,5 +1,8 @@
 #pragma once
 
+// UnivariatePolynomial::content() may need gcd().
+#include "GCD.h"
+
 #include <list>
 #include <vector>
 

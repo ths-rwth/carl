@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-#include "carl/core/MultivariateGCD.h"
-#include "carl/core/PrimitiveEuclideanAlgorithm.h"
+#include "carl/core/polynomialfunctions/GCD.h"
 #include <carl/numbers/numbers.h>
 #include "carl/util/platform.h"
 
@@ -9,6 +8,19 @@
 using namespace carl;
 
 typedef mpq_class Rational;
+
+TEST(GCD, constants) {
+	using P = MultivariatePolynomial<Rational>;
+	Variable x = freshRealVariable("x");
+	EXPECT_EQ(P(1), carl::gcd(P(1), P(2)));
+	EXPECT_EQ(P(1), carl::gcd(P(2), P(1)));
+	EXPECT_EQ(P(1), carl::gcd(P(1), P(x)));
+	EXPECT_EQ(P(1), carl::gcd(P(x), P(1)));
+	EXPECT_EQ(P(2), carl::gcd(P(10), P(6)));
+	EXPECT_EQ(P(2), carl::gcd(P(6), P(10)));
+	EXPECT_EQ(P(1), carl::gcd(P(10), P(x)));
+	EXPECT_EQ(P(1), carl::gcd(P(x), P(10)));
+}
 
 TEST(MultivariateGCD, test1)
 {
@@ -19,13 +31,11 @@ TEST(MultivariateGCD, test1)
     P f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x*y});
     P g1({(Rational)1*x*x*x*x*y, (Rational)3*x*y*y});
 
-    MultivariateGCD<PrimitiveEuclidean, Rational> gcd(f1,g1);
-    std::cout << gcd.calculate() << std::endl;
+    std::cout << carl::gcd(f1, g1) << std::endl;
 
     P fxy({(Rational)1*x*y});
     P fz({(Rational)1*z});
-    MultivariateGCD<PrimitiveEuclidean, Rational> gcd2(fxy, fz);
-    std::cout << gcd2.calculate() << std::endl;
+    std::cout << carl::gcd(fxy, fz) << std::endl;
 
 //    UnivariatePolynomial<mpz_class> A1(x, {(mpz_class)1, (mpz_class)1, (mpz_class)0, (mpz_class)1});
 //    const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);

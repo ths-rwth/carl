@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/FactorizedPolynomial.h"
+#include "carl/core/polynomialfunctions/LCM.h"
 #include "carl/util/stringparser.h"
 #include "carl/util/platform.h"
 #include "carl/numbers/numbers.h"

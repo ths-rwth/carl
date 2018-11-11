@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GCD_univariate.h"
+
 #include "../logging.h"
 #include "../UnivariatePolynomial.h"
 

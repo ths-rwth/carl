@@ -14,8 +14,6 @@
 #include "Variable.h"
 #include "VariableInformation.h"
 
-#include "polynomialfunctions/Resultant.h"
-
 #include <functional>
 #include <list>
 #include <map>
@@ -839,19 +837,6 @@ public:
 	 */
 	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
 	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
-
-	[[deprecated("use carl::resultant() instead")]]
-	UnivariatePolynomial<Coefficient> resultant(
-			const UnivariatePolynomial<Coefficient>& p,
-			SubresultantStrategy strategy = SubresultantStrategy::Default
-	) const {
-		return carl::resultant(*this, p, strategy);
-	}
-
-	[[deprecated("use carl::discriminant() instead")]]
-	UnivariatePolynomial<Coefficient> discriminant(SubresultantStrategy strategy = SubresultantStrategy::Default) const {
-		return carl::discriminant(*this, strategy);
-	}
 
 	/// @name Equality comparison operators
 	/// @{
