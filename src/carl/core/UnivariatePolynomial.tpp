@@ -11,6 +11,7 @@
 #include "../util/debug.h"
 #include "../util/platform.h"
 #include "../util/SFINAE.h"
+#include "polynomialfunctions/GCD_multivariate.h"
 #include "logging.h"
 #include "MultivariatePolynomial.h"
 #include "Sign.h"
