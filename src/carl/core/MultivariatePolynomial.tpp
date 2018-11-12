@@ -1604,9 +1604,9 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(Variable::Arg rhs)
+MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(Variable rhs)
 {
-	return *this += MonomialPool::getInstance().create(rhs, 1);
+	return *this += createMonomial(rhs, 1);
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
