@@ -24,6 +24,28 @@ TEST(ModelEvaluation, Formula)
 	EXPECT_TRUE(res.isTrue());
 }
 
+TEST(ModelEvaluation, Constraint)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Variable z = freshRealVariable("z");
+	ModelT m;
+	Pol p = Pol(x) + Pol(y)*z + Pol(1);
+	ConstraintT c1(p, carl::Relation::EQ);
+	ConstraintT c2(Pol(x), carl::Relation::EQ);
+
+	Variable v;
+	Pol repl;
+	c1.getSubstitution(v, repl);
+	EXPECT_EQ(v, x);
+	EXPECT_EQ(repl, -Pol(y)*z - Pol(1));
+
+	m.emplace(v, carl::createSubstitution<Rational,Pol,carl::ModelPolynomialSubstitution<Rational, Pol>>(repl));
+	model::substituteIn(c2, m);
+	EXPECT_EQ(c2, ConstraintT(Pol(y)*z + Pol(1), carl::Relation::EQ));
+}
+
+
 TEST(ModelEvaluation, EvaluateMVR)
 {
 	Variable x = freshRealVariable("x");
@@ -47,4 +69,51 @@ TEST(ModelEvaluation, EvaluateRANIR)
 	auto res = model::evaluate(f, m);
 	EXPECT_TRUE(res.isBool());
 	EXPECT_TRUE(res.asBool());
+}
+
+TEST(ModelEvaluation, EvaluateWithMVR)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	ModelT m;
+	Pol p = Pol(x*x) - y*y - Rational(4);
+	Pol mvrpol = Pol(MVRootT::var() * MVRootT::var()) - Rational(3);
+	m.assign(y, createSubstitution<Rational>(MVRootT(mvrpol, 1)));
+	auto res = carl::model::realRoots(p, x, m);
+
+	using UPol = UnivariatePolynomial<Rational>;
+
+	UPol upol(x, {Rational(-7), 0, 1});
+	RealAlgebraicNumber<Rational> r1(upol, Interval<Rational>(-3,BoundType::STRICT,-1,BoundType::STRICT));
+	RealAlgebraicNumber<Rational> r2(upol, Interval<Rational>(1,BoundType::STRICT,3,BoundType::STRICT));
+
+	EXPECT_TRUE(res);
+	EXPECT_EQ(*res, std::decay<decltype(*res)>::type({r1, r2}));
+}
+
+TEST(ModelEvaluation, EvaluateBV)
+{
+	carl::SortManager& sm = carl::SortManager::getInstance();
+	sm.clear();
+	carl::Sort bvSort = sm.addSort("BitVec", carl::VariableType::VT_UNINTERPRETED);
+	sm.makeSortIndexable(bvSort, 1, carl::VariableType::VT_BITVECTOR);
+	carl::Variable a = carl::freshBitvectorVariable("a");
+	carl::Sort s = carl::getSort("BitVec", std::vector<std::size_t>({4}));
+	carl::BVVariable v(a, s);
+	carl::BVTerm bvt_v(carl::BVTermType::VARIABLE, v);
+	
+	carl::BVValue bv1(4, 0);
+	carl::BVTerm bvt_v1(carl::BVTermType::CONSTANT, bv1);
+	carl::BVValue bv2(4, 17);
+	
+	FormulaT f = FormulaT(BVConstraint::create(BVCompareRelation::EQ, bvt_v, bvt_v1));
+	
+	std::cout << f << std::endl;
+	
+	ModelT m;
+	m.emplace(v, bv2);
+	std::cout << m << std::endl;
+	
+	auto res = carl::model::evaluate(f, m);
+	std::cout << res << std::endl;
 }
