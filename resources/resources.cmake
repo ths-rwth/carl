@@ -162,6 +162,8 @@ if(NOT GTEST_FOUND)
 endif()
 print_resource_info("GTest" GTESTMAIN_STATIC ${GTEST_VERSION})
 
+include(resources/google-benchmark.cmake)
+
 ##### MPFR
 IF(USE_MPFR_FLOAT)
 	load_library(carl MPFR 0.0 REQUIRED)

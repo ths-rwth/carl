@@ -5,6 +5,7 @@ ExternalProject_Add(
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=RELEASE -DBENCHMARK_DOWNLOAD_DEPENDENCIES=ON
 	UPDATE_COMMAND ""
 )
+set_target_properties(google-benchmark-EP PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 ExternalProject_Get_Property(google-benchmark-EP install_dir)
 
@@ -14,5 +15,3 @@ add_imported_library(GBMAIN STATIC "${install_dir}/lib/${CMAKE_FIND_LIBRARY_PREF
 
 add_dependencies(GBCORE_STATIC google-benchmark-EP)
 add_dependencies(GBMAIN_STATIC google-benchmark-EP)
-
-add_dependencies(resources google-benchmark-EP)
