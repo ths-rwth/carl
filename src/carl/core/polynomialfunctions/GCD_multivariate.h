@@ -52,16 +52,7 @@ MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const 
 		return MultivariatePolynomial<C,O,P>(carl::gcd(a.constantPart(), b.constantPart()));
 	}
 	if (a.isConstant() || b.isConstant()) {
-		//CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(a.constantPart(), b.constantPart()));
 		return MultivariatePolynomial<C,O,P>(1);
-	}
-	if (is_field<C>::value && a.isConstant()) {
-		CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(a.constantPart(), C(1)/b.coprimeFactor()));
-		return MultivariatePolynomial<C,O,P>(carl::gcd(a.constantPart(), C(1)/b.coprimeFactor()));
-	}
-	if (is_field<C>::value && b.isConstant()) {
-		CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(b.constantPart(),C(1)/a.coprimeFactor()));
-		return MultivariatePolynomial<C,O,P>(carl::gcd(b.constantPart(), C(1)/a.coprimeFactor()));
 	}
 
 	auto s = overloaded {
