@@ -4,6 +4,7 @@
 
 #include "framework/Benchmark.h"
 #include "carl/core/MultivariatePolynomial.h"
+#include "carl/core/polynomialfunctions/GCD.h"
 #include "carl/core/polynomialfunctions/Resultant.h"
 #include "BenchmarkTest.h"
 #include "framework/BenchmarkGenerator.h"
@@ -284,6 +285,11 @@ namespace carl {
 		bool operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
 			return std::get<0>(args) == std::get<1>(args);
 		}
+        #ifdef USE_COCOA
+		bool operator()(const std::tuple<CoMP,CoMP>& args) {
+			return std::get<0>(args) == std::get<1>(args);
+		}
+        #endif
         #ifdef USE_GINAC
 		bool operator()(const std::tuple<GMP,GMP>& args) {
 			return std::get<0>(args) == std::get<1>(args);
@@ -429,6 +435,9 @@ TEST_F(BenchmarkTest, Substitute)
 	bi.n = 1000;
 	for (bi.degree = 5; bi.degree < 11; bi.degree++) {
 		Benchmark<SubstituteGenerator<Coeff>, SubstituteExecutor, CMP<Coeff>> bench(bi, "CArL");
+        #ifdef USE_COCOA
+		//bench.compare<CoMP, TupleConverter<CoMP,CoVAR,CoMP>>("CoCoA");
+        #endif
         #ifdef USE_GINAC
 		bench.compare<GMP, TupleConverter<GMP,GVAR,GMP>>("GiNaC");
         #endif
@@ -442,6 +451,9 @@ TEST_F(BenchmarkTest, Resultant)
 	bi.n = 10;
 	for (bi.degree = 5; bi.degree < 7; bi.degree++) {
 		Benchmark<ResultantGenerator<Coeff>, ResultantExecutor, CUMP<Coeff>> bench(bi, "CArL");
+        #ifdef USE_COCOA
+		//bench.compare<CoMP, ResultantConverter<CoMP,CoVAR>>("CoCoA");
+        #endif
         #ifdef USE_GINAC
 		bench.compare<GMP, ResultantConverter<GMP,GVAR>>("GiNaC");
         #endif
@@ -475,6 +487,9 @@ TEST_F(BenchmarkTest, Compare)
 	bi.n = 1000;
 	for (bi.degree = 20; bi.degree < 29; bi.degree+=2) {
 		Benchmark<ComparisonGenerator<Coeff>, CompareExecutor, bool> bench(bi, "CArL");
+        #ifdef USE_COCOA
+		bench.compare<bool, TupleConverter<CoMP,CoMP>>("CoCoA");
+        #endif
         #ifdef USE_GINAC
 		bench.compare<bool, TupleConverter<GMP,GMP>>("GiNaC");
         #endif
