@@ -22,6 +22,8 @@ add_subdirectory(pycarl)
 # Only for debugging.
 #add_subdirectory(debug)
 
+add_subdirectory(microbenchmarks)
+
 if (CLANG_TIDY)
 	add_custom_target(tidy-tests
 		COMMAND ${CLANG_TIDY} -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${carl_lib_sources}
