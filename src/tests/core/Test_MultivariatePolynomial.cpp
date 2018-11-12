@@ -451,6 +451,12 @@ TEST(MultivariatePolynomial, GatherVariables)
     f1.gatherVariables(vars);
     EXPECT_EQ(x, *vars.begin());
     EXPECT_EQ((unsigned)2, vars.size());
+
+	{
+		carlVariables vars;
+		f1.gatherVariables(vars);
+		EXPECT_EQ(vars, carlVariables({x, y}));
+	}
 }
 
 TEST(MultivariatePolynomial, Derivative)

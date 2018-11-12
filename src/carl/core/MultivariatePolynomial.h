@@ -431,6 +431,7 @@ public:
 	 * @param vars Holds the variables occuring in the polynomial at return.
 	 */
 	void gatherVariables(std::set<Variable>& vars) const;
+	void gatherVariables(carlVariables& vars) const;
 	std::set<Variable> gatherVariables() const;
 	
 	/**
@@ -752,8 +753,6 @@ public:
 	 */
 	bool isConsistent() const;
 };
-
-#define MPOpTemplate typename C, typename O = GrLexOrdering, typename P = StdMultivariatePolynomialPolicies<>
 
 	template<typename C, typename O, typename P>
 	MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q)

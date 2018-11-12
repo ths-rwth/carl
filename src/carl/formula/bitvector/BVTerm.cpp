@@ -7,6 +7,8 @@
 #include "BVTermContent.h"
 #include "BVTermPool.h"
 
+#include "../../core/Variables.h"
+
 #include <utility>
 
 namespace carl {
@@ -48,6 +50,9 @@ BVTermType BVTerm::type() const {
 
 void BVTerm::collectVariables(std::set<BVVariable>& vars) const {
 	mpContent->collectVariables(vars);
+}
+void BVTerm::gatherVariables(carlVariables& vars) const {
+	mpContent->gatherVariables(vars);
 }
 
 bool BVTerm::isInvalid() const {

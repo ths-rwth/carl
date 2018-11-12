@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include "../../core/Variables.h"
 #include "UVariable.h"
 #include "UninterpretedFunction.h"
 
 #include <iostream>
-
 #include <utility>
 #include <vector>
 
@@ -56,6 +56,8 @@ namespace carl
             const std::vector<UTerm>& args() const;
 
 			std::size_t complexity() const;
+
+			void gatherVariables(carlVariables& vars) const;
     };
 
 	static_assert(std::is_trivially_copyable<UFInstance>::value, "UFInstance should be trivially copyable.");

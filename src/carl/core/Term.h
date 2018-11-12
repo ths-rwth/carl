@@ -271,12 +271,11 @@ class Term {
 		template<bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const;
 		
-		void gatherVariables(std::set<Variable>& variables) const
-		{
-			if(mMonomial)
-			{
-				mMonomial->gatherVariables(variables);
-			}
+		void gatherVariables(std::set<Variable>& variables) const {
+			if (mMonomial) mMonomial->gatherVariables(variables);
+		}
+		void gatherVariables(carlVariables& variables) const {
+			if (mMonomial) mMonomial->gatherVariables(variables);
 		}
 		
 		Term pow(uint exp) const

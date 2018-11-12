@@ -893,6 +893,8 @@ namespace carl
             void collectVariables( Variables& _vars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
             void collectVariables_( Variables& _vars, std::set<BVVariable>* _bvVars, std::set<UVariable>* _ueVars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
 
+			void gatherVariables(carlVariables& vars) const;
+
             /**
              * @return The formula's complexity, which is mainly the number of operations within this formula.
              */

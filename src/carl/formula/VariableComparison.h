@@ -111,6 +111,13 @@ namespace carl {
 				}, mValue);
 			vars.insert(newVars.begin(), newVars.end());
 		}
+		void gatherVariables(carlVariables& vars) const {
+			vars.add(mVar);
+			std::visit(overloaded {
+				[&vars](const MR& mr) { mr.gatherVariables(vars); },
+				[](const RAN&) {}
+			}, mValue);
+		}
 	};
 
 	template<typename Poly>

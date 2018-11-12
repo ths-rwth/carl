@@ -133,6 +133,11 @@ public:
 		return var;
 	}
 
+	void gatherVariables(carlVariables& vars) const {
+		mPoly.gatherVariables(vars);
+		vars.erase(sVar);
+	}
+
 	/**
 	 * Create a copy of the underlying polynomial with the given variable
 	 * replaced by the given polynomial.

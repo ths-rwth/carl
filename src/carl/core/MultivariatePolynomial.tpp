@@ -1185,11 +1185,17 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-void MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables(std::set<Variable>& vars) const
-{
-	for(const auto& t : mTerms)
-	{
+void MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables(std::set<Variable>& vars) const {
+	for (const auto& t : mTerms) {
 		t.gatherVariables(vars);
+	}
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+void MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables(carlVariables& vars) const {
+	for (const auto& t : mTerms) {
+		t.gatherVariables(vars);
+		vars.compact();
 	}
 }
 

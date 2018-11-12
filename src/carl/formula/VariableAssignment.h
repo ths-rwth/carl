@@ -42,6 +42,9 @@ namespace carl {
 		void collectVariables(Variables& vars) const {
 			mComparison.collectVariables(vars);
 		}
+		void gatherVariables(carlVariables& vars) const {
+			mComparison.gatherVariables(vars);
+		}
 	};
 	
 	template<typename Poly>

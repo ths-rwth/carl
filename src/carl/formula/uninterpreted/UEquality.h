@@ -90,6 +90,10 @@ namespace carl
 			}
 
             void collectUVariables(std::set<UVariable>& uvars) const;
+			void gatherVariables(carlVariables& vars) const {
+				mLhs.gatherVariables(vars);
+				mRhs.gatherVariables(vars);
+			}
 
     };
 

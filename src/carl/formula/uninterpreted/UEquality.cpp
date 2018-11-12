@@ -7,29 +7,29 @@
 
 #include "UEquality.h"
 
-namespace carl
-{
+namespace carl {
 
-    void collectUFVars(std::set<UVariable>& uvars, UFInstance ufi) {
-      for(const auto& arg : ufi.args()) {
-          if(arg.isUVariable()) {
-              uvars.insert(arg.asUVariable());
-          } else if(arg.isUFInstance()) {
-              collectUFVars(uvars, arg.asUFInstance());
-          }
-      }
-    }
+void collectUFVars(std::set<UVariable>& uvars, UFInstance ufi) {
+	for (const auto& arg : ufi.args()) {
+		if (arg.isUVariable()) {
+			uvars.insert(arg.asUVariable());
+		} else if (arg.isUFInstance()) {
+			collectUFVars(uvars, arg.asUFInstance());
+		}
+	}
+}
 
-    void UEquality::collectUVariables(std::set<UVariable>& uvars) const {
-        if(mLhs.isUVariable()) {
-            uvars.insert(mLhs.asUVariable());
-        } else {
-            collectUFVars(uvars, mLhs.asUFInstance());
-        }
-        if(mRhs.isUVariable()) {
-            uvars.insert(mRhs.asUVariable());
-        } else {
-            collectUFVars(uvars, mRhs.asUFInstance());
-        }
-    }
+void UEquality::collectUVariables(std::set<UVariable>& uvars) const {
+	if (mLhs.isUVariable()) {
+		uvars.insert(mLhs.asUVariable());
+	} else {
+		collectUFVars(uvars, mLhs.asUFInstance());
+	}
+	if (mRhs.isUVariable()) {
+		uvars.insert(mRhs.asUVariable());
+	} else {
+		collectUFVars(uvars, mRhs.asUFInstance());
+	}
+}
+
 } // end namespace carl

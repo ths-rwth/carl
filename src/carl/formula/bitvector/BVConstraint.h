@@ -92,6 +92,10 @@ public:
 		mLhs.collectVariables(vars);
 		mRhs.collectVariables(vars);
 	}
+	void gatherVariables(carlVariables& vars) const {
+		mLhs.gatherVariables(vars);
+		mRhs.gatherVariables(vars);
+	}
 
 	/**
 	 * @return A hash value for this constraint.

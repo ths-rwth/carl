@@ -364,6 +364,31 @@ TEST(Formula, ConstraintSimplication)
     }
 }
 
+TEST(Formula, gatherVariables)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Variable z = freshRealVariable("z");
+	{
+		carlVariables vars;
+		FormulaT f(Pol(x), Relation::LESS);
+		f.gatherVariables(vars);
+		EXPECT_EQ(vars, carlVariables({x}));
+	}
+	{
+		carlVariables vars;
+		FormulaT f(Pol(x)+y, Relation::LESS);
+		f.gatherVariables(vars);
+		EXPECT_EQ(vars, carlVariables({x,y}));
+	}
+	{
+		carlVariables vars;
+		FormulaT f(Pol(x)*y+z, Relation::LESS);
+		f.gatherVariables(vars);
+		EXPECT_EQ(vars, carlVariables({x,y,z}));
+	}
+}
+
 TEST(Formula, Uniqueness)
 {
 	//(X !> (IR ]-594743/343, -1189485/686[, __r^2 + -1031250000/343 R))

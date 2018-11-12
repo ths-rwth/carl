@@ -5,6 +5,7 @@
 #include "BVValue.h"
 #include "BVVariable.h"
 
+#include <tuple>
 #include <variant>
 
 namespace carl {
@@ -185,6 +186,19 @@ struct BVTermContent {
 			std::cerr << "Type is " << mType << std::endl;
 			assert(false);
 		}
+	}
+
+	void gatherVariables(carlVariables& vars) const {
+		std::visit(overloaded {
+			[&vars](const BVVariable& v){ vars.add(v.variable()); },
+			[&vars](const BVExtractContent& c){ c.mOperand.gatherVariables(vars); },
+			[&vars](const BVUnaryContent& c){ c.mOperand.gatherVariables(vars); },
+			[&vars](const BVBinaryContent& c){
+				c.mFirst.gatherVariables(vars);
+				c.mSecond.gatherVariables(vars);
+			},
+			[](const auto&){}
+		}, mContent);
 	}
 
 	std::size_t complexity() const {

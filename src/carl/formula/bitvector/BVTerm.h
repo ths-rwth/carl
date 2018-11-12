@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "../../core/Variables.h"
 #include "../../util/variant_util.h"
 #include <boost/variant.hpp>
 
@@ -57,6 +58,8 @@ public:
 	size_t complexity() const;
 
 	void collectVariables(std::set<BVVariable>& vars) const;
+
+	void gatherVariables(carlVariables& vars) const;
 
 	bool isInvalid() const;
 

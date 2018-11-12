@@ -10,6 +10,7 @@
 #include "../numbers/numbers.h"
 #include "CompareResult.h"
 #include "Variable.h"
+#include "Variables.h"
 #include "VariablePool.h"
 #include "logging.h"
 
@@ -433,9 +434,17 @@ namespace carl
 		 */
 		void gatherVariables(std::set<Variable>& variables) const
 		{
-			for (auto it: mExponents) {
+			for (const auto& it: mExponents) {
 				variables.insert(it.first);
 			}
+		}
+
+		/**
+		 * Fill the variables with the variables from this monomial.
+		 * @param variables Variables.
+		 */
+		void gatherVariables(carlVariables& variables) const {
+			variables.add(mExponents, [](const auto& e){ return e.first; });
 		}
 		
 		/**

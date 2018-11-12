@@ -7,11 +7,12 @@
 
 #pragma once
 
+#include "../../core/Variables.h"
 #include "UVariable.h"
 #include "UFInstance.h"
-#include <variant>
 
 #include <iostream>
+#include <variant>
 
 namespace carl
 {
@@ -76,6 +77,8 @@ namespace carl
 		Sort domain() const;
 
 		std::size_t complexity() const;
+
+		void gatherVariables(carlVariables& vars) const;
 	};
 	static_assert(std::is_literal_type<UTerm>::value, "UTerm should be a literal type.");
 

@@ -27,6 +27,13 @@ namespace carl
 		}, mTerm);
 	}
 
+	void UTerm::gatherVariables(carlVariables& vars) const {
+		return std::visit(overloaded {
+			[&vars](UVariable v) { vars.add(v.variable()); },
+			[&vars](UFInstance ufi) { ufi.gatherVariables(vars); },
+		}, mTerm);
+	}
+
 	bool operator==(const UTerm& lhs, const UTerm& rhs) {
 		return std::visit(overloaded {
 			[](UVariable lhs, UVariable rhs) { return lhs == rhs; },

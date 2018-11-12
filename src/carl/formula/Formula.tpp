@@ -117,6 +117,46 @@ namespace carl
         }
     }
 
+	template<typename Pol>
+	void Formula<Pol>::gatherVariables(carlVariables& vars) const {
+		switch (getType()) {
+			case FormulaType::TRUE:
+			case FormulaType::FALSE:
+				break;
+			case FormulaType::BOOL:
+				vars.add(boolean());
+				break;
+			case FormulaType::CONSTRAINT:
+				constraint().gatherVariables(vars);
+				break;
+			case FormulaType::VARCOMPARE:
+				variableComparison().gatherVariables(vars);
+				break;
+			case FormulaType::VARASSIGN:
+				variableAssignment().gatherVariables(vars);
+				break;
+			case FormulaType::BITVECTOR:
+				bvConstraint().gatherVariables(vars);
+				break;
+			case FormulaType::UEQ:
+				uequality().gatherVariables(vars);
+				break;
+			case FormulaType::NOT:
+				subformula().gatherVariables(vars);
+				break;
+			case FormulaType::EXISTS:
+			case FormulaType::FORALL:
+				quantifiedFormula().gatherVariables(vars);
+				break;
+			default:
+			{
+				for (const Formula<Pol>& subFormula : subformulas()) {
+					subFormula.gatherVariables(vars);
+				}
+			}
+		}
+	}
+
     template<typename Pol>
     size_t Formula<Pol>::complexity() const
     {

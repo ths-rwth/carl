@@ -389,6 +389,10 @@ namespace carl
                 return mpContent->mVariables;
             }
 
+			void gatherVariables(carlVariables& vars) const {
+				vars.add(mpContent->mVariables);
+			}
+
             /**
              * @return The relation symbol of this constraint.
              */

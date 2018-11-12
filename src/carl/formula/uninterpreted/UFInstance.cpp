@@ -36,6 +36,12 @@ namespace carl
 		);
 	}
 
+	void UFInstance::gatherVariables(carlVariables& vars) const {
+		for (const auto& a: args()) {
+			a.gatherVariables(vars);
+		}
+	}
+
 	std::ostream& operator<<(std::ostream& os, const UFInstance& ufun) {
 		assert(ufun.id() != 0);
 		os << ufun.uninterpretedFunction().name() << "(";
