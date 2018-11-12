@@ -1014,8 +1014,8 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
 	assert(!isZero());
 
-	auto it = begin();
 	if constexpr (carl::is_subset_of_rationals<Coeff>::value) {
+		auto it = begin();
 		auto num = carl::abs(carl::getNum(it->coeff()));
 		auto den = carl::abs(carl::getDenom(it->coeff()));
 		for (++it; it != end(); ++it) {
@@ -1024,11 +1024,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 		}
 		return den / num;
 	} else {
-		auto num = carl::abs(it->coeff());
-		for (++it; it != end(); ++it) {
-			num = carl::gcd(num, carl::abs(it->coeff()));
-		}
-		return Coeff(1) / num;
+		return Coeff(1);
 	}
 }
 
