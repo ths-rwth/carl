@@ -519,7 +519,6 @@ public:
 	 * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
 	 *		 of the coefficients in p.
 	 */
-	template<typename C = Coeff, EnableIf<is_subset_of_rationals<C>> = dummy>
 	Coeff coprimeFactor() const;
     
     /**
@@ -1352,36 +1351,22 @@ public:
 /**
  * @ingroup multirp
  */
-namespace std
-{
+namespace std {
 	/**
 	 * Specialization of `std::hash` for MultivariatePolynomial.
 	 */
 	template<typename C, typename O, typename P>
-	struct hash<carl::MultivariatePolynomial<C,O,P>>
-	{
+	struct hash<carl::MultivariatePolynomial<C,O,P>> {
 		/**
 		 * Calculates the hash of a MultivariatePolynomial.
 		 * @param mpoly MultivariatePolynomial.
 		 * @return Hash of mpoly.
 		 */
-		size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const 
-		{
+		std::size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const {
 			assert(mpoly.isConsistent());
-			std::hash<carl::Term<C>> h;
-			size_t result = 0;
-			for(auto it = mpoly.begin(); it != mpoly.end(); ++it) {
-				if (it == (mpoly.end()-1)) {
-					// Shift before leading term
-					result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-				}
-				result ^= h(*it);
-				if (it == mpoly.begin() && it->isConstant()) {
-					// Shift after constant term
-					result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-				}
-			}
-			return result;
+			return std::accumulate(mpoly.begin(), mpoly.end(), static_cast<std::size_t>(0),
+				[](std::size_t seed, const auto& t){ carl::hash_add(seed, t); return seed; }
+			);
 		}
 	};
 } // namespace std

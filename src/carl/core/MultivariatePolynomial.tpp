@@ -1010,26 +1010,26 @@ SubstitutionType MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-template<typename C, EnableIf<is_subset_of_rationals<C>>>
 Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
-	assert(nrTerms() != 0);
-	typename TermsType::const_iterator it = mTerms.begin();
-	typename IntegralType<Coeff>::type num = carl::abs(getNum((it)->coeff()));
-	typename IntegralType<Coeff>::type den = carl::abs(getDenom((it)->coeff()));
-	for(++it; it != mTerms.end(); ++it)
-	{
-		num = carl::gcd(num, getNum((it)->coeff()));
-		den = carl::lcm(den, getDenom((it)->coeff()));
+	assert(!isZero());
+
+	auto it = begin();
+	if constexpr (carl::is_subset_of_rationals<Coeff>::value) {
+		auto num = carl::abs(carl::getNum(it->coeff()));
+		auto den = carl::abs(carl::getDenom(it->coeff()));
+		for (++it; it != end(); ++it) {
+			num = carl::gcd(num, carl::abs(carl::getNum(it->coeff())));
+			den = carl::lcm(den, carl::abs(carl::getDenom(it->coeff())));
+		}
+		return den / num;
+	} else {
+		auto num = carl::abs(it->coeff());
+		for (++it; it != end(); ++it) {
+			num = carl::gcd(num, carl::abs(it->coeff()));
+		}
+		return Coeff(1) / num;
 	}
-    if( carl::isNegative(lcoeff()) )
-    {
-        return Coeff(den)/Coeff(-num);
-    }
-    else
-    {
-        return Coeff(den)/Coeff(num);
-    }
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

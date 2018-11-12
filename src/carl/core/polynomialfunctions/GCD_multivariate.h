@@ -61,16 +61,16 @@ MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const 
 	}
 
 	auto s = overloaded {
+	#if defined USE_GINAC
+		[](const MultivariatePolynomial<cln::cl_RA,O,P>& n1, const MultivariatePolynomial<cln::cl_RA,O,P>& n2){ return ginacGcd<MultivariatePolynomial<cln::cl_RA,O,P>>( n1, n2 ); },
+		[](const MultivariatePolynomial<cln::cl_I,O,P>& n1, const MultivariatePolynomial<cln::cl_I,O,P>& n2){ return ginacGcd<MultivariatePolynomial<cln::cl_I,O,P>>( n1, n2 ); },
+	#endif
 	#if defined USE_COCOA
 		[](const MultivariatePolynomial<mpq_class,O,P>& n1, const MultivariatePolynomial<mpq_class,O,P>& n2){ CoCoAAdaptor<MultivariatePolynomial<mpq_class,O,P>> c({n1, n2}); return c.gcd(n1,n2); },
 		[](const MultivariatePolynomial<mpz_class,O,P>& n1, const MultivariatePolynomial<mpz_class,O,P>& n2){ CoCoAAdaptor<MultivariatePolynomial<mpz_class,O,P>> c({n1, n2}); return c.gcd(n1,n2); }
 	#else
-		[](const Polynomial& n1, const Polynomial& n2){ return gcd_detail::gcd_calculate(n1,n2); }
-	#endif
-	#if defined USE_GINAC
-		,
-		[](const MultivariatePolynomial<cln::cl_RA,O,P>& n1, const MultivariatePolynomial<cln::cl_RA,O,P>& n2){ return ginacGcd<MultivariatePolynomial<cln::cl_RA,O,P>>( n1, n2 ); },
-		[](const MultivariatePolynomial<cln::cl_I,O,P>& n1, const MultivariatePolynomial<cln::cl_I,O,P>& n2){ return ginacGcd<MultivariatePolynomial<cln::cl_I,O,P>>( n1, n2 ); }
+		[](const MultivariatePolynomial<mpq_class,O,P>& n1, const MultivariatePolynomial<mpq_class,O,P>& n2){ return gcd_detail::gcd_calculate(n1,n2); },
+		[](const MultivariatePolynomial<mpz_class,O,P>& n1, const MultivariatePolynomial<mpz_class,O,P>& n2){ return gcd_detail::gcd_calculate(n1,n2); }
 	#endif
 	};
 	CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a.coprimeCoefficients() << ", " << b.coprimeCoefficients() << ")");
