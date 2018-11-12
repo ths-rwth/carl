@@ -40,11 +40,21 @@ namespace carl {
     ) {
         polynomial::polynomial_ref poly = z3().toZ3IntCoeff(p);
 
-        nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
+        nlsat::assignment map(z3().anumMan());
         for(auto const &pair : m) {
             polynomial::var var = z3().toZ3(pair.first);
-            const algebraic_numbers::anum& val = pair.second.getZ3Ran().content();
-            map.set(var, val);
+            if (pair.second.isZ3Ran()) {
+                const algebraic_numbers::anum& val = pair.second.getZ3Ran().content();
+                map.set(var, val);
+            } else {
+                assert(pair.second.isNumeric());
+                mpq num = z3().toZ3MPQ(pair.second.value());
+                anum alnum;
+                z3().anumMan().set(alnum, num);
+                map.set(var, alnum);
+                z3().free(num);
+                z3().free(alnum);
+            }
         }
 
         anum_vector roots;

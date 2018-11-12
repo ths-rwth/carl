@@ -11,11 +11,14 @@ namespace carl {
 		CARL_LOG_FUNC("carl.ran", *this << ", " << n);
 		if (this == &n) return true;
 
-		if (this->isZ3Ran()) {
-			assert(n.isZ3Ran());
+		if (this->isZ3Ran() && n.isZ3Ran()) {
 			return getZ3Ran().equal(n.getZ3Ran());
+		} else if (this->isZ3Ran() && n.isNumeric()) {
+			return getZ3Ran().equal(n.value());
+		} else if (this->isNumeric() && n.isZ3Ran()) {
+			return n.getZ3Ran().equal(this->value());
 		}
-		assert(!isZ3Ran());
+		assert(!isZ3Ran() && !n.isZ3Ran());
 
 		if(this->isThom() || n.isThom()) {
 			assert(!this->isInterval() && !n.isInterval());
@@ -82,11 +85,13 @@ namespace carl {
 				} else {
 					return value() <= n.lower();
 				}
-			} else {
-				assert(n.isThom());
+			} else if (n.isThom()) {
 				bool res = this->value() < *(n.mTE);
 				CARL_LOG_TRACE("carl.ran", "result is " << res);
 				return res;
+			} else {
+				assert(n.isZ3Ran());
+				return n.getZ3Ran().greater(value());
 			}
 		} else if(isInterval()) {
 			if (n.isNumeric()) {
@@ -110,8 +115,13 @@ namespace carl {
 				return res;
 			}
 		} else if (isZ3Ran()) {
-			assert(n.isZ3Ran());
-			return getZ3Ran().less(n.getZ3Ran());
+			if (n.isZ3Ran()) {
+				return getZ3Ran().less(n.getZ3Ran());
+			} else if (n.isNumeric()) {
+				return getZ3Ran().less(n.value());
+			} else {
+				assert(false);
+			}
 		}
 
 		if (mIR == n.mIR) return false;

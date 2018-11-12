@@ -17,7 +17,26 @@ RealAlgebraicNumber<Number> sampleBelowZ3(const RealAlgebraicNumber<Number>& n) 
 template<typename Number>
 RealAlgebraicNumber<Number> sampleBetweenZ3(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper) {
     algebraic_numbers::anum val;
-    z3().anumMan().select(lower.getZ3Ran().content(), upper.getZ3Ran().content(), val);
+    if (lower.isZ3Ran() && upper.isZ3Ran()) {
+        z3().anumMan().select(lower.getZ3Ran().content(), upper.getZ3Ran().content(), val);        
+    } else if (lower.isZ3Ran() && upper.isNumeric()) {
+        mpq num = z3().toZ3MPQ(upper.value());
+        anum alnum;
+        z3().anumMan().set(alnum, num);
+        z3().anumMan().select(lower.getZ3Ran().content(), alnum, val); 
+        z3().free(num);
+        z3().free(alnum);
+
+    } else if (lower.isNumeric() && upper.isZ3Ran()) {
+        mpq num = z3().toZ3MPQ(lower.value());
+        anum alnum;
+        z3().anumMan().set(alnum, num);
+        z3().anumMan().select(alnum, upper.getZ3Ran().content(), val); 
+        z3().free(num);
+        z3().free(alnum);
+    } else {
+        assert(false);
+    }
     return RealAlgebraicNumber<Number>(Z3Ran<Number>(std::move(val)));
 }
 

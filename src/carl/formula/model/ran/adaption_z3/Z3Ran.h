@@ -38,6 +38,10 @@ namespace carl {
             bool isZero() const;
 
             bool isIntegral() const;
+
+            bool isNumeric() const;
+
+            Number getNumber() const;
            
             const Number& lower() const;
 
@@ -60,6 +64,12 @@ namespace carl {
             bool equal(const Z3Ran<Number>& n) const;
 
 	        bool less(const Z3Ran<Number>& n) const;
+
+            bool equal(const Number& n) const;
+
+            bool less(const Number& n) const;
+
+            bool greater(const Number& n) const;
     };
 
     template<typename Number>

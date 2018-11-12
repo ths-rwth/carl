@@ -80,7 +80,7 @@ private:
 	std::shared_ptr<ThomEncoding<Number>> mTE;
 	// z3 adaption
 	#ifdef USE_Z3_RANS
-	std::shared_ptr<Z3Ran<Number>> mZR;
+	mutable std::shared_ptr<Z3Ran<Number>> mZR;
 	#endif
 
 	void checkForSimplification() const {
@@ -88,6 +88,11 @@ private:
 		if (mIR && mIR->interval.isPointInterval()) {
 			switchToNR(mIR->interval.lower());
 		}
+		#ifdef USE_Z3_RANS
+		if (mZR && mZR->isNumeric()) {
+			switchToNR(mZR->getNumber());
+		}
+		#endif
 	}
 	// Switch to numeric representation.
 	void switchToNR(const Number& n) const {
@@ -96,21 +101,19 @@ private:
 			mIR->interval = Interval<Number>(n);
 			mIR.reset();
 		}
+		#ifdef USE_Z3_RANS
+		if (mZR) {
+			mZR.reset();
+		}
+		#endif
 	}
 
 public:
 	RealAlgebraicNumber() = default;
-	#ifndef USE_Z3_RANS
 	explicit RealAlgebraicNumber(const Number& n, bool isRoot = true):
 		mValue(n),
 		mIsRoot(isRoot)
 	{}
-	#else
-	explicit RealAlgebraicNumber(const Number& n, bool isRoot = true):
-		mZR(std::make_shared<Z3Ran<Number>>(n)),
-		mIsRoot(isRoot)
-	{}
-	#endif
 	explicit RealAlgebraicNumber(Variable var, bool isRoot = true):
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(Polynomial(var), Interval<Number>::zeroInterval()))
@@ -245,6 +248,7 @@ public:
 
 	bool isZ3Ran() const {
 		#ifdef USE_Z3_RANS
+		checkForSimplification();
 		return bool(mZR);
 		#else
 		return false;

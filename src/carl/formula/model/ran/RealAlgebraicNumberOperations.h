@@ -81,6 +81,8 @@ namespace carl {
 			}
 			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
 			return res;
+		} else if (lower.isZ3Ran() || upper.isZ3Ran()) {
+			return sampleBetweenZ3(lower, upper);
 		} else if (lower.isNumeric() || upper.isNumeric() || lower.isInterval() || upper.isInterval()) {
 			Interval<Number> i;
 			if (lower.isNumeric()) i.set(lower.value(), lower.value());
@@ -117,8 +119,6 @@ namespace carl {
 					CARL_LOG_WARN("carl.ran", "Using unknown sampling heuristic " << heuristic << ", fallback to sample.");
 					return RealAlgebraicNumber<Number>(sample(i, false), false);
 			}
-		} else if (lower.isZ3Ran() && upper.isZ3Ran()) {
-			return sampleBetweenZ3(lower, upper);
 		}
 		assert(false);
 	}
