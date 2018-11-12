@@ -176,7 +176,7 @@ public:
 	template<typename Coeff>
 	polynomial::polynomial_ref toZ3(const carl::Term<Coeff>& t) {
 		polynomial::polynomial_ref res(polyMan());
-		assert(getDenom(t.coeff()) == 1); // z3 polynomial coefficients must be integer // TODO test
+		assert(getDenom(t.coeff()) == 1); // z3 polynomial coefficients must be integer
 		res = toZ3(polyMan().mk_const(toZ3(t.coeff())));
 		if (t.monomial()) return res * toZ3(*(t.monomial()));
 		else return res;
@@ -201,6 +201,26 @@ public:
 		}
 		polyMan().lex_sort(res);
 		return res;
+	}
+
+	// polynomial conversions ensuring that coefficients are integral
+
+	template<typename Coeff>
+	polynomial::polynomial_ref toZ3IntCoeff(const carl::MultivariatePolynomial<Coeff>& p) {
+		auto p2 = p.coprimeCoefficientsSignPreserving();
+		return toZ3(p2);
+	}
+
+	template<typename Number, EnableIf<is_subset_of_rationals<Number>> = dummy>
+	polynomial::polynomial_ref toZ3IntCoeff(const carl::UnivariatePolynomial<Number>& p) {
+		auto p2 = p.coprimeCoefficientsSignPreserving(); // does not work correctly if Coeff is MultivariatePolynomial<Number>
+		return toZ3(p2);
+	}
+
+	template<typename Number, EnableIf<is_subset_of_rationals<Number>> = dummy>
+	polynomial::polynomial_ref toZ3IntCoeff(const carl::UnivariatePolynomial<carl::MultivariatePolynomial<Number>>& p) {
+		MultivariatePolynomial<Number> p2(p);
+		return toZ3IntCoeff(p2);
 	}
 
 	// conversions back to CArL types

@@ -536,6 +536,12 @@ public:
 	 * @see coprimeFactor()
 	 */
 	MultivariatePolynomial coprimeCoefficients() const;
+
+	/**
+	 * @return p * |p.coprimeFactor()|
+	 * @see coprimeCoefficients()
+	 */
+	MultivariatePolynomial coprimeCoefficientsSignPreserving() const;
 	
 	/**
 	 * For a polynomial p, returns p/lc(p)

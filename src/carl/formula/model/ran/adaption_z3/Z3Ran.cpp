@@ -120,7 +120,7 @@ namespace carl { // TODO do all operations work if !is_rational ???
 
     template<typename Number>
     Sign Z3Ran<Number>::sgn(const UnivariatePolynomial<Number>& p) const {
-        polynomial::polynomial_ref poly = z3().toZ3(p);
+        polynomial::polynomial_ref poly = z3().toZ3IntCoeff(p);
         nlsat::assignment map(z3().anumMan());  // map frees its elements automatically
         polynomial::var var = z3().toZ3(p.mainVar());
         map.set(var, content());

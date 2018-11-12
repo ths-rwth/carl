@@ -11,7 +11,7 @@ namespace carl {
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval
     ) {
-        polynomial::polynomial_ref poly = z3().toZ3(polynomial);
+        polynomial::polynomial_ref poly = z3().toZ3IntCoeff(polynomial);
 
         anum_vector roots;
         z3().anumMan().isolate_roots(poly, roots);
@@ -38,7 +38,7 @@ namespace carl {
         const std::map<Variable, RealAlgebraicNumber<Number>>& m,
         const Interval<Number>& interval
     ) {
-        polynomial::polynomial_ref poly = z3().toZ3(p);
+        polynomial::polynomial_ref poly = z3().toZ3IntCoeff(p);
 
         nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
         for(auto const &pair : m) {

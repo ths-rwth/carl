@@ -9,7 +9,7 @@ namespace carl {
 
     template<typename Number>
     RealAlgebraicNumber<Number> evaluateZ3(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, RealAlgebraicNumber<Number>>& evalMap) {
-        polynomial::polynomial_ref poly = z3().toZ3(polynomial);
+        polynomial::polynomial_ref poly = z3().toZ3IntCoeff(polynomial);
         algebraic_numbers::anum res;
         nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
         for(auto const &pair : evalMap) {
