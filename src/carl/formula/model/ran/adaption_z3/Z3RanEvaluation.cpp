@@ -13,6 +13,7 @@ namespace carl {
         algebraic_numbers::anum res;
         nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
         for(auto const &pair : evalMap) {
+            assert(pair.second.isZ3Ran()); // all trivial assignments should have already been plugged in ...
             polynomial::var var = z3().toZ3(pair.first);
             const algebraic_numbers::anum& val = pair.second.getZ3Ran().content();
             map.set(var, val);

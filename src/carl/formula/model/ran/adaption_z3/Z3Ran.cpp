@@ -5,7 +5,7 @@
 #include "Z3Ran.h"
 #include "Z3RanContent.h"
 
-namespace carl { // TODO do all operations work if !is_rational ???
+namespace carl {
 
     template<typename Number>
     Z3Ran<Number>::Z3Ran() {
@@ -40,9 +40,24 @@ namespace carl { // TODO do all operations work if !is_rational ???
     }
 
     template<typename Number>
+    bool Z3Ran<Number>::isNumeric() const {
+        return z3().anumMan().is_rational(content());
+    }
+
+    template<typename Number>
+    Number Z3Ran<Number>::getNumber() const {
+        assert(isNumeric());
+        mpq res;
+        z3().anumMan().to_rational(content(), res);
+        Number num = z3().toNumber<Number>(res);
+        z3().free(res);
+        return num;
+    }
+
+    template<typename Number>
     const Number& Z3Ran<Number>::lower() const {
         mpq res;
-        if (z3().anumMan().is_rational(content())) {
+        if (isNumeric()) {
             z3().anumMan().to_rational(content(), res);
         } else {
             z3().anumMan().get_lower(content(), res);
@@ -171,6 +186,30 @@ namespace carl { // TODO do all operations work if !is_rational ???
     template<typename Number>
     bool Z3Ran<Number>::less(const Z3Ran<Number>& n) const {
         return z3().anumMan().lt(content(),n.content());
+    }
+
+    template<typename Number>
+    bool Z3Ran<Number>::equal(const Number& n) const {
+        mpq zn = z3().toZ3MPQ(n);
+        bool res = z3().anumMan().eq(content(), zn);
+        z3().free(zn);
+        return res;
+    }
+
+    template<typename Number>
+    bool Z3Ran<Number>::less(const Number& n) const {
+        mpq zn = z3().toZ3MPQ(n);
+        bool res = z3().anumMan().lt(content(), zn);
+        z3().free(zn);
+        return res;
+    }
+
+    template<typename Number>
+    bool Z3Ran<Number>::greater(const Number& n) const {
+        mpq zn = z3().toZ3MPQ(n);
+        bool res = z3().anumMan().gt(content(), zn);
+        z3().free(zn);
+        return res;
     }
 
     template<typename Number>
