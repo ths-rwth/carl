@@ -282,44 +282,6 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Constr
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-const Monomial::Arg& MultivariatePolynomial<Coeff,Ordering,Policies>::lmon() const
-{
-	return lterm().monomial();
-}
-template<typename Coeff, typename Ordering, typename Policies>
-const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::lterm() const
-{
-	CARL_LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
-	return mTerms.back();
-}
-template<typename Coeff, typename Ordering, typename Policies>
-Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::lterm()
-{
-	CARL_LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
-	return mTerms.back();
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm() const
-{
-	CARL_LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
-	return mTerms.front();
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm()
-{
-	CARL_LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
-	return mTerms.front();
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-const Coeff& MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
-{
-	return lterm().coeff();
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 std::size_t MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 {
 	if (isZero()) return 0;
@@ -329,25 +291,6 @@ std::size_t MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 	} else {
 		CARL_LOG_NOTIMPLEMENTED();
 	}
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::isZero() const
-{
-	return mTerms.empty();
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::isOne() const
-{
-	return (mTerms.size() == 1) && mTerms.front().isOne();
-}
-
-
-template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::isConstant() const
-{
-	return (mTerms.empty()) || (mTerms.size() == 1 && mTerms.front().isConstant());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -361,16 +304,14 @@ const Coeff& MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() c
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
-{
-	if(mTerms.empty()) return true;
-	if(Ordering::degreeOrder)
-	{
-		return this->lterm().isLinear();
-	}
-	else
-	{
-		CARL_LOG_NOTIMPLEMENTED();
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const {
+	if (mTerms.empty()) return true;
+	if (Ordering::degreeOrder) {
+		return lterm().isLinear();
+	} else {
+		return std::all_of(mTerms.begin(), mTerms.end(),
+			[](const auto& t){ return t.isLinear(); }
+		);
 	}
 }
 
@@ -435,33 +376,6 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness( bool
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::hasConstantTerm() const
-{
-	if(nrTerms() == 0) return false;
-	else {
-		// A term may not be zero...
-		return trailingTerm().isConstant();
-	}
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::integerValued() const
-{
-    for(const auto& term : mTerms)
-	{
-		if(!term.integerValued()) return false;
-	}
-	return true;
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator[](unsigned index) const
-{
-	assert(index < nrTerms());
-	return mTerms.at(index);
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::tail(bool makeFullyOrdered) const
 {
 	assert(!mTerms.empty());
@@ -514,25 +428,6 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const {
 		if (!term.hasNoOtherVariable(v)) return false;
 	}
 	return true;
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::isTsos() const
-{
-	// A polynomial is a tsos if it is the sum of squares in its standard representation.
-	for(const auto& term : mTerms)
-	{
-		if(!term.isSquare()) return false;
-	}
-	return true;
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::has(Variable::Arg v) const
-{
-	for (auto& term : mTerms)
-		if (term.has(v)) return true;
-	return false;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

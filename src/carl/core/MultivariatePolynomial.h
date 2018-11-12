@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <numeric>
 #include <memory>
 #include <type_traits>
 #include <vector>
@@ -151,28 +153,39 @@ public:
      */
 	void makeOrdered() const {
 		if (isOrdered()) return;
-		std::sort(mTerms.begin(), mTerms.end(), (bool (&)(Term<Coeff> const&, Term<Coeff> const&))Ordering::less);
+		std::sort(begin(), end(),
+			[](const auto& lhs, const auto& rhs){ return Ordering::less(lhs, rhs); }
+		);
 		mOrdered = true;
         assert(this->isConsistent());
 	}
-	
-	/**
-	 * The leading monomial
-	 * @return 
-	 */
-	const Monomial::Arg& lmon() const;
 	/**
 	 * The leading term
-	 * @return 
+	 * @return leading term.
 	 */
-	const Term<Coeff>& lterm() const;
-	Term<Coeff>& lterm();
+	const Term<Coeff>& lterm() const {
+		CARL_LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
+		return mTerms.back();
+	}
+	Term<Coeff>& lterm(){
+		CARL_LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
+		return mTerms.back();
+	}
 	/**
 	 * Returns the coefficient of the leading term.
 	 * Notice that this is not defined for zero polynomials. 
 	 * @return Leading coefficient.
 	 */
-	const Coeff& lcoeff() const;
+	const Coeff& lcoeff() const {
+		return lterm().coeff();
+	}
+	/**
+	 * The leading monomial
+	 * @return monomial of leading term.
+	 */
+	const Monomial::Arg& lmon() const {
+		return lterm().monomial();
+	}
 	/**
 	 * Returns the leading coefficient with respect to the given variable.
 	 * @param var Variable.
@@ -181,6 +194,19 @@ public:
 	MultivariatePolynomial lcoeff(Variable::Arg var) const {
 		return coeff(var, degree(var));
 	}
+
+	/**
+	 * Give the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
+	 */
+	const Term<Coeff>& trailingTerm() const {
+		CARL_LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
+		return mTerms.front();
+	}
+	Term<Coeff>& trailingTerm() {
+		CARL_LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
+		return mTerms.front();
+	}
+	
 	/**
 	 * Calculates the max. degree over all monomials occurring in the polynomial.
 	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
@@ -228,27 +254,38 @@ public:
 	/**
 	 * Check if the polynomial is zero.
 	 */
-	bool isZero() const;
+	bool isZero() const {
+		return mTerms.empty();
+	}
 	/**
 	 * 
      * @return 
      */
-	bool isOne() const;
+	bool isOne() const {
+		return (nrTerms() == 1) && lterm().isOne();
+	}
 	/**
 	 * Check if the polynomial is constant.
 	 */
-	bool isConstant() const;
+	bool isConstant() const {
+		return isZero() || ((nrTerms() == 1) && lterm().isConstant());
+	}
+	/**
+	 * Check if the polynomial is a number, i.e., a constant.
+	 */
+	bool isNumber() const {
+		return isConstant();
+	}
+	/**
+	 * @return true, if this polynomial consists just of one variable (with coefficient 1). 
+	 */
+	bool isVariable() const {
+		return (nrTerms() == 1) && carl::isOne(lcoeff()) && lterm().isSingleVariable();
+	}
 	/**
 	 * Check if the polynomial is linear.
 	 */
 	bool isLinear() const;
-	/**
-	 * Check if the polynomial is a number, i.e., a constant.
-	 */
-	bool isNumber() const
-	{
-		return this->isConstant();
-	}
 	
 	/**
 	 * Retrieves information about the definiteness of the polynomial.
@@ -268,8 +305,7 @@ public:
 	/**
 	 * Calculate the number of terms.
 	 */
-	size_t nrTerms() const
-	{
+	std::size_t nrTerms() const {
 		return mTerms.size();
 	}
     
@@ -277,74 +313,58 @@ public:
      * @return A rough estimation of the size of this polynomial being the number of its terms.
      *         (Note, that this method is required, as it is provided of other polynomials not necessarily being straightforward.)
      */
-    size_t size() const
-    {
+    std::size_t size() const {
         return mTerms.size();
     }
     
     /**
      * @return An approximation of the complexity of this polynomial.
      */
-    size_t complexity() const
-    {
-        size_t result = 0;
-        for(const auto& term : mTerms)
-            result += term.complexity();
-        return result;
+    std::size_t complexity() const {
+		return std::accumulate(begin(), end(), 0,
+			[](std::size_t cur, const auto& t){ return cur + t.complexity(); }
+		);
     }
-    
-	/**
-	 * Give the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
-	 */
-	const Term<Coeff>& trailingTerm() const;
-	Term<Coeff>& trailingTerm();
 	/**
 	 * Check if the polynomial has a constant term that is not zero.
 	 */
-	bool hasConstantTerm() const;
+	bool hasConstantTerm() const {
+		return (nrTerms() > 0) && trailingTerm().isConstant();
+	}
     
     /**
      * @return true, if the image of this polynomial is integer-valued.
      */
-    bool integerValued() const;
+    bool integerValued() const {
+		return std::all_of(begin(), end(),
+			[](const auto& t){ return t.integerValued(); }
+		);
+	}
     
 	/**
 	 * Retrieve the constant term of this polynomial or zero, if there is no constant term.
 	 */
 	const Coeff& constantPart() const;
 	
-	typename TermsType::const_iterator begin() const
-	{
+	auto begin() const {
 		return mTerms.begin();
 	}
-	
-	typename TermsType::const_iterator end() const
-	{
+	auto end() const {
 		return mTerms.end();
 	}
-	
-	typename TermsType::const_reverse_iterator rbegin() const
-	{
+	auto rbegin() const {
 		return mTerms.rbegin();
 	}
-	
-	typename TermsType::const_reverse_iterator rend() const
-	{
+	auto rend() const {
 		return mTerms.rend();
 	}
 
-	typename TermsType::iterator eraseTerm(typename TermsType::iterator pos) {
+	auto eraseTerm(typename TermsType::iterator pos) {
 		///@todo find new lterm or constant term
 		assert(false);
 		return mTerms.erase(pos);
 	}
     
-    //TODO: This cannot be compiled with gcc 4.8.1
-//	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
-//		///@todo find new lterm or constant term
-//		assert(false);
-//		return mTerms.erase(pos);
-//	}
 	TermsType& getTerms() {
 		return mTerms;
 	}
@@ -363,37 +383,29 @@ public:
 	///@todo find new lterm
 	MultivariatePolynomial& stripLT();
     
-    /**
-     * @return true, if this polynomial consists just of one variable (with coefficient 1). 
-     */
-    bool isVariable() const
-    {
-        return !mTerms.empty() && totalDegree() == 1 && nrTerms() == 1 && lcoeff() == constant_one<CoeffType>::get();
-    }
+	bool hasSingleVariable() const {
+		return (nrTerms() > 0) && lterm().isSingleVariable();
+	}
     
     /**
      * For terms with exactly one variable, get this variable.
      * @return The only variable occuring in the term.
      */
-    Variable getSingleVariable() const
-    {
-        assert( !isConstant() );
+    Variable getSingleVariable() const {
         return lterm().getSingleVariable();
     }
     
     /**
      * @return Coefficient of the polynomial (this makes only sense for polynomials storing the gcd of all coefficients separately)
      */
-    const CoeffType& coefficient() const
-    {
+    const CoeffType& coefficient() const {
         return constant_one<CoeffType>::get();
     }
     
     /**
      * @return The coprimeCoefficients of this polyomial, if this is stored internally, otherwise this polynomial.
      */
-    const PolyType& polynomial() const
-    {
+    const PolyType& polynomial() const {
         return *this;
     }
 	
@@ -408,7 +420,11 @@ public:
 	 * Checks whether the polynomial is a trivial sum of squares.
 	 * @return true if polynomial is of the form \\sum a_im_i^2 with a_i > 0 for all i.
 	 */
-	bool isTsos() const;
+	bool isTsos() const {
+		return std::all_of(begin(), end(),
+			[](const auto& t){ return t.isSquare(); }
+		);
+	}
 	
 	/**
 	 * Iterates through all terms to find variables occuring in this polynomial.
@@ -421,7 +437,11 @@ public:
 	 * @param v The variable to check for its occurrence.
 	 * @return true, if the variable occurs in this term.
 	 */
-	bool has(Variable::Arg v) const;
+	bool has(Variable v) const {
+		return std::any_of(begin(), end(),
+			[v](const auto& t){ return t.has(v); }
+		);
+	}
 	
 	bool isReducibleIdentity() const;
 
@@ -600,7 +620,10 @@ public:
 	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
 	UnivariatePolynomial<MultivariatePolynomial> toUnivariatePolynomial(Variable::Arg mainVar) const;
 	
-	const Term<Coeff>& operator[](unsigned index) const;
+	const Term<Coeff>& operator[](std::size_t index) const {
+		assert(index < mTerms.size());
+		return mTerms[index];
+	}
 
 	MultivariatePolynomial mod(const typename IntegralType<Coeff>::type& modulo) const;
 	

@@ -182,16 +182,6 @@ public:
 		return rank();
 	}
 
-	/**
-	 * Streaming operator for Variable.
-	 * @param os Output stream.
-	 * @param rhs Variable.
-	 * @return `os`
-	 */
-	friend std::ostream& operator<<(std::ostream& os, Variable rhs) {
-		return os << rhs.name();
-	}
-
 	/// @name Comparison operators
 	/// @{
 	/**
@@ -242,6 +232,16 @@ public:
 };
 static_assert(std::is_trivially_copyable<Variable>::value, "Variable should be trivially copyable.");
 static_assert(std::is_literal_type<Variable>::value, "Variable should be a literal type.");
+
+/**
+ * Streaming operator for Variable.
+ * @param os Output stream.
+ * @param rhs Variable.
+ * @return `os`
+ */
+inline std::ostream& operator<<(std::ostream& os, Variable rhs) {
+	return os << rhs.name();
+}
 
 } // namespace carl
 
