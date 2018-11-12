@@ -299,11 +299,10 @@ TEST(FactorizedPolynomial, GCD)
     FPol fg1( g1, pCache );
     FPol fg2( g2, pCache );
 
-    Pol pGCD = gcd( pA, pB );
+    Pol pGCD = Pol(2)*gcd( pA, pB );
     Pol pRestA = pA.quotient( pGCD );
     Pol pRestB = pB.quotient( pGCD );
     FPol fpGCD = gcd( fpA, fpB, fpRestA, fpRestB );
-
     EXPECT_EQ( pGCD, computePolynomial( fpGCD ) );
     EXPECT_EQ( pRestA, computePolynomial( fpRestA ) );
     EXPECT_EQ( pRestB, computePolynomial( fpRestB ) );
