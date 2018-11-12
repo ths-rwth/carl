@@ -1,6 +1,6 @@
 #include "../Common.h"
 
-#include <carl/core/MultivariateGCD.h>
+#include <carl/core/polynomialfunctions/GCD.h>
 #include <carl/numbers/numbers.h>
 #include <gtest/gtest.h>
 
