@@ -51,13 +51,17 @@ MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const 
 		CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(a.constantPart(), b.constantPart()));
 		return MultivariatePolynomial<C,O,P>(carl::gcd(a.constantPart(), b.constantPart()));
 	}
+	if (a.isConstant() || b.isConstant()) {
+		//CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(a.constantPart(), b.constantPart()));
+		return MultivariatePolynomial<C,O,P>(1);
+	}
 	if (is_field<C>::value && a.isConstant()) {
-		CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(a.constantPart(), b.coprimeFactor()));
-		return MultivariatePolynomial<C,O,P>(carl::gcd(a.constantPart(), b.coprimeFactor()));
+		CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(a.constantPart(), C(1)/b.coprimeFactor()));
+		return MultivariatePolynomial<C,O,P>(carl::gcd(a.constantPart(), C(1)/b.coprimeFactor()));
 	}
 	if (is_field<C>::value && b.isConstant()) {
-		CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(b.constantPart(), a.coprimeFactor()));
-		return MultivariatePolynomial<C,O,P>(carl::gcd(b.constantPart(), a.coprimeFactor()));
+		CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(b.constantPart(),C(1)/a.coprimeFactor()));
+		return MultivariatePolynomial<C,O,P>(carl::gcd(b.constantPart(), C(1)/a.coprimeFactor()));
 	}
 
 	auto s = overloaded {
@@ -73,9 +77,9 @@ MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const 
 		[](const MultivariatePolynomial<mpz_class,O,P>& n1, const MultivariatePolynomial<mpz_class,O,P>& n2){ return gcd_detail::gcd_calculate(n1,n2); }
 	#endif
 	};
-	CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a.coprimeCoefficients() << ", " << b.coprimeCoefficients() << ")");
+	CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ")");
 	auto res = s(a, b);
-	CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a.coprimeCoefficients() << ", " << b.coprimeCoefficients() << ") = " << res);
+	CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << res);
 	return res;
 }
 }

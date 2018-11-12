@@ -1022,7 +1022,10 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 			num = carl::gcd(num, carl::abs(carl::getNum(it->coeff())));
 			den = carl::lcm(den, carl::abs(carl::getDenom(it->coeff())));
 		}
-		return den / num;
+		if (lcoeff() < 0) {
+			den = -den;
+		}
+		return Coeff(den) / num;
 	} else {
 		return Coeff(1);
 	}
