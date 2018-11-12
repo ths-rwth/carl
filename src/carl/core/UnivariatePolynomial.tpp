@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <boost/optional.hpp>
 
 namespace carl
 {
@@ -615,7 +616,8 @@ typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::coprimeF
 	for (++it; it != mCoefficients.end(); ++it) {
 		factor = carl::lcm(factor, it->coprimeFactor());
 	}
-	return factor;
+	assert(factor != boost::none);
+	return *factor;
 }
 
 template<typename Coeff>
@@ -644,6 +646,38 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprimeCoefficients() c
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
 	auto factor = this->coprimeFactor();
+	for (const Coeff& c: mCoefficients) {
+		result.mCoefficients.push_back(factor * c);
+	}
+	return result;
+}
+
+template<typename Coeff>
+template<typename C, EnableIf<is_subset_of_rationals<C>>>
+UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficientsSignPreserving() const
+{
+	CARL_LOG_TRACE("carl.core", *this << " .coprimeCoefficientsSignPreserving()");
+	// Notice that even if factor is 1, we create a new polynomial
+	UnivariatePolynomial<typename IntegralType<Coeff>::type> result(mMainVar);
+	if (this->isZero()) {
+		return result;
+	}
+	result.mCoefficients.reserve(mCoefficients.size());
+	Coeff factor = carl::abs(this->coprimeFactor());
+	for (const Coeff& coeff: mCoefficients) {
+		assert(getDenom(coeff * factor) == 1);
+		result.mCoefficients.push_back(getNum(coeff * factor));
+	}
+	return result;
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_subset_of_rationals<C>>>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprimeCoefficientsSignPreserving() const {
+	if (this->isZero()) return *this;
+	UnivariatePolynomial<Coeff> result(mMainVar);
+	result.mCoefficients.reserve(mCoefficients.size());
+	auto factor = carl::abs(this->coprimeFactor());
 	for (const Coeff& c: mCoefficients) {
 		result.mCoefficients.push_back(factor * c);
 	}

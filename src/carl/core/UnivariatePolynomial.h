@@ -456,6 +456,13 @@ public:
 
 	template<typename C = Coefficient, DisableIf<is_subset_of_rationals<C>> = dummy>
 	UnivariatePolynomial<Coefficient> coprimeCoefficients() const;
+	
+
+	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprimeCoefficientsSignPreserving() const;
+
+	template<typename C = Coefficient, DisableIf<is_subset_of_rationals<C>> = dummy>
+	UnivariatePolynomial<Coefficient> coprimeCoefficientsSignPreserving() const;
 
 	/**
 	 * Checks whether the polynomial is unit normal.

@@ -1074,6 +1074,23 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeCoefficientsSignPreserving() const
+{
+	if(nrTerms() == 0) return *this;
+	Coeff factor = carl::abs(coprimeFactor());
+	// Notice that even if factor is 1, we create a new polynomial
+	MultivariatePolynomial<Coeff, Ordering, Policies> result;
+	result.mTerms.reserve(mTerms.size());
+	for (const auto& term: mTerms)
+	{
+		result.mTerms.push_back(term * factor);
+	}
+    result.mOrdered = mOrdered;
+    assert(result.isConsistent());
+	return result;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::normalize() const
 {
 	MultivariatePolynomial result(*this);
