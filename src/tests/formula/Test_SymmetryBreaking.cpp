@@ -10,7 +10,7 @@ typedef carl::MultivariatePolynomial<Rational> Pol;
 typedef carl::Constraint<Pol> Constr;
 typedef carl::Formula<Pol> FormulaT;
 
-void report_aut(void* param, const unsigned int n, const unsigned int* aut)
+void report_aut(void*, const unsigned int n, const unsigned int* aut)
 {
   std::cout << "Generator: ";
   for (unsigned int i = 0; i < n; ++i) {
