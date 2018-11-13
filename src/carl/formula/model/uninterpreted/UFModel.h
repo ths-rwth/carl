@@ -16,66 +16,78 @@
 #include <map>
 #include <utility>
 
-namespace carl
-{
+namespace carl {
 
 /**
  * Implements a sort value, being a value of the uninterpreted domain specified by this sort.
  */
-class UFModel : private std::map<std::vector<SortValue>,SortValue>
-{
-	private:
-		UninterpretedFunction uf;
-    public:
-        
-        explicit UFModel(const UninterpretedFunction& uf): uf(uf)
-        {}
+class UFModel {
+private:
+	UninterpretedFunction mFunction;
+	std::map<std::vector<SortValue>, SortValue> mValues;
 
-        bool extend( const std::vector<SortValue>& _args, const SortValue& _value );
+public:
+	explicit UFModel(const UninterpretedFunction& uf)
+		: mFunction(uf) {}
 
-        SortValue get( const std::vector<SortValue>& _args ) const;
-        
-        std::size_t getHash() const;
+	bool extend(const std::vector<SortValue>& _args, const SortValue& _value);
 
-        /**
-         * Prints the given uninterpreted function model on the given output stream.
-         * @param _os The output stream to print on.
-         * @param _ufm The uninterpreted function model to print.
-         * @return The output stream after printing the given uninterpreted function model on it.
-         */
-        friend std::ostream& operator<<( std::ostream& _os, const UFModel& _ufm );
+	SortValue get(const std::vector<SortValue>& _args) const;
 
-        /**
-         * @param _ufm The uninterpreted function model to compare with.
-         * @return true, if this uninterpreted function model equals the given one.
-         */
-        bool operator==( const UFModel& _ufm ) const;
+	const auto& function() const {
+		return mFunction;
+	}
+	const auto& values() const {
+		return mValues;
+	}
 
-        /**
-         * @param _ufm The uninterpreted function model to compare with.
-         * @return true, if this uninterpreted function model is less than the given one.
-         */
-        bool operator<( const UFModel& _ufm ) const;
 };
 
+/**
+ * @param _ufm The uninterpreted function model to compare with.
+ * @return true, if this uninterpreted function model equals the given one.
+ */
+inline bool operator==(const UFModel& lhs, const UFModel& rhs) {
+	return std::forward_as_tuple(lhs.function(), lhs.values())
+		== std::forward_as_tuple(rhs.function(), rhs.values());
+}
+/**
+ * @param _ufm The uninterpreted function model to compare with.
+ * @return true, if this uninterpreted function model is less than the given one.
+ */
+inline bool operator<(const UFModel& lhs, const UFModel& rhs) {
+	return std::forward_as_tuple(lhs.function(), lhs.values())
+		<  std::forward_as_tuple(rhs.function(), rhs.values());
 }
 
-namespace std
-{
-    /**
-     * Implements std::hash for uninterpreted function model.
-     */
-    template<>
-    struct hash<carl::UFModel>
-    {
-    public:
-        /**
-         * @param _ufm The uninterpreted function model to get the hash for.
-         * @return The hash of the given uninterpreted function model.
-         */
-        std::size_t operator()( const carl::UFModel& _ufm ) const 
-        {
-            return _ufm.getHash();
-        }
-    };
-}
+/**
+ * Prints the given uninterpreted function model on the given output stream.
+ * @param _os The output stream to print on.
+ * @param _ufm The uninterpreted function model to print.
+ * @return The output stream after printing the given uninterpreted function model on it.
+ */
+std::ostream& operator<<(std::ostream& os, const UFModel& ufm);
+
+} // namespace carl
+
+namespace std {
+/**
+ * Implements std::hash for uninterpreted function model.
+ */
+template<>
+struct hash<carl::UFModel> {
+	/**
+	 * @param _ufm The uninterpreted function model to get the hash for.
+	 * @return The hash of the given uninterpreted function model.
+	 */
+	std::size_t operator()(const carl::UFModel& ufm) const {
+		std::size_t seed = 0;
+		carl::hash_add(seed, ufm.function());
+		for (const auto& v: ufm.values()) {
+			carl::hash_add(seed, v.first);
+			carl::hash_add(seed, v.second);
+		}
+		return seed;
+	}
+};
+} // namespace std
