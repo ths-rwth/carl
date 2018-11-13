@@ -822,11 +822,25 @@ namespace std {
 		 * @param mpoly MultivariatePolynomial.
 		 * @return Hash of mpoly.
 		 */
+
 		std::size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const {
 			assert(mpoly.isConsistent());
+#ifdef true
+			if (mpoly.nrTerms() == 0) return 0;
+			if (mpoly.nrTerms() == 1) return carl::hash_all(mpoly[0]);
+			std::size_t seed = 0;
+			carl::hash_add(seed, mpoly[0]);
+			for (std::size_t i = 1; i < mpoly.nrTerms() - 1; ++i) {
+				seed = seed | carl::hash_all(mpoly[i]);
+			}
+			carl::hash_add(seed, mpoly[mpoly.nrTerms()-1]);
+			return seed;
+#else
+			mpoly.makeOrdered();
 			return std::accumulate(mpoly.begin(), mpoly.end(), static_cast<std::size_t>(0),
 				[](std::size_t seed, const auto& t){ carl::hash_add(seed, t); return seed; }
 			);
+#endif
 		}
 	};
 } // namespace std
