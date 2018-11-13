@@ -75,6 +75,7 @@ public:
 	
 	TAMId getId(std::size_t expectedSize = 0) {
 		TAM_LOCK_GUARD
+		assert(mNextId != mData.end());
 		while (std::get<2>(*mNextId)) {
 			mNextId++;
 			if (mNextId == mData.end()) {
