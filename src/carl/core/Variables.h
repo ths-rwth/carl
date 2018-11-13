@@ -14,8 +14,8 @@ class carlVariables {
 public:
 	friend bool operator==(const carlVariables& lhs, const carlVariables& rhs);
 	friend std::ostream& operator<<(std::ostream& os, const carlVariables& vars);
-private:
 	using VarTypes = std::variant<Variable,BVVariable,UVariable>;
+private:
 	std::vector<VarTypes> mVariables;
 public:
 	carlVariables() = default;
@@ -92,6 +92,12 @@ public:
 		return res;
 	}
 };
+
+inline void swap(carlVariables::VarTypes& lhs, carlVariables::VarTypes& rhs) {
+	auto tmp = lhs;
+	lhs = rhs;
+	rhs = tmp;
+}
 
 inline bool operator==(const carlVariables& lhs, const carlVariables& rhs) {
 	return lhs.mVariables == rhs.mVariables;
