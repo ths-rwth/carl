@@ -98,7 +98,7 @@ namespace model {
 	}
 	
 	template<typename Rational, typename Poly>
-	auto tryRealRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
+	boost::optional<std::vector<RealAlgebraicNumber<Rational>>> tryRealRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
 		CARL_LOG_DEBUG("carl.formula.model", p << " over " << m << " = " << tmp);
 		auto map = collectRANIR(tmp.gatherVariables(), m);
