@@ -13,12 +13,12 @@ std::vector<double> root_approximation(const std::vector<double>& coeffs) {
 	
 	using Index = Eigen::MatrixXd::Index;
 	// Create companion matrix
-	std::size_t degree = coeffs.size();
-	Eigen::MatrixXd m = Eigen::MatrixXd::Zero(Index(degree), Index(degree));
-	m(0, Index(degree)-1) = -coeffs[0] / coeffs[degree];
-	for (size_t i = 1; i < degree; ++i) {
+	std::size_t degree = coeffs.size() - 1;
+	Eigen::MatrixXd m = Eigen::MatrixXd::Zero(Index(degree + 1), Index(degree + 1));
+	m(0, Index(degree)) = -coeffs[0] / coeffs[degree];
+	for (std::size_t i = 1; i <= degree; ++i) {
 		m(Index(i), Index(i)-1) = 1;
-		m(Index(i), Index(degree)-1) = -coeffs[i] / coeffs[degree];
+		m(Index(i), Index(degree)) = -coeffs[i] / coeffs[degree];
 	}
 	
 	// Obtain eigenvalues
