@@ -69,3 +69,5 @@ static void UVariable_by_value(benchmark::State& state) {
 		pass_by_value(v);
 }
 BENCHMARK(UVariable_by_value);
+
+BENCHMARK_MAIN();
