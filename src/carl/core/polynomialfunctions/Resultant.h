@@ -1,7 +1,7 @@
 #pragma once
 
-// UnivariatePolynomial::content() may need gcd().
-#include "GCD.h"
+#include "Content.h"
+#include "PrimitivePart.h"
 
 #include <list>
 #include <vector>
@@ -344,10 +344,10 @@ namespace resultant_debug {
 		UnivariatePolynomial<Coeff> nB(p.normalized());
 
 		//std::cout << "Content" << std::endl;
-		Coeff cA = nA.content();
-		Coeff cB = nB.content();
-		Coeff A(nA.primitivePart());
-		Coeff B(nB.primitivePart());
+		Coeff cA = content(nA);
+		Coeff cB = content(nB);
+		Coeff A(primitive_part(nA));
+		Coeff B(primitive_part(nB));
 		//std::cout << "Done" << std::endl;
 		cA = carl::pow(cA, p.degree());
 		cB = carl::pow(cB, q.degree());
