@@ -444,7 +444,7 @@ namespace carl
 		 * @param variables Variables.
 		 */
 		void gatherVariables(carlVariables& variables) const {
-			variables.add(mExponents, [](const auto& e){ return e.first; });
+			variables.add(mExponents.begin(), mExponents.end(), [](const auto& e){ return e.first; });
 		}
 		
 		/**

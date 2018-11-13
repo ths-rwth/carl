@@ -148,11 +148,11 @@ namespace carl
 			case FormulaType::FORALL:
 				quantifiedFormula().gatherVariables(vars);
 				break;
-			default:
-			{
+			default: {
 				for (const Formula<Pol>& subFormula : subformulas()) {
 					subFormula.gatherVariables(vars);
 				}
+				vars.compact();
 			}
 		}
 	}

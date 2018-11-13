@@ -45,11 +45,8 @@ public:
 	}
 
 	void compact() {
-		CARL_LOG_DEBUG("carl.core", "Before: " << *this);
 		std::sort(begin(), end());
-		CARL_LOG_DEBUG("carl.core", "Sorted: " << *this);
 		mVariables.erase(std::unique(begin(), end()), mVariables.end());
-		CARL_LOG_DEBUG("carl.core", "After:  " << *this);
 	}
 
 	void add(VarTypes v) {

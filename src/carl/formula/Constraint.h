@@ -390,7 +390,7 @@ namespace carl
             }
 
 			void gatherVariables(carlVariables& vars) const {
-				vars.add(mpContent->mVariables);
+				vars.add(mpContent->mVariables.begin(), mpContent->mVariables.end());
 			}
 
             /**
