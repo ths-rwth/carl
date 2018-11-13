@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Content.h"
+#include "GCD.h"
 #include "PrimitivePart.h"
 
 #include <list>
