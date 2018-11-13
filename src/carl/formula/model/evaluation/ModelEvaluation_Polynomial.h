@@ -85,20 +85,20 @@ namespace model {
 	}
 	
 	template<typename Rational, typename Poly>
-	std::vector<RealAlgebraicNumber<Rational>> realRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
+	auto realRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
 		auto map = collectRANIR(tmp.gatherVariables(), m);
 		return carl::rootfinder::realRoots(tmp.toUnivariatePolynomial(v), map);
 	}
 	template<typename Rational, typename Poly>
-	boost::optional<std::vector<RealAlgebraicNumber<Rational>>> realRoots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
+	auto realRoots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
 		UnivariatePolynomial<Poly> tmp = substitute(p, m);
 		auto map = collectRANIR(tmp.gatherVariables(), m);
 		return carl::rootfinder::realRoots(tmp, map);
 	}
 	
 	template<typename Rational, typename Poly>
-	boost::optional<std::vector<RealAlgebraicNumber<Rational>>> tryRealRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
+	auto tryRealRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
 		CARL_LOG_DEBUG("carl.formula.model", p << " over " << m << " = " << tmp);
 		auto map = collectRANIR(tmp.gatherVariables(), m);
