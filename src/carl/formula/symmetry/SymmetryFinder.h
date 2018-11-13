@@ -78,7 +78,7 @@ class GraphBuilder {
 	std::map<carl::Variable,unsigned> mVariableIDs;
 	std::vector<carl::Variable> mVariables;
 	
-	void collectVariables(const Formula<Poly>& f) {
+	void gatherVariables(const Formula<Poly>& f) {
 		assert(mColor.next() == 0);
 		carlVariables vars;
 		f.gatherVariables(vars);
@@ -166,7 +166,7 @@ class GraphBuilder {
 	}
 public:
 	GraphBuilder(const Formula<Poly>& f) {
-		collectVariables(f);
+		gatherVariables(f);
 		addFormula(f);
 	}
 	Symmetries symmetries() {

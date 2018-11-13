@@ -186,17 +186,21 @@ public:
 	QEPCADStream(): mStream() {
 	}
 
-	void initialize(const Variables& vars) {
-		for (auto v: vars) {
-			declare(v);
+	void initialize(const carlVariables& vars) {
+		for (const auto& v: vars) {
+			std::visit(overloaded {
+				[this](Variable v){ declare(v); },
+				[this](BVVariable v){ declare(v.variable()); },
+				[this](UVariable v){ declare(v.variable()); },
+			}, v);
 		}
 	}
 	
 	template<typename Pol>
 	void initialize(std::initializer_list<Formula<Pol>> formulas) {
-		Variables vars;
+		carlVariables vars;
 		for (const auto& f: formulas) {
-			f.collectVariables(vars, true, true, true, true, true);
+			f.gatherVariables(vars);
 		}
 		initialize(vars);
 	}

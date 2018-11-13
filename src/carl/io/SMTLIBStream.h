@@ -227,19 +227,25 @@ public:
 	void declare(Variable v) {
 		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
 	}
-	void declare(const Variables& vars) {
-		for (auto v: vars) declare(v);
+	void declare(const carlVariables& vars) {
+		for (const auto& v: vars) {
+			std::visit(overloaded {
+				[this](Variable v){ declare(v); },
+				[this](BVVariable v){ declare(v.variable()); },
+				[this](UVariable v){ declare(v.variable()); },
+			}, v);
+		}
 	}
-	void initialize(Logic l, const Variables& vars) {
+	void initialize(Logic l, const carlVariables& vars) {
 		declare(l);
 		declare(vars);
 	}
 	
 	template<typename Pol>
 	void initialize(Logic l, std::initializer_list<Formula<Pol>> formulas) {
-		Variables vars;
+		carlVariables vars;
 		for (const auto& f: formulas) {
-			f.collectVariables(vars, true, true, true, true, true);
+			f.gatherVariables(vars);
 		}
 		initialize(l, vars);
 	}

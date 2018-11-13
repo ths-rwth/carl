@@ -44,6 +44,10 @@ public:
 		return mVariables.end();
 	}
 
+	bool empty() const {
+		return mVariables.empty();
+	}
+
 	void compact() {
 		std::sort(begin(), end());
 		mVariables.erase(std::unique(begin(), end()), mVariables.end());
