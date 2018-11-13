@@ -22,7 +22,7 @@ UnivariatePolynomial<Coeff> primitive_euclidean(const UnivariatePolynomial<Coeff
 		c = d;
 		d = carl::primitive_part(r.normalized());
 	}
-	return gcd(carl::content(a), carl::content(b)) * c;
+	return carl::gcd(carl::content(a), carl::content(b)) * c;
 }
 
 }
