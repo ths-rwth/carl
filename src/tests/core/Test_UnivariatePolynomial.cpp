@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
-#include "carl/core/polynomialfunctions/Resultant.h"
+#include "carl/core/polynomialfunctions/Content.h"
 #include "carl/core/polynomialfunctions/GCD.h"
+#include "carl/core/polynomialfunctions/PrimitivePart.h"
+#include "carl/core/polynomialfunctions/Resultant.h"
 #include "carl/core/polynomialfunctions/Factorization_univariate.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
@@ -309,20 +311,20 @@ TYPED_TEST(UnivariatePolynomialIntTest, unitPart)
 TYPED_TEST(UnivariatePolynomialIntTest, content)
 {
     Variable x = freshRealVariable("x");
-	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {1,2,3}).normalized().content());
-	EXPECT_EQ(3,UnivariatePolynomial<TypeParam>(x, {15,27,3}).normalized().content());
-	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).normalized().content());
-	EXPECT_EQ(3,UnivariatePolynomial<TypeParam>(x, {-15,-27,-3}).normalized().content());
+	EXPECT_EQ(1,carl::content(UnivariatePolynomial<TypeParam>(x, {1,2,3}).normalized()));
+	EXPECT_EQ(3,carl::content(UnivariatePolynomial<TypeParam>(x, {15,27,3}).normalized()));
+	EXPECT_EQ(1,carl::content(UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).normalized()));
+	EXPECT_EQ(3,carl::content(UnivariatePolynomial<TypeParam>(x, {-15,-27,-3}).normalized()));
 }
 
 
 TYPED_TEST(UnivariatePolynomialIntTest, primitivePart)
 {
 	Variable x = freshRealVariable("x");
-	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {1,2,3}),UnivariatePolynomial<TypeParam>(x, {1,2,3}).normalized().primitivePart());
-	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {5,9,1}),UnivariatePolynomial<TypeParam>(x, {15,27,3}).normalized().primitivePart());
-	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {1,2,3}),UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).normalized().primitivePart());
-	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {5,9,1}),UnivariatePolynomial<TypeParam>(x, {-15,-27,-3}).normalized().primitivePart().normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {1,2,3}),carl::primitive_part(UnivariatePolynomial<TypeParam>(x, {1,2,3}).normalized()));
+	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {5,9,1}),carl::primitive_part(UnivariatePolynomial<TypeParam>(x, {15,27,3}).normalized()));
+	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {1,2,3}),carl::primitive_part(UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).normalized()));
+	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {5,9,1}),carl::primitive_part(UnivariatePolynomial<TypeParam>(x, {-15,-27,-3}).normalized()));
 }
 
 TYPED_TEST(UnivariatePolynomialIntTest, switchVariable)

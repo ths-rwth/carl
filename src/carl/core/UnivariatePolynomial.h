@@ -505,22 +505,6 @@ public:
 #endif
 	
 	/**
-	 * The content of a polynomial is the gcd of the coefficients of the normal part of a polynomial.
-	 * The content of zero is zero.
-	 * @see @cite GCL92, page 52
-	 * @return The content of the polynomial.
-	 */
-	Coefficient content() const;
-	
-	/**
-	 * The primitive part of p is the normal part of p divided by the content of p.
-	 * The primitive part of zero is zero.
-	 * @see @cite GCL92, page 53
-	 * @return The primitive part of the polynomial.
-	 */
-	UnivariatePolynomial primitivePart() const;
-	
-	/**
 	 * The n'th derivative of the polynomial in its main variable.
 	 * @param nth how many times the derivative should be applied.
 	 * @return A polynomial \f$(d/dx)^n p(x)\f$ where \f$p(x)\f$ is the input polynomial.

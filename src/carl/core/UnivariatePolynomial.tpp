@@ -437,49 +437,6 @@ bool UnivariatePolynomial<Coeff>::isNormal() const
 	return unitPart() == Coeff(1);
 }
 
-template<typename Coeff>
-Coeff UnivariatePolynomial<Coeff>::content() const
-{
-	if(isZero())
-	{
-		// By definition.
-		return Coeff(0);
-	}
-	assert(isNormal());
-	// As we consider normal polynomials, for fields, we know that the content must be 1.
-	if(is_field<Coeff>::value)
-	{
-		return Coeff(1);
-	}
-	typename std::vector<Coeff>::const_reverse_iterator it = mCoefficients.rbegin();
-	Coeff gcd = *it;
-	for(++it; it != mCoefficients.rend(); ++it)
-	{
-		if(gcd == Coeff(1)) break;
-		if(*it == Coeff(0)) continue;
-		gcd = carl::gcd(gcd, *it);
-	}
-	return gcd;
-}
-
-template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::primitivePart() const
-{
-	if(this->isZero()) {
-		return *this;
-	}
-	
-	if (this->isNormal())
-	{
-		return *this / this->content();
-	}
-	else
-	{
-		auto tmp = *this * Coeff(-1);
-		return tmp / tmp.content();
-	}
-}
-
 template<typename Coefficient>
 UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::mod(const Coefficient& modulus)
 {
