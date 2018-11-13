@@ -34,42 +34,26 @@ enum class VariableType { VT_BOOL = 0,
 						  TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
 
 /**
- * To string conversion for variable type
- * @param t  VariableType
- * @return  String Representation
- */
-inline std::string to_string(const VariableType& t) {
-	switch (t) {
-	case VariableType::VT_BOOL:
-		return "Bool";
-	case VariableType::VT_REAL:
-		return "Real";
-	case VariableType::VT_INT:
-		return "Int";
-	case VariableType::VT_UNINTERPRETED:
-		return "Uninterpreted";
-	case VariableType::VT_BITVECTOR:
-		return "Bitvector";
-	default:
-		return "Invalid " + std::to_string(static_cast<std::underlying_type_t<VariableType>>(t));
-	}
-}
-
-/**
- *
- * @param in A string describing the variable type (e.g. produced by to_string)
- * @return the corresponding variable type
- */
-VariableType variableTypeFromString(const std::string& in);
-
-/**
  * Streaming operator for VariableType.
  * @param os Output Stream.
  * @param t VariableType.
  * @return os.
  */
 inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
-	return os << to_string(t);
+	switch (t) {
+	case VariableType::VT_BOOL:
+		return os << "Bool";
+	case VariableType::VT_REAL:
+		return os << "Real";
+	case VariableType::VT_INT:
+		return os << "Int";
+	case VariableType::VT_UNINTERPRETED:
+		return os << "Uninterpreted";
+	case VariableType::VT_BITVECTOR:
+		return os << "Bitvector";
+	default:
+		return os << "Invalid " + std::to_string(static_cast<std::underlying_type_t<VariableType>>(t));
+	}
 }
 
 class VariablePool;
