@@ -125,11 +125,7 @@ public:
 		return mValue[_index];
 	}
 
-	BVValue operator+(const BVValue& _other) const;
-
 	BVValue concat(const BVValue& _other) const;
-
-	BVValue operator*(const BVValue& _other) const;
 
 	BVValue divideSigned(const BVValue& _other) const;
 
@@ -159,6 +155,9 @@ inline bool operator<(const BVValue& lhs, const BVValue& rhs) {
 inline BVValue operator~(const BVValue& val) {
 	return BVValue(~val.base());
 }
+
+BVValue operator+(const BVValue& lhs, const BVValue& rhs);
+BVValue operator*(const BVValue& lhs, const BVValue& rhs);
 
 inline BVValue operator-(const BVValue& val) {
 	return ~val + BVValue(val.width(), 1);

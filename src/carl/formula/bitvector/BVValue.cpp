@@ -43,20 +43,6 @@ BVValue::BVValue(std::size_t _width, const mpz_class& _value) {
 	}
 }
 
-BVValue BVValue::operator+(const BVValue& _other) const {
-	assert(_other.width() == width());
-
-	bool carry = false;
-	Base sum(width());
-
-	for (std::size_t i = 0; i < width(); ++i) {
-		sum[i] = ((*this)[i] != _other[i]) != carry;
-		carry = ((*this)[i] && _other[i]) || (carry && ((*this)[i] || _other[i]));
-	}
-
-	return BVValue(std::move(sum));
-}
-
 BVValue BVValue::concat(const BVValue& _other) const {
 	Base concatenation(mValue);
 	concatenation.resize(width() + _other.width());
@@ -65,20 +51,6 @@ BVValue BVValue::concat(const BVValue& _other) const {
 	otherResized.resize(concatenation.size());
 	concatenation |= otherResized;
 	return BVValue(std::move(concatenation));
-}
-
-BVValue BVValue::operator*(const BVValue& _other) const {
-	BVValue product(width());
-	Base summand(mValue);
-
-	for (std::size_t i = 0; i < width(); ++i) {
-		if (_other[i]) {
-			product = product + BVValue(Base(summand));
-		}
-		summand <<= 1;
-	}
-
-	return product;
 }
 
 BVValue BVValue::divideSigned(const BVValue& _other) const {
@@ -184,38 +156,64 @@ BVValue BVValue::shift(const BVValue& _other, bool _left, bool _arithmetic) cons
 }
 
 BVValue BVValue::divideUnsigned(const BVValue& _other, bool _returnRemainder) const {
-		assert(width() == _other.width());
-		assert(Base(_other) != Base(_other.width(), 0));
+	assert(width() == _other.width());
+	assert(Base(_other) != Base(_other.width(), 0));
 
-		Base quotient(width());
-		std::size_t quotientIndex = 0;
-		Base divisor = static_cast<Base>(_other);
-		Base remainder(mValue);
+	Base quotient(width());
+	std::size_t quotientIndex = 0;
+	Base divisor = static_cast<Base>(_other);
+	Base remainder(mValue);
 
-		while (!divisor[divisor.size() - 1] && remainder > divisor) {
-			++quotientIndex;
-			divisor <<= 1;
-		}
-
-		while (true) {
-			if (remainder >= divisor) {
-				quotient[quotientIndex] = true;
-				// substract divisor from remainder
-				bool carry = false;
-				for (std::size_t i = divisor.find_first(); i < remainder.size(); ++i) {
-					bool newRemainderI = (remainder[i] != divisor[i]) != carry;
-					carry = (remainder[i] && carry && divisor[i]) || (!remainder[i] && (carry || divisor[i]));
-					remainder[i] = newRemainderI;
-				}
-			}
-			if (quotientIndex == 0) {
-				break;
-			}
-			divisor >>= 1;
-			--quotientIndex;
-		}
-
-		return BVValue(_returnRemainder ? std::move(remainder) : std::move(quotient));
+	while (!divisor[divisor.size() - 1] && remainder > divisor) {
+		++quotientIndex;
+		divisor <<= 1;
 	}
+
+	while (true) {
+		if (remainder >= divisor) {
+			quotient[quotientIndex] = true;
+			// substract divisor from remainder
+			bool carry = false;
+			for (std::size_t i = divisor.find_first(); i < remainder.size(); ++i) {
+				bool newRemainderI = (remainder[i] != divisor[i]) != carry;
+				carry = (remainder[i] && carry && divisor[i]) || (!remainder[i] && (carry || divisor[i]));
+				remainder[i] = newRemainderI;
+			}
+		}
+		if (quotientIndex == 0) {
+			break;
+		}
+		divisor >>= 1;
+		--quotientIndex;
+	}
+
+	return BVValue(_returnRemainder ? std::move(remainder) : std::move(quotient));
+}
+
+BVValue operator+(const BVValue& lhs, const BVValue& rhs) {
+	assert(lhs.width() == rhs.width());
+	bool carry = false;
+	BVValue::Base sum(lhs.width());
+	for (std::size_t i = 0; i < lhs.width(); ++i) {
+		sum[i] = (lhs[i] != rhs[i]) != carry;
+		carry = (lhs[i] && rhs[i]) || (carry && (lhs[i] || rhs[i]));
+	}
+	return BVValue(std::move(sum));
+}
+
+BVValue operator*(const BVValue& lhs, const BVValue& rhs) {
+	assert(lhs.width() == rhs.width());
+	BVValue product(lhs.width());
+	BVValue::Base summand(lhs.base());
+
+	for (std::size_t i = 0; i < lhs.width(); ++i) {
+		if (rhs[i]) {
+			product = product + BVValue(BVValue::Base(summand));
+		}
+		summand <<= 1;
+	}
+
+	return product;
+}
 
 }
