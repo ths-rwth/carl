@@ -755,6 +755,15 @@ public:
 };
 
 	template<typename C, typename O, typename P>
+	bool isOne(const MultivariatePolynomial<C,O,P>& p) {
+		return p.isOne();
+	}
+	template<typename C, typename O, typename P>
+	bool isZero(const MultivariatePolynomial<C,O,P>& p) {
+		return p.isZero();
+	}
+
+	template<typename C, typename O, typename P>
 	MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q)
 	{
 		return p.quotient(q);
