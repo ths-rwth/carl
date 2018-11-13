@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Content.h"
+#include "PrimitivePart.h"
+
 #include "../UnivariatePolynomial.h"
 
 namespace carl {
@@ -11,15 +14,15 @@ namespace carl {
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> primitive_euclidean(const UnivariatePolynomial<Coeff>& a, const UnivariatePolynomial<Coeff>& b) {
-	UnivariatePolynomial<Coeff> c = a.normalized().primitivePart();
-	UnivariatePolynomial<Coeff> d = b.normalized().primitivePart();
+	UnivariatePolynomial<Coeff> c = carl::primitive_part(a.normalized());
+	UnivariatePolynomial<Coeff> d = carl::primitive_part(b.normalized());
 	
 	while (!d.isZero()) {
 		UnivariatePolynomial<Coeff> r = c.prem(d);
 		c = d;
-		d = r.normalized().primitivePart();
+		d = carl::primitive_part(r.normalized());
 	}
-	return gcd(a.content(), b.content()) * c;
+	return gcd(carl::content(a), carl::content(b)) * c;
 }
 
 }

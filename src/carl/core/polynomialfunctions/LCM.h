@@ -10,7 +10,7 @@ MultivariatePolynomial<C,O,P> lcm(const MultivariatePolynomial<C,O,P>& a, const 
 	assert(!a.isZero());
 	assert(!b.isZero());
 	if (a == b) return a;
-	return quotient((a*b), gcd(a,b));
+	return quotient(a*b, gcd(a,b));
 }
 
 }

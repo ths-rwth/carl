@@ -1,11 +1,12 @@
 #pragma once
 
-#include "GCD.h"
-
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"
 
 namespace  carl {
+
+template<typename T>
+T gcd(const T& lhs, const T& rhs);
 
 /**
  * The content of a polynomial is the gcd of the coefficients of the normal part of a polynomial.
