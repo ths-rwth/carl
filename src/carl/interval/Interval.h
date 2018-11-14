@@ -840,6 +840,10 @@ namespace carl
         {
             return mContent;
         }
+		const BoostInterval& rContent() const
+        {
+            return mContent;
+        }
 
         /**
          * Returns a copy of the included boost interval.
@@ -1544,166 +1548,6 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void log_assign();
-
-        /*
-         * Trigonometric functions
-         */
-
-        /**
-         * Calculates the sine of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> sin() const;
-
-        /**
-         * Calculates and assigns the sine of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void sin_assign();
-
-        /**
-         * Calculates the cosine of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> cos() const;
-
-        /**
-         * Calculates and assigns the cosine of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void cos_assign();
-
-        /**
-         * Calculates the tangent of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> tan() const;
-
-        /**
-         * Calculates and assigns the tangent of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void tan_assign();
-
-        /**
-         * Calculates the arcus sine of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> asin() const;
-
-        /**
-         * Calculates and assigns the arcus sine of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void asin_assign();
-
-        /**
-         * Calculates the arcus cosine of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> acos() const;
-
-        /**
-         * Calculates and assigns the arcus cosine of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void acos_assign();
-
-        /**
-         * Calculates the arcus tangent of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> atan() const;
-
-        /**
-         * Calculates and assigns the arcus tangent of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void atan_assign();
-
-        /**
-         * Calculates the hyperbolic sine of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> sinh() const;
-
-        /**
-         * Calculates and assigns the hyperbolic sine of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void sinh_assign();
-
-        /**
-         * Calculates the hyperbolic cosine of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> cosh() const;
-
-        /**
-         * Calculates and assigns the hyperbolic cosine of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void cosh_assign();
-
-        /**
-         * Calculates the hyperbolic tangent of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> tanh() const;
-
-        /**
-         * Calculates and assigns the hyperbolic tangent of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void tanh_assign();
-
-        /**
-         * Calculates the hyperbolic arcus sine of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> asinh() const;
-
-        /**
-         * Calculates and assigns the hyperbolic arcus sine of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void asinh_assign();
-
-        /**
-         * Calculates the hyperbolic arcus cosine of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> acosh() const;
-
-        /**
-         * Calculates and assigns the hyperbolic arcus cosine of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void acosh_assign();
-
-        /**
-         * Calculates the hyperbolic arcus tangent of the given interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> atanh() const;
-
-        /**
-         * Calculates and assigns the hyperbolic arcus tangent of the given interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void atanh_assign();
 
         /*
          * Boolean Operations
