@@ -8,7 +8,7 @@ using I = carl::Interval<double>;
 #define EXPECT_RESULT(F,IN,R) \
 	EXPECT_TRUE((I(R,R) + I(-0.01,0.01)).contains(F(I(IN,IN))))
 #define EXPECT_RESULT_E(F,IN,EXP,R) \
-	EXPECT_TRUE((I(R,R) + I(-0.01,0.01)).contains(F(I(IN,IN),EXP)))
+	EXPECT_TRUE((I(R,R) + I(-0.01,0.01)).contains(F(I(IN,IN),uint(EXP))))
 
 TEST(Interval, pow) {
 	EXPECT_RESULT_E(carl::pow, 0.0, 2, 0.0);
