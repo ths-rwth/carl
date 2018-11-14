@@ -108,7 +108,6 @@ namespace carl {
             z3().free(res[i]);
         }
         return *mPolynomial;
-        // TODO use IntervalContent<Number>::auxVariable
     }
 
     template<typename Number>

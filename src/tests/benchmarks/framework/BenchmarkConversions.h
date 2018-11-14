@@ -64,7 +64,7 @@ template<>
 inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& p, const CIPtr& ci) {
 	CMP<rational> res;
 	for (auto t: p) {
-		res += Term<rational>(ci->carl.toZ3Rational(t.coeff()), t.monomial());
+		res += Term<rational>(z3().toZ3Rational(t.coeff()), t.monomial());
 	}
 	return res;
 }
