@@ -83,7 +83,7 @@ public:
 	// rationals and polynomial_refs are free'd automatically:
 	// rationals: scoped
 	// polynomial_ref: reference counting
-	// var: is an unisgned
+	// var: is an unsigned
 
 	// conversions to Z3 types
 
@@ -99,17 +99,32 @@ public:
 	rational toZ3(const rational& n) {
 		return n;
 	}
-    #ifdef USE_CLN_NUMBERS  // TODO remove, deduplicate with carlconverter...
+    #ifdef USE_CLN_NUMBERS
+	mpz toZ3MPZ(const cln::cl_I& n) {
+		// FIXME performant conversion
+		mpz res;
+		std::stringstream ss;
+		ss << n;
+		z3().mpqMan().set(res, ss.str().c_str());
+		return res;
+	}
+	mpq toZ3MPQ(const cln::cl_RA& n) {
+		mpz num = toZ3MPZ(getNum(n));
+		mpz den = toZ3MPZ(getDenom(n));
+		mpq res;
+		z3().mpqMan().set(res, num, den);
+		z3().free(num);
+		z3().free(den);
+		return res;
+	}
+	rational toZ3Rational(const cln::cl_RA& n) {
+		mpq m = toZ3MPQ(n);
+		rational res = rational(m);
+		z3().free(m);
+		return res;
+	}
 	rational toZ3(const cln::cl_RA& n) {
-		std::stringstream ss1;
-		ss1 << carl::getDenom(n);
-		mpz denom;
-		mpzMan().set(denom, ss1.str().c_str());
-		std::stringstream ss2;
-		ss2 << carl::getNum(n);
-		mpz num;
-		mpzMan().set(num, ss2.str().c_str());
-		return rational(num / denom);
+		return toZ3Rational(n);
 	}
     #endif
 	mpz toZ3MPZ(const mpz_t z) {
