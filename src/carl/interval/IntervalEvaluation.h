@@ -153,7 +153,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial
 	Interval<Numeric> res = Interval<Numeric>(carl::constant_zero<Numeric>().get());
 	const Interval<Numeric>& varValue = map.at(p.mainVar());
 	Interval<Numeric> exp(1);
-	for (unsigned i = 0; i <= p.degree(); i++) {
+	for (uint i = 0; i <= p.degree(); i++) {
 		res += IntervalEvaluation::evaluate(p.coefficients()[i], map) * exp;
         if( res.isInfinite() )
             return res;
