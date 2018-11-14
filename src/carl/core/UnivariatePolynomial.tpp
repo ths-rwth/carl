@@ -611,7 +611,7 @@ typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::coprimeF
 	auto it = mCoefficients.begin();
 	typename UnderlyingNumberType<Coeff>::type factor = it->coprimeFactor();
 	for (++it; it != mCoefficients.end(); ++it) {
-		factor = carl::gcd(factor, it->coprimeFactor());
+		factor = carl::lcm(factor, it->coprimeFactor());
 	}
 	return factor;
 }
