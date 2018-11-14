@@ -892,99 +892,6 @@ bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) cons
 	}
 
 template<typename Number>
-Interval<Number> Interval<Number>::pow(uint exp) const
-	{
-		assert(this->isConsistent());
-		assert(exp <= INT_MAX );
-        if( exp % 2 == 0 )
-        {
-            if( mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY )
-            {
-                return Interval<Number>( carl::constant_zero<Number>().get(), BoundType::WEAK, carl::constant_zero<Number>().get(), BoundType::INFTY );
-            }
-            else if( mLowerBoundType == BoundType::INFTY )
-            {
-                if( contains( carl::constant_zero<Number>().get() ) )
-                {
-                    return Interval<Number>( carl::constant_zero<Number>().get(), BoundType::WEAK, carl::constant_zero<Number>().get(), BoundType::INFTY );
-                }
-                else
-                {
-                    return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), mUpperBoundType, BoundType::INFTY );
-                }
-            }
-            else if( mUpperBoundType == BoundType::INFTY )
-            {
-                if( contains( carl::constant_zero<Number>().get() ) )
-                {
-                    return Interval<Number>( carl::constant_zero<Number>().get(), BoundType::WEAK, carl::constant_zero<Number>().get(), BoundType::INFTY );
-                }
-                else
-                {
-                    return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), mLowerBoundType, BoundType::INFTY );
-                }
-            }
-            else
-            {
-                BoundType rType = mUpperBoundType;
-                BoundType lType = mLowerBoundType;
-                if( carl::abs( mContent.lower() ) > carl::abs( mContent.upper() ) )
-                {
-                    rType = mLowerBoundType;
-                    lType = mUpperBoundType;
-                }
-                if( contains( carl::constant_zero<Number>().get() ) )
-                {
-                    return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), BoundType::WEAK, rType );
-                }
-                else
-                {
-                    return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), lType, rType );
-                }
-            }
-        }
-        else
-        {
-            return Interval<Number>( boost::numeric::pow( mContent, int(exp) ), mLowerBoundType, mUpperBoundType );
-        }
-
-	}
-
-template<typename Number>
-void Interval<Number>::pow_assign(uint exp)
-	{
-		*this = this->pow(exp);
-	}
-
-template<typename Number>
-template<typename Num, EnableIf<std::is_floating_point<Num>>>
-Interval<Number> Interval<Number>::sqrt() const
-	{
-		assert(this->isConsistent());
-        if( mUpperBoundType != BoundType::INFTY &&  mContent.upper() < carl::constant_zero<Number>().get() )
-            return Interval<Number>::emptyInterval();
-        if( mLowerBoundType == BoundType::INFTY || mContent.lower() < carl::constant_zero<Number>().get() )
-        {
-            if( mUpperBoundType == BoundType::INFTY )
-            {
-                return Interval<Number>(BoostInterval(carl::constant_zero<Number>().get()), BoundType::WEAK, mUpperBoundType);
-            }
-            else
-            {
-                return Interval<Number>(boost::numeric::sqrt(BoostInterval(carl::constant_zero<Number>().get(),mContent.upper())), BoundType::WEAK, mUpperBoundType);
-            }
-        }
-		return Interval<Number>(boost::numeric::sqrt(mContent), mLowerBoundType, mUpperBoundType);
-	}
-
-template<typename Number>
-template<typename Num, EnableIf<std::is_floating_point<Num>>>
-void Interval<Number>::sqrt_assign()
-	{
-		*this = this->sqrt();
-	}
-
-template<typename Number>
 template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::root(int deg) const
 	{
@@ -1013,22 +920,6 @@ template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::root_assign(unsigned deg)
 	{
 		*this = this->root(deg);
-	}
-
-template<typename Number>
-template<typename Num, EnableIf<std::is_floating_point<Num>>>
-Interval<Number> Interval<Number>::log() const
-	{
-		assert(this->isConsistent());
-		assert( mContent.lower() > carl::constant_zero<Number>().get() );
-        return Interval<Number>(boost::numeric::log(mContent), mLowerBoundType, mUpperBoundType);
-	}
-
-template<typename Number>
-template<typename Num, EnableIf<std::is_floating_point<Num>>>
-void Interval<Number>::log_assign()
-	{
-		this->set(boost::numeric::log(mContent));
 	}
 
 /*******************************************************************************

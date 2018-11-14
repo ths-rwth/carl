@@ -9,7 +9,7 @@ constexpr double PI = 3.141592653589793;
 #define EXPECT_RESULT(F,IN,R) \
 	EXPECT_TRUE((I(R,R) + I(-0.01,0.01)).contains(F(I(IN,IN))))
 
-TEST(IntervalTrig, base) {
+TEST(Interval, base) {
 	EXPECT_RESULT(carl::sin, 0.0, 0.0);
 	EXPECT_RESULT(carl::cos, 0.0, 1.0);
 	EXPECT_RESULT(carl::tan, 0.0, 0.0);
@@ -29,7 +29,7 @@ TEST(IntervalTrig, base) {
 	EXPECT_RESULT(carl::cos, PI, -1.0);
 }
 
-TEST(IntervalTrig, inverse) {
+TEST(Interval, inverse) {
 	EXPECT_RESULT(carl::asin, -1.0, -PI/2);
 	EXPECT_RESULT(carl::acos, -1.0, PI);
 	EXPECT_RESULT(carl::atan, -1.0, -PI/4);
@@ -51,7 +51,7 @@ TEST(IntervalTrig, inverse) {
 	EXPECT_RESULT(carl::atan, 1.0, PI/4);
 }
 
-TEST(IntervalTrig, hyperbolic) {
+TEST(Interval, hyperbolic) {
 	EXPECT_RESULT(carl::sinh, 0.0, 0.0);
 	EXPECT_RESULT(carl::cosh, 0.0, 1.0);
 	EXPECT_RESULT(carl::tanh, 0.0, 0.0);
@@ -73,7 +73,7 @@ TEST(IntervalTrig, hyperbolic) {
 	EXPECT_RESULT(carl::tanh, PI, 0.996);
 }
 
-TEST(IntervalTrig, inverse_hyperbolic) {
+TEST(Interval, inverse_hyperbolic) {
 	EXPECT_RESULT(carl::asinh, 0.0, 0.0);
 	EXPECT_RESULT(carl::atanh, 0.0, 0.0);
 

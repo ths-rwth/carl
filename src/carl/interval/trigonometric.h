@@ -2,12 +2,6 @@
 
 #include "Interval.h"
 
-CLANG_WARNING_DISABLE("-Wunused-parameter")
-CLANG_WARNING_DISABLE("-Wunused-local-typedef")
-#include <boost/numeric/interval.hpp>
-#include <boost/numeric/interval/interval.hpp>
-CLANG_WARNING_RESET
-
 #include <cassert>
 
 namespace carl {

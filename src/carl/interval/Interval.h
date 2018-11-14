@@ -1496,32 +1496,6 @@ namespace carl
         bool reciprocal(Interval<Number>& a, Interval<Number>& b) const;
 
         /**
-         * Calculates the power of the interval with respect to natural interval arithmetic.
-         * @param exp Exponent.
-         * @return Result.
-         */
-        Interval<Number> pow(uint exp) const;
-
-        /**
-         * Calculates and assigns the power of the interval with respect to natural interval arithmetic.
-         * @param exp Exponent.
-         */
-        void pow_assign(uint exp);
-
-        /**
-         * Calculates the square root of the interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> sqrt() const;
-
-        /**
-         * Calculates and assigns the square root of the interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void sqrt_assign();
-
-        /**
          * Calculates the nth root of the interval with respect to natural interval arithmetic.
          * @param deg Degree.
          * @return Result.
@@ -1535,19 +1509,6 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void root_assign(unsigned deg);
-
-        /**
-         * Calculates the logarithm of the interval with respect to natural interval arithmetic.
-         * @return Result.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        Interval<Number> log() const;
-
-        /**
-         * Calculates and assigns the logarithm of the interval with respect to natural interval arithmetic.
-         */
-        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
-        void log_assign();
 
         /*
          * Boolean Operations
@@ -1955,35 +1916,6 @@ namespace carl
     inline Interval<Number> abs(const Interval<Number>& _in)
     {
         return _in.abs();
-    }
-
-    /**
-     * Method which returns the logarithm of the passed number.
-     * @param _in Number.
-     * @return Number which holds the result.
-     */
-    template<typename Number>
-    inline Interval<Number> log(const Interval<Number>& _in)
-    {
-        return _in.log();
-    }
-
-    /**
-     * Method which returns the square root of the passed number.
-     * @param _in Number.
-     * @return Number which holds the result.
-     */
-    template<typename Number>
-    inline Interval<Number> sqrt(const Interval<Number>& _in)
-    {
-        return _in.sqrt();
-    }
-
-
-    template<typename Number>
-    inline Interval<Number> pow(const Interval<Number>& _in, uint _exponent)
-    {
-        return _in.pow(_exponent);
     }
 
     /**

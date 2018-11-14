@@ -7,6 +7,7 @@
 
 #pragma once
 #include "Interval.h"
+#include "power.h"
 
 #include "../core/Monomial.h"
 #include "../core/Term.h"
@@ -64,7 +65,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const s
 		CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 		// We expect every variable to be in the map.
 		CARL_LOG_ASSERT("carl.interval", map.count(m[i].first) > (size_t)0, "Every variable is expected to be in the map.");
-		result *= map.at(m[i].first).pow(m[i].second);
+		result *= carl::pow(map.at(m[i].first), m[i].second);
         if( result.isZero() )
             return result;
 	}
@@ -156,7 +157,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial
 		res += IntervalEvaluation::evaluate(p.coefficients()[i], map) * exp;
         if( res.isInfinite() )
             return res;
-		exp = varValue.pow(i+1);
+		exp = carl::pow(varValue, i+1);
 	}
 	return res;
 }
