@@ -54,7 +54,7 @@ public:
         
         // means that this gb contains only 1
         inline bool isTrivialBase() const {
-                return this->get().size() == 1 && this->get().front().isOne(); 
+                return this->get().size() == 1 && isOne(this->get().front()); 
         }
         
         bool hasFiniteMon() const;

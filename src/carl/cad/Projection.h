@@ -42,7 +42,7 @@ namespace cad {
          */
         template<typename PolyCoeff>
         bool doesNotVanish(const PolyCoeff& p) const {
-            if (p.isZero()) return false;
+            if (carl::isZero(p)) return false;
             if (p.isConstant()) return true;
             auto def = p.definiteness();
             if (def == Definiteness::POSITIVE) return true;

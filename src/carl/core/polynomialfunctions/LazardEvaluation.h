@@ -150,7 +150,7 @@ public:
 			CARL_LOG_DEBUG("carl.lazard", "Obtained reductor " << red.second);
 			newPoly = mLiftingPoly.remainder(red.second);
 		}
-		while (newPoly.isZero()) {
+		while (carl::isZero(newPoly)) {
 			if (red.first) {
 				mLiftingPoly = mLiftingPoly.quotient(v - red.second);
 				newPoly = mLiftingPoly.substitute(v, red.second);

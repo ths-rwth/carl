@@ -115,7 +115,7 @@ public:
 				entry = mDatastruct.top();
 				leadingTerm = entry->getLead();
 				CARL_LOG_TRACE("carl.gb.reductor", "Intermediate leading term: " << leadingTerm);
-				assert(!leadingTerm.isZero());
+				assert(!isZero(leadingTerm));
 				// update the data structure.
 				// only insert non-empty polynomials.
 				if(!updateDatastruct(entry)) break;
@@ -128,11 +128,11 @@ public:
 					newentry = mDatastruct.top();
 				}
 			}
-			while(leadingTerm.isZero() && !mDatastruct.empty());
+			while(isZero(leadingTerm) && !mDatastruct.empty());
 			// Done finding leading term.
 			//std::cout <<  "Leading term: " << *leadingTerm << std::endl;
 			// We have found the leading term..
-			if(leadingTerm.isZero())
+			if(isZero(leadingTerm))
 			{
 				assert(mDatastruct.empty());
 				//then the datastructure is empty, we are done.
@@ -214,7 +214,7 @@ private:
 	inline bool updateDatastruct(EntryType* entry)
 	{
 		assert(!mDatastruct.empty());
-		if(entry->getTail().isZero())
+		if(isZero(entry->getTail()))
 		{
 			mDatastruct.pop();
 			delete entry;
@@ -231,7 +231,7 @@ private:
 
 	void insert(const InputPolynomial& g, const Term<Coeff>& fact)
 	{
-		if(!g.isZero())
+		if(!isZero(g))
 		{
 			CARL_LOG_TRACE("carl.gb.reductor", "Insert polynomial: " << g << " * " << fact);
 			mDatastruct.push(new EntryType(fact, g));

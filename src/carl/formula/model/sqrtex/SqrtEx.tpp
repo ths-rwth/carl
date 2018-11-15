@@ -30,14 +30,14 @@ namespace carl
 	template<typename Poly>
     SqrtEx<Poly>::SqrtEx( Poly&& _constantPart, Poly&& _factor, Poly&& _denominator, Poly&& _radicand ):
         mConstantPart( std::move( _constantPart ) ),
-        mFactor( _radicand.isZero() ? std::move( _radicand ) : std::move( _factor ) ),
-        mDenominator( (mFactor.isZero() && mConstantPart.isZero()) ? constant_one<Poly>::get() : std::move( _denominator ) ),
-        mRadicand( mFactor.isZero() ? mFactor : std::move( _radicand ) )
+        mFactor( isZero(_radicand) ? std::move( _radicand ) : std::move( _factor ) ),
+        mDenominator( (isZero(mFactor) && isZero(mConstantPart)) ? constant_one<Poly>::get() : std::move( _denominator ) ),
+        mRadicand( isZero(mFactor) ? mFactor : std::move( _radicand ) )
     {
-        assert( !mDenominator.isZero() );
-//        if( !( !mRadicand.isConstant() || mRadicand.isZero() || smtrat::ZERO_RATIONAL <= mRadicand.trailingTerm().coeff() ) )
+        assert( !isZero(mDenominator) );
+//        if( !( !mRadicand.isConstant() || isZero(mRadicand) || smtrat::ZERO_RATIONAL <= mRadicand.trailingTerm().coeff() ) )
 //            exit(1569);
-        assert( !mRadicand.isConstant() || mRadicand.isZero() || constant_zero<Rational>::get() <= mRadicand.trailingTerm().coeff() );
+        assert( !mRadicand.isConstant() || isZero(mRadicand) || constant_zero<Rational>::get() <= mRadicand.trailingTerm().coeff() );
         normalize();
     }
 
@@ -46,7 +46,7 @@ namespace carl
     {
 //        std::cout << *this << std::endl;
         Poly gcdA;
-        if( mFactor.isZero() )
+        if( isZero(mFactor) )
         {
             gcdA = mConstantPart;
         }
@@ -61,7 +61,7 @@ namespace carl
             }
             else
             {
-                assert( !radicand().isZero() );
+                assert( !isZero(radicand()) );
                 Rational absOfLCoeff = abs( radicand().coprimeFactor() );
                 Rational sqrtResult = 0;
                 if( carl::sqrt_exact( absOfLCoeff, sqrtResult ) )
@@ -70,13 +70,13 @@ namespace carl
                     mRadicand *= absOfLCoeff;
                 }
             }
-            if( mFactor.isZero() )
+            if( isZero(mFactor) )
             {
                 gcdA = mConstantPart;
             }
             else
             {
-                if( mConstantPart.isZero() )
+                if( isZero(mConstantPart) )
                 {
                     gcdA = mFactor;
                 }
@@ -90,7 +90,7 @@ namespace carl
                 }
             }
         }
-        if( gcdA.isZero() ) return;
+        if( isZero(gcdA) ) return;
         Rational ccGcdA = gcdA.coprimeFactor();
         Poly cpGcdA = gcdA * ccGcdA;
         Rational ccDenominator = mDenominator.coprimeFactor();
@@ -99,11 +99,11 @@ namespace carl
         // Make sure that the polynomial to divide by cannot be negative, otherwise the sign of the square root expression could change.
         if( !(gcdA == constant_one<Poly>::get()) && gcdA.definiteness() == carl::Definiteness::POSITIVE_SEMI )
         {
-            if( !mConstantPart.isZero() )
+            if( !isZero(mConstantPart) )
             {
                 mConstantPart.divideBy( gcdA, mConstantPart );
             }
-            if( !mFactor.isZero() )
+            if( !isZero(mFactor) )
             {
                 mFactor.divideBy( gcdA, mFactor );
             }
@@ -111,9 +111,9 @@ namespace carl
         }
         Rational numGcd = constant_zero<Rational>::get();
         Rational denomLcm = constant_one<Rational>::get();
-        if( factor().isZero() )
+        if( isZero(factor()) )
         {
-            if( !constantPart().isZero() )
+            if( !isZero(constantPart()) )
             {
                 Rational cpOfConstantPart = constantPart().coprimeFactor();
                 numGcd = carl::getNum( cpOfConstantPart );
@@ -128,7 +128,7 @@ namespace carl
         else
         {
             Rational cpOfFactorPart = factor().coprimeFactor();
-            if( constantPart().isZero() )
+            if( isZero(constantPart()) )
             {
                 numGcd = carl::getNum( cpOfFactorPart );
                 denomLcm = carl::getDenom( cpOfFactorPart );
@@ -169,7 +169,7 @@ namespace carl
             mConstantPart = _sqrtEx.constantPart();
             mFactor       = _sqrtEx.factor();
             mDenominator  = _sqrtEx.denominator();
-            if (factor().isZero())
+            if (isZero(factor()))
                 mRadicand = constant_zero<Poly>::get();
             else
                 mRadicand = _sqrtEx.radicand();
@@ -239,7 +239,7 @@ namespace carl
         {
             bool complexNum = hasSqrt() && !mConstantPart.isConstant();
             std::stringstream result;
-            if( complexNum && !mDenominator.isOne() )
+            if( complexNum && !carl::isOne(mDenominator) )
                 result << "(";
             if( hasSqrt() )
             {
@@ -256,12 +256,12 @@ namespace carl
             }
             else
             {
-                if( mConstantPart.isConstant() || mDenominator.isOne())
+                if( mConstantPart.isConstant() || carl::isOne(mDenominator))
                     result << mConstantPart;
                 else
                     result << "(" << mConstantPart << ")";
             }
-            if (!mDenominator.isOne())
+            if (!carl::isOne(mDenominator))
             {
                 if( complexNum )
                     result << ")";

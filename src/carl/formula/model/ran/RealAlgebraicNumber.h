@@ -343,7 +343,7 @@ public:
 		CARL_LOG_DEBUG("carl.ran", "gcd(" << irp << ", " << poly << ")");
 		auto gmv = carl::gcd(MultivariatePolynomial<Number>(irp), poly);
 		CARL_LOG_DEBUG("carl.ran", "Simplyfing, gcd = " << gmv);
-		if (gmv.isOne()) return;
+		if (carl::isOne(gmv)) return;
 		auto g = gmv.toUnivariatePolynomial();
 		if (isRootOf(g)) {
 			CARL_LOG_DEBUG("carl.ran", "Is a root of " << g);

@@ -16,7 +16,7 @@ T gcd(const T& lhs, const T& rhs);
  */
 template<typename Coeff>
 Coeff content(const UnivariatePolynomial<Coeff>& p) {
-	if (p.isZero()) {
+	if (isZero(p)) {
 		// By definition
 		return Coeff(0);
 	}

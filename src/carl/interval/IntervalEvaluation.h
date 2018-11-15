@@ -94,7 +94,7 @@ template<typename Coeff, typename Policy, typename Ordering, typename Numeric>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomial<Coeff, Policy, Ordering>& p, const std::map<Variable, Interval<Numeric>>& map)
 {
 	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
-	if(p.isZero()) {
+	if(isZero(p)) {
 		return Interval<Numeric>(0);
 	} else {
 		Interval<Numeric> result(evaluate(p[0], map)); 

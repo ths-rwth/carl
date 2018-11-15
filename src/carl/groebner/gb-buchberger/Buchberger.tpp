@@ -79,7 +79,7 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 			Polynomial remainder = reductor.fullReduce();
 			CARL_LOG_DEBUG("carl.gb.buchberger", "Remainder of SPol: " << remainder);
 			// If it is not zero, we should add this one to our GB
-			if(!remainder.isZero())
+			if(!isZero(remainder))
 			{
 				// If it is constant, we are done and can return {1} as GB.
 				if(remainder.isConstant())

@@ -105,7 +105,7 @@ namespace carl
              */
             bool hasSqrt() const
             {
-                return !mFactor.isZero();
+                return !carl::isZero(mFactor);
             }
 
             /**

@@ -205,8 +205,8 @@ namespace carl
 		CARL_LOG_DEBUG("carl.formula.constraint", "Normalizing " << _lhs << " " << _rel << " 0");
         if( _rel == Relation::GREATER )
         {
-            Pol lhs = _lhs.isZero() ? Pol( typename Pol::NumberType( 0 ) ) : _lhs.coprimeCoefficients();
-            if( !lhs.isZero() && (_lhs.lterm().coeff() < 0) == (lhs.lterm().coeff() < 0) )
+            Pol lhs = isZero(_lhs) ? Pol( typename Pol::NumberType( 0 ) ) : _lhs.coprimeCoefficients();
+            if( !isZero(lhs) && (_lhs.lterm().coeff() < 0) == (lhs.lterm().coeff() < 0) )
             {
                 lhs = -lhs;
             }
@@ -215,8 +215,8 @@ namespace carl
         }
         else if( _rel == Relation::GEQ )
         {
-            Pol lhs = _lhs.isZero() ? Pol( typename Pol::NumberType( 0 ) ) : _lhs.coprimeCoefficients();
-            if( !lhs.isZero() && (_lhs.lterm().coeff() < 0) == (lhs.lterm().coeff() < 0) )
+            Pol lhs = isZero(_lhs) ? Pol( typename Pol::NumberType( 0 ) ) : _lhs.coprimeCoefficients();
+            if( !isZero(lhs) && (_lhs.lterm().coeff() < 0) == (lhs.lterm().coeff() < 0) )
             {
                 lhs = -lhs;
             }
@@ -225,12 +225,12 @@ namespace carl
         }
         else
         {
-            Pol lhs = _lhs.isZero() ? Pol( typename Pol::NumberType( 0 ) ) : _lhs.coprimeCoefficients();
+            Pol lhs = isZero(_lhs) ? Pol( typename Pol::NumberType( 0 ) ) : _lhs.coprimeCoefficients();
             if( _rel == Relation::EQ || _rel == Relation::NEQ ) 
             {
-                if( !_lhs.isZero() && lhs.lterm().coeff() < typename Pol::NumberType( 0 ) ) lhs = -lhs;
+                if( !isZero(_lhs) && lhs.lterm().coeff() < typename Pol::NumberType( 0 ) ) lhs = -lhs;
             }
-            else if( !lhs.isZero() && (_lhs.lterm().coeff() < 0) != (lhs.lterm().coeff() < 0) )
+            else if( !isZero(lhs) && (_lhs.lterm().coeff() < 0) != (lhs.lterm().coeff() < 0) )
             {
                 lhs = -lhs;
             }

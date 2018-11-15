@@ -104,7 +104,7 @@ public:
 
     template<bool SizeUnknown, bool NewMonomials = true>
 	void addTerm(TAMId id, const TermPtr& term) {
-		assert(!term.isZero());
+		assert(!isZero(term));
         Tuple& data = *id;
 		assert(std::get<2>(data));
 		TermIDs& termIDs = std::get<0>(data);
@@ -149,8 +149,8 @@ public:
 		for (std::size_t i = 1; i < terms.size(); i++) {
 			if (Ordering::less(terms[max], terms[i])) max = i;
 		}
-		assert(!terms[max].isConstant() || terms[max].isZero());
-		if (terms[max].isZero()) return TermType(std::get<3>(data));
+		assert(!terms[max].isConstant() || isZero(terms[max]));
+		if (isZero(terms[max])) return TermType(std::get<3>(data));
 		else return terms[max];
 	}
     
@@ -164,7 +164,7 @@ public:
 			t[0] = std::move(TermType(std::move(std::get<3>(data)), nullptr));
 		}
         for (auto i = t.begin(); i != t.end();) {
-			if (i->isZero()) {
+			if (isZero(*i)) {
 				//Avoid invalidating pointer for last element
 				if (i == --t.end()) {
 					t.pop_back();

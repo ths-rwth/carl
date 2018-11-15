@@ -559,7 +559,7 @@ template<typename C, EnableIf<Not<is_number<C>>>>
 #endif
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
-	if(isZero() || lcoeff().isZero() || lcoeff().lcoeff() > NumberType(0))
+	if(isZero() || carl::isZero(lcoeff()) || lcoeff().lcoeff() > NumberType(0))
 	{
 		return Coeff(1);
 	}	

@@ -254,6 +254,7 @@ public:
 	/**
 	 * Check if the polynomial is zero.
 	 */
+	[[deprecated("use carl::isZero(p) instead.")]]
 	bool isZero() const {
 		return mTerms.empty();
 	}
@@ -261,14 +262,15 @@ public:
 	 * 
      * @return 
      */
+	[[deprecated("use carl::isOne(p) instead.")]]
 	bool isOne() const {
-		return (nrTerms() == 1) && lterm().isOne();
+		return (nrTerms() == 1) && carl::isOne(lterm());
 	}
 	/**
 	 * Check if the polynomial is constant.
 	 */
 	bool isConstant() const {
-		return isZero() || ((nrTerms() == 1) && lterm().isConstant());
+		return (nrTerms() == 0) || ((nrTerms() == 1) && lterm().isConstant());
 	}
 	/**
 	 * Check if the polynomial is a number, i.e., a constant.
@@ -756,11 +758,11 @@ public:
 
 	template<typename C, typename O, typename P>
 	bool isOne(const MultivariatePolynomial<C,O,P>& p) {
-		return p.isOne();
+		return (p.nrTerms() == 1) && carl::isOne(p.lterm());
 	}
 	template<typename C, typename O, typename P>
 	bool isZero(const MultivariatePolynomial<C,O,P>& p) {
-		return p.isZero();
+		return p.nrTerms() == 0;
 	}
 
 	template<typename C, typename O, typename P>
@@ -803,7 +805,7 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	inline std::ostream& operator<<(std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs) {
-		if (rhs.isZero()) return os << "0";
+		if (isZero(rhs)) return os << "0";
 		return os << carl::stream_joined(" + ", rhs);
 	}
 } // namespace carl

@@ -240,11 +240,11 @@ public:
 		{
 			Reductor<Polynomial, Polynomial> reduct(reduced, *index);
 			Polynomial res = reduct.fullReduce();
-			if(res.isZero())
+			if(isZero(res))
 			{
 				result.push_back(std::pair<BitVector, BitVector>(index->getReasons(), res.getReasons()));
 			}
-			else // ( !res.isZero( ) )
+			else // ( !isZero(res) )
 			{
 				CARL_LOG_TRACE("carl.gb.gbproc", "Add input polynomial " << res.normalize());
 				// Use the polynomial to reduce other input polynomials.
@@ -290,7 +290,7 @@ private:
 		{
 			Reductor<Polynomial, Polynomial> reduct(*reduced, mGb->getGenerator(*index));
 			Polynomial res = reduct.fullReduce();
-            if(!res.isZero())
+            if(!isZero(res))
             {
                 res.normalize();
                 CARL_LOG_DEBUG("carl.gb.gbproc", "GB Reduction, reduced " << mGb->getGenerator(*index) << " to " << res);

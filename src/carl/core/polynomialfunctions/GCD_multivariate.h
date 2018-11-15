@@ -41,10 +41,10 @@ namespace gcd_detail {
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b) {
 	CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ")");
-	assert(!a.isZero());
-	assert(!b.isZero());
+	assert(!isZero(a));
+	assert(!isZero(b));
 
-	if (a.isOne() || b.isOne()) {
+	if (isOne(a) || isOne(b)) {
 		return MultivariatePolynomial<C,O,P>(1);
 	}
 	if (a.isConstant() && b.isConstant()) {

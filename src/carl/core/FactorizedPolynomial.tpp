@@ -32,8 +32,8 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& _pCache, bool _polyNormalized ):
         mCacheRef( CACHE::NO_REF ),
-        mpCache( _polynomial.isZero() ? nullptr : _pCache ),
-        mCoefficient( _polynomial.isZero() ? CoeffType(0) : (_polyNormalized ? CoeffType(1) : CoeffType(1)/_polynomial.coprimeFactor()) )
+        mpCache( carl::isZero(_polynomial) ? nullptr : _pCache ),
+        mCoefficient( carl::isZero(_polynomial) ? CoeffType(0) : (_polyNormalized ? CoeffType(1) : CoeffType(1)/_polynomial.coprimeFactor()) )
     {
         assert( !_polyNormalized || (_polynomial.coprimeFactor() == CoeffType(1)) );
         if ( _polynomial.isConstant() )
@@ -943,7 +943,7 @@ namespace carl
             sum = computePolynomial( factorizationRestA ) * coefficientRestA;
             sum += computePolynomial( factorizationRestB ) * coefficientRestB;
         }
-        if ( sum.isZero() )
+        if ( carl::isZero(sum) )
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );

@@ -116,6 +116,7 @@ class Term {
 		 * Checks whether the term is zero.
 		 * @return 
 		 */
+		[[deprecated("use carl::isZero(t) instead.")]]
 		bool isZero() const {
 			return carl::isZero(mCoeff); //change this to mCoeff.isZero() at some point
 		}
@@ -124,6 +125,7 @@ class Term {
 		 * Checks whether the term equals one.
          * @return 
          */
+		[[deprecated("use carl::isOne(t) instead.")]]
 		bool isOne() const {
 			return isConstant() && carl::isOne(mCoeff); //change this to mCoeff.isOne() at some point
 		}

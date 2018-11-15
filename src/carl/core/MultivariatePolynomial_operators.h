@@ -39,7 +39,7 @@ inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Multivari
 }
 template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-	if (lhs.isZero() && rhs.isZero()) return true;
+	if (isZero(lhs) && isZero(rhs)) return true;
 	if (lhs.nrTerms() > 1) return false;
 	return lhs.lterm() == rhs;
 }
@@ -173,9 +173,9 @@ inline bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Univariat
  */
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (lhs.isZero() && rhs.isZero()) return false;
-	if (lhs.isZero()) return true;
-	if (rhs.isZero()) return false;
+	if (isZero(lhs) && isZero(rhs)) return false;
+	if (isZero(lhs)) return true;
+	if (isZero(rhs)) return false;
 	if (lhs.totalDegree() != rhs.totalDegree()) return lhs.totalDegree() < rhs.totalDegree();
 	if (lhs.totalDegree() == 0) return lhs.constantPart() < rhs.constantPart();
 	if (lhs.lterm() < rhs.lterm()) return true;
@@ -194,48 +194,48 @@ inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Multivaria
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-	if (lhs.isZero()) return carl::constant_zero<C>().get() < rhs;
+	if (isZero(lhs)) return carl::constant_zero<C>().get() < rhs;
 	return lhs.lterm() < rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
-	if (lhs.isZero()) return true;
+	if (isZero(lhs)) return true;
 	return lhs.lterm() < rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, Variable rhs) {
-	if (lhs.isZero()) return true;
+	if (isZero(lhs)) return true;
 	return lhs.lterm() < rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-	if (lhs.isZero()) return true;
+	if (isZero(lhs)) return true;
 	return lhs.lterm() < rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (rhs.isZero()) return lhs < carl::constant_zero<C>().get();
+	if (isZero(rhs)) return lhs < carl::constant_zero<C>().get();
 	if (lhs < rhs.lterm()) return true;
 	if (lhs == rhs.lterm()) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (rhs.isZero()) return false;
+	if (isZero(rhs)) return false;
 	if (lhs < rhs.lterm()) return true;
 	if (lhs == rhs.lterm()) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(Variable lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (rhs.isZero()) return false;
+	if (isZero(rhs)) return false;
 	if (lhs < rhs.lterm()) return true;
 	if (lhs == rhs.lterm()) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (rhs.isZero()) return lhs < carl::constant_zero<C>().get();
+	if (isZero(rhs)) return lhs < carl::constant_zero<C>().get();
 	return lhs < rhs.lterm();
 }
 /// @}

@@ -23,8 +23,8 @@ namespace carl {
 template<typename C, typename O, typename P>
 Term<C> gcd(const MultivariatePolynomial<C,O,P>& a, const Term<C>& b) {
 	static_assert(is_field<C>::value, "Only implemented for field coefficients");
-	assert(!a.isZero());
-	assert(!b.isZero());
+	assert(!isZero(a));
+	assert(!isZero(b));
 	if (b.isConstant()) return Term<C>(C(1));
 	return Term<C>(C(1), gcd(a, b.monomial()));
 }
@@ -37,7 +37,7 @@ Term<C> gcd(const Term<C>& a, const MultivariatePolynomial<C,O,P>& b) {
 template<typename C, typename O, typename P>
 Monomial::Arg gcd(const MultivariatePolynomial<C,O,P>& a, const Monomial::Arg& b) {
 	if (!b) return nullptr;
-	assert(!a.isZero());
+	assert(!isZero(a));
 	VariablesInformation<false, MultivariatePolynomial<C,O,P>> varinfo = a.getVarInfo();
 	std::vector<std::pair<Variable, exponent>> vepairs;
 	for (const auto& ve : *b) {
