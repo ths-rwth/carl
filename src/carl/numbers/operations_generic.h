@@ -75,7 +75,7 @@ namespace carl
 	 * @param exp The exponent.
 	 * @return `t` to the power of `exp`.
 	 */
-	template<typename T>
+	template<typename T, DisableIf<is_interval<T>> = dummy>
 	T pow(const T& basis, std::size_t exp) {
 		T res = carl::constant_one<T>().get();
 		T mult = basis;

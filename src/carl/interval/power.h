@@ -4,10 +4,11 @@
 
 #include <cassert>
 
+
 namespace carl {
 
-template<typename Number>
-Interval<Number> pow(const Interval<Number>& i, uint exp) {
+template<typename Number, typename Integer>
+Interval<Number> pow(const Interval<Number>& i, Integer exp) {
 	assert(i.isConsistent());
 	if (exp % 2 == 0) {
 		if (i.isInfinite()) {
@@ -41,8 +42,8 @@ Interval<Number> pow(const Interval<Number>& i, uint exp) {
 	}
 }
 
-template<typename Number, EnableIf<std::is_floating_point<Number>> = dummy>
-void pow_assign(Interval<Number>& i, int exp) {
+template<typename Number, typename Integer>
+void pow_assign(Interval<Number>& i, Integer exp) {
 	i = pow(i, exp);
 }
 
