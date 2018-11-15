@@ -358,6 +358,22 @@ class Term {
 		static Term gcd(const Term& t1, const Term& t2);
 };
 
+/**
+ * Checks whether a term is zero.
+ */
+template<typename Coeff>
+inline bool isZero(const Term<Coeff>& term) {
+	return carl::isZero(term.coeff());
+}
+
+/**
+ * Checks whether a term is one.
+ */
+template<typename Coeff>
+inline bool isOne(const Term<Coeff>& term) {
+	return term.isConstant() && carl::isOne(term.coeff());
+}
+
 
 template<typename Coeff>
 Term<Coeff> operator-(const Term<Coeff>& rhs) {
