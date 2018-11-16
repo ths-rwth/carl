@@ -13,6 +13,7 @@ CLANG_WARNING_DISABLE("-Wsign-compare")
 #include "gtest/gtest.h"
 CLANG_WARNING_RESET
 #include "carl/interval/Interval.h"
+#include "carl/interval/set_theory.h"
 #include "carl/core/VariablePool.h"
 
 #include "../Common.h"
@@ -877,31 +878,31 @@ TEST(clRA_Interval, Intersection)
 
     clRA_Interval b21(1,BoundType::WEAK,1,BoundType::INFTY);
 
-    EXPECT_EQ(clRA_Interval::emptyInterval(), a1.intersect(b01));
-    EXPECT_EQ(clRA_Interval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b02));
-    EXPECT_EQ(clRA_Interval(0,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b03));
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b04));
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,0,BoundType::WEAK), a1.intersect(b05));
+    EXPECT_EQ(clRA_Interval::emptyInterval(), carl::set_intersection(a1, b01));
+    EXPECT_EQ(clRA_Interval(1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b02));
+    EXPECT_EQ(clRA_Interval(0,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b03));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b04));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,0,BoundType::WEAK), carl::set_intersection(a1, b05));
 
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,-1,BoundType::WEAK), a1.intersect(b06));
-    EXPECT_EQ(clRA_Interval::emptyInterval(), a1.intersect(b07));
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,-1,BoundType::WEAK), a1.intersect(b08));
-    EXPECT_EQ(clRA_Interval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b09));
-    EXPECT_EQ(clRA_Interval(0,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b10));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,-1,BoundType::WEAK), carl::set_intersection(a1, b06));
+    EXPECT_EQ(clRA_Interval::emptyInterval(), carl::set_intersection(a1, b07));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,-1,BoundType::WEAK), carl::set_intersection(a1, b08));
+    EXPECT_EQ(clRA_Interval(1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b09));
+    EXPECT_EQ(clRA_Interval(0,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b10));
 
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,0,BoundType::WEAK), a1.intersect(b11));
-    EXPECT_EQ(clRA_Interval(-0.5,BoundType::WEAK,0.5,BoundType::WEAK), a1.intersect(b12));
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b13));
-    EXPECT_EQ(clRA_Interval::emptyInterval(), a1.intersect(b14));
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b15));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,0,BoundType::WEAK), carl::set_intersection(a1, b11));
+    EXPECT_EQ(clRA_Interval(-0.5,BoundType::WEAK,0.5,BoundType::WEAK), carl::set_intersection(a1, b12));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b13));
+    EXPECT_EQ(clRA_Interval::emptyInterval(), carl::set_intersection(a1, b14));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b15));
 
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,-1,BoundType::WEAK), a1.intersect(b16));
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,0,BoundType::WEAK), a1.intersect(b17));
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b18));
-    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b19));
-    EXPECT_EQ(clRA_Interval(0,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b20));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,-1,BoundType::WEAK), carl::set_intersection(a1, b16));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,0,BoundType::WEAK), carl::set_intersection(a1, b17));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b18));
+    EXPECT_EQ(clRA_Interval(-1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b19));
+    EXPECT_EQ(clRA_Interval(0,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b20));
 
-    EXPECT_EQ(clRA_Interval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b21));
+    EXPECT_EQ(clRA_Interval(1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b21));
 }
 
 TEST(clRA_Interval, Union)
@@ -921,8 +922,8 @@ TEST(clRA_Interval, Union)
     EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
 
     EXPECT_TRUE(i1.unite(i3, result1, result2));
-    EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
-    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
+    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
+    EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 5, BoundType::WEAK), result2);
 
     EXPECT_FALSE(i3.unite(i2, result1, result2));
     EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 4, BoundType::WEAK), result1);
@@ -948,8 +949,8 @@ TEST(clRA_Interval, Union)
     EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 3, BoundType::INFTY), result1);
 
     EXPECT_TRUE(i6.unite(i3, result1, result2));
-    EXPECT_EQ(clRA_Interval(3, BoundType::STRICT, 3, BoundType::INFTY), result1);
-    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
+    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
+    EXPECT_EQ(clRA_Interval(3, BoundType::STRICT, 3, BoundType::INFTY), result2);
 }
 
 TEST(clRA_Interval, Split)
