@@ -39,6 +39,8 @@ namespace carl {
 
             bool isIntegral() const;
 
+            // Note: this already tries to simplify to a polynomial!
+            // TODO can this result be cached ?!?
             bool isNumeric() const;
 
             Number getNumber() const;
