@@ -24,19 +24,23 @@ namespace carl {
  * The following functions return informations about the given numbers.
  */
 
-inline bool isZero(sint n) {
+template<typename T, EnableIf<std::is_fundamental<T>> = dummy>
+inline bool isZero(T n) {
 	return n == 0;
 }
 inline bool isZero(double n) {
 	return std::fpclassify(n) == FP_ZERO;
 }
-inline bool isOne(sint n) {
+template<typename T, EnableIf<std::is_fundamental<T>> = dummy>
+inline bool isOne(T n) {
 	return n == 1;
 }
-inline bool isPositive(sint n) {
+template<typename T, EnableIf<std::is_fundamental<T>> = dummy>
+inline bool isPositive(T n) {
 	return n > 0;
 }
-inline bool isNegative(sint n) {
+template<typename T, EnableIf<std::is_fundamental<T>> = dummy>
+inline bool isNegative(T n) {
 	return n < 0;
 }
 
