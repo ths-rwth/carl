@@ -144,7 +144,7 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value) {
-	if (this->isZero()) return;
+	if (carl::isZero(*this)) return;
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -156,7 +156,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value)
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value) {
-	if (this->isZero()) return;
+	if (carl::isZero(*this)) return;
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -257,8 +257,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) co
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
-	assert(!divisor.isZero());
-	if(this->isZero()) {
+	assert(!carl::isZero(divisor));
+	if(carl::isZero(*this)) {
 		return *this;
 	}
 	if(this->degree() < divisor.degree()) return *this;
@@ -315,7 +315,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const 
 	// strip zeros from the end as we might have pushed zeros.
 	result.stripLeadingZeroes();
 	
-	if(result.isZero() || result.degree() < divisor.degree())
+	if(carl::isZero(result) || result.degree() < divisor.degree())
 	{
 		return result;
 	}
@@ -344,8 +344,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder(const Univari
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem_old(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	assert(!divisor.isZero());
-	if(isZero() || degree() < divisor.degree())
+	assert(!carl::isZero(divisor));
+	if(carl::isZero(*this) || degree() < divisor.degree())
 	{
 		// According to definition.
 		return *this;
@@ -370,7 +370,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 
 	std::size_t reductions = 0;
 	while (true) {
-		if (res.isZero()) {
+		if (carl::isZero(res)) {
 			assert(res == this->prem_old(divisor));
 			return res;
 		}
@@ -389,7 +389,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 			assert(!newR[i].has(v));
 		}
 		if (res.degree() == divisor.degree()) {
-			if (!reduct.isZero()) {
+			if (!carl::isZero(reduct)) {
 				for (std::size_t i = 0; i <= reduct.degree(); i++) {
 					newR[i] -= lc * reduct.coefficients()[i];
 					assert(!newR[i].has(v));
@@ -397,7 +397,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 			}
 		} else {
 			assert(!lc.has(v));
-			if (!reduct.isZero()) {
+			if (!carl::isZero(reduct)) {
 				for (std::size_t i = 0; i <= reduct.degree(); i++) {
 					newR[res.degree() - divisor.degree() + i] -= lc * reduct.coefficients()[i];
 					assert(!newR[res.degree() - divisor.degree() + i].has(v));
@@ -418,7 +418,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::sprem(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	if(isZero() || degree() < divisor.degree())
+	if(carl::isZero(*this) || degree() < divisor.degree())
 	{
 		// According to definition.
 		return *this;
@@ -463,7 +463,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::pow(std::size_t exp) const
 {
 	if (exp == 0) return UnivariatePolynomial(mMainVar, constant_one<Coeff>::get());
-	if (isZero()) return UnivariatePolynomial(mMainVar);
+	if (carl::isZero(*this)) return UnivariatePolynomial(mMainVar);
 	UnivariatePolynomial<Coeff> res(mMainVar, constant_one<Coeff>::get());
 	UnivariatePolynomial<Coeff> mult(*this);
 	while(exp > 0) {
@@ -534,7 +534,7 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 {
-	if(isZero())
+	if(carl::isZero(*this))
 	{
 		return *this;
 	}
@@ -559,7 +559,7 @@ template<typename C, EnableIf<Not<is_number<C>>>>
 #endif
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
-	if(isZero() || carl::isZero(lcoeff()) || lcoeff().lcoeff() > NumberType(0))
+	if(carl::isZero(*this) || carl::isZero(lcoeff()) || lcoeff().lcoeff() > NumberType(0))
 	{
 		return Coeff(1);
 	}	
@@ -578,7 +578,7 @@ template<typename C, EnableIf<Not<is_field<C>>, is_number<C> >>
 #endif
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
-	if(isZero() || lcoeff() > Coeff(0))
+	if(carl::isZero(*this) || lcoeff() > Coeff(0))
 	{
 		return Coeff(1);
 	}
@@ -592,7 +592,7 @@ template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 {
-	assert(!this->isZero());
+	assert(!carl::isZero(*this));
 	auto it = mCoefficients.begin();
 	IntNumberType num = getNum(*it);
 	IntNumberType den = getDenom(*it);
@@ -607,7 +607,7 @@ template<typename Coeff>
 template<typename C, DisableIf<is_subset_of_rationals<C>>>
 typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::coprimeFactor() const
 {
-	assert(!this->isZero());
+	assert(!carl::isZero(*this));
 	auto it = mCoefficients.begin();
 	typename UnderlyingNumberType<Coeff>::type factor = it->coprimeFactor();
 	for (++it; it != mCoefficients.end(); ++it) {
@@ -623,7 +623,7 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 	CARL_LOG_TRACE("carl.core", *this << " .coprimeCoefficients()");
 	// Notice that even if factor is 1, we create a new polynomial
 	UnivariatePolynomial<typename IntegralType<Coeff>::type> result(mMainVar);
-	if (this->isZero()) {
+	if (carl::isZero(*this)) {
 		return result;
 	}
 	result.mCoefficients.reserve(mCoefficients.size());
@@ -638,7 +638,7 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 template<typename Coeff>
 template<typename C, DisableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprimeCoefficients() const {
-	if (this->isZero()) return *this;
+	if (carl::isZero(*this)) return *this;
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
 	auto factor = this->coprimeFactor();
@@ -652,9 +652,9 @@ template<typename Coeff>
 template<typename C, EnableIf<is_integer<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	assert(!divisor.isZero());
+	assert(!carl::isZero(divisor));
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
-	if(isZero()) return result;
+	if(carl::isZero(*this)) return result;
 	assert(*this == divisor * result.quotient + result.remainder);
 
 	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(), Coeff(0));
@@ -673,10 +673,10 @@ template<typename Coeff>
 template<typename C, DisableIf<is_integer<C>>, EnableIf<is_field<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	assert(!divisor.isZero());
+	assert(!carl::isZero(divisor));
 	assert(this->mainVar() == divisor.mainVar());
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
-	if(isZero()) return result;
+	if(carl::isZero(*this)) return result;
 	assert(*this == divisor * result.quotient + result.remainder);
 	if(divisor.degree() > degree())
 	{
@@ -691,7 +691,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff) * divisor;
 		result.quotient.mCoefficients[degdiff] += factor;
 	}
-	while(!result.remainder.isZero() && divisor.degree() <= result.remainder.degree());
+	while(!carl::isZero(result.remainder) && divisor.degree() <= result.remainder.degree());
 	
 	assert(*this == divisor * result.quotient + result.remainder);
 	return result;
@@ -739,7 +739,7 @@ template<typename Coeff>
 bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& divisor) const
 {
 	///@todo Is this correct?
-	return divisor.divideBy(*this).remainder.isZero();
+	return carl::isZero(divisor.divideBy(*this).remainder);
 }
 
 template<typename Coeff>
@@ -819,7 +819,7 @@ template<typename Coeff>
 template<typename N, EnableIf<is_subset_of_rationals<N>>>
 typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::numericContent() const
 {
-	if (this->isZero()) return NumberType(0);
+	if (carl::isZero(*this)) return NumberType(0);
 	// Obtain main denominator for all coefficients.
 	IntNumberType mainDenom = this->mainDenom();
 	
@@ -1077,7 +1077,7 @@ LinearFactorRemains:
 		// Add the constant factor to the factors.
 		if( !linearFactors.empty() && linearFactors.begin()->first.isConstant() )
 		{
-			if( linearFactors.begin()->first.isZero() )
+			if( carl::isZero(linearFactors.begin()->first) )
 				factor = Coeff( 0 );
 			else
 				factor *= linearFactors.begin()->first.lcoeff();
@@ -1142,7 +1142,7 @@ void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
 template<typename Coeff>
 void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
 	assert(this->isRoot(root));
-	if (this->isZero()) return;
+	if (carl::isZero(*this)) return;
 	if (root == Coeff(0)) {
 		this->eliminateZeroRoots();
 		return;
@@ -1171,7 +1171,7 @@ std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardStur
 	UnivariatePolynomial<Coeff> q = polynomial;
 
 	seq.push_back(p);
-	while (! q.isZero()) {
+	while (! carl::isZero(q)) {
 		seq.push_back(q);
 		q = - p.remainder(q);
 		p = seq.back();
@@ -1207,7 +1207,7 @@ uint UnivariatePolynomial<Coeff>::signVariations(const Interval<Coeff>& interval
 
 template<typename Coeff>
 int UnivariatePolynomial<Coeff>::countRealRoots(const Interval<Coeff>& interval) const {
-	assert(!this->isZero());
+	assert(!carl::isZero(*this));
 	assert(!this->isRoot(interval.lower()));
 	assert(!this->isRoot(interval.upper()));
 	return UnivariatePolynomial<Coeff>::countRealRoots(this->standardSturmSequence(), interval);
@@ -1291,7 +1291,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Univa
 {
 	assert(mMainVar == rhs.mMainVar);
 	
-	if(rhs.isZero())
+	if(carl::isZero(rhs))
 	{
 		return *this;
 	}
@@ -1440,7 +1440,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const UnivariatePolynomial& rhs)
 {
 	assert(mMainVar == rhs.mMainVar);
-	if(rhs.isZero())
+	if(carl::isZero(rhs))
 	{
 		mCoefficients.clear();
 		return *this;
@@ -1544,7 +1544,7 @@ template<typename C>
 UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs)
 {
 	assert(rhs != C(0));
-	if(lhs.isZero()) return lhs;
+	if(carl::isZero(lhs)) return lhs;
 	UnivariatePolynomial<C> res(lhs);
 	return res /= rhs;
 }
@@ -1561,7 +1561,7 @@ bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C
 	else
 	{
 		// in different variables, polynomials can still be equal if constant.
-		if(lhs.isZero() && rhs.isZero()) return true;
+		if(carl::isZero(lhs) && carl::isZero(rhs)) return true;
 		if(lhs.isConstant() && rhs.isConstant() && lhs.lcoeff() == rhs.lcoeff()) return true;
 		return MultivariatePolynomial<typename carl::UnderlyingNumberType<C>::type>(lhs) == MultivariatePolynomial<typename carl::UnderlyingNumberType<C>::type>(rhs);
 	}
@@ -1577,7 +1577,7 @@ bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomia
 template<typename C>
 bool operator==(const UnivariatePolynomial<C>& lhs, const C& rhs)
 {	
-	if(lhs.isZero())
+	if(carl::isZero(lhs))
 	{
 		return rhs == C(0);
 	}
@@ -1614,8 +1614,8 @@ bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, const Pol
 			return *this < rhs;
 		}*/
 		case PolynomialComparisonOrder::LowDegree:
-			if (rhs.isZero()) return false;
-			if (isZero() || this->degree() < rhs.degree()) return true;
+			if (carl::isZero(rhs)) return false;
+			if (carl::isZero(*this) || this->degree() < rhs.degree()) return true;
 			return *this < rhs;
 		case PolynomialComparisonOrder::Memory:
 			return this < &rhs;
@@ -1654,7 +1654,7 @@ bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>
 template<typename C>
 std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 {
-	if(rhs.isZero()) return os << "0";
+	if(carl::isZero(rhs)) return os << "0";
 	for(size_t i = 0; i < rhs.mCoefficients.size()-1; ++i )
 	{
 		const C& c = rhs.mCoefficients[rhs.mCoefficients.size()-i-1];
@@ -1681,7 +1681,7 @@ template<typename Coefficient>
 template<typename C, DisableIf<is_number<C>>>
 bool UnivariatePolynomial<Coefficient>::isConsistent() const {
 	if (this->mCoefficients.size() > 0) {
-		assert(!this->lcoeff().isZero());
+		assert(!carl::isZero(lcoeff()));
 	}
 	for (auto c: this->mCoefficients) {
 		assert(!c.has(this->mainVar()));

@@ -7,10 +7,10 @@ namespace carl {
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> gcd_recursive(const UnivariatePolynomial<Coeff>& a, const UnivariatePolynomial<Coeff>& b) {
-	assert(!a.isZero());
-	assert(b.isZero() || b.degree() <= a.degree());
+	assert(!carl::isZero(a));
+	assert(carl::isZero(b) || b.degree() <= a.degree());
 	
-	if(b.isZero()) return a;
+	if(carl::isZero(b)) return a;
 //	if(is_field<Coeff>::value)
 //	{
 //		if(b.isConstant()) return b;
@@ -96,8 +96,8 @@ UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, c
 template<typename Coeff>
 UnivariatePolynomial<Coeff> gcd(const UnivariatePolynomial<Coeff>& a, const UnivariatePolynomial<Coeff>& b) {
 	// We want degree(b) <= degree(a).
-	assert(!a.isZero());
-	assert(!b.isZero());
+	assert(!carl::isZero(a));
+	assert(!carl::isZero(b));
 	assert(a.mainVar() == b.mainVar());
 	if(a.degree() < b.degree()) return gcd_recursive(b.normalized(),a.normalized()).normalized();
 	else return gcd_recursive(a.normalized(),b.normalized()).normalized();

@@ -29,7 +29,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 	CARL_LOG_FUNC("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 	assert(varToRANMap.count(poly.mainVar()) == 0);
 
-	if (poly.isZero()) {
+	if (carl::isZero(poly)) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "poly is 0 -> everything is a root");
 		return boost::none;
 	}
@@ -55,7 +55,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 			IRmap.emplace(v, varToRANMap.at(v));
 		}
 	}
-	if (polyCopy.isZero()) {
+	if (carl::isZero(polyCopy)) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "poly is 0 after substituting rational assignments -> everything is a root");
 		return boost::none;
 	}
@@ -66,7 +66,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		CARL_LOG_TRACE("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 		assert(IRmap.find(polyCopy.mainVar()) == IRmap.end());
 		UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(polyCopy, IRmap);
-		if (evaledpoly.isZero()) return boost::none;
+		if (carl::isZero(evaledpoly)) return boost::none;
 		CARL_LOG_TRACE("carl.core.rootfinder", "Calling on " << evaledpoly);
 		auto res = realRoots(evaledpoly, interval, pivoting);
 		MultivariatePolynomial<Number> mvpoly(polyCopy);

@@ -59,8 +59,8 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 	std::list<UnivariatePolynomial<Coeff>> subresultants;
 	Variable variable = pol1.mainVar();
 	
-	assert(!pol1.isZero());
-	assert(!pol2.isZero());
+	assert(!carl::isZero(pol1));
+	assert(!carl::isZero(pol2));
 	// We initialize p and q with pol1 and pol2.
 	UnivariatePolynomial<Coeff> p(pol1), q(pol2);
 	
@@ -72,7 +72,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 	CARL_LOG_TRACE("carl.core.resultant", "q = " << q);
 	
 	subresultants.push_front(p);
-	if (q.isZero()) {
+	if (carl::isZero(q)) {
 		CARL_LOG_TRACE("carl.core.resultant", "q is Zero.");
 		return subresultants;
 	}
@@ -110,7 +110,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 		CARL_LOG_TRACE("carl.core.resultant", "Looping...");
 		CARL_LOG_TRACE("carl.core.resultant", "p = " << p);
 		CARL_LOG_TRACE("carl.core.resultant", "q = " << q);
-		if (q.isZero()) return subresultants;
+		if (carl::isZero(q)) return subresultants;
 		uint pDeg = p.degree();
 		uint qDeg = q.degree();
 		subresultants.push_front(q);
@@ -139,7 +139,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 					bool res = reductionCoeff.divideBy(dividant, c);
 					if (res) {
 						subresultants.push_front(c);
-						assert(!c.isZero());
+						assert(!carl::isZero(c));
 						qDeg = c.degree();
 					} else {
 						c = q;
@@ -181,7 +181,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 					bool res = reductionCoeff.divideBy(subresLcoeff, c);
 					if (res) {
 						subresultants.push_front(c);
-						assert(!c.isZero());
+						assert(!carl::isZero(c));
 						qDeg = c.degree();
 						CARL_LOG_TRACE("carl.core.resultant", "qDeg = " << qDeg);
 					} else {
@@ -206,7 +206,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 			case SubresultantStrategy::Generic:
 			case SubresultantStrategy::Lazard: {
 				CARL_LOG_TRACE("carl.core.resultant", "Part 3: Generic/Lazard strategy");
-				if (p.isZero()) return subresultants;
+				if (carl::isZero(p)) return subresultants;
 				
 				/* If b was constant, the degree properties for subresultants are still met, enforcing us to disregard whether
 				 * the above division was successful (in this case, reducedNewB remains unchanged).
@@ -273,7 +273,7 @@ std::vector<UnivariatePolynomial<Coeff>> principalSubresultantsCoefficients(
 	CARL_LOG_DEBUG("carl.upoly", "PSC of " << p << " and " << q << " on " << p.mainVar() << ": " << subres);
 	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs;
 	for (const auto& s: subres) {
-		assert(!s.isZero());
+		assert(!carl::isZero(s));
 		subresCoeffs.emplace_back(s.mainVar(), s.lcoeff());
 	}
 	return subresCoeffs;
@@ -286,7 +286,7 @@ UnivariatePolynomial<Coeff> resultant(
 		SubresultantStrategy strategy
 ) {
 	assert(p.mainVar() == q.mainVar());
-	if (p.isZero() || q.isZero()) return UnivariatePolynomial<Coeff>(p.mainVar());
+	if (carl::isZero(p) || carl::isZero(q)) return UnivariatePolynomial<Coeff>(p.mainVar());
 	UnivariatePolynomial<Coeff> resultant = subresultants(p.normalized(), q.normalized(), strategy).front();
 	CARL_LOG_TRACE("carl.core.resultant", "resultant(" << p << ", " << q << ") = " << resultant);
 	if (resultant.isConstant()) {
@@ -323,7 +323,7 @@ namespace resultant_debug {
 		const UnivariatePolynomial<Coeff>& q
 	) {
 		//std::cout << "resultant(" << p << ", " << q << ", " << q.mainVar() << ")" << std::endl;
-		if (p.isZero() || q.isZero()) {
+		if (carl::isZero(p) || carl::isZero(q)) {
 			//std::cout << "Zero" << std::endl;
 			return UnivariatePolynomial<Coeff>(q.mainVar());
 		}
@@ -444,7 +444,7 @@ namespace resultant_debug {
 		const UnivariatePolynomial<Coeff>& p,
 		const UnivariatePolynomial<Coeff>& q
 	) {
-		if (p.isZero() || q.isZero()) {
+		if (carl::isZero(p) || carl::isZero(q)) {
 			return UnivariatePolynomial<Coeff>(q.mainVar());
 		}
 		if (p.isConstant()) {

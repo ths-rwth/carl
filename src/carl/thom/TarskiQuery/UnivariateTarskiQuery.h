@@ -14,7 +14,7 @@ namespace carl {
 
 template<typename Number>
 Sign signAtMinusInf(const UnivariatePolynomial<Number>& p) {
-        if(p.isZero()) return Sign::ZERO; // check this special case because otherwise lcoeff fires assertion
+        if(carl::isZero(p)) return Sign::ZERO; // check this special case because otherwise lcoeff fires assertion
         if(p.degree() % 2 == 0) {               // even degree
                 return carl::sgn(p.lcoeff());
         }
@@ -25,7 +25,7 @@ Sign signAtMinusInf(const UnivariatePolynomial<Number>& p) {
 
 template<typename Number>
 Sign signAtPlusInf(const UnivariatePolynomial<Number>& p) {
-        if(p.isZero()) return Sign::ZERO;
+        if(carl::isZero(p)) return Sign::ZERO;
         return carl::sgn(p.lcoeff());
 }
 
@@ -37,7 +37,7 @@ Sign signAtPlusInf(const UnivariatePolynomial<Number>& p) {
 template<typename Number>
 int univariateTarskiQuery(const UnivariatePolynomial<Number>& p, const UnivariatePolynomial<Number>& q, const UnivariatePolynomial<Number>& der_q) {
         CARL_LOG_FUNC("carl.thom.tarski", "p = " << p << ", q = " << q << ", der_q = " << der_q);
-        CARL_LOG_ASSERT("carl.thom.tarski", !q.isZero(), "cannot query on an infinite zero set!");
+        CARL_LOG_ASSERT("carl.thom.tarski", !carl::isZero(q), "cannot query on an infinite zero set!");
         std::list<UnivariatePolynomial<Number>> srs = q.standardSturmSequence(der_q * p); // standardSturmSequence is the signed remainder sequence
         int atMinusInf = int(signVariations(srs.begin(), srs.end(), [](const UnivariatePolynomial<Number>& p){ return signAtMinusInf(p); })); 
         int atPlusInf = int(signVariations(srs.begin(), srs.end(), [](const UnivariatePolynomial<Number>& p){ return signAtPlusInf(p); }));

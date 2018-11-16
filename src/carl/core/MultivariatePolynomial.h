@@ -164,11 +164,11 @@ public:
 	 * @return leading term.
 	 */
 	const Term<Coeff>& lterm() const {
-		CARL_LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
+		CARL_LOG_ASSERT("carl.core", nrTerms() > 0, "Leading term undefined on zero polynomials.");
 		return mTerms.back();
 	}
 	Term<Coeff>& lterm(){
-		CARL_LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
+		CARL_LOG_ASSERT("carl.core", nrTerms() > 0, "Leading term undefined on zero polynomials.");
 		return mTerms.back();
 	}
 	/**
@@ -199,11 +199,11 @@ public:
 	 * Give the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 */
 	const Term<Coeff>& trailingTerm() const {
-		CARL_LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
+		CARL_LOG_ASSERT("carl.core", nrTerms() > 0, "Trailing term undefined on zero polynomials.");
 		return mTerms.front();
 	}
 	Term<Coeff>& trailingTerm() {
-		CARL_LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
+		CARL_LOG_ASSERT("carl.core", nrTerms() > 0, "Trailing term undefined on zero polynomials.");
 		return mTerms.front();
 	}
 	

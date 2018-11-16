@@ -204,7 +204,7 @@ public:
 	 */
 	UnivariatePolynomial one() const {
 		if constexpr (carl::is_instantiation_of<GFNumber, Coefficient>::value) {
-			if (isZero()) {
+			if (mCoefficients.empty()) {
 				return UnivariatePolynomial(mMainVar, Coefficient(1));
 			} else {
 				return UnivariatePolynomial(mMainVar, Coefficient(1, lcoeff().gf()));
@@ -259,7 +259,7 @@ public:
 		if constexpr (carl::is_number<Coefficient>::value) {
 			return isConstant();
 		} else {
-			if (isZero()) return true;
+			if (mCoefficients.empty()) return true;
 			return isConstant() && lcoeff().isNumber();
 		}
 	}
@@ -270,7 +270,7 @@ public:
 	 */
 	NumberType constantPart() const
 	{
-		if (isZero()) return NumberType(0);
+		if (mCoefficients.empty()) return NumberType(0);
 		if constexpr (carl::is_number<Coefficient>::value) {
 			return tcoeff();
 		} else {
@@ -300,7 +300,7 @@ public:
 	 * @return Degree.
 	 */
 	uint degree() const {
-		assert(mCoefficients.size() > 0);
+		assert(!mCoefficients.empty());
 		return uint(mCoefficients.size()-1);
 	}
 	
@@ -314,7 +314,7 @@ public:
 		if constexpr (carl::is_number<Coefficient>::value) {
 			return degree();
 		} else {
-			if (isZero()) return 0;
+			if (carl::isZero(*this)) return 0;
 			uint max = 0;
 			for (std::size_t deg = 0; deg < mCoefficients.size(); deg++) {
 				if (!mCoefficients[deg].isZero()) {
@@ -342,7 +342,7 @@ public:
 	 * Removes the leading term from the polynomial.
 	 */
 	void truncate() {
-		assert(this->mCoefficients.size() > 0);
+		assert(!mCoefficients.empty());
 		this->mCoefficients.resize(this->mCoefficients.size()-1);
 		this->stripLeadingZeroes();
 	}
@@ -396,7 +396,7 @@ public:
 			return std::set<Variable>({mainVar()});
 		} else {
 			std::set<Variable> res({this->mainVar()});
-			for (auto c: this->mCoefficients) {
+			for (const auto& c: this->mCoefficients) {
 				auto tmp = c.gatherVariables();
 				res.insert(tmp.begin(), tmp.end());
 			}
@@ -411,7 +411,7 @@ public:
 	void gatherVariables(std::set<Variable>& vars) const {
 		vars = {mainVar()};
 		if constexpr (!carl::is_number<Coefficient>::value) {
-			for (auto c: this->mCoefficients) {
+			for (const auto& c: mCoefficients) {
 				auto tmp = c.gatherVariables();
 				vars.insert(tmp.begin(), tmp.end());
 			}
@@ -779,7 +779,7 @@ public:
 	 * @return True if zero is a root.
 	 */
 	bool zeroIsRoot() const {
-		return this->isZero() || (this->mCoefficients[0] == Coefficient(0));
+		return mCoefficients.empty() || carl::isZero(mCoefficients[0]);
 	}
 	/**
 	 * Reduces the polynomial such that zero is not a root anymore.
@@ -1051,7 +1051,7 @@ private:
 	
 	void stripLeadingZeroes() 
 	{
-		while(!isZero() && lcoeff() == Coefficient(0))
+		while(mCoefficients.size() > 0 && carl::isZero(lcoeff()))
 		{
 			mCoefficients.pop_back();
 		}

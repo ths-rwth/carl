@@ -33,7 +33,7 @@ template<typename Pol, bool AS>
 void RationalFunction<Pol, AS>::eliminateCommonFactor(bool _justNormalize) {
 	if (mIsSimplified) return;
 	assert(!isConstant());
-	if (nominatorAsPolynomial().isZero()) {
+	if (carl::isZero(nominatorAsPolynomial())) {
 		mPolynomialQuotient.reset();
 		mNumberQuotient = std::move(CoeffType(0));
 		mIsSimplified = true;

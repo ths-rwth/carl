@@ -49,7 +49,7 @@ public:
                 if(std::distance(first, last) == 1 && first->isUnivariate()) {
                         CARL_LOG_TRACE("carl.thom.tarski.manager", "as a UNIVARIATE manager");
                         mZ = first->toUnivariatePolynomial();
-                        CARL_LOG_ASSERT("carl.thom.tarski.manager", !mZ.isZero(), "");
+                        CARL_LOG_ASSERT("carl.thom.tarski.manager", !carl::isZero(mZ), "");
                         mDer = mZ.derivative();
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", this->isUnivariateManager(), "");
                 }
@@ -127,7 +127,7 @@ public:
 private:
         
         bool isUnivariateManager() const {
-                return !mZ.isZero();
+                return !carl::isZero(mZ);
         }
         
         /*

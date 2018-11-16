@@ -33,7 +33,7 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Detected zero root in " << mPolynomial);
 		addRoot(RealAlgebraicNumber<Number>(0));
 	}
-	if (mPolynomial.isZero()) {
+	if (carl::isZero(mPolynomial)) {
 		setFinished();
 		return;
 	}

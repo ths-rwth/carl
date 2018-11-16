@@ -785,6 +785,22 @@ namespace carl
         template <typename P1>
         friend FactorizedPolynomial<P1> operator*(const FactorizedPolynomial<P1>& _lhs, const typename FactorizedPolynomial<P1>::CoeffType& _rhs);
     };
+
+/**
+ * @return true, if the factorized polynomial is one.
+ */
+template <typename P>
+bool isOne(const FactorizedPolynomial<P>& fp) {
+	return fp.isOne();
+}
+
+/**
+ * @return true, if the factorized polynomial is zero.
+ */
+template <typename P>
+bool isZero(const FactorizedPolynomial<P>& fp) {
+	return fp.isZero();
+}
     
     /**
      * Obtains the polynomial (representation) of this factorized polynomial. Note, that the result won't be stored

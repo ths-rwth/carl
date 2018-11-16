@@ -592,7 +592,7 @@ namespace carl
         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "GCD (internal) of " << _pfPairA << " and " << _pfPairB << ": " << result << " with rests " << _restA << " and " << _restB );
         assert( computePolynomial( result ) * computePolynomial( _restA ) == computePolynomial( _pfPairA ) );
         assert( computePolynomial( result ) * computePolynomial( _restB ) == computePolynomial( _pfPairB ) );
-        assert( carl::gcd( computePolynomial( _restA ), computePolynomial( _restB )).isOne());
+        assert( carl::isOne(carl::gcd( computePolynomial( _restA ), computePolynomial( _restB ))));
         return result;
     }
     

@@ -72,7 +72,7 @@ public:
 		} else {
 			mPolynomialQuotient = std::pair<Pol, Pol>(nom, denom);
 			eliminateCommonFactor(!AutoSimplify);
-			assert(isConstant() || !denominatorAsPolynomial().isZero());
+			assert(isConstant() || !carl::isZero(denominatorAsPolynomial()));
 		}
 	}
 
@@ -81,7 +81,7 @@ public:
 		  mNumberQuotient(),
 		  mIsSimplified(false) {
 		eliminateCommonFactor(!AutoSimplify);
-		assert(isConstant() || !denominatorAsPolynomial().isZero());
+		assert(isConstant() || !carl::isZero(denominatorAsPolynomial()));
 	}
 
 	explicit RationalFunction(boost::optional<std::pair<Pol, Pol>>&& quotient, const CoeffType& num, bool simplified)

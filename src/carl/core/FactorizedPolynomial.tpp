@@ -1304,16 +1304,16 @@ namespace carl
         {
             FactorizedPolynomial<P> result( _fpolyA );
             result.mCoefficient = coefficientLCM;
-            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
-            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
+            assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyA ) )) );
+            assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyB ) )) );
             return std::move( result );
         }
         else if( !existsFactorization( _fpolyA ) )
         {
             FactorizedPolynomial<P> result( _fpolyB );
             result.mCoefficient = coefficientLCM;
-            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
-            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
+            assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyA ) )) );
+            assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyB ) )) );
             return std::move( result );
         }
         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "Compute LCM of " << _fpolyA << " and " << _fpolyB );
@@ -1342,8 +1342,8 @@ namespace carl
         coefficientLCM *= distributeCoefficients( lcmFactorization );
         FactorizedPolynomial<P> result( std::move( lcmFactorization ), coefficientLCM, _fpolyA.pCache() );
         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "LCM of " << _fpolyA << " and " << _fpolyB << ": " << result);
-        assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
-        assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
+        assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyA ) )) );
+        assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyB ) )) );
         return std::move( result );
     }
 
@@ -1362,16 +1362,16 @@ namespace carl
         {
             FactorizedPolynomial<P> result( _fpolyA );
             result.mCoefficient = coefficientLCM;
-            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
-            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
+            assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyA ) )) );
+            assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyB ) )) );
             return std::move( result );
         }
         else if( !existsFactorization( _fpolyA ) )
         {
             FactorizedPolynomial<P> result( _fpolyB );
             result.mCoefficient = coefficientLCM;
-            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
-            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
+            assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyA ) )) );
+            assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyB ) )) );
             return std::move( result );
         }
         
@@ -1410,8 +1410,8 @@ namespace carl
             factorB++;
         }
         FactorizedPolynomial<P> result( std::move( cmFactorization ), coefficientLCM, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
-        assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
-        assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
+        assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyA ) )) );
+        assert( carl::isZero(computePolynomial( result ).remainder( computePolynomial( _fpolyB ) )) );
         return std::move( result );
     }
 
@@ -1428,8 +1428,8 @@ namespace carl
         if( !existsFactorization( _fpolyA ) || !existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> result( coefficientCommon );
-            assert( computePolynomial( _fpolyA ).remainder( computePolynomial( result ) ).isZero() );
-            assert( computePolynomial( _fpolyB ).remainder( computePolynomial( result ) ).isZero() );
+            assert( carl::isZero(computePolynomial( _fpolyA ).remainder( computePolynomial( result ) )) );
+            assert( carl::isZero(computePolynomial( _fpolyB ).remainder( computePolynomial( result ) )) );
             return std::move( result );
         }
         
@@ -1452,8 +1452,8 @@ namespace carl
                 factorB++;
         }
         FactorizedPolynomial<P> result( std::move( cdFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
-        assert( computePolynomial( _fpolyA ).remainder( computePolynomial( result ) ).isZero() );
-        assert( computePolynomial( _fpolyB ).remainder( computePolynomial( result ) ).isZero() );
+        assert( carl::isZero(computePolynomial( _fpolyA ).remainder( computePolynomial( result ) )) );
+        assert( carl::isZero(computePolynomial( _fpolyB ).remainder( computePolynomial( result ) )) );
         return std::move( result );
     }
 

@@ -34,7 +34,7 @@ MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>
 template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>
 UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p) {
 	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
-	if (p.isZero()) return p;
+	if (carl::isZero(p)) return p;
 	if (p.isLinearInMainVar()) return p;
 	UnivariatePolynomial<Coeff> normalized = p.coprimeCoefficients().template convert<Coeff>();
 	return normalized.divideBy(carl::gcd(normalized, normalized.derivative())).quotient;

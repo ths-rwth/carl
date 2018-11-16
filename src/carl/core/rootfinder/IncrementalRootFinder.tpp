@@ -139,7 +139,7 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 				if (interval.contains(roots[i]) && finder.getPolynomial().evaluate(roots[i]) == 0) {
 					res.push_back(roots[i]);
 				}
-				Number tmpSample = Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT).sample();
+				Number tmpSample = carl::sample(Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT));
 				if (interval.contains(tmpSample)) res.push_back(tmpSample);
 			}
 			if (interval.contains(roots.back()) && finder.getPolynomial().evaluate(roots.back()) == 0) {
@@ -176,7 +176,7 @@ namespace splitting_strategies {
 
 template<typename Number>
 void GenericStrategy<Number>::operator()(const Interval<Number>& interval, RootFinder<Number>& finder) {
-	Number pivot = interval.center();
+	Number pivot = center(interval);
 	if (finder.getPolynomial().evaluate(pivot) == 0) {
 		finder.addRoot(RealAlgebraicNumber<Number>(pivot));
 	}
@@ -186,7 +186,7 @@ void GenericStrategy<Number>::operator()(const Interval<Number>& interval, RootF
 
 template<typename Number>
 void BinarySampleStrategy<Number>::operator()(const Interval<Number>& interval, RootFinder<Number>& finder) {
-	Number pivot = interval.sample();
+	Number pivot = carl::sample(interval);
 	if (finder.getPolynomial().evaluate(pivot) == 0) {
 		finder.addRoot(RealAlgebraicNumber<Number>(pivot));
 	}
@@ -196,12 +196,12 @@ void BinarySampleStrategy<Number>::operator()(const Interval<Number>& interval, 
 
 template<typename Number>
 void BinaryNewtonStrategy<Number>::operator()(const Interval<Number>& interval, RootFinder<Number>& finder) {
-	Number pivot = interval.sample();
+	Number pivot = sample(interval);
 	Number diff = finder.getPolynomial().derivative().evaluate(pivot);
 	if (diff != 0) {
 		pivot -= finder.getPolynomial().evaluate(pivot) / diff;
 	}
-	if (!interval.contains(pivot)) pivot = interval.sample();
+	if (!interval.contains(pivot)) pivot = sample(interval);
 	if (finder.getPolynomial().evaluate(pivot) == 0) {
 		finder.addRoot(RealAlgebraicNumber<Number>(pivot));
 	}

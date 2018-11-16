@@ -87,7 +87,7 @@ Number sample_left(const Interval<Number>& i) {
 	}
 	Number res = carl::floor(i.lower()) + carl::constant_one<Number>().get();
 	if (i.contains(res)) return res;
-	return i.center();
+	return center(i);
 }
 /**
  * Searches for some point in this interval, preferably near the right endpoint and with a small representation.
