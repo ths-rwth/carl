@@ -186,14 +186,14 @@ public:
 	bool isZero() const {
 		if (isConstant())
 			return carl::isZero(mNumberQuotient);
-		assert(!denominatorAsPolynomial().isZero());
-		return nominatorAsPolynomial().isZero();
+		assert(!carl::isZero(denominatorAsPolynomial()));
+		return carl::isZero(nominatorAsPolynomial());
 	}
 
 	bool isOne() const {
 		if (isConstant())
 			return carl::isOne(mNumberQuotient);
-		assert(!denominatorAsPolynomial().isZero());
+		assert(!carl::isZero(denominatorAsPolynomial()));
 		return nominatorAsPolynomial() == denominatorAsPolynomial();
 	}
 

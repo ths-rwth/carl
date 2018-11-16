@@ -146,7 +146,7 @@ namespace carl {
                 if( mRoot % 2 == 0 )
                 {
                     Interval<double> rootA, rootB;
-                    if( tmp.unite( -tmp, rootA, rootB ) )
+                    if( carl::set_union(tmp, -tmp, rootA, rootB ) )
                     {   
                         if (mVar.type() == VariableType::VT_INT) {
                             rootA = rootA.integralPart();
@@ -209,7 +209,7 @@ namespace carl {
                 {
                     // TODO: division returns two intervals, which might be united to one interval
                     Interval<double> tmpA, tmpB;
-                    if( result1.unite( result2, tmpA, tmpB ) )
+                    if( carl::set_union(result1, result2, tmpA, tmpB ) )
                     {
                         addRoot( tmpA, varInterval, result );
                         addRoot( tmpB, varInterval, result );
@@ -378,10 +378,10 @@ namespace carl {
                     Interval<double> tmp;
                     for( const auto& i : resultPropagation )
                     {
-                        tmp = i.intersect( resA );
+                        tmp = carl::set_intersection(i, resA);
                         if( !tmp.isEmpty() )
                             resultingIntervals.push_back(tmp);
-                        tmp = i.intersect( resB );
+                        tmp = carl::set_intersection(i, resB);
                         if( !tmp.isEmpty() )
                             resultingIntervals.push_back(tmp);
                     }
@@ -392,7 +392,7 @@ namespace carl {
                     Interval<double> tmp;
                     for( const auto& i : resultPropagation )
                     {
-                        tmp = i.intersect( resA );
+                        tmp = carl::set_intersection(i, resA);
                         if( !tmp.isEmpty() )
                             resultingIntervals.push_back(tmp);
                     }
@@ -497,7 +497,7 @@ namespace carl {
         {
             bool splitOccurred = false;
             
-            double center = useNiceCenter ? intervals.at(variable).sample() : intervals.at(variable).center();
+            double center = useNiceCenter ? carl::sample(intervals.at(variable)) : carl::center(intervals.at(variable));
             if( center == std::numeric_limits<double>::infinity() || center == -std::numeric_limits<double>::infinity() )
             {
                 resA = intervals.at(variable);
@@ -539,13 +539,13 @@ namespace carl {
 				#endif
                 splitOccurred = true;
                 if(result1 >= result2) {
-                    resA = intervals.at(variable).intersect(centerInterval.sub(result1));
-                    resB = intervals.at(variable).intersect(centerInterval.sub(result2));
+                    resA = carl::set_intersection(intervals.at(variable), centerInterval.sub(result1));
+                    resB = carl::set_intersection(intervals.at(variable), centerInterval.sub(result2));
                 }
                 else
                 {
-                    resA = intervals.at(variable).intersect(centerInterval.sub(result2));
-                    resB = intervals.at(variable).intersect(centerInterval.sub(result1));
+                    resA = carl::set_intersection(intervals.at(variable), centerInterval.sub(result2));
+                    resB = carl::set_intersection(intervals.at(variable), centerInterval.sub(result1));
                 }
                 if (variable.type() == VariableType::VT_INT) {
                     resA = resA.integralPart();
@@ -567,8 +567,7 @@ namespace carl {
                 else
                 {
                     Interval<double> tmpA, tmpB;
-                    if( !resA.unite( resB, tmpA, tmpB ) )
-                    {
+                    if (!carl::set_union(resA, resB, tmpA, tmpB)) {
                         resA = std::move(tmpA);
                         resB = Interval<double>::emptyInterval();
                         splitOccurred = false;
@@ -578,7 +577,7 @@ namespace carl {
 				#ifdef CONTRACTION_DEBUG
 				std::cout << __func__ << ": result: " << result1 << std::endl;
 				#endif
-                resA = intervals.at(variable).intersect(centerInterval.sub(result1));
+                resA = carl::set_intersection(intervals.at(variable), centerInterval.sub(result1));
 				if (variable.type() == VariableType::VT_INT) {
 					resA = resA.integralPart();
 				}

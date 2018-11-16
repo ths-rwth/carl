@@ -62,7 +62,7 @@ TEST(MultivariatePolynomial, remainder)
     MultivariatePolynomial<Rational> py( y );
     MultivariatePolynomial<Rational> p( px - Rational(3) );
     MultivariatePolynomial<Rational> p4( p * p * p * p );
-    EXPECT_TRUE( p4.remainder( p ).isZero() );
+    EXPECT_TRUE( carl::isZero(p4.remainder( p )) );
 }
 
 

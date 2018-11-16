@@ -94,23 +94,23 @@ namespace carl {
 					else i.setUpper(upper.lower());
 				}
 			}
-			CARL_LOG_TRACE("carl.ran", "Selecting from (" << lower << ", " << upper << ") -> " << i.sample(false) << " (from " << i << ")");
+			CARL_LOG_TRACE("carl.ran", "Selecting from (" << lower << ", " << upper << ") -> " << sample(i, false) << " (from " << i << ")");
 			switch (heuristic) {
 				case RANSampleHeuristic::Center:
-					return RealAlgebraicNumber<Number>(i.center(), false);
+					return RealAlgebraicNumber<Number>(center(i), false);
 				case RANSampleHeuristic::CenterInt:
-					return RealAlgebraicNumber<Number>(i.sample(false), false);
+					return RealAlgebraicNumber<Number>(sample(i, false), false);
 				case RANSampleHeuristic::LeftInt:
-					return RealAlgebraicNumber<Number>(i.sampleLeft(), false);
+					return RealAlgebraicNumber<Number>(sample_left(i), false);
 				case RANSampleHeuristic::RightInt:
-					return RealAlgebraicNumber<Number>(i.sampleRight(), false);
+					return RealAlgebraicNumber<Number>(sample_right(i), false);
 				case RANSampleHeuristic::ZeroInt:
-					return RealAlgebraicNumber<Number>(i.sampleZero(), false);
+					return RealAlgebraicNumber<Number>(sample_zero(i), false);
 				case RANSampleHeuristic::InftyInt:
-					return RealAlgebraicNumber<Number>(i.sampleInfty(), false);
+					return RealAlgebraicNumber<Number>(sample_infty(i), false);
 				default:
 					CARL_LOG_WARN("carl.ran", "Using unknown sampling heuristic " << heuristic << ", fallback to sample.");
-					return RealAlgebraicNumber<Number>(i.sample(false), false);
+					return RealAlgebraicNumber<Number>(sample(i, false), false);
 			}
 		}
 	}

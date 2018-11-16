@@ -273,7 +273,7 @@ RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const RationalF
 		return *this /= rhs.mNumberQuotient;
 	}
 	mIsSimplified = false;
-	if (rhs.denominatorAsPolynomial().isOne()) {
+	if (carl::isOne(rhs.denominatorAsPolynomial())) {
 		return *this /= rhs.nominatorAsPolynomial();
 	}
 	mPolynomialQuotient->first *= rhs.denominatorAsPolynomial();

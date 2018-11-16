@@ -178,7 +178,7 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 
 	auto sturmSeq = res.standardSturmSequence();
 	// the interval should include at least one root.
-	assert(!res.isZero());
+	assert(!carl::isZero(res));
 	assert(
 		res.sgn(interval.lower()) == Sign::ZERO ||
 		res.sgn(interval.upper()) == Sign::ZERO ||

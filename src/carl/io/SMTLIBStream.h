@@ -149,7 +149,7 @@ private:
 	
 	template<typename Coeff>
 	void write(const MultivariatePolynomial<Coeff>& mp) {
-		if (mp.isZero()) *this << "0";
+		if (isZero(mp)) *this << "0";
 		else if (mp.nrTerms() == 1) *this << mp.lterm();
 		else {
 			*this << "(+";
@@ -316,7 +316,7 @@ std::ostream& operator<<(std::ostream& os, const SMTLIBScriptContainer<Pol>& sc)
 	SMTLIBStream sls;
 	sls.initialize(sc.mLogic, sc.mFormulas);
 	for (const auto& f: sc.mFormulas) sls.assertFormula(f);
-	if (!sc.mObjective.isZero()) sls.minimize(sc.mObjective);
+	if (!isZero(sc.mObjective)) sls.minimize(sc.mObjective);
 	sls.checkSat();
 	if (sc.mGetModel) sls.getModel();
 	return os << sls;

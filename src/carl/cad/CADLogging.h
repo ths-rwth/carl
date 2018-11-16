@@ -57,7 +57,7 @@ public:
 	}
 	template<typename Coeff>
 	void node(const std::string& id, const carl::cad::UPolynomial<Coeff>* name, const std::string& options) {
-		if (name->isZero()) return;
+		if (carl::isZero(*name)) return;
 		CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << name->mainVar() << ":" << *name << "\" [" << options << "];");
 	}
 
@@ -71,7 +71,7 @@ public:
 	}
 	template<typename Coeff>
 	void edge(const std::string& id, const carl::cad::UPolynomial<Coeff>& from, const carl::cad::UPolynomial<Coeff>& to, const std::string& options = "") {
-		if (to.isZero()) return;
+		if (carl::isZero(to)) return;
 		CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << from.mainVar() << ":" << from << "\" -> \"" << to.mainVar() << ":" << to << "\" [" << options << "];");
 	}
 	template<typename Coeff>
@@ -80,7 +80,7 @@ public:
 	}
 	template<typename Coeff>
 	void hyperedge(const std::string& id, const std::initializer_list<const carl::cad::UPolynomial<Coeff>*>& from, const carl::cad::UPolynomial<Coeff>& to) {
-		if (to.isZero()) return;
+		if (carl::isZero(to)) return;
 		assert(from.size() > 0);
 		bool same = true;
 		auto first = *from.begin();
@@ -91,7 +91,7 @@ public:
 			std::stringstream name;
 			std::vector<const carl::cad::UPolynomial<Coeff>*> hashes(from.begin(), from.end());
 			std::sort(hashes.begin(), hashes.end());
-			for (auto h: hashes) name << h;
+			for (const auto& h: hashes) name << h;
 			CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << name.str() << "\" [shape=point];");
 			for (auto f: from) {
 				CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << f->mainVar() << ":" << *f << "\" -> \""<< name.str() << "\";");

@@ -143,7 +143,7 @@ TEST(RationalFunction, Multiplication)
     if( !AutoSimplify )
         rfC.simplify();
     std::cout << rfC << std::endl;
-    EXPECT_TRUE( computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ).remainder( computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) ).isZero() );
+    EXPECT_TRUE( isZero(computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ).remainder( computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) )) );
 }
 
 TEST(RationalFunction, Division)

@@ -72,7 +72,7 @@ namespace ran {
 		}
 		
 		void refine() {
-			Number pivot = interval.sample();
+			Number pivot = carl::sample(interval);
 			assert(interval.contains(pivot));
 			if (polynomial.isRoot(pivot)) {
 				interval = Interval<Number>(pivot, pivot);
@@ -111,7 +111,7 @@ namespace ran {
 			
 			bool isLeft = interval.lower() == n;
 			
-			Number newBound = interval.sample();
+			Number newBound = carl::sample(interval);
 			
 			if (polynomial.isRoot(newBound)) {
 				interval = Interval<Number>(newBound, newBound);
@@ -127,7 +127,7 @@ namespace ran {
 			while (polynomial.countRealRoots(interval) == 0) {
 				if (isLeft) {
 					Number oldBound = interval.lower();
-					newBound = Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT).sample();
+					newBound = carl::sample(Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT));
 					if (polynomial.isRoot(newBound)) {
 						interval = Interval<Number>(newBound, newBound);
 						return false;
@@ -136,7 +136,7 @@ namespace ran {
 					interval.setLower(newBound);
 				} else {
 					Number oldBound = interval.upper();
-					newBound = Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT).sample();
+					newBound = carl::sample(Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT));
 					if (polynomial.isRoot(newBound)) {
 						interval = Interval<Number>(newBound, newBound);
 						return false;

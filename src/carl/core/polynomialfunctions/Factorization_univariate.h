@@ -12,7 +12,7 @@ std::map<uint, UnivariatePolynomial<Coeff>> squareFreeFactorization(const Univar
 	CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: " << p);
 	std::map<uint,UnivariatePolynomial<Coeff>> result;
 CLANG_WARNING_DISABLE("-Wtautological-compare")
-	assert(!p.isZero()); // TODO what if zero?
+	assert(!isZero(p)); // TODO what if zero?
 	// degree() >= characteristic<Coeff>::value throws a warning in clang...
 	if(characteristic<Coeff>::value != 0 && p.degree() >= characteristic<Coeff>::value)
 CLANG_WARNING_RESET
@@ -28,7 +28,7 @@ CLANG_WARNING_RESET
 		CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: b = " << b);
 		UnivariatePolynomial<Coeff> s(p.mainVar());
 		UnivariatePolynomial<Coeff> t(p.mainVar());
-		assert(!b.isZero());
+		assert(!isZero(b));
 		UnivariatePolynomial<Coeff> c = carl::extended_gcd(p, b, s, t); // TODO: use gcd instead
 		typename IntegralType<Coeff>::type numOfCpf = getNum(c.coprimeFactor());
 		if(numOfCpf != 1) // TODO: is this maybe only necessary because the extended_gcd returns a polynomial with non-integer coefficients but it shouldn't?
@@ -36,7 +36,7 @@ CLANG_WARNING_RESET
 			c *= Coeff(numOfCpf);
 		}
 		CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: c = " << c);
-		if(c.isZero())
+		if(isZero(c))
 		{
 			result.emplace(1, p);
 			CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: add the factor (" << p << ")^1");
@@ -50,7 +50,7 @@ CLANG_WARNING_RESET
 			UnivariatePolynomial<Coeff> z = y-w.derivative();
 			CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: z = " << z);
 			uint i = 1;
-			while(!z.isZero())
+			while(!isZero(z))
 			{
 				CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: next iteration");
 				UnivariatePolynomial<Coeff> g = carl::extended_gcd(w, z, s, t); // TODO: use gcd instead

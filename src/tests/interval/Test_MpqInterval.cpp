@@ -1016,10 +1016,10 @@ TEST(MpqInterval, Properties)
     EXPECT_EQ(5, i4.magnitude());
     
     // Center
-    EXPECT_EQ(5, i1.center());
-    EXPECT_EQ(-1, i2.center());
-    EXPECT_EQ(5, i3.center());
-    EXPECT_EQ(-1, i4.center());
+    EXPECT_EQ(5, center(i1));
+    EXPECT_EQ(-1, center(i2));
+    EXPECT_EQ(5, center(i3));
+    EXPECT_EQ(-1, center(i4));
 }
 
 TEST(MpqInterval, Contains)

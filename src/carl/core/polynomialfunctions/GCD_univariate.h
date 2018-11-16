@@ -34,8 +34,8 @@ UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, c
 	assert(a.mainVar() == b.mainVar());
 	assert(a.mainVar() == s.mainVar());
 	assert(a.mainVar() == t.mainVar());
-	assert(!a.isZero());
-	assert(!b.isZero());
+	assert(!isZero(a));
+	assert(!isZero(b));
 	
 	CARL_LOG_DEBUG("carl.core", "UnivEEA: a=" << a << ", b=" << b );
 	Variable x = a.mainVar();
@@ -52,7 +52,7 @@ UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, c
 	UnivariatePolynomial<Coeff> d1(x);
 	UnivariatePolynomial<Coeff> d2 = a.one();
 	
-	while(!d.isZero())
+	while(!isZero(d))
 	{
 		DivisionResult<UnivariatePolynomial<Coeff>> divres = c.divideBy(d);
 		assert(divres.remainder == c - divres.quotient * d);
@@ -74,7 +74,7 @@ UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, c
 		CARL_LOG_TRACE("carl.core", "UnivEEA: c1=" << c1 << ", c2=" << c2 );
 		CARL_LOG_TRACE("carl.core", "UnivEEA: d1=" << d1 << ", d2=" << d2 );
 	}
-	assert(!c.isZero());
+	assert(!isZero(c));
 	s = c1 / (a.lcoeff() * c.lcoeff());
 	t = c2 / (b.lcoeff() * c.lcoeff());
 	c = c.normalized();

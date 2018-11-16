@@ -915,40 +915,40 @@ TEST(clRA_Interval, Union)
     clRA_Interval i6(3, BoundType::STRICT, 3, BoundType::INFTY);
     clRA_Interval result1, result2;
 
-    EXPECT_FALSE(i1.unite(i2, result1, result2));
+    EXPECT_FALSE(carl::set_union(i1, i2, result1, result2));
     EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i2.unite(i1, result1, result2));
+    EXPECT_FALSE(carl::set_union(i2, i1, result1, result2));
     EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
 
-    EXPECT_TRUE(i1.unite(i3, result1, result2));
+    EXPECT_TRUE(carl::set_union(i1, i3, result1, result2));
     EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
     EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 5, BoundType::WEAK), result2);
 
-    EXPECT_FALSE(i3.unite(i2, result1, result2));
+    EXPECT_FALSE(carl::set_union(i3, i2, result1, result2));
     EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 4, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i4.unite(i1, result1, result2));
+    EXPECT_FALSE(carl::set_union(i4, i1, result1, result2));
     EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 9, BoundType::STRICT), result1);
 
-    EXPECT_TRUE(i3.unite(i4, result1, result2));
+    EXPECT_TRUE(carl::set_union(i3, i4, result1, result2));
     EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
     EXPECT_EQ(clRA_Interval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
 
-    EXPECT_FALSE(i2.unite(i4, result1, result2));
+    EXPECT_FALSE(carl::set_union(i2, i4, result1, result2));
     EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 9, BoundType::STRICT), result1);
 
-    EXPECT_FALSE(i2.unite(i5, result1, result2));
+    EXPECT_FALSE(carl::set_union(i2, i5, result1, result2));
     EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 4, BoundType::WEAK), result1);
 
-    EXPECT_TRUE(i5.unite(i4, result1, result2));
+    EXPECT_TRUE(carl::set_union(i5, i4, result1, result2));
     EXPECT_EQ(clRA_Interval(1, BoundType::STRICT, 4, BoundType::STRICT), result1);
     EXPECT_EQ(clRA_Interval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
 
-    EXPECT_FALSE(i6.unite(i1, result1, result2));
+    EXPECT_FALSE(carl::set_union(i6, i1, result1, result2));
     EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 3, BoundType::INFTY), result1);
 
-    EXPECT_TRUE(i6.unite(i3, result1, result2));
+    EXPECT_TRUE(carl::set_union(i6, i3, result1, result2));
     EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
     EXPECT_EQ(clRA_Interval(3, BoundType::STRICT, 3, BoundType::INFTY), result2);
 }
@@ -1021,10 +1021,10 @@ TEST(clRA_Interval, Properties)
     EXPECT_EQ(5, i4.magnitude());
 
     // Center
-    EXPECT_EQ(5, i1.center());
-    EXPECT_EQ(-1, i2.center());
-    EXPECT_EQ(5, i3.center());
-    EXPECT_EQ(-1, i4.center());
+    EXPECT_EQ(5, center(i1));
+    EXPECT_EQ(-1, center(i2));
+    EXPECT_EQ(5, center(i3));
+    EXPECT_EQ(-1, center(i4));
 }
 
 TEST(clRA_Interval, Contains)

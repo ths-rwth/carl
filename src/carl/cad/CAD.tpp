@@ -1466,7 +1466,7 @@ cad::Answer CAD<Number>::liftCheck(
 			boundRoots.push_back(RealAlgebraicNumber<Number>(bound->second.upper(), true));
 		}
 		if (boundRoots.empty()) {
-			sampleSetIncrement.insert(this->samples(openVariableCount, {RealAlgebraicNumber<Number>(bound->second.center(), true)}, currentSamples, replacedSamples));
+			sampleSetIncrement.insert(this->samples(openVariableCount, {RealAlgebraicNumber<Number>(carl::center(bound->second), true)}, currentSamples, replacedSamples));
 		} else {
 			sampleSetIncrement.insert(this->samples(openVariableCount, boundRoots, currentSamples, replacedSamples));
 		}

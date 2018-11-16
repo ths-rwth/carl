@@ -105,7 +105,7 @@ public:
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(p.normalized(), i))
 	{
-		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
+		assert(!carl::isZero(mIR->polynomial) && mIR->polynomial.degree() > 0);
 		assert(i.isOpenInterval() || i.isPointInterval());
 		assert(p.countRealRoots(i) == 1);
 		if (mIR->polynomial.degree() == 1) {
@@ -121,7 +121,7 @@ public:
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(p.normalized(), i, sturmSequence))
 	{
-		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
+		assert(!carl::isZero(mIR->polynomial) && mIR->polynomial.degree() > 0);
 		assert(i.isOpenInterval() || i.isPointInterval());
 		assert(p.countRealRoots(i) == 1);
 		if (mIR->polynomial.degree() == 1) {
@@ -170,7 +170,7 @@ public:
 
 	bool isZero() const {
 		if (isNumeric()) return carl::isZero(mValue);
-		else if (isInterval()) return mIR->interval.isZero();
+		else if (isInterval()) return carl::isZero(mIR->interval);
 		else if (isThom()) return mTE->isZero();
 		else return false;
 	}

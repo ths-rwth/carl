@@ -374,7 +374,7 @@ template<typename Number>
 template<typename Number>
 Number Interval<Number>::distance(const Interval<Number>& intervalA)
 {
-    if( this->intersectsWith(intervalA) )
+    if( set_intersect(*this, intervalA) )
         return carl::constant_zero<Number>::get();
     if( intervalA.upperBoundType() == BoundType::INFTY || this->lowerBoundType() == BoundType::INFTY )
     {
@@ -908,7 +908,7 @@ template<typename Number>
 template<typename Number>
 	Interval<Number>& Interval<Number>::intersect_assign(const Interval<Number>& rhs)
 	{
-		*this = this->intersect(rhs);
+		*this = set_intersection(*this, rhs);
         return *this;
 	}
 
