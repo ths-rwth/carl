@@ -62,25 +62,6 @@ namespace carl
     */
    template <class Number> struct is_interval<const carl::Interval<Number>> : std::true_type {};
 
-   /**
-	* Check if this interval is a point-interval containing 0.
-	*/
-   template<typename Number>
-   bool isZero(const Interval<Number>& _in)
-   {
-	   return _in.isZero();
-   }
-
-   /**
-	* Check if this interval is a point-interval containing 1.
-	*/
-   template<typename Number>
-   bool isOne(const Interval<Number>& _in)
-   {
-	   return _in.isOne();
-   }
-
-
     /**
      * Struct which holds the rounding and checking policies required for boost
      * interval.
@@ -1594,6 +1575,26 @@ namespace carl
 	inline bool isInteger(const Interval<Number>& n) {
 		return n.isPointInterval() && carl::isInteger(n.lower());
 	}
+
+/**
+* Check if this interval is a point-interval containing 0.
+*/
+template<typename Number>
+bool isZero(const Interval<Number>& i) {
+	assert(i.isConsistent());
+	return i.isPointInterval() && carl::isZero(i.lower());
+}
+
+/**
+* Check if this interval is a point-interval containing 1.
+*/
+template<typename Number>
+bool isOne(const Interval<Number>& i) {
+	assert(i.isConsistent());
+	return i.isPointInterval() && carl::isOne(i.lower());
+}
+
+
 
     /**
      * Implements the division which assumes that there is no remainder.
