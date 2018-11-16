@@ -5,6 +5,60 @@
 namespace carl {
 
 /**
+ * Operators for LowerBound and UpperBound.
+ */
+template<typename Number>
+inline bool operator<(const LowerBound<Number>& lhs, const LowerBound<Number>& rhs) {
+	if (rhs.bound_type == BoundType::INFTY) return false;
+	switch (lhs.bound_type) {
+		case BoundType::INFTY:
+			return true;
+		case BoundType::STRICT:
+			return lhs.number < rhs.number;
+		case BoundType::WEAK:
+			if (lhs.number < rhs.number) return true;
+			if (rhs.bound_type == BoundType::STRICT) return lhs.number == rhs.number;
+			return false;
+	}
+}
+
+template<typename Number>
+inline bool operator<(const UpperBound<Number>& lhs, const LowerBound<Number>& rhs) {
+	if (lhs.bound_type == BoundType::INFTY) return false;
+	if (rhs.bound_type == BoundType::INFTY) return false;
+	if (lhs.bound_type == BoundType::STRICT || rhs.bound_type == BoundType::STRICT) {
+		return lhs.number <= rhs.number;
+	}
+	return lhs.number < rhs.number;
+}
+
+template<typename Number>
+inline bool operator<(const UpperBound<Number>& lhs, const UpperBound<Number>& rhs) {
+	if (lhs.bound_type == BoundType::INFTY) return false;
+	switch (rhs.bound_type) {
+		case BoundType::INFTY:
+			return true;
+		case BoundType::STRICT:
+			return lhs.number < rhs.number;
+		case BoundType::WEAK:
+			if (lhs.number < rhs.number) return true;
+			if (lhs.bound_type == BoundType::STRICT) return lhs.number == rhs.number;
+			return false;
+	}
+}
+
+/**
+ * Check whether the two bounds connect, for example as for ...3),[3...
+ */
+template<typename Number>
+inline bool bounds_connect(const UpperBound<Number>& lhs, const LowerBound<Number>& rhs) {
+	if (lhs.bound_type == BoundType::INFTY) return false;
+	if (rhs.bound_type == BoundType::INFTY) return false;
+	if (lhs.bound_type == rhs.bound_type) return false;
+	return lhs.number == rhs.number;
+}
+
+/**
  * Operator for the comparison of two intervals.
  * @param lhs Lefthand side.
  * @param rhs Righthand side.
@@ -51,7 +105,7 @@ inline bool operator!=(const Number& lhs, const Interval<Number>& rhs) {
  */
 template<typename Number>
 inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs) {
-	if (lhs.upper() < rhs.lower()) return true;
+	if (lhs.upperBound() < rhs.lowerBound()) return true;
 	if (lhs.upper() == rhs.lower()) {
 		switch (lhs.upperBoundType()) {
 			case BoundType::STRICT:
@@ -116,7 +170,7 @@ inline bool operator>(const Number& lhs, const Interval<Number>& rhs) {
  */
 template<typename Number>
 inline bool operator<=(const Interval<Number>& lhs, const Interval<Number>& rhs) {
-	if (lhs < rhs) return true;
+	if (lhs.upperBound() < rhs.lowerBound()) return true;
 	if (lhs.upper() == rhs.lower()) {
 		switch (lhs.upperBoundType()) {
 			case BoundType::STRICT:
