@@ -158,45 +158,12 @@ template<typename Number>
 template<typename Number>
 	Number Interval<Number>::sample( bool _includingBounds ) const
 	{
-		assert(this->isConsistent());
-		assert(!this->isEmpty());
-		assert(_includingBounds || !this->isPointInterval());
-		Number mid = this->center();
-		// TODO: check if mid is an integer already.
-		Number midf = carl::floor(mid);
-		if (this->contains(midf) && (_includingBounds || this->lowerBoundType() == BoundType::INFTY || this->lower() < midf ))
-            return midf;
-		Number midc = carl::ceil(mid);
-		if (this->contains(midc) && (_includingBounds || this->upperBoundType() == BoundType::INFTY || this->upper() > midc ))
-            return midc;
-		return mid;
+		return carl::sample(*this, _includingBounds);
 	}
 template<typename Number>
 	Number Interval<Number>::sampleSB( bool _includingBounds ) const
 	{
-		using Int = typename carl::IntegralType<Number>::type;
-		Int leftnum = Int(carl::floor(this->center()));
-		Int leftden = carl::constant_one<Int>::get();
-		Int rightnum = carl::constant_one<Int>::get();
-		Int rightden = carl::constant_zero<Int>::get();
-		Number cur = Number(leftnum) / Number(leftden);
-		if (this->contains(cur)) {
-			return cur;
-		}
-		while (true) {
-			Int curnum = leftnum + rightnum;
-			Int curden = leftden + rightden;
-			cur = Number(curnum) / Number(curden);
-			if ((cur < this->lower()) || (!_includingBounds && cur == this->lower())) {
-				leftnum = curnum;
-				leftden = curden;
-			} else if ((cur > this->upper()) || (!_includingBounds && cur == this->upper())) {
-				rightnum = curnum;
-				rightden = curden;
-			} else {
-				return cur;
-			}
-		}
+		return carl::sample_stern_brocot(*this, _includingBounds);
 	}
 
 template<typename Number>

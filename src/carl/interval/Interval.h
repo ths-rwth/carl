@@ -40,6 +40,8 @@ CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include <boost/numeric/interval/interval.hpp>
 CLANG_WARNING_RESET
 
+#include "sampling.h"
+
 #include <cassert>
 #include <cmath>
 #include <limits>
@@ -1226,28 +1228,10 @@ namespace carl
          * Returns the center point of the interval.
          * @return Center.
          */
-        template<typename N = Number, DisableIf<std::is_floating_point<N>> = dummy>
-		N center() const
+		[[deprecated("Use carl::center() instead.")]]
+		Number center() const
 		{
-			assert(this->isConsistent());
-			if (this->isInfinite()) return carl::constant_zero<Number>().get();
-			if (this->mLowerBoundType == BoundType::INFTY)
-				return N(carl::floor(this->mContent.upper()) - carl::constant_one<Number>().get());
-			if (this->mUpperBoundType == BoundType::INFTY)
-				return N(carl::ceil(this->mContent.lower()) + carl::constant_one<Number>().get());
-			return boost::numeric::median(mContent);
-		}
-
-		template<typename N = Number, EnableIf<std::is_floating_point<N>> = dummy>
-		N center() const
-		{
-			assert(this->isConsistent());
-			if (this->isInfinite()) return carl::constant_zero<N>().get();
-			if (this->mLowerBoundType == BoundType::INFTY)
-				return N(std::nextafter(this->mContent.upper(), -INFINITY));
-			if (this->mUpperBoundType == BoundType::INFTY)
-				return N(std::nextafter(this->mContent.lower(), INFINITY));
-			return boost::numeric::median(mContent);
+			return carl::center(*this);
 		}
 
         /**
@@ -1260,6 +1244,7 @@ namespace carl
 		 * Checks the integers next to the midpoint, uses the midpoint if both are outside.
          * @return Some point within this interval.
          */
+		[[deprecated("Use carl::sample() instead.")]]
         Number sample(bool _includingBounds = true) const;
 
 		/**
@@ -1267,6 +1252,7 @@ namespace carl
 		 * Uses a binary search based on the Stern-Brocot tree starting from the integer below the midpoint.
 		 * @return Some point within this interval.
 		 */
+		[[deprecated("Use carl::sample_stern_brocot() instead.")]]
 		Number sampleSB(bool _includingBounds = true) const;
 		
 		/**
@@ -1274,26 +1260,18 @@ namespace carl
 		 * Checks the integer next to the left endpoint, uses the midpoint if it is outside.
          * @return Some point within this interval.
          */
+		[[deprecated("Use carl::sample_left() instead.")]]
 		Number sampleLeft() const {
-			if (lowerBoundType() == BoundType::INFTY) {
-				return carl::floor(upper()) - 1;
-			}
-			Number res = carl::floor(lower()) + 1;
-			if (contains(res)) return res;
-			return center();
+			return sample_left(*this);
 		}
 		/**
          * Searches for some point in this interval, preferably near the right endpoint and with a small representation.
 		 * Checks the integer next to the right endpoint, uses the midpoint if it is outside.
          * @return Some point within this interval.
          */
+		[[deprecated("Use carl::sample_right() instead.")]]
 		Number sampleRight() const {
-			if (upperBoundType() == BoundType::INFTY) {
-				return carl::ceil(lower()) + 1;
-			}
-			Number res = carl::ceil(upper()) - 1;
-			if (contains(res)) return res;
-			return center();
+			return sample_right(*this);
 		}
 		/**
 		* Searches for some point in this interval, preferably near zero and with a small representation.
@@ -1302,10 +1280,9 @@ namespace carl
 		 * Uses zero otherwise.
          * @return Some point within this interval.
          */
+		[[deprecated("Use carl::sample_zero() instead.")]]
 		Number sampleZero() const {
-			if (isSemiPositive()) return sampleLeft();
-			if (isSemiNegative()) return sampleRight();
-			return carl::constant_zero<Number>::get();
+			return sample_zero(*this);
 		}
 		/**
 		* Searches for some point in this interval, preferably far aways from zero and with a small representation.
@@ -1314,10 +1291,9 @@ namespace carl
 		 * Uses zero otherwise.
          * @return Some point within this interval.
          */
+		[[deprecated("Use carl::sample_infty() instead.")]]
 		Number sampleInfty() const {
-			if (isSemiPositive()) return sampleRight();
-			if (isSemiNegative()) return sampleLeft();
-			return carl::constant_zero<Number>::get();
+			return sample_infty(*this);
 		}
 
         /**
