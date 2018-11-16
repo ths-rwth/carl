@@ -19,6 +19,14 @@ enum class BoundType {
 	INFTY = 2
 };
 
+inline std::ostream& operator<<(std::ostream& os, BoundType b) {
+	switch (b) {
+		case BoundType::STRICT: return os << "STRICT";
+		case BoundType::WEAK: return os << "WEAK";
+		case BoundType::INFTY: return os << "INFTY";
+	}
+}
+
 inline static BoundType getWeakestBoundType(BoundType type1, BoundType type2) {
 	if (type1 == BoundType::INFTY || type2 == BoundType::INFTY) return BoundType::INFTY;
 	if (type1 == BoundType::WEAK || type2 == BoundType::WEAK) return BoundType::WEAK;
