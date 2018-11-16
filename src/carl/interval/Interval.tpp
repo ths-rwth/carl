@@ -929,148 +929,13 @@ void Interval<Number>::root_assign(unsigned deg)
 template<typename Number>
 bool Interval<Number>::intersectsWith(const Interval<Number>& rhs) const
 {
-    return !this->intersect(rhs).isEmpty();
-    // TODO: make this working
-//    if( this->isEmpty() || rhs.isEmpty() )
-//        return false;
-//    if( this->lowerBoundType() == BoundType::INFTY && this->upperBoundType() == BoundType::INFTY )
-//        return true;
-//    if( rhs.lowerBoundType() == BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
-//        return true;
-//    if( this->lowerBoundType() == BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
-//        return true;
-//    if( this->upperBoundType() == BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
-//        return true;
-//    if( this->lowerBoundType() == BoundType::INFTY )
-//    {
-//        assert( rhs.lowerBoundType() != BoundType::INFTY );
-//        if( rhs.lower() < this->upper() )
-//            return true;
-//        else if( this->upper() == rhs.lower() && this->upperBoundType() == BoundType::WEAK && rhs.lowerBoundType() == BoundType::WEAK )
-//            return true;
-//        return false;
-//    }
-//    if( this->upperBoundType() == BoundType::INFTY )
-//    {
-//        assert( rhs.upperBoundType() != BoundType::INFTY );
-//        if( this->lower() < rhs.upper() )
-//            return true;
-//        else if( rhs.upper() == this->lower() && rhs.upperBoundType() == BoundType::WEAK && this->lowerBoundType() == BoundType::WEAK )
-//            return true;
-//        return false;
-//    }
-//    if( rhs.lowerBoundType() == BoundType::INFTY )
-//    {
-//        assert( this->lowerBoundType() != BoundType::INFTY );
-//        if( this->lower() < rhs.upper() )
-//            return true;
-//        else if( rhs.upper() == this->lower() && rhs.upperBoundType() == BoundType::WEAK && this->lowerBoundType() == BoundType::WEAK )
-//            return true;
-//        return false;
-//    }
-//    if( this->upperBoundType() == BoundType::INFTY )
-//    {
-//        assert( this->upperBoundType() != BoundType::INFTY );
-//        if( rhs.lower() < this->upper() )
-//            return true;
-//        else if( this->upper() == rhs.lower() && this->upperBoundType() == BoundType::WEAK && rhs.lowerBoundType() == BoundType::WEAK )
-//            return true;
-//        return false;
-//    }
-//    return rhs.upper() < this->lower() || this->upper() < rhs.lower();
+    return set_intersect(*this, rhs);
 }
 
 template<typename Number>
 	Interval<Number> Interval<Number>::intersect(const Interval<Number>& rhs) const
 	{
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-		Number lowerValue;
-        Number upperValue;
-        BoundType maxLowest;
-        BoundType minUppest;
-        // determine value first by: LowerValue = max ( lowervalues ) where max considers infty.
-        if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-        {
-            if ( mContent.lower() < rhs.lower() )
-            {
-                lowerValue = rhs.lower();
-                maxLowest = rhs.lowerBoundType();
-            }
-            else if ( rhs.lower() < mContent.lower() )
-            {
-                lowerValue = mContent.lower();
-                maxLowest = mLowerBoundType;
-            }
-            else
-            {
-                lowerValue = mContent.lower();
-                maxLowest = getStrictestBoundType(mLowerBoundType, rhs.lowerBoundType());
-            }
-        }
-        else if ( mLowerBoundType == BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-        {
-            lowerValue = rhs.lower();
-            maxLowest = rhs.lowerBoundType();
-        }
-        else if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
-        {
-            lowerValue = mContent.lower();
-            maxLowest = mLowerBoundType;
-        }
-        else
-        {
-            lowerValue = carl::constant_zero<Number>().get();
-            maxLowest = BoundType::INFTY;
-        }
-
-        // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
-        if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-        {
-            if ( mContent.upper() > rhs.upper() )
-            {
-                upperValue = rhs.upper();
-                minUppest = rhs.upperBoundType();
-            }
-            else if ( rhs.upper() > mContent.upper() )
-            {
-                upperValue = mContent.upper();
-                minUppest = mUpperBoundType;
-            }
-            else
-            {
-                upperValue = mContent.upper();
-                minUppest = getStrictestBoundType(mUpperBoundType, rhs.upperBoundType());
-            }
-            if( maxLowest == BoundType::INFTY )
-            {
-                lowerValue = upperValue;
-            }
-        }
-        else if ( mUpperBoundType == BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-        {
-            upperValue = rhs.upper();
-            minUppest = rhs.upperBoundType();
-            if( maxLowest == BoundType::INFTY )
-            {
-                lowerValue = upperValue;
-            }
-        }
-        else if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
-        {
-            upperValue = mContent.upper();
-            minUppest = mUpperBoundType;
-            if( maxLowest == BoundType::INFTY )
-            {
-                lowerValue = upperValue;
-            }
-        }
-        else
-        {
-            upperValue = lowerValue;
-            minUppest = BoundType::INFTY;
-        }
-        return Interval<Number>(lowerValue, maxLowest, upperValue, minUppest );
+		return set_intersection(*this, rhs);
 	}
 
 template<typename Number>
@@ -1083,94 +948,13 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::unite(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-		if( !this->intersectsWith(rhs) )
-		{
-            // special case: [a;b] U (b;c]
-            if( this->lower() == rhs.upper() && (rhs.upperBoundType() == BoundType::WEAK || mLowerBoundType == BoundType::WEAK) )
-            {
-                resultA = Interval<Number>(rhs.lower(), rhs.lowerBoundType(), this->upper(), this->upperBoundType());
-                resultB = emptyInterval();
-                return false;
-            }
-            else if( this->upper() == rhs.lower() && (mUpperBoundType == BoundType::WEAK || rhs.lowerBoundType() == BoundType::WEAK) )
-            {
-                resultA = Interval<Number>(this->lower(), this->lowerBoundType(), rhs.upper(), rhs.upperBoundType());
-                resultB = emptyInterval();
-                return false;
-            }
-            else
-            {
-                resultA = *this;
-                resultB = rhs;
-                return true;
-            }
-		}
-		else
-		{
-            resultB = emptyInterval();
-			BoundType lowerType = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
-			BoundType upperType = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
-			// calculate lowerBound and lowerBoundType
-            if( lowerType == BoundType::INFTY && upperType == BoundType::INFTY )
-            {
-                resultA = unboundedInterval();
-                return false;
-            }
-			Number lower;
-			Number upper;
-            if( lowerType != BoundType::INFTY )
-            {
-                if( this->lower() < rhs.lower() )
-                {
-                    lower = this->lower();
-                    lowerType = mLowerBoundType;
-                }
-                else if ( this->lower() == rhs.lower() )
-                {
-                    lower = this->lower();
-                }
-                else
-                {
-                    lower = rhs.lower();
-                    lowerType = rhs.lowerBoundType();
-                }
-            }
-            else
-            {
-                lower = this->upper();
-            }
-			// calculate upperBound and upperBoundType
-            if( upperType != BoundType::INFTY )
-            {
-                if( this->upper() > rhs.upper() )
-                {
-                    upper = this->upper();
-                    upperType = mUpperBoundType;
-                }
-                else if ( this->upper() == rhs.upper() )
-                {
-                    upper = this->upper();
-                }
-                else
-                {
-                    upper = rhs.upper();
-                    upperType = rhs.upperBoundType();
-                }
-            }
-            else
-            {
-                upper = lower;
-            }
-			resultA = Interval<Number>(lower, lowerType, upper, upperType);
-			return false;
-		}
+		return set_union(*this, rhs, resultA, resultB);
 	}
 
 	template<typename Number>
 	bool Interval<Number>::difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
+		return set_difference(*this, rhs, resultA, resultB);
 		assert(this->isConsistent());
 		assert(rhs.isConsistent());
                 if( rhs.isEmpty() )

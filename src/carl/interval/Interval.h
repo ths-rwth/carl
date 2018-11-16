@@ -1536,7 +1536,7 @@ namespace carl
         /*
          * Boolean Operations
          */
-
+		[[deprecated("Use carl::set_intersect() instead.")]]
         bool intersectsWith(const Interval<Number>& rhs) const;
 
         /**
@@ -1544,6 +1544,7 @@ namespace carl
          * @param rhs Righthand side.
          * @return Result.
          */
+		[[deprecated("Use carl::set_intersection() instead.")]]
         Interval<Number> intersect(const Interval<Number>& rhs) const;
 
         /**
@@ -1560,6 +1561,7 @@ namespace carl
          * @param resultB Result b.
          * @return True, if the result is twofold.
          */
+		[[deprecated("Use carl::set_union() instead.")]]
         bool unite(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
 
         /**
@@ -1732,4 +1734,5 @@ namespace std {
 } // namespace std
 
 #include "operators.h"
+#include "set_theory.h"
 #include "Interval.tpp"
