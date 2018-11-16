@@ -182,6 +182,7 @@ public:
 	 * Checks if the polynomial is equal to zero.
 	 * @return If polynomial is zero.
 	 */
+	[[deprecated("use carl::isZero(p) instead.")]]
 	bool isZero() const
 	{
 		return mCoefficients.size() == 0;
@@ -191,6 +192,7 @@ public:
 	 * Checks if the polynomial is equal to one.
 	 * @return If polynomial is one.
 	 */
+	[[deprecated("use carl::isOne(p) instead.")]]
 	bool isOne() const
 	{
 		return mCoefficients.size() == 1 && mCoefficients.back() == Coefficient(1);
@@ -298,7 +300,7 @@ public:
 	 * @return Degree.
 	 */
 	uint degree() const {
-		assert(!isZero());
+		assert(mCoefficients.size() > 0);
 		return uint(mCoefficients.size()-1);
 	}
 	
@@ -1055,6 +1057,24 @@ private:
 		}
 	}
 };
+
+/**
+ * Checks if the polynomial is equal to zero.
+ * @return If polynomial is zero.
+ */
+template<typename Coefficient>
+bool isZero(const UnivariatePolynomial<Coefficient>& p) {
+	return p.coefficients().size() == 0;
+}
+
+/**
+ * Checks if the polynomial is equal to one.
+ * @return If polynomial is one.
+ */
+template<typename Coefficient>
+bool isOne(const UnivariatePolynomial<Coefficient>& p) {
+	return p.coefficients().size() == 1 && carl::isOne(p.coefficients().front());
+}
 
 }
 

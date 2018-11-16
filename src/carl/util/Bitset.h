@@ -46,7 +46,7 @@ namespace carl {
 			}
 		public:
 			/// Construct a new iterator from a Bitset and a bit.
-			iterator(const Bitset& b, std::size_t bit): mBitset(b), mBit(bit) {};
+			iterator(const Bitset& b, std::size_t bit): mBitset(b), mBit(bit) {}
 			
 			/// Retrieve the index into the Bitset.
 			operator std::size_t() const {

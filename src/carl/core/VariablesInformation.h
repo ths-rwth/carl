@@ -26,32 +26,27 @@ class VariablesInformation : public VariablesInformationInterface
 	std::map<Variable, VariableInformation<collectCoeff, CoeffType>> mVariableInfo;
 	
 public:
-    VariablesInformation() = default;
+	VariablesInformation() = default;
     explicit VariablesInformation(std::map<Variable, VariableInformation<collectCoeff, CoeffType>>&& _varInfos): mVariableInfo(std::move(_varInfos)) {}
-	~VariablesInformation() override = default;
 
 	bool hasCoeff() const override
 	{
 		return collectCoeff;
 	}
     
-    typename std::map<Variable, VariableInformation<collectCoeff, CoeffType>>::const_iterator cbegin()
-    {
+    auto cbegin() const {
         return mVariableInfo.begin();
     }
     
-    typename std::map<Variable, VariableInformation<collectCoeff, CoeffType>>::const_iterator cend()
-    {
+    auto cend() const {
         return mVariableInfo.end();
     }
     
-    typename std::map<Variable, VariableInformation<collectCoeff, CoeffType>>::iterator begin()
-    {
+    auto begin() {
         return mVariableInfo.begin();
     }
     
-    typename std::map<Variable, VariableInformation<collectCoeff, CoeffType>>::iterator end()
-    {
+    auto end() {
         return mVariableInfo.end();
     }
     

@@ -16,7 +16,6 @@ struct NoReasons
 	void setReason(unsigned index);
 	BitVector getReasons() const { return BitVector(0); }
 	void setReasons(const BitVector&) const {}
-	virtual ~NoReasons() noexcept = default;
 };
 
 struct BVReasons

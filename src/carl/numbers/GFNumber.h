@@ -172,13 +172,13 @@ class GFNumber
 };
 
 template<typename IntegerT>
-static bool isZero(const GFNumber<IntegerT>& _in) {
-	return _in.isZero();
+bool isZero(const GFNumber<IntegerT>& _in) {
+	return _in.representingInteger() == 0;
 }
 
 template<typename IntegerT>
-static bool isOne(const GFNumber<IntegerT>& _in) {
-	return _in.isOne();
+bool isOne(const GFNumber<IntegerT>& _in) {
+	return _in.representingInteger() == 1;
 }
 
 template<typename IntegerT>

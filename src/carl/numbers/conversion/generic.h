@@ -9,7 +9,7 @@ namespace carl {
 	 * @return Double representation of o.
 	 */
 	template<typename Rational>
-	static double roundDown(const Rational& o, bool overapproximate = false) {
+	double roundDown(const Rational& o, bool overapproximate = false) {
 	    using limits = std::numeric_limits<double>;
 	    double result = carl::toDouble(o);
 	    if (result == -limits::infinity()) return result;
@@ -29,7 +29,7 @@ namespace carl {
 	 * @return double representation of o (overapprox) Note, that it can return the double INFINITY.
 	 */
 	template<typename Rational>
-	static double roundUp(const Rational& o, bool overapproximate = false) {
+	double roundUp(const Rational& o, bool overapproximate = false) {
 	    using limits = std::numeric_limits<double>;
 	    double result = carl::toDouble(o);
 	    if (result == limits::infinity()) return result;

@@ -10,9 +10,9 @@
 namespace carl {
 
 template<typename C, typename O, typename P>
-MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>& p) {
-	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
-	if (p.isConstant() || p.isLinear()) return p;
+MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>& polynomial) {
+	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << polynomial);
+	if (polynomial.isConstant() || polynomial.isLinear()) return polynomial;
 
 	auto s = overloaded {
 	#if defined USE_COCOA
@@ -28,7 +28,7 @@ MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>
 		[](const MultivariatePolynomial<cln::cl_I,O,P>& p){ return p; }
 	#endif
 	};
-	return s(p);
+	return s(polynomial);
 }
 
 template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>

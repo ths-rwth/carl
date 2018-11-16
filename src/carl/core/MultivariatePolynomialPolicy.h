@@ -29,10 +29,6 @@ namespace carl
 		
 		// Easy access.
 		static const bool has_reasons = ReasonsAdaptor::has_reasons;
-		
-		//typedef typename ReasonsAdaptor::ReasonsType ReasonsType;
-		
-		virtual ~StdMultivariatePolynomialPolicies() = default;
     };
 	
 }

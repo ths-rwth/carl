@@ -336,6 +336,7 @@ namespace carl
              * Collects all real valued variables occurring in this formula.
              * @param _realVars The container to collect the real valued variables in.
              */
+			[[deprecated("use gatherVariables() instead.")]]
             void realValuedVars( Variables& _realVars ) const
             {
                 if( propertyHolds( PROP_CONTAINS_REAL_VALUED_VARS ) )
@@ -346,6 +347,7 @@ namespace carl
              * Collects all integer valued variables occurring in this formula.
              * @param _intVars The container to collect the integer valued variables in.
              */
+			[[deprecated("use gatherVariables() instead.")]]
             void integerValuedVars( Variables& _intVars ) const
             {
                 if( propertyHolds( PROP_CONTAINS_INTEGER_VALUED_VARS ) )
@@ -356,6 +358,7 @@ namespace carl
              * Collects all arithmetic variables occurring in this formula.
              * @param _arithmeticVars The container to collect the arithmetic variables in.
              */
+			[[deprecated("use gatherVariables() instead.")]]
             void arithmeticVars( Variables& _arithmeticVars ) const
             {
                 if( propertyHolds( PROP_CONTAINS_REAL_VALUED_VARS ) || propertyHolds( PROP_CONTAINS_INTEGER_VALUED_VARS ) )
@@ -366,6 +369,7 @@ namespace carl
              * Collects all boolean variables occurring in this formula.
              * @param _booleanVars The container to collect the boolean variables in.
              */
+			[[deprecated("use gatherVariables() instead.")]]
             void booleanVars( Variables& _booleanVars ) const
             {
                 if( propertyHolds( PROP_CONTAINS_BOOLEAN ) )
@@ -376,6 +380,7 @@ namespace carl
              * Collects all variables occurring in this formula.
              * @param _vars The container to collect the variables in.
              */
+			[[deprecated("use gatherVariables() instead.")]]
             void allVars( Variables& _vars ) const
             {
                 collectVariables( _vars, true, true, true, true, true );
@@ -890,7 +895,9 @@ namespace carl
 			 * @param _type
 			 * @param _ofThisType
              */
+			[[deprecated("use gatherVariables() instead.")]]
             void collectVariables( Variables& _vars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
+			[[deprecated("use gatherVariables() instead.")]]
             void collectVariables_( Variables& _vars, std::set<BVVariable>* _bvVars, std::set<UVariable>* _ueVars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
 
 			void gatherVariables(carlVariables& vars) const;
