@@ -95,6 +95,26 @@ namespace carl
 		}
     };
 
+	template<typename Number>
+	struct LowerBound {
+		const Number& number;
+		BoundType bound_type;
+	};
+	template<typename Number>
+	std::ostream& operator<<(std::ostream& os, const LowerBound<Number>& lb) {
+		return os << "Lower(" << lb.number << "," << lb.bound_type << ")";
+	}
+	
+	template<typename Number>
+	struct UpperBound {
+		const Number& number;
+		BoundType bound_type;
+	};
+	template<typename Number>
+	std::ostream& operator<<(std::ostream& os, const UpperBound<Number>& lb) {
+		return os << "Upper(" << lb.number << "," << lb.bound_type << ")";
+	}
+
     /**
      *The class which contains the interval arithmetic including trigonometric
      * functions. The template parameter contains the number type used for the
@@ -759,6 +779,21 @@ namespace carl
 			Policy::sanitize(*this);
         }
 
+		Interval(const LowerBound<Number>& lb, const UpperBound<Number>& ub):
+			Interval(lb.number, lb.bound_type, ub.number, ub.bound_type)
+		{
+		}
+
+		Interval(const LowerBound<Number>& lb, const LowerBound<Number>& ub):
+			Interval(lb.number, lb.bound_type, ub.number, getOtherBoundType(ub.bound_type))
+		{
+		}
+
+		Interval(const UpperBound<Number>& lb, const UpperBound<Number>& ub):
+			Interval(lb.number, getOtherBoundType(lb.bound_type), ub.number, ub.bound_type)
+		{
+		}
+
         /**
          * Method which returns the unbounded interval rooted at 0.
          * @return Unbounded interval.
@@ -812,6 +847,13 @@ namespace carl
         {
             return mContent.upper();
         }
+
+		auto lowerBound() const {
+			return LowerBound<Number>{ lower(), lowerBoundType() };
+		}
+		auto upperBound() const {
+			return UpperBound<Number>{ upper(), upperBoundType() };
+		}
 
         /**
          * Returns a reference to the included boost interval.
