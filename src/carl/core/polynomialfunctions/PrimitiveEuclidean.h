@@ -14,15 +14,15 @@ namespace carl {
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> primitive_euclidean(const UnivariatePolynomial<Coeff>& a, const UnivariatePolynomial<Coeff>& b) {
-	UnivariatePolynomial<Coeff> c = carl::primitive_part(a.normalized());
-	UnivariatePolynomial<Coeff> d = carl::primitive_part(b.normalized());
+	UnivariatePolynomial<Coeff> c = primitive_part(a.normalized());
+	UnivariatePolynomial<Coeff> d = primitive_part(b.normalized());
 	
-	while (!d.isZero()) {
+	while (!isZero(d)) {
 		UnivariatePolynomial<Coeff> r = c.prem(d);
 		c = d;
-		d = carl::primitive_part(r.normalized());
+		d = primitive_part(r.normalized());
 	}
-	return carl::gcd(carl::content(a), carl::content(b)) * c;
+	return gcd(content(a), content(b)) * c;
 }
 
 }

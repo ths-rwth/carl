@@ -327,8 +327,10 @@ namespace carl
                 {
                     return *(mpContent->mpVariables);
                 }
-                mpContent->mpVariables = new Variables();
-                allVars( *(mpContent->mpVariables) );
+                carlVariables vars;
+                gatherVariables(vars);
+                auto varvector = vars.underlyingVariables();
+                mpContent->mpVariables = new Variables(varvector.begin(), varvector.end());
                 return *(mpContent->mpVariables);
             }
 
@@ -989,20 +991,6 @@ namespace carl
              * @param _init The string to print initially in every row.
              */
             void printProposition( std::ostream& _out = std::cout, const std::string _init = "" ) const;
-
-            /**
-             * @param _withVariables A flag indicating whether the variables shall be displayed before the formula.
-             * @return A string which represents this formula in the input format of the tool Redlog.
-             */
-            std::string toRedlogFormat( bool _withVariables = true ) const;
-
-            /**
-             * Gets a string, which represents all variables occurring in this formula in a row, separated by the given separator.
-             * @param _separator The separator between the variables.
-             * @param _variableIds Maps variable names to names, which shall be used instead in the result.
-             * @return The string, which represents all variables occurring in this formula in a row, separated by the given separator.
-             */
-            std::string variableListToString( std::string _separator = ",", const std::unordered_map<std::string, std::string>& _variableIds = (std::unordered_map<std::string, std::string>())) const;
 
             /**
              * Resolves the outermost negation of this formula.
