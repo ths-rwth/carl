@@ -31,6 +31,19 @@ bool set_intersect(const Interval<Number>& lhs, const Interval<Number>& rhs) {
 }
 
 /**
+ * Checks whether lhs is a subset of rhs.
+ */
+template<typename Number>
+bool set_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
+	assert(lhs.isConsistent() && rhs.isConsistent());
+
+	if (lhs.isEmpty()) return true;
+	if (lhs.lowerBound() < rhs.lowerBound()) return false;
+	if (rhs.upperBound() < lhs.upperBound()) return false;
+	return true;
+}
+
+/**
  * Computes the union of two intervals (can result in two distinct intervals).
  * @param lhs First interval.
  * @param rhs Second interval.

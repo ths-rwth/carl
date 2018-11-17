@@ -258,14 +258,13 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::isSubset(const Interval<Number>& rhs) const
 	{
-		assert(this->isConsistent());
-		return rhs.contains(*this);
+        return set_subset(rhs, *this);
 	}
 
 	template<typename Number>
 	bool Interval<Number>::isProperSubset(const Interval<Number>& rhs) const
 	{
-        return this->isSubset(rhs);
+        return set_subset(rhs, *this);
     }
 
     template<typename Number>
