@@ -20,7 +20,7 @@ namespace carl {
         for (size_t i = 0; i < roots.size(); i++) {
             Z3Ran<Number> zr(std::move(roots[i]));
             if (zr.containedIn(interval)) {
-                res.push_back(RealAlgebraicNumber<Number>(zr); // std::move(zr)));
+                res.push_back(RealAlgebraicNumber<Number>(zr)); // std::move(zr)));
             }
         }
 
@@ -64,7 +64,7 @@ namespace carl {
         for (size_t i = 0; i < roots.size(); i++) {
             Z3Ran<Number> zr(std::move(roots[i]));
             if (zr.containedIn(interval)) {
-                res.push_back(RealAlgebraicNumber<Number>(zr); // std::move(zr)));
+                res.push_back(RealAlgebraicNumber<Number>(zr)); // std::move(zr)));
             }
         }
 
