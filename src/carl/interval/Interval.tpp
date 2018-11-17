@@ -264,7 +264,7 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::isProperSubset(const Interval<Number>& rhs) const
 	{
-        return set_subset(rhs, *this);
+        return set_proper_subset(rhs, *this);
     }
 
     template<typename Number>

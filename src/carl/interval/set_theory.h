@@ -31,6 +31,21 @@ bool set_intersect(const Interval<Number>& lhs, const Interval<Number>& rhs) {
 }
 
 /**
+ * Checks whether lhs is a proper subset of rhs.
+ */
+template<typename Number>
+bool set_proper_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
+	assert(lhs.isConsistent() && rhs.isConsistent());
+
+	if (lhs.isEmpty()) return !rhs.isEmpty();
+	if (lhs.lowerBound() < rhs.lowerBound()) return false;
+	if (rhs.upperBound() < lhs.upperBound()) return false;
+	if (rhs.lowerBound() < lhs.lowerBound()) return true;
+	if (lhs.upperBound() < rhs.upperBound()) return true;
+	return false;
+}
+
+/**
  * Checks whether lhs is a subset of rhs.
  */
 template<typename Number>
