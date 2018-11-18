@@ -11,6 +11,7 @@
 #include "Interval.h"
 
 #include "../numbers/numbers.h"
+#include "set_theory.h"
 
 #include <iostream>
 

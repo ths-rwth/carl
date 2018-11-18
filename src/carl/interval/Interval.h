@@ -1710,5 +1710,4 @@ namespace std {
 } // namespace std
 
 #include "operators.h"
-#include "set_theory.h"
 #include "Interval.tpp"
