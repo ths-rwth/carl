@@ -7,6 +7,7 @@
 
 #pragma once
 #include "Interval.h"
+#include "set_theory.h"
 #include "../core/Sign.h"
 #include "../core/MultivariateHorner.h"
 #include "IntervalEvaluation.h"
