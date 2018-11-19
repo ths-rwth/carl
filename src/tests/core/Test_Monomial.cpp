@@ -5,6 +5,8 @@
 #include <list>
 #include <boost/variant.hpp>
 
+#include <carl/core/polynomialfunctions/Derivative.h>
+
 #include "../Common.h"
 
 TEST(Monomial, Constructor)
@@ -124,14 +126,26 @@ TEST(Monomial, MonomialMultiplication)
 	);
 }
 
+#define DERIVATIVE_EQUAL(n,f,expr) { \
+	auto res = carl::derivative(m, y, n); \
+	auto ref = std::pair<std::size_t,carl::Monomial::Arg>(f, expr); \
+	EXPECT_EQ(ref, res); \
+	}
 TEST(Monomial, derivative)
 {
-	auto v0 = carl::freshRealVariable("x");
-	auto v1 = carl::freshRealVariable("y");
-	auto m0 = v0 * v1;
-	auto d1 = m0->derivative(v0);
-	EXPECT_EQ(1, d1.first);
-	EXPECT_EQ(v1, d1.second);
+	auto x = carl::freshRealVariable("x");
+	auto y = carl::freshRealVariable("y");
+	auto z = carl::freshRealVariable("z");
+
+	{
+		auto m = x*x*y*y*y*z;
+		DERIVATIVE_EQUAL(0, 1, m);
+		DERIVATIVE_EQUAL(1, 3, x*x*y*y*z);
+		DERIVATIVE_EQUAL(2, 6, x*x*y*z);
+		DERIVATIVE_EQUAL(3, 6, x*x*z);
+		DERIVATIVE_EQUAL(4, 0, nullptr);
+		DERIVATIVE_EQUAL(5, 0, nullptr);
+	}
 }
 
 TEST(Monomial, division)

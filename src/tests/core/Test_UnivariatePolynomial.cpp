@@ -4,6 +4,7 @@
 #include "carl/core/polynomialfunctions/PrimitivePart.h"
 #include "carl/core/polynomialfunctions/Resultant.h"
 #include "carl/core/polynomialfunctions/Factorization_univariate.h"
+#include "carl/core/polynomialfunctions/Derivative.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 
@@ -336,6 +337,24 @@ TYPED_TEST(UnivariatePolynomialIntTest, switchVariable)
 	UnivariatePolynomial<MultivariatePolynomial<TypeParam>> res(y, {mp});
 	auto q = p.switchVariable(y);
 	EXPECT_EQ(q, res);
+}
+
+TYPED_TEST(UnivariatePolynomialTest, derivative)
+{
+	Variable x = freshRealVariable("x");
+
+	{
+		UnivariatePolynomial<TypeParam> p(x, {1,2,3,4,5,6,7});
+		EXPECT_EQ(carl::derivative(p, 0), p);
+		EXPECT_EQ(carl::derivative(p, 1), UnivariatePolynomial<TypeParam>(x, {2,6,12,20,30,42}));
+		EXPECT_EQ(carl::derivative(p, 2), UnivariatePolynomial<TypeParam>(x, {6,24,60,120,210}));
+		EXPECT_EQ(carl::derivative(p, 3), UnivariatePolynomial<TypeParam>(x, {24,120,360,840}));
+		EXPECT_EQ(carl::derivative(p, 4), UnivariatePolynomial<TypeParam>(x, {120,720,2520}));
+		EXPECT_EQ(carl::derivative(p, 5), UnivariatePolynomial<TypeParam>(x, {720, 5040}));
+		EXPECT_EQ(carl::derivative(p, 6), UnivariatePolynomial<TypeParam>(x, {5040}));
+		EXPECT_EQ(carl::derivative(p, 7), UnivariatePolynomial<TypeParam>(x));
+		EXPECT_EQ(carl::derivative(p, 8), UnivariatePolynomial<TypeParam>(x));
+	}
 }
 
 TEST(UnivariatePolynomial, resultant)
