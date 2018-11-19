@@ -17,6 +17,15 @@ namespace detail_derivative {
 }
 
 /**
+ * Computes the n'th derivative of a number, which is either the number itself (for n = 0) or zero.
+ */
+template<typename T, EnableIf<is_number<T>> = dummy>
+const T& derivative(const T& t, Variable v, std::size_t n = 1) {
+	if (n == 0) return t;
+	return constant_zero<T>::get();
+}
+
+/**
  * Computes the n'th derivative of m with respect to v.
  */
 inline std::pair<std::size_t,Monomial::Arg> derivative(const Monomial::Arg& m, Variable v, std::size_t n = 1) {
@@ -100,6 +109,22 @@ UnivariatePolynomial<C> derivative(const UnivariatePolynomial<C>& p, std::size_t
 		std::size_t factor = detail_derivative::multiply(n + i, n);
 		newCoeffs.emplace_back(static_cast<C>(factor) * p.coefficients()[i + n]);
 	}
+	CARL_LOG_DEBUG("carl.core", "derivative(" << p << ", " << n << ") = " << UnivariatePolynomial<C>(p.mainVar(), newCoeffs));
+	return UnivariatePolynomial<C>(p.mainVar(), std::move(newCoeffs));
+}
+
+/**
+ * Computes the n'th derivative of p with respect to v.
+ */
+template<typename C>
+UnivariatePolynomial<C> derivative(const UnivariatePolynomial<C>& p, Variable v, std::size_t n = 1) {
+	if (n == 0) return p;
+	if (v == p.mainVar()) return derivative(p, n);
+
+	std::vector<C> newCoeffs;
+	std::transform(p.coefficients().begin(), p.coefficients().end(), std::back_inserter(newCoeffs),
+		[v,n](const auto& c) { return derivative(c, v, n); }
+	);
 	CARL_LOG_DEBUG("carl.core", "derivative(" << p << ", " << n << ") = " << UnivariatePolynomial<C>(p.mainVar(), newCoeffs));
 	return UnivariatePolynomial<C>(p.mainVar(), std::move(newCoeffs));
 }
