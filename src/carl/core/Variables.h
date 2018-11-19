@@ -47,6 +47,9 @@ public:
 	bool empty() const {
 		return mVariables.empty();
 	}
+	std::size_t size() const {
+		return mVariables.size();
+	}
 
 	void compact() {
 		std::sort(begin(), end());
