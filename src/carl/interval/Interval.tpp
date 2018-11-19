@@ -361,25 +361,13 @@ template<typename Number>
 template<typename Number>
 Number Interval<Number>::distance(const Interval<Number>& intervalA)
 {
-    if( set_intersect(*this, intervalA) )
-        return carl::constant_zero<Number>::get();
-    if( intervalA.upperBoundType() == BoundType::INFTY || this->lowerBoundType() == BoundType::INFTY )
-    {
-        assert( this->upperBoundType() != BoundType::INFTY );
-        assert( intervalA.lowerBoundType() != BoundType::INFTY );
-        return carl::abs(Number(intervalA.lower() - this->upper()));
-    }
-    else if( intervalA.lowerBoundType() == BoundType::INFTY || this->upperBoundType() == BoundType::INFTY )
-    {
-        assert( this->lowerBoundType() != BoundType::INFTY );
-        assert( intervalA.upperBoundType() != BoundType::INFTY );
-        return carl::abs(Number(intervalA.upper() - this->lower()));
-    }
-    Number distA = carl::abs(Number(intervalA.upper() - this->lower()));
-    Number distB = carl::abs(Number(intervalA.lower() - this->upper()));
-    if( distA < distB )
-        return distA;
-    return distB;
+	if (intervalA.upperBound() < lowerBound()) {
+		return lower() - intervalA.upper();
+	}
+	if (upperBound() < intervalA.lowerBound()) {
+		return intervalA.lower() - upper();
+	}
+	return carl::constant_zero<Number>::get();
 }
 
 template<typename Number>
