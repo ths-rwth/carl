@@ -1231,26 +1231,26 @@ TEST(DoubleInterval, Contains)
     EXPECT_FALSE(i4.contains(i8));
 
     // Subset is the opposite
-    EXPECT_FALSE(i2.isSubset(i1));
-    EXPECT_FALSE(i1.isSubset(i2));
-    EXPECT_TRUE(i3.isSubset(i1));
-    EXPECT_FALSE(i1.isSubset(i3));
-    EXPECT_FALSE(i5.isSubset(i1));
-    EXPECT_TRUE(i1.isSubset(i5));
-    EXPECT_TRUE(i6.isSubset(i1));
-    EXPECT_FALSE(i1.isSubset(i6));
-    EXPECT_TRUE(i1.isSubset(i1));
-    EXPECT_TRUE(i6.isSubset(i6));
-    EXPECT_FALSE(i7.isSubset(i1));
-    EXPECT_TRUE(i1.isSubset(i7));
-    EXPECT_FALSE(i7.isSubset(i6));
-    EXPECT_TRUE(i6.isSubset(i7));
-    EXPECT_FALSE(i5.isSubset(i8));
-    EXPECT_TRUE(i8.isSubset(i5));
-    EXPECT_FALSE(i6.isSubset(i8));
-    EXPECT_TRUE(i8.isSubset(i6));
-    EXPECT_FALSE(i4.isSubset(i8));
-    EXPECT_FALSE(i8.isSubset(i4));
+    EXPECT_FALSE(carl::set_subset(i1, i2));
+    EXPECT_FALSE(carl::set_subset(i2, i1));
+    EXPECT_TRUE(carl::set_subset(i1, i3));
+    EXPECT_FALSE(carl::set_subset(i3, i1));
+    EXPECT_FALSE(carl::set_subset(i1, i5));
+    EXPECT_TRUE(carl::set_subset(i5, i1));
+    EXPECT_TRUE(carl::set_subset(i1, i6));
+    EXPECT_FALSE(carl::set_subset(i6, i1));
+    EXPECT_TRUE(carl::set_subset(i1, i1));
+    EXPECT_TRUE(carl::set_subset(i6, i6));
+    EXPECT_FALSE(carl::set_subset(i1, i7));
+    EXPECT_TRUE(carl::set_subset(i7, i1));
+    EXPECT_FALSE(carl::set_subset(i6, i7));
+    EXPECT_TRUE(carl::set_subset(i7, i6));
+    EXPECT_FALSE(carl::set_subset(i8, i5));
+    EXPECT_TRUE(carl::set_subset(i5, i8));
+    EXPECT_FALSE(carl::set_subset(i8, i6));
+    EXPECT_TRUE(carl::set_subset(i6, i8));
+    EXPECT_FALSE(carl::set_subset(i8, i4));
+    EXPECT_FALSE(carl::set_subset(i4, i8));
 
     EXPECT_FALSE(set_proper_subset(i1, i2));
     EXPECT_FALSE(set_proper_subset(i2, i1));
