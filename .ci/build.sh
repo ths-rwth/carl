@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
 function fold_start {
-	echo -en "travis_fold:start:$1\r"
+	travis_start_time=`date -u '+%s000000000'`
+	echo -en "travis_fold:start:$1\r\033[0K"
+	echo -en "travis_time:start:timer_$1\r\033[0K"
 }
 function fold_end {
-	echo -en "travis_fold:end:$1\r"
+	local travis_end_time=`date -u '+%s000000000'`
+	local duration=$(($travis_end_time-$travis_start_time))
+	echo -en "travis_time:end:timer_$1:start=$travis_start_time,finish=$travis_end_time,duration=$duration\r\033[0K"
+	echo -en "travis_fold:end:$1\r\033[0K"
 }
 function fold {
 	fold_start "$1"
@@ -51,7 +56,7 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	fold "collect-coverage" make coverage-collect
 	
 	cd ../ && sonar-scanner -X -Dproject.settings=build/sonarcloud.properties && cd build/
-	
+
 elif [[ ${TASK} == "doxygen" ]]; then
 	
 	fold "reconfigure" cmake -D DOCUMENTATION_CREATE_PDF=ON -D BUILD_DOXYGEN=ON ../
