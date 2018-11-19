@@ -258,6 +258,7 @@ class Term {
 		template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
 		bool divisible(const Term& t) const;
 		
+		[[deprecated("Use carl::derivative() instead.")]]
 		Term derivative(Variable v) const;
 		
 		Definiteness definiteness() const;

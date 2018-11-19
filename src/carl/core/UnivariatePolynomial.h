@@ -511,6 +511,7 @@ public:
 	 * @param nth how many times the derivative should be applied.
 	 * @return A polynomial \f$(d/dx)^n p(x)\f$ where \f$p(x)\f$ is the input polynomial.
 	 */
+	[[deprecated("Use carl::derivative() instead.")]]
 	UnivariatePolynomial derivative(uint nth = 1) const;
 
 	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;

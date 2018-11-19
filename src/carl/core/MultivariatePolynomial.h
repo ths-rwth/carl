@@ -508,7 +508,7 @@ public:
 	MultivariatePolynomial remainder(const MultivariatePolynomial& divisor) const;
 	MultivariatePolynomial prem(const MultivariatePolynomial& divisor, Variable::Arg var) const;
 	
-	
+	[[deprecated("Use carl::derivative() instead.")]]
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
     
     /**

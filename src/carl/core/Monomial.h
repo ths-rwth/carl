@@ -450,8 +450,9 @@ namespace carl
 		/**
 		 * Computes the (partial) derivative of this monomial with respect to the given variable.
 		 * @param v Variable.
-		 * @return Partial derivative.
+		 * @return Partial derivative, consisting of constant factor and the remaining monomial.
 		 */
+		[[deprecated("Use carl::derivative() instead.")]]
 		std::pair<std::size_t,Monomial::Arg> derivative(Variable v) const;
 		
 		/**
