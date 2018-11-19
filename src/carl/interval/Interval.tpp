@@ -11,7 +11,6 @@
 #include "Interval.h"
 
 #include "../numbers/numbers.h"
-#include "set_theory.h"
 
 #include <iostream>
 
@@ -255,18 +254,6 @@ template<typename Number>
 		assert(this->isConsistent());
 		return (mContent.lower() <= n || mLowerBoundType == BoundType::INFTY) && (mContent.upper() >= n || mUpperBoundType == BoundType::INFTY);
 	}
-
-	template<typename Number>
-	bool Interval<Number>::isSubset(const Interval<Number>& rhs) const
-	{
-        return set_subset(rhs, *this);
-	}
-
-	template<typename Number>
-	bool Interval<Number>::isProperSubset(const Interval<Number>& rhs) const
-	{
-        return set_proper_subset(rhs, *this);
-    }
 
     template<typename Number>
     void Interval<Number>::bloat_by(const Number& width)
@@ -887,180 +874,6 @@ template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::root_assign(unsigned deg)
 	{
 		*this = this->root(deg);
-	}
-
-/*******************************************************************************
- * Boolean operations
- ******************************************************************************/
-
-template<typename Number>
-bool Interval<Number>::intersectsWith(const Interval<Number>& rhs) const
-{
-    return set_intersect(*this, rhs);
-}
-
-template<typename Number>
-	Interval<Number> Interval<Number>::intersect(const Interval<Number>& rhs) const
-	{
-		return set_intersection(*this, rhs);
-	}
-
-template<typename Number>
-	Interval<Number>& Interval<Number>::intersect_assign(const Interval<Number>& rhs)
-	{
-		*this = set_intersection(*this, rhs);
-        return *this;
-	}
-
-	template<typename Number>
-	bool Interval<Number>::unite(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
-	{
-		return set_union(*this, rhs, resultA, resultB);
-	}
-
-	template<typename Number>
-	bool Interval<Number>::difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
-	{
-		return set_difference(*this, rhs, resultA, resultB);
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-                if( rhs.isEmpty() )
-                {
-                    resultA = *this;
-                    return false;
-                }
-                if ( this->isEmpty() )
-                {
-                    resultA = rhs;
-                    return false;
-                }
-                // check for subset before contains because we may want to get
-                // the difference from ourselves which is empty.
-                if( this->isSubset(rhs) )
-                {
-                    resultA = emptyInterval();
-                    return false;
-                }
-                else if( this->contains(rhs) )
-                {
-                    if( mContent.lower() != rhs.lower() && mContent.upper() != rhs.upper() )
-                    {
-			BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
-			BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
-			resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.lower(), upperType);
-			resultB = Interval<Number>(rhs.upper(), lowerType, mContent.upper(), mUpperBoundType);
-			return true;
-                    }
-                    else if( mContent.lower() == rhs.lower() && mContent.upper() != rhs.upper() )
-                    {
-                        if( mLowerBoundType == rhs.lowerBoundType() )
-                        {
-                            BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
-                            resultA = Interval<Number>(rhs.upper(), lowerType, mContent.upper(), mUpperBoundType );
-                            return false;
-                        }
-                        else
-                        {
-                            resultA = Interval<Number>( mContent.lower(),mLowerBoundType, mContent.lower(), getOtherBoundType(rhs.lowerBoundType()) );
-                            resultB = Interval<Number>(rhs.upper(), getOtherBoundType(rhs.upperBoundType()), mContent.upper(), mUpperBoundType);
-                            return true;
-                        }
-                    }
-                    else if( mContent.lower() != rhs.lower() && mContent.upper() == rhs.upper() )
-                    {
-                        if( mUpperBoundType == rhs.upperBoundType() )
-                        {
-                            BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
-                            BoundType lowerType = mLowerBoundType;
-                            resultA = Interval<Number>(mContent.lower(), lowerType, rhs.upper(), upperType);
-                            return false;
-                        }
-                        else
-                        {
-                            resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.upper(), getOtherBoundType(rhs.upperBoundType()));
-                            resultB = Interval<Number>(mContent.upper(), getOtherBoundType(rhs.upperBoundType()), mContent.upper(), mUpperBoundType);
-                            return true;
-                        }
-                    }
-                    else if( mContent.lower() == rhs.lower() && mContent.upper() == rhs.upper() )
-                    {
-                        resultA = emptyInterval();
-                        return false;
-                    }
-                    // Shouldn't happen
-                    assert(false);
-                    return false;
-		}
-		else
-		{
-			if( this->contains(rhs.lower()) )
-			{
-                            BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
-                            resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.lower(), upperType);
-			}
-			else if( this->contains(rhs.upper()) )
-			{
-                            BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
-                            resultA = Interval<Number>(rhs.upper(), lowerType, mContent.upper(), mUpperBoundType);
-			}
-			else //both are totally distinct
-			{
-                            resultA = *this;
-			}
-			return false;
-		}
-	}
-
-	template<typename Number>
-	bool Interval<Number>::complement(Interval<Number>& resultA, Interval<Number>& resultB) const
-	{
-		BoundType upperType;
-		BoundType lowerType;
-		switch (mLowerBoundType) {
-			case BoundType::INFTY:
-				if(mUpperBoundType == BoundType::INFTY)
-				{
-					resultA = emptyInterval();
-				}
-				else
-				{
-					lowerType = mUpperBoundType == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
-					resultA = Interval<Number>(mContent.upper(), lowerType, mContent.upper(), BoundType::INFTY);
-				}
-				return false;
-
-			default:
-				switch (mUpperBoundType) {
-					case BoundType::INFTY:
-						upperType = mLowerBoundType == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
-						resultA = Interval<Number>(mContent.lower(), BoundType::INFTY, mContent.lower(), upperType);
-						return false;
-
-					default:
-						upperType = mLowerBoundType == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
-						lowerType = mUpperBoundType == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
-						resultA = Interval<Number>(mContent.lower(), BoundType::INFTY, mContent.lower(), upperType);
-						resultB = Interval<Number>(mContent.upper(), lowerType, mContent.upper(), BoundType::INFTY);
-						return true;
-				}
-		}
-	}
-
-	template<typename Number>
-	bool Interval<Number>::symmetricDifference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
-	{
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-		Interval<Number> intersection = this->intersect(rhs);
-		if( !intersection.isEmpty() )
-		{
-			Interval<Number> tmp;
-			this->unite(rhs, tmp, tmp); //we know this will result in exactly one interval as the intersection is not empty
-			return tmp.difference(intersection, resultA, resultB);
- 		}
-		resultA = *this;
-		resultB = rhs;
-		return true;
 	}
 
 }

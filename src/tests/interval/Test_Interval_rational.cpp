@@ -1,6 +1,7 @@
 #include "../Common.h"
 
 #include <carl/interval/Interval.h>
+#include <carl/interval/set_theory.h>
 
 using namespace carl;
 

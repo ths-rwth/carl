@@ -152,13 +152,13 @@ namespace carl {
                         if (mVar.type() == VariableType::VT_INT) {
                             rootA = rootA.integralPart();
                         }
-                        rootA.intersect_assign(_varInterval);
+                        rootA = set_intersect(rootA, _varInterval);
                         if( !rootA.isEmpty() )
                             _result.push_back(std::move(rootA));
                         if (mVar.type() == VariableType::VT_INT) {
                             rootB = rootB.integralPart();
                         }
-                        rootB.intersect_assign(_varInterval);
+                        rootB = set_intersect(rootB, _varInterval);
                         if( !rootB.isEmpty() )
                             _result.push_back(std::move(rootB));
                     }
@@ -167,7 +167,7 @@ namespace carl {
                         if (mVar.type() == VariableType::VT_INT) {
                             rootA = rootA.integralPart();
                         }
-                        rootA.intersect_assign(_varInterval);
+                        rootA = set_intersect(rootA, _varInterval);
                         if( !rootA.isEmpty() )
                             _result.push_back(std::move(rootA));
                     }

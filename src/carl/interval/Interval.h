@@ -1330,20 +1330,6 @@ namespace carl
         bool meets(const Number& n) const;
 
         /**
-         * Checks if the given interval is a subset of the calling interval.
-         * @param rhs Interval to be checked.
-         * @return True if rhs is contained in this.
-         */
-        bool isSubset(const Interval<Number>& rhs) const;
-
-        /**
-         * Checks if the given interval is a proper subset of the calling interval.
-         * @param rhs Interval to be checked.
-         * @return True if rhs is fully contained in this.
-         */
-        bool isProperSubset(const Interval<Number>& rhs) const;
-
-        /**
          * Bloats the interval by the given value.
          * @param width Width.
          */
@@ -1508,66 +1494,6 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void root_assign(unsigned deg);
-
-        /*
-         * Boolean Operations
-         */
-		[[deprecated("Use carl::set_intersect() instead.")]]
-        bool intersectsWith(const Interval<Number>& rhs) const;
-
-        /**
-         * Intersects two intervals in a set-theoretic manner.
-         * @param rhs Righthand side.
-         * @return Result.
-         */
-		[[deprecated("Use carl::set_intersection() instead.")]]
-        Interval<Number> intersect(const Interval<Number>& rhs) const;
-
-        /**
-         * Intersects and assigns two intervals in a set-theoretic manner.
-         * @param rhs Righthand side.
-         * @return Reference to this.
-         */
-        Interval<Number>& intersect_assign(const Interval<Number>& rhs);
-
-        /**
-         * Unites two intervals in a set-theoretic manner (can result in two distinct intervals).
-         * @param rhs Righthand side.
-         * @param resultA Result a.
-         * @param resultB Result b.
-         * @return True, if the result is twofold.
-         */
-		[[deprecated("Use carl::set_union() instead.")]]
-        bool unite(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
-
-        /**
-         * Calculates the difference of two intervals in a set-theoretic manner:
-         * lhs - rhs (can result in two distinct intervals).
-         * @param rhs Righthand side.
-         * @param resultA Result a.
-         * @param resultB Result b.
-         * @return True, if the result is twofold.
-         */
-        bool difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
-
-        /**
-         * Calculates the complement in a set-theoretic manner (can result
-         * in two distinct intervals).
-         * @param resultA Result a.
-         * @param resultB Result b.
-         * @return True, if the result is twofold.
-         */
-        bool complement(Interval<Number>& resultA, Interval<Number>& resultB) const;
-
-        /**
-         * Calculates the symmetric difference of two intervals in a
-         * set-theoretic manner (can result in two distinct intervals).
-         * @param rhs Righthand side.
-         * @param resultA Result a.
-         * @param resultB Result b.
-         * @return True, if the result is twofold.
-         */
-        bool symmetricDifference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
 
         /**
          * A quick check for the bound values.
