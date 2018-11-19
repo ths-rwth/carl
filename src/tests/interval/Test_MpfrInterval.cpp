@@ -931,47 +931,47 @@ TEST(mpfrInterval, Union)
     mpfrInterval i7(0, BoundType::INFTY, 0, BoundType::INFTY);
     mpfrInterval result1, result2;
 
-    EXPECT_FALSE(i1.unite(i2, result1, result2));
+    EXPECT_FALSE(carl::set_union(i1, i2, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i2.unite(i1, result1, result2));
+    EXPECT_FALSE(carl::set_union(i2, i1, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
 
-    EXPECT_TRUE(i1.unite(i3, result1, result2));
+    EXPECT_TRUE(carl::set_union(i1, i3, result1, result2));
     EXPECT_EQ(mpfrInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
     EXPECT_EQ(mpfrInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
 
-    EXPECT_FALSE(i3.unite(i2, result1, result2));
+    EXPECT_FALSE(carl::set_union(i3, i2, result1, result2));
     EXPECT_EQ(mpfrInterval(-2, BoundType::WEAK, 4, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i4.unite(i1, result1, result2));
+    EXPECT_FALSE(carl::set_union(i4, i1, result1, result2));
     EXPECT_EQ(mpfrInterval(3, BoundType::WEAK, 9, BoundType::STRICT), result1);
 
-    EXPECT_TRUE(i3.unite(i4, result1, result2));
+    EXPECT_TRUE(carl::set_union(i3, i4, result1, result2));
     EXPECT_EQ(mpfrInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
     EXPECT_EQ(mpfrInterval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
 
-    EXPECT_FALSE(i2.unite(i4, result1, result2));
+    EXPECT_FALSE(carl::set_union(i2, i4, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::WEAK, 9, BoundType::STRICT), result1);
 
-    EXPECT_FALSE(i2.unite(i5, result1, result2));
+    EXPECT_FALSE(carl::set_union(i2, i5, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::WEAK, 4, BoundType::WEAK), result1);
 
-    EXPECT_TRUE(i5.unite(i4, result1, result2));
+    EXPECT_TRUE(carl::set_union(i5, i4, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::STRICT, 4, BoundType::STRICT), result1);
     EXPECT_EQ(mpfrInterval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
 
-    EXPECT_FALSE(i6.unite(i1, result1, result2));
+    EXPECT_FALSE(carl::set_union(i6, i1, result1, result2));
     EXPECT_EQ(mpfrInterval(3, BoundType::WEAK, 3, BoundType::INFTY), result1);
 
-    EXPECT_TRUE(i6.unite(i3, result1, result2));
+    EXPECT_TRUE(carl::set_union(i6, i3, result1, result2));
     EXPECT_EQ(mpfrInterval(3, BoundType::STRICT, 3, BoundType::INFTY), result1);
     EXPECT_EQ(mpfrInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
 
-    EXPECT_FALSE(i1.unite(i7, result1, result2));
+    EXPECT_FALSE(carl::set_union(i1, i7, result1, result2));
     EXPECT_EQ(mpfrInterval::unboundedInterval(), result1);
 
-    EXPECT_FALSE(i7.unite(i6, result1, result2));
+    EXPECT_FALSE(carl::set_union(i7, i6, result1, result2));
     EXPECT_EQ(mpfrInterval::unboundedInterval(), result1);
 }
 
@@ -987,71 +987,71 @@ TEST(mpfrInterval, Difference)
     mpfrInterval i8(0, BoundType::STRICT, 0, BoundType::STRICT);
     mpfrInterval result1, result2;
 
-    EXPECT_FALSE(i1.difference(i2, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i1, i2, result1, result2));
     EXPECT_EQ(mpfrInterval(4, BoundType::STRICT, 5, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i2.difference(i1, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i2, i1, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::WEAK, 3, BoundType::STRICT), result1);
 
-    EXPECT_FALSE(i1.difference(i3, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i1, i3, result1, result2));
     EXPECT_EQ(mpfrInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i3.difference(i1, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i3, i1, result1, result2));
     EXPECT_EQ(mpfrInterval(-1, BoundType::WEAK, 2, BoundType::WEAK), result1);
 
-    EXPECT_TRUE(i2.difference(i4, result1, result2));
+    EXPECT_TRUE(carl::set_difference(i2, i4, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::WEAK, 2, BoundType::STRICT), result1);
     EXPECT_EQ(mpfrInterval(3, BoundType::STRICT, 4, BoundType::WEAK), result2);
 
-    EXPECT_FALSE(i4.difference(i2, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i4, i2, result1, result2));
     EXPECT_EQ(mpfrInterval::emptyInterval(), result1);
 
-    EXPECT_FALSE(i5.difference(i2, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i5, i2, result1, result2));
     EXPECT_EQ(mpfrInterval::emptyInterval(), result1);
 
-    EXPECT_TRUE(i2.difference(i5, result1, result2));
+    EXPECT_TRUE(carl::set_difference(i2, i5, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::WEAK, 1, BoundType::WEAK), result1);
     EXPECT_EQ(mpfrInterval(3, BoundType::WEAK, 4, BoundType::WEAK), result2);
 
-    EXPECT_FALSE(i1.difference(i1, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i1, i1, result1, result2));
     EXPECT_EQ(mpfrInterval::emptyInterval(), result1);
 
-    EXPECT_FALSE(i6.difference(i2, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i6, i2, result1, result2));
     EXPECT_EQ(mpfrInterval(4, BoundType::STRICT, 4, BoundType::INFTY), result1);
 
-    EXPECT_FALSE(i2.difference(i6, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i2, i6, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::WEAK, 2, BoundType::STRICT), result1);
 
-    EXPECT_TRUE(i6.difference(i1, result1, result2));
+    EXPECT_TRUE(carl::set_difference(i6, i1, result1, result2));
     EXPECT_EQ(mpfrInterval(2, BoundType::WEAK, 3, BoundType::STRICT), result1);
     EXPECT_EQ(mpfrInterval(5, BoundType::STRICT, 5, BoundType::INFTY), result2);
 
-    EXPECT_FALSE(i1.difference(i6, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i1, i6, result1, result2));
     EXPECT_EQ(mpfrInterval::emptyInterval(), result1);
 
-    EXPECT_FALSE(i3.difference(i6, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i3, i6, result1, result2));
     EXPECT_EQ(mpfrInterval(-1, BoundType::WEAK, 2, BoundType::STRICT), result1);
 
-    EXPECT_FALSE(i7.difference(i2, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i7, i2, result1, result2));
     EXPECT_EQ(mpfrInterval::emptyInterval(), result1);
 
-    EXPECT_TRUE(i2.difference(i7, result1, result2));
+    EXPECT_TRUE(carl::set_difference(i2, i7, result1, result2));
     EXPECT_EQ(mpfrInterval(1, BoundType::WEAK, 3, BoundType::STRICT), result1);
     EXPECT_EQ(mpfrInterval(3, BoundType::STRICT, 4, BoundType::WEAK), result2);
 
-    EXPECT_FALSE(i1.difference(i7, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i1, i7, result1, result2));
     EXPECT_EQ(mpfrInterval(3, BoundType::STRICT, 5, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i8.difference(i1, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i8, i1, result1, result2));
     EXPECT_EQ(mpfrInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i1.difference(i8, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i1, i8, result1, result2));
     EXPECT_EQ(mpfrInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i8.difference(i3, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i8, i3, result1, result2));
     EXPECT_EQ(mpfrInterval(-1, BoundType::WEAK, 2, BoundType::WEAK), result1);
 
-    EXPECT_FALSE(i3.difference(i8, result1, result2));
+    EXPECT_FALSE(carl::set_difference(i3, i8, result1, result2));
     EXPECT_EQ(mpfrInterval(-1, BoundType::WEAK, 2, BoundType::WEAK), result1);
 }
 
@@ -1215,26 +1215,26 @@ TEST(mpfrInterval, Contains)
     EXPECT_FALSE(carl::set_subset(i8, i4));
     EXPECT_FALSE(carl::set_subset(i4, i8));
 
-    EXPECT_FALSE(i2.isProperSubset(i1));
-    EXPECT_FALSE(i1.isProperSubset(i2));
-    EXPECT_FALSE(i3.isProperSubset(i1));
-    EXPECT_TRUE(i1.isProperSubset(i3));
-    EXPECT_TRUE(i5.isProperSubset(i1));
-    EXPECT_FALSE(i1.isProperSubset(i5));
-    EXPECT_FALSE(i6.isProperSubset(i1));
-    EXPECT_TRUE(i1.isProperSubset(i6));
-    EXPECT_TRUE(i1.isProperSubset(i1));
-    EXPECT_TRUE(i6.isProperSubset(i6));
-    EXPECT_TRUE(i7.isProperSubset(i1));
-    EXPECT_FALSE(i1.isProperSubset(i7));
-    EXPECT_TRUE(i7.isProperSubset(i6));
-    EXPECT_FALSE(i6.isProperSubset(i7));
-    EXPECT_TRUE(i5.isProperSubset(i8));
-    EXPECT_FALSE(i8.isProperSubset(i5));
-    EXPECT_TRUE(i6.isProperSubset(i8));
-    EXPECT_FALSE(i8.isProperSubset(i6));
-    EXPECT_FALSE(i4.isProperSubset(i8));
-    EXPECT_FALSE(i8.isProperSubset(i4));
+    EXPECT_FALSE(carl::set_proper_subset(i1, i2));
+    EXPECT_FALSE(carl::set_proper_subset(i2, i1));
+    EXPECT_FALSE(carl::set_proper_subset(i1, i3));
+    EXPECT_TRUE(carl::set_proper_subset(i3, i1));
+    EXPECT_TRUE(carl::set_proper_subset(i1, i5));
+    EXPECT_FALSE(carl::set_proper_subset(i5, i1));
+    EXPECT_FALSE(carl::set_proper_subset(i1, i6));
+    EXPECT_TRUE(carl::set_proper_subset(i6, i1));
+    EXPECT_TRUE(carl::set_proper_subset(i1, i1));
+    EXPECT_TRUE(carl::set_proper_subset(i6, i6));
+    EXPECT_TRUE(carl::set_proper_subset(i1, i7));
+    EXPECT_FALSE(carl::set_proper_subset(i7, i1));
+    EXPECT_TRUE(carl::set_proper_subset(i6, i7));
+    EXPECT_FALSE(carl::set_proper_subset(i7, i6));
+    EXPECT_TRUE(carl::set_proper_subset(i8, i5));
+    EXPECT_FALSE(carl::set_proper_subset(i5, i8));
+    EXPECT_TRUE(carl::set_proper_subset(i8, i6));
+    EXPECT_FALSE(carl::set_proper_subset(i6, i8));
+    EXPECT_FALSE(carl::set_proper_subset(i8, i4));
+    EXPECT_FALSE(carl::set_proper_subset(i4, i8));
 }
 
 TEST(mpfrInterval, BloatShrink)

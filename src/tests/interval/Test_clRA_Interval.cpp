@@ -1113,26 +1113,26 @@ TEST(clRA_Interval, Contains)
     EXPECT_FALSE(carl::set_subset(i8, i4));
     EXPECT_FALSE(carl::set_subset(i4, i8));
 
-    EXPECT_FALSE(i2.isProperSubset(i1));
-    EXPECT_FALSE(i1.isProperSubset(i2));
-    EXPECT_TRUE(i3.isProperSubset(i1));
-    EXPECT_FALSE(i1.isProperSubset(i3));
-    EXPECT_FALSE(i5.isProperSubset(i1));
-    EXPECT_TRUE(i1.isProperSubset(i5));
-    EXPECT_TRUE(i6.isProperSubset(i1));
-    EXPECT_FALSE(i1.isProperSubset(i6));
-    EXPECT_FALSE(i1.isProperSubset(i1));
-    EXPECT_FALSE(i6.isProperSubset(i6));
-    EXPECT_FALSE(i7.isProperSubset(i1));
-    EXPECT_TRUE(i1.isProperSubset(i7));
-    EXPECT_FALSE(i7.isProperSubset(i6));
-    EXPECT_TRUE(i6.isProperSubset(i7));
-    EXPECT_FALSE(i5.isProperSubset(i8));
-    EXPECT_TRUE(i8.isProperSubset(i5));
-    EXPECT_FALSE(i6.isProperSubset(i8));
-    EXPECT_TRUE(i8.isProperSubset(i6));
-    EXPECT_FALSE(i4.isProperSubset(i8));
-    EXPECT_FALSE(i8.isProperSubset(i4));
+    EXPECT_FALSE(carl::set_proper_subset(i1, i2));
+    EXPECT_FALSE(carl::set_proper_subset(i2, i1));
+    EXPECT_TRUE(carl::set_proper_subset(i1, i3));
+    EXPECT_FALSE(carl::set_proper_subset(i3, i1));
+    EXPECT_FALSE(carl::set_proper_subset(i1, i5));
+    EXPECT_TRUE(carl::set_proper_subset(i5, i1));
+    EXPECT_TRUE(carl::set_proper_subset(i1, i6));
+    EXPECT_FALSE(carl::set_proper_subset(i6, i1));
+    EXPECT_FALSE(carl::set_proper_subset(i1, i1));
+    EXPECT_FALSE(carl::set_proper_subset(i6, i6));
+    EXPECT_FALSE(carl::set_proper_subset(i1, i7));
+    EXPECT_TRUE(carl::set_proper_subset(i7, i1));
+    EXPECT_FALSE(carl::set_proper_subset(i6, i7));
+    EXPECT_TRUE(carl::set_proper_subset(i7, i6));
+    EXPECT_FALSE(carl::set_proper_subset(i8, i5));
+    EXPECT_TRUE(carl::set_proper_subset(i5, i8));
+    EXPECT_FALSE(carl::set_proper_subset(i8, i6));
+    EXPECT_TRUE(carl::set_proper_subset(i6, i8));
+    EXPECT_FALSE(carl::set_proper_subset(i8, i4));
+    EXPECT_FALSE(carl::set_proper_subset(i4, i8));
 }
 
 TEST(clRA_Interval, BloatShrink)
