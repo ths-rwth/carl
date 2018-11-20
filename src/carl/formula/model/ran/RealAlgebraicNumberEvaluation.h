@@ -176,18 +176,18 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 	Interval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
 	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
 
-	auto sturmSeq = res.standardSturmSequence();
+	auto sturmSeq = sturm_sequence(res);
 	// the interval should include at least one root.
 	assert(!carl::isZero(res));
 	assert(
 		res.sgn(interval.lower()) == Sign::ZERO ||
 		res.sgn(interval.upper()) == Sign::ZERO ||
-		res.countRealRoots(sturmSeq, interval) >= 1
+		count_real_roots(sturmSeq, interval) >= 1
 	);
 	while (
 		res.sgn(interval.lower()) == Sign::ZERO ||
 		res.sgn(interval.upper()) == Sign::ZERO ||
-		res.countRealRoots(sturmSeq, interval) != 1) {
+		count_real_roots(sturmSeq, interval) != 1) {
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (auto it = m.begin(); it != m.end(); it++) {
 			it->second.refine();

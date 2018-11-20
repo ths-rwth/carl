@@ -3,10 +3,14 @@
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"
 
-namespace  carl {
+namespace carl {
+	template<typename Coeff>
+	Coeff content(const UnivariatePolynomial<Coeff>& p);
+}
 
-template<typename T>
-T gcd(const T& lhs, const T& rhs);
+#include "GCD.h"
+
+namespace  carl {
 
 /**
  * The content of a polynomial is the gcd of the coefficients of the normal part of a polynomial.

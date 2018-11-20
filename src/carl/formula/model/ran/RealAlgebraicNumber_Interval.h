@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../../../core/UnivariatePolynomial.h"
+#include "../../../core/polynomialfunctions/RootCounting.h"
+#include "../../../core/polynomialfunctions/SturmSequence.h"
 
 #include "../../../interval/Interval.h"
 
@@ -19,7 +21,7 @@ namespace ran {
 		
 		Polynomial polynomial;
 		Interval<Number> interval;
-		std::list<Polynomial> sturmSequence;
+		std::vector<Polynomial> sturmSequence;
 		std::size_t refinementCount;
 		
 		Polynomial replaceVariable(const Polynomial& p) const {
@@ -32,14 +34,14 @@ namespace ran {
 		):
 			polynomial(replaceVariable(p)),
 			interval(i),
-			sturmSequence(p.standardSturmSequence()),
+			sturmSequence(carl::sturm_sequence(p)),
 			refinementCount(0)
 		{}
 		
 		IntervalContent(
 			const Polynomial& p,
 			const Interval<Number> i,
-			const std::list<UnivariatePolynomial<Number>>& seq
+			const std::vector<UnivariatePolynomial<Number>>& seq
 		):
 			polynomial(replaceVariable(p)),
 			interval(i),
@@ -52,14 +54,14 @@ namespace ran {
 		
 		void setPolynomial(const Polynomial& p) {
 			polynomial = replaceVariable(p);
-			sturmSequence = polynomial.standardSturmSequence();
+			sturmSequence = carl::sturm_sequence(polynomial);
 		}
 		
 		Sign sgn(const Polynomial& p) const {
 			Polynomial tmp = replaceVariable(p);
 			if (polynomial == tmp) return Sign::ZERO;
-			auto seq = polynomial.standardSturmSequence(polynomial.derivative() * tmp);
-			int variations = Polynomial::countRealRoots(seq, interval);
+			auto seq = carl::sturm_sequence(polynomial, derivative(polynomial) * tmp);
+			int variations = carl::count_real_roots(seq, interval);
 			assert((variations == -1) || (variations == 0) || (variations == 1));
 			switch (variations) {
 				case -1: return Sign::NEGATIVE;
@@ -77,7 +79,7 @@ namespace ran {
 			if (polynomial.isRoot(pivot)) {
 				interval = Interval<Number>(pivot, pivot);
 			} else {
-				if (polynomial.countRealRoots(Interval<Number>(interval.lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
+				if (carl::count_real_roots(polynomial, Interval<Number>(interval.lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
 					interval.setUpper(pivot);
 				} else {
 					interval.setLower(pivot);
@@ -99,7 +101,7 @@ namespace ran {
 					interval = Interval<Number>(n, n);
 					return true;
 				}
-				if (polynomial.countRealRoots(Interval<Number>(interval.lower(), BoundType::STRICT, n, BoundType::STRICT)) > 0) {
+				if (carl::count_real_roots(polynomial, Interval<Number>(interval.lower(), BoundType::STRICT, n, BoundType::STRICT)) > 0) {
 					interval.setUpper(n);
 				} else {
 					interval.setLower(n);
@@ -124,7 +126,7 @@ namespace ran {
 				interval.setUpper(newBound);
 			}
 			
-			while (polynomial.countRealRoots(interval) == 0) {
+			while (carl::count_real_roots(polynomial, interval) == 0) {
 				if (isLeft) {
 					Number oldBound = interval.lower();
 					newBound = carl::sample(Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT));

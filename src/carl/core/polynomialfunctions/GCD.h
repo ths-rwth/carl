@@ -1,13 +1,13 @@
 #pragma once
 
+#include "../MultivariatePolynomial.h"
+#include "../UnivariatePolynomial.h"
+#include "../../numbers/typetraits.h"
+
 namespace carl {
-	template<typename C, typename O, typename P>
-	class MultivariatePolynomial;
 	template<typename C, typename O, typename P>
 	MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
 	
-	template<typename Coeff>
-	class UnivariatePolynomial;
 	template<typename Coeff>
 	UnivariatePolynomial<Coeff> gcd(const UnivariatePolynomial<Coeff>& a, const UnivariatePolynomial<Coeff>& b);
 }
@@ -15,8 +15,6 @@ namespace carl {
 #include "GCD_multivariate.h"
 #include "GCD_univariate.h"
 #include "PrimitiveEuclidean.h"
-#include "../MultivariatePolynomial.h"
-#include "../../numbers/typetraits.h"
 
 namespace carl {
 

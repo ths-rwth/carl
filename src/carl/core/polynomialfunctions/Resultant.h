@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GCD.h"
 #include "Content.h"
+#include "Derivative.h"
 #include "PrimitivePart.h"
 
 #include <list>
@@ -301,7 +301,7 @@ UnivariatePolynomial<Coeff> discriminant(
 	const UnivariatePolynomial<Coeff>& p,
 	SubresultantStrategy strategy
 ) {
-	UnivariatePolynomial<Coeff> res = resultant(p, p.derivative(), strategy);
+	UnivariatePolynomial<Coeff> res = resultant(p, derivative(p), strategy);
 	if (p.isLinearInMainVar()) return res;
 	uint d = p.degree();
 	Coeff sign = ((d*(d-1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);

@@ -53,7 +53,7 @@ namespace carl {
 			auto g = carl::gcd(getIRPolynomial(), n.getIRPolynomial());
 			if (!isRootOf(g)) return false;
 			mIR->polynomial = g;
-			mIR->sturmSequence = g.standardSturmSequence();
+			mIR->sturmSequence = carl::sturm_sequence(g);
 			if (!n.isRootOf(g)) return false;
 			n.mIR->polynomial = g;
 			n.mIR->sturmSequence = mIR->sturmSequence;
