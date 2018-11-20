@@ -46,15 +46,19 @@ if(USE_MPFR_FLOAT)
 	target_link_libraries(carl-static PUBLIC MPFR_STATIC)
 endif()
 
-#target_include_directories( lib_carl PUBLIC
-#	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-#	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
-#)
+target_include_directories( carl-shared PUBLIC
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+)
+target_include_directories( carl-static PUBLIC
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+)
 
 #set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_END_STATIC TRUE )
 #set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_START_STATIC TRUE )
 
-#set(CARL_TARGETS lib_carl lib_carl_static CACHE STRING INTERNAL FORCE)
+set(CARL_TARGETS carl-shared carl-static CACHE STRING INTERNAL FORCE)
 #set(CARL_TARGETS lib_carl CACHE STRING INTERNAL FORCE)
 
 cotire(carl)
