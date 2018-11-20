@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../core/MultivariatePolynomial.h"
+#include "../core/polynomialfunctions/Derivative.h"
 
 namespace carl {
 
@@ -18,10 +19,10 @@ std::list<MultivariatePolynomial<Number>> der(const MultivariatePolynomial<Numbe
         std::list<MultivariatePolynomial<Number>> derivatives;
         if(from > upto) return derivatives; // empty list  
         MultivariatePolynomial<Number> from_th = p;
-        for(uint i = 0; i < from; i++) from_th = from_th.derivative(var);
+        for(uint i = 0; i < from; i++) from_th = carl::derivative(from_th, var);
         derivatives.push_back(from_th);
         for(uint n = from + 1; n <= upto; n++) {
-                derivatives.push_back(derivatives.back().derivative(var));
+                derivatives.push_back(carl::derivative(derivatives.back(), var));
         }
         return derivatives;
 }

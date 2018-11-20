@@ -50,7 +50,7 @@ public:
                         CARL_LOG_TRACE("carl.thom.tarski.manager", "as a UNIVARIATE manager");
                         mZ = first->toUnivariatePolynomial();
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", !carl::isZero(mZ), "");
-                        mDer = mZ.derivative();
+                        mDer = derivative(mZ);
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", this->isUnivariateManager(), "");
                 }
                 // multivariate manager

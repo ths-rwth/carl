@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Derivative.h"
 #include "GCD_univariate.h"
 
 #include "../logging.h"
@@ -24,7 +25,7 @@ CLANG_WARNING_RESET
 	else
 	{
 		assert(!p.isConstant()); // Othewise, the derivative is zero and the next assertion is thrown.
-		UnivariatePolynomial<Coeff> b = p.derivative();
+		UnivariatePolynomial<Coeff> b = derivative(p);
 		CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: b = " << b);
 		UnivariatePolynomial<Coeff> s(p.mainVar());
 		UnivariatePolynomial<Coeff> t(p.mainVar());
@@ -47,7 +48,7 @@ CLANG_WARNING_RESET
 			CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: w = " << w);
 			UnivariatePolynomial<Coeff> y = b.divideBy(c).quotient;
 			CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: y = " << y);
-			UnivariatePolynomial<Coeff> z = y-w.derivative();
+			UnivariatePolynomial<Coeff> z = y - derivative(w);
 			CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: z = " << z);
 			uint i = 1;
 			while(!isZero(z))
@@ -68,7 +69,7 @@ CLANG_WARNING_RESET
 				CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: w = " << w);
 				y = z.divideBy(g).quotient;
 				CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: y = " << y);
-				z = y - w.derivative();
+				z = y - derivative(w);
 				CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: z = " << z);
 			}
 			result.emplace(i, w);
