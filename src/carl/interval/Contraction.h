@@ -319,9 +319,9 @@ namespace carl {
                         it = mDerivatives.emplace(variable, std::move(MultivariateHorner<Polynomial, strategy>( mpOriginal->derivative(variable)))).first;
                     #else
                     if( mpOriginal == nullptr )
-                        it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                        it = mDerivatives.emplace(variable, derivative(mConstraint, variable)).first;
                     else
-                        it = mDerivatives.emplace(variable, mpOriginal->derivative(variable)).first;
+                        it = mDerivatives.emplace(variable, derivative(*mpOriginal, variable)).first;
                     #endif
                 }
 

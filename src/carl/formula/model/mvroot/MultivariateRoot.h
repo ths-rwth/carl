@@ -40,55 +40,32 @@ private:
    * Distinguished, globally unique root-variable
    */
 	static const Variable sVar;
+	/// Polynomial defining this root.
 	Poly mPoly;
-	std::size_t mK; // also called rootId, rootNumber or rootIndex
+	/// Specifies which root to consider.
+	std::size_t mK;
 public:
-  /**
-   * @param poly Must mention the root-variable "_z" and
-   * should have a at least 'rootIdx'-many roots in "_z" at each subpoint
-   * where it is intended to be evaluated.
-   * @param rootIdx The index of the root of the polynomial in "_z".
-   * The first root has index 1, the second has index 2 and so on.
-   */
-	MultivariateRoot(const Poly& poly, std::size_t rootIdx): mPoly(poly), mK(rootIdx)
-	{
-		assert(rootIdx > 0);
-//		assert(poly.gatherVariables().count(sVar) == 1);
+	/**
+	 * @param poly Must mention the root-variable "_z" and
+	 * should have a at least 'rootIdx'-many roots in "_z" at each subpoint
+	 * where it is intended to be evaluated.
+	 * @param rootIdx The index of the root of the polynomial in "_z".
+	 * The first root has index 1, the second has index 2 and so on.
+	 */
+	MultivariateRoot(const Poly& poly, std::size_t k): mPoly(poly), mK(k) {
+		assert(mK > 0);
 	}
 
-//	/**
-//   * @param poly Must mention the root-variable "_z" and
-//   * should have a at least 'rootIdx'-many roots in "_z" at each subpoint
-//   * where it is intended to be evaluated.
-//   * @param rootIdx The index of the root of the polynomial in "_z".
-//   * @param mainPolyVar Must be a variable that appears with non-zero coefficient
-//   * to be replaced by "_z".
-//   */
-//	MultivariateRoot(const Poly& poly, Variable mainPolyVar, std::size_t rootIdx): mPoly(poly.substitutue(mainPolyVar,Poly(sVar))), mK(rootIdx)
-//	{
-//		assert(rootIdx > 0);
-////    assert(poly.gatherVariables().count(sVar) == 1);
-//	}
-
 	/**
-	 * Return the rootIndex, also know as k, rootNumber, rootId
+	 * Return k, the index of the root.
 	 */
-  [[deprecated("Use rootIdx() instead for better semantic meaning")]]
 	std::size_t k() const noexcept {
 		return mK;
 	}
 
-  /**
-   * @return the rootIndex, also know as k, rootNumber, rootId
-   */
-  std::size_t rootIdx() const noexcept {
-    return mK;
-  }
-
-
-  /**
-   * @return the raw underlying polynomial that still mentions the root-variable "_z".
-   */
+	/**
+	 * @return the raw underlying polynomial that still mentions the root-variable "_z".
+	 */
 	const Poly& poly() const noexcept {
 		return mPoly;
 	}
@@ -105,28 +82,19 @@ public:
 	 * @return The globally-unique distinguished root-variable "_z"
 	 * to allow you to build a polynomial with this variable yourself.
 	 */
-  [[deprecated("Use uniqRootVar() instead for better semantic meaning")]]
 	static Variable var() noexcept {
 		return sVar;
 	}
-
-  /**
-   * @return The globally-unique, distinguished root-variable "_z"
-   * to allow you to build a polynomial with this variable yourself.
-   */
-  static Variable uniqRootVar() noexcept {
-    return sVar;
-  }
 
 	bool isUnivariate() const {
 		return mPoly.isUnivariate();
 	}
 
-  /**
-   * @return The variables mentioned in underlying polynomial, excluding
-   * the root-variable "_z". For example, with an underlying poly p(x,y,_z)
-   * we return {x,y}.
-   */
+	/**
+	 * @return The variables mentioned in underlying polynomial, excluding
+	 * the root-variable "_z". For example, with an underlying poly p(x,y,_z)
+	 * we return {x,y}.
+	 */
 	std::set<Variable> gatherVariables() const {
 		Variables var = mPoly.gatherVariables();
 		var.erase(sVar);
@@ -174,16 +142,16 @@ const Variable MultivariateRoot<Poly>::sVar = carl::VariablePool::getInstance().
 
 template<typename Poly>
 inline bool operator==(const MultivariateRoot<Poly>& lhs, const MultivariateRoot<Poly>& rhs) {
-	return std::forward_as_tuple(lhs.rootIdx(), lhs.poly()) == std::forward_as_tuple(rhs.rootIdx(), rhs.poly());
+	return std::forward_as_tuple(lhs.k(), lhs.poly()) == std::forward_as_tuple(rhs.k(), rhs.poly());
 }
 template<typename Poly>
 inline bool operator<(const MultivariateRoot<Poly>& lhs, const MultivariateRoot<Poly>& rhs) {
-	return std::forward_as_tuple(lhs.rootIdx(), lhs.poly()) < std::forward_as_tuple(rhs.rootIdx(), rhs.poly());
+	return std::forward_as_tuple(lhs.k(), lhs.poly()) < std::forward_as_tuple(rhs.k(), rhs.poly());
 }
 
 template<typename P>
 std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
-	return os << "rootExpr(" << mr.poly() << ", " << mr.rootIdx() << ", " << MultivariateRoot<P>::uniqRootVar() << ")";
+	return os << "rootExpr(" << mr.poly() << ", " << mr.k() << ", " << MultivariateRoot<P>::var() << ")";
 }
 
 }
@@ -192,7 +160,7 @@ namespace std {
 	template<typename Pol>
 	struct hash<carl::MultivariateRoot<Pol>> {
 		std::size_t operator()(const carl::MultivariateRoot<Pol>& mv) const {
-			return carl::hash_all(mv.poly(), mv.rootIdx());
+			return carl::hash_all(mv.poly(), mv.k());
 		}
 	};
 }
