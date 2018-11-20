@@ -22,10 +22,6 @@ $ mkdir build && cd build && cmake ../
 $ make
 $ make test doc
 @endcode
-
-Sample installations:
-- @subpage ubuntu_1404_lts
-- @subpage windows_7_msvc2014
  
 Using CArL
 --------------------------------------------
@@ -35,14 +31,13 @@ To use CArL in other projects, link against the shared or static library created
 
 Supported platforms
 --------------------------------------------
-We have tested carl successfully on the following platforms:
+We test carl on the following platforms:
 
-- Arch Linux with Clang 3.9.1 and GCC 6.2.1
 - Ubuntu 14.04 LTS with several compilers on [Travis CI](https://travis-ci.org/smtrat/carl)
 - OS X 10.11 with several compilers on [Travis CI](https://travis-ci.org/smtrat/carl)
 
 We usually support at least all `clang` and `gcc` versions starting from those shipped with the latest Ubuntu LTS or Debian stable releases.
-As of now, this is `clang-3.8` and newer and `gcc-5` and newer.
+As of now, this is `clang-5` and newer and `gcc-7` and newer.
 
 Advanced building topics
 --------------------------------------------

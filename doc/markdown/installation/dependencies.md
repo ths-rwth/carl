@@ -6,6 +6,8 @@ To build and use CArL, you need the following other software:
 - `cmake` to generate the make files.
 - `g++` or `clang` to compile.
 
+We use C++17 and thus need at least `g++` 7 or `clang` 5.
+
 Optional dependencies
 - `ccmake` to set cmake flags.
 - `doxygen` to build the documentation.
