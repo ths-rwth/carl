@@ -226,3 +226,11 @@ macro(add_new_libraries name version sources dependencies)
 
 	add_custom_target(${name} DEPENDS ${name}-shared ${name}-static)
 endmacro(add_new_libraries)
+
+macro(configure_everything)
+	file(GLOB_RECURSE tpl_files "*.in")
+	foreach(tpl ${tpl_files})
+		string(REGEX REPLACE ".in$" "" file ${tpl})
+		configure_file("${tpl}" "${file}")
+	endforeach()
+endmacro(configure_everything)
