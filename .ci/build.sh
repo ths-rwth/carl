@@ -42,7 +42,7 @@ if [[ ${TASK} == "dependencies" ]]; then
 elif [[ ${TASK} == "coverity" ]]; then
 
 	keep_waiting &
-	fold "build" /usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
+	fold "build" /usr/bin/time make ${MAKE_PARALLEL} carl || return 1
 	fold "build-tests" /usr/bin/time make ${MAKE_PARALLEL} || return 1
 	kill $!
 
@@ -51,7 +51,7 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	fold "reconfigure" cmake -D COVERAGE=ON ../ || return 1
 	
 	WRAPPER="build-wrapper-linux-x86-64 --out-dir ../bw-output"
-	fold "build" $WRAPPER make ${MAKE_PARALLEL} lib_carl || return 1
+	fold "build" $WRAPPER make ${MAKE_PARALLEL} carl || return 1
 	fold "build-tests" $WRAPPER make ${MAKE_PARALLEL} || return 1
 	fold "collect-coverage" make coverage-collect
 	
@@ -89,7 +89,7 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	virtualenv -p python3 pycarl-env
 	source pycarl-env/bin/activate
 	
-	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
+	/usr/bin/time make ${MAKE_PARALLEL} carl || return 1
 	
 	# Clone pycarl
 	git clone https://github.com/moves-rwth/pycarl.git
@@ -109,12 +109,12 @@ elif [[ ${TASK} == "addons" ]]; then
 	
 	fold "reconfigure" cmake -D BUILD_ADDONS=ON -D BUILD_ADDON_PARSER=ON -D BUILD_ADDON_PYCARL=ON -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
 	
-	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
+	/usr/bin/time make ${MAKE_PARALLEL} carl || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
 	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
 	
 else
-	/usr/bin/time make ${MAKE_PARALLEL} lib_carl || return 1
+	/usr/bin/time make ${MAKE_PARALLEL} carl || return 1
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
 	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
 fi
