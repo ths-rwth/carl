@@ -199,3 +199,21 @@ macro(get_include_dir var name)
 	get_target_property(INCLUDE_DIR ${name} INTERFACE_INCLUDE_DIRECTORIES)
 	set(${var} ${${var}}:${INCLUDE_DIR})
 endmacro(get_include_dir)
+
+macro(add_new_libraries name sources dependencies linking)
+	message(STATUS "New lib ${name}")
+	message(STATUS "From ${sources}")
+	message(STATUS "With deps ${dependencies}")
+	message(STATUS "Linking ${linking}")
+	add_library(${name}-objects OBJECT ${sources})
+	add_dependencies(${name}-objects ${dependencies})
+	target_link_libraries(${name}-objects ${linking})
+
+	add_library(${name}-shared SHARED $<TARGET_OBJECTS:${name}-objects>)
+	target_link_libraries(${name}-shared ${linking})
+
+	add_library(${name}-static STATIC $<TARGET_OBJECTS:${name}-objects>)
+	target_link_libraries(${name}-static ${linking})
+
+	add_custom_target(${name} DEPENDS ${name}-shared ${name}-static)
+endmacro(add_new_libraries)
