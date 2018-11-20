@@ -200,13 +200,11 @@ macro(get_include_dir var name)
 	set(${var} ${${var}}:${INCLUDE_DIR})
 endmacro(get_include_dir)
 
-macro(add_new_libraries name version sources dependencies linking)
+macro(add_new_libraries name version sources dependencies)
 	add_library(${name}-objects OBJECT ${sources})
 	add_dependencies(${name}-objects ${dependencies})
-	target_link_libraries(${name}-objects ${linking})
 
 	add_library(${name}-shared SHARED $<TARGET_OBJECTS:${name}-objects>)
-	target_link_libraries(${name}-shared ${linking})
 	set_target_properties(${name}-shared PROPERTIES
 		VERSION "${version}"
 		SOVERSION "${version}"
@@ -217,7 +215,6 @@ macro(add_new_libraries name version sources dependencies linking)
 	)
 
 	add_library(${name}-static STATIC $<TARGET_OBJECTS:${name}-objects>)
-	target_link_libraries(${name}-static ${linking})
 	set_target_properties(${name}-static PROPERTIES
 		VERSION "${version}"
 		SOVERSION "${version}"
