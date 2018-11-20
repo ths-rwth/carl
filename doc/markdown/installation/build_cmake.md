@@ -21,9 +21,6 @@ Using `[t]`, you can enable the _advanced mode_ that shows all options. Most of 
 
 ### General 
 
-- *BUILD_STATIC* [ON, OFF] <br>
-  If set to *ON*, carl is built as shared and static library, otherwise only as shared library.
-
 - *CMAKE_BUILD_TYPE* [Release, Debug]
   - *Release*
   - *Debug*
