@@ -15,6 +15,8 @@
 #include "MultivariatePolynomial.h"
 #include "Sign.h"
 
+#include "polynomialfunctions/Derivative.h"
+
 #include <algorithm>
 #include <iomanip>
 
@@ -1158,14 +1160,14 @@ void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
 }
 
 template<typename Coeff>
-std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence() const {
-	return this->standardSturmSequence(this->derivative());
+std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence() const {
+	return this->standardSturmSequence(derivative());
 }
 
 template<typename Coeff>
-std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence(const UnivariatePolynomial<Coeff>& polynomial) const {
+std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence(const UnivariatePolynomial<Coeff>& polynomial) const {
 	assert(this->mainVar() == polynomial.mainVar());
-	std::list<UnivariatePolynomial<Coeff>> seq;
+	std::vector<UnivariatePolynomial<Coeff>> seq;
 
 	UnivariatePolynomial<Coeff> p = *this;
 	UnivariatePolynomial<Coeff> q = polynomial;
@@ -1215,7 +1217,7 @@ int UnivariatePolynomial<Coeff>::countRealRoots(const Interval<Coeff>& interval)
 
 template<typename Coeff>
 template<typename C, typename Number>
-int UnivariatePolynomial<Coeff>::countRealRoots(const std::list<UnivariatePolynomial<Coeff>>& seq, const Interval<Number>& interval) {
+int UnivariatePolynomial<Coeff>::countRealRoots(const std::vector<UnivariatePolynomial<Coeff>>& seq, const Interval<Number>& interval) {
 	int l = int(carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.lower()); }));
 	int r = int(carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.upper()); }));
 	return l - r;

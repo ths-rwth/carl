@@ -2,6 +2,7 @@
 #include "../Common.h"
 
 #include "carl/core/VariablePool.h"
+#include "carl/core/polynomialfunctions/Derivative.h"
 #include "carl/util/stringparser.h"
 
 #include "carl/thom/SignDetermination/SignDetermination.h"
@@ -60,12 +61,12 @@ TEST(Thom, SignDetermination) {
         zeroSet = {ellipse, fourZeros};
         SignDetermination<Rational> sd3(zeroSet.begin(), zeroSet.end());
         
-        sd3.getSignsAndAdd(fourZeros.derivative(x).derivative(x).derivative(x).derivative(x));
-        sd3.getSignsAndAdd(fourZeros.derivative(x).derivative(x).derivative(x));
-        sd3.getSignsAndAdd(fourZeros.derivative(x).derivative(x));
-        sd3.getSignsAndAdd(fourZeros.derivative(x));
-        sd3.getSignsAndAdd(ellipse.derivative(y).derivative(y));
-        sd3.getSignsAndAdd(ellipse.derivative(y));
+        sd3.getSignsAndAdd(carl::derivative(fourZeros, x, 4));
+        sd3.getSignsAndAdd(carl::derivative(fourZeros, x, 3));
+        sd3.getSignsAndAdd(carl::derivative(fourZeros, x, 2));
+        sd3.getSignsAndAdd(carl::derivative(fourZeros, x, 1));
+        sd3.getSignsAndAdd(carl::derivative(ellipse, y, 2));
+        sd3.getSignsAndAdd(carl::derivative(ellipse, y, 1));
 }
 
 

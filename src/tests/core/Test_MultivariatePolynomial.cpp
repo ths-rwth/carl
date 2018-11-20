@@ -464,16 +464,16 @@ TEST(MultivariatePolynomial, Derivative)
     Variable x = freshRealVariable("x");
     Variable y = freshRealVariable("y");
     MultivariatePolynomial<Rational> fx({x});
-    EXPECT_EQ((Rational)1, fx.derivative(x));
-    EXPECT_EQ((Rational)0, fx.derivative(y));
+    EXPECT_EQ((Rational)1, carl::derivative(fx, x));
+    EXPECT_EQ((Rational)0, carl::derivative(fx, y));
 	MultivariatePolynomial<Rational> f2x({ (Rational)2 * x });
-	EXPECT_EQ((Rational)2, f2x.derivative(x));
+	EXPECT_EQ((Rational)2, carl::derivative(f2x, x));
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     MultivariatePolynomial<Rational> f1dx({(Rational)3*x*x*y*y, (Rational)-2*x*y*y*y, Term<Rational>((Rational)1)});
     MultivariatePolynomial<Rational> f1dy({(Rational)2*x*x*x*y, (Rational)-3*x*x*y*y});
-    EXPECT_EQ(f1dx, f1.derivative(x));
-    EXPECT_EQ(f1dy, f1.derivative(y));
-    EXPECT_EQ(f1.derivative(x).derivative(y), f1.derivative(y).derivative(x));
+    EXPECT_EQ(f1dx, carl::derivative(f1, x));
+    EXPECT_EQ(f1dy, carl::derivative(f1, y));
+    EXPECT_EQ(carl::derivative(carl::derivative(f1, x), y), carl::derivative(carl::derivative(f1, y), x));
 }
 
 TEST(MultivariatePolynomial, varInfo)

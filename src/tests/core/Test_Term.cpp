@@ -5,6 +5,8 @@
 #include <carl/core/Term.h>
 #include <list>
 
+#include <carl/core/polynomialfunctions/Derivative.h>
+
 #include "../Common.h"
 
 using namespace carl;
@@ -70,7 +72,7 @@ TYPED_TEST(TermTest, Derivative)
     Variable v1 = carl::freshRealVariable("v1");
     Term<TypeParam> t(3);
     t *= v0 * v0 * v0 * v1;
-    Term<TypeParam> tprime = t.derivative(v0);
+    Term<TypeParam> tprime = carl::derivative(t, v0);
     EXPECT_EQ(9,tprime.coeff());
 }
 

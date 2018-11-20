@@ -798,8 +798,10 @@ public:
 	void eliminateRoot(const Coefficient& root);
 	
 public:
-	std::list<UnivariatePolynomial> standardSturmSequence() const;
-	std::list<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
+	[[deprecated("Use carl::sturm_sequence() instead.")]]
+	std::vector<UnivariatePolynomial> standardSturmSequence() const;
+	[[deprecated("Use carl::sturm_sequence() instead.")]]
+	std::vector<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
 
 	/**
 	 * Counts the sign variations (i.e. an upper bound for the number of real roots) via Descarte's rule of signs.
@@ -814,6 +816,7 @@ public:
 	 * @param interval Count roots within this interval.
 	 * @return Number of real roots within the interval.
 	 */
+	[[deprecated("Use carl::count_real_roots() instead.")]]
 	int countRealRoots(const Interval<Coefficient>& interval) const;
 
 	/**
@@ -823,7 +826,7 @@ public:
 	 * @return Number of real roots in the interval.
 	 */
 	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
-	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
+	static int countRealRoots(const std::vector<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
 
 	/// @name Equality comparison operators
 	/// @{

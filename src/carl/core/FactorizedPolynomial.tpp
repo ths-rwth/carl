@@ -547,7 +547,7 @@ namespace carl
 			return FactorizedPolynomial<P>( constant_zero<CoeffType>::get() );
 		}
 		// TODO VERY NAIVE
-        FactorizedPolynomial<P> result(polynomial().derivative(_var), mpCache);
+        FactorizedPolynomial<P> result(carl::derivative(polynomial(), _var), mpCache);
         result *= coefficient();
 		return result;
 	}

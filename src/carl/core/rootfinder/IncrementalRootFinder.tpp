@@ -11,6 +11,8 @@
 #include "AbstractRootFinder.h"
 #include "RootFinder.h"
 
+#include "../polynomialfunctions/Derivative.h"
+
 #include "EigenWrapper.h"
 
 namespace carl {
@@ -76,7 +78,7 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 		CARL_LOG_TRACE("carl.core.rootfinder", "Single: " << variations);
 		if (!getPolynomial().isRoot(interval.lower()) && !getPolynomial().isRoot(interval.upper())) {
 			CARL_LOG_TRACE("carl.core.rootfinder", "Root should be within " << interval);
-			assert(getPolynomial().countRealRoots(interval) == 1);
+			assert(count_real_roots(getPolynomial(), interval) == 1);
 			CARL_LOG_TRACE("carl.core.rootfinder", "It is indeed, adding it");
 			this->addRoot(interval);
 			return true;
@@ -197,7 +199,7 @@ void BinarySampleStrategy<Number>::operator()(const Interval<Number>& interval, 
 template<typename Number>
 void BinaryNewtonStrategy<Number>::operator()(const Interval<Number>& interval, RootFinder<Number>& finder) {
 	Number pivot = sample(interval);
-	Number diff = finder.getPolynomial().derivative().evaluate(pivot);
+	Number diff = derivative(finder.getPolynomial()).evaluate(pivot);
 	if (diff != 0) {
 		pivot -= finder.getPolynomial().evaluate(pivot) / diff;
 	}

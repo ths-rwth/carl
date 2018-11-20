@@ -107,7 +107,7 @@ public:
 	{
 		assert(!carl::isZero(mIR->polynomial) && mIR->polynomial.degree() > 0);
 		assert(i.isOpenInterval() || i.isPointInterval());
-		assert(p.countRealRoots(i) == 1);
+		assert(count_real_roots(p, i) == 1);
 		if (mIR->polynomial.degree() == 1) {
 			Number a = mIR->polynomial.coefficients()[1];
 			Number b = mIR->polynomial.coefficients()[0];
@@ -117,13 +117,13 @@ public:
 			refineToIntegrality();
 		}
 	}
-	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, const std::list<UnivariatePolynomial<Number>>& sturmSequence, bool isRoot = true):
+	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, const std::vector<UnivariatePolynomial<Number>>& sturmSequence, bool isRoot = true):
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(p.normalized(), i, sturmSequence))
 	{
 		assert(!carl::isZero(mIR->polynomial) && mIR->polynomial.degree() > 0);
 		assert(i.isOpenInterval() || i.isPointInterval());
-		assert(p.countRealRoots(i) == 1);
+		assert(carl::count_real_roots(p, i) == 1);
 		if (mIR->polynomial.degree() == 1) {
 			Number a = mIR->polynomial.coefficients()[1];
 			Number b = mIR->polynomial.coefficients()[0];
@@ -286,8 +286,8 @@ public:
 	}
 
 	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
-		if (isNumeric()) return p.countRealRoots(value()) == 1;
-		else if (isInterval()) return p.countRealRoots(mIR->interval) == 1;
+		if (isNumeric()) return carl::count_real_roots(p, Interval<Number>(value())) == 1;
+		else if (isInterval()) return carl::count_real_roots(p, mIR->interval) == 1;
 		else if (isThom()) return this->sgn(p) == Sign::ZERO;
 		else return false;
 	}
