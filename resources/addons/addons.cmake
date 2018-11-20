@@ -7,7 +7,7 @@ cmake_dependent_option(BUILD_ADDON_PYCARL "Build python binding addon" OFF "BUIL
 if(BUILD_ADDONS)
 
 	add_custom_target(addons)
-	add_dependencies(addons lib_carl)
+	add_dependencies(addons carl-shared)
 	set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/addons)
 	
 	if(BUILD_ADDON_PYCARL)

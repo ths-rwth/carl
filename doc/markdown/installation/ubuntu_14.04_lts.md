@@ -31,9 +31,9 @@ cmake ../
 @endcode
 By default, `c++` will be used as compiler which points to `g++`. This, and many other options, can be configured using `ccmake`.
 
-- Build `libcarl`:
+- Build `carl`:
 @code
-make lib_carl
+make carl-shared
 @endcode
 This builds the shared library `build/libcarl.so`.
 
