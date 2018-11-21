@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../numbers/numbers.h"
+#include "../util/hash.h"
 #include "CompareResult.h"
 #include "Variable.h"
 #include "Variables.h"
@@ -563,16 +564,7 @@ namespace carl
 		 * @return Hash of the monomial.
 		 */
 		static std::size_t hashContent(const Monomial::Content& c) {
-			static std::hash<carl::Variable> h;
-			size_t result = 0;
-			for (const auto& it: c) {
-				// perform a circular shift by 5 bits.
-				result = (result << 5) | (result >> (sizeof(std::size_t)*8 - 5));
-				result ^= h( it.first );
-				result = (result << 5) | (result >> (sizeof(std::size_t)*8 - 5));
-				result ^= it.second;
-			}
-			return result;
+			return carl::hash_all(c);
 		}
 
 	public:
