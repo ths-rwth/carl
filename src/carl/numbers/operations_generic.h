@@ -16,25 +16,14 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 
 namespace carl
 {
-	template<typename T, EnableIf<has_isZero<T>>>
-	inline bool isZero(const T& t) 
-	{
-		return t.isZero();
-	}
 	
-	template<typename T, DisableIf<has_isZero<T>>>
+	template<typename T>
 	inline bool isZero(const T& t)
 	{
 		return t == 0;
 	}
 	
-	template<typename T, EnableIf<has_isOne<T>>>
-	inline bool isOne(const T& t) 
-	{
-		return t.isOne();
-	}
-	
-	template<typename T, DisableIf<has_isOne<T>>>
+	template<typename T>
 	inline bool isOne(const T& t) 
 	{
 		return t == 1;

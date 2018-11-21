@@ -24,24 +24,8 @@ namespace carl {
  * The following functions return informations about the given numbers.
  */
 
-template<typename T, EnableIf<std::is_fundamental<T>> = dummy>
-inline bool isZero(T n) {
-	return n == 0;
-}
 inline bool isZero(double n) {
 	return std::fpclassify(n) == FP_ZERO;
-}
-template<typename T, EnableIf<std::is_fundamental<T>> = dummy>
-inline bool isOne(T n) {
-	return n == 1;
-}
-template<typename T, EnableIf<std::is_fundamental<T>> = dummy>
-inline bool isPositive(T n) {
-	return n > 0;
-}
-template<typename T, EnableIf<std::is_fundamental<T>> = dummy>
-inline bool isNegative(T n) {
-	return n < 0;
 }
 
 inline bool isNaN(double d) {
@@ -70,14 +54,6 @@ inline bool isInteger(double d) {
 
 inline bool isInteger(sint /*unused*/) {
 	return true;
-}
-
-inline bool isNegative(double d) {
-	return d < 0;
-}
-
-inline bool isPositive(double d) {
-	return d > 0;
 }
 
 inline std::size_t bitsize(unsigned /*unused*/) {
