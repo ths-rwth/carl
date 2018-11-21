@@ -28,6 +28,14 @@ inline bool isZero(double n) {
 	return std::fpclassify(n) == FP_ZERO;
 }
 
+inline bool isPositive(double n) {
+	return n > 0;
+}
+
+inline bool isNegative(double n) {
+	return n < 0;
+}
+
 inline bool isNaN(double d) {
 	if (std::is_same<decltype(std::isnan(d)), bool>::value) {
 		return std::isnan(d);
