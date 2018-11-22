@@ -112,7 +112,7 @@ Interval<Number> set_intersection(const Interval<Number>& lhs, const Interval<Nu
 }
 
 template<typename Number>
-bool set_intersect(const Interval<Number>& lhs, const Interval<Number>& rhs) {
+bool set_have_intersection(const Interval<Number>& lhs, const Interval<Number>& rhs) {
 	if (rhs.lowerBound() < lhs.lowerBound() && lhs.upperBound() < rhs.upperBound()) return true;
 	if (lhs.lowerBound() < rhs.lowerBound() && rhs.upperBound() < lhs.upperBound()) return true;
 	return false;
@@ -122,7 +122,7 @@ bool set_intersect(const Interval<Number>& lhs, const Interval<Number>& rhs) {
  * Checks whether lhs is a proper subset of rhs.
  */
 template<typename Number>
-bool set_proper_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
+bool set_is_proper_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
 	assert(lhs.isConsistent() && rhs.isConsistent());
 
 	if (lhs.isEmpty()) return !rhs.isEmpty();
@@ -137,7 +137,7 @@ bool set_proper_subset(const Interval<Number>& lhs, const Interval<Number>& rhs)
  * Checks whether lhs is a subset of rhs.
  */
 template<typename Number>
-bool set_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
+bool set_is_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
 	assert(lhs.isConsistent() && rhs.isConsistent());
 
 	if (lhs.isEmpty()) return true;
