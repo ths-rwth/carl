@@ -60,13 +60,13 @@ Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomia
 		[includeConstants](const MultivariatePolynomial<mpq_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpq_class,O,P>> c({p}); return c.factorize(p, includeConstants); },
 		[includeConstants](const MultivariatePolynomial<mpz_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpz_class,O,P>> c({p}); return c.factorize(p, includeConstants); }
 	#else
-		[includeConstants](const MultivariatePolynomial<mpq_class,O,P>& p){ return helper::trivialFactorization(p); },
-		[includeConstants](const MultivariatePolynomial<mpz_class,O,P>& p){ return helper::trivialFactorization(p); }
+		[](const MultivariatePolynomial<mpq_class,O,P>& p){ return helper::trivialFactorization(p); },
+		[](const MultivariatePolynomial<mpz_class,O,P>& p){ return helper::trivialFactorization(p); }
 	#endif
 	#if defined USE_GINAC
 		,
-		[includeConstants](const MultivariatePolynomial<cln::cl_RA,O,P>& p){ return ginacFactorization(p); },
-		[includeConstants](const MultivariatePolynomial<cln::cl_I,O,P>& p){ return ginacFactorization(p); }
+		[](const MultivariatePolynomial<cln::cl_RA,O,P>& p){ return ginacFactorization(p); },
+		[](const MultivariatePolynomial<cln::cl_I,O,P>& p){ return ginacFactorization(p); }
 	#endif
 	};
 
