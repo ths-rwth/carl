@@ -152,7 +152,6 @@ namespace carl
 				for (const Formula<Pol>& subFormula : subformulas()) {
 					subFormula.gatherVariables(vars);
 				}
-				vars.compact();
 			}
 		}
 	}

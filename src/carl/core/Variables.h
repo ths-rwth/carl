@@ -16,7 +16,16 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const carlVariables& vars);
 	using VarTypes = std::variant<Variable,BVVariable,UVariable>;
 private:
-	std::vector<VarTypes> mVariables;
+	mutable std::vector<VarTypes> mVariables;
+	mutable std::size_t mAddedSinceCompact = 0;
+
+	void compact(bool force = false) const {
+		if (force || (mAddedSinceCompact > mVariables.size() / 2)) {
+			std::sort(mVariables.begin(), mVariables.end());
+			mVariables.erase(std::unique(mVariables.begin(), mVariables.end()), mVariables.end());
+			mAddedSinceCompact = 0;
+		}
+	}
 public:
 	carlVariables() = default;
 	explicit carlVariables(std::initializer_list<VarTypes> i):
@@ -32,12 +41,14 @@ public:
 	}
 
 	auto begin() const {
+		compact();
 		return mVariables.begin();
 	}
 	auto end() const {
 		return mVariables.end();
 	}
 	auto begin() {
+		compact();
 		return mVariables.begin();
 	}
 	auto end() {
@@ -48,28 +59,26 @@ public:
 		return mVariables.empty();
 	}
 	std::size_t size() const {
+		compact();
 		return mVariables.size();
 	}
-
-	void compact() {
-		std::sort(begin(), end());
-		mVariables.erase(std::unique(begin(), end()), mVariables.end());
-	}
-
 	void add(VarTypes v) {
 		mVariables.emplace_back(v);
+		++mAddedSinceCompact;
 	}
 	void add(std::initializer_list<VarTypes> i) {
 		mVariables.insert(end(), i.begin(), i.end());
+		mAddedSinceCompact += i.size();
 	}
 	template<typename Iterator>
 	void add(const Iterator& b, const Iterator& e) {
 		mVariables.insert(end(), b, e);
+		mAddedSinceCompact += std::distance(b, e);
 	}
 	template<typename Iterator, typename F>
 	void add(const Iterator& b, const Iterator& e, F&& f) {
 		std::for_each(b, e,
-			[this, &f](const auto& elem){ mVariables.emplace_back(f(elem)); }
+			[this, &f](const auto& elem){ this->add(f(elem)); }
 		);
 	}
 
@@ -84,6 +93,7 @@ public:
 		return res;
 	}
 	std::vector<Variable> underlyingVariables() const {
+		compact();
 		std::vector<Variable> res;
 		std::for_each(begin(), end(), [&res](const auto& var) {
 			std::visit(overloaded {
@@ -103,6 +113,8 @@ inline void swap(carlVariables::VarTypes& lhs, carlVariables::VarTypes& rhs) {
 }
 
 inline bool operator==(const carlVariables& lhs, const carlVariables& rhs) {
+	lhs.compact(true);
+	rhs.compact(true);
 	return lhs.mVariables == rhs.mVariables;
 }
 inline std::ostream& operator<<(std::ostream& os, const carlVariables& vars) {

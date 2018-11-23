@@ -1196,7 +1196,6 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables(carlVariables& vars) const {
 	for (const auto& t : mTerms) {
 		t.gatherVariables(vars);
-		vars.compact();
 	}
 }
 
