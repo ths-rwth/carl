@@ -11,6 +11,17 @@ namespace carl {
     };
 
 	template<>
+    inline cln::cl_RA convert<cln::cl_I, cln::cl_RA>(const cln::cl_I& n) {
+        return n;
+    };
+
+	template<>
+    inline cln::cl_I convert<cln::cl_RA, cln::cl_I>(const cln::cl_RA& n) {
+		assert(cln::denominator(n) == 1);
+        return cln::numerator(n);
+    };
+
+	template<>
     inline cln::cl_RA convert<cln::cl_RA, cln::cl_RA>(const cln::cl_RA& n) {
 		return n;
 	}
