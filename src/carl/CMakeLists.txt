@@ -49,9 +49,6 @@ endif()
 #set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_END_STATIC TRUE )
 #set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_START_STATIC TRUE )
 
-set(CARL_TARGETS carl-shared carl-static CACHE STRING INTERNAL FORCE)
-#set(CARL_TARGETS lib_carl CACHE STRING INTERNAL FORCE)
-
 cotire(carl)
 include(install)
 
