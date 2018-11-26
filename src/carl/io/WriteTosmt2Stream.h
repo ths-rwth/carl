@@ -158,7 +158,7 @@ namespace io
 		WriteTosmt2Stream& operator<<(const Constraint<MultivariatePolynomial<C,O,P>> c)
 		{
 			c.lhs().gatherVariables(mVars);
-			mAssertions.back()->assertion  << "(" << c.relation() << " " << c.lhs().toString(false, true) << " 0)";
+			mAssertions.back()->assertion  << "(" << c.relation() << " " << c.lhs() << " 0)";
 			if(mAutoLineBreaks) mAssertions.back()->assertion << "\n";
 			return *this;
 		}
@@ -169,11 +169,11 @@ namespace io
 			c.lhs().gatherVariables(mVars);
 			if(c.lhs().denominator() == Pol(1))
 			{
-				mAssertions.back()->assertion << "(" << c.rel() << c.lhs().nominator().toString(false, true) << " 0)";
+				mAssertions.back()->assertion << "(" << c.rel() << c.lhs().nominator() << " 0)";
 			}
 			else
 			{
-				mAssertions.back()->assertion << "(" << c.rel() << " (/ " << c.lhs().nominator().toString(false, true) << " " << c.lhs().denominator().toString(false, true) << ") 0)";
+				mAssertions.back()->assertion << "(" << c.rel() << " (/ " << c.lhs().nominator() << " " << c.lhs().denominator() << ") 0)";
 			}
 			if(mAutoLineBreaks) mAssertions.back()->assertion  << "\n";
 			return *this;
