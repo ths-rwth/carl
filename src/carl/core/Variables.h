@@ -73,7 +73,7 @@ public:
 	template<typename Iterator>
 	void add(const Iterator& b, const Iterator& e) {
 		mVariables.insert(end(), b, e);
-		mAddedSinceCompact += std::distance(b, e);
+		mAddedSinceCompact += static_cast<std::size_t>(std::distance(b, e));
 	}
 	template<typename Iterator, typename F>
 	void add(const Iterator& b, const Iterator& e, F&& f) {
