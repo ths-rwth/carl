@@ -33,6 +33,7 @@
 #include "../../../core/polynomialfunctions/GCD.h"
 #include "../../../core/MultivariatePolynomial.h"
 #include "../../../interval/Interval.h"
+#include "../../../interval/sampling.h"
 
 #include "RealAlgebraicNumberSettings.h"
 
@@ -221,7 +222,7 @@ public:
 	Number branchingPoint() const {
 		if (isNumeric()) return mValue;
 		assert(isInterval());
-		return mIR->interval.sample();
+		return carl::sample(mIR->interval);
 	}
 
 	const Number& value() const noexcept {

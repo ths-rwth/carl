@@ -155,23 +155,6 @@ template<typename Number>
 		this->set(BoostInterval(this->center()));
 	}
 
-template<typename Number>
-	Number Interval<Number>::sample( bool _includingBounds ) const
-	{
-		return carl::sample(*this, _includingBounds);
-	}
-template<typename Number>
-	Number Interval<Number>::sampleSB( bool _includingBounds ) const
-	{
-		return carl::sample_stern_brocot(*this, _includingBounds);
-	}
-
-template<typename Number>
-	void Interval<Number>::sample_assign()
-	{
-		this->set(BoostInterval(this->sample()));
-	}
-
 	template<typename Number>
 	bool Interval<Number>::contains(const Number& val) const
 	{

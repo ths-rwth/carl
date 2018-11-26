@@ -1240,69 +1240,6 @@ namespace carl
         void center_assign();
 
         /**
-         * Searches for some point in this interval, preferably near the midpoint and with a small representation.
-		 * Checks the integers next to the midpoint, uses the midpoint if both are outside.
-         * @return Some point within this interval.
-         */
-		[[deprecated("Use carl::sample() instead.")]]
-        Number sample(bool _includingBounds = true) const;
-
-		/**
-		 * Searches for some point in this interval, preferably near the midpoint and with a small representation.
-		 * Uses a binary search based on the Stern-Brocot tree starting from the integer below the midpoint.
-		 * @return Some point within this interval.
-		 */
-		[[deprecated("Use carl::sample_stern_brocot() instead.")]]
-		Number sampleSB(bool _includingBounds = true) const;
-		
-		/**
-         * Searches for some point in this interval, preferably near the left endpoint and with a small representation.
-		 * Checks the integer next to the left endpoint, uses the midpoint if it is outside.
-         * @return Some point within this interval.
-         */
-		[[deprecated("Use carl::sample_left() instead.")]]
-		Number sampleLeft() const {
-			return sample_left(*this);
-		}
-		/**
-         * Searches for some point in this interval, preferably near the right endpoint and with a small representation.
-		 * Checks the integer next to the right endpoint, uses the midpoint if it is outside.
-         * @return Some point within this interval.
-         */
-		[[deprecated("Use carl::sample_right() instead.")]]
-		Number sampleRight() const {
-			return sample_right(*this);
-		}
-		/**
-		* Searches for some point in this interval, preferably near zero and with a small representation.
-		 * Checks the integer next to the left endpoint if the interval is semi-positive.
-		 * Checks the integer next to the right endpoint if the interval is semi-negative.
-		 * Uses zero otherwise.
-         * @return Some point within this interval.
-         */
-		[[deprecated("Use carl::sample_zero() instead.")]]
-		Number sampleZero() const {
-			return sample_zero(*this);
-		}
-		/**
-		* Searches for some point in this interval, preferably far aways from zero and with a small representation.
-		 * Checks the integer next to the right endpoint if the interval is semi-positive.
-		 * Checks the integer next to the left endpoint if the interval is semi-negative.
-		 * Uses zero otherwise.
-         * @return Some point within this interval.
-         */
-		[[deprecated("Use carl::sample_infty() instead.")]]
-		Number sampleInfty() const {
-			return sample_infty(*this);
-		}
-
-        /**
-         * Searches for some point in this interval, preferably near the midpoint and with a small representation and
-         * assigns this interval the calculated point.
-         */
-        void sample_assign();
-
-        /**
          * Checks if the interval contains the given value.
          * @param val Value to be checked.
          * @return True if the value is contained in this.

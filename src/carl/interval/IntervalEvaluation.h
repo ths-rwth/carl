@@ -183,25 +183,25 @@ inline Interval<Number> IntervalEvaluation::evaluate(const MultivariateHorner<Po
 		//Case 1: no further Horner schemes in mvH
 		if (!mvH.getDependent() && !mvH.getIndependent())
 		{
-			result = ( varValue.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) ) + Interval<Number> (mvH.getIndepConstant());
+			result = ( pow(varValue, mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) ) + Interval<Number> (mvH.getIndepConstant());
 			return result;
 		}
 		//Case 2: dependent part contains a Horner Scheme
 		else if (mvH.getDependent() && !mvH.getIndependent())
 		{
-			result = varValue.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + Interval<Number> (mvH.getIndepConstant());
+			result = pow(varValue, mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + Interval<Number> (mvH.getIndepConstant());
 			return result;
 		}
 		//Case 3: independent part contains a Horner Scheme
 		else if (!mvH.getDependent() && mvH.getIndependent())
 		{
-			result = varValue.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) +  evaluate(*mvH.getIndependent(), map);
+			result = pow(varValue, mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) +  evaluate(*mvH.getIndependent(), map);
 			return result;
 		}
 		//Case 4: both independent part and dependent part 
 		else if (mvH.getDependent()  && mvH.getIndependent())
 		{
-			result = varValue.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + evaluate(*mvH.getIndependent(), map);
+			result = pow(varValue, mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + evaluate(*mvH.getIndependent(), map);
 			return result;
 		}
 	}
