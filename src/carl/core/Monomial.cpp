@@ -309,18 +309,13 @@ namespace carl
 		CARL_LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree << ", " << mHash);
 		if (mTotalDegree < 1) return false;
 		uint tdegree = 0;
-		Variable lastVar = Variable::NO_VARIABLE;
 		for(const auto& ve : mExponents)
 		{
 			if (ve.second <= 0) {
 				CARL_LOG_TRACE("carl.core.monomial", "Degree is zero.");
 				return false;
 			}
-			if (lastVar != Variable::NO_VARIABLE) {
-				if (ve.first <= lastVar) return false;
-			}
 			tdegree += ve.second;
-			lastVar = ve.first;
 		}
 		if (tdegree != mTotalDegree) {
 			CARL_LOG_TRACE("carl.core.monomial", "Wrong total degree.");
