@@ -89,9 +89,10 @@ namespace carl {
 				bool res = this->value() < *(n.mTE);
 				CARL_LOG_TRACE("carl.ran", "result is " << res);
 				return res;
-			} else {
-				assert(n.isZ3Ran());
+			} else if (n.isZ3Ran()) {
 				return n.getZ3Ran().greater(value());
+			} else {
+				assert(false);
 			}
 		} else if(isInterval()) {
 			if (n.isNumeric()) {
