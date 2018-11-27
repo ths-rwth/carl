@@ -200,4 +200,79 @@ TEST(CoCoA, Benchmark) {
 	std::cout << "Passed: " << (double(timer.passed()) / double(count)) << "ms per instance" << std::endl;
 }
 
+
+TEST(CoCoA, Zeug1) {
+	auto Q = CoCoA::RingQQ();
+	auto Qx = CoCoA::NewPolyRing(Q, CoCoA::symbols("x"));
+	auto x = CoCoA::indets(Qx)[0];
+	
+	auto cf = 1*x*x - 2;
+	
+	auto Qadjx = CoCoA::NewQuotientRing(Qx, CoCoA::ideal(cf));
+	auto QHom = CoCoA::QuotientingHom(Qadjx);
+	
+	std::cout << cf << std::endl;
+	std::cout << QHom(cf) << std::endl;
+	
+	auto Qy = CoCoA::NewPolyRing(Qadjx, CoCoA::symbols("y"));
+	auto y = CoCoA::indets(Qy)[0];
+	
+	auto cg = (1*y*y*y*y - 2); // *(1*y*y*y*y - 2);
+	
+	std::cout << "CG: " << cg << std::endl;
+	auto fact = CoCoA::factor(cg).myFactors();
+	std::cout << fact << std::endl;
+	//std::cout << QHom(cg) << std::endl;
+	
+	auto Qadjy = CoCoA::NewQuotientRing(Qy, CoCoA::ideal(cg));
+	auto QyHom = CoCoA::QuotientingHom(Qadjy);
+	
+	std::cout << Qadjy << std::endl;
+	std::cout << "Field? " << CoCoA::IsField(Qadjy) << std::endl;
+	//
+	auto Qz = CoCoA::NewPolyRing(Qadjy, CoCoA::symbols("z"));
+	auto z = CoCoA::indets(Qz)[0];
+	
+	auto ch = 1*z*z*z*z - 2;
+	
+	try {
+		auto facth = CoCoA::factor(ch).myFactors();
+	}
+	catch (const CoCoA::ErrorInfo& e) {
+		std::cout << e << std::endl;
+	}
+	//std::cout << "CH: " << facth << std::endl;
+}
+
+TEST(CoCoA, Zeug) {
+	auto Q = CoCoA::RingQQ();
+	auto Qx = CoCoA::NewPolyRing(Q, CoCoA::symbols("x"));
+	auto x = CoCoA::indets(Qx)[0];
+	
+	{
+		auto test = 1*x*x*x*x - 9*x*x + 9;
+		auto fact = CoCoA::factor(test).myFactors();
+		std::cout << test << " -> " << fact << std::endl;
+	}
+	
+	auto cf = 1*x*x*x*x - 6*x*x + 6;
+	
+	auto ideal = CoCoA::ideal(cf);
+	auto Qadjx = CoCoA::NewQuotientRing(Qx, ideal);
+	auto QHom = CoCoA::QuotientingHom(Qadjx);
+	
+	std::cout << cf << std::endl;
+	std::cout << QHom(cf) << std::endl;
+	
+	auto Qy = CoCoA::NewPolyRing(Qadjx, CoCoA::symbols("y"));
+	auto y = CoCoA::indets(Qy)[0];
+	
+	auto cg = 1*y*y*y*y - 9*y*y + 9;
+	
+	std::cout << "CG: " << cg << std::endl;
+	auto fact = CoCoA::factor(cg).myFactors();
+	std::cout << fact << std::endl;
+	//std::cout << QHom(cg) << std::endl;
+}
+
 #endif
