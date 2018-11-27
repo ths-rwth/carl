@@ -479,3 +479,23 @@ TEST(UnivariatePolynomial, intervalCoeffs)
 	p *= p;
 	p += p;
 }
+
+
+TEST(UnivariatePolynomial, coprimeFactor)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	MultivariatePolynomial<Rational> polY(y);
+
+	MultivariatePolynomial<Rational> coeff1(Rational(12)*polY*polY + Rational(6)*polY);
+	MultivariatePolynomial<Rational> coeff2(Rational(5)*polY);
+
+	std::cout << coeff1 << " -> " << coeff1.coprimeFactor() << std::endl;
+	std::cout << coeff2 << " -> " << coeff2.coprimeFactor() << std::endl;
+
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> pol(x, {coeff1, coeff2});
+
+	std::cout << pol << " -> " << pol.coprimeFactor() << std::endl;
+
+	ASSERT_EQ(carl::getDenom(pol.coprimeFactor()), 1);
+}
