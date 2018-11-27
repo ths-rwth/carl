@@ -389,6 +389,22 @@ TEST(MultivariatePolynomial, Substitute)
     evMapB[x] = Rational(-1);
     MultivariatePolynomial<Rational> pxB = pxA + (Rational)1;
     EXPECT_EQ(pxB.substitute(evMapB),carl::constant_zero<Rational>::get());
+
+	{
+		Variable x = freshRealVariable("x");
+		Variable y = freshRealVariable("y");
+		Variable z = freshRealVariable("z");
+		using P = MultivariatePolynomial<Rational>;
+		P p = P(x)*x*x*y + P(y)*y*y + P(x)*x*x + P(x)*x*y + P(x)*y*y + P(x)*y*y*y;
+		std::map<Variable,P> repl;
+		repl.emplace(z, P());
+		std::cout << p << std::endl;
+		P res = p.substitute(repl);
+		std::cout << "-> " << p << std::endl;
+		std::cout << "-> " << res << std::endl;
+		p.substituteIn(z, P());
+		std::cout << "-> " << p << std::endl;
+	}
 }
 
 //typedef Rational Rat;
@@ -525,7 +541,6 @@ TEST(MultivariatePolynomial, Quotient)
 
 TEST(MultivariatePolynomial, Quotient2)
 {
-    carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"t", "u"});
     Variable t = carl::VariablePool::getInstance().findVariableWithName("t");
