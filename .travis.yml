@@ -1,5 +1,5 @@
 language: generic
-dist: trusty
+dist: xenial
 
 cache:
   apt: true
@@ -39,13 +39,13 @@ matrix:
           packages: [*packages_base, g++-8]
     - stage: dependencies
       os: linux
-      compiler: clang++-5.0
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=coverity
+      compiler: clang++-7.0
+      env: CC=clang CXX=clang++ TASK=coverity
       script: TASK=dependencies source .ci/build.sh
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-5.0]
-          packages: [*packages_base, clang-5.0, libstdc++-8-dev]
+          sources: [*sources_base, llvm-toolchain-xenial-7]
+          packages: [*packages_base, libstdc++-8-dev]
     - stage: dependencies
       os: linux
       compiler: g++-7
@@ -71,7 +71,7 @@ matrix:
       script: source .ci/build.sh
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-5.0]
+          sources: [*sources_base, llvm-toolchain-xenial-5.0]
           packages: [*packages_base, clang-5.0, libstdc++-8-dev]
     - stage: build
       os: linux
@@ -80,17 +80,17 @@ matrix:
       script: source .ci/build.sh
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-6.0]
+          sources: [*sources_base, llvm-toolchain-xenial-6.0]
           packages: [*packages_base, clang-6.0, libstdc++-8-dev]
     - stage: build
       os: linux
       compiler: clang++-7.0
-      env: CC=clang-7 CXX=clang++-7
+      env: CC=clang CXX=clang++
       script: source .ci/build.sh
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-7]
-          packages: [*packages_base, clang-7, libstdc++-8-dev]
+          sources: [*sources_base, llvm-toolchain-xenial-7]
+          packages: [*packages_base, libstdc++-8-dev]
     - stage: build
       os: linux
       compiler: g++-7
@@ -138,20 +138,20 @@ matrix:
     - stage: build
       os: linux
       compiler: clang++-7.0
-      env: CC=clang-7 CXX=clang++-7 TASK=tidy
+      env: CC=clang CXX=clang++ TASK=tidy
       script: source .ci/build.sh
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-7]
-          packages: [*packages_base, clang-7, libstdc++-8-dev]
+          sources: [*sources_base, llvm-toolchain-xenial-7]
+          packages: [*packages_base, libstdc++-8-dev]
     - stage: build
       os: linux
-      compiler: clang++-5.0
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=coverity
+      compiler: clang++-7.0
+      env: CC=clang CXX=clang++ TASK=coverity
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-5.0]
-          packages: [*packages_base, clang-5.0, libstdc++-8-dev]
+          sources: [*sources_base, llvm-toolchain-xenial-7]
+          packages: [*packages_base, libstdc++-8-dev]
         coverity_scan:
           project:
             name: "smtrat/carl"
@@ -162,13 +162,13 @@ matrix:
           branch_pattern: "master"
     - stage: build
       os: linux
-      compiler: clang++-5.0
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=sonarcloud
+      compiler: clang++-7.0
+      env: CC=clang CXX=clang++ TASK=sonarcloud
       script: source .ci/build.sh
       addons:
         apt:
-          sources: [*sources_base, llvm-toolchain-trusty-5.0]
-          packages: [*packages_base, clang-5.0, libstdc++-8-dev]
+          sources: [*sources_base, llvm-toolchain-xenial-7]
+          packages: [*packages_base, libstdc++-8-dev]
         sonarcloud:
           organization: "smtrat-github"
           token:
@@ -194,13 +194,13 @@ matrix:
   allow_failures:
     - stage: build
       os: linux
-      env: CC=clang-7 CXX=clang++-7 TASK=tidy
+      env: CC=clang CXX=clang++ TASK=tidy
     - stage: build
       os: linux
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=coverity
+      env: CC=clang CXX=clang++ TASK=coverity
     - stage: build
       os: linux
-      env: CC=clang-5.0 CXX=clang++-5.0 TASK=sonarcloud
+      env: CC=clang CXX=clang++ TASK=sonarcloud
     - stage: build
       os: linux
       env: CC=gcc-7 CXX=g++-7 TASK=pycarl

@@ -1,5 +1,5 @@
 language: generic
-dist: trusty
+dist: xenial
 
 cache:
   apt: true
