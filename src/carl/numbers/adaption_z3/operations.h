@@ -28,8 +28,4 @@ inline auto getNum(const rational& n) {
 	return numerator(n);
 }
 
-inline std::string toString(const rational& _number, bool _infix) {
-	return toString(_number.to_mpq(), _infix);
-}
-
 }
