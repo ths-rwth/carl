@@ -32,7 +32,7 @@ namespace carl {
         return res;
     }
 
-    template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
+    template<typename Coeff, typename Number>
     boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRootsZ3(
         const UnivariatePolynomial<Coeff>& p,
         const std::map<Variable, RealAlgebraicNumber<Number>>& m,

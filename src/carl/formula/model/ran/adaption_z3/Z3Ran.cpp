@@ -31,12 +31,12 @@ namespace carl {
 
     template<typename Number>
     bool Z3Ran<Number>::isZero() const {
-        z3().anumMan().is_zero(content());
+        return z3().anumMan().is_zero(content());
     }
 
     template<typename Number>
     bool Z3Ran<Number>::isIntegral() const {
-        z3().anumMan().is_int(content());
+        return z3().anumMan().is_int(content());
     }
 
     template<typename Number>

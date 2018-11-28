@@ -118,17 +118,11 @@ public:
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(Polynomial(var), Interval<Number>::zeroInterval()))
 	{
-		#ifdef USE_Z3_RANS
-		assert(false);
-		#endif
 	}
 	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, bool isRoot = true):
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(p.normalized(), i))
 	{
-		#ifdef USE_Z3_RANS
-		assert(false);
-		#endif
 		assert(!carl::isZero(mIR->polynomial) && mIR->polynomial.degree() > 0);
 		assert(i.isOpenInterval() || i.isPointInterval());
 		assert(count_real_roots(p, i) == 1);
@@ -145,9 +139,6 @@ public:
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(p.normalized(), i, sturmSequence))
 	{
-		#ifdef USE_Z3_RANS
-		assert(false);
-		#endif
 		assert(!carl::isZero(mIR->polynomial) && mIR->polynomial.degree() > 0);
 		assert(i.isOpenInterval() || i.isPointInterval());
 		assert(carl::count_real_roots(p, i) == 1);
@@ -165,9 +156,6 @@ public:
 		mIsRoot(isRoot),
 		mTE(std::make_shared<ThomEncoding<Number>>(te))
 	{
-		#ifdef USE_Z3_RANS
-		assert(false);
-		#endif
 	}
 
 	explicit RealAlgebraicNumber(const Z3Ran<Number>& zr, bool isRoot = true)
@@ -319,6 +307,7 @@ public:
 		if (isInterval()) return mIR->polynomial;
 		else if (isZ3Ran()) return getZ3Ran().getPolynomial();
 		assert(!isThom() && !isNumeric());
+		return mIR->polynomial;
 	}
 	const auto& getIRSturmSequence() const {
 		assert(isInterval());
