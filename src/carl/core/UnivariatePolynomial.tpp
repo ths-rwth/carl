@@ -616,8 +616,7 @@ typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::coprimeF
 	for (++it; it != mCoefficients.end(); ++it) {
 		factor = carl::lcm(factor, it->coprimeFactor());
 	}
-	assert(factor != boost::none);
-	return *factor;
+	return factor;
 }
 
 template<typename Coeff>
@@ -659,7 +658,7 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 	CARL_LOG_TRACE("carl.core", *this << " .coprimeCoefficientsSignPreserving()");
 	// Notice that even if factor is 1, we create a new polynomial
 	UnivariatePolynomial<typename IntegralType<Coeff>::type> result(mMainVar);
-	if (this->isZero()) {
+	if (carl::isZero(*this)) {
 		return result;
 	}
 	result.mCoefficients.reserve(mCoefficients.size());
