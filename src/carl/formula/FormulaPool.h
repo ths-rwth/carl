@@ -466,7 +466,7 @@ namespace carl
 					else return trueFormula();
 				}
 				#endif
-				return add(new FormulaContent<Pol>(UEquality(_lhs, _rhs, _negated)));
+				return create(UEquality(_lhs, _rhs, _negated));
 			}
 
 			const FormulaContent<Pol>* create( UEquality&& eq )
