@@ -4,6 +4,10 @@
  */
 #pragma once
 
+#include "../../io/streamingOperators.h"
+
+using carl::operator<<;
+
 // Prevent Z3 from using openmp
 #define _NO_OMP_
 #define uint64 unsigned long
