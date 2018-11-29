@@ -18,7 +18,7 @@ namespace carl {
     template<typename Poly>
     using FormulaSet = std::set<Formula<Poly>>;
 	template<typename Poly>
-    using FormulasMulti = std::multiset<Formula<Poly>, carl::less<Formula<Poly>>>;
+    using FormulasMulti = std::multiset<Formula<Poly>>;
 	
     
     /// 
