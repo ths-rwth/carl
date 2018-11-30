@@ -8,6 +8,9 @@
 
 using carl::operator<<;
 
+// disable some code in Z3
+#define INCLUDED_FROM_CARL
+
 // Prevent Z3 from using openmp
 #define _NO_OMP_
 #define uint64 unsigned long

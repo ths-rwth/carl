@@ -11,6 +11,7 @@
 #include <string>
 #include <type_traits>
 
+#include "../util/enum_util.h"
 #include "config.h"
 #include "logging.h"
 
@@ -52,7 +53,8 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 	case VariableType::VT_BITVECTOR:
 		return os << "Bitvector";
 	default:
-		return os << "Invalid " + std::to_string(static_cast<std::underlying_type_t<VariableType>>(t));
+		assert(false && "Invalid enum value for VariableType");
+		return os << "VariableType(" << underlying_enum_value(t) << ")";
 	}
 }
 

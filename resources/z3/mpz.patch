@@ -61,3 +61,21 @@ index 92c6d0d10..20dbf93d8 100644
      mpz dup(const mpz & source) {
          mpz temp;
          set(temp, source);
+diff --git a/src/util/util.h b/src/util/util.h
+index 2b11a6ce8..58a166428 100644
+--- a/src/util/util.h
++++ b/src/util/util.h
+@@ -263,11 +263,13 @@ public:
+     }
+ };
+ 
++#ifndef INCLUDED_FROM_CARL
+ template<typename T1, typename T2>
+ inline std::ostream & operator<<(std::ostream & out, std::pair<T1, T2> const & p) {
+     out << "(" << p.first << ", " << p.second << ")";
+     return out;
+ }
++#endif
+ 
+ template<typename IT>
+ bool has_duplicates(const IT & begin, const IT & end) {
