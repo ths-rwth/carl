@@ -12,6 +12,8 @@
 
 #include <utility>
 
+#include "../numbers/adaption_z3/z3.h"
+
 #include "../core/Variable.h"
 #include "../core/Monomial.h"
 #include "../core/Term.h"
