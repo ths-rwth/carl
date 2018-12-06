@@ -32,26 +32,30 @@ index f1b261278..6b9092ec3 100644
          mpq temp;
          set(temp, source);
 diff --git a/src/util/mpz.h b/src/util/mpz.h
-index 92c6d0d10..20dbf93d8 100644
+index 92c6d0d10..922f5d71f 100644
 --- a/src/util/mpz.h
 +++ b/src/util/mpz.h
-@@ -709,6 +709,25 @@ public:
+@@ -709,6 +709,29 @@ public:
  
      void set(mpz & target, unsigned sz, digit_t const * digits);
  
 +#ifdef _MP_GMP
 +
 +    void set(mpz & target, const mpz_t source) {
-+        if (is_small(target)) {
-+            target.m_ptr = allocate();
++        if (mpz_cmp_si(source, INT_MIN) >= 0 && mpz_cmp_si(source, INT_MAX) <= 0) {
++            del(target);
++            target.m_val = static_cast<int>(mpz_get_si(source)); 
++        } else {
++            mk_big(target);
++            mpz_set(*target.m_ptr, source);
 +        }
-+        mpz_set(*target.m_ptr, source);
 +    }
 +
 +    void get_mpz_t(mpz const & source, mpz_t& val) const {
-+        if (is_int64(source)) {
-+            mpz_set_si(val, get_int64(source));
-+        } else {
++        if (is_small(source)) {
++            mpz_set_si(val, source.m_val);
++        }
++        else {
 +            mpz_set(val, *source.m_ptr);
 +        }
 +    }
