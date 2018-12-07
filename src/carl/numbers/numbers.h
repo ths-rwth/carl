@@ -56,8 +56,7 @@ namespace carl {
 #include "adaption_float/FLOAT_T.h"
 #include "adaption_float/typetraits.h"
 
-#if /*defined(USE_Z3_RANS) || */ defined(USE_Z3_NUMBERS) || defined(COMPARE_WITH_Z3)
-// USE_Z3_RANS: Z3 is included in Z3Converter.h to avoid naming conflicts with other libraries
+#ifdef USE_Z3_NUMBERS
 #include "adaption_z3/z3.h"
 #endif
 
