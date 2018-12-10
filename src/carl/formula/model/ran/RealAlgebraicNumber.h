@@ -85,7 +85,7 @@ private:
 	friend struct ran::less;
 public:
 	using NumberContent = ran::NumberContent<Number>;
-	using IntervalContent = std::shared_ptr<ran::IntervalContent<Number>>;
+	using IntervalContent = ran::IntervalContent<Number>;
 	using ThomContent = std::shared_ptr<ThomEncoding<Number>>;
 	using Z3Content = std::shared_ptr<Z3Ran<Number>>;
 private:
@@ -103,20 +103,20 @@ private:
 	// A flag/tag that a user of this class can set.
 	// It indicates that this number stems from an outside root computation.
 	bool mIsRoot = true;
-  // Interval representation
-	mutable IntervalContent mIR;
   // ThomEncoding
 	std::shared_ptr<ThomEncoding<Number>> mTE;
 
 	/// Convert to a plain number if possible.
 	void checkForSimplification() const {
 		if (std::holds_alternative<NumberContent>(mContent)) return;
-		if (std::visit(
+		if (std::visit(overloaded {
+			[](const IntervalContent& c) { return c.is_number(); },
 			[](const auto& c) { return c->is_number(); }
-		, mContent)) {
-			switchToNR(std::visit(
+		}, mContent)) {
+			switchToNR(std::visit(overloaded {
+				[](const IntervalContent& c) { return c.get_number(); },
 				[](const auto& c) { return c->get_number(); }
-			, mContent));
+			}, mContent));
 		}
 	}
 	// Switch to numeric representation.
@@ -131,16 +131,16 @@ public:
 		mIsRoot(isRoot)
 	{}
 	explicit RealAlgebraicNumber(Variable var, bool isRoot = true):
-		mContent(std::make_shared<ran::IntervalContent<Number>>(Polynomial(var), Interval<Number>::zeroInterval())),
+		mContent(std::in_place_type<IntervalContent>, Polynomial(var), Interval<Number>::zeroInterval()),
 		mIsRoot(isRoot)
 	{
 	}
 	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, bool isRoot = true):
-		mContent(std::make_shared<ran::IntervalContent<Number>>(p.normalized(), i)),
+		mContent(std::in_place_type<IntervalContent>, p.normalized(), i),
 		mIsRoot(isRoot)
 	{}
-	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, const std::vector<UnivariatePolynomial<Number>>& sturmSequence, bool isRoot = true):
-		mContent(std::make_shared<ran::IntervalContent<Number>>(p.normalized(), i, sturmSequence)),
+	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, std::vector<UnivariatePolynomial<Number>> sturmSequence, bool isRoot = true):
+		mContent(std::in_place_type<IntervalContent>, p.normalized(), i, std::move(sturmSequence)),
 		mIsRoot(isRoot)
 	{}
 
@@ -204,7 +204,10 @@ public:
 	}
 
 	bool isZero() const {
-		return std::visit([](const auto& c) { return c->is_zero(); }, mContent);
+		return std::visit(overloaded {
+			[](const IntervalContent& c) { return c.is_zero(); },
+			[](const auto& c) { return c->is_zero(); }
+		}, mContent);
 	}
 
 	/**
@@ -247,16 +250,18 @@ public:
 
 	bool isIntegral() const {
 		refineToIntegrality();
-		return std::visit(
+		return std::visit(overloaded {
+			[](const IntervalContent& c) { return c.is_integral(); },
 			[](const auto& c) { return c->is_integral(); }
-		, mContent);
+		}, mContent);
 	}
 
 	Number integerBelow() const {
 		refineToIntegrality();
-		return std::visit(
+		return std::visit(overloaded {
+			[](const IntervalContent& c) { return c.integer_below(); },
 			[](const auto& c) { return c->integer_below(); }
-		, mContent);
+		}, mContent);
 	}
 	
 	Number branchingPoint() const {
@@ -268,17 +273,17 @@ public:
 
 	const Number& value() const noexcept {
 		assert(isNumeric());
-		return std::get<NumberContent>(mContent)->value;
+		return std::get<NumberContent>(mContent).value;
 	}
 
 	std::size_t getRefinementCount() const {
 		assert(isInterval());
-		return std::get<IntervalContent>(mContent)->refinementCount;
+		return std::get<IntervalContent>(mContent).refinementCount();
 	}
 	const Interval<Number>& getInterval() const {
 		if (isZ3Ran()) return getZ3Ran().getInterval();
 		assert(isInterval());
-		return std::get<IntervalContent>(mContent)->interval;
+		return std::get<IntervalContent>(mContent).interval();
 	}
 	const Number& lower() const {
 		if (isZ3Ran()) getZ3Ran().lower();
@@ -289,19 +294,20 @@ public:
 		return getInterval().upper();
 	}
 	const Polynomial& getIRPolynomial() const {
-		if (isInterval()) return std::get<IntervalContent>(mContent)->polynomial;
+		if (isInterval()) return std::get<IntervalContent>(mContent).polynomial();
 		else if (isZ3Ran()) return getZ3Ran().getPolynomial();
 		assert(!isThom() && !isNumeric());
-		return std::get<IntervalContent>(mContent)->polynomial;
+		return std::get<IntervalContent>(mContent).polynomial();
 	}
 	const auto& getIRSturmSequence() const {
 		assert(isInterval());
-		return std::get<IntervalContent>(mContent)->sturmSequence;
+		return std::get<IntervalContent>(mContent).sturm_sequence();
 	}
 
 	Sign sgn() const {
 		return std::visit(overloaded {
 			[](const NumberContent& c) { return carl::sgn(c.value); },
+			[](const IntervalContent& c) { return c.sgn(); },
 			[](const auto& c) { return c->sgn(); }
 		}, mContent);
 	}
@@ -309,6 +315,7 @@ public:
 	Sign sgn(const Polynomial& p) const {
 		return std::visit(overloaded {
 			[&p](const NumberContent& c) { return carl::sgn(p.evaluate(c.value)); },
+			[&p](const IntervalContent& c) { return c.sgn(p); },
 			[&p](const auto& c) { return c->sgn(p); }
 		}, mContent);
 	}
@@ -316,7 +323,7 @@ public:
 	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
 		return std::visit(overloaded {
 			[&p](const NumberContent& c) { return carl::count_real_roots(p, Interval<Number>(c.value)) == 1; },
-			[&p](const IntervalContent& c) { return c->is_root_of(p); },
+			[&p](const IntervalContent& c) { return c.is_root_of(p); },
 			[&p](const auto& c) { return c->sgn(p) == Sign::ZERO; }
 		}, mContent);
 	}
@@ -328,26 +335,27 @@ public:
 	bool containedIn(const Interval<Number>& i) const {
 		return std::visit(overloaded {
 			[&i](const NumberContent& c) { return i.contains(c.value); },
+			[&i](IntervalContent& c) { return c.containedIn(i); },
 			[&i](const auto& c) { return c->containedIn(i); }
 		}, mContent);
 	}
 
 	bool refineAvoiding(const Number& n) const {
 		assert(isInterval());
-		bool res = std::get<IntervalContent>(mContent)->refineAvoiding(n);
+		bool res = std::get<IntervalContent>(mContent).refineAvoiding(n);
 		checkForSimplification();
 		return res;
 	}
 	/// Refines until the number is either numeric or the interval does not contain any integer.
 	void refineToIntegrality() const {
 		std::visit(overloaded {
-			[](const IntervalContent& c) { c->refineToIntegrality(); },
+			[](IntervalContent& c) { c.refineToIntegrality(); },
 			[](const auto& c) {}
 		}, mContent);
 	}
 	void refine() const {
 		std::visit(overloaded {
-			[](const IntervalContent& c) { c->refine(); },
+			[](IntervalContent& c) { c.refine(); },
 			[](const auto& c) {}
 		}, mContent);
 	}
@@ -362,11 +370,11 @@ public:
 		auto g = gmv.toUnivariatePolynomial();
 		if (isRootOf(g)) {
 			CARL_LOG_DEBUG("carl.ran", "Is a root of " << g);
-			std::get<IntervalContent>(mContent)->setPolynomial(g);
+			std::get<IntervalContent>(mContent).setPolynomial(g);
 		} else {
 			CARL_LOG_DEBUG("carl.ran", "Is not a root of " << g);
-			CARL_LOG_DEBUG("carl.ran", "Dividing " << std::get<IntervalContent>(mContent)->polynomial << " by " << g);
-			std::get<IntervalContent>(mContent)->setPolynomial(std::get<IntervalContent>(mContent)->polynomial.divideBy(g.replaceVariable(ran::IntervalContent<Number>::auxVariable)).quotient);
+			CARL_LOG_DEBUG("carl.ran", "Dividing " << std::get<IntervalContent>(mContent).polynomial() << " by " << g);
+			std::get<IntervalContent>(mContent).setPolynomial(std::get<IntervalContent>(mContent).polynomial().divideBy(g.replaceVariable(ran::IntervalContent<Number>::auxVariable)).quotient);
 		}
 	}
 	
@@ -374,10 +382,10 @@ public:
 		if (isNumeric()) return RealAlgebraicNumber<Number>(carl::abs(value()), mIsRoot);
 		if (isInterval()) {
 			if (getInterval().contains(constant_zero<Number>::get())) {
-				std::get<IntervalContent>(mContent)->refineAvoiding(constant_zero<Number>::get());
+				std::get<IntervalContent>(mContent).refineAvoiding(constant_zero<Number>::get());
 				return abs();
 			}
-			if (std::get<IntervalContent>(mContent)->interval.isPositive()) return *this;
+			if (std::get<IntervalContent>(mContent).interval().isPositive()) return *this;
 			return RealAlgebraicNumber<Number>(std::get<IntervalContent>(mContent)->polynomial.negateVariable(), std::get<IntervalContent>(mContent)->interval.abs(), mIsRoot);
 		}
 		if (isZ3Ran()) {
@@ -385,15 +393,12 @@ public:
 		}
 		return RealAlgebraicNumber<Number>();
 	}
-
-	std::pair<bool,bool> checkOrder(const RealAlgebraicNumber<Number>& n) const;
-private:
-	bool lessWhileUnequal(const RealAlgebraicNumber<Number>& n) const;
 };
 
 template<typename Num>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
 	return std::visit(overloaded {
+		[&os,&ran](const ran::IntervalContent<Num>& c) -> auto& { return os << "(" << c << (ran.isRoot() ? " R" : "") << ")"; },
 		[&os,&ran](const auto& c) -> auto& { return os << "(" << *c << (ran.isRoot() ? " R" : "") << ")"; }
 	}, ran.mContent);
 }

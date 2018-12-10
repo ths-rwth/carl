@@ -18,7 +18,7 @@ struct equal {
 
 	template<typename T1, typename T2>
 	bool operator()(const T1& lhs, const T2& rhs) const {
-		CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << *lhs << " == " << *rhs);
+		CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << lhs << " == " << rhs);
 		CARL_LOG_ERROR("carl.ran", "Types: " << typeid(T1).name() << " and " << typeid(T2).name());
 		CARL_LOG_ERROR("carl.ran", "Interval: " << typeid(IntervalContent).name());
 		return false;
@@ -27,8 +27,8 @@ struct equal {
 	bool operator()(const NumberContent& lhs, const NumberContent& rhs) const {
 		return lhs.value == rhs.value;
 	}
-	bool operator()(const NumberContent& lhs, const IntervalContent& rhs) const {
-		return rhs->refineAvoiding(lhs.value);
+	bool operator()(const NumberContent& lhs, IntervalContent& rhs) const {
+		return rhs.refineAvoiding(lhs.value);
 	}
 	bool operator()(const NumberContent& lhs, const ThomContent& rhs) const {
 		return *rhs == lhs.value;
@@ -48,14 +48,13 @@ struct equal {
 	}
 
 	bool operator()(IntervalContent& lhs, IntervalContent& rhs) const {
-		if (lhs.get() == rhs.get()) return true;
 		return merge_if_identical(
-			lhs, rhs, *lhs == *rhs
+			lhs, rhs, lhs == rhs
 		);
 	}
 	bool operator()(IntervalContent& lhs, Z3Content& rhs) const {
 		carl::ran::IntervalContent tmp(rhs->getPolynomial(), rhs->getInterval());
-		return *lhs == tmp;
+		return lhs == tmp;
 	}
 	bool operator()(Z3Content& lhs, IntervalContent& rhs) const {
 		return (*this)(rhs, lhs);
@@ -98,7 +97,7 @@ struct less {
 
 	template<typename T1, typename T2>
 	bool operator()(const T1& lhs, const T2& rhs) const {
-		CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << *lhs << " < " << *rhs);
+		CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << lhs << " < " << rhs);
 		CARL_LOG_ERROR("carl.ran", "Types: " << typeid(T1).name() << " and " << typeid(T2).name());
 		CARL_LOG_ERROR("carl.ran", "Interval: " << typeid(IntervalContent).name());
 		return false;
@@ -107,9 +106,9 @@ struct less {
 	bool operator()(const NumberContent& lhs, const NumberContent& rhs) const {
 		return lhs.value < rhs.value;
 	}
-	bool operator()(const NumberContent& lhs, const IntervalContent& rhs) const {
-		if (rhs->refineAvoiding(lhs.value)) return false;
-		return lhs.value < rhs->interval.lower();
+	bool operator()(const NumberContent& lhs, IntervalContent& rhs) const {
+		if (rhs.refineAvoiding(lhs.value)) return false;
+		return lhs.value < rhs.interval().lower();
 	}
 	bool operator()(const NumberContent& lhs, const ThomContent& rhs) const {
 		return lhs.value < *rhs;
@@ -118,26 +117,27 @@ struct less {
 		return rhs->greater(lhs.value);
 	}
 
-	bool operator()(const IntervalContent& lhs, const NumberContent& rhs) const {
-		return (*this)(rhs, lhs);
+	bool operator()(IntervalContent& lhs, const NumberContent& rhs) const {
+		if (lhs.refineAvoiding(rhs.value)) return false;
+		return lhs.interval().upper() < rhs.value;
 	}
 	bool operator()(const ThomContent& lhs, const NumberContent& rhs) const {
-		return (*this)(rhs, lhs);
+		return *lhs < rhs.value;
 	}
 	bool operator()(const Z3Content& lhs, const NumberContent& rhs) const {
-		return (*this)(rhs, lhs);
+		return lhs->less(rhs.value);
 	}
 
 	bool operator()(IntervalContent& lhs, IntervalContent& rhs) const {
-		if (lhs.get() == rhs.get()) return false;
-		return *lhs < *rhs;
+		return lhs < rhs;
 	}
 	bool operator()(IntervalContent& lhs, Z3Content& rhs) const {
 		carl::ran::IntervalContent tmp(rhs->getPolynomial(), rhs->getInterval());
-		return *lhs < tmp;
+		return (*this)(lhs, tmp);
 	}
 	bool operator()(Z3Content& lhs, IntervalContent& rhs) const {
-		return (*this)(rhs, lhs);
+		carl::ran::IntervalContent tmp(lhs->getPolynomial(), lhs->getInterval());
+		return (*this)(tmp, rhs);
 	}
 
 

@@ -11,7 +11,7 @@ template<typename Number>
 RealAlgebraicNumber<Number> sampleBelowZ3(const RealAlgebraicNumber<Number>& n) {
     algebraic_numbers::anum val;
     z3().anumMan().int_lt(n.getZ3Ran().content(), val);
-    return RealAlgebraicNumber<Number>(Z3Ran<Number>(std::move(val)));
+    return RealAlgebraicNumber<Number>(Z3Ran<Number>(std::move(val)), false);
 }
 
 template<typename Number>
@@ -37,14 +37,14 @@ RealAlgebraicNumber<Number> sampleBetweenZ3(const RealAlgebraicNumber<Number>& l
     } else {
         assert(false);
     }
-    return RealAlgebraicNumber<Number>(Z3Ran<Number>(std::move(val)));
+    return RealAlgebraicNumber<Number>(Z3Ran<Number>(std::move(val)), false);
 }
 
 template<typename Number>
 RealAlgebraicNumber<Number> sampleAboveZ3(const RealAlgebraicNumber<Number>& n) {
     algebraic_numbers::anum val;
     z3().anumMan().int_gt(n.getZ3Ran().content(), val);
-    return RealAlgebraicNumber<Number>(Z3Ran<Number>(std::move(val)));
+    return RealAlgebraicNumber<Number>(Z3Ran<Number>(std::move(val)), false);
 }
 
 

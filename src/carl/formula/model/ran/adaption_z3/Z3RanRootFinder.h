@@ -10,7 +10,7 @@ namespace carl {
     );
 
     template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-    boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRootsZ3(
+    std::vector<RealAlgebraicNumber<Number>> realRootsZ3(
         const UnivariatePolynomial<Coeff>& p,
         const std::map<Variable, RealAlgebraicNumber<Number>>& m,
         const Interval<Number>& interval = Interval<Number>::unboundedInterval()

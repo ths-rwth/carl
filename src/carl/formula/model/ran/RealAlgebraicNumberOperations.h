@@ -62,7 +62,9 @@ namespace carl {
 			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
 			return res;
 		} else if (n.isZ3Ran()) {
-			return sampleBelowZ3(n);
+			auto res = sampleBelowZ3(n);
+			CARL_LOG_TRACE("carl.ran", "selecting sample " << res << " below " << n);
+			return res;
 		}
 		assert(false);
 	}
@@ -82,7 +84,9 @@ namespace carl {
 			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
 			return res;
 		} else if (lower.isZ3Ran() || upper.isZ3Ran()) {
-			return sampleBetweenZ3(lower, upper);
+			auto res = sampleBetweenZ3(lower, upper);
+			CARL_LOG_TRACE("carl.ran", "selecting sample " << res << " between " << lower << " and " << upper);
+			return res;
 		} else if (lower.isNumeric() || upper.isNumeric() || lower.isInterval() || upper.isInterval()) {
 			Interval<Number> i;
 			if (lower.isNumeric()) i.set(lower.value(), lower.value());
@@ -137,7 +141,9 @@ namespace carl {
 			CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
 			return res;
 		} else if (n.isZ3Ran()) {
-			return sampleAboveZ3(n);
+			auto res = sampleAboveZ3(n);
+			CARL_LOG_TRACE("carl.ran", "selecting sample " << res << " above " << n);
+			return res;
 		}
 		assert(false);
 	}
