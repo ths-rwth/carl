@@ -85,13 +85,9 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
  *   <li>the main variable of 'p' must not be in 'm'</li>
  *   <li>all variables from the coefficients of 'p' must be in 'm'</li>
  * </ul>
- * Note that boost::none is returned if replacing variables in 'p' already yields
- * the zero-polynomial and no valid root computation is possible.
- * However, if it's a non-zero-polynomial that simply has no roots, an empty vector
- * of roots is returned.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
+std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
@@ -99,7 +95,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 );
 
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
+std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable>& variables,
 		const std::list<RealAlgebraicNumber<Number>>& values,

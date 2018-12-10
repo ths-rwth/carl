@@ -842,11 +842,11 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	}
 	CARL_LOG_FUNC("carl.cad", *p << " on " << m);
 	auto roots = carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy);
-	if (roots) {
+	if (roots.empty()) {
 		return this->samples(
 			openVariableCount,
 	        //carl::realRootsThom(*p, m, bounds),
-			std::list<RealAlgebraicNumber<Number>>(roots->begin(), roots->end()),
+			{ RealAlgebraicNumber<Number>(0) },
 			currentSamples,
 			replacedSamples,
 			bounds
@@ -855,7 +855,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		return this->samples(
 			openVariableCount,
 	        //carl::realRootsThom(*p, m, bounds),
-			{ RealAlgebraicNumber<Number>(0) },
+			std::list<RealAlgebraicNumber<Number>>(roots.begin(), roots.end()),
 			currentSamples,
 			replacedSamples,
 			bounds

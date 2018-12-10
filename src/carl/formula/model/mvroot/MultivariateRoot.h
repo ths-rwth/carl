@@ -125,15 +125,16 @@ public:
 		CARL_LOG_DEBUG("carl.rootexpression", "Evaluate: " << *this << " against: " << m);
 		auto poly = mPoly.toUnivariatePolynomial(sVar);
 		auto roots = rootfinder::realRoots(poly, m);
-		if (!roots || (roots->size() < mK)) {
+		CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << roots);
+		if (roots.size() < mK) {
 			CARL_LOG_TRACE("carl.rootexpression", mK << "th root does not exist.");
 			return boost::none;
 		}
-		CARL_LOG_TRACE("carl.rootexpression", "Take " << mK << "th of isolated roots " << *roots);
-		assert(roots->size() >= mK);
+		CARL_LOG_TRACE("carl.rootexpression", "Take " << mK << "th of isolated roots " << roots);
+		assert(roots.size() >= mK);
 		assert(mK > 0);
-		CARL_LOG_DEBUG("carl.rootexpression", "Result is " << (*roots)[mK-1]);
-		return (*roots)[mK-1];
+		CARL_LOG_DEBUG("carl.rootexpression", "Result is " << roots[mK-1]);
+		return roots[mK-1];
 	}
 };
 

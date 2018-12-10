@@ -20,7 +20,7 @@ namespace rootfinder {
 
 // hiervon eine thom version machen!!!
 template<typename Coeff, typename Number>
-boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
+std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& poly,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& varToRANMap,
 		const Interval<Number>& interval,
@@ -35,7 +35,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 
 	if (carl::isZero(poly)) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "poly is 0 -> everything is a root");
-		return boost::none;
+		return {};
 	}
 	if (poly.isNumber()) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "poly is constant but not zero -> no root");
@@ -50,7 +50,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		if (v == poly.mainVar()) continue;
 		if (varToRANMap.count(v) == 0) {
 			CARL_LOG_TRACE("carl.core.rootfinder", "poly still contains unassigned variable " << v);
-			return boost::none;
+			return {};
 		}
 		assert(varToRANMap.count(v) > 0);
 		if (varToRANMap.at(v).isNumeric()) {
@@ -61,7 +61,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 	}
 	if (carl::isZero(polyCopy)) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "poly is 0 after substituting rational assignments -> everything is a root");
-		return boost::none;
+		return {};
 	}
 	if (IRmap.empty()) {
 		assert(polyCopy.isUnivariate());
@@ -70,7 +70,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 		CARL_LOG_TRACE("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 		assert(IRmap.find(polyCopy.mainVar()) == IRmap.end());
 		UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(polyCopy, IRmap);
-		if (carl::isZero(evaledpoly)) return boost::none;
+		if (carl::isZero(evaledpoly)) return {};
 		CARL_LOG_TRACE("carl.core.rootfinder", "Calling on " << evaledpoly);
 		auto res = realRoots(evaledpoly, interval, pivoting);
 		MultivariatePolynomial<Number> mvpoly(polyCopy);
@@ -91,7 +91,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 }
 
 template<typename Coeff, typename Number>
-boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
+std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& poly,
 		const std::list<Variable>& variables,
 		const std::list<RealAlgebraicNumber<Number>>& values,

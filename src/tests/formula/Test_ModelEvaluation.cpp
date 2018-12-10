@@ -87,8 +87,7 @@ TEST(ModelEvaluation, EvaluateWithMVR)
 	RealAlgebraicNumber<Rational> r1(upol, Interval<Rational>(-3,BoundType::STRICT,-1,BoundType::STRICT));
 	RealAlgebraicNumber<Rational> r2(upol, Interval<Rational>(1,BoundType::STRICT,3,BoundType::STRICT));
 
-	EXPECT_TRUE(res);
-	EXPECT_EQ(*res, std::decay<decltype(*res)>::type({r1, r2}));
+	EXPECT_EQ(res, std::decay<decltype(res)>::type({r1, r2}));
 }
 
 TEST(ModelEvaluation, EvaluateBV)
