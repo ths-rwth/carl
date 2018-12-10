@@ -35,9 +35,16 @@ namespace carl {
                 return *mContent;
             }
 
-            bool isZero() const;
+            bool is_zero() const;
 
-            bool isIntegral() const;
+			bool is_number() const;
+			Number get_number() const;
+
+            bool is_integral() const;
+
+			Number integer_below() const {
+				return carl::floor(lower());
+			}
 
             // Note: this already tries to simplify to a polynomial!
             // TODO can this result be cached ?!?

@@ -29,13 +29,27 @@ namespace carl {
         z3().free(val);
     }
 
+	template<typename Number>
+	bool Z3Ran<Number>::is_number() const {
+		return z3().anumMan().is_rational(content());
+	}
+	template<typename Number>
+	Number Z3Ran<Number>::get_number() const {
+		assert(isNumeric());
+        mpq res;
+        z3().anumMan().to_rational(content(), res);
+        Number num = z3().toNumber<Number>(res);
+        z3().free(res);
+        return num;
+	}
+
     template<typename Number>
-    bool Z3Ran<Number>::isZero() const {
+    bool Z3Ran<Number>::is_zero() const {
         return z3().anumMan().is_zero(content());
     }
 
     template<typename Number>
-    bool Z3Ran<Number>::isIntegral() const {
+    bool Z3Ran<Number>::is_integral() const {
         return z3().anumMan().is_int(content());
     }
 
@@ -165,6 +179,8 @@ namespace carl {
             z3().anumMan().neg(res);
             return Z3Ran<Number>(std::move(res));
         }
+		assert(false);
+		return *this;
     }
 
     template<typename Number>
@@ -203,6 +219,7 @@ namespace carl {
 
     template<typename Number>
     std::ostream& operator<<(std::ostream& os, const Z3Ran<Number>& zr) {
+		os << "Z3 ";
         z3().anumMan().display_root(os, zr.content());
         return os;
     }

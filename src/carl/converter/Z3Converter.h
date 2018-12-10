@@ -175,7 +175,7 @@ public:
 	 * Converts a variable and an exponent.
      */
 	polynomial::polynomial_ref toZ3(const std::pair<carl::Variable, carl::exponent>& p) {
-		return toZ3(polyMan().mk_polynomial(toZ3(p.first), p.second));
+		return toZ3(polyMan().mk_polynomial(toZ3(p.first), static_cast<unsigned>(p.second)));
 	}
 	/**
 	 * Converts a monomial.

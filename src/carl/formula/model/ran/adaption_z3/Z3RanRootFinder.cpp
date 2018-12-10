@@ -13,11 +13,13 @@ namespace carl {
     ) {
         polynomial::polynomial_ref poly = z3().toZ3IntCoeff(polynomial);
 
+		CARL_LOG_WARN("carl.z3ran", "Roots of " << poly);
+
         anum_vector roots;
         z3().anumMan().isolate_roots(poly, roots);
 
         std::vector<RealAlgebraicNumber<Number>> res;
-        for (size_t i = 0; i < roots.size(); i++) {
+        for (unsigned i = 0; i < roots.size(); i++) {
             Z3Ran<Number> zr(std::move(roots[i]));
             if (zr.containedIn(interval)) {
                 res.push_back(RealAlgebraicNumber<Number>(zr)); // std::move(zr)));
@@ -25,7 +27,7 @@ namespace carl {
         }
 
         /* values have been moved...
-        for (size_t i = 0; i < roots.size(); i++) {
+        for (unsigned i = 0; i < roots.size(); i++) {
             z3().free(roots[i]);
         }*/
         
@@ -40,18 +42,31 @@ namespace carl {
     ) {
         polynomial::polynomial_ref poly = z3().toZ3IntCoeff(p);
 
+		CARL_LOG_WARN("carl.z3ran", "Roots of " << poly);
+
         nlsat::assignment map(z3().anumMan());
         for(auto const &pair : m) {
+			CARL_LOG_WARN("carl.z3ran", pair.first << " -> " << pair.second);
             polynomial::var var = z3().toZ3(pair.first);
             if (pair.second.isZ3Ran()) {
                 const algebraic_numbers::anum& val = pair.second.getZ3Ran().content();
                 map.set(var, val);
+				{
+					std::stringstream ss;
+					z3().anumMan().display_root(ss, val);
+					CARL_LOG_WARN("carl.z3ran", var << " -> " << ss.str());
+				}
             } else {
                 assert(pair.second.isNumeric());
                 mpq num = z3().toZ3MPQ(pair.second.value());
                 anum alnum;
                 z3().anumMan().set(alnum, num);
                 map.set(var, alnum);
+				{
+					std::stringstream ss;
+					z3().anumMan().display_root(ss, alnum);
+					CARL_LOG_WARN("carl.z3ran", var << " -> " << ss.str());
+				}
                 z3().free(num);
                 z3().free(alnum);
             }
@@ -61,7 +76,7 @@ namespace carl {
         z3().anumMan().isolate_roots(poly, map, roots);
 
         std::vector<RealAlgebraicNumber<Number>> res;
-        for (size_t i = 0; i < roots.size(); i++) {
+        for (unsigned i = 0; i < roots.size(); i++) {
             Z3Ran<Number> zr(std::move(roots[i]));
             if (zr.containedIn(interval)) {
                 res.push_back(RealAlgebraicNumber<Number>(zr)); // std::move(zr)));
@@ -69,7 +84,7 @@ namespace carl {
         }
 
         /* values have been moved...
-        for (size_t i = 0; i < roots.size(); i++) {
+        for (unsigned i = 0; i < roots.size(); i++) {
             z3().free(roots[i]);
         }*/
         

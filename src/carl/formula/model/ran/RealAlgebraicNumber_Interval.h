@@ -31,11 +31,7 @@ namespace ran {
 		IntervalContent(
 			const Polynomial& p,
 			const Interval<Number> i
-		):
-			polynomial(replaceVariable(p)),
-			interval(i),
-			sturmSequence(carl::sturm_sequence(p)),
-			refinementCount(0)
+		): IntervalContent(p, i, carl::sturm_sequence(p))
 		{}
 		
 		IntervalContent(
@@ -47,7 +43,45 @@ namespace ran {
 			interval(i),
 			sturmSequence(seq),
 			refinementCount(0)
-		{}
+		{
+			assert(!carl::isZero(polynomial) && polynomial.degree() > 0);
+			assert(interval.isOpenInterval() || interval.isPointInterval());
+			assert(count_real_roots(polynomial, interval) == 1);
+			if (polynomial.degree() == 1) {
+				Number a = polynomial.coefficients()[1];
+				Number b = polynomial.coefficients()[0];
+				interval = Interval<Number>(Number(-b / a));
+			} else {
+				if (interval.contains(0)) refineAvoiding(0);
+				refineToIntegrality();
+			}
+		}
+
+		bool is_zero() const {
+			return carl::isZero(interval);
+		}
+		bool is_number() const {
+			return interval.isPointInterval();
+		}
+		const auto& get_number() const {
+			assert(is_number());
+			return interval.lower();
+		}
+		bool is_integral() const {
+			return interval.isPointInterval() && carl::isInteger(interval.lower());
+		}
+		Number integer_below() const {
+			return carl::floor(interval.lower());
+		}
+
+		std::size_t size() const {
+			return carl::bitsize(interval.lower()) + carl::bitsize(interval.upper()) + polynomial.degree();
+		}
+
+		bool is_root_of(const UnivariatePolynomial<Number>& p) const {
+			return carl::count_real_roots(p, interval) == 1;
+		}
+
 		bool isIntegral() {
 			return interval.isPointInterval() && carl::isInteger(interval.lower());
 		}
@@ -55,6 +89,10 @@ namespace ran {
 		void setPolynomial(const Polynomial& p) {
 			polynomial = replaceVariable(p);
 			sturmSequence = carl::sturm_sequence(polynomial);
+		}
+
+		Sign sgn() const {
+			return interval.sgn();
 		}
 		
 		Sign sgn(const Polynomial& p) const {
@@ -71,6 +109,16 @@ namespace ran {
 					CARL_LOG_ERROR("carl.ran", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
 					return Sign::ZERO;
 			}
+		}
+
+		bool containedIn(const Interval<Number>& i) {
+			if (interval.contains(i.lower())) {
+				refineAvoiding(i.lower());
+			}
+			if (interval.contains(i.upper())) {
+				refineAvoiding(i.upper());
+			}
+			return i.contains(interval);
 		}
 		
 		void refine() {
@@ -156,6 +204,60 @@ namespace ran {
 			}
 		}
 	};
+
+template<typename Number>
+bool operator==(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	if (lhs.interval.upper() < rhs.interval.lower()) return false;
+	if (lhs.interval.lower() > rhs.interval.upper()) return false;
+	if (lhs.polynomial == rhs.polynomial) {
+		if (lhs.interval.lower() <= rhs.interval.lower()) {
+			if (rhs.interval.upper() <= lhs.interval.upper()) return true;
+			lhs.refineAvoiding(rhs.interval.lower());
+			rhs.refineAvoiding(lhs.interval.upper());
+		} else {
+			assert(rhs.interval.lower() <= lhs.interval.lower());
+			if (lhs.interval.upper() <= rhs.interval.upper()) return true;
+			lhs.refineAvoiding(rhs.interval.upper());
+			rhs.refineAvoiding(lhs.interval.lower());
+		}
+	} else {
+		assert(lhs.polynomial != rhs.polynomial);
+		assert(lhs.polynomial.mainVar() == rhs.polynomial.mainVar());
+		auto g = carl::gcd(lhs.polynomial, rhs.polynomial);
+		if (carl::isOne(g)) return false;
+		if (lhs.is_root_of(g)) {
+			lhs.setPolynomial(g);
+		} else {
+			assert(carl::isZero(lhs.polynomial.divideBy(g).remainder));
+			lhs.setPolynomial(lhs.polynomial.divideBy(g).quotient);
+		}
+		if (rhs.is_root_of(g)) {
+			rhs.setPolynomial(g);
+		} else {
+			assert(carl::isZero(rhs.polynomial.divideBy(g).remainder));
+			rhs.setPolynomial(rhs.polynomial.divideBy(g).quotient);
+		}
+	}
+	return lhs == rhs;
+}
+
+template<typename Number>
+bool operator<(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	if (lhs == rhs) return false;
+	while (true) {
+		if (lhs.interval.upper() < rhs.interval.lower()) return true;
+		if (lhs.interval.lower() > rhs.interval.upper()) return false;
+		lhs.refineAvoiding(rhs.interval.lower());
+		lhs.refineAvoiding(rhs.interval.upper());
+		rhs.refineAvoiding(lhs.interval.lower());
+		rhs.refineAvoiding(lhs.interval.upper());
+	}
+}
+
+template<typename Num>
+std::ostream& operator<<(std::ostream& os, const IntervalContent<Num>& ran) {
+	return os << "IR " << ran.interval << ", " << ran.polynomial;
+}
 
 	template<typename Number>
 	const Variable IntervalContent<Number>::auxVariable = freshRealVariable("__r");

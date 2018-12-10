@@ -168,7 +168,7 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 	assert(m.size() > 0);
 	auto poly = p.toUnivariatePolynomial(m.begin()->first);
 	if (m.size() == 1 && m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
-		return RealAlgebraicNumber<Number>(poly.mainVar());
+		return RealAlgebraicNumber<Number>();
 	}
 	Variable v = freshRealVariable();
 	// compute the result polynomial and the initial result interval

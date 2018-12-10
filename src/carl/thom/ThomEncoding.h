@@ -86,7 +86,27 @@ public:
 		}
 		CARL_LOG_ASSERT("carl.thom", false, "should never get here");
 	}
-	      
+
+	bool is_number() const {
+		return false;
+	}
+
+	const auto& get_number() const {
+		return carl::constant_zero<Number>::get();
+	}
+
+	bool containedIn(const Interval<Number>& i) const {
+		if(i.lowerBoundType() != BoundType::INFTY) {
+			if(i.lowerBoundType() == BoundType::STRICT && *this <= i.lower()) return false;
+			if(i.lowerBoundType() == BoundType::WEAK && *this < i.lower()) return false;
+		}
+		if(i.upperBoundType() != BoundType::INFTY) {
+			if(i.upperBoundType() == BoundType::STRICT && *this >= i.upper()) return false;
+			if(i.upperBoundType() == BoundType::WEAK && *this > i.upper()) return false;
+		}
+		return true;
+	}
+
 	inline SignCondition signCondition() const { return mSc; }
 	inline SignCondition relevantSignCondition() const { return mSc.trailingPart(mRelevant); }
 	inline Variable::Arg mainVar() const { return mMainVar; }
@@ -145,7 +165,7 @@ public:
 	Sign signOnPolynomial(const Polynomial& p) const {
 		CARL_LOG_ASSERT("carl.thom", p.gatherVariables().size() <= this->dimension(), "\np = " << p << "\nthis = " << *this);
 		if(carl::isZero(p)) return Sign(0);
-		if(p.isConstant()) return Sign(sgn(p.lcoeff()));
+		if(p.isConstant()) return Sign(carl::sgn(p.lcoeff()));
 		std::list<SignCondition> signs = mSd->getSigns(p);
 		SignCondition relevant = accumulateRelevantSigns();
 		for(const auto& sigma : signs) {
@@ -178,12 +198,30 @@ public:
 		Polynomial derivative = der(mP, mMainVar, 1, mP.degree(mMainVar) - mSc.size()).back();
 		mSc.push_front(this->signOnPolynomial(derivative));
 	}
+
+	Sign sgn(const UnivariatePolynomial<Number>& p) const {
+		return sgn(Polynomial(p));
+	}
+	Sign sgn(const Polynomial& p) const {
+		return signOnPolynomial(p);
+	}
+	Sign sgn() const {
+		return signOnPolynomial(Polynomial(mMainVar));
+	}
+
+	bool is_integral() const {
+		return false;
+	}
+	Number integer_below() const {
+		return carl::constant_zero<Number>::get();
+	}
 	
+	//[[deprecated("Use sgn() instead.")]]
 	Sign sgnReprNum() const {
 		return signOnPolynomial(Polynomial(mMainVar));
 	}
 	
-	bool isZero() const {
+	bool is_zero() const {
 		return sgnReprNum() == Sign::ZERO;
 	}
 	
@@ -561,7 +599,7 @@ ThomEncoding<N> operator+(const N& lhs, const ThomEncoding<N>& rhs) { return rhs
 
 template<typename N>
 std::ostream& operator<<(std::ostream& os, const ThomEncoding<N>& rhs) {
-	os << rhs.polynomial() << " in " << rhs.mainVar() << ", " << rhs.signCondition();
+	os << "TE " << rhs.polynomial() << " in " << rhs.mainVar() << ", " << rhs.signCondition();
 	if(rhs.dimension() > 1) {
 		os << " OVER " << rhs.point();
 	}
