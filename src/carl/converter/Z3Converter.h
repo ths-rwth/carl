@@ -210,8 +210,8 @@ public:
 		res = toZ3(polyMan().mk_zero());
 		unsigned exp = 0;
 		polynomial::var mainvar = toZ3(p.mainVar());
-		for (auto t: p.coefficients()) {
-			res = res + toZ3(polyMan().mk_polynomial(mainvar, exp)) * toZ3(t);
+		for (const auto& t: p.coefficients()) {
+			res = res + toZ3(t) * toZ3(polyMan().mk_polynomial(mainvar, exp));
 			exp++;
 		}
 		polyMan().lex_sort(res);
@@ -252,7 +252,7 @@ public:
 	template<typename Coeff>
 	UnivariatePolynomial<Coeff> toUnivPoly(const svector<mpz>& p, carl::Variable var) {
 		std::vector<Coeff> coeff;
-		for(size_t i = 0; i < p.size(); i++) {
+		for(unsigned i = 0; i < p.size(); i++) {
 			Coeff c = toNumber<Coeff>(p[i]);
 			coeff.push_back(c);
 		}
