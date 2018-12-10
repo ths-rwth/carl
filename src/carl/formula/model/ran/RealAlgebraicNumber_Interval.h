@@ -145,7 +145,7 @@ namespace ran {
 			}
 		}
 
-		bool containedIn(const Interval<Number>& i) {
+		bool contained_in(const Interval<Number>& i) {
 			if (interval().contains(i.lower())) {
 				refineAvoiding(i.lower());
 			}

@@ -43,6 +43,7 @@
 #include "../../../thom/ThomEncoding.h"
 #include "RealAlgebraicNumber_Number.h"
 #include "RealAlgebraicNumber_Interval.h"
+#include "RealAlgebraicNumber_Thom.h"
 #include "adaption_z3/Z3Ran.h"
 #include "../../../numbers/config.h"
 
@@ -86,7 +87,7 @@ private:
 public:
 	using NumberContent = ran::NumberContent<Number>;
 	using IntervalContent = ran::IntervalContent<Number>;
-	using ThomContent = std::shared_ptr<ThomEncoding<Number>>;
+	using ThomContent = ran::ThomContent<Number>;
 	using Z3Content = std::shared_ptr<Z3Ran<Number>>;
 private:
 	using Polynomial = UnivariatePolynomial<Number>;
@@ -111,10 +112,12 @@ private:
 		if (std::holds_alternative<NumberContent>(mContent)) return;
 		if (std::visit(overloaded {
 			[](const IntervalContent& c) { return c.is_number(); },
+			[](const ThomContent& c) { return c.is_number(); },
 			[](const auto& c) { return c->is_number(); }
 		}, mContent)) {
 			switchToNR(std::visit(overloaded {
 				[](const IntervalContent& c) { return c.get_number(); },
+				[](const ThomContent& c) { return c.get_number(); },
 				[](const auto& c) { return c->get_number(); }
 			}, mContent));
 		}
@@ -145,7 +148,7 @@ public:
 	{}
 
 	explicit RealAlgebraicNumber(const ThomEncoding<Number>& te, bool isRoot = true):
-		mContent(std::make_shared<ThomEncoding<Number>>(te)),
+		mContent(std::in_place_type<ThomContent>, te),
 		mIsRoot(isRoot)
 	{
 	}
@@ -206,6 +209,7 @@ public:
 	bool isZero() const {
 		return std::visit(overloaded {
 			[](const IntervalContent& c) { return c.is_zero(); },
+			[](const ThomContent& c) { return c.is_zero(); },
 			[](const auto& c) { return c->is_zero(); }
 		}, mContent);
 	}
@@ -236,7 +240,7 @@ public:
 	}
 	const ThomEncoding<Number>& getThomEncoding() const {
 		assert(isThom());
-		return *std::get<ThomContent>(mContent);
+		return std::get<ThomContent>(mContent).thom_encoding();
 	}
 
 	bool isZ3Ran() const {
@@ -252,6 +256,7 @@ public:
 		refineToIntegrality();
 		return std::visit(overloaded {
 			[](const IntervalContent& c) { return c.is_integral(); },
+			[](const ThomContent& c) { return c.is_integral(); },
 			[](const auto& c) { return c->is_integral(); }
 		}, mContent);
 	}
@@ -260,6 +265,7 @@ public:
 		refineToIntegrality();
 		return std::visit(overloaded {
 			[](const IntervalContent& c) { return c.integer_below(); },
+			[](const ThomContent& c) { return c.integer_below(); },
 			[](const auto& c) { return c->integer_below(); }
 		}, mContent);
 	}
@@ -308,6 +314,7 @@ public:
 		return std::visit(overloaded {
 			[](const NumberContent& c) { return carl::sgn(c.value); },
 			[](const IntervalContent& c) { return c.sgn(); },
+			[](const ThomContent& c) { return c.sgn(); },
 			[](const auto& c) { return c->sgn(); }
 		}, mContent);
 	}
@@ -316,6 +323,7 @@ public:
 		return std::visit(overloaded {
 			[&p](const NumberContent& c) { return carl::sgn(p.evaluate(c.value)); },
 			[&p](const IntervalContent& c) { return c.sgn(p); },
+			[&p](const ThomContent& c) { return c.sgn(p); },
 			[&p](const auto& c) { return c->sgn(p); }
 		}, mContent);
 	}
@@ -324,6 +332,7 @@ public:
 		return std::visit(overloaded {
 			[&p](const NumberContent& c) { return carl::count_real_roots(p, Interval<Number>(c.value)) == 1; },
 			[&p](const IntervalContent& c) { return c.is_root_of(p); },
+			[&p](const ThomContent& c) { return c.sgn(p) == Sign::ZERO; },
 			[&p](const auto& c) { return c->sgn(p) == Sign::ZERO; }
 		}, mContent);
 	}
@@ -335,7 +344,8 @@ public:
 	bool containedIn(const Interval<Number>& i) const {
 		return std::visit(overloaded {
 			[&i](const NumberContent& c) { return i.contains(c.value); },
-			[&i](IntervalContent& c) { return c.containedIn(i); },
+			[&i](IntervalContent& c) { return c.contained_in(i); },
+			[&i](ThomContent& c) { return c.contained_in(i); },
 			[&i](const auto& c) { return c->containedIn(i); }
 		}, mContent);
 	}
@@ -399,6 +409,7 @@ template<typename Num>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
 	return std::visit(overloaded {
 		[&os,&ran](const ran::IntervalContent<Num>& c) -> auto& { return os << "(" << c << (ran.isRoot() ? " R" : "") << ")"; },
+		[&os,&ran](const ran::ThomContent<Num>& c) -> auto& { return os << "(" << c << (ran.isRoot() ? " R" : "") << ")"; },
 		[&os,&ran](const auto& c) -> auto& { return os << "(" << *c << (ran.isRoot() ? " R" : "") << ")"; }
 	}, ran.mContent);
 }

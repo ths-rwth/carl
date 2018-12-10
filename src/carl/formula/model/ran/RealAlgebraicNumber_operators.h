@@ -31,7 +31,7 @@ struct equal {
 		return rhs.refineAvoiding(lhs.value);
 	}
 	bool operator()(const NumberContent& lhs, const ThomContent& rhs) const {
-		return *rhs == lhs.value;
+		return rhs == lhs.value;
 	}
 	bool operator()(const NumberContent& lhs, const Z3Content& rhs) const {
 		return rhs->equal(lhs.value);
@@ -48,9 +48,7 @@ struct equal {
 	}
 
 	bool operator()(IntervalContent& lhs, IntervalContent& rhs) const {
-		return merge_if_identical(
-			lhs, rhs, lhs == rhs
-		);
+		return merge_if_identical(lhs, rhs, lhs == rhs);
 	}
 	bool operator()(IntervalContent& lhs, Z3Content& rhs) const {
 		carl::ran::IntervalContent tmp(rhs->getPolynomial(), rhs->getInterval());
@@ -62,10 +60,7 @@ struct equal {
 
 
 	bool operator()(ThomContent& lhs, ThomContent& rhs) const {
-		if (lhs.get() == rhs.get()) return true;
-		return merge_if_identical(
-			lhs, rhs, *lhs == *rhs
-		);
+		return merge_if_identical(lhs, rhs, lhs == rhs);
 	}
 
 	bool operator()(Z3Content& lhs, Z3Content& rhs) const {
@@ -111,7 +106,7 @@ struct less {
 		return lhs.value < rhs.interval().lower();
 	}
 	bool operator()(const NumberContent& lhs, const ThomContent& rhs) const {
-		return lhs.value < *rhs;
+		return lhs.value < rhs;
 	}
 	bool operator()(const NumberContent& lhs, const Z3Content& rhs) const {
 		return rhs->greater(lhs.value);
@@ -122,7 +117,7 @@ struct less {
 		return lhs.interval().upper() < rhs.value;
 	}
 	bool operator()(const ThomContent& lhs, const NumberContent& rhs) const {
-		return *lhs < rhs.value;
+		return lhs < rhs.value;
 	}
 	bool operator()(const Z3Content& lhs, const NumberContent& rhs) const {
 		return lhs->less(rhs.value);
@@ -142,8 +137,7 @@ struct less {
 
 
 	bool operator()(ThomContent& lhs, ThomContent& rhs) const {
-		if (lhs.get() == rhs.get()) return false;
-		return *lhs < *rhs;
+		return lhs < rhs;
 	}
 
 	bool operator()(Z3Content& lhs, Z3Content& rhs) const {
