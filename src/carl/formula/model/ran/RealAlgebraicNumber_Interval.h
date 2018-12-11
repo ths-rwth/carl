@@ -94,13 +94,6 @@ namespace ran {
 		bool is_zero() const {
 			return carl::isZero(interval());
 		}
-		bool is_number() const {
-			return interval().isPointInterval();
-		}
-		const auto& get_number() const {
-			assert(is_number());
-			return interval().lower();
-		}
 		bool is_integral() const {
 			return interval().isPointInterval() && carl::isInteger(interval().lower());
 		}
@@ -238,6 +231,54 @@ namespace ran {
 			}
 		}
 	};
+
+
+template<typename Number>
+const auto& get_number(const IntervalContent<Number>& n) {
+	assert(is_number(n));
+	return n.interval().lower();
+}
+
+template<typename Number>
+bool is_number(const IntervalContent<Number>& n) {
+	return n.interval().isPointInterval();
+}
+
+
+template<typename Number>
+Number sample_above(const IntervalContent<Number>& n) {
+	return carl::floor(n.interval().upper()) + 1;
+}
+template<typename Number>
+Number sample_below(const IntervalContent<Number>& n) {
+	return carl::ceil(n.interval().lower()) - 1;
+}
+template<typename Number>
+Number sample_between(IntervalContent<Number>& lower, IntervalContent<Number>& upper) {
+	lower.refineAvoiding(upper.interval().lower());
+	upper.refineAvoiding(lower.interval().upper());
+	while (lower.interval().upper() >= upper.interval().lower()) {
+		lower.refine();
+		upper.refine();
+	}
+	return sample_between(NumberContent<Number>(lower.interval().upper()), NumberContent<Number>(upper.interval().lower()));
+}
+template<typename Number>
+Number sample_between(IntervalContent<Number>& lower, const NumberContent<Number>& upper) {
+	lower.refineAvoiding(upper.value());
+	while (lower.interval().upper() >= upper.value()) {
+		lower.refine();
+	}
+	return sample_between(NumberContent<Number>(lower.interval().upper()), upper);
+}
+template<typename Number>
+Number sample_between(const NumberContent<Number>& lower, IntervalContent<Number>& upper) {
+	upper.refineAvoiding(lower.value());
+	while (lower.value() >= upper.interval().lower()) {
+		upper.refine();
+	}
+	return sample_between(lower, NumberContent<Number>(upper.interval().lower()));
+}
 
 template<typename Number>
 bool operator==(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {

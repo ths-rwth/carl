@@ -20,21 +20,20 @@ struct equal {
 	bool operator()(const T1& lhs, const T2& rhs) const {
 		CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << lhs << " == " << rhs);
 		CARL_LOG_ERROR("carl.ran", "Types: " << typeid(T1).name() << " and " << typeid(T2).name());
-		CARL_LOG_ERROR("carl.ran", "Interval: " << typeid(IntervalContent).name());
 		return false;
 	}
 
 	bool operator()(const NumberContent& lhs, const NumberContent& rhs) const {
-		return lhs.value == rhs.value;
+		return lhs.value() == rhs.value();
 	}
 	bool operator()(const NumberContent& lhs, IntervalContent& rhs) const {
-		return rhs.refineAvoiding(lhs.value);
+		return rhs.refineAvoiding(lhs.value());
 	}
 	bool operator()(const NumberContent& lhs, const ThomContent& rhs) const {
-		return rhs == lhs.value;
+		return rhs == lhs.value();
 	}
 	bool operator()(const NumberContent& lhs, const Z3Content& rhs) const {
-		return rhs->equal(lhs.value);
+		return rhs == lhs.value();
 	}
 
 	bool operator()(const IntervalContent& lhs, const NumberContent& rhs) const {
@@ -51,7 +50,7 @@ struct equal {
 		return merge_if_identical(lhs, rhs, lhs == rhs);
 	}
 	bool operator()(IntervalContent& lhs, Z3Content& rhs) const {
-		carl::ran::IntervalContent tmp(rhs->getPolynomial(), rhs->getInterval());
+		carl::ran::IntervalContent tmp(rhs.polynomial(), rhs.interval());
 		return lhs == tmp;
 	}
 	bool operator()(Z3Content& lhs, IntervalContent& rhs) const {
@@ -64,10 +63,7 @@ struct equal {
 	}
 
 	bool operator()(Z3Content& lhs, Z3Content& rhs) const {
-		if (lhs.get() == rhs.get()) return true;
-		return merge_if_identical(
-			lhs, rhs, lhs->equal(*rhs)
-		);
+		return merge_if_identical(lhs, rhs, lhs == rhs);
 	}
 
 	bool operator()(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) const {
@@ -94,44 +90,43 @@ struct less {
 	bool operator()(const T1& lhs, const T2& rhs) const {
 		CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << lhs << " < " << rhs);
 		CARL_LOG_ERROR("carl.ran", "Types: " << typeid(T1).name() << " and " << typeid(T2).name());
-		CARL_LOG_ERROR("carl.ran", "Interval: " << typeid(IntervalContent).name());
 		return false;
 	}
 
 	bool operator()(const NumberContent& lhs, const NumberContent& rhs) const {
-		return lhs.value < rhs.value;
+		return lhs.value() < rhs.value();
 	}
 	bool operator()(const NumberContent& lhs, IntervalContent& rhs) const {
-		if (rhs.refineAvoiding(lhs.value)) return false;
-		return lhs.value < rhs.interval().lower();
+		if (rhs.refineAvoiding(lhs.value())) return false;
+		return lhs.value() < rhs.interval().lower();
 	}
 	bool operator()(const NumberContent& lhs, const ThomContent& rhs) const {
-		return lhs.value < rhs;
+		return lhs.value() < rhs;
 	}
 	bool operator()(const NumberContent& lhs, const Z3Content& rhs) const {
-		return rhs->greater(lhs.value);
+		return lhs.value() < rhs;
 	}
 
 	bool operator()(IntervalContent& lhs, const NumberContent& rhs) const {
-		if (lhs.refineAvoiding(rhs.value)) return false;
-		return lhs.interval().upper() < rhs.value;
+		if (lhs.refineAvoiding(rhs.value())) return false;
+		return lhs.interval().upper() < rhs.value();
 	}
 	bool operator()(const ThomContent& lhs, const NumberContent& rhs) const {
-		return lhs < rhs.value;
+		return lhs < rhs.value();
 	}
 	bool operator()(const Z3Content& lhs, const NumberContent& rhs) const {
-		return lhs->less(rhs.value);
+		return lhs < rhs.value();
 	}
 
 	bool operator()(IntervalContent& lhs, IntervalContent& rhs) const {
 		return lhs < rhs;
 	}
 	bool operator()(IntervalContent& lhs, Z3Content& rhs) const {
-		carl::ran::IntervalContent tmp(rhs->getPolynomial(), rhs->getInterval());
+		carl::ran::IntervalContent tmp(rhs.polynomial(), rhs.interval());
 		return (*this)(lhs, tmp);
 	}
 	bool operator()(Z3Content& lhs, IntervalContent& rhs) const {
-		carl::ran::IntervalContent tmp(lhs->getPolynomial(), lhs->getInterval());
+		carl::ran::IntervalContent tmp(lhs.polynomial(), lhs.interval());
 		return (*this)(tmp, rhs);
 	}
 
@@ -141,8 +136,7 @@ struct less {
 	}
 
 	bool operator()(Z3Content& lhs, Z3Content& rhs) const {
-		if (lhs.get() == rhs.get()) return false;
-		return lhs->less(*rhs);
+		return lhs < rhs;
 	}
 
 	bool operator()(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) const {

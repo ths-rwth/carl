@@ -48,19 +48,13 @@ public:
 	}
 
 	std::size_t size() const {
-		return thom_encoding().size();
+		return thom_encoding().dimension();
 	}
 
 	std::size_t dimension() const {
 		return thom_encoding().dimension();
 	}
 
-	bool is_number() const {
-		return thom_encoding().is_number();
-	}
-	const Number& get_number() const {
-		return thom_encoding().get_number();
-	}
 	bool is_integral() const {
 		return thom_encoding().is_integral();
 	}
@@ -81,6 +75,37 @@ public:
 		return thom_encoding().sgn(p);
 	}
 };
+
+template<typename Number>
+const Number& get_number(const ThomContent<Number>& n) {
+	return n.thom_encoding().get_number();
+}
+
+template<typename Number>
+bool is_number(const ThomContent<Number>& n) {
+	return n.thom_encoding().is_number();
+}
+
+template<typename Number>
+ThomContent<Number> sample_above(const ThomContent<Number>& n) {
+	return n.thom_encoding() + Number(1);
+}
+template<typename Number>
+ThomContent<Number> sample_below(const ThomContent<Number>& n) {
+	return n.thom_encoding() + Number(-1);
+}
+template<typename Number>
+ThomContent<Number> sample_between(const ThomContent<Number>& lower, const ThomContent<Number>& upper) {
+	return ThomEncoding<Number>::intermediatePoint(lower.thom_encoding(), upper.thom_encoding());
+}
+template<typename Number>
+Number sample_between(const ThomContent<Number>& lower, const NumberContent<Number>& upper) {
+	return ThomEncoding<Number>::intermediatePoint(lower.thom_encoding(), upper.value());
+}
+template<typename Number>
+Number sample_between(const NumberContent<Number>& lower, const ThomContent<Number>& upper) {
+	return ThomEncoding<Number>::intermediatePoint(lower.value(), upper.thom_encoding());
+}
 
 template<typename Number>
 bool operator==(const ThomContent<Number>& lhs, const ThomContent<Number>& rhs) {

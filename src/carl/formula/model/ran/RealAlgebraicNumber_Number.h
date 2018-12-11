@@ -5,46 +5,68 @@ namespace ran {
 
 template<typename Number>
 struct NumberContent {
-	Number value = carl::constant_zero<Number>::get();
+	Number mContent = carl::constant_zero<Number>::get();
 
-	NumberContent* operator->() {
-		return this;
-	}
-	const NumberContent* operator->() const {
-		return this;
-	}
-	NumberContent& operator*() {
-		return *this;
-	}
-	const NumberContent& operator*() const {
-		return *this;
+public:
+
+	NumberContent() {}
+	NumberContent(const Number& n): mContent(n) {}
+
+	const auto& value() const {
+		return mContent;
 	}
 
 	std::size_t size() const {
-		return carl::bitsize(value);
+		return carl::bitsize(value());
 	}
 
-	bool is_number() const {
-		return true;
-	}
-	const Number& get_number() const {
-		return value;
-	}
 	bool is_integral() const {
-		return carl::isInteger(value);
+		return carl::isInteger(value());
 	}
 	bool is_zero() const {
-		return carl::isZero(value);
+		return carl::isZero(value());
+	}
+	bool contained_in(const Interval<Number>& i) const {
+		return i.contains(value());
 	}
 
 	Number integer_below() const {
-		return carl::floor(value);
+		return carl::floor(value());
+	}
+	Sign sgn() const {
+		return carl::sgn(value());
+	}
+	Sign sgn(const UnivariatePolynomial<Number>& p) const {
+		return carl::sgn(p.evaluate(value()));
 	}
 };
 
+template<typename Number>
+const Number& get_number(const NumberContent<Number>& n) {
+	return n.value();
+}
+
+template<typename Number>
+bool is_number(const NumberContent<Number>&) {
+	return true;
+}
+
+template<typename Number>
+Number sample_above(const NumberContent<Number>& n) {
+	return carl::floor(n.value()) + 1;
+}
+template<typename Number>
+Number sample_below(const NumberContent<Number>& n) {
+	return carl::ceil(n.value()) - 1;
+}
+template<typename Number>
+Number sample_between(const NumberContent<Number>& lower, const NumberContent<Number>& upper) {
+	return sample(Interval<Number>(lower.value(), upper.value()), false);
+}
+
 template<typename Num>
 std::ostream& operator<<(std::ostream& os, const NumberContent<Num>& ran) {
-	return os << "NR " << ran.value;
+	return os << "NR " << ran.value();
 }
 
 }

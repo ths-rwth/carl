@@ -5,12 +5,12 @@
 namespace carl {
 
 template<typename Number>
-RealAlgebraicNumber<Number> sampleBelowZ3(const RealAlgebraicNumber<Number>& n);
+Z3Ran<Number> sampleBelowZ3(const Z3Ran<Number>& n);
 
 template<typename Number>
-RealAlgebraicNumber<Number> sampleBetweenZ3(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper);
+Z3Ran<Number> sampleBetweenZ3(const Z3Ran<Number>& lower, const Z3Ran<Number>& upper);
 
 template<typename Number>
-RealAlgebraicNumber<Number> sampleAboveZ3(const RealAlgebraicNumber<Number>& n);
+Z3Ran<Number> sampleAboveZ3(const Z3Ran<Number>& n);
 
 }
