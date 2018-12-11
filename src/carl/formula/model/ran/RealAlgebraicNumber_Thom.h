@@ -77,6 +77,55 @@ public:
 };
 
 template<typename Number>
+Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, ThomContent<Number>>& m) {
+	//using Polynomial = MultivariatePolynomial<Number>;
+	
+	CARL_LOG_INFO("carl.ran.thom",
+			"\n****************************\n"
+			<< "Thom evaluate\n"
+			<< "****************************\n"
+			<< "p = " << p << "\n"
+			<< "m = " << m << "\n"
+			<< "****************************\n");
+	for(const auto& entry : m) { 
+		assert(entry.first == entry.second.thom_encoding().mainVar());
+	}
+	assert(m.size() > 0);
+	
+	std::map<Variable, ThomContent<Number>>& m_prime(m);
+	auto it = m_prime.begin();
+	while(it != m_prime.end()) {
+			if(!p.has(it->first)) {
+					CARL_LOG_TRACE("carl.thom.evaluation", "removing " << it->first);
+					it = m_prime.erase(it);
+			} else {
+					it++;
+			}
+	}
+	
+	std::map<Variable, ThomEncoding<Number>> mTE;
+	for(const auto& entry : m_prime) {
+			mTE.insert(std::make_pair(entry.first, entry.second.thom_encoding()));
+	}
+	
+	CARL_LOG_ASSERT("carl.thom.evaluation", p.gatherVariables().size() == mTE.size(), "p = " << p << ", mTE = " << mTE);
+	
+	if(mTE.size() == 1) {
+			int sgn = int(mTE.begin()->second.signOnPolynomial(p));
+			CARL_LOG_TRACE("carl.thom.evaluation", "sign of evaluated polynomial is " << sgn);
+			return Number(sgn);
+	}
+	
+	CARL_LOG_TRACE("carl.thom.evaluation", "mTE = " << mTE);
+	
+	ThomEncoding<Number> point = ThomEncoding<Number>::analyzeTEMap(mTE);
+	int sgn = int(point.signOnPolynomial(p));
+	CARL_LOG_TRACE("carl.thom.", "sign of evaluated polynomial is " << sgn);
+	return Number(sgn);
+	
+}
+
+template<typename Number>
 const Number& get_number(const ThomContent<Number>& n) {
 	return n.thom_encoding().get_number();
 }

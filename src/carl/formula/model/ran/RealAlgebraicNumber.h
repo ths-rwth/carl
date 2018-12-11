@@ -40,7 +40,6 @@
 
 #include "RealAlgebraicNumberSettings.h"
 
-#include "../../../thom/ThomEncoding.h"
 #include "RealAlgebraicNumber_Number.h"
 #include "RealAlgebraicNumber_Interval.h"
 #include "RealAlgebraicNumber_Thom.h"

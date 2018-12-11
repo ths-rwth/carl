@@ -67,6 +67,10 @@ public:
 	}
 };
 
+template<typename Number>
+Z3Content<Number> evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable, Z3Content<Number>>& m) {
+	return evaluateZ3(p, m);
+}
 
 template<typename Number>
 Number get_number(const Z3Content<Number>& n) {

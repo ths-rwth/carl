@@ -1,10 +1,12 @@
 #pragma once
 
 #include "../../../core/UnivariatePolynomial.h"
+#include "../../../core/polynomialfunctions/Resultant.h"
 #include "../../../core/polynomialfunctions/RootCounting.h"
 #include "../../../core/polynomialfunctions/SturmSequence.h"
 
 #include "../../../interval/Interval.h"
+#include "../../../interval/IntervalEvaluation.h"
 
 #include <list>
 
@@ -33,12 +35,16 @@ namespace ran {
 			{}
 		};
 
-		std::shared_ptr<Content> mContent;
+		mutable std::shared_ptr<Content> mContent;
 
 		static Polynomial replaceVariable(const Polynomial& p) {
 			return p.replaceVariable(auxVariable);
 		}
 	public:
+
+		IntervalContent():
+			IntervalContent(Polynomial(auxVariable, {0, 1}), Interval<Number>(0))
+		{}
 		
 		IntervalContent(
 			const Polynomial& p,
@@ -53,9 +59,10 @@ namespace ran {
 		):
 			mContent(std::make_shared<Content>(replaceVariable(p), i, std::move(seq)))
 		{
+			CARL_LOG_DEBUG("carl.ran.ir", "Creating " << *this);
 			assert(!carl::isZero(polynomial()) && polynomial().degree() > 0);
 			assert(interval().isOpenInterval() || interval().isPointInterval());
-			assert(count_real_roots(polynomial(), interval()) == 1);
+			assert(interval().isPointInterval() || count_real_roots(polynomial(), interval()) == 1);
 			if (polynomial().degree() == 1) {
 				Number a = polynomial().coefficients()[1];
 				Number b = polynomial().coefficients()[0];
@@ -66,28 +73,16 @@ namespace ran {
 			}
 		}
 
-		auto& polynomial() {
+		auto& polynomial() const {
 			return mContent->polynomial;
 		}
-		const auto& polynomial() const {
-			return mContent->polynomial;
-		}
-		auto& interval() {
+		auto& interval() const {
 			return mContent->interval;
 		}
-		const auto& interval() const {
-			return mContent->interval;
-		}
-		auto& sturm_sequence() {
+		auto& sturm_sequence() const {
 			return mContent->sturmSequence;
 		}
-		const auto& sturm_sequence() const {
-			return mContent->sturmSequence;
-		}
-		auto& refinementCount() {
-			return mContent->refinementCount;
-		}
-		const auto& refinementCount() const {
+		auto& refinementCount() const {
 			return mContent->refinementCount;
 		}
 
@@ -113,7 +108,7 @@ namespace ran {
 			return interval().isPointInterval() && carl::isInteger(interval().lower());
 		}
 		
-		void setPolynomial(const Polynomial& p) {
+		void setPolynomial(const Polynomial& p) const {
 			polynomial() = replaceVariable(p);
 			sturm_sequence() = carl::sturm_sequence(polynomial());
 		}
@@ -148,7 +143,7 @@ namespace ran {
 			return i.contains(interval());
 		}
 		
-		void refine() {
+		void refine() const {
 			Number pivot = carl::sample(interval());
 			assert(interval().contains(pivot));
 			if (polynomial().isRoot(pivot)) {
@@ -170,7 +165,7 @@ namespace ran {
 		 * @scomplexity constant
 		 * @return true, if n is the exact numeric representation of this root, otherwise false
 		 */
-		bool refineAvoiding(const Number& n) {
+		bool refineAvoiding(const Number& n) const {
 			if (interval().contains(n)) {
 				if (polynomial().isRoot(n)) {
 					interval() = Interval<Number>(n, n);
@@ -230,8 +225,121 @@ namespace ran {
 				refine();
 			}
 		}
+
+
+		void simplifyByPolynomial(Variable var, const MultivariatePolynomial<Number>& poly) const {
+			UnivariatePolynomial<Number> irp(var, polynomial().template convert<Number>().coefficients());
+			CARL_LOG_DEBUG("carl.ran", "gcd(" << irp << ", " << poly << ")");
+			auto gmv = carl::gcd(MultivariatePolynomial<Number>(irp), poly);
+			CARL_LOG_DEBUG("carl.ran", "Simplyfing, gcd = " << gmv);
+			if (carl::isOne(gmv)) return;
+			auto g = gmv.toUnivariatePolynomial();
+			if (is_root_of(g)) {
+				CARL_LOG_DEBUG("carl.ran", "Is a root of " << g);
+				setPolynomial(g);
+			} else {
+				CARL_LOG_DEBUG("carl.ran", "Is not a root of " << g);
+				CARL_LOG_DEBUG("carl.ran", "Dividing " << polynomial() << " by " << g);
+				setPolynomial(polynomial().divideBy(g.replaceVariable(auxVariable)).quotient);
+			}
+		}
 	};
 
+template<typename Number, typename Coeff>
+UnivariatePolynomial<Number> evaluatePolynomial(
+		const UnivariatePolynomial<Coeff>& p,
+		const std::map<Variable, IntervalContent<Number>>& m,
+		std::map<Variable, Interval<Number>>& varToInterval
+) {
+	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
+	Variable v = p.mainVar();
+	UnivariatePolynomial<Coeff> tmp = p;
+	for (const auto& i: m) {
+		if (!tmp.has(i.first)) {
+			if (p.has(i.first)) {
+				CARL_LOG_DEBUG("carl.ran", i.first << " vanished from " << tmp << " but was present in " << p);
+				if (!is_number(i.second)) {
+					// Variable vanished, add it to varToInterval
+					varToInterval[i.first] = i.second.interval();
+				}
+			}
+			continue;
+		}
+		if (is_number(i.second)) {
+			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
+			tmp.substituteIn(i.first, Coeff(get_number(i.second)));
+		} else {
+			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
+			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
+			UnivariatePolynomial<Coeff> p2(i.first, i.second.polynomial().template convert<Coeff>().coefficients());
+			CARL_LOG_DEBUG("carl.ran", "Simplifying " << tmp.switchVariable(i.first) << " with " << p2);
+			tmp = tmp.switchVariable(i.first).prem(p2);
+			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp);
+			tmp = carl::resultant(tmp, p2);
+			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
+			varToInterval[i.first] = i.second.interval();
+		}
+		CARL_LOG_DEBUG("carl.ran", "Substituted " << i.first << " -> " << i.second << ", result: " << tmp);
+	}
+	CARL_LOG_DEBUG("carl.ran", "Result: " << tmp.switchVariable(v).toNumberCoefficients());
+	return tmp.switchVariable(v).toNumberCoefficients();
+}
+
+/**
+ * Evaluate the given polynomial with the given values for the variables.
+ * Asserts that all variables of p have an assignment in m and that m has no additional assignments.
+ *
+ * @param p Polynomial to be evaluated
+ * @param m Variable assignment
+ * @return Evaluation result
+ */
+template<typename Number>
+IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable, IntervalContent<Number>>& m) {
+	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
+	assert(m.size() > 0);
+	auto poly = p.toUnivariatePolynomial(m.begin()->first);
+	if (m.size() == 1 && m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
+		CARL_LOG_DEBUG("carl.ran", "Returning " << IntervalContent<Number>());
+		return IntervalContent<Number>();
+	}
+	Variable v = freshRealVariable();
+	// compute the result polynomial and the initial result interval
+	std::map<Variable, Interval<Number>> varToInterval;
+	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m, varToInterval);
+	assert(!varToInterval.empty());
+	poly = p.toUnivariatePolynomial(varToInterval.begin()->first);
+	CARL_LOG_DEBUG("carl.ran", "res = " << res);
+	CARL_LOG_DEBUG("carl.ran", "varToInterval = " << varToInterval);
+	CARL_LOG_DEBUG("carl.ran", "poly = " << poly);
+	Interval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
+	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
+
+	auto sturmSeq = sturm_sequence(res);
+	// the interval should include at least one root.
+	assert(!carl::isZero(res));
+	assert(
+		res.sgn(interval.lower()) == Sign::ZERO ||
+		res.sgn(interval.upper()) == Sign::ZERO ||
+		count_real_roots(sturmSeq, interval) >= 1
+	);
+	while (
+		res.sgn(interval.lower()) == Sign::ZERO ||
+		res.sgn(interval.upper()) == Sign::ZERO ||
+		count_real_roots(sturmSeq, interval) != 1) {
+		// refine the result interval until it isolates exactly one real root of the result polynomial
+		for (auto it = m.begin(); it != m.end(); it++) {
+			it->second.refine();
+			if (is_number(it->second)) {
+				return evaluate(p, m);
+			} else {
+				varToInterval[it->first] = it->second.interval();
+			}
+		}
+		interval = IntervalEvaluation::evaluate(poly, varToInterval);
+	}
+	CARL_LOG_DEBUG("carl.ran", "Result is " << IntervalContent<Number>(res, interval));
+	return IntervalContent<Number>(res, interval, std::move(sturmSeq));
+}
 
 template<typename Number>
 const auto& get_number(const IntervalContent<Number>& n) {

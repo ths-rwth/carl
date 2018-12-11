@@ -42,6 +42,11 @@ public:
 };
 
 template<typename Number>
+NumberContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable, NumberContent<Number>>& m) {
+	return m.begin()->second;
+}
+
+template<typename Number>
 const Number& get_number(const NumberContent<Number>& n) {
 	return n.value();
 }

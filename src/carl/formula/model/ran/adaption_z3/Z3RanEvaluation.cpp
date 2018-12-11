@@ -4,6 +4,7 @@
 
 #include "Z3RanEvaluation.h"
 #include "Z3RanContent.h"
+#include "../RealAlgebraicNumber_Z3.h"
 
 namespace carl {
 
@@ -23,6 +24,23 @@ namespace carl {
     }
 
     template RealAlgebraicNumber<mpq_class> evaluateZ3(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, RealAlgebraicNumber<mpq_class>>& evalMap);
+
+
+    template<typename Number>
+    ran::Z3Content<Number> evaluateZ3(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, ran::Z3Content<Number>>& evalMap) {
+        polynomial::polynomial_ref poly = z3().toZ3IntCoeff(polynomial);
+        algebraic_numbers::anum res;
+        nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
+        for(auto const &pair : evalMap) {
+            polynomial::var var = z3().toZ3(pair.first);
+            const algebraic_numbers::anum& val = pair.second.z3_ran().content();
+            map.set(var, val);
+        }
+        z3().polyMan().eval(poly.get(), map, res);
+        return ran::Z3Content<Number>(Z3Ran<Number>(std::move(res)));
+    }
+
+    template ran::Z3Content<mpq_class> evaluateZ3(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, ran::Z3Content<mpq_class>>& evalMap);
 
 }
 

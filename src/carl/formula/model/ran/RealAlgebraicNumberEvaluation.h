@@ -25,10 +25,33 @@
 #include "adaption_z3/Z3RanEvaluation.h"
 
 namespace carl {
+
 namespace RealAlgebraicNumberEvaluation {
 
 template <typename Number>
 using RANMap = std::map<Variable, RealAlgebraicNumber<Number>>;
+
+namespace detail {
+	template<typename Tag, typename F, typename Number>
+	auto overload_on_map(Tag, F&& f, const RANMap<Number>& map) {
+		std::map<Variable, Tag> tmp;
+		for (const auto& m: map) {
+			tmp.emplace(m.first, std::get<Tag>(m.second.content()));
+		}
+		return f(tmp);
+	}
+}
+
+template<typename F, typename Number>
+auto overload_on_map(F&& f, const RANMap<Number>& map) {
+	assert(!map.empty());
+	return std::visit(
+		[&f, &map](const auto& tag){
+			return RealAlgebraicNumber<Number>(detail::overload_on_map(tag, std::forward<F>(f), map));
+		},
+		map.begin()->second.content()
+	);
+}
 
 /**
  * Evaluate the given polynomial 'p' at the given 'point' based on the variable order given by 'variables'.
@@ -141,6 +164,12 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, co
 	}
 
 	// need to evaluate polynomial on non-trivial RANs
+
+	return overload_on_map(
+		[&pol](auto& map){ return RealAlgebraicNumber<Number>(ran::evaluate(pol, map)); },
+		IRmap
+	);
+
 	assert(IRmap.size() > 0);
 	if(IRmap.begin()->second.isInterval()) {
 		return evaluateIR(pol, IRmap);
