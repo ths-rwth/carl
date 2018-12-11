@@ -44,7 +44,6 @@
 #include "RealAlgebraicNumber_Interval.h"
 #include "RealAlgebraicNumber_Thom.h"
 #include "RealAlgebraicNumber_Z3.h"
-#include "adaption_z3/Z3Ran.h"
 #include "../../../numbers/config.h"
 
 namespace carl {

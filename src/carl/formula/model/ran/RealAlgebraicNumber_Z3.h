@@ -1,7 +1,7 @@
 #pragma once
 
-#include "adaption_z3/Z3Ran.h"
-#include "adaption_z3/Z3RanOperations.h"
+#include "z3/Z3Ran.h"
+#include "z3/Z3RanOperations.h"
 
 #include <memory>
 
@@ -66,6 +66,13 @@ public:
 		return z3_ran().sgn(p);
 	}
 };
+}
+}
+
+#include "z3/Z3RanEvaluation.h"
+
+namespace carl {
+namespace ran {
 
 template<typename Number>
 Z3Content<Number> evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable, Z3Content<Number>>& m) {

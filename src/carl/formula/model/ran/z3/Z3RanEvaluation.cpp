@@ -7,7 +7,7 @@
 #include "../RealAlgebraicNumber_Z3.h"
 
 namespace carl {
-
+/*
     template<typename Number>
     RealAlgebraicNumber<Number> evaluateZ3(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, RealAlgebraicNumber<Number>>& evalMap) {
         polynomial::polynomial_ref poly = z3().toZ3IntCoeff(polynomial);
@@ -24,7 +24,7 @@ namespace carl {
     }
 
     template RealAlgebraicNumber<mpq_class> evaluateZ3(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, RealAlgebraicNumber<mpq_class>>& evalMap);
-
+*/
 
     template<typename Number>
     ran::Z3Content<Number> evaluateZ3(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, ran::Z3Content<Number>>& evalMap) {

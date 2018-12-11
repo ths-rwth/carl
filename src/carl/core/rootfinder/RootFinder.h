@@ -13,7 +13,7 @@
 #include <list>
 #include <map>
 
-#include "../../formula/model/ran/adaption_z3/Z3RanRootFinder.h"
+#include "../../formula/model/ran/z3/Z3RanRootFinder.h"
 
 namespace carl {
 namespace rootfinder {
