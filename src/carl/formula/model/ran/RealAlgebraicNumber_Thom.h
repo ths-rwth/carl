@@ -77,6 +77,11 @@ public:
 };
 
 template<typename Number>
+Number branching_point(const ThomContent<Number>& n) {
+	return n.thom_encoding().get_number();
+}
+
+template<typename Number>
 Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, ThomContent<Number>>& m) {
 	//using Polynomial = MultivariatePolynomial<Number>;
 	
@@ -126,8 +131,24 @@ Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, Thom
 }
 
 template<typename Number>
+ThomContent<Number> abs(const ThomContent<Number>& n) {
+	assert(false);
+	return n;
+}
+
+template<typename Number>
+Interval<Number> get_interval(const ThomContent<Number>& n) {
+	return Interval<Number>(n.thom_encoding().get_number());
+}
+
+template<typename Number>
 const Number& get_number(const ThomContent<Number>& n) {
 	return n.thom_encoding().get_number();
+}
+
+template<typename Number>
+UnivariatePolynomial<Number> get_polynomial(const ThomContent<Number>& n) {
+	return UnivariatePolynomial<Number>(Variable::NO_VARIABLE);
 }
 
 template<typename Number>
@@ -163,8 +184,13 @@ bool operator==(const ThomContent<Number>& lhs, const ThomContent<Number>& rhs) 
 }
 
 template<typename Number>
-bool operator==(const ThomContent<Number>& lhs, const Number& rhs) {
-	return lhs.thom_encoding() == rhs;
+bool operator==(const ThomContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return lhs.thom_encoding() == rhs.value();
+}
+
+template<typename Number>
+bool operator==(const NumberContent<Number>& lhs, const ThomContent<Number>& rhs) {
+	return lhs.value() == rhs.thom_encoding();
 }
 
 template<typename Number>
@@ -174,12 +200,13 @@ bool operator<(const ThomContent<Number>& lhs, const ThomContent<Number>& rhs) {
 }
 
 template<typename Number>
-bool operator<(const ThomContent<Number>& lhs, const Number& rhs) {
-	return lhs.thom_encoding() < rhs;
+bool operator<(const ThomContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return lhs.thom_encoding() == rhs.value();
 }
+
 template<typename Number>
-bool operator<(const Number& lhs, const ThomContent<Number>& rhs) {
-	return lhs < rhs.thom_encoding();
+bool operator<(const NumberContent<Number>& lhs, const ThomContent<Number>& rhs) {
+	return lhs.value() == rhs.thom_encoding();
 }
 
 template<typename Num>

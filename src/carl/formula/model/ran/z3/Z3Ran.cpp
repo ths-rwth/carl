@@ -1,8 +1,9 @@
+#include "Z3Ran.h"
+
+#ifdef RAN_USE_Z3
+
 #include "../../../../converter/Z3Converter.h"
 
-#ifdef USE_Z3_RANS
-
-#include "Z3Ran.h"
 #include "Z3RanContent.h"
 
 namespace carl {

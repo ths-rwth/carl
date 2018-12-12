@@ -10,8 +10,6 @@
 #include "../../../numbers/numbers.h"
 #include "RealAlgebraicNumber.h"
 
-#include "z3/Z3RanOperations.h"
-
 namespace carl {
 	template<typename Number>
 	inline bool isZero(const RealAlgebraicNumber<Number>& n) {

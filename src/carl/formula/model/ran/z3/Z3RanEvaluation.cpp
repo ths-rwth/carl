@@ -1,8 +1,9 @@
+#include "Z3RanEvaluation.h"
+
+#ifdef RAN_USE_Z3
+
 #include "../../../../converter/Z3Converter.h"
 
-#ifdef USE_Z3_RANS
-
-#include "Z3RanEvaluation.h"
 #include "Z3RanContent.h"
 #include "../RealAlgebraicNumber_Z3.h"
 

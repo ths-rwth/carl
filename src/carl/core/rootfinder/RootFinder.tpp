@@ -26,7 +26,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
-	#ifdef USE_Z3_RANS
+	#ifdef RAN_USE_Z3
 	return realRootsZ3(poly, varToRANMap, interval);
 	#endif
 

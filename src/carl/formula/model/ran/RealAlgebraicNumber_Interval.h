@@ -245,6 +245,18 @@ namespace ran {
 		}
 	};
 
+template<typename Number>
+IntervalContent<Number> abs(const IntervalContent<Number>& n) {
+	n.refineAvoiding(constant_zero<Number>::get());
+	if (n.interval().isPositive()) return n;
+	return IntervalContent<Number>(n.polynomial().negateVariable(), n.interval().abs());
+}
+
+template<typename Number>
+const Number& branching_point(const IntervalContent<Number>& n) {
+	return carl::sample(n.interval());
+}
+
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluatePolynomial(
 		const UnivariatePolynomial<Coeff>& p,
@@ -342,16 +354,25 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 }
 
 template<typename Number>
+const Interval<Number>& get_interval(const IntervalContent<Number>& n) {
+	return n.interval();
+}
+
+template<typename Number>
 const auto& get_number(const IntervalContent<Number>& n) {
 	assert(is_number(n));
 	return n.interval().lower();
 }
 
 template<typename Number>
+const UnivariatePolynomial<Number>& get_polynomial(const IntervalContent<Number>& n) {
+	return n.polynomial();
+}
+
+template<typename Number>
 bool is_number(const IntervalContent<Number>& n) {
 	return n.interval().isPointInterval();
 }
-
 
 template<typename Number>
 Number sample_above(const IntervalContent<Number>& n) {
@@ -395,12 +416,18 @@ bool operator==(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
 	if (lhs.interval().lower() > rhs.interval().upper()) return false;
 	if (lhs.polynomial() == rhs.polynomial()) {
 		if (lhs.interval().lower() <= rhs.interval().lower()) {
-			if (rhs.interval().upper() <= lhs.interval().upper()) return true;
+			if (rhs.interval().upper() <= lhs.interval().upper()) {
+				rhs = lhs;
+				return true;
+			}
 			lhs.refineAvoiding(rhs.interval().lower());
 			rhs.refineAvoiding(lhs.interval().upper());
 		} else {
 			assert(rhs.interval().lower() <= lhs.interval().lower());
-			if (lhs.interval().upper() <= rhs.interval().upper()) return true;
+			if (lhs.interval().upper() <= rhs.interval().upper()) {
+				rhs = lhs;
+				return true;
+			}
 			lhs.refineAvoiding(rhs.interval().upper());
 			rhs.refineAvoiding(lhs.interval().lower());
 		}
@@ -426,6 +453,16 @@ bool operator==(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
 }
 
 template<typename Number>
+bool operator==(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return lhs.refineAvoiding(rhs.value());
+}
+
+template<typename Number>
+bool operator==(const NumberContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return rhs == lhs;
+}
+
+template<typename Number>
 bool operator<(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
 	if (lhs == rhs) return false;
 	while (true) {
@@ -438,12 +475,25 @@ bool operator<(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
 	}
 }
 
+template<typename Number>
+bool operator<(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	if (lhs.refineAvoiding(rhs.value())) return false;
+		return lhs.interval().upper() < rhs.value();
+}
+
+template<typename Number>
+bool operator<(const NumberContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	if (rhs.refineAvoiding(lhs.value())) return false;
+	return lhs.value() < rhs.interval().lower();
+}
+
 template<typename Num>
 std::ostream& operator<<(std::ostream& os, const IntervalContent<Num>& ran) {
 	return os << "IR " << ran.interval() << ", " << ran.polynomial();
 }
 
-	template<typename Number>
-	const Variable IntervalContent<Number>::auxVariable = freshRealVariable("__r");
+template<typename Number>
+const Variable IntervalContent<Number>::auxVariable = freshRealVariable("__r");
+
 }
 }

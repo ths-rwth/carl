@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../RealAlgebraicNumber.h"
+#include "Z3Ran.h"
+
+#ifdef RAN_USE_Z3
 
 namespace carl {
 
@@ -14,3 +16,5 @@ template<typename Number>
 Z3Ran<Number> sampleAboveZ3(const Z3Ran<Number>& n);
 
 }
+
+#endif

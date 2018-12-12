@@ -42,15 +42,17 @@
 
 #include "RealAlgebraicNumber_Number.h"
 #include "RealAlgebraicNumber_Interval.h"
+#ifdef RAN_USE_THOM
 #include "RealAlgebraicNumber_Thom.h"
+#endif
+#ifdef RAN_USE_Z3
 #include "RealAlgebraicNumber_Z3.h"
+#endif
 #include "../../../numbers/config.h"
 
 namespace carl {
 
-template<typename Number> class Z3Ran;
 namespace ran {
-	template<typename Number> struct IntervalContent;
 	template<typename Number> struct equal;
 	template<typename Number> struct less;
 }
@@ -78,6 +80,10 @@ private:
 	template<typename Num>
 	friend RealAlgebraicNumber<Num> sampleAbove(const RealAlgebraicNumber<Num>&);
 	template<typename Num>
+	friend bool operator==(const RealAlgebraicNumber<Num>& lhs, const RealAlgebraicNumber<Num>& rhs);
+	template<typename Num>
+	friend bool operator<(const RealAlgebraicNumber<Num>& lhs, const RealAlgebraicNumber<Num>& rhs);
+	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran);
 	template<typename Num>
 	friend struct ran::equal;
@@ -86,15 +92,27 @@ private:
 public:
 	using NumberContent = ran::NumberContent<Number>;
 	using IntervalContent = ran::IntervalContent<Number>;
+#ifdef RAN_USE_THOM
 	using ThomContent = ran::ThomContent<Number>;
+#else
+	using ThomContent = void;
+#endif
+#ifdef RAN_USE_Z3
 	using Z3Content = ran::Z3Content<Number>;
+#else
+	using Z3Content = void;
+#endif
 private:
 	using Polynomial = UnivariatePolynomial<Number>;
 	using Content = std::variant<
 		NumberContent,
-		IntervalContent,
-		ThomContent,
-		Z3Content
+		IntervalContent
+#ifdef RAN_USE_THOM
+		, ThomContent
+#endif
+#ifdef RAN_USE_Z3
+		, Z3Content
+#endif
 	>;
 
 	mutable Content mContent = NumberContent();
@@ -140,32 +158,33 @@ public:
 		mIsRoot(isRoot)
 	{}
 
-	explicit RealAlgebraicNumber(const ThomEncoding<Number>& te, bool isRoot = true):
-		mContent(std::in_place_type<ThomContent>, te),
-		mIsRoot(isRoot)
-	{
-	}
-
 	explicit RealAlgebraicNumber(const NumberContent& ran, bool isRoot = true):
 		mContent(ran), mIsRoot(isRoot)
 	{}
 	explicit RealAlgebraicNumber(const IntervalContent& ran, bool isRoot = true):
 		mContent(ran), mIsRoot(isRoot)
 	{}
+#ifdef RAN_USE_THOM
+	explicit RealAlgebraicNumber(const ThomEncoding<Number>& te, bool isRoot = true):
+		mContent(std::in_place_type<ThomContent>, te),
+		mIsRoot(isRoot)
+	{}
 	explicit RealAlgebraicNumber(const ThomContent& ran, bool isRoot = true):
 		mContent(ran), mIsRoot(isRoot)
 	{}
+#endif
+
+#ifdef RAN_USE_Z3
 	explicit RealAlgebraicNumber(const Z3Content& ran, bool isRoot = true):
 		mContent(ran), mIsRoot(isRoot)
 	{}
-
 	explicit RealAlgebraicNumber(const Z3Ran<Number>& zr, bool isRoot = true)
 		: mContent(std::in_place_type<Z3Content>, zr), mIsRoot(isRoot)
 	{}
-
 	explicit RealAlgebraicNumber(Z3Ran<Number>&& zr, bool isRoot = true)
 		: mContent(std::in_place_type<Z3Content>, std::move(zr)), mIsRoot(isRoot)
 	{}
+#endif
 
 	RealAlgebraicNumber(const RealAlgebraicNumber& ran) = default;
 	RealAlgebraicNumber(RealAlgebraicNumber&& ran) = default;
@@ -222,6 +241,7 @@ public:
 		return std::holds_alternative<IntervalContent>(mContent);
 	}
 
+#ifdef RAN_USE_THOM
 	/**
 	 * Check if the underlying representation is an implicit number
 	 * that uses the Thom encoding.
@@ -234,7 +254,9 @@ public:
 		assert(isThom());
 		return std::get<ThomContent>(mContent).thom_encoding();
 	}
+#endif
 
+#ifdef RAN_USE_Z3
 	bool isZ3Ran() const {
 		checkForSimplification();
 		return std::holds_alternative<Z3Content>(mContent);
@@ -243,6 +265,7 @@ public:
 		assert(isZ3Ran());
 		return std::get<Z3Content>(mContent).z3_ran();
 	}
+#endif
 
 	bool isIntegral() const {
 		refineToIntegrality();
@@ -259,10 +282,9 @@ public:
 	}
 	
 	Number branchingPoint() const {
-		if (isNumeric()) return value();
-		else if (isInterval()) return carl::sample(getInterval());
-		else if (isZ3Ran()) return getZ3Ran().branchingPoint();
-		assert(!isThom());
+		return std::visit(overloaded {
+			[](const auto& c) { return ran::branching_point(c); }
+		}, mContent);
 	}
 
 	const Number& value() const noexcept {
@@ -274,24 +296,25 @@ public:
 		assert(isInterval());
 		return std::get<IntervalContent>(mContent).refinementCount();
 	}
-	const Interval<Number>& getInterval() const {
-		if (isZ3Ran()) return getZ3Ran().getInterval();
-		assert(isInterval());
-		return std::get<IntervalContent>(mContent).interval();
+	Interval<Number> getInterval() const {
+		return std::visit(overloaded {
+			[](const auto& c) { return ran::get_interval(c); }
+		}, mContent);
 	}
-	const Number& lower() const {
-		if (isZ3Ran()) getZ3Ran().lower();
-		return getInterval().lower();
-	}
-	const Number& upper() const {
-		if (isZ3Ran()) getZ3Ran().upper();
-		return getInterval().upper();
-	}
-	const Polynomial& getIRPolynomial() const {
-		if (isInterval()) return std::get<IntervalContent>(mContent).polynomial();
-		else if (isZ3Ran()) return getZ3Ran().getPolynomial();
-		assert(!isThom() && !isNumeric());
-		return std::get<IntervalContent>(mContent).polynomial();
+	//const Number& lower() const {
+	//	return std::visit(overloaded {
+	//		[](const auto& c) { ran::lower(c); }
+	//	}, mContent);
+	//}
+	//const Number& upper() const {
+	//	return std::visit(overloaded {
+	//		[](const auto& c) { ran::upper(c); }
+	//	}, mContent);
+	//}
+	Polynomial getIRPolynomial() const {
+		return std::visit(overloaded {
+			[](const auto& c) { return ran::get_polynomial(c); }
+		}, mContent);
 	}
 	const auto& getIRSturmSequence() const {
 		assert(isInterval());
@@ -367,19 +390,9 @@ public:
 	}
 	
 	RealAlgebraicNumber<Number> abs() const {
-		if (isNumeric()) return RealAlgebraicNumber<Number>(carl::abs(value()), mIsRoot);
-		if (isInterval()) {
-			if (getInterval().contains(constant_zero<Number>::get())) {
-				std::get<IntervalContent>(mContent).refineAvoiding(constant_zero<Number>::get());
-				return abs();
-			}
-			if (std::get<IntervalContent>(mContent).interval().isPositive()) return *this;
-			return RealAlgebraicNumber<Number>(std::get<IntervalContent>(mContent).polynomial().negateVariable(), std::get<IntervalContent>(mContent).interval().abs(), mIsRoot);
-		}
-		if (isZ3Ran()) {
-			return RealAlgebraicNumber<Number>(getZ3Ran().abs());
-		}
-		return RealAlgebraicNumber<Number>();
+		return std::visit(overloaded {
+			[this](const auto& c) { return RealAlgebraicNumber<Number>(ran::abs(c), mIsRoot); }
+		}, mContent);
 	}
 };
 

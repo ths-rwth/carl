@@ -42,6 +42,16 @@ public:
 };
 
 template<typename Number>
+Number abs(const NumberContent<Number>& n) {
+	return carl::abs(n.value());
+}
+
+template<typename Number>
+const Number& branching_point(const NumberContent<Number>& n) {
+	return n.value();
+}
+
+template<typename Number>
 NumberContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable, NumberContent<Number>>& m) {
 	MultivariatePolynomial<Number> res = p;
 	for (const auto& e: m) {
@@ -52,8 +62,18 @@ NumberContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const st
 }
 
 template<typename Number>
+Interval<Number> get_interval(const NumberContent<Number>& n) {
+	return Interval<Number>(n.value());
+}
+
+template<typename Number>
 const Number& get_number(const NumberContent<Number>& n) {
 	return n.value();
+}
+
+template<typename Number>
+UnivariatePolynomial<Number> get_polynomial(const NumberContent<Number>& n) {
+	return UnivariatePolynomial<Number>(Variable::NO_VARIABLE);
 }
 
 template<typename Number>
@@ -72,6 +92,16 @@ Number sample_below(const NumberContent<Number>& n) {
 template<typename Number>
 Number sample_between(const NumberContent<Number>& lower, const NumberContent<Number>& upper) {
 	return sample(Interval<Number>(lower.value(), upper.value()), false);
+}
+
+template<typename Number>
+inline bool operator==(const NumberContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return lhs.value() == rhs.value();
+}
+
+template<typename Number>
+inline bool operator<(const NumberContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return lhs.value() < rhs.value();
 }
 
 template<typename Num>

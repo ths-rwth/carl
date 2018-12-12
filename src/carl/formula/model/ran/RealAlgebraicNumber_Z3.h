@@ -11,7 +11,7 @@ namespace ran {
 template<typename Number>
 struct Z3Content {
 	template<typename Num>
-	friend bool operator==(const Z3Content<Num>& lhs, const Z3Content<Num>& rhs);
+	friend bool operator==(Z3Content<Num>& lhs, Z3Content<Num>& rhs);
 	template<typename Num>
 	friend bool operator<(const Z3Content<Num>& lhs, const Z3Content<Num>& rhs);
 private:
@@ -75,13 +75,33 @@ namespace carl {
 namespace ran {
 
 template<typename Number>
+Z3Content<Number> abs(const Z3Content<Number>& n) {
+	return n.z3_ran().abs();
+}
+
+template<typename Number>
+Number branching_point(const Z3Content<Number>& n) {
+	return n.z3_ran().branchingPoint();
+}
+
+template<typename Number>
 Z3Content<Number> evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable, Z3Content<Number>>& m) {
 	return evaluateZ3(p, m);
 }
 
 template<typename Number>
+const Interval<Number>& get_interval(const Z3Content<Number>& n) {
+	return n.z3_ran().getInterval();
+}
+
+template<typename Number>
 Number get_number(const Z3Content<Number>& n) {
 	return n.z3_ran().get_number();
+}
+
+template<typename Number>
+const UnivariatePolynomial<Number>& get_polynomial(const Z3Content<Number>& n) {
+	return n.z3_ran().getPolynomial();
 }
 
 template<typename Number>
@@ -128,14 +148,35 @@ Sign sgn(const Z3Content<Number>& n, const UnivariatePolynomial<Number>& p) {
 }
 
 template<typename Number>
-bool operator==(const Z3Content<Number>& lhs, const Z3Content<Number>& rhs) {
+bool operator==(Z3Content<Number>& lhs, Z3Content<Number>& rhs) {
 	if (lhs.mContent.get() == rhs.mContent.get()) return true;
-	return lhs.z3_ran().equal(rhs.z3_ran());
+	if (lhs.z3_ran().equal(rhs.z3_ran())) {
+		rhs = lhs;
+		return true;
+	}
+	return false;
 }
 
 template<typename Number>
-bool operator==(const Z3Content<Number>& lhs, const Number& rhs) {
-	return lhs.z3_ran().equal(rhs);
+bool operator==(Z3Content<Number>& lhs, const NumberContent<Number>& rhs) {
+	return lhs.z3_ran().equal(rhs.value());
+}
+
+template<typename Number>
+bool operator==(const NumberContent<Number>& lhs, Z3Content<Number>& rhs) {
+	return rhs.z3_ran().equal(lhs.value());
+}
+
+template<typename Number>
+bool operator==(Z3Content<Number>& lhs, IntervalContent<Number>& rhs) {
+	carl::ran::IntervalContent tmp(lhs.polynomial(), lhs.interval());
+	return tmp == rhs;
+}
+
+template<typename Number>
+bool operator==(IntervalContent<Number>& lhs, Z3Content<Number>& rhs) {
+	carl::ran::IntervalContent tmp(rhs.polynomial(), rhs.interval());
+	return lhs == tmp;
 }
 
 template<typename Number>
@@ -145,12 +186,25 @@ bool operator<(const Z3Content<Number>& lhs, const Z3Content<Number>& rhs) {
 }
 
 template<typename Number>
-bool operator<(const Z3Content<Number>& lhs, const Number& rhs) {
-	return lhs.z3_ran().less(rhs);
+bool operator<(Z3Content<Number>& lhs, const NumberContent<Number>& rhs) {
+	return lhs.z3_ran().less(rhs.value());
 }
+
 template<typename Number>
-bool operator<(const Number& lhs, const Z3Content<Number>& rhs) {
-	return rhs.z3_ran().greater(lhs);
+bool operator<(const NumberContent<Number>& lhs, Z3Content<Number>& rhs) {
+	return rhs.z3_ran().greater(lhs.value());
+}
+
+template<typename Number>
+bool operator<(Z3Content<Number>& lhs, IntervalContent<Number>& rhs) {
+	carl::ran::IntervalContent tmp(lhs.polynomial(), lhs.interval());
+	return tmp < rhs;
+}
+
+template<typename Number>
+bool operator<(IntervalContent<Number>& lhs, Z3Content<Number>& rhs) {
+	carl::ran::IntervalContent tmp(rhs.polynomial(), rhs.interval());
+	return lhs < tmp;
 }
 
 template<typename Num>

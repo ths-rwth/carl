@@ -11,3 +11,6 @@
 #cmakedefine USE_BLISS
 #cmakedefine USE_COCOA
 #cmakedefine BOOST_HAS_STACKTRACE
+
+#cmakedefine RAN_USE_THOM
+#cmakedefine RAN_USE_Z3

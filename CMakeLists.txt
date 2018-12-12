@@ -36,7 +36,6 @@ option( USE_GINAC "Compile with testing with the runtime and result comparisons 
 export_option(USE_GINAC)
 option( COMPARE_WITH_Z3 "Compile benchmarks that compare to z3" OFF )
 option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
-option( USE_Z3_RANS "Make z3 real algebraic numbers available in carl" OFF )
 option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )
 export_option(USE_CLN_NUMBERS)
 option( USE_COCOA "Use CoCoALib" OFF )
@@ -51,6 +50,9 @@ export_option(BUILD_DOXYGEN)
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
+
+option( RAN_USE_THOM "Enable real algebraic numbers based on thom encodings" OFF )
+option( RAN_USE_Z3 "Enable real algebraic numbers from z3" OFF )
 
 set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
 set_property(CACHE CLANG_SANITIZER PROPERTY STRINGS none address memory thread)

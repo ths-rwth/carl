@@ -1813,9 +1813,9 @@ void CAD<Number>::shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number
 				} else {
 					// translate given open interval into the bounds
 					bound->second.setLowerBoundType(BoundType::STRICT);
-					bound->second.setLower(r[level].lower());
+					bound->second.setLower(r[level].getInterval().lower());
 					bound->second.setUpperBoundType(BoundType::STRICT);
-					bound->second.setUpper(r[level].upper());
+					bound->second.setUpper(r[level].getInterval().upper());
 				}
 			}
 		}

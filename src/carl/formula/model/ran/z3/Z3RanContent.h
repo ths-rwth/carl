@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../../../../config.h"
+
+#ifdef RAN_USE_Z3
+
 #include "../../../../converter/Z3Converter.h"
 
 namespace carl {
@@ -34,3 +38,5 @@ namespace carl {
     };
 
 }
+
+#endif

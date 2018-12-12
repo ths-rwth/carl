@@ -8,7 +8,7 @@
 #include "config.h"
 #include "../numbers/numbers.h"
 
-#if defined(USE_Z3_RANS) || defined(USE_Z3_NUMBERS)
+#if defined(RAN_USE_Z3) || defined(USE_Z3_NUMBERS)
 
 #include <utility>
 

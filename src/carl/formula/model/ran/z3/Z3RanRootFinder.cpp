@@ -1,8 +1,9 @@
+#include "Z3RanRootFinder.h"
+
+#ifdef RAN_USE_Z3
+
 #include "../../../../converter/Z3Converter.h"
 
-#ifdef USE_Z3_RANS
-
-#include "Z3RanRootFinder.h"
 #include "Z3RanContent.h"
 
 namespace carl {
@@ -48,8 +49,8 @@ namespace carl {
                 map.set(var, val);
 			} else if (pair.second.isInterval()) {
 				polynomial::polynomial_ref poly = z3().toZ3IntCoeff(pair.second.getIRPolynomial());
-				mpq lower = z3().toZ3MPQ(pair.second.lower());
-				mpq upper = z3().toZ3MPQ(pair.second.upper());
+				mpq lower = z3().toZ3MPQ(pair.second.getInterval().lower());
+				mpq upper = z3().toZ3MPQ(pair.second.getInterval().upper());
 				algebraic_numbers::anum root;
 				for (unsigned i = 1; i <= pair.second.getIRPolynomial().degree(); ++i) {
 					z3().anumMan().mk_root(poly, i, root);

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Z3Ran.h"
+
+#ifdef RAN_USE_Z3
+
 #include "../RealAlgebraicNumber.h"
 
 namespace carl {
@@ -16,3 +20,5 @@ namespace carl {
         const Interval<Number>& interval = Interval<Number>::unboundedInterval()
     );
 }
+
+#endif

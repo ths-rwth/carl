@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../../../../config.h"
+
+#ifdef RAN_USE_Z3
+
 #include "../../../../core/Sign.h"
 #include "../../../../core/UnivariatePolynomial.h"
 #include "../../../../core/MultivariatePolynomial.h"
@@ -84,3 +88,5 @@ namespace carl {
     template<typename Number>
     std::ostream& operator<<(std::ostream& os, const Z3Ran<Number>& zr);    
 }
+
+#endif

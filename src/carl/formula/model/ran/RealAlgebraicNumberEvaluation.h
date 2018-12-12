@@ -19,7 +19,6 @@
 #include "../../../core/MultivariatePolynomial.h"
 #include "../../../core/polynomialfunctions/Resultant.h"
 #include "../../../interval/IntervalEvaluation.h"
-#include "../../../thom/ThomEvaluation.h"
 #include "../../../util/SFINAE.h"
 
 namespace carl {
