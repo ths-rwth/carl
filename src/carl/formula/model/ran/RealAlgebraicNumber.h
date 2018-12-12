@@ -117,7 +117,6 @@ private:
 
 	mutable Content mContent = NumberContent();
 
-	//mutable Number mValue = carl::constant_zero<Number>::get();
 	// A flag/tag that a user of this class can set.
 	// It indicates that this number stems from an outside root computation.
 	bool mIsRoot = true;
@@ -125,17 +124,26 @@ private:
 	/// Convert to a plain number if possible.
 	void checkForSimplification() const {
 		if (std::holds_alternative<NumberContent>(mContent)) return;
-		if (std::visit(overloaded {
+		if (call_on_content(
 			[](const auto& c) { return ran::is_number(c); }
-		}, mContent)) {
-			switchToNR(std::visit(overloaded {
+		)) {
+			switchToNR(call_on_content(
 				[](const auto& c) { return ran::get_number(c); }
-			}, mContent));
+			));
 		}
 	}
 	// Switch to numeric representation.
 	void switchToNR(Number n) const {
 		mContent = NumberContent{ n };
+	}
+
+	template<typename... F>
+	auto call_on_content(F&&... f) const {
+		return std::visit(overloaded {
+				std::forward<F>(f)...
+			},
+			mContent
+		);
 	}
 
 public:
@@ -200,9 +208,9 @@ public:
 	 * Return the size of this representation in memory in number of bits.
 	 */
 	std::size_t size() const {
-		return std::visit(
+		return call_on_content(
 			[](const auto& c) { return c.size(); }
-		, mContent);
+		);
 	}
 
 	/**
@@ -220,9 +228,9 @@ public:
 	}
 
 	bool isZero() const {
-		return std::visit(overloaded {
+		return call_on_content(
 			[](const auto& c) { return c.is_zero(); }
-		}, mContent);
+		);
 	}
 
 	/**
@@ -269,22 +277,22 @@ public:
 
 	bool isIntegral() const {
 		refineToIntegrality();
-		return std::visit(
+		return call_on_content(
 			[](const auto& c) { return c.is_integral(); }
-		, mContent);
+		);
 	}
 
 	Number integerBelow() const {
 		refineToIntegrality();
-		return std::visit(overloaded {
+		return call_on_content(
 			[](const auto& c) { return c.integer_below(); }
-		}, mContent);
+		);
 	}
 	
 	Number branchingPoint() const {
-		return std::visit(overloaded {
+		return call_on_content(
 			[](const auto& c) { return ran::branching_point(c); }
-		}, mContent);
+		);
 	}
 
 	const Number& value() const noexcept {
@@ -297,9 +305,9 @@ public:
 		return std::get<IntervalContent>(mContent).refinementCount();
 	}
 	Interval<Number> getInterval() const {
-		return std::visit(overloaded {
+		return call_on_content(
 			[](const auto& c) { return ran::get_interval(c); }
-		}, mContent);
+		);
 	}
 	//const Number& lower() const {
 	//	return std::visit(overloaded {
@@ -312,9 +320,9 @@ public:
 	//	}, mContent);
 	//}
 	Polynomial getIRPolynomial() const {
-		return std::visit(overloaded {
+		return call_on_content(
 			[](const auto& c) { return ran::get_polynomial(c); }
-		}, mContent);
+		);
 	}
 	const auto& getIRSturmSequence() const {
 		assert(isInterval());
@@ -322,23 +330,23 @@ public:
 	}
 
 	Sign sgn() const {
-		return std::visit(overloaded {
+		return call_on_content(
 			[](const auto& c) { return c.sgn(); }
-		}, mContent);
+		);
 	}
 
 	Sign sgn(const Polynomial& p) const {
-		return std::visit(overloaded {
+		return call_on_content(
 			[&p](const auto& c) { return c.sgn(p); }
-		}, mContent);
+		);
 	}
 
 	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
-		return std::visit(overloaded {
+		return call_on_content(
 			[&p](const NumberContent& c) { return carl::count_real_roots(p, Interval<Number>(c.value())) == 1; },
 			[&p](const IntervalContent& c) { return c.is_root_of(p); },
 			[&p](const auto& c) { return c.sgn(p) == Sign::ZERO; }
-		}, mContent);
+		);
 	}
 
 	/**
@@ -346,9 +354,9 @@ public:
 	 * the bounds of interval 'i'.
 	 */
 	bool containedIn(const Interval<Number>& i) const {
-		return std::visit(overloaded {
+		return call_on_content(
 			[&i](auto& c) { return c.contained_in(i); }
-		}, mContent);
+		);
 	}
 
 	bool refineAvoiding(const Number& n) const {
@@ -359,16 +367,16 @@ public:
 	}
 	/// Refines until the number is either numeric or the interval does not contain any integer.
 	void refineToIntegrality() const {
-		std::visit(overloaded {
+		return call_on_content(
 			[](IntervalContent& c) { c.refineToIntegrality(); },
 			[](const auto& c) {}
-		}, mContent);
+		);
 	}
 	void refine() const {
-		std::visit(overloaded {
+		return call_on_content(
 			[](IntervalContent& c) { c.refine(); },
 			[](const auto& c) {}
-		}, mContent);
+		);
 	}
 
 	void simplifyByPolynomial(Variable var, const MultivariatePolynomial<Number>& poly) const {
@@ -390,9 +398,9 @@ public:
 	}
 	
 	RealAlgebraicNumber<Number> abs() const {
-		return std::visit(overloaded {
+		return call_on_content(
 			[this](const auto& c) { return RealAlgebraicNumber<Number>(ran::abs(c), mIsRoot); }
-		}, mContent);
+		);
 	}
 };
 
