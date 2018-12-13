@@ -40,18 +40,27 @@ inline bool operator>=(const RealAlgebraicNumber<Number>& lhs, const RealAlgebra
 namespace ran {
 
 template<typename T1, typename T2>
-inline bool operator==(const T1& lhs, const T2& rhs) {
-	CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << lhs << " == " << rhs);
+void unsupported_operation(const std::string& op, const T1& lhs, const T2& rhs) {
+	CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << lhs << " " << op << " " << rhs);
 	CARL_LOG_ERROR("carl.ran", "Types: " << typeid(T1).name() << " and " << typeid(T2).name());
 	assert(false);
+}
+
+template<typename T1, typename T2>
+T1 sample_between(const T1& lower, const T2& upper) {
+	unsupported_operation("sample_between", lower, upper);
+	return lower;
+}
+
+template<typename T1, typename T2>
+inline bool operator==(const T1& lhs, const T2& rhs) {
+	unsupported_operation("==", lhs, rhs);
 	return false;
 }
 
 template<typename T1, typename T2>
 inline bool operator<(const T1& lhs, const T2& rhs) {
-	CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << lhs << " < " << rhs);
-	CARL_LOG_ERROR("carl.ran", "Types: " << typeid(T1).name() << " and " << typeid(T2).name());
-	assert(false);
+	unsupported_operation("==", lhs, rhs);
 	return false;
 }
 

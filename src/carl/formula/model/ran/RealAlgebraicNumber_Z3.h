@@ -137,6 +137,22 @@ template<typename Number>
 Z3Content<Number> sample_between(const NumberContent<Number>& lower, const Z3Content<Number>& upper) {
 	return sampleBetweenZ3(Z3Ran<Number>(lower.value()), upper.z3_ran());
 }
+template<typename Number>
+Z3Content<Number> sample_between(const Z3Content<Number>& lower, IntervalContent<Number>& upper) {
+	if (lower < upper) {
+		return sample_between(lower, NumberContent<Number>{ upper.interval().lower() });
+	}
+	assert(false);
+	return lower;
+}
+template<typename Number>
+Z3Content<Number> sample_between(IntervalContent<Number>& lower, const Z3Content<Number>& upper) {
+	if (lower < upper) {
+		return sample_between(NumberContent<Number>{ lower.interval().upper() }, upper);
+	}
+	assert(false);
+	return upper;
+}
 
 template<typename Number>
 Sign sgn(const Z3Content<Number>& n) {
