@@ -805,37 +805,14 @@ public:
 	void eliminateRoot(const Coefficient& root);
 	
 public:
-	[[deprecated("Use carl::sturm_sequence() instead.")]]
-	std::vector<UnivariatePolynomial> standardSturmSequence() const;
-	[[deprecated("Use carl::sturm_sequence() instead.")]]
-	std::vector<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
-
 	/**
 	 * Counts the sign variations (i.e. an upper bound for the number of real roots) via Descarte's rule of signs.
 	 * This is an upper bound for countRealRoots().
 	 * @param interval Count roots within this interval.
 	 * @return Upper bound for number of real roots within the interval.
 	 */
-	[[deprecated("Use carl::signVariations() instead.")]]
+	[[deprecated("Use carl::sign_variations() instead.")]]
 	uint signVariations(const Interval<Coefficient>& interval) const;
-
-	/**
-	 * Count the number of real roots within the given interval using Sturm sequences.
-	 * @param interval Count roots within this interval.
-	 * @return Number of real roots within the interval.
-	 */
-	[[deprecated("Use carl::count_real_roots() instead.")]]
-	int countRealRoots(const Interval<Coefficient>& interval) const;
-
-	/**
-	 * Calculate the number of real roots of a polynomial within a given interval based on a sturm sequence of this polynomial.
-	 * @param seq Sturm sequence.
-	 * @param interval Interval.
-	 * @return Number of real roots in the interval.
-	 */
-	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
-	[[deprecated("Use carl::count_real_roots() instead.")]]
-	static int countRealRoots(const std::vector<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
 
 	/// @name Equality comparison operators
 	/// @{
