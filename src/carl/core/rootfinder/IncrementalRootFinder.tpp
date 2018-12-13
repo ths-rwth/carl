@@ -70,7 +70,7 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 		return true;
 	}
 
-	uint variations = carl::signVariations(getPolynomial(), interval);
+	uint variations = carl::sign_variations(getPolynomial(), interval);
 	CARL_LOG_TRACE("carl.core.rootfinder", "Sign variations: " << variations);
 
 	if (variations == 0) return true;

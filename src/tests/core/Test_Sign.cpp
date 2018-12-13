@@ -16,13 +16,13 @@ TYPED_TEST_CASE(SignTest, NumberTypes);
 // Helper function for tests of signVariations
 template<typename Object, typename Function>
 std::size_t signVar(const std::initializer_list<Object>& l, const Function& f) {
-	return carl::signVariations(l.begin(), l.end(), f);
+	return carl::sign_variations(l.begin(), l.end(), f);
 }
 
 // Helper function for tests of signVariations
 template<typename Object>
 std::size_t signVar(const std::initializer_list<Object>& l) {
-	return carl::signVariations(l.begin(), l.end());
+	return carl::sign_variations(l.begin(), l.end());
 }
 
 TEST(Sign, Output) {

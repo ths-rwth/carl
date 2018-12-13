@@ -39,8 +39,8 @@ int univariateTarskiQuery(const UnivariatePolynomial<Number>& p, const Univariat
         CARL_LOG_FUNC("carl.thom.tarski", "p = " << p << ", q = " << q << ", der_q = " << der_q);
         CARL_LOG_ASSERT("carl.thom.tarski", !carl::isZero(q), "cannot query on an infinite zero set!");
         auto srs = sturm_sequence(q, der_q * p); // standardSturmSequence is the signed remainder sequence
-        int atMinusInf = int(signVariations(srs.begin(), srs.end(), [](const UnivariatePolynomial<Number>& p){ return signAtMinusInf(p); })); 
-        int atPlusInf = int(signVariations(srs.begin(), srs.end(), [](const UnivariatePolynomial<Number>& p){ return signAtPlusInf(p); }));
+        int atMinusInf = int(sign_variations(srs.begin(), srs.end(), [](const UnivariatePolynomial<Number>& p){ return signAtMinusInf(p); })); 
+        int atPlusInf = int(sign_variations(srs.begin(), srs.end(), [](const UnivariatePolynomial<Number>& p){ return signAtPlusInf(p); }));
         return atMinusInf - atPlusInf;
 }
 

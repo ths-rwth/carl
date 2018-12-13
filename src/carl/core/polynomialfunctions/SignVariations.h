@@ -13,7 +13,7 @@ namespace carl {
  * @return Upper bound for number of real roots within the interval.
  */
 template<typename Coefficient>
-uint signVariations(const UnivariatePolynomial<Coefficient>& polynomial, const Interval<Coefficient>& interval) {
+uint sign_variations(const UnivariatePolynomial<Coefficient>& polynomial, const Interval<Coefficient>& interval) {
 	if (interval.isEmpty()) return 0;
 	if (interval.isPointInterval()) {
 		std::vector<Coefficient> vals;
@@ -22,7 +22,7 @@ uint signVariations(const UnivariatePolynomial<Coefficient>& polynomial, const I
 			vals.push_back(c * factor);
 			factor *= interval.lower();
 		}
-		auto res = carl::signVariations(vals.begin(), vals.end(), [](const auto& c){ return carl::sgn(c); });
+		auto res = carl::sign_variations(vals.begin(), vals.end(), [](const auto& c){ return carl::sgn(c); });
 		CARL_LOG_TRACE("carl.core", polynomial << " has " << res << " sign variations at " << interval.lower());
 		return res;
 	}
@@ -33,7 +33,7 @@ uint signVariations(const UnivariatePolynomial<Coefficient>& polynomial, const I
 	p.shift(1);
 	p.stripLeadingZeroes();
 	assert(p.isConsistent());
-	auto res = carl::signVariations(p.coefficients().begin(), p.coefficients().end(), [](const auto& c){ return carl::sgn(c); });
+	auto res = carl::sign_variations(p.coefficients().begin(), p.coefficients().end(), [](const auto& c){ return carl::sgn(c); });
 	CARL_LOG_TRACE("carl.core", polynomial << " has " << res << " sign variations within " << interval);
 	return res;
 }
