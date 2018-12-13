@@ -816,6 +816,7 @@ public:
 	 * @param interval Count roots within this interval.
 	 * @return Upper bound for number of real roots within the interval.
 	 */
+	[[deprecated("Use carl::signVariations() instead.")]]
 	uint signVariations(const Interval<Coefficient>& interval) const;
 
 	/**
@@ -833,6 +834,7 @@ public:
 	 * @return Number of real roots in the interval.
 	 */
 	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
+	[[deprecated("Use carl::count_real_roots() instead.")]]
 	static int countRealRoots(const std::vector<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
 
 	/// @name Equality comparison operators
@@ -1026,7 +1028,6 @@ public:
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isConsistent() const;
-private:
 	
 	/**
 	 * Reverses the order of the coefficients of this polynomial.
