@@ -179,7 +179,7 @@ if(COMPARE_WITH_Z3 OR USE_Z3_NUMBERS OR USE_Z3_RANS)
 endif()
 
 ##### Doxygen
-find_package(Doxygen 1.8.9 QUIET)
+find_package(Doxygen 1.8.12 QUIET)
 if(DOXYGEN_FOUND AND ${CMAKE_VERSION} VERSION_LESS "3.9.0")
 	add_executable(Doxygen::doxygen IMPORTED GLOBAL)
 	set_target_properties(Doxygen::doxygen PROPERTIES IMPORTED_LOCATION "${DOXYGEN_EXECUTABLE}")
