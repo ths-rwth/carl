@@ -45,15 +45,6 @@ namespace carl {
 		else return carl::ceil(n.upper());
 	}
 
-namespace ran {
-	template<typename T1, typename T2>
-	T1 sample_between(T1& lower, T2& upper) {
-		CARL_LOG_ERROR("carl.ran", "Unsupported operation " << lower << " < " << upper);
-		CARL_LOG_ERROR("carl.ran", "Types: " << typeid(T1).name() << " and " << typeid(T2).name());
-		return lower;
-	}
-}
-
 	template<typename Number>
 	RealAlgebraicNumber<Number> sampleBelow(const RealAlgebraicNumber<Number>& n) {
 		return std::visit(
@@ -65,7 +56,7 @@ namespace ran {
 	RealAlgebraicNumber<Number> sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper, RANSampleHeuristic heuristic = RANSampleHeuristic::Default) {
 		return std::visit(
 			[](auto& l, auto& u){ return RealAlgebraicNumber<Number>(ran::sample_between(l, u), false); }
-			, lower.content(), upper.content()
+			, lower.mContent, upper.mContent
 		);
 		//CARL_LOG_FUNC("carl.ran", lower << ", " << upper);
 		//if(lower.isThom() || upper.isThom()) {

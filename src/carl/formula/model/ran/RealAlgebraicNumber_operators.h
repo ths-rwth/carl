@@ -43,6 +43,7 @@ template<typename T1, typename T2>
 inline bool operator==(const T1& lhs, const T2& rhs) {
 	CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << lhs << " == " << rhs);
 	CARL_LOG_ERROR("carl.ran", "Types: " << typeid(T1).name() << " and " << typeid(T2).name());
+	assert(false);
 	return false;
 }
 
@@ -50,6 +51,7 @@ template<typename T1, typename T2>
 inline bool operator<(const T1& lhs, const T2& rhs) {
 	CARL_LOG_ERROR("carl.ran", "Unsupported comparison " << lhs << " < " << rhs);
 	CARL_LOG_ERROR("carl.ran", "Types: " << typeid(T1).name() << " and " << typeid(T2).name());
+	assert(false);
 	return false;
 }
 
