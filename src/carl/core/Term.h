@@ -7,13 +7,6 @@
 
 #pragma once
 
-#include "../interval/Interval.h"
-#include "../numbers/number/NumberMpq.h"
-#include "../numbers/number/NumberClRA.h"
-#include "../numbers/number/NumberInterval.h"
-#include "../numbers/number/NumberInt.h"
-#include "../numbers/numbers.h"
-#include "../util/pointerOperations.h"
 #include "Definiteness.h"
 #include "Monomial.h"
 #include "VariablesInformation.h"
@@ -23,7 +16,7 @@
 
 namespace carl
 {
-    
+
 /**
  * Represents a single term, that is a numeric coefficient and a monomial.
  * @ingroup multirp
