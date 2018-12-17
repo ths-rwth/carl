@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "../interval/Interval.h"
 #include "../numbers/numbers.h"
 #include "../util/SFINAE.h"
 #include "Polynomial.h"
@@ -805,15 +804,6 @@ public:
 	void eliminateRoot(const Coefficient& root);
 	
 public:
-	/**
-	 * Counts the sign variations (i.e. an upper bound for the number of real roots) via Descarte's rule of signs.
-	 * This is an upper bound for countRealRoots().
-	 * @param interval Count roots within this interval.
-	 * @return Upper bound for number of real roots within the interval.
-	 */
-	[[deprecated("Use carl::sign_variations() instead.")]]
-	uint signVariations(const Interval<Coefficient>& interval) const;
-
 	/// @name Equality comparison operators
 	/// @{
 	/**

@@ -20,7 +20,7 @@ namespace detail_derivative {
  * Computes the n'th derivative of a number, which is either the number itself (for n = 0) or zero.
  */
 template<typename T, EnableIf<is_number<T>> = dummy>
-const T& derivative(const T& t, Variable v, std::size_t n = 1) {
+const T& derivative(const T& t, Variable, std::size_t n = 1) {
 	if (n == 0) return t;
 	return constant_zero<T>::get();
 }
