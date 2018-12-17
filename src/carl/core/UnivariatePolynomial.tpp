@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "../converter/OldGinacConverter.h"
 #include "../util/debug.h"
 #include "../util/platform.h"
 #include "../util/SFINAE.h"
