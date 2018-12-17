@@ -20,13 +20,13 @@ namespace carl
 	template<typename T>
 	inline bool isZero(const T& t)
 	{
-		return t == static_cast<T>(0);
+		return t == 0;
 	}
 	
 	template<typename T>
 	inline bool isOne(const T& t) 
 	{
-		return t == static_cast<T>(1);
+		return t == 1;
 	}
     
 	template<typename T, EnableIf<has_isPositive<T>>>
@@ -38,7 +38,7 @@ namespace carl
 	template<typename T, DisableIf<has_isPositive<T>>>
 	inline bool isPositive(const T& t)
 	{
-		return t > static_cast<T>(0);
+		return t > 0;
 	}
 	
 	template<typename T, EnableIf<has_isNegative<T>>>
@@ -50,7 +50,7 @@ namespace carl
 	template<typename T, DisableIf<has_isNegative<T>>>
 	inline bool isNegative(const T& t) 
 	{
-		return t < static_cast<T>(0);
+		return t < 0;
 	}
 	
 	/**
