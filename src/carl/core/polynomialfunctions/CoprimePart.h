@@ -24,8 +24,8 @@ MultivariatePolynomial<C,O,P> coprimePart(const MultivariatePolynomial<C,O,P>& p
 	#endif
 	#if defined USE_GINAC
 		,
-		[](const MultivariatePolynomial<cln::cl_RA,O,P>& p, const MultivariatePolynomial<cln::cl_RA,O,P>& q){ return p; },
-		[](const MultivariatePolynomial<cln::cl_I,O,P>& p, const MultivariatePolynomial<cln::cl_I,O,P>& q){ return p; }
+		[](const MultivariatePolynomial<cln::cl_RA,O,P>& p, const MultivariatePolynomial<cln::cl_RA,O,P>&){ return p; },
+		[](const MultivariatePolynomial<cln::cl_I,O,P>& p, const MultivariatePolynomial<cln::cl_I,O,P>&){ return p; }
 	#endif
 	};
 	return s(p, q);

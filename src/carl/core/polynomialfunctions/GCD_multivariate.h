@@ -5,6 +5,9 @@
 #include "../MultivariatePolynomial.h"
 #include "../../numbers/typetraits.h"
 
+#include "../../converter/OldGinacConverter.h"
+#include "../../converter/CoCoAAdaptor.h"
+
 namespace carl {
 
 namespace gcd_detail {
