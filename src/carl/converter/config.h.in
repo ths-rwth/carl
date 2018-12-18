@@ -3,5 +3,7 @@
  */ 
 #pragma once
 
+#cmakedefine USE_COCOA
+#cmakedefine USE_CLN_NUMBER
 #cmakedefine USE_GINAC
 #cmakedefine COMPARE_WITH_Z3

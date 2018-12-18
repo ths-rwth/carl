@@ -105,22 +105,22 @@ public:
 		mpz res;
 		std::stringstream ss;
 		ss << n;
-		z3().mpqMan().set(res, ss.str().c_str());
+		mpqMan().set(res, ss.str().c_str());
 		return res;
 	}
 	mpq toZ3MPQ(const cln::cl_RA& n) {
 		mpz num = toZ3MPZ(getNum(n));
 		mpz den = toZ3MPZ(getDenom(n));
 		mpq res;
-		z3().mpqMan().set(res, num, den);
-		z3().free(num);
-		z3().free(den);
+		mpqMan().set(res, num, den);
+		free(num);
+		free(den);
 		return res;
 	}
 	rational toZ3Rational(const cln::cl_RA& n) {
 		mpq m = toZ3MPQ(n);
 		rational res = rational(m);
-		z3().free(m);
+		free(m);
 		return res;
 	}
 	rational toZ3(const cln::cl_RA& n) {
