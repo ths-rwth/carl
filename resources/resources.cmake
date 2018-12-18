@@ -43,6 +43,8 @@ endfunction(print_resource_info)
 ###############
 if(USE_GINAC)
 	set(USE_CLN_NUMBERS ON)
+elseif(USE_CLN_NUMBERS)
+	set(USE_GINAC ON)
 endif()
 
 ###############
