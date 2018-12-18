@@ -938,6 +938,33 @@ TEST(DoubleInterval, Intersection)
     EXPECT_EQ(DoubleInterval(1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b21));
 }
 
+TEST(DoubleInterval, HaveIntersection)
+{
+    // have_intersection is symmetric, just test one side.
+    DoubleInterval a1(-1,BoundType::WEAK,1,BoundType::WEAK);
+    DoubleInterval a2(0,BoundType::WEAK,1,BoundType::WEAK);
+    DoubleInterval a3(1,BoundType::WEAK,2,BoundType::WEAK);
+    DoubleInterval a4(2,BoundType::WEAK,3,BoundType::WEAK);
+    DoubleInterval a5(2,BoundType::INFTY,3,BoundType::WEAK);
+    DoubleInterval a6(1,BoundType::STRICT,3,BoundType::WEAK);
+    DoubleInterval a7(1,BoundType::INFTY,-1,BoundType::WEAK);
+    DoubleInterval a8(-1,BoundType::INFTY,-1,BoundType::STRICT);
+    DoubleInterval a9(-1,BoundType::INFTY,1,BoundType::INFTY);
+    DoubleInterval a10(-1,BoundType::INFTY,-2,BoundType::WEAK);
+
+
+    EXPECT_TRUE(carl::set_have_intersection(a1,a1));
+    EXPECT_TRUE(carl::set_have_intersection(a1,a2));
+    EXPECT_TRUE(carl::set_have_intersection(a1,a3));
+    EXPECT_FALSE(carl::set_have_intersection(a1,a4));
+    EXPECT_TRUE(carl::set_have_intersection(a1,a5));
+    EXPECT_FALSE(carl::set_have_intersection(a1,a6));
+    EXPECT_TRUE(carl::set_have_intersection(a1,a7));
+    EXPECT_FALSE(carl::set_have_intersection(a1,a8));
+    EXPECT_TRUE(carl::set_have_intersection(a1,a9));
+    EXPECT_FALSE(carl::set_have_intersection(a1,a10));
+}
+
 TEST(DoubleInterval, Union)
 {
     DoubleInterval i1(3, BoundType::WEAK, 5, BoundType::WEAK);
