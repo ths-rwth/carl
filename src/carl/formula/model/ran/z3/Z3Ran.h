@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../../../../config.h"
+
+#ifdef RAN_USE_Z3
+
 #include "../../../../core/Sign.h"
 #include "../../../../core/UnivariatePolynomial.h"
 #include "../../../../core/MultivariatePolynomial.h"
@@ -35,9 +39,16 @@ namespace carl {
                 return *mContent;
             }
 
-            bool isZero() const;
+            bool is_zero() const;
 
-            bool isIntegral() const;
+			bool is_number() const;
+			Number get_number() const;
+
+            bool is_integral() const;
+
+			Number integer_below() const {
+				return carl::floor(lower());
+			}
 
             // Note: this already tries to simplify to a polynomial!
             // TODO can this result be cached ?!?
@@ -77,3 +88,5 @@ namespace carl {
     template<typename Number>
     std::ostream& operator<<(std::ostream& os, const Z3Ran<Number>& zr);    
 }
+
+#endif

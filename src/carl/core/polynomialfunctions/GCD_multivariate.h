@@ -1,8 +1,12 @@
 #pragma once
 
+#include "../config.h"
 #include "PrimitiveEuclidean.h"
 #include "../MultivariatePolynomial.h"
 #include "../../numbers/typetraits.h"
+
+#include "../../converter/OldGinacConverter.h"
+#include "../../converter/CoCoAAdaptor.h"
 
 namespace carl {
 

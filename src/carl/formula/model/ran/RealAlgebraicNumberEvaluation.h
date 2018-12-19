@@ -19,16 +19,36 @@
 #include "../../../core/MultivariatePolynomial.h"
 #include "../../../core/polynomialfunctions/Resultant.h"
 #include "../../../interval/IntervalEvaluation.h"
-#include "../../../thom/ThomEvaluation.h"
 #include "../../../util/SFINAE.h"
 
-#include "adaption_z3/Z3RanEvaluation.h"
-
 namespace carl {
+
 namespace RealAlgebraicNumberEvaluation {
 
 template <typename Number>
 using RANMap = std::map<Variable, RealAlgebraicNumber<Number>>;
+
+namespace detail {
+	template<typename Tag, typename F, typename Number>
+	auto overload_on_map(Tag, F&& f, const RANMap<Number>& map) {
+		std::map<Variable, Tag> tmp;
+		for (const auto& m: map) {
+			tmp.emplace(m.first, std::get<Tag>(m.second.content()));
+		}
+		return f(tmp);
+	}
+}
+
+template<typename F, typename Number>
+auto overload_on_map(F&& f, const RANMap<Number>& map) {
+	assert(!map.empty());
+	return std::visit(
+		[&f, &map](const auto& tag){
+			return RealAlgebraicNumber<Number>(detail::overload_on_map(tag, std::forward<F>(f), map));
+		},
+		map.begin()->second.content()
+	);
+}
 
 /**
  * Evaluate the given polynomial 'p' at the given 'point' based on the variable order given by 'variables'.
@@ -141,16 +161,11 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, co
 	}
 
 	// need to evaluate polynomial on non-trivial RANs
-	assert(IRmap.size() > 0);
-	if(IRmap.begin()->second.isInterval()) {
-		return evaluateIR(pol, IRmap);
-	} else if (IRmap.begin()->second.isThom()) {
-		return evaluateTE(pol, IRmap);
-	} else if (IRmap.begin()->second.isZ3Ran()) {
-		return evaluateZ3(pol, IRmap);
-	} else {
-		assert(false);
-	}
+
+	return overload_on_map(
+		[&pol](auto& map){ return RealAlgebraicNumber<Number>(ran::evaluate(pol, map)); },
+		IRmap
+	);
 }
 
 
@@ -168,7 +183,7 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 	assert(m.size() > 0);
 	auto poly = p.toUnivariatePolynomial(m.begin()->first);
 	if (m.size() == 1 && m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
-		return RealAlgebraicNumber<Number>(poly.mainVar());
+		return RealAlgebraicNumber<Number>();
 	}
 	Variable v = freshRealVariable();
 	// compute the result polynomial and the initial result interval

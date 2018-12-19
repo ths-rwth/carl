@@ -230,9 +230,9 @@ TEST(Thom, Samples) {
         Rational intermediate3 = TE::intermediatePoint(sqrt2, Rational(2));
         EXPECT_TRUE(sqrt2 < intermediate3 && intermediate3 < Rational(2));
         std::cout << intermediate3 << std::endl;
-        
-        
 }
+
+#ifdef RAN_USE_THOM
 
 TEST(Thom, Evaluation) {
         typedef MultivariatePolynomial<Rational> Polynomial;
@@ -272,3 +272,5 @@ TEST(Thom, Evaluation) {
         std::map<Variable, RAN> m4 = {std::make_pair(x, RAN(sqrt2x)), std::make_pair(y, RAN(realRootsPoly5.front())), std::make_pair(z, RAN(sqrt2z))};
         EXPECT_TRUE(evaluateTE(poly4, m4).sgn() == Sign::NEGATIVE);
 }
+
+#endif

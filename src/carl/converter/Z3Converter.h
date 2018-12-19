@@ -8,7 +8,7 @@
 #include "config.h"
 #include "../numbers/numbers.h"
 
-#if defined(USE_Z3_RANS) || defined(USE_Z3_NUMBERS)
+#if defined(RAN_USE_Z3) || defined(USE_Z3_NUMBERS)
 
 #include <utility>
 
@@ -105,22 +105,22 @@ public:
 		mpz res;
 		std::stringstream ss;
 		ss << n;
-		z3().mpqMan().set(res, ss.str().c_str());
+		mpqMan().set(res, ss.str().c_str());
 		return res;
 	}
 	mpq toZ3MPQ(const cln::cl_RA& n) {
 		mpz num = toZ3MPZ(getNum(n));
 		mpz den = toZ3MPZ(getDenom(n));
 		mpq res;
-		z3().mpqMan().set(res, num, den);
-		z3().free(num);
-		z3().free(den);
+		mpqMan().set(res, num, den);
+		free(num);
+		free(den);
 		return res;
 	}
 	rational toZ3Rational(const cln::cl_RA& n) {
 		mpq m = toZ3MPQ(n);
 		rational res = rational(m);
-		z3().free(m);
+		free(m);
 		return res;
 	}
 	rational toZ3(const cln::cl_RA& n) {
@@ -175,7 +175,7 @@ public:
 	 * Converts a variable and an exponent.
      */
 	polynomial::polynomial_ref toZ3(const std::pair<carl::Variable, carl::exponent>& p) {
-		return toZ3(polyMan().mk_polynomial(toZ3(p.first), p.second));
+		return toZ3(polyMan().mk_polynomial(toZ3(p.first), static_cast<unsigned>(p.second)));
 	}
 	/**
 	 * Converts a monomial.
@@ -211,8 +211,8 @@ public:
 		res = toZ3(polyMan().mk_zero());
 		unsigned exp = 0;
 		polynomial::var mainvar = toZ3(p.mainVar());
-		for (auto t: p.coefficients()) {
-			res = res + toZ3(polyMan().mk_polynomial(mainvar, exp)) * toZ3(t);
+		for (const auto& t: p.coefficients()) {
+			res = res + toZ3(t) * toZ3(polyMan().mk_polynomial(mainvar, exp));
 			exp++;
 		}
 		polyMan().lex_sort(res);
@@ -258,7 +258,7 @@ public:
 	template<typename Coeff>
 	UnivariatePolynomial<Coeff> toUnivPoly(const svector<mpz>& p, carl::Variable var) {
 		std::vector<Coeff> coeff;
-		for(size_t i = 0; i < p.size(); i++) {
+		for(unsigned i = 0; i < p.size(); i++) {
 			Coeff c = toNumber<Coeff>(p[i]);
 			coeff.push_back(c);
 		}

@@ -12,6 +12,7 @@
 #include "RootFinder.h"
 
 #include "../polynomialfunctions/Derivative.h"
+#include "../polynomialfunctions/SignVariations.h"
 
 #include "EigenWrapper.h"
 
@@ -69,7 +70,7 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 		return true;
 	}
 
-	uint variations = getPolynomial().signVariations(interval);
+	uint variations = carl::sign_variations(getPolynomial(), interval);
 	CARL_LOG_TRACE("carl.core.rootfinder", "Sign variations: " << variations);
 
 	if (variations == 0) return true;

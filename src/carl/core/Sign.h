@@ -65,7 +65,7 @@ Sign sgn(const Number& n) {
  * @return Sign variations of objects.
  */
 template<typename InputIterator>
-std::size_t signVariations(InputIterator begin, InputIterator end) {
+std::size_t sign_variations(InputIterator begin, InputIterator end) {
 	while ((*begin == Sign::ZERO) && (begin != end))
 		++begin;
 
@@ -93,7 +93,7 @@ std::size_t signVariations(InputIterator begin, InputIterator end) {
  * @return Sign variations of objects.
  */
 template<typename InputIterator, typename Function>
-std::size_t signVariations(InputIterator begin, InputIterator end, const Function& f) {
+std::size_t sign_variations(InputIterator begin, InputIterator end, const Function& f) {
 	while ((begin != end) && (f(*begin) == Sign::ZERO))
 		++begin;
 	if (begin == end) return 0;

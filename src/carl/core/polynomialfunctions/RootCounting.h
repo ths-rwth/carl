@@ -16,10 +16,10 @@ namespace carl {
  */
 template<typename Coefficient>
 int count_real_roots(const std::vector<UnivariatePolynomial<Coefficient>>& seq, const Interval<Coefficient>& i) {
-	int l = static_cast<int>(carl::signVariations(seq.begin(), seq.end(), 
+	int l = static_cast<int>(carl::sign_variations(seq.begin(), seq.end(), 
 		[&i](const auto& p){ return p.sgn(i.lower()); }
 	));
-	int r = static_cast<int>(carl::signVariations(seq.begin(), seq.end(),
+	int r = static_cast<int>(carl::sign_variations(seq.begin(), seq.end(),
 		[&i](const auto& p){ return p.sgn(i.upper()); }
 	));
 	return l - r;

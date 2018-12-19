@@ -32,6 +32,11 @@ namespace carl
         public:
             UEquality() = default;
 
+            UEquality(const UEquality&) = default;
+            UEquality(UEquality&&) = default;
+
+            UEquality& operator=(const UEquality&) noexcept = default;
+            UEquality& operator=(UEquality&&) noexcept = default;
 			/**
 			 * Constructs an uninterpreted equality.
 			 * @param negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
@@ -100,8 +105,9 @@ namespace carl
 	static_assert(std::is_literal_type<UEquality>::value, "UEquality should be a literal type.");
 
 	/**
-	 * @param ueq The uninterpreted equality to compare with.
-	 * @return true, if this and the given equality instance are equal.
+	 * @param lhs The left hand side.
+	 * @param rhs The right hand side.
+	 * @return true, if lhs and rhs are equal.
 	 */
 	inline bool operator==(const UEquality& lhs, const UEquality& rhs) {
 		return std::forward_as_tuple(lhs.negated(), lhs.lhs(), lhs.rhs()) == std::forward_as_tuple(rhs.negated(), rhs.lhs(), rhs.rhs());
@@ -109,7 +115,16 @@ namespace carl
 
 	/**
 	 * @param lhs The left hand side.
-	 * @param lhs The right hand side.
+	 * @param rhs The right hand side.
+	 * @return true, if lhs and rhs are not equal.
+	 */
+	inline bool operator!=(const UEquality& lhs, const UEquality& rhs) {
+	    return !(lhs == rhs);
+	}
+
+	/**
+	 * @param lhs The left hand side.
+	 * @param rhs The right hand side.
 	 * @return true, if the left equality is less than the right one.
 	 */
 	inline bool operator<(const UEquality& lhs, const UEquality& rhs) {

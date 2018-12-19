@@ -10,6 +10,7 @@
 #include "config.h"
 
 #ifdef USE_GINAC
+
 #include "../core/VariablePool.h"
 #include "../numbers/numbers.h"
 #include "../util/Common.h"

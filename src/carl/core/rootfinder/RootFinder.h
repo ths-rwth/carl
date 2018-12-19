@@ -13,7 +13,9 @@
 #include <list>
 #include <map>
 
-#include "../../formula/model/ran/adaption_z3/Z3RanRootFinder.h"
+#ifdef RAN_USE_Z3
+#include "../../formula/model/ran/z3/Z3RanRootFinder.h"
+#endif
 
 namespace carl {
 namespace rootfinder {
@@ -32,7 +34,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 ) {
 	CARL_LOG_DEBUG("carl.core.rootfinder", polynomial << " within " << interval);
-	#ifdef USE_Z3_RANS
+	#ifdef RAN_USE_Z3
 	auto r = realRootsZ3(polynomial, interval);
 	#else
 	auto r = Finder(polynomial, interval, pivoting).getAllRoots();
@@ -85,13 +87,9 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
  *   <li>the main variable of 'p' must not be in 'm'</li>
  *   <li>all variables from the coefficients of 'p' must be in 'm'</li>
  * </ul>
- * Note that boost::none is returned if replacing variables in 'p' already yields
- * the zero-polynomial and no valid root computation is possible.
- * However, if it's a non-zero-polynomial that simply has no roots, an empty vector
- * of roots is returned.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
+std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
@@ -99,7 +97,7 @@ boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
 );
 
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-boost::optional<std::vector<RealAlgebraicNumber<Number>>> realRoots(
+std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable>& variables,
 		const std::list<RealAlgebraicNumber<Number>>& values,

@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "../interval/Interval.h"
 #include "../numbers/numbers.h"
 #include "../util/SFINAE.h"
 #include "Polynomial.h"
@@ -481,37 +480,12 @@ public:
 	/**
 	 * The unit part of a polynomial over a field is its leading coefficient for nonzero polynomials, 
 	 * and one for zero polynomials.
-	 * @see @cite GCL92, page 42.
-	 * @return The unit part of the polynomial.
-	 */
-	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
-	const Coefficient& unitPart() const;
-	/**
 	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
 	 * and one for zero polynomials.
 	 * @see @cite GCL92, page 42.
 	 * @return The unit part of the polynomial.
 	 */
-#ifdef __VS
-	template<typename C = Coefficient, EnableIfBool<!is_number<C>::value > = dummy>
 	Coefficient unitPart() const;
-#else
-	template<typename C = Coefficient, EnableIf<Not<is_number<C>> > = dummy>
-	Coefficient unitPart() const;
-#endif
-	/**
-	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
-	 * and one for zero polynomials.
-	 * @see @cite GCL92, page 42.
-	 * @return The unit part of the polynomial.
-	 */
-#ifdef __VS
-	template<typename C = Coefficient, EnableIfBool<!is_field<C>::value && is_number<C>::value> = dummy>
-	Coefficient unitPart() const;
-#else
-	template<typename C = Coefficient, EnableIf<Not<is_field<C>>, is_number<C>> = dummy>
-	Coefficient unitPart() const;
-#endif
 	
 	/**
 	 * The n'th derivative of the polynomial in its main variable.
@@ -621,9 +595,6 @@ public:
 
 	Coefficient evaluate(const Coefficient& value) const;
 	
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	void substituteIn(Variable var, const Coefficient& value);
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	void substituteIn(Variable var, const Coefficient& value);
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -805,36 +776,6 @@ public:
 	void eliminateRoot(const Coefficient& root);
 	
 public:
-	[[deprecated("Use carl::sturm_sequence() instead.")]]
-	std::vector<UnivariatePolynomial> standardSturmSequence() const;
-	[[deprecated("Use carl::sturm_sequence() instead.")]]
-	std::vector<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
-
-	/**
-	 * Counts the sign variations (i.e. an upper bound for the number of real roots) via Descarte's rule of signs.
-	 * This is an upper bound for countRealRoots().
-	 * @param interval Count roots within this interval.
-	 * @return Upper bound for number of real roots within the interval.
-	 */
-	uint signVariations(const Interval<Coefficient>& interval) const;
-
-	/**
-	 * Count the number of real roots within the given interval using Sturm sequences.
-	 * @param interval Count roots within this interval.
-	 * @return Number of real roots within the interval.
-	 */
-	[[deprecated("Use carl::count_real_roots() instead.")]]
-	int countRealRoots(const Interval<Coefficient>& interval) const;
-
-	/**
-	 * Calculate the number of real roots of a polynomial within a given interval based on a sturm sequence of this polynomial.
-	 * @param seq Sturm sequence.
-	 * @param interval Interval.
-	 * @return Number of real roots in the interval.
-	 */
-	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
-	static int countRealRoots(const std::vector<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
-
 	/// @name Equality comparison operators
 	/// @{
 	/**
@@ -1026,7 +967,6 @@ public:
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isConsistent() const;
-private:
 	
 	/**
 	 * Reverses the order of the coefficients of this polynomial.

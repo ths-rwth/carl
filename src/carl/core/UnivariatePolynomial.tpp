@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "../converter/OldGinacConverter.h"
 #include "../util/debug.h"
 #include "../util/platform.h"
 #include "../util/SFINAE.h"
@@ -145,38 +144,27 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value) {
 	if (carl::isZero(*this)) return;
-	if (var == this->mainVar()) {
-		this->mCoefficients[0] = this->evaluate(value);
-		this->mCoefficients.resize(1);
-	}
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
-}
-
-template<typename Coeff>
-template<typename C, DisableIf<is_number<C>>>
-void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value) {
-	if (carl::isZero(*this)) return;
-	if (var == this->mainVar()) {
-		this->mCoefficients[0] = this->evaluate(value);
-		this->mCoefficients.resize(1);
-	} else {
+	if (var == mainVar()) {
+		mCoefficients[0] = evaluate(value);
+		mCoefficients.resize(1);
+	} else if constexpr (!is_number<Coeff>::value) {
+		// Coefficients from a polynomial ring
 		if (value.has(var)) {
 			// Fall back to multivariate substitution.
 			MultivariatePolynomial<NumberType> tmp(*this);
 			tmp.substituteIn(var, value);
-			*this = tmp.toUnivariatePolynomial(this->mMainVar);
+			*this = tmp.toUnivariatePolynomial(mainVar());
 		} else {
+			// Safely substitute into each coefficient separately
 			for (auto& c: mCoefficients) {
 				c.substituteIn(var, value);
 			}
 		}
 	}
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
+	stripLeadingZeroes();
+	assert(isConsistent());
 }
 
 template<typename Coeff>
@@ -544,50 +532,25 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 	return *this/unitPart();
 }
 
-
-
 template<typename Coeff>
-template<typename C, EnableIf<is_field<C>>>
-const Coeff& UnivariatePolynomial<Coeff>::unitPart() const
-{
-	return lcoeff();
-}
-
-#ifdef __VS
-template<typename Coeff>
-template<typename C, EnableIfBool<!is_number<C>::value>>
-#else
-template<typename Coeff>
-template<typename C, EnableIf<Not<is_number<C>>>>
-#endif
-Coeff UnivariatePolynomial<Coeff>::unitPart() const
-{
-	if(carl::isZero(*this) || carl::isZero(lcoeff()) || lcoeff().lcoeff() > NumberType(0))
-	{
-		return Coeff(1);
-	}	
-	else
-	{
-		return Coeff(-1);
-	}
-}
-
-#ifdef __VS
-template<typename Coeff>
-template<typename C, EnableIfBool<!is_field<C>::value && is_number<C>::value >>
-#else
-template<typename Coeff>
-template<typename C, EnableIf<Not<is_field<C>>, is_number<C> >>
-#endif
-Coeff UnivariatePolynomial<Coeff>::unitPart() const
-{
-	if(carl::isZero(*this) || lcoeff() > Coeff(0))
-	{
-		return Coeff(1);
-	}
-	else
-	{
-		return Coeff(-1);
+Coeff UnivariatePolynomial<Coeff>::unitPart() const {
+	if constexpr (is_field<Coeff>::value) {
+		// Coeffs from a field
+		return lcoeff();
+	} else if constexpr (is_number<Coeff>::value) {
+		// Coeffs from a number ring
+		if (carl::isZero(*this) || lcoeff() > Coeff(0)) {
+			return Coeff(1);
+		} else {
+			return Coeff(-1);
+		}
+	} else {
+		// Coeffs from a polynomial ring
+		if (carl::isZero(*this) || carl::isZero(lcoeff()) || lcoeff().lcoeff() > NumberType(0)) {
+			return Coeff(1);
+		} else {
+			return Coeff(-1);
+		}
 	}
 }
 
@@ -1191,71 +1154,6 @@ void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
 		this->mCoefficients = tmp;
 	} while ((this->evaluate(root) == Coeff(0)) && (this->mCoefficients.size() > 0));
 }
-
-template<typename Coeff>
-std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence() const {
-	return this->standardSturmSequence(derivative());
-}
-
-template<typename Coeff>
-std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence(const UnivariatePolynomial<Coeff>& polynomial) const {
-	assert(this->mainVar() == polynomial.mainVar());
-	std::vector<UnivariatePolynomial<Coeff>> seq;
-
-	UnivariatePolynomial<Coeff> p = *this;
-	UnivariatePolynomial<Coeff> q = polynomial;
-
-	seq.push_back(p);
-	while (! carl::isZero(q)) {
-		seq.push_back(q);
-		q = - p.remainder(q);
-		p = seq.back();
-	}
-	return seq;
-}
-
-template<typename Coeff>
-uint UnivariatePolynomial<Coeff>::signVariations(const Interval<Coeff>& interval) const {
-	if (interval.isEmpty()) return 0;
-	if (interval.isPointInterval()) {
-		std::vector<Coeff> vals;
-		Coeff factor = carl::constant_one<Coeff>::get();
-		for (const auto& c: mCoefficients) {
-			vals.push_back(c * factor);
-			factor *= interval.lower();
-		}
-		auto res = carl::signVariations(vals.begin(), vals.end(), [](const Coeff& c){ return carl::sgn(c); });
-		CARL_LOG_TRACE("carl.core", *this << " has " << res << " sign variations at " << interval.lower());
-		return res;
-	}
-	UnivariatePolynomial<Coeff> p(*this);
-	p.shift(interval.lower());
-	p.scale(interval.diameter());
-	p.reverse();
-	p.shift(1);
-	p.stripLeadingZeroes();
-	assert(p.isConsistent());
-	auto res = carl::signVariations(p.mCoefficients.begin(), p.mCoefficients.end(), [](const Coeff& c){ return carl::sgn(c); });
-	CARL_LOG_TRACE("carl.core", *this << " has " << res << " sign variations within " << interval);
-	return res;
-}
-
-template<typename Coeff>
-int UnivariatePolynomial<Coeff>::countRealRoots(const Interval<Coeff>& interval) const {
-	assert(!carl::isZero(*this));
-	assert(!this->isRoot(interval.lower()));
-	assert(!this->isRoot(interval.upper()));
-	return UnivariatePolynomial<Coeff>::countRealRoots(this->standardSturmSequence(), interval);
-}
-
-template<typename Coeff>
-template<typename C, typename Number>
-int UnivariatePolynomial<Coeff>::countRealRoots(const std::vector<UnivariatePolynomial<Coeff>>& seq, const Interval<Number>& interval) {
-	int l = int(carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.lower()); }));
-	int r = int(carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.upper()); }));
-	return l - r;
-}
-
 
 template<typename Coeff>
 void UnivariatePolynomial<Coeff>::reverse() {

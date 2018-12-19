@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "carl/interval/Interval.h"
 #include "carl/core/polynomialfunctions/Content.h"
 #include "carl/core/polynomialfunctions/GCD.h"
 #include "carl/core/polynomialfunctions/PrimitivePart.h"
@@ -11,7 +12,6 @@
 #include "carl/numbers/GFNumber.h"
 #include "carl/numbers/GaloisField.h"
 #include "carl/util/debug.h"
-#include "carl/interval/Interval.h"
 #include "carl/util/platform.h"
 
 

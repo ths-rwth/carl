@@ -42,6 +42,10 @@ namespace carl
 		}, lhs.asVariant(), rhs.asVariant());
 	}
 
+	bool operator!=(const UTerm& lhs, const UTerm& rhs) {
+        return !(lhs == rhs);
+    }
+
 	bool operator<(const UTerm& lhs, const UTerm& rhs) {
 		return std::visit(overloaded {
 			[](UVariable lhs, UVariable rhs) { return lhs < rhs; },

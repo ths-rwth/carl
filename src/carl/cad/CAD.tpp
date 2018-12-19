@@ -842,11 +842,11 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	}
 	CARL_LOG_FUNC("carl.cad", *p << " on " << m);
 	auto roots = carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy);
-	if (roots) {
+	if (roots.empty()) {
 		return this->samples(
 			openVariableCount,
 	        //carl::realRootsThom(*p, m, bounds),
-			std::list<RealAlgebraicNumber<Number>>(roots->begin(), roots->end()),
+			{ RealAlgebraicNumber<Number>(0) },
 			currentSamples,
 			replacedSamples,
 			bounds
@@ -855,7 +855,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		return this->samples(
 			openVariableCount,
 	        //carl::realRootsThom(*p, m, bounds),
-			{ RealAlgebraicNumber<Number>(0) },
+			std::list<RealAlgebraicNumber<Number>>(roots.begin(), roots.end()),
 			currentSamples,
 			replacedSamples,
 			bounds
@@ -1813,9 +1813,9 @@ void CAD<Number>::shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number
 				} else {
 					// translate given open interval into the bounds
 					bound->second.setLowerBoundType(BoundType::STRICT);
-					bound->second.setLower(r[level].lower());
+					bound->second.setLower(r[level].getInterval().lower());
 					bound->second.setUpperBoundType(BoundType::STRICT);
-					bound->second.setUpper(r[level].upper());
+					bound->second.setUpper(r[level].getInterval().upper());
 				}
 			}
 		}

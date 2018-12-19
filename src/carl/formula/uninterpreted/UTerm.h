@@ -89,6 +89,8 @@ namespace carl
 	 */
 	bool operator==(const UTerm& lhs, const UTerm& rhs);
 
+	bool operator!=(const UTerm& lhs, const UTerm& rhs);
+
 	/**
 	 * @param lhs The uninterpreted term to the left.
 	 * @param rhs The uninterpreted term to the right.

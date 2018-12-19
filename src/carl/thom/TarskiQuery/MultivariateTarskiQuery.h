@@ -56,12 +56,12 @@ int multivariateTarskiQuery(const MultivariatePolynomial<Number>& Q, const Multi
         CARL_LOG_INFO("carl.thom.tarski", "... done setting up matrix.");
         std::vector<Number> cp = charPol(m);
         CARL_LOG_TRACE("carl.thom.tarski", "char pol: " << cp);
-        int v1 = int(signVariations(cp.begin(), cp.end(), sgn<Number>));
+        int v1 = int(sign_variations(cp.begin(), cp.end(), sgn<Number>));
         for(uint i = 1; i < cp.size(); i += 2) {
                 cp[i] *= -Number(1);
         }
         CARL_LOG_TRACE("carl.thom.tarski", "char pol': " << cp);
-        int v2 = int(signVariations(cp.begin(), cp.end(), sgn<Number>));
+        int v2 = int(sign_variations(cp.begin(), cp.end(), sgn<Number>));
         
         CARL_LOG_TRACE("carl.thom.tarski", "result = " << v1 - v2);
         return v1 - v2;

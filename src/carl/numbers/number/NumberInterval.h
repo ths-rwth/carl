@@ -1,10 +1,8 @@
 #pragma once
 
-
-
 #include "Number.h"
 
-
+#include "../../interval/Interval.h"
 
 namespace carl {
 
