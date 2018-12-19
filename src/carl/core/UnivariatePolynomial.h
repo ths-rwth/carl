@@ -480,37 +480,12 @@ public:
 	/**
 	 * The unit part of a polynomial over a field is its leading coefficient for nonzero polynomials, 
 	 * and one for zero polynomials.
-	 * @see @cite GCL92, page 42.
-	 * @return The unit part of the polynomial.
-	 */
-	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
-	const Coefficient& unitPart() const;
-	/**
 	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
 	 * and one for zero polynomials.
 	 * @see @cite GCL92, page 42.
 	 * @return The unit part of the polynomial.
 	 */
-#ifdef __VS
-	template<typename C = Coefficient, EnableIfBool<!is_number<C>::value > = dummy>
 	Coefficient unitPart() const;
-#else
-	template<typename C = Coefficient, EnableIf<Not<is_number<C>> > = dummy>
-	Coefficient unitPart() const;
-#endif
-	/**
-	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
-	 * and one for zero polynomials.
-	 * @see @cite GCL92, page 42.
-	 * @return The unit part of the polynomial.
-	 */
-#ifdef __VS
-	template<typename C = Coefficient, EnableIfBool<!is_field<C>::value && is_number<C>::value> = dummy>
-	Coefficient unitPart() const;
-#else
-	template<typename C = Coefficient, EnableIf<Not<is_field<C>>, is_number<C>> = dummy>
-	Coefficient unitPart() const;
-#endif
 	
 	/**
 	 * The n'th derivative of the polynomial in its main variable.
@@ -620,9 +595,6 @@ public:
 
 	Coefficient evaluate(const Coefficient& value) const;
 	
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	void substituteIn(Variable var, const Coefficient& value);
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	void substituteIn(Variable var, const Coefficient& value);
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>

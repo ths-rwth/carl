@@ -144,38 +144,27 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value) {
 	if (carl::isZero(*this)) return;
-	if (var == this->mainVar()) {
-		this->mCoefficients[0] = this->evaluate(value);
-		this->mCoefficients.resize(1);
-	}
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
-}
-
-template<typename Coeff>
-template<typename C, DisableIf<is_number<C>>>
-void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value) {
-	if (carl::isZero(*this)) return;
-	if (var == this->mainVar()) {
-		this->mCoefficients[0] = this->evaluate(value);
-		this->mCoefficients.resize(1);
-	} else {
+	if (var == mainVar()) {
+		mCoefficients[0] = evaluate(value);
+		mCoefficients.resize(1);
+	} else if constexpr (!is_number<Coeff>::value) {
+		// Coefficients from a polynomial ring
 		if (value.has(var)) {
 			// Fall back to multivariate substitution.
 			MultivariatePolynomial<NumberType> tmp(*this);
 			tmp.substituteIn(var, value);
-			*this = tmp.toUnivariatePolynomial(this->mMainVar);
+			*this = tmp.toUnivariatePolynomial(mainVar());
 		} else {
+			// Safely substitute into each coefficient separately
 			for (auto& c: mCoefficients) {
 				c.substituteIn(var, value);
 			}
 		}
 	}
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
+	stripLeadingZeroes();
+	assert(isConsistent());
 }
 
 template<typename Coeff>
@@ -543,50 +532,25 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 	return *this/unitPart();
 }
 
-
-
 template<typename Coeff>
-template<typename C, EnableIf<is_field<C>>>
-const Coeff& UnivariatePolynomial<Coeff>::unitPart() const
-{
-	return lcoeff();
-}
-
-#ifdef __VS
-template<typename Coeff>
-template<typename C, EnableIfBool<!is_number<C>::value>>
-#else
-template<typename Coeff>
-template<typename C, EnableIf<Not<is_number<C>>>>
-#endif
-Coeff UnivariatePolynomial<Coeff>::unitPart() const
-{
-	if(carl::isZero(*this) || carl::isZero(lcoeff()) || lcoeff().lcoeff() > NumberType(0))
-	{
-		return Coeff(1);
-	}	
-	else
-	{
-		return Coeff(-1);
-	}
-}
-
-#ifdef __VS
-template<typename Coeff>
-template<typename C, EnableIfBool<!is_field<C>::value && is_number<C>::value >>
-#else
-template<typename Coeff>
-template<typename C, EnableIf<Not<is_field<C>>, is_number<C> >>
-#endif
-Coeff UnivariatePolynomial<Coeff>::unitPart() const
-{
-	if(carl::isZero(*this) || lcoeff() > Coeff(0))
-	{
-		return Coeff(1);
-	}
-	else
-	{
-		return Coeff(-1);
+Coeff UnivariatePolynomial<Coeff>::unitPart() const {
+	if constexpr (is_field<Coeff>::value) {
+		// Coeffs from a field
+		return lcoeff();
+	} else if constexpr (is_number<Coeff>::value) {
+		// Coeffs from a number ring
+		if (carl::isZero(*this) || lcoeff() > Coeff(0)) {
+			return Coeff(1);
+		} else {
+			return Coeff(-1);
+		}
+	} else {
+		// Coeffs from a polynomial ring
+		if (carl::isZero(*this) || carl::isZero(lcoeff()) || lcoeff().lcoeff() > NumberType(0)) {
+			return Coeff(1);
+		} else {
+			return Coeff(-1);
+		}
 	}
 }
 
