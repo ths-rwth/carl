@@ -119,7 +119,7 @@ namespace carl {
         svector<mpz> res;
         z3().anumMan().get_polynomial(content(), res);
         mPolynomial = z3().toUnivPoly<Number>(res);
-        for (size_t i = 0; i < res.size(); i++) {
+        for (unsigned i = 0; i < res.size(); i++) {
             z3().free(res[i]);
         }
         return *mPolynomial;
