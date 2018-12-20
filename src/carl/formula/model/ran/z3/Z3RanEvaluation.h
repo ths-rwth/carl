@@ -14,6 +14,9 @@ namespace carl {
 template<typename Number>
 ran::Z3Content<Number> evaluateZ3(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, ran::Z3Content<Number>>& evalMap);
 
+template<typename Number, typename Poly>
+bool evaluateZ3(const Constraint<Poly>& constraint, const std::map<Variable, ran::Z3Content<Number>>& evalMap);
+
 }
 
 #endif

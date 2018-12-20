@@ -50,6 +50,18 @@ auto overload_on_map(F&& f, const RANMap<Number>& map) {
 	);
 }
 
+// TODO solve :
+template<typename F, typename Number>
+auto overload_on_map2(F&& f, const RANMap<Number>& map) {
+	assert(!map.empty());
+	return std::visit(
+		[&f, &map](const auto& tag){
+			return bool(detail::overload_on_map(tag, std::forward<F>(f), map));
+		},
+		map.begin()->second.content()
+	);
+}
+
 /**
  * Evaluate the given polynomial 'p' at the given 'point' based on the variable order given by 'variables'.
  * If a variable is assigned a numeric representation, the corresponding value is directly plugged in.
@@ -164,6 +176,43 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, co
 
 	return overload_on_map(
 		[&pol](auto& map){ return RealAlgebraicNumber<Number>(ran::evaluate(pol, map)); },
+		IRmap
+	);
+}
+
+/**
+ * Evaluate the given constraint 'c' at the given 'point' based on the variable order given by 'variables'.
+ * If a variable is assigned a numeric representation, the corresponding value is directly plugged in.
+ * All assignments of interval representations are passed on to <code>evaluate(Constraint, RANIRMap)</code>.
+ * Note that the number of variables must match the dimension of the 'point', all
+ * variables of 'c' must appear in 'variables' and that 'variables' must not mention any additional variables.
+ */
+template<typename Number, typename Poly>
+bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
+	CARL_LOG_TRACE("carl.ran", "Evaluating " << c << " on " << m);
+	MultivariatePolynomial<Number> pol(c.lhs());
+	RANMap<Number> IRmap;
+	
+	for (const auto& r: m) {
+		//assert(pol.has(it->first));
+		if (r.second.isNumeric()) {
+			// Plug in numeric representations
+			pol.substituteIn(r.first, MultivariatePolynomial<Number>(r.second.value()));
+		} else {
+			// Defer interval representations
+			IRmap.emplace(r.first, r.second);
+		}
+	}
+	if (pol.isNumber()) {
+		return evaluate(pol.constantPart(), c.relation());
+	}
+
+	// need to evaluate polynomial on non-trivial RANs
+
+	Constraint<Poly> constr(pol, c.relation());
+
+	return overload_on_map2(
+		[&constr](auto& map){ return bool(ran::evaluate(constr, map)); },
 		IRmap
 	);
 }

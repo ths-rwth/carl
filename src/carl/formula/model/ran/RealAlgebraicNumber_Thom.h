@@ -130,6 +130,12 @@ Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, Thom
 	
 }
 
+template<typename Number, typename Poly>
+bool evaluate(const Constraint<Poly>& c, std::map<Variable, ThomContent<Number>>& m) {
+	auto res = evaluate(c.lhs(), m);
+	return evaluate(res, c.relation());
+}
+
 template<typename Number>
 ThomContent<Number> abs(const ThomContent<Number>& n) {
 	assert(false);

@@ -353,6 +353,12 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	return IntervalContent<Number>(res, interval, std::move(sturmSeq));
 }
 
+template<typename Number, typename Poly>
+bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m) {
+	IntervalContent<Number> res = evaluate(c.lhs(), m);
+	return evaluate(res.sgn(), c.relation());
+}
+
 template<typename Number>
 const Interval<Number>& get_interval(const IntervalContent<Number>& n) {
 	return n.interval();

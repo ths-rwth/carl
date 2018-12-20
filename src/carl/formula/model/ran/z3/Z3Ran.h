@@ -8,6 +8,7 @@
 #include "../../../../core/UnivariatePolynomial.h"
 #include "../../../../core/MultivariatePolynomial.h"
 #include "../../../../interval/Interval.h"
+#include "../../../Constraint.h"
 
 #include <boost/optional.hpp>
 

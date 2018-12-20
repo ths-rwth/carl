@@ -33,6 +33,7 @@
 #include "../../../core/UnivariatePolynomial.h"
 #include "../../../core/polynomialfunctions/GCD.h"
 #include "../../../core/MultivariatePolynomial.h"
+#include "../../Constraint.h"
 #include "../../../core/polynomialfunctions/RootCounting.h"
 #include "../../../core/polynomialfunctions/SturmSequence.h"
 #include "../../../interval/Interval.h"

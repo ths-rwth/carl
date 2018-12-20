@@ -24,12 +24,21 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void evaluate(ModelValue<Rational,Poly>& res, Constraint<Poly>& c, const Model<Rational,Poly>& m) {
+		substituteIn(c, m);
+		
+		auto map = collectRANIR(c.lhs().gatherVariables(), m);
+		if (map.size() == c.lhs().gatherVariables().size()) {
+			res = RealAlgebraicNumberEvaluation::evaluate(c, map);
+			return;
+		}
+
+		// TODO some of these cases are already handled above:
 		Poly p = c.lhs();
 		evaluate(res, p, m);
 		if (res.isRational()) {
 			res = evaluate(res.asRational(), c.relation());
 		} else if (res.isRAN()) {
-			res = evaluate(res.asRAN().sgn(), c.relation());
+		 	res = evaluate(res.asRAN().sgn(), c.relation());
 		} else {
 			res = createSubstitution<Rational,Poly,ModelFormulaSubstitution<Rational,Poly>>(Formula<Poly>(Constraint<Poly>(p, c.relation())));
 		}
