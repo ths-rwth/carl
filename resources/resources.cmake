@@ -172,7 +172,7 @@ IF(USE_MPFR_FLOAT)
 endif()
 
 ##### Z3
-if(COMPARE_WITH_Z3 OR USE_Z3_NUMBERS OR USE_Z3_RANS)
+if(COMPARE_WITH_Z3 OR USE_Z3_NUMBERS OR RAN_USE_Z3)
 	#load_library(carl Z3 4.0)
 	set(Z3_VERSION "4.7.1")
 	include(resources/z3.cmake)

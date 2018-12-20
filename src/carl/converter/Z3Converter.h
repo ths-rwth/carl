@@ -204,8 +204,9 @@ public:
 		polyMan().lex_sort(res);
 		return res;
 	}
+	/*
 	template<typename Coeff>
-	polynomial::polynomial_ref toZ3(const carl::UnivariatePolynomial<Coeff>& p) {
+	polynomial::polynomial_ref toZ3(const carl::UnivariatePolynomial<Coeff>& p) { // TODO does not work
 		polynomial::polynomial_ref res(polyMan());
 		res = toZ3(polyMan().mk_zero());
 		unsigned exp = 0;
@@ -217,6 +218,7 @@ public:
 		polyMan().lex_sort(res);
 		return res;
 	}
+	*/
 
 	// polynomial conversions ensuring that coefficients are integral
 
@@ -228,8 +230,12 @@ public:
 
 	template<typename Number, EnableIf<is_subset_of_rationals<Number>> = dummy>
 	polynomial::polynomial_ref toZ3IntCoeff(const carl::UnivariatePolynomial<Number>& p) {
+		MultivariatePolynomial<Number> p2(p);
+		return toZ3IntCoeff(p2);
+		/*
 		auto p2 = p.coprimeCoefficientsSignPreserving(); // does not work correctly if Coeff is MultivariatePolynomial<Number>
 		return toZ3(p2);
+		*/
 	}
 
 	template<typename Number, EnableIf<is_subset_of_rationals<Number>> = dummy>
