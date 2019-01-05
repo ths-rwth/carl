@@ -197,7 +197,7 @@ public:
 		else return res;
 	}
 	template<typename Coeff>
-	polynomial::polynomial_ref toZ3(const carl::MultivariatePolynomial<Coeff>& p) { // TODO slow
+	polynomial::polynomial_ref toZ3(const carl::MultivariatePolynomial<Coeff>& p) {
 		polynomial::polynomial_ref res(polyMan());
 		res = toZ3(polyMan().mk_zero());
 		for (auto t: p) res = res + toZ3(t);
@@ -206,7 +206,7 @@ public:
 	}
 	/*
 	template<typename Coeff>
-	polynomial::polynomial_ref toZ3(const carl::UnivariatePolynomial<Coeff>& p) { // TODO does not work
+	polynomial::polynomial_ref toZ3(const carl::UnivariatePolynomial<Coeff>& p) { // FIXME does not work
 		polynomial::polynomial_ref res(polyMan());
 		res = toZ3(polyMan().mk_zero());
 		unsigned exp = 0;

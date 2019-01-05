@@ -45,7 +45,6 @@ namespace carl {
 
     template<typename Number, typename Poly>
     bool evaluateZ3(const Constraint<Poly>& constraint, const std::map<Variable, ran::Z3Content<Number>>& evalMap) {
-        // TODO assert that constraint is fully assigned!
         polynomial::polynomial_ref poly = z3().toZ3IntCoeff(constraint.lhs());
         algebraic_numbers::anum res;
         nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
