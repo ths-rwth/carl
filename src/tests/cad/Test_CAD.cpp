@@ -15,7 +15,7 @@
 using namespace carl;
 
 
-typedef carl::cad::Constraint<Rational> Constraint;
+typedef carl::cad::Constraint<Rational> CadConstraint;
 
 class CADTest : public ::testing::Test {
 protected:
@@ -97,12 +97,12 @@ protected:
 TEST_F(CADTest, Check1)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 	this->cad.addPolynomial(this->p[0], {x, y});
 	this->cad.addPolynomial(this->p[1], {x, y});
 	cons.assign({
-		Constraint(this->p[0], Sign::ZERO, {x,y}),
-		Constraint(this->p[1], Sign::ZERO, {x,y})
+		CadConstraint(this->p[0], Sign::ZERO, {x,y}),
+		CadConstraint(this->p[1], Sign::ZERO, {x,y})
 	});
 	this->cad.prepareElimination();
 	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
@@ -116,15 +116,15 @@ TEST_F(CADTest, Check1)
 TEST_F(CADTest, Check2)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 	Rational half = Rational(1) / 2;
 
 	this->cad.addPolynomial(this->p[0], {x, y});
 	this->cad.addPolynomial(this->p[2], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[0], Sign::ZERO, {x,y}),
-		Constraint(this->p[2], Sign::ZERO, {x,y})
+		CadConstraint(this->p[0], Sign::ZERO, {x,y}),
+		CadConstraint(this->p[2], Sign::ZERO, {x,y})
 	});
 	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
 	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
@@ -136,14 +136,14 @@ TEST_F(CADTest, Check2)
 TEST_F(CADTest, Check3)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 
 	this->cad.addPolynomial(this->p[0], {x, y});
 	this->cad.addPolynomial(this->p[2], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[0], Sign::POSITIVE, {x,y}),
-		Constraint(this->p[2], Sign::NEGATIVE, {x,y})
+		CadConstraint(this->p[0], Sign::POSITIVE, {x,y}),
+		CadConstraint(this->p[2], Sign::NEGATIVE, {x,y})
 	});
 	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
 	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
@@ -152,14 +152,14 @@ TEST_F(CADTest, Check3)
 TEST_F(CADTest, Check4)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 
 	this->cad.addPolynomial(this->p[0], {x, y});
 	this->cad.addPolynomial(this->p[2], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[0], Sign::NEGATIVE, {x,y}),
-		Constraint(this->p[2], Sign::POSITIVE, {x,y})
+		CadConstraint(this->p[0], Sign::NEGATIVE, {x,y}),
+		CadConstraint(this->p[2], Sign::POSITIVE, {x,y})
 	});
 	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
 	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
@@ -168,14 +168,14 @@ TEST_F(CADTest, Check4)
 TEST_F(CADTest, Check5)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 
 	this->cad.addPolynomial(this->p[0], {x, y});
 	this->cad.addPolynomial(this->p[2], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[0], Sign::ZERO, {x,y}),
-		Constraint(this->p[2], Sign::POSITIVE, {x,y})
+		CadConstraint(this->p[0], Sign::ZERO, {x,y}),
+		CadConstraint(this->p[2], Sign::POSITIVE, {x,y})
 	});
 	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
 	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
@@ -184,16 +184,16 @@ TEST_F(CADTest, Check5)
 TEST_F(CADTest, Check6)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 
 	this->cad.addPolynomial(this->p[3], {x, y, z});
 	this->cad.addPolynomial(this->p[4], {x, y, z});
 	this->cad.addPolynomial(this->p[5], {x, y, z});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[3], Sign::NEGATIVE, {x,y,z}),
-		Constraint(this->p[4], Sign::POSITIVE, {x,y,z}),
-		Constraint(this->p[5], Sign::POSITIVE, {x,y,z})
+		CadConstraint(this->p[3], Sign::NEGATIVE, {x,y,z}),
+		CadConstraint(this->p[4], Sign::POSITIVE, {x,y,z}),
+		CadConstraint(this->p[5], Sign::POSITIVE, {x,y,z})
 	});
 	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
 	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
@@ -202,14 +202,14 @@ TEST_F(CADTest, Check6)
 TEST_F(CADTest, Check7)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 	
 	this->cad.addPolynomial(this->p[7], {x, y});
 	this->cad.addPolynomial(this->p[6], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[7], Sign::ZERO, {x,y}),
-		Constraint(this->p[6], Sign::ZERO, {x,y})
+		CadConstraint(this->p[7], Sign::ZERO, {x,y}),
+		CadConstraint(this->p[6], Sign::ZERO, {x,y})
 	});
 	EXPECT_EQ(carl::cad::Answer::False, cad.check(cons, r, this->bounds));
 	//for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
@@ -218,14 +218,14 @@ TEST_F(CADTest, Check7)
 TEST_F(CADTest, Check8)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 	
 	this->cad.addPolynomial(this->p[7], {x, y, z});
 	this->cad.addPolynomial(this->p[8], {x, y, z});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[7], Sign::NEGATIVE, {x,y, z}),
-		Constraint(this->p[8], Sign::ZERO, {x,y, z})
+		CadConstraint(this->p[7], Sign::NEGATIVE, {x,y, z}),
+		CadConstraint(this->p[8], Sign::ZERO, {x,y, z})
 	});
 	EXPECT_EQ(carl::cad::Answer::False, cad.check(cons, r, this->bounds));
 	//for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
@@ -234,7 +234,7 @@ TEST_F(CADTest, Check8)
 TEST_F(CADTest, Check9)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 	
 	this->cad.addPolynomial(this->p[9], {x, y, z, w});
 	this->cad.addPolynomial(this->p[10], {x, y, z, w});
@@ -242,10 +242,10 @@ TEST_F(CADTest, Check9)
 	this->cad.addPolynomial(this->p[12], {x, y, z, w});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[9], Sign::NEGATIVE, {x,y,z,w}),
-		Constraint(this->p[10], Sign::ZERO, {x,y,z,w}),
-		Constraint(this->p[11], Sign::POSITIVE, {x,y,z,w}),
-		Constraint(this->p[12], Sign::ZERO, {x,y,z,w})
+		CadConstraint(this->p[9], Sign::NEGATIVE, {x,y,z,w}),
+		CadConstraint(this->p[10], Sign::ZERO, {x,y,z,w}),
+		CadConstraint(this->p[11], Sign::POSITIVE, {x,y,z,w}),
+		CadConstraint(this->p[12], Sign::ZERO, {x,y,z,w})
 	});
 	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
 	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
@@ -254,15 +254,15 @@ TEST_F(CADTest, Check9)
 TEST_F(CADTest, CheckInt)
 {
 	RealAlgebraicPoint<Rational> r;
-	std::vector<Constraint> cons;
+	std::vector<CadConstraint> cons;
 	carl::Variable i = carl::freshIntegerVariable("i");
 
 	this->cad.addPolynomial(Polynomial(i), {i});
 	this->cad.addPolynomial(Polynomial(Rational(1)-i), {i});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(Polynomial(i), Sign::ZERO, {i}),
-		Constraint(Polynomial(Rational(1)-i), Sign::ZERO, {i})
+		CadConstraint(Polynomial(i), Sign::ZERO, {i}),
+		CadConstraint(Polynomial(Rational(1)-i), Sign::ZERO, {i})
 	});
 	//EXPECT_EQ(carl::cad::Answer::False, cad.check(cons, r, this->bounds));
 	//std::cout << r << std::endl;
