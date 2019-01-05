@@ -39,24 +39,12 @@ namespace detail {
 	}
 }
 
-template<typename F, typename Number>
+template<typename T, typename F, typename Number>
 auto overload_on_map(F&& f, const RANMap<Number>& map) {
 	assert(!map.empty());
 	return std::visit(
 		[&f, &map](const auto& tag){
-			return RealAlgebraicNumber<Number>(detail::overload_on_map(tag, std::forward<F>(f), map));
-		},
-		map.begin()->second.content()
-	);
-}
-
-// TODO solve :
-template<typename F, typename Number>
-auto overload_on_map2(F&& f, const RANMap<Number>& map) {
-	assert(!map.empty());
-	return std::visit(
-		[&f, &map](const auto& tag){
-			return bool(detail::overload_on_map(tag, std::forward<F>(f), map));
+			return T(detail::overload_on_map(tag, std::forward<F>(f), map));
 		},
 		map.begin()->second.content()
 	);
@@ -174,7 +162,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, co
 
 	// need to evaluate polynomial on non-trivial RANs
 
-	return overload_on_map(
+	return overload_on_map<RealAlgebraicNumber<Number>>(
 		[&pol](auto& map){ return RealAlgebraicNumber<Number>(ran::evaluate(pol, map)); },
 		IRmap
 	);
@@ -211,7 +199,7 @@ bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
 
 	Constraint<Poly> constr(pol, c.relation());
 
-	return overload_on_map2(
+	return overload_on_map<bool>(
 		[&constr](auto& map){ return bool(ran::evaluate(constr, map)); },
 		IRmap
 	);
