@@ -35,8 +35,8 @@ namespace carl
             UEquality(const UEquality&) = default;
             UEquality(UEquality&&) = default;
 
-            UEquality& operator=(const UEquality&) noexcept = default;
-            UEquality& operator=(UEquality&&) noexcept = default;
+            UEquality& operator=(const UEquality&) = default;
+            UEquality& operator=(UEquality&&) = default;
 			/**
 			 * Constructs an uninterpreted equality.
 			 * @param negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
