@@ -99,10 +99,6 @@ public:
 				mNumerator -= t;
 			}
 		}
-		if (mDenominator.isNumber()) {
-			mNumerator /= mDenominator.constantPart();
-			mDenominator = Polynomial(1);
-		}
 		CARL_LOG_DEBUG("carl.contractor", p << " with " << v << " -> " << *this);
 	}
 
@@ -124,9 +120,9 @@ public:
 	 * Returns a list of resulting intervals.
 	 * 
 	 * Allows to integrate a relation symbol as follows:
-	 * - Transform relation into an interval (e.g. < to (-oo, 0))
-	 * - Transform constraint to equality (e.g. p*x - q < 0 to p*x - q + h = 0)
-	 * - Evaluate with respect to interval h (e.g. x = (q - h) / p)
+	 * - Transform relation into an interval (e.g. < 0 to = (-oo, 0))
+	 * - Transform constraint to equality (e.g. p*x - q < 0 to p*x - q = h)
+	 * - Evaluate with respect to interval h (e.g. x = (q + h) / p)
 	 */
 	template<typename Number>
 	std::vector<Interval<Number>> evaluate(const std::map<Variable, Interval<Number>>& assignment, const Interval<Number>& h = Interval<Number>(0,0)) const {
@@ -134,7 +130,7 @@ public:
 		CARL_LOG_DEBUG("carl.contractor", "Evaluating on " << assignment);
 		auto num = IntervalEvaluation::evaluate(numerator(), assignment);
 		CARL_LOG_DEBUG("carl.contractor", numerator() << " -> " << num);
-		num -= h;
+		num += h;
 		CARL_LOG_DEBUG("carl.contractor", "Subtracting " << h << " -> " << num);
 		if (!isOne(denominator())) {
 			auto den = IntervalEvaluation::evaluate(denominator(), assignment);;
