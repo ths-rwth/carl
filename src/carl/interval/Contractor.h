@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/MultivariatePolynomial.h"
+#include "../core/Variables.h"
 #include "../formula/Constraint.h"
 #include "Interval.h"
 #include "IntervalEvaluation.h"
@@ -24,6 +25,7 @@ private:
 	Polynomial mNumerator;
 	Polynomial mDenominator;
 	std::size_t mRoot;
+	std::vector<Variable> mDependees;
 
 	bool make_integer() const {
 		return mVar.type() == VariableType::VT_INT;
@@ -100,6 +102,10 @@ public:
 			}
 		}
 		CARL_LOG_DEBUG("carl.contractor", p << " with " << v << " -> " << *this);
+		carlVariables vars;
+		mNumerator.gatherVariables(vars);
+		mDenominator.gatherVariables(vars);
+		mDependees = vars.underlyingVariables();
 	}
 
 	auto var() const {
@@ -113,6 +119,9 @@ public:
 	}
 	auto root() const {
 		return mRoot;
+	}
+	const auto& dependees() const {
+		return mDependees;
 	}
 
 	/**
@@ -175,14 +184,16 @@ std::ostream& operator<<(std::ostream& os, const Evaluation<Polynomial>& e) {
 	return os;
 }
 
-template<typename Polynomial, typename Number = double>
+template<typename Origin, typename Polynomial, typename Number = double>
 class Contractor {
 private:
 	Evaluation<Polynomial> mEvaluation;
 	Interval<Number> mRelation;
+	Origin mOrigin;
 public:
-	Contractor(const Constraint<Polynomial>& c, Variable v):
-		mEvaluation(c.lhs(), v)
+	Contractor(const Origin& origin, const Constraint<Polynomial>& c, Variable v):
+		mEvaluation(c.lhs(), v),
+		mOrigin(origin)
 	{
 		switch (c.relation()) {
 			case Relation::LESS:
@@ -209,6 +220,12 @@ public:
 
 	auto var() const {
 		return mEvaluation.var();
+	}
+	const auto& dependees() const {
+		return mEvaluation.dependees();
+	}
+	const auto& origin() const {
+		return mOrigin;
 	}
 
 	std::vector<Interval<Number>> evaluate(const std::map<Variable, Interval<Number>>& assignment) const {
