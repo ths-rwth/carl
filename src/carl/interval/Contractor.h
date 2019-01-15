@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/MultivariatePolynomial.h"
+#include "../formula/Constraint.h"
 #include "Interval.h"
 #include "IntervalEvaluation.h"
 #include "set_theory.h"
@@ -17,7 +18,7 @@ namespace contractor {
  * mRoot'th root of (mNumerator / mDenominator)
  */
 template<typename Polynomial>
-class Contraction {
+class Evaluation {
 private:
 	Variable mVar;
 	Polynomial mNumerator;
@@ -86,7 +87,7 @@ private:
 		CARL_LOG_DEBUG("carl.contractor", "->   " << intervals);
 	}
 public:
-	Contraction(const Polynomial& p, Variable v):
+	Evaluation(const Polynomial& p, Variable v):
 		mVar(v)
 	{
 		assert(p.has(v));
@@ -121,13 +122,20 @@ public:
 	/**
 	 * Evaluate this contraction over the given assignment.
 	 * Returns a list of resulting intervals.
+	 * 
+	 * Allows to integrate a relation symbol as follows:
+	 * - Transform relation into an interval (e.g. < to (-oo, 0))
+	 * - Transform constraint to equality (e.g. p*x - q < 0 to p*x - q + h = 0)
+	 * - Evaluate with respect to interval h (e.g. x = (q - h) / p)
 	 */
 	template<typename Number>
-	std::vector<Interval<Number>> evaluate(const std::map<Variable, Interval<Number>>& assignment) const {
+	std::vector<Interval<Number>> evaluate(const std::map<Variable, Interval<Number>>& assignment, const Interval<Number>& h = Interval<Number>(0,0)) const {
 		std::vector<Interval<Number>> res;
 		CARL_LOG_DEBUG("carl.contractor", "Evaluating on " << assignment);
 		auto num = IntervalEvaluation::evaluate(numerator(), assignment);
 		CARL_LOG_DEBUG("carl.contractor", numerator() << " -> " << num);
+		num -= h;
+		CARL_LOG_DEBUG("carl.contractor", "Subtracting " << h << " -> " << num);
 		if (!isOne(denominator())) {
 			auto den = IntervalEvaluation::evaluate(denominator(), assignment);;
 			CARL_LOG_DEBUG("carl.contractor", denominator() << " -> " << den);
@@ -159,17 +167,79 @@ public:
 };
 
 template<typename Polynomial>
-std::ostream& operator<<(std::ostream& os, const Contraction<Polynomial>& c) {
-	if (c.root() != 1) {
-		os << c.root() << "th root of ";
+std::ostream& operator<<(std::ostream& os, const Evaluation<Polynomial>& e) {
+	if (e.root() != 1) {
+		os << e.root() << "th root of ";
 	}
-	if (!isOne(c.denominator())) {
-		os << "(" << c.numerator() << " / " << c.denominator() << ")";
+	if (!isOne(e.denominator())) {
+		os << "(" << e.numerator() << " / " << e.denominator() << ")";
 	} else {
-		os << c.numerator();
+		os << e.numerator();
 	}
 	return os;
 }
+
+template<typename Polynomial, typename Number = double>
+class Contractor {
+private:
+	Evaluation<Polynomial> mEvaluation;
+	Interval<Number> mRelation;
+public:
+	Contractor(const Constraint<Polynomial>& c, Variable v):
+		mEvaluation(c.lhs(), v)
+	{
+		switch (c.relation()) {
+			case Relation::LESS:
+				mRelation = Interval<Number>(0, BoundType::INFTY, 0, BoundType::STRICT);
+				break;
+			case Relation::LEQ:
+				mRelation = Interval<Number>(0, BoundType::INFTY, 0, BoundType::WEAK);
+				break;
+			case Relation::EQ:
+				mRelation = Interval<Number>(0, BoundType::WEAK, 0, BoundType::WEAK);
+				break;
+			case Relation::NEQ:
+				assert(false);
+				mRelation = Interval<Number>(0, BoundType::STRICT, 0, BoundType::STRICT);
+				break;
+			case Relation::GEQ:
+				mRelation = Interval<Number>(0, BoundType::WEAK, 0, BoundType::INFTY);
+				break;
+			case Relation::GREATER:
+				mRelation = Interval<Number>(0, BoundType::STRICT, 0, BoundType::INFTY);
+				break;
+		}
+	}
+
+	auto var() const {
+		return mEvaluation.var();
+	}
+
+	std::vector<Interval<Number>> evaluate(const std::map<Variable, Interval<Number>>& assignment) const {
+		CARL_LOG_DEBUG("carl.contractor", "Evaluating " << mEvaluation << " on " << assignment);
+		return mEvaluation.evaluate(assignment, mRelation);
+	}
+
+	std::vector<Interval<Number>> contract(const std::map<Variable, Interval<Number>>& assignment) const {
+		auto res = evaluate(assignment);
+		assert(assignment.find(mEvaluation.var()) != assignment.end());
+		auto cur = assignment.find(mEvaluation.var())->second;
+		CARL_LOG_DEBUG("carl.contractor", "Intersecting " << res << " with " << cur);
+
+		std::size_t last = 0;
+		for (std::size_t i = 0; i < res.size(); ++i) {
+			auto tmp = set_intersection(res[i], cur);
+			if (!tmp.isEmpty()) {
+				res[last] = tmp;
+				last++;
+			}
+		}
+		res.resize(last);
+
+		CARL_LOG_DEBUG("carl.contractor", "-> " << res);
+		return res;
+	}
+};
 
 }
 }
