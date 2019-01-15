@@ -171,6 +171,13 @@ class Term {
 			if (!mMonomial) return false;
 			return mMonomial->has(v);
 		}
+
+		/**
+		 * Removes the given variable from the term.
+		 */
+		Term dropVariable(Variable v) const {
+			return Term(coeff(), monomial()->dropVariable(v));
+		}
 		
 		/**
 		 * Checks if the monomial is either a constant or the only variable occuring is the variable v.
