@@ -355,7 +355,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 
 template<typename Number, typename Poly>
 bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m) {
-	Number min_magnitude = Number(1); // TODO how to set this parameter?
+	Number min_magnitude = Number(1000000); // TODO how to set this parameter?
 
 	// first try to evaluate c using interval arithmetic
 	Poly p = c.lhs();
