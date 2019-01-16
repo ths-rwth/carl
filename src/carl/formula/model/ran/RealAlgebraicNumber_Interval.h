@@ -355,7 +355,53 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 
 template<typename Number, typename Poly>
 bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m) {
-	IntervalContent<Number> res = evaluate(c.lhs(), m);
+	Number min_magnitude = Number(1); // TODO how to set this parameter?
+
+	// first try to evaluate c using interval arithmetic
+	Poly p = c.lhs();
+	while(true) {
+		// evaluate
+		std::map<Variable, Interval<Number>> varToInterval;
+		for (const auto& var : p.gatherVariables()) {
+			varToInterval[var] = m.at(var).interval();
+		}
+
+		auto res = IntervalEvaluation::evaluate(p, varToInterval);
+
+		if (res.isPositive()) {
+			return carl::evaluate(Sign::POSITIVE, c.relation());
+		} else if (res.isNegative()) {
+			return carl::evaluate(Sign::NEGATIVE, c.relation());
+		} else if (res.isZero()) {
+			return carl::evaluate(Sign::ZERO, c.relation());
+		}
+	
+		// refine RANs
+		bool refined = false;
+		for (const auto& a : varToInterval) {
+			if (a.second.magnitude() > min_magnitude) {
+				if (p.has(a.first)) { // is var still in p?
+					m.at(a.first).refine();
+					// if RAN converted to a number, plug it in
+					if (is_number(m.at(a.first))) {
+						p.substituteIn(a.first, Poly(get_number(m.at(a.first))));
+					}
+					refined = true;
+				}				
+			}
+		}
+		if (!refined) {
+			break; // nothing to refine
+		}
+
+		// if all variables are substituted we're done
+		if (p.gatherVariables().size() == 0) {
+			assert(p.isNumber());
+			return carl::evaluate(p.constantPart(), c.relation());
+		}
+	}
+
+	IntervalContent<Number> res = evaluate(p, m);
 	return evaluate(res.sgn(), c.relation());
 }
 
