@@ -355,11 +355,11 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 
 template<typename Number, typename Poly>
 bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m) {
-	Number min_magnitude = Number(1000000); // TODO how to set this parameter?
+	//Number min_magnitude = Number(1); // TODO how to set this parameter?
 
 	// first try to evaluate c using interval arithmetic
 	Poly p = c.lhs();
-	while(true) {
+	for(int i = 0; i < 3; i++) {
 		// evaluate
 		std::map<Variable, Interval<Number>> varToInterval;
 		for (const auto& var : p.gatherVariables()) {
@@ -379,7 +379,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		// refine RANs
 		bool refined = false;
 		for (const auto& a : varToInterval) {
-			if (a.second.magnitude() > min_magnitude) {
+			//if (a.second.magnitude() > min_magnitude) {
 				if (p.has(a.first)) { // is var still in p?
 					m.at(a.first).refine();
 					// if RAN converted to a number, plug it in
@@ -388,7 +388,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 					}
 					refined = true;
 				}				
-			}
+			//}
 		}
 		if (!refined) {
 			break; // nothing to refine
