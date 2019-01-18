@@ -378,6 +378,7 @@ Interval<Number> Interval<Number>::add(const Interval<Number>& rhs) const
 {
     assert(this->isConsistent());
     assert(rhs.isConsistent());
+	if (rhs.isEmpty()) return emptyInterval();
     return Interval<Number>( mContent + rhs.content(),
                           getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() ),
                           getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() ) );

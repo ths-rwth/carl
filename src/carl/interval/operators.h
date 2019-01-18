@@ -118,6 +118,17 @@ inline bool operator==(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	return std::forward_as_tuple(lhs.lowerBoundType(), lhs.upperBoundType(), lhs.lower(), lhs.upper())
 		== std::forward_as_tuple(rhs.lowerBoundType(), rhs.upperBoundType(), rhs.lower(), rhs.upper());
 }
+
+template<>
+inline bool operator==(const Interval<double>& lhs, const Interval<double>& rhs) {
+	if(!AlmostEqual2sComplement(lhs.lower(),rhs.lower()) ||
+		!AlmostEqual2sComplement(lhs.upper(),rhs.upper())) {
+			return false;
+		}
+	return std::forward_as_tuple(lhs.lowerBoundType(), lhs.upperBoundType())
+		== std::forward_as_tuple(rhs.lowerBoundType(), rhs.upperBoundType());
+}
+
 template<typename Number>
 inline bool operator==(const Interval<Number>& lhs, const Number& rhs) {
 	return lhs.isPointInterval() && lhs.lower() == rhs;
