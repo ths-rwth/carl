@@ -65,7 +65,7 @@ endif()
 print_resource_info("GMP / GMPXX" GMP_SHARED ${GMP_VERSION})
 
 ##### Boost
-set(BOOST_COMPONENTS "system;program_options;regex;unit_test_framework;timer;chrono")
+set(BOOST_COMPONENTS "system;program_options;regex;unit_test_framework;timer;chrono;filesystem")
 set(Boost_USE_DEBUG_RUNTIME "OFF")
 if(NOT FORCE_SHIPPED_RESOURCES)
 	load_library(carl Boost 1.65.1 COMPONENTS ${BOOST_COMPONENTS})

@@ -8,7 +8,7 @@ elseif( WIN32 )
 endif()
 
 string(REPLACE "." "_" BOOST_VERSION_FILENAME ${Boost_VERSION})
-set(BOOST_OPTIONS --without-atomic --without-context --without-coroutine --without-fiber --without-filesystem --without-iostreams --without-locale --without-log --without-mpi --without-python --without-random --without-regex --without-serialization --without-signals --without-thread --without-wave)
+set(BOOST_OPTIONS --without-atomic --without-context --without-coroutine --without-fiber --without-iostreams --without-locale --without-log --without-mpi --without-python --without-random --without-regex --without-serialization --without-signals --without-thread --without-wave)
 
 ExternalProject_Add(
 	Boost-EP
