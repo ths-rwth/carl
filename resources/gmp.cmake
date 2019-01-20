@@ -8,7 +8,7 @@ if(UNIX)
 	ExternalProject_Add(
 		GMP-EP
 		URL "https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2"
-		URL_MD5 86ee6e54ebfc4a90b643a65e402c4048
+		URL_MD5 8ddbb26dc3bd4e2302984debba1406a5
 		DOWNLOAD_NO_PROGRESS 1
 		BUILD_IN_SOURCE YES
 		CONFIGURE_COMMAND ./configure --enable-cxx --prefix=<INSTALL_DIR>
