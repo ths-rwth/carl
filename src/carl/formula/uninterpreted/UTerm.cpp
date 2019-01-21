@@ -29,7 +29,7 @@ namespace carl
 
 	void UTerm::gatherVariables(carlVariables& vars) const {
 		return std::visit(overloaded {
-			[&vars](UVariable v) { vars.add(v.variable()); },
+			[&vars](UVariable v) { vars.add(v); },
 			[&vars](UFInstance ufi) { ufi.gatherVariables(vars); },
 		}, mTerm);
 	}
