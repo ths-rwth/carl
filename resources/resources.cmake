@@ -53,8 +53,8 @@ endif()
 
 ##### GMP / GMPXX
 if((NOT FORCE_SHIPPED_RESOURCES) AND (NOT FORCE_SHIPPED_GMP))
-	load_library(carl GMP 5.1)
-	load_library(carl GMPXX 5.1)
+	load_library(carl GMP 6.1)
+	load_library(carl GMPXX 6.1)
 endif()
 if(NOT GMP_FOUND)
 	set(GMP_VERSION "6.1.0")
