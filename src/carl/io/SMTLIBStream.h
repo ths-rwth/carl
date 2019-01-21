@@ -182,6 +182,14 @@ private:
 			}
 		}
 	}
+
+	void write(const UEquality& ueq) {
+		if (ueq.negated()) {
+			*this << "(not (= " << ueq.lhs() << " " << ueq.rhs() << "))";
+		} else {
+			*this << "(= " << ueq.lhs() << " " << ueq.rhs() << ")";
+		}
+	}
 	
 	template<typename Coeff>
 	void write(const UnivariatePolynomial<Coeff>& up) {
@@ -227,17 +235,31 @@ public:
 	void declare(Variable v) {
 		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
 	}
+	void declare(UVariable v) {
+		*this << "(declare-fun " << v << " () " << v.domain() << ")" << std::endl;
+	}
 	void declare(const carlVariables& vars) {
 		for (const auto& v: vars) {
 			std::visit(overloaded {
 				[this](Variable v){ declare(v); },
 				[this](BVVariable v){ declare(v.variable()); },
-				[this](UVariable v){ declare(v.variable()); },
+				[this](UVariable v){ declare(v); },
 			}, v);
 		}
 	}
 	void initialize(Logic l, const carlVariables& vars) {
 		declare(l);
+		std::set<Sort> sorts;
+		for (const auto& v: vars) {
+			std::visit(overloaded {
+				[](Variable v){},
+				[&sorts](BVVariable v){ sorts.insert(v.sort()); },
+				[&sorts](UVariable v){ sorts.insert(v.domain()); },
+			}, v);
+		}
+		for (const auto& s: sorts) {
+			declare(s);
+		}
 		declare(vars);
 	}
 	
