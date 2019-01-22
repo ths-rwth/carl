@@ -190,6 +190,14 @@ private:
 			*this << "(= " << ueq.lhs() << " " << ueq.rhs() << ")";
 		}
 	}
+
+	void write(const UFInstance& ufi) {
+		*this << "(" << ufi.uninterpretedFunction().name();
+		for (const auto& a: ufi.args()) {
+			*this << " " << a;
+		}
+		*this << ")";
+	}
 	
 	template<typename Coeff>
 	void write(const UnivariatePolynomial<Coeff>& up) {
@@ -204,6 +212,13 @@ private:
 			}
 			*this << ")";
 		}
+	}
+
+	void write(const UTerm& t) {
+		std::visit(overloaded {
+			[this](UVariable v) { *this << v; },
+			[this](UFInstance ufi) { *this << ufi; },
+		}, t.asVariant());
 	}
 
 	void write(const Variable& v) {
