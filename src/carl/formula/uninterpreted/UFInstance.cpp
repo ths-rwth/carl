@@ -41,6 +41,12 @@ namespace carl
 			a.gatherVariables(vars);
 		}
 	}
+	void UFInstance::gatherUFs(std::set<UninterpretedFunction>& ufs) const {
+		ufs.insert(uninterpretedFunction());
+		for (const auto& a: args()) {
+			a.gatherUFs(ufs);
+		}
+	}
 
 	std::ostream& operator<<(std::ostream& os, const UFInstance& ufun) {
 		assert(ufun.id() != 0);

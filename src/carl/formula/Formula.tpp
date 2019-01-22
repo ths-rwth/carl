@@ -157,6 +157,38 @@ namespace carl
 	}
 
     template<typename Pol>
+    void Formula<Pol>::gatherUFs(std::set<UninterpretedFunction>& ufs) const {
+		switch (getType()) {
+			case FormulaType::TRUE:
+			case FormulaType::FALSE:
+				break;
+			case FormulaType::BOOL:
+				break;
+			case FormulaType::CONSTRAINT:
+				break;
+			case FormulaType::VARCOMPARE:
+				break;
+			case FormulaType::VARASSIGN:
+				break;
+			case FormulaType::BITVECTOR:
+				break;
+			case FormulaType::UEQ:
+				uequality().gatherUFs(ufs);
+				break;
+			case FormulaType::NOT:
+				break;
+			case FormulaType::EXISTS:
+			case FormulaType::FORALL:
+				break;
+			default: {
+				for (const Formula<Pol>& subFormula : subformulas()) {
+					subFormula.gatherUFs(ufs);
+				}
+			}
+		}
+    }
+
+    template<typename Pol>
     size_t Formula<Pol>::complexity() const
     {
         size_t result = 0;

@@ -34,6 +34,13 @@ namespace carl
 		}, mTerm);
 	}
 
+	void UTerm::gatherUFs(std::set<UninterpretedFunction>& ufs) const {
+		return std::visit(overloaded {
+			[](UVariable v) {},
+			[&ufs](UFInstance ufi) { ufi.gatherUFs(ufs); },
+		}, mTerm);
+	}
+
 	bool operator==(const UTerm& lhs, const UTerm& rhs) {
 		return std::visit(overloaded {
 			[](UVariable lhs, UVariable rhs) { return lhs == rhs; },
