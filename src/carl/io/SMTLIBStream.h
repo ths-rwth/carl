@@ -232,11 +232,25 @@ public:
 	void declare(Sort s) {
 		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
 	}
+	void declare(UninterpretedFunction uf) {
+		*this << "(declare-fun " << uf.name() << " (";
+		const auto& sorts = uf.domain();
+		for (std::size_t i = 0; i < sorts.size(); ++i) {
+			if (i != 0) *this << " ";
+			*this << sorts[i];
+		}
+		*this << ") " << uf.codomain() << ")" << std::endl;
+	}
 	void declare(Variable v) {
 		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
 	}
 	void declare(UVariable v) {
 		*this << "(declare-fun " << v << " () " << v.domain() << ")" << std::endl;
+	}
+	void declare(const std::set<UninterpretedFunction>& ufs) {
+		for (auto uf: ufs) {
+			declare(uf);
+		}
 	}
 	void declare(const carlVariables& vars) {
 		for (const auto& v: vars) {
@@ -247,7 +261,7 @@ public:
 			}, v);
 		}
 	}
-	void initialize(Logic l, const carlVariables& vars) {
+	void initialize(Logic l, const carlVariables& vars, const std::set<UninterpretedFunction>& ufs = {}) {
 		declare(l);
 		std::set<Sort> sorts;
 		for (const auto& v: vars) {
@@ -260,16 +274,19 @@ public:
 		for (const auto& s: sorts) {
 			declare(s);
 		}
+		declare(ufs);
 		declare(vars);
 	}
 	
 	template<typename Pol>
 	void initialize(Logic l, std::initializer_list<Formula<Pol>> formulas) {
 		carlVariables vars;
+		std::set<UninterpretedFunction> ufs;
 		for (const auto& f: formulas) {
 			f.gatherVariables(vars);
+			f.gatherUFs(ufs);
 		}
-		initialize(l, vars);
+		initialize(l, vars, ufs);
 	}
 
 	void setInfo(const std::string& name, const std::string& value) {
