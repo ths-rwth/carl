@@ -11,8 +11,8 @@
 
 #include "platform.h"
 
-#include <ostream>
 #include <cassert>
+#include <ostream>
 
 CLANG_WARNING_DISABLE("-Wnull-pointer-arithmetic")
 
@@ -184,7 +184,7 @@ namespace carl
             }
 
         private:
-            CompactTree& operator = ( const CompactTree& tree ) const;    // not available
+            CompactTree& operator = ( const CompactTree& tree ) const = delete;
 
             Entry* _array;
             Node   _lastLeaf;
@@ -216,8 +216,9 @@ namespace carl
         _lastLeaf( 0 ),
         _capacityEnd( Node( 0 ).next( initialCapacity ))
     {
-        if( initialCapacity > 0 )
+        if( initialCapacity > 0 ) {
             _array = new E[initialCapacity]-1;
+        }
         assert( isValid() );
     }
 
@@ -226,21 +227,25 @@ namespace carl
         _array( static_cast<E*>(0) - 1 ),
         _lastLeaf( tree._lastLeaf )
     {
-        if( tree.size() > minCapacity )
+        if( tree.size() > minCapacity ) {
             minCapacity = tree.size();
+        }
         _capacityEnd = Node( 0 ).next( minCapacity );
-        if( minCapacity == 0 )
+        if( minCapacity == 0 ) {
             return;
+        }
         _array = new E[minCapacity]-1;
-        for( Node i; i <= tree.lastLeaf(); ++i )
+        for( Node i; i <= tree.lastLeaf(); ++i ) {
             (*this)[i] = tree[i];
+        }
     }
 
     template<class E, bool FI>
     E& CompactTree<E, FI>::operator []( Node n )
     {
-        if( !FI )
+        if( !FI ) {
             return _array[n._index];
+        }
         char* base    = reinterpret_cast<char*>(_array);
         E*    element = reinterpret_cast<E*>(base + n._index);
         assert( element == &(_array[n._index / sizeof(E)]) );
@@ -334,8 +339,9 @@ namespace carl
         Node last = lastLeaf();
         for( Node i; i <= last; i = i.next() )
         {
-            if( (i._index & (i._index - 1)) == 0 )    // if i._index is a power of 2
+            if( (i._index & (i._index - 1)) == 0 ) { // if i._index is a power of 2
                 out << "\n " << i._index << ':';
+			}
             out << ' ' << (*this)[i] << " := ";
             out.flush();
             (*this)[i]->print( out );
@@ -373,8 +379,9 @@ namespace carl
     void CompactTree<E, FI>::increaseCapacity()
     {
         CompactTree<E, FI> newTree( capacity() == 0 ? 16 : capacity() * 2 );
-        for( Node i; i <= lastLeaf(); i = i.next() )
+        for( Node i; i <= lastLeaf(); i = i.next() ) {
             newTree.pushBack( (*this)[i] );
+        }
         std::swap( _array, newTree._array );
         std::swap( _capacityEnd, newTree._capacityEnd );
         assert( isValid() );
