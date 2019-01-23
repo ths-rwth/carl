@@ -389,10 +389,8 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		for (const auto& a : varToInterval) {
 			if (a.second.diameter() > min_width) {
 				if (p.has(a.first)) { // is var still in p?
-					std::cout << "BEFORE: " << m.at(a.first).interval() << std::endl; 
 					CARL_LOG_DEBUG("carl.ran", "Refine " <<  m.at(a.first) << " (" << a.first << ")");
 					m.at(a.first).refine();
-					std::cout << m.at(a.first).interval() << std::endl;
 					// if RAN converted to a number, plug it in
 					if (is_number(m.at(a.first))) {
 						CARL_LOG_DEBUG("carl.ran",  m.at(a.first) << " (" << a.first << ") simplified to a number, plugging in");
