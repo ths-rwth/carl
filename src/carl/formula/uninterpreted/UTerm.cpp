@@ -36,7 +36,7 @@ namespace carl
 
 	void UTerm::gatherUFs(std::set<UninterpretedFunction>& ufs) const {
 		return std::visit(overloaded {
-			[](UVariable v) {},
+			[](UVariable) {},
 			[&ufs](UFInstance ufi) { ufi.gatherUFs(ufs); },
 		}, mTerm);
 	}
