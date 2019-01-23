@@ -613,7 +613,7 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 	assert(q.isConsistent());
 	assert(r.isConsistent());
 	assert(*this == q * divisor + r);
-	return DivisionResult<MultivariatePolynomial<C,O,P>>(q,r);
+	return DivisionResult<MultivariatePolynomial<C,O,P>> {q,r};
 }
 
 template<typename C, typename O, typename P>

@@ -62,7 +62,7 @@ T pow(const T& basis, std::size_t exp) {
 	T res = carl::constant_one<T>().get();
 	T mult = basis;
 	for (std::size_t e = exp; e > 0; e /= 2) {
-		if (e & 1) {
+		if (e & static_cast<std::size_t>(1)) {
 			res *= mult;
 		}
 		mult *= mult;
@@ -86,7 +86,7 @@ void pow_assign(T& t, std::size_t exp) {
 	T mult = t;
 	t = carl::constant_one<T>().get();
 	for (std::size_t e = exp; e > 0; e /= 2) {
-		if (e & 1) {
+		if (e & static_cast<std::size_t>(1)) {
 			t *= mult;
 		}
 		mult *= mult;

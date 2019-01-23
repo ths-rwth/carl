@@ -6,21 +6,15 @@
 
 #pragma once
 
-namespace carl
-{
-	
+namespace carl {
+
 /**
  * A strongly typed pair encoding the result of a division, 
  * being a quotient and a remainder.
- */	
+ */
 template<typename Type>
-struct DivisionResult
-{
-public:
-	DivisionResult(const Type& q, const Type& r) :
-	quotient(q), remainder(r)
-	{}
+struct DivisionResult {
 	Type quotient;
 	Type remainder;
 };
-}
+} // namespace carl
