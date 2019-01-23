@@ -38,10 +38,8 @@ template<typename U, typename V>
 inline std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p);
 template<typename T, typename C>
 inline std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s);
-template<std::size_t I, typename... T, typename std::enable_if<I == sizeof...(T), void>::type*>
-inline std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t);
-template<std::size_t I, typename... T, typename std::enable_if<I < sizeof...(T), void>::type*>
-inline std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t);
+template<typename... T>
+std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t);
 template<typename Key, typename Value, typename H, typename E, typename A>
 inline std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value, H, E, A>& m);
 template<typename T, typename H, typename K, typename A>
@@ -160,15 +158,19 @@ inline std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s) {
 	return os << "{" << s.size() << ": " << stream_joined(", ", s) << "}";
 }
 
+namespace detail {
 /**
- * Output a std::tuple with arbitrary content.
- * Final case for `I == 0`.
+ * Helper function that actually outputs a std::tuple.
+ * The format is `(<item>, <item>, ...)`
  * @param os Output stream.
+ * @param t tuple to be printed.
  * @return Output stream.
  */
-template<std::size_t I = 0, typename... T, typename std::enable_if<I == sizeof...(T), void>::type* = nullptr>
-inline std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& /*unused*/) {
+template<typename Tuple, std::size_t... I>
+std::ostream& stream_tuple_impl(std::ostream& os, const Tuple& t, std::index_sequence<I...>) {
+	(..., (os << (I == 0 ? "(" : ", ") << std::get<I>(t)));
 	return os << ")";
+}
 }
 
 /**
@@ -178,11 +180,9 @@ inline std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& /*unus
  * @param t tuple to be printed.
  * @return Output stream.
  */
-template<std::size_t I = 0, typename... T, typename std::enable_if<I < sizeof...(T), void>::type* = nullptr>
+template<typename... T>
 std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t) {
-	if (I == 0) os << "(" << std::get<I>(t);
-	else os << ", " << std::get<I>(t);
-	return operator<< <I+1>(os, t);
+	return detail::stream_tuple_impl(os, t, std::make_index_sequence<sizeof...(T)>());
 }
 
 /**
