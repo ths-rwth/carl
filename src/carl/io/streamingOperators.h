@@ -48,6 +48,7 @@ template<typename T, typename... Tail>
 inline std::ostream& operator<<(std::ostream& os, const std::variant<T, Tail...>& v);
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v);
+*/
 
 /**
  * Allows to easily output some container with all elements separated by some string.
@@ -71,7 +72,6 @@ inline auto stream_joined(const std::string& glue, const T& v);
 template<typename T, typename F>
 inline auto stream_joined(const std::string& glue, const T& v, F&& f);
 
-*/
 
 /**
  * Output a std::forward_list with arbitrary content.
