@@ -144,7 +144,7 @@ namespace ran {
 		}
 		
 		void refine() const {
-			Number pivot = carl::sample(interval());
+			Number pivot = carl::center(interval());
 			assert(interval().contains(pivot));
 			if (polynomial().isRoot(pivot)) {
 				interval() = Interval<Number>(pivot, pivot);
@@ -357,11 +357,12 @@ template<typename Number, typename Poly>
 bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m) {
 	// TODO needs some profound considerations ...
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << c << " on " << m);
-	//Number min_width = Number(1);
+	Number min_width = Number(1)/(Number(65536)); // (1/2)^16, taken from Z3
 
 	// first try to evaluate c using interval arithmetic
 	Poly p = c.lhs();
-	for(int i = 0; i < 3; i++) {
+	//for(int i = 0; i < 3; i++) {
+	while(true) {
 		// evaluate
 		std::map<Variable, Interval<Number>> varToInterval;
 		for (const auto& var : p.gatherVariables()) {
@@ -386,7 +387,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		// refine RANs
 		bool refined = false;
 		for (const auto& a : varToInterval) {
-			// if (a.second.diameter() > min_width) {
+			if (a.second.diameter() > min_width) {
 				if (p.has(a.first)) { // is var still in p?
 					std::cout << "BEFORE: " << m.at(a.first).interval() << std::endl; 
 					CARL_LOG_DEBUG("carl.ran", "Refine " <<  m.at(a.first) << " (" << a.first << ")");
@@ -399,7 +400,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 					}
 					refined = true;
 				}				
-			// }
+			}
 		}
 		if (!refined) {
 			CARL_LOG_DEBUG("carl.ran", "Nothing to refine");
