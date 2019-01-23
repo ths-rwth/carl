@@ -261,8 +261,9 @@ namespace carl
     template<class E, bool FI>
     void CompactTree<E, FI>::pushBack( const E& value )
     {
-        if( _lastLeaf == _capacityEnd )
+        if( _lastLeaf == _capacityEnd ) {
             increaseCapacity();
+        }
         _lastLeaf           = _lastLeaf.next();
         (*this)[lastLeaf()] = value;
     }

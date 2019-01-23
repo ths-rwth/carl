@@ -8,8 +8,8 @@
 #pragma once
 
 #include "../../core/Variables.h"
-#include "UVariable.h"
 #include "UFInstance.h"
+#include "UVariable.h"
 
 #include <iostream>
 #include <variant>

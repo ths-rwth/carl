@@ -341,7 +341,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem_old(const Univaria
 		// According to definition.
 		return *this;
 	}
-	Coeff b = divisor.lcoeff();
+	const Coeff& b = divisor.lcoeff();
 	uint d = degree() - divisor.degree() + 1;
 	Coeff prefactor = carl::pow(b,d);
 	return remainder(divisor, prefactor);
@@ -1190,8 +1190,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 {
 	UnivariatePolynomial result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
-	for(auto c : mCoefficients)
-	{
+	for(const auto& c : mCoefficients) {
 		result.mCoefficients.push_back(-c);
 	}
 
@@ -1604,8 +1603,8 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 template<typename Coefficient>
 template<typename C, EnableIf<is_number<C>>>
 bool UnivariatePolynomial<Coefficient>::isConsistent() const {
-	if (this->mCoefficients.size() > 0) {
-		assert(this->lcoeff() != Coefficient(0));
+	if (!mCoefficients.empty() > 0) {
+		assert(!carl::isZero(lcoeff()));
 	}
 	return true;
 }
@@ -1613,11 +1612,11 @@ bool UnivariatePolynomial<Coefficient>::isConsistent() const {
 template<typename Coefficient>
 template<typename C, DisableIf<is_number<C>>>
 bool UnivariatePolynomial<Coefficient>::isConsistent() const {
-	if (this->mCoefficients.size() > 0) {
+	if (!mCoefficients.empty()) {
 		assert(!carl::isZero(lcoeff()));
 	}
-	for (auto c: this->mCoefficients) {
-		assert(!c.has(this->mainVar()));
+	for (const auto& c: mCoefficients) {
+		assert(!c.has(mainVar()));
 		assert(c.isConsistent());
 	}
 	return true;

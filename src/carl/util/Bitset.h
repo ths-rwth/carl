@@ -97,7 +97,7 @@ namespace carl {
 		}
 	public:
 		/// Create an empty bitset.
-		Bitset(bool defaultValue = false): mDefault(defaultValue) {}
+		explicit Bitset(bool defaultValue = false): mDefault(defaultValue) {}
 		/// Create a bitset from a BaseType object.
 		Bitset(BaseType&& base, bool defaultValue): mData(std::move(base)), mDefault(defaultValue) {}
 		/// Create a bitset from a list of bits indices that shall be set to true.

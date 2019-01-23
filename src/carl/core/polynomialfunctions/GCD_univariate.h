@@ -10,12 +10,16 @@ UnivariatePolynomial<Coeff> gcd_recursive(const UnivariatePolynomial<Coeff>& a, 
 	assert(!carl::isZero(a));
 	assert(carl::isZero(b) || b.degree() <= a.degree());
 	
-	if(carl::isZero(b)) return a;
+	if(carl::isZero(b)) {
+		return a;
+	}
 //	if(is_field<Coeff>::value)
 //	{
 //		if(b.isConstant()) return b;
 //	}
-	else return gcd_recursive(b, a.remainder(b));
+	else {
+		return gcd_recursive(b, a.remainder(b));
+	}
 }
 
 /**
@@ -99,8 +103,11 @@ UnivariatePolynomial<Coeff> gcd(const UnivariatePolynomial<Coeff>& a, const Univ
 	assert(!carl::isZero(a));
 	assert(!carl::isZero(b));
 	assert(a.mainVar() == b.mainVar());
-	if(a.degree() < b.degree()) return gcd_recursive(b.normalized(),a.normalized()).normalized();
-	else return gcd_recursive(a.normalized(),b.normalized()).normalized();
+	if(a.degree() < b.degree()) {
+		return gcd_recursive(b.normalized(),a.normalized()).normalized();
+	} else {
+		return gcd_recursive(a.normalized(),b.normalized()).normalized();
+	}
 }
 
 }

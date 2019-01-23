@@ -7,7 +7,9 @@ namespace carl {
 template<typename C, typename O, typename P>
 std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> SoSDecomposition(const MultivariatePolynomial<C,O,P>& p, bool not_trivial = false) {
 	std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> result;
-	if (carl::isNegative(p.lcoeff())) return result;
+	if (carl::isNegative(p.lcoeff())) {
+		return result;
+	}
 	if (!not_trivial) {
 		for (auto term = p.rbegin(); term != p.rend(); ++term) {
 			if (!carl::isNegative(term->coeff())) {
@@ -16,7 +18,9 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> SoSDecomposition(const M
 					result.emplace_back(term->coeff(), MultivariatePolynomial<C,O,P>(constant_one<C>::get()));
 				} else {
 					auto resMonomial = term->monomial()->sqrt();
-					if (resMonomial == nullptr) break;
+					if (resMonomial == nullptr) {
+						break;
+					}
 					result.emplace_back(term->coeff(), MultivariatePolynomial<C,O,P>(resMonomial));
 				}
 			} else {
@@ -27,7 +31,9 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> SoSDecomposition(const M
 	}
 	// TODO: If cheap, find substitution of monomials to variables such that applied to this polynomial a quadratic form is achieved.
 	// Only compute sos for quadratic forms.
-	if (p.totalDegree() != 2) return result;
+	if (p.totalDegree() != 2) {
+		return result;
+	}
 	auto rem = p;
 	while (!rem.isConstant()) {
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Consider " << rem);

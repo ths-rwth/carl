@@ -86,16 +86,18 @@ inline Integer toInt(double n);
 
 template<>
 inline sint toInt<sint>(double n) {
-    return sint(n);
+	return sint(n);
 }
 
 template<>
 inline uint toInt<uint>(double n) {
-    return uint(n);
+	return uint(n);
 }
 
 template<>
-inline double rationalize(double n) { return n; }
+inline double rationalize(double n) {
+	return n;
+}
 
 template<typename T>
 inline typename std::enable_if<std::is_arithmetic<typename remove_all<T>::type>::value, std::string>::type toString(const T& n, bool /*unused*/) {
@@ -164,12 +166,12 @@ inline double sqrt(double in) {
 	return std::sqrt(in);
 }
 
-inline std::pair<double,double> sqrt_safe(double in) {
+inline std::pair<double, double> sqrt_safe(double in) {
 	return std::make_pair(std::sqrt(in), std::sqrt(in));
 }
 
 inline double pow(double in, uint exp) {
-	return std::pow(in,exp);
+	return std::pow(in, exp);
 }
 
 inline double log(double in) {
@@ -191,9 +193,13 @@ inline Number highestPower(const Number& n) {
 	static_assert(std::is_fundamental<Number>::value, "Only works on native types.");
 	uint iterations = 0;
 	// Number has 2^k Bits, we do k iterations
-	if (sizeof(Number) == 2) iterations = 4;
-	else if (sizeof(Number) == 4) iterations = 5;
-	else if (sizeof(Number) == 8) iterations = 6;
+	if (sizeof(Number) == 2) {
+		iterations = 4;
+	} else if (sizeof(Number) == 4) {
+		iterations = 5;
+	} else if (sizeof(Number) == 8) {
+		iterations = 6;
+	}
 	assert(iterations > 0);
 
 	Number res = n;
@@ -204,5 +210,4 @@ inline Number highestPower(const Number& n) {
 	return res;
 }
 
-
-}
+} // namespace carl
