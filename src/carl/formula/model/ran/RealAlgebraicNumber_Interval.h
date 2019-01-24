@@ -149,7 +149,7 @@ namespace ran {
 			if (polynomial().isRoot(pivot)) {
 				interval() = Interval<Number>(pivot, pivot);
 			} else {
-				if (carl::count_real_roots(polynomial(), Interval<Number>(interval().lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
+				if (carl::count_real_roots(sturm_sequence(), Interval<Number>(interval().lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
 					interval().setUpper(pivot);
 				} else {
 					interval().setLower(pivot);
