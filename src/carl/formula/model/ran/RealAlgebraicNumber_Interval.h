@@ -152,32 +152,35 @@ namespace ran {
 			return i.contains(interval());
 		}
 		
-		void refine() const {
+		void refine(bool newone = true) const {
 			Number pivot = carl::sample(interval());
 			assert(interval().contains(pivot));
-			if (polynomial().isRoot(pivot)) {
-				interval() = Interval<Number>(pivot, pivot);
-			} else {
-				if (true) {
-					assert(is_consistent());
-					auto lsgn = carl::sgn(polynomial().evaluate(interval().lower()));
-					auto psgn = carl::sgn(polynomial().evaluate(pivot));
-					assert(psgn != Sign::ZERO);
-					if (psgn == lsgn) {
-						interval().setLower(pivot);
-					} else {
-						interval().setUpper(pivot);
-					}
-				} else {
-					if (carl::count_real_roots(sturm_sequence(), Interval<Number>(interval().lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
-						interval().setUpper(pivot);
-					} else {
-						interval().setLower(pivot);
-					}
+			if (newone) {
+				assert(is_consistent());
+				auto psgn = carl::sgn(polynomial().evaluate(pivot));
+				if (psgn == Sign::ZERO) {
+					interval() = Interval<Number>(pivot, pivot);
+					return;
 				}
-				refinementCount()++;
-				assert(interval().isConsistent());
+				auto lsgn = carl::sgn(polynomial().evaluate(interval().lower()));
+				if (psgn == lsgn) {
+					interval().setLower(pivot);
+				} else {
+					interval().setUpper(pivot);
+				}
+			} else {
+				if (polynomial().isRoot(pivot)) {
+					interval() = Interval<Number>(pivot, pivot);
+					return;
+				}
+				if (carl::count_real_roots(sturm_sequence(), Interval<Number>(interval().lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
+					interval().setUpper(pivot);
+				} else {
+					interval().setLower(pivot);
+				}
 			}
+			refinementCount()++;
+			assert(interval().isConsistent());
 		}
 			
 		/** Refine the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
