@@ -66,13 +66,13 @@ TEST(StreamingOperators, unordered_map)
 	m.emplace(1,2);
 	m.emplace(3,4);
 	m.emplace(5,6);
-	EXPECT_EQ("{5 : 6, 1 : 2, 3 : 4}", getOutput(m));
+	EXPECT_TRUE("{1 : 2, 3 : 4}" == getOutput(m) || "{3 : 4, 1 : 2}" == getOutput(m));
 }
 
 TEST(StreamingOperators, unordered_set)
 {
-	std::unordered_set<int> s {1,2,3,4,5,1,2,3,4,5};
-	EXPECT_EQ("{5: 5, 4, 3, 2, 1}", getOutput(s));
+	std::unordered_set<int> s {1,2,1,2};
+	EXPECT_TRUE("{5: 1, 2}" == getOutput(s) || "{5: 2, 1}" == getOutput(s));
 }
 
 TEST(StreamingOperators, variant)
