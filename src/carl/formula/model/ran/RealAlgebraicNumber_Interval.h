@@ -144,7 +144,7 @@ namespace ran {
 		}
 		
 		void refine() const {
-			Number pivot = carl::center(interval());
+			Number pivot = carl::sample(interval());
 			assert(interval().contains(pivot));
 			if (polynomial().isRoot(pivot)) {
 				interval() = Interval<Number>(pivot, pivot);
