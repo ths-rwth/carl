@@ -30,6 +30,11 @@ namespace ran {
 
 			Content(Polynomial&& p, const Interval<Number>& i, std::vector<UnivariatePolynomial<Number>>&& seq):
 				polynomial(std::move(p)), interval(i), sturmSequence(std::move(seq))
+			{
+				assert(polynomial == carl::squareFreePart(polynomial));
+			}
+			Content(const Polynomial& p, const Interval<Number>& i):
+				polynomial(carl::squareFreePart(p)), interval(i), sturmSequence(carl::sturm_sequence(polynomial))
 			{}
 		};
 
@@ -47,15 +52,8 @@ namespace ran {
 		IntervalContent(
 			const Polynomial& p,
 			const Interval<Number> i
-		): IntervalContent(p, i, carl::sturm_sequence(p))
-		{}
-		
-		IntervalContent(
-			const Polynomial& p,
-			const Interval<Number> i,
-			std::vector<UnivariatePolynomial<Number>>&& seq
 		):
-			mContent(std::make_shared<Content>(replaceVariable(p), i, std::move(seq)))
+			mContent(std::make_shared<Content>(replaceVariable(p), i))
 		{
 			CARL_LOG_DEBUG("carl.ran.ir", "Creating " << *this);
 			assert(!carl::isZero(polynomial()) && polynomial().degree() > 0);
@@ -360,7 +358,8 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	while (
 		res.sgn(interval.lower()) == Sign::ZERO ||
 		res.sgn(interval.upper()) == Sign::ZERO ||
-		count_real_roots(sturmSeq, interval) != 1) {
+		count_real_roots(sturmSeq, interval) != 1) 
+	{
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (auto it = m.begin(); it != m.end(); it++) {
 			it->second.refine();
@@ -373,7 +372,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 		interval = IntervalEvaluation::evaluate(poly, varToInterval);
 	}
 	CARL_LOG_DEBUG("carl.ran", "Result is " << IntervalContent<Number>(res, interval));
-	return IntervalContent<Number>(res, interval, std::move(sturmSeq));
+	return IntervalContent<Number>(res, interval);
 }
 
 template<typename Number>
