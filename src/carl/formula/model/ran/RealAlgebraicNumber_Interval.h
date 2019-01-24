@@ -3,6 +3,7 @@
 #include "../../../core/UnivariatePolynomial.h"
 #include "../../../core/polynomialfunctions/Resultant.h"
 #include "../../../core/polynomialfunctions/RootCounting.h"
+#include "../../../core/polynomialfunctions/SquareFreePart.h"
 #include "../../../core/polynomialfunctions/SturmSequence.h"
 
 #include "../../../interval/Interval.h"
@@ -12,9 +13,6 @@
 
 namespace carl {
 namespace ran {
-  /**
-   * FIX isn't this the standard representation of a real algebraic number?
-   */
 	template<typename Number>
 	struct IntervalContent {
 		using Polynomial = UnivariatePolynomial<Number>;
@@ -71,6 +69,19 @@ namespace ran {
 				if (interval().contains(0)) refineAvoiding(0);
 				refineToIntegrality();
 			}
+		}
+
+		bool is_consistent() const {
+			if (polynomial() != carl::squareFreePart(polynomial())) {
+				CARL_LOG_DEBUG("carl.ran.ir", "Poly is not square free: " << polynomial());
+				return false;
+			}
+			auto lsgn = carl::sgn(polynomial().evaluate(interval().lower()));
+			auto usgn = carl::sgn(polynomial().evaluate(interval().upper()));
+			if (lsgn == Sign::ZERO) return false;
+			if (usgn == Sign::ZERO) return false;
+			if (lsgn == usgn) return false;
+			return true;
 		}
 
 		auto& polynomial() const {
@@ -149,10 +160,22 @@ namespace ran {
 			if (polynomial().isRoot(pivot)) {
 				interval() = Interval<Number>(pivot, pivot);
 			} else {
-				if (carl::count_real_roots(polynomial(), Interval<Number>(interval().lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
-					interval().setUpper(pivot);
+				if (true) {
+					assert(is_consistent());
+					auto lsgn = carl::sgn(polynomial().evaluate(interval().lower()));
+					auto psgn = carl::sgn(polynomial().evaluate(pivot));
+					assert(psgn != Sign::ZERO);
+					if (psgn == lsgn) {
+						interval().setLower(pivot);
+					} else {
+						interval().setUpper(pivot);
+					}
 				} else {
-					interval().setLower(pivot);
+					if (carl::count_real_roots(sturm_sequence(), Interval<Number>(interval().lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
+						interval().setUpper(pivot);
+					} else {
+						interval().setLower(pivot);
+					}
 				}
 				refinementCount()++;
 				assert(interval().isConsistent());
