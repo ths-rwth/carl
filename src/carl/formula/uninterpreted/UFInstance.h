@@ -58,6 +58,7 @@ namespace carl
 			std::size_t complexity() const;
 
 			void gatherVariables(carlVariables& vars) const;
+			void gatherUFs(std::set<UninterpretedFunction>& ufs) const;
     };
 
 	static_assert(std::is_trivially_copyable<UFInstance>::value, "UFInstance should be trivially copyable.");

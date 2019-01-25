@@ -222,7 +222,9 @@ public:
 	 */
 	friend std::ostream& operator<<(std::ostream& os, const Filter& f) {
 		os << "Filter:" << std::endl;
-		for (const auto& it: f.mData) os << "\t\"" << it.first << "\" -> " << it.second << std::endl;
+		for (const auto& it: f.mData) {
+			os << "\t\"" << it.first << "\" -> " << it.second << std::endl;
+		}
 		return os;
 	}
 };
@@ -279,10 +281,14 @@ public:
 
 		std::string filename(carl::basename(info.filename));
 		std::size_t spacing = 1;
-		if (channelwidth + 15 > channel.size() + filename.size()) spacing = channelwidth + 15 - channel.size() - filename.size();
+		if (channelwidth + 15 > channel.size() + filename.size()) {
+			spacing = channelwidth + 15 - channel.size() - filename.size();
+		}
 		os << channel << std::string(spacing, ' ') << filename << ":" << std::left << std::setw(4) << info.line << " ";
 		os << std::resetiosflags(std::ios::adjustfield);
-		if (!info.func.empty()) os << info.func << "(): ";
+		if (!info.func.empty()) {
+			os << info.func << "(): ";
+		}
 	}
 
 	/**
@@ -390,7 +396,9 @@ public:
 	 */
 	bool visible(LogLevel level, const std::string& channel) const noexcept {
 		for (const auto& t: mData) {
-			if (std::get<1>(t.second).check(channel, level)) return true;
+			if (std::get<1>(t.second).check(channel, level)) {
+				return true;
+			}
 		}
 		return false;
 	}

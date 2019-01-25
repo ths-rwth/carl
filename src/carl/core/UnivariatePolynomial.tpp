@@ -341,7 +341,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem_old(const Univaria
 		// According to definition.
 		return *this;
 	}
-	Coeff b = divisor.lcoeff();
+	const Coeff& b = divisor.lcoeff();
 	uint d = degree() - divisor.degree() + 1;
 	Coeff prefactor = carl::pow(b,d);
 	return remainder(divisor, prefactor);
@@ -651,7 +651,7 @@ template<typename C, EnableIf<is_integer<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const UnivariatePolynomial<Coeff>& divisor) const
 {
 	assert(!carl::isZero(divisor));
-	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
+	DivisionResult<UnivariatePolynomial<Coeff>> result {UnivariatePolynomial<Coeff>(mMainVar), *this};
 	if(carl::isZero(*this)) return result;
 	assert(*this == divisor * result.quotient + result.remainder);
 
@@ -673,7 +673,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 {
 	assert(!carl::isZero(divisor));
 	assert(this->mainVar() == divisor.mainVar());
-	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
+	DivisionResult<UnivariatePolynomial<Coeff>> result {UnivariatePolynomial<Coeff>(mMainVar), *this};
 	if(carl::isZero(*this)) return result;
 	assert(*this == divisor * result.quotient + result.remainder);
 	if(divisor.degree() > degree())
@@ -703,7 +703,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 	for (auto& c: res.mCoefficients) {
 		c = c / divisor;
 	}
-	return DivisionResult<UnivariatePolynomial<Coeff>>(res, UnivariatePolynomial(this->mainVar()));
+	return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial(this->mainVar()) };
 }
 
 template<typename Coeff>
@@ -730,7 +730,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 		c = c.divideBy(divisor);
 	}
 	assert(res.isConsistent());
-	return DivisionResult<UnivariatePolynomial<Coeff>>(res, UnivariatePolynomial(this->mainVar()));
+	return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial(this->mainVar())};
 }
 
 template<typename Coeff>
@@ -1190,8 +1190,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 {
 	UnivariatePolynomial result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
-	for(auto c : mCoefficients)
-	{
+	for(const auto& c : mCoefficients) {
 		result.mCoefficients.push_back(-c);
 	}
 
@@ -1604,8 +1603,8 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 template<typename Coefficient>
 template<typename C, EnableIf<is_number<C>>>
 bool UnivariatePolynomial<Coefficient>::isConsistent() const {
-	if (this->mCoefficients.size() > 0) {
-		assert(this->lcoeff() != Coefficient(0));
+	if (!mCoefficients.empty() > 0) {
+		assert(!carl::isZero(lcoeff()));
 	}
 	return true;
 }
@@ -1613,11 +1612,11 @@ bool UnivariatePolynomial<Coefficient>::isConsistent() const {
 template<typename Coefficient>
 template<typename C, DisableIf<is_number<C>>>
 bool UnivariatePolynomial<Coefficient>::isConsistent() const {
-	if (this->mCoefficients.size() > 0) {
+	if (!mCoefficients.empty()) {
 		assert(!carl::isZero(lcoeff()));
 	}
-	for (auto c: this->mCoefficients) {
-		assert(!c.has(this->mainVar()));
+	for (const auto& c: mCoefficients) {
+		assert(!c.has(mainVar()));
 		assert(c.isConsistent());
 	}
 	return true;

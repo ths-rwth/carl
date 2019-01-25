@@ -119,42 +119,49 @@ namespace carl
 
 	template<typename Pol>
 	void Formula<Pol>::gatherVariables(carlVariables& vars) const {
-		switch (getType()) {
-			case FormulaType::TRUE:
-			case FormulaType::FALSE:
-				break;
-			case FormulaType::BOOL:
-				vars.add(boolean());
-				break;
-			case FormulaType::CONSTRAINT:
-				constraint().gatherVariables(vars);
-				break;
-			case FormulaType::VARCOMPARE:
-				variableComparison().gatherVariables(vars);
-				break;
-			case FormulaType::VARASSIGN:
-				variableAssignment().gatherVariables(vars);
-				break;
-			case FormulaType::BITVECTOR:
-				bvConstraint().gatherVariables(vars);
-				break;
-			case FormulaType::UEQ:
-				uequality().gatherVariables(vars);
-				break;
-			case FormulaType::NOT:
-				subformula().gatherVariables(vars);
-				break;
-			case FormulaType::EXISTS:
-			case FormulaType::FORALL:
-				quantifiedFormula().gatherVariables(vars);
-				break;
-			default: {
-				for (const Formula<Pol>& subFormula : subformulas()) {
-					subFormula.gatherVariables(vars);
+		FormulaVisitor<Formula<Pol>> visitor;
+		visitor.visit(*this,
+			[&vars](const Formula<Pol>& f) {
+				switch (f.getType()) {
+					case FormulaType::BOOL:
+						vars.add(f.boolean());
+						break;
+					case FormulaType::CONSTRAINT:
+						f.constraint().gatherVariables(vars);
+						break;
+					case FormulaType::VARCOMPARE:
+						f.variableComparison().gatherVariables(vars);
+						break;
+					case FormulaType::VARASSIGN:
+						f.variableAssignment().gatherVariables(vars);
+						break;
+					case FormulaType::BITVECTOR:
+						f.bvConstraint().gatherVariables(vars);
+						break;
+					case FormulaType::UEQ:
+						f.uequality().gatherVariables(vars);
+						break;
+					case FormulaType::EXISTS:
+					case FormulaType::FORALL:
+						f.quantifiedFormula().gatherVariables(vars);
+						break;
+					default: break;
 				}
 			}
-		}
+		);
 	}
+
+    template<typename Pol>
+    void Formula<Pol>::gatherUFs(std::set<UninterpretedFunction>& ufs) const {
+		FormulaVisitor<Formula<Pol>> visitor;
+		visitor.visit(*this,
+			[&ufs](const Formula<Pol>& f) {
+				if (f.getType() == FormulaType::UEQ) {
+					f.uequality().gatherUFs(ufs);
+				}
+			}
+		);
+    }
 
     template<typename Pol>
     size_t Formula<Pol>::complexity() const

@@ -32,8 +32,12 @@ Coeff content(const UnivariatePolynomial<Coeff>& p) {
 	auto it = p.coefficients().rbegin();
 	Coeff gcd = *it;
 	for (++it; it != p.coefficients().rend(); ++it) {
-		if (isOne(gcd)) break;
-		if (isZero(*it)) continue;
+		if (isOne(gcd)) {
+			break;
+		}
+		if (isZero(*it)) {
+			continue;
+		}
 		gcd = carl::gcd(gcd, *it);
 	}
 	return gcd;

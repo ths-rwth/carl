@@ -99,6 +99,10 @@ namespace carl
 				mLhs.gatherVariables(vars);
 				mRhs.gatherVariables(vars);
 			}
+			void gatherUFs(std::set<UninterpretedFunction>& ufs) const {
+				mLhs.gatherUFs(ufs);
+				mRhs.gatherUFs(ufs);
+			}
 
     };
 

@@ -8,8 +8,8 @@
 #pragma once
 
 #include "../../core/Variables.h"
-#include "UVariable.h"
 #include "UFInstance.h"
+#include "UVariable.h"
 
 #include <iostream>
 #include <variant>
@@ -79,6 +79,7 @@ namespace carl
 		std::size_t complexity() const;
 
 		void gatherVariables(carlVariables& vars) const;
+		void gatherUFs(std::set<UninterpretedFunction>& ufs) const;
 	};
 	static_assert(std::is_literal_type<UTerm>::value, "UTerm should be a literal type.");
 

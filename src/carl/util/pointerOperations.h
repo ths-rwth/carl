@@ -35,9 +35,13 @@ struct equal_to {
 template<typename T, bool mayBeNull>
 struct equal_to<T*, mayBeNull> {
 	bool operator()(const T* lhs, const T* rhs) const {
-		if (lhs == rhs) return true;
+		if (lhs == rhs) {
+			return true;
+		}
 		if (mayBeNull) {
-			if (lhs == nullptr || rhs == nullptr) return false;
+			if (lhs == nullptr || rhs == nullptr) {
+				return false;
+			}
 		}
 		assert(lhs != nullptr);
 		assert(rhs != nullptr);
@@ -48,9 +52,13 @@ struct equal_to<T*, mayBeNull> {
 template<typename T, bool mayBeNull>
 struct equal_to<std::shared_ptr<T>, mayBeNull> {
 	bool operator()(const std::shared_ptr<const T>& lhs, const std::shared_ptr<const T>& rhs) const {
-		if (lhs == rhs) return true;
+		if (lhs == rhs) {
+			return true;
+		}
 		if (mayBeNull) {
-			if (lhs == nullptr || rhs == nullptr) return false;
+			if (lhs == nullptr || rhs == nullptr) {
+				return false;
+			}
 		}
 		return std::equal_to<T>()(*lhs, *rhs);
 	}
@@ -96,9 +104,13 @@ template<typename T, bool mayBeNull>
 struct less<T*, mayBeNull> {
 	std::less<T> _less;
 	bool operator()(const T* lhs, const T* rhs) const {
-		if (lhs == rhs) return false;
+		if (lhs == rhs) {
+			return false;
+		}
 		if (mayBeNull) {
-			if (lhs == nullptr || rhs == nullptr) return lhs == nullptr;
+			if (lhs == nullptr || rhs == nullptr) {
+				return lhs == nullptr;
+			}
 		}
 		return _less(*lhs, *rhs);
 	}
@@ -108,9 +120,13 @@ template<typename T, bool mayBeNull>
 struct less<std::shared_ptr<T>, mayBeNull> {
 	std::less<T> _less;
 	bool operator()(const std::shared_ptr<const T>& lhs, const std::shared_ptr<const T>& rhs) const {
-		if (lhs == rhs) return false;
+		if (lhs == rhs) {
+			return false;
+		}
 		if (mayBeNull) {
-			if (lhs == nullptr || rhs == nullptr) return lhs == nullptr;
+			if (lhs == nullptr || rhs == nullptr) {
+				return lhs == nullptr;
+			}
 		}
 		return _less(*lhs, *rhs);
 	}
@@ -155,7 +171,9 @@ template<typename T, bool mayBeNull>
 struct hash<T*, mayBeNull> {
 	std::size_t operator()(const T* t) const {
 		if (mayBeNull) {
-			if (t == nullptr) return 0;
+			if (t == nullptr) {
+				return 0;
+			}
 		}
 		return std::hash<T>()(*t);
 	}
@@ -165,7 +183,9 @@ template<typename T, bool mayBeNull>
 struct hash<std::shared_ptr<T>, mayBeNull> {
 	std::size_t operator()(const std::shared_ptr<T>& t) const {
 		if (mayBeNull) {
-			if (t == nullptr) return 0;
+			if (t == nullptr) {
+				return 0;
+			}
 		}
 		return std::hash<T>()(*t);
 	}

@@ -613,7 +613,7 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 	assert(q.isConsistent());
 	assert(r.isConsistent());
 	assert(*this == q * divisor + r);
-	return DivisionResult<MultivariatePolynomial<C,O,P>>(q,r);
+	return DivisionResult<MultivariatePolynomial<C,O,P>> {q,r};
 }
 
 template<typename C, typename O, typename P>
@@ -1274,7 +1274,7 @@ UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P
 	for (const auto& term: this->mTerms) {
 		if (term.monomial() == nullptr) coeffs[0] += term;
 		else {
-			auto mon = term.monomial();
+			const auto& mon = term.monomial();
 			auto exponent = mon->exponentOfVariable(v);
 			if (exponent >= coeffs.size()) {
 				coeffs.resize(exponent + 1);
@@ -1579,7 +1579,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	CARL_LOG_TRACE("carl.core", *this << " -= " << rhs);
 	if (Policies::searchLinear)
 	{
-		typename TermsType::iterator it(mTerms.begin());
+		auto it = mTerms.begin();
 		while(it != mTerms.end())
 		{
 			// TODO consider comparing the shared pointers.
@@ -1634,7 +1634,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
 	if (Policies::searchLinear)
 	{
-		typename TermsType::iterator it(mTerms.begin());
+		auto it = mTerms.begin();
 		while(it != mTerms.end())
 		{
 			if ((*it).monomial() != nullptr) {

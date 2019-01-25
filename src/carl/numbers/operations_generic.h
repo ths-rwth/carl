@@ -14,46 +14,39 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #include "../util/SFINAE.h"
 #include "constants.h"
 
-namespace carl
-{
-	
-	template<typename T>
-	inline bool isZero(const T& t)
-	{
-		return t == 0;
-	}
-	
-	template<typename T>
-	inline bool isOne(const T& t) 
-	{
-		return t == 1;
-	}
-    
-	template<typename T, EnableIf<has_isPositive<T>>>
-	inline bool isPositive(const T& t) 
-	{
-		return t.isPositive();
-	}
-	
-	template<typename T, DisableIf<has_isPositive<T>>>
-	inline bool isPositive(const T& t)
-	{
-		return t > 0;
-	}
-	
-	template<typename T, EnableIf<has_isNegative<T>>>
-	inline bool isNegative(const T& t) 
-	{
-		return t.isNegative();
-	}
-	
-	template<typename T, DisableIf<has_isNegative<T>>>
-	inline bool isNegative(const T& t) 
-	{
-		return t < 0;
-	}
-	
-	/**
+namespace carl {
+
+template<typename T>
+inline bool isZero(const T& t) {
+	return t == 0;
+}
+
+template<typename T>
+inline bool isOne(const T& t) {
+	return t == 1;
+}
+
+template<typename T, EnableIf<has_isPositive<T>>>
+inline bool isPositive(const T& t) {
+	return t.isPositive();
+}
+
+template<typename T, DisableIf<has_isPositive<T>>>
+inline bool isPositive(const T& t) {
+	return t > 0;
+}
+
+template<typename T, EnableIf<has_isNegative<T>>>
+inline bool isNegative(const T& t) {
+	return t.isNegative();
+}
+
+template<typename T, DisableIf<has_isNegative<T>>>
+inline bool isNegative(const T& t) {
+	return t < 0;
+}
+
+/**
 	 * Implements a fast exponentiation on an arbitrary type T.
 	 * To use carl::pow() on a type T, the following must be defined:
 	 * - carl::constant_one<T>,
@@ -64,18 +57,20 @@ namespace carl
 	 * @param exp The exponent.
 	 * @return `t` to the power of `exp`.
 	 */
-	template<typename T, DisableIf<is_interval<T>> = dummy>
-	T pow(const T& basis, std::size_t exp) {
-		T res = carl::constant_one<T>().get();
-		T mult = basis;
-		for (std::size_t e = exp; e > 0; e /= 2) {
-			if (e & 1) res *= mult;
-			mult *= mult;
+template<typename T, DisableIf<is_interval<T>> = dummy>
+T pow(const T& basis, std::size_t exp) {
+	T res = carl::constant_one<T>().get();
+	T mult = basis;
+	for (std::size_t e = exp; e > 0; e /= 2) {
+		if (e & static_cast<std::size_t>(1)) {
+			res *= mult;
 		}
-		return res;
+		mult *= mult;
 	}
+	return res;
+}
 
-	/**
+/**
 	 * Implements a fast exponentiation on an arbitrary type T.
 	 * The result is stored in the given number.
 	 * To use carl::pow_assign() on a type T, the following must be defined:
@@ -86,14 +81,16 @@ namespace carl
 	 * @param t A number.
 	 * @param exp The exponent.
 	 */
-	template<typename T>
-	void pow_assign(T& t, std::size_t exp) {
-		T mult = t;
-		t = carl::constant_one<T>().get();
-		for (std::size_t e = exp; e > 0; e /= 2) {
-			if (e & 1) t *= mult;
-			mult *= mult;
+template<typename T>
+void pow_assign(T& t, std::size_t exp) {
+	T mult = t;
+	t = carl::constant_one<T>().get();
+	for (std::size_t e = exp; e > 0; e /= 2) {
+		if (e & static_cast<std::size_t>(1)) {
+			t *= mult;
 		}
+		mult *= mult;
 	}
-	
 }
+
+} // namespace carl

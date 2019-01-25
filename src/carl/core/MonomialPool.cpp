@@ -21,13 +21,8 @@ namespace carl
 			CARL_LOG_TRACE("carl.core.monomial", "Was newly added");
 			if (iter.first->monomial.expired()) {
 				CARL_LOG_TRACE("carl.core.monomial", "Weakptr is expired");
-				if (totalDegree == 0) {
-					res = Monomial::Arg(new Monomial(iter.first->hash, iter.first->content));
-					iter.first->monomial = res;
-				} else {
-					res = Monomial::Arg(new Monomial(iter.first->hash, iter.first->content, totalDegree));
-					iter.first->monomial = res;
-				}
+				res = Monomial::Arg(new Monomial(Monomial::is_sorted{}, iter.first->content, totalDegree, iter.first->hash));
+				iter.first->monomial = res;
 			} else {
 				res = iter.first->monomial.lock();
 				CARL_LOG_TRACE("carl.core.monomial", "Got existing weakptr as " << res);

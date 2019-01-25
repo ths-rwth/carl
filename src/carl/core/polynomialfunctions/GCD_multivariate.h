@@ -5,8 +5,8 @@
 #include "../MultivariatePolynomial.h"
 #include "../../numbers/typetraits.h"
 
-#include "../../converter/OldGinacConverter.h"
 #include "../../converter/CoCoAAdaptor.h"
+#include "../../converter/OldGinacConverter.h"
 
 namespace carl {
 

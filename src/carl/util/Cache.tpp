@@ -18,13 +18,8 @@ namespace carl
     template<typename T>
     Cache<T>::Cache( size_t _maxCacheSize, double _cacheReductionAmount, double _decay ):
         mMaxCacheSize( _maxCacheSize ),
-        mNumOfUnusedEntries( 0 ),
         mCacheReductionAmount( _cacheReductionAmount ), // TODO: use it, but without the effort of quick select
-        mMaxActivity( 0.0 ),
-        mActivityIncrement( 1.0 ),
         mDecay( _decay ),
-        mActivityThreshold( 1e100 ),
-        mActivityDecrementFactor( 1e-100 ),
         mCache(),
         mCacheRefs(),
         mUnusedPositionsInCacheRefs()

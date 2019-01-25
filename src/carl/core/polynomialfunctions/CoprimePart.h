@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../logging.h"
 #include "../../converter/CoCoAAdaptor.h"
+#include "../logging.h"
 
 namespace carl {
 

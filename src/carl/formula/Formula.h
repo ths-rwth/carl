@@ -904,6 +904,8 @@ namespace carl
 
 			void gatherVariables(carlVariables& vars) const;
 
+            void gatherUFs(std::set<UninterpretedFunction>& ufs) const;
+
             /**
              * @return The formula's complexity, which is mainly the number of operations within this formula.
              */

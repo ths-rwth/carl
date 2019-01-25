@@ -38,10 +38,8 @@ template<typename U, typename V>
 inline std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p);
 template<typename T, typename C>
 inline std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s);
-template<std::size_t I, typename... T, typename std::enable_if<I == sizeof...(T), void>::type*>
-inline std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t);
-template<std::size_t I, typename... T, typename std::enable_if<I < sizeof...(T), void>::type*>
-inline std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t);
+template<typename... T>
+std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t);
 template<typename Key, typename Value, typename H, typename E, typename A>
 inline std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value, H, E, A>& m);
 template<typename T, typename H, typename K, typename A>
@@ -53,6 +51,29 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v);
 */
 
 /**
+ * Allows to easily output some container with all elements separated by some string.
+ * Usage: `os << stream_joined(" ", container)`.
+ * @param glue The intermediate string.
+ * @param v The container to be printed.
+ * @return A temporary object that implements `operator<<()`.
+ */
+template<typename T>
+inline auto stream_joined(const std::string& glue, const T& v);
+
+/**
+ * Allows to easily output some container with all elements separated by some string.
+ * An additional callable `f` takes care of writing an individual element to the stream.
+ * Usage: `os << stream_joined(" ", container)`.
+ * @param glue The intermediate string.
+ * @param v The container to be printed.
+ * @param f A callable taking a stream and an element of `v`.
+ * @return A temporary object that implements `operator<<()`.
+ */
+template<typename T, typename F>
+inline auto stream_joined(const std::string& glue, const T& v, F&& f);
+
+
+/**
  * Output a std::forward_list with arbitrary content.
  * The format is `[<item>, <item>, ...]`
  * @param os Output stream.
@@ -61,14 +82,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v);
  */
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l) {
-	os << "[";
-	bool first = true;
-	for (const auto& it: l) {
-		if (!first) os << ", ";
-		first = false;
-		os << it;
-	}
-	return os << "]";
+	return os << "[" << stream_joined(", ", l) << "]";
 }
 
 /**
@@ -80,14 +94,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l)
  */
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
-	os << "[" << l.size() << ": ";
-	bool first = true;
-	for (const auto& it: l) {
-		if (!first) os << ", ";
-		first = false;
-		os << it;
-	}
-	return os << "]";
+	return os << "[" << l.size() << ": " << stream_joined(", ", l) << "]";
 }
 
 /**
@@ -99,14 +106,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
  */
 template<typename Key, typename Value, typename Comparator>
 inline std::ostream& operator<<(std::ostream& os, const std::map<Key, Value, Comparator>& m) {
-	os << "{";
-	bool first = true;
-	for (const auto& it: m) {
-		if (!first) os << ", ";
-		first = false;
-		os << it.first << " : " << it.second;
-	}
-	return os << "}";
+	return os << "{" << stream_joined(", ", m, [](auto& os, const auto& p){ os << p.first << " : " << p.second; }) << "}";
 }
 
 /**
@@ -118,14 +118,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::map<Key, Value, Com
  */
 template<typename Key, typename Value, typename Comparator>
 inline std::ostream& operator<<(std::ostream& os, const std::multimap<Key, Value, Comparator>& m) {
-	os << "{";
-	bool first = true;
-	for (const auto& it: m) {
-		if (!first) os << ", ";
-		first = false;
-		os << it.first << " : " << it.second;
-	}
-	return os << "}";
+	return os << "{" << stream_joined(", ", m, [](auto& os, const auto& p){ os << p.first << " : " << p.second; }) << "}";
 }
 
 /**
@@ -162,25 +155,22 @@ inline std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p) {
  */
 template<typename T, typename C>
 inline std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s) {
-	os << "{" << s.size() << ": ";
-	bool first = true;
-	for (const auto& it: s) {
-		if (!first) os << ", ";
-		first = false;
-		os << it;
-	}
-	return os << "}";
+	return os << "{" << s.size() << ": " << stream_joined(", ", s) << "}";
 }
 
+namespace detail {
 /**
- * Output a std::tuple with arbitrary content.
- * Final case for `I == 0`.
+ * Helper function that actually outputs a std::tuple.
+ * The format is `(<item>, <item>, ...)`
  * @param os Output stream.
+ * @param t tuple to be printed.
  * @return Output stream.
  */
-template<std::size_t I = 0, typename... T, typename std::enable_if<I == sizeof...(T), void>::type* = nullptr>
-inline std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& /*unused*/) {
+template<typename Tuple, std::size_t... I>
+std::ostream& stream_tuple_impl(std::ostream& os, const Tuple& t, std::index_sequence<I...>) {
+	(..., (os << (I == 0 ? "(" : ", ") << std::get<I>(t)));
 	return os << ")";
+}
 }
 
 /**
@@ -190,11 +180,9 @@ inline std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& /*unus
  * @param t tuple to be printed.
  * @return Output stream.
  */
-template<std::size_t I = 0, typename... T, typename std::enable_if<I < sizeof...(T), void>::type* = nullptr>
+template<typename... T>
 std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t) {
-	if (I == 0) os << "(" << std::get<I>(t);
-	else os << ", " << std::get<I>(t);
-	return operator<< <I+1>(os, t);
+	return detail::stream_tuple_impl(os, t, std::make_index_sequence<sizeof...(T)>());
 }
 
 /**
@@ -206,14 +194,7 @@ std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t) {
  */
 template<typename Key, typename Value, typename H, typename E, typename A>
 inline std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value, H, E, A>& m) {
-	os << "{";
-	bool first = true;
-	for (const auto& it: m) {
-		if (!first) os << ", ";
-		first = false;
-		os << it.first << " : " << it.second;
-	}
-	return os << "}";
+	return os << "{" << stream_joined(", ", m, [](auto& os, const auto& p){ os << p.first << " : " << p.second; }) << "}";
 }
 
 /**
@@ -225,14 +206,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, 
  */
 template<typename T, typename H, typename K, typename A>
 inline std::ostream& operator<<(std::ostream& os, const std::unordered_set<T, H, K, A>& s) {
-	os << "{" << s.size() << ": ";
-	bool first = true;
-	for (const auto& it: s) {
-		if (!first) os << ", ";
-		first = false;
-		os << it;
-	}
-	return os << "}";
+	return os << "{" << s.size() << ": " << stream_joined(", ", s) << "}";
 }
 
 /**
@@ -256,41 +230,39 @@ inline std::ostream& operator<<(std::ostream& os, const std::variant<T, Tail...>
  */
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
-	os << "[" << v.size() << ": ";
-	bool first = true;
-	for (const auto& it: v) {
-		if (!first) os << ", ";
-		first = false;
-		os << it;
-	}
-	return os << "]";
+	return os << "[" << v.size() << ": " << stream_joined(", ", v) << "]";
 }
 
 namespace detail {
-	template<typename T>
+	template<typename T, typename F>
 	struct stream_joined_impl {
 		std::string glue;
 		const T& values;
+		const F& callable;
 	};
-	template<typename T>
-	std::ostream& operator<<(std::ostream& os, const stream_joined_impl<T>& sji) {
+	template<typename T, typename F>
+	std::ostream& operator<<(std::ostream& os, const stream_joined_impl<T,F>& sji) {
 		auto it = sji.values.begin();
-		if (it == sji.values.end()) return os;
-		os << *it;
-		for (++it; it != sji.values.end(); ++it) os << sji.glue << *it;
+		if (it == sji.values.end()) {
+			return os;
+		}
+		sji.callable(os, *it);
+		for (++it; it != sji.values.end(); ++it) {
+			os << sji.glue;
+			sji.callable(os, *it);
+		}
 		return os;
 	}
 }
-/**
- * Allows to easily output some container with all elements separated by some string.
- * Usage: `os << stream_joined(" ", container)`.
- * @param glue The intermediate string.
- * @param v The container to be printed.
- * @return A temporary object that implements `operator<<()`.
- */
 template<typename T>
 inline auto stream_joined(const std::string& glue, const T& v) {
-	return detail::stream_joined_impl<T>{glue, v};
+	auto f = [](auto& os, const auto& t){ os << t; };
+	return detail::stream_joined_impl<T, decltype(f)>{glue, v, f};
+}
+
+template<typename T, typename F>
+inline auto stream_joined(const std::string& glue, const T& v, F&& f) {
+	return detail::stream_joined_impl<T,F>{glue, v, std::forward<F>(f)};
 }
 
 }

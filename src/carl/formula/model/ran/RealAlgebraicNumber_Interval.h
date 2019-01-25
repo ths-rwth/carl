@@ -3,6 +3,7 @@
 #include "../../../core/UnivariatePolynomial.h"
 #include "../../../core/polynomialfunctions/Resultant.h"
 #include "../../../core/polynomialfunctions/RootCounting.h"
+#include "../../../core/polynomialfunctions/SquareFreePart.h"
 #include "../../../core/polynomialfunctions/SturmSequence.h"
 
 #include "../../../interval/Interval.h"
@@ -12,9 +13,6 @@
 
 namespace carl {
 namespace ran {
-  /**
-   * FIX isn't this the standard representation of a real algebraic number?
-   */
 	template<typename Number>
 	struct IntervalContent {
 		using Polynomial = UnivariatePolynomial<Number>;
@@ -32,6 +30,11 @@ namespace ran {
 
 			Content(Polynomial&& p, const Interval<Number>& i, std::vector<UnivariatePolynomial<Number>>&& seq):
 				polynomial(std::move(p)), interval(i), sturmSequence(std::move(seq))
+			{
+				assert(polynomial == carl::squareFreePart(polynomial));
+			}
+			Content(const Polynomial& p, const Interval<Number>& i):
+				polynomial(carl::squareFreePart(p)), interval(i), sturmSequence(carl::sturm_sequence(polynomial))
 			{}
 		};
 
@@ -49,15 +52,8 @@ namespace ran {
 		IntervalContent(
 			const Polynomial& p,
 			const Interval<Number> i
-		): IntervalContent(p, i, carl::sturm_sequence(p))
-		{}
-		
-		IntervalContent(
-			const Polynomial& p,
-			const Interval<Number> i,
-			std::vector<UnivariatePolynomial<Number>>&& seq
 		):
-			mContent(std::make_shared<Content>(replaceVariable(p), i, std::move(seq)))
+			mContent(std::make_shared<Content>(replaceVariable(p), i))
 		{
 			CARL_LOG_DEBUG("carl.ran.ir", "Creating " << *this);
 			assert(!carl::isZero(polynomial()) && polynomial().degree() > 0);
@@ -71,6 +67,19 @@ namespace ran {
 				if (interval().contains(0)) refineAvoiding(0);
 				refineToIntegrality();
 			}
+		}
+
+		bool is_consistent() const {
+			if (polynomial() != carl::squareFreePart(polynomial())) {
+				CARL_LOG_DEBUG("carl.ran.ir", "Poly is not square free: " << polynomial());
+				return false;
+			}
+			auto lsgn = carl::sgn(polynomial().evaluate(interval().lower()));
+			auto usgn = carl::sgn(polynomial().evaluate(interval().upper()));
+			if (lsgn == Sign::ZERO) return false;
+			if (usgn == Sign::ZERO) return false;
+			if (lsgn == usgn) return false;
+			return true;
 		}
 
 		auto& polynomial() const {
@@ -143,20 +152,38 @@ namespace ran {
 			return i.contains(interval());
 		}
 		
-		void refine() const {
+		void refine(bool newone = true) const {
 			Number pivot = carl::sample(interval());
 			assert(interval().contains(pivot));
-			if (polynomial().isRoot(pivot)) {
-				interval() = Interval<Number>(pivot, pivot);
+			if (newone) {
+				assert(is_consistent());
+				auto psgn = carl::sgn(polynomial().evaluate(pivot));
+				if (psgn == Sign::ZERO) {
+					interval() = Interval<Number>(pivot, pivot);
+					return;
+				}
+				auto lsgn = carl::sgn(polynomial().evaluate(interval().lower()));
+				if (psgn == lsgn) {
+					interval().setLower(pivot);
+				} else {
+					interval().setUpper(pivot);
+				}
 			} else {
+<<<<<<< HEAD
+=======
+				if (polynomial().isRoot(pivot)) {
+					interval() = Interval<Number>(pivot, pivot);
+					return;
+				}
+>>>>>>> master
 				if (carl::count_real_roots(sturm_sequence(), Interval<Number>(interval().lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
 					interval().setUpper(pivot);
 				} else {
 					interval().setLower(pivot);
 				}
-				refinementCount()++;
-				assert(interval().isConsistent());
 			}
+			refinementCount()++;
+			assert(interval().isConsistent());
 		}
 			
 		/** Refine the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
@@ -337,7 +364,8 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	while (
 		res.sgn(interval.lower()) == Sign::ZERO ||
 		res.sgn(interval.upper()) == Sign::ZERO ||
-		count_real_roots(sturmSeq, interval) != 1) {
+		count_real_roots(sturmSeq, interval) != 1) 
+	{
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (auto it = m.begin(); it != m.end(); it++) {
 			it->second.refine();
@@ -350,7 +378,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 		interval = IntervalEvaluation::evaluate(poly, varToInterval);
 	}
 	CARL_LOG_DEBUG("carl.ran", "Result is " << IntervalContent<Number>(res, interval));
-	return IntervalContent<Number>(res, interval, std::move(sturmSeq));
+	return IntervalContent<Number>(res, interval);
 }
 
 template<typename Number, typename Poly>

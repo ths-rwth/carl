@@ -159,11 +159,7 @@ public:
 	{
 	}
 	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, bool isRoot = true):
-		mContent(std::in_place_type<IntervalContent>, p.normalized(), i),
-		mIsRoot(isRoot)
-	{}
-	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, std::vector<UnivariatePolynomial<Number>> sturmSequence, bool isRoot = true):
-		mContent(std::in_place_type<IntervalContent>, p.normalized(), i, std::move(sturmSequence)),
+		mContent(std::in_place_type<IntervalContent>, p, i),
 		mIsRoot(isRoot)
 	{}
 
@@ -373,9 +369,9 @@ public:
 			[](const auto& c) {}
 		);
 	}
-	void refine() const {
+	void refine(bool newone = true) const {
 		return call_on_content(
-			[](IntervalContent& c) { c.refine(); },
+			[newone](IntervalContent& c) { c.refine(newone); },
 			[](const auto& c) {}
 		);
 	}

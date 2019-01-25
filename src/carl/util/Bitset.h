@@ -97,12 +97,14 @@ namespace carl {
 		}
 	public:
 		/// Create an empty bitset.
-		Bitset(bool defaultValue = false): mDefault(defaultValue) {}
+		explicit Bitset(bool defaultValue = false): mDefault(defaultValue) {}
 		/// Create a bitset from a BaseType object.
 		Bitset(BaseType&& base, bool defaultValue): mData(std::move(base)), mDefault(defaultValue) {}
 		/// Create a bitset from a list of bits indices that shall be set to true.
 		Bitset(const std::initializer_list<std::size_t>& bits, bool defaultValue = false): mDefault(defaultValue) {
-			for (auto b: bits) set(b);
+			for (auto b: bits) {
+				set(b);
+			}
 		}
 		
 		/// Resize the Bitset to hold at least num_bits bits. New bits are set to the given value.
@@ -143,7 +145,9 @@ namespace carl {
 		/// Sets the a range of bits to a value, true by default.
 		Bitset& set_interval(std::size_t start, std::size_t end, bool value = true) {
 			ensureSize(end);
-			for (; start <= end; start++) mData.set(start, value);
+			for (; start <= end; start++) {
+				mData.set(start, value);
+			}
 			return *this;
 		}
 		/// Resets a bit to false.
@@ -154,7 +158,9 @@ namespace carl {
 		}
 		/// Retrieves the value of the given bit.
 		bool test(std::size_t n) const {
-			if (n >= mData.size()) return mDefault;
+			if (n >= mData.size()) {
+				return mDefault;
+			}
 			return mData.test(n);
 		}
 		/// Checks if any bits are set to true. Asserts that mDefault is false.
@@ -184,7 +190,9 @@ namespace carl {
 		}
 		/// Checks wether the bits set is a subset of the bits set in rhs.
 		auto is_subset_of(const Bitset& rhs) const {
-			if (mDefault && !rhs.mDefault) return false;
+			if (mDefault && !rhs.mDefault) {
+				return false;
+			}
 			alignSize(*this, rhs);
 			return mData.is_subset_of(rhs.mData);
 		}
@@ -207,8 +215,11 @@ namespace carl {
 		
 		/// Ensures that the explicitly stored bits of lhs and rhs have the same size.
 		friend void alignSize(const Bitset& lhs, const Bitset& rhs) {
-			if (lhs.size() < rhs.size()) lhs.resize(rhs.size());
-			else if (lhs.size() > rhs.size()) rhs.resize(lhs.size());
+			if (lhs.size() < rhs.size()) {
+				lhs.resize(rhs.size());
+			} else if (lhs.size() > rhs.size()) {
+				rhs.resize(lhs.size());
+			}
 		}
 		
 		/// Compares lhs and rhs.
@@ -218,8 +229,12 @@ namespace carl {
 		}
 		/// Compares lhs and rhs according to some order.
 		friend bool operator<(const Bitset& lhs, const Bitset& rhs) {
-			if (lhs.size() < rhs.size()) return true;
-			if (lhs.size() > rhs.size()) return false;
+			if (lhs.size() < rhs.size()) {
+				return true;
+			}
+			if (lhs.size() > rhs.size()) {
+				return false;
+			}
 			return lhs.mData < rhs.mData;
 		}
 		

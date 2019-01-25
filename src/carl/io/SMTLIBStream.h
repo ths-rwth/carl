@@ -182,6 +182,22 @@ private:
 			}
 		}
 	}
+
+	void write(const UEquality& ueq) {
+		if (ueq.negated()) {
+			*this << "(not (= " << ueq.lhs() << " " << ueq.rhs() << "))";
+		} else {
+			*this << "(= " << ueq.lhs() << " " << ueq.rhs() << ")";
+		}
+	}
+
+	void write(const UFInstance& ufi) {
+		*this << "(" << ufi.uninterpretedFunction().name();
+		for (const auto& a: ufi.args()) {
+			*this << " " << a;
+		}
+		*this << ")";
+	}
 	
 	template<typename Coeff>
 	void write(const UnivariatePolynomial<Coeff>& up) {
@@ -196,6 +212,13 @@ private:
 			}
 			*this << ")";
 		}
+	}
+
+	void write(const UTerm& t) {
+		std::visit(overloaded {
+			[this](UVariable v) { *this << v; },
+			[this](UFInstance ufi) { *this << ufi; },
+		}, t.asVariant());
 	}
 
 	void write(const Variable& v) {
@@ -224,30 +247,61 @@ public:
 	void declare(Sort s) {
 		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
 	}
+	void declare(UninterpretedFunction uf) {
+		*this << "(declare-fun " << uf.name() << " (";
+		const auto& sorts = uf.domain();
+		for (std::size_t i = 0; i < sorts.size(); ++i) {
+			if (i != 0) *this << " ";
+			*this << sorts[i];
+		}
+		*this << ") " << uf.codomain() << ")" << std::endl;
+	}
 	void declare(Variable v) {
 		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
+	}
+	void declare(UVariable v) {
+		*this << "(declare-fun " << v << " () " << v.domain() << ")" << std::endl;
+	}
+	void declare(const std::set<UninterpretedFunction>& ufs) {
+		for (auto uf: ufs) {
+			declare(uf);
+		}
 	}
 	void declare(const carlVariables& vars) {
 		for (const auto& v: vars) {
 			std::visit(overloaded {
 				[this](Variable v){ declare(v); },
 				[this](BVVariable v){ declare(v.variable()); },
-				[this](UVariable v){ declare(v.variable()); },
+				[this](UVariable v){ declare(v); },
 			}, v);
 		}
 	}
-	void initialize(Logic l, const carlVariables& vars) {
+	void initialize(Logic l, const carlVariables& vars, const std::set<UninterpretedFunction>& ufs = {}) {
 		declare(l);
+		std::set<Sort> sorts;
+		for (const auto& v: vars) {
+			std::visit(overloaded {
+				[](Variable v){},
+				[&sorts](BVVariable v){ sorts.insert(v.sort()); },
+				[&sorts](UVariable v){ sorts.insert(v.domain()); },
+			}, v);
+		}
+		for (const auto& s: sorts) {
+			declare(s);
+		}
+		declare(ufs);
 		declare(vars);
 	}
 	
 	template<typename Pol>
 	void initialize(Logic l, std::initializer_list<Formula<Pol>> formulas) {
 		carlVariables vars;
+		std::set<UninterpretedFunction> ufs;
 		for (const auto& f: formulas) {
 			f.gatherVariables(vars);
+			f.gatherUFs(ufs);
 		}
-		initialize(l, vars);
+		initialize(l, vars, ufs);
 	}
 
 	void setInfo(const std::string& name, const std::string& value) {

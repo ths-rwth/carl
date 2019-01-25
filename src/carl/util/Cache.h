@@ -87,7 +87,7 @@ namespace carl
         /**
          * The current number of entries in the cache, which are not used.
          */
-        std::size_t mNumOfUnusedEntries;
+        std::size_t mNumOfUnusedEntries = 0;
         
         /**
          * The percentage of the cache, which shall be removed at best, if the cache size exceeds the threshold. (NOT YET USED)
@@ -97,13 +97,13 @@ namespace carl
         /**
          * The threshold for the maximum activity. In case it is exceeded, all activities are rescaled.
          */
-        double mMaxActivity;
+        double mMaxActivity = 0.0;
         
         /**
          * The reciprocal of the factor to multiply an activity with in order to increase it. 
          * This member can increased by a user interface.
          */
-        double mActivityIncrement;
+        double mActivityIncrement = 1.0;
         
         /**
          * The decay (between 0.9 and 1.0) of the given increments on activities. 
@@ -114,12 +114,12 @@ namespace carl
         /**
          * The threshold limiting the maximum activity. If this threshold is exceeded, all activities are rescaled.
          */
-        double mActivityThreshold;
+        double mActivityThreshold = 1e100;
         
         /**
          * The factor multiplied to all activities in order to rescale (decrease) them.
          */
-        double mActivityDecrementFactor;
+        double mActivityDecrementFactor = 1e-100;
         
         /**
          * A mutex for situation where any member is changed. TODO: Refine the locking-situations. 
