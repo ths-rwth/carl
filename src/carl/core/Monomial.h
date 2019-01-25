@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <list>
+#include <numeric>
 #include <set>
 #include <sstream>
 
@@ -56,6 +57,11 @@ namespace carl
 	{
 		friend class MonomialPool;
 	public:
+		/**
+		 * Tag type to indicate that the Content provided to a constructor is already properly sorted.
+		 * This should only be used internally.
+		 */
+		struct is_sorted {};
 		using Arg = std::shared_ptr<const Monomial>;
 		using Content = std::vector<std::pair<Variable, uint>>;
 		~Monomial();
@@ -76,12 +82,23 @@ namespace carl
 		 * Default constructor.
 		 */
 		Monomial() = delete;
+		Monomial(const Monomial& rhs) = delete;
+		Monomial(Monomial&& rhs) = delete;
 
 		/**
 		 * Calculates the hash and stores it to mHash.
 		 */
-		void calcHash() {
+		void calc_hash() {
 			mHash = Monomial::hashContent(mExponents);
+		}
+		/**
+		 * Calculates the total degree and stores it to mTotalDegree.
+		 */
+		void calc_total_degree() {
+			mTotalDegree = std::accumulate(
+				mExponents.begin(), mExponents.end(), uint(0),
+				[](uint d, const auto& p) { return d + p.second; }
+			);
 		}
 
 		/**
@@ -93,68 +110,83 @@ namespace carl
 			mExponents(1, std::make_pair(v,e)),
 			mTotalDegree(e)
 		{
-			calcHash();
+			calc_hash();
 			assert(isConsistent());
 		}
-
-		Monomial(const Monomial& rhs) = delete;
-
-		/**
-		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
-		 * @param exponents The variables and their exponents.
-		 * @param totalDegree The total degree of the monomial to generate.
-		 */
-		Monomial(Content&& exponents, uint totalDegree) :
-			mExponents(std::move(exponents)),
-			mTotalDegree(totalDegree)
-		{
-			calcHash();
-			assert(isConsistent());
-		}
-				
+		
 		/**
 		 * Generate a monomial from an initializer list of variable-exponent pairs and a total degree.
 		 * @param exponents The variables and their exponents.
 		 */
 		Monomial(const std::initializer_list<std::pair<Variable, uint>>& exponents) :
-			mExponents(exponents)
-		{
-			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, uint>& p1, const std::pair<Variable, uint>& p2){ return p1.first < p2.first; });
-			for (const auto& e: mExponents) mTotalDegree += e.second;
-			calcHash();
-			assert(isConsistent());
-		}
-		
+			Monomial(Content(exponents))
+		{}
+
 		/**
 		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
-		 * @param exponents The variables and their exponents.
+		 * If the totalDegree is zero, it is recalculated.
+		 * The content is not expected to be sorted.
+		 * @param content The variables and their exponents.
+		 * @param totalDegree The total degree of the monomial to generate, or zero.
 		 */
-		explicit Monomial(Content&& exponents) :
-			mExponents(std::move(exponents))
+		Monomial(Content&& content, uint totalDegree = 0) :
+			mExponents(std::move(content)),
+			mTotalDegree(totalDegree)
 		{
-			for(auto const& ve : mExponents) {
-				mTotalDegree += ve.second;
+			std::sort(mExponents.begin(), mExponents.end(),
+				[](const auto& p1, const auto& p2){ return p1.first < p2.first; }
+			);
+			if (mTotalDegree == 0) {
+				calc_total_degree();
 			}
-			calcHash();
+			calc_hash();
 			assert(isConsistent());
 		}
 
-		explicit Monomial(std::size_t hash, Content exponents) :
-			mExponents(std::move(exponents)),
-			mHash(hash)
-		{
-			for(auto const& ve : mExponents) {
-				mTotalDegree += ve.second;
-			}
-			assert(isConsistent());
-		}
-		explicit Monomial(std::size_t hash, Content exponents, uint totalDegree) :
-			mExponents(std::move(exponents)),
+		/**
+		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
+		 * If the totalDegree is zero, it is recalculated.
+		 * The content is not expected to be sorted.
+		 * @param content The variables and their exponents
+		 * @param totalDegree The total degree of the monomial to generate, or zero.
+		 */
+		Monomial(const Content& content, uint totalDegree = 0) :
+			Monomial(Content(content), totalDegree)
+		{}
+		
+		/**
+		 * Generate a monomial from a vector of variable-exponent pairs, a total degree and its hash.
+		 * This overload expects the content to be sorted, as is indicated by the tag parameter is_sorted.
+		 * If the totalDegree or the hash is zero, it is recalculated.
+		 * @param content The variables and their exponents.
+		 * @param totalDegree The total degree of the monomial to generate, or zero.
+		 * @param hash The hash of the content, or zero.
+		 */
+		Monomial(is_sorted, Content&& content, uint totalDegree = 0, std::size_t hash = 0) :
+			mExponents(std::move(content)),
 			mTotalDegree(totalDegree),
 			mHash(hash)
 		{
+			if (mTotalDegree == 0) {
+				calc_total_degree();
+			}
+			if (mHash == 0) {
+				calc_hash();
+			}
 			assert(isConsistent());
 		}
+
+		/**
+		 * Generate a monomial from a vector of variable-exponent pairs, a total degree and its hash.
+		 * This overload expects the content to be sorted, as is indicated by the tag parameter is_sorted.
+		 * If the totalDegree or the hash is zero, it is recalculated.
+		 * @param content The variables and their exponents.
+		 * @param totalDegree The total degree of the monomial to generate, or zero.
+		 * @param hash The hash of the content, or zero.
+		 */
+		Monomial(is_sorted, const Content& content, uint totalDegree = 0, std::size_t hash = 0) :
+			Monomial(is_sorted{}, Content(content), totalDegree, hash)
+		{}
 
 	public:
 		/**
