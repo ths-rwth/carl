@@ -169,13 +169,10 @@ namespace ran {
 					interval().setUpper(pivot);
 				}
 			} else {
-<<<<<<< HEAD
-=======
 				if (polynomial().isRoot(pivot)) {
 					interval() = Interval<Number>(pivot, pivot);
 					return;
 				}
->>>>>>> master
 				if (carl::count_real_roots(sturm_sequence(), Interval<Number>(interval().lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
 					interval().setUpper(pivot);
 				} else {
