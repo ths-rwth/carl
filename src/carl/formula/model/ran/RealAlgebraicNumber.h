@@ -368,7 +368,7 @@ public:
 			[](const auto& c) {}
 		);
 	}
-	void refine(bool newone) const {
+	void refine(bool newone = true) const {
 		return call_on_content(
 			[newone](IntervalContent& c) { c.refine(newone); },
 			[](const auto& c) {}
