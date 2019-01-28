@@ -55,16 +55,24 @@ namespace model {
 		} else if (ue.lhs().isUFInstance()) {
 			evaluate(lhs, ue.lhs().asUFInstance(), m);
 		}
+		CARL_LOG_DEBUG("carl.model.evaluation", "lhs = " << lhs);
 		ModelValue<Rational,Poly> rhs;
 		if (ue.rhs().isUVariable()) {
 			evaluate(rhs, ue.rhs().asUVariable(), m);
 		} else if (ue.rhs().isUFInstance()) {
 			evaluate(rhs, ue.rhs().asUFInstance(), m);
 		}
+		CARL_LOG_DEBUG("carl.model.evaluation", "rhs = " << rhs);
 		assert(lhs.isSortValue());
 		assert(rhs.isSortValue());
 		assert(lhs.asSortValue().sort() == rhs.asSortValue().sort());
-		res = (lhs.asSortValue() == rhs.asSortValue());
+		if (ue.negated()) {
+			CARL_LOG_DEBUG("carl.model.evaluation", "-> " << lhs << " != " << rhs);
+			res = !(lhs.asSortValue() == rhs.asSortValue());
+		} else {
+			CARL_LOG_DEBUG("carl.model.evaluation", "-> " << lhs << " == " << rhs);
+			res = (lhs.asSortValue() == rhs.asSortValue());
+		}
 	}
 }
 }
