@@ -339,7 +339,7 @@ public:
 
 	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
 		return call_on_content(
-			[&p](const NumberContent& c) { return carl::count_real_roots(p, Interval<Number>(c.value())) == 1; },
+			[&p](const NumberContent& c) { return carl::count_real_roots(p, Interval<Number>(c.value())) == 1; }, // TODO use p.isRoot(c.value())
 			[&p](const IntervalContent& c) { return c.is_root_of(p); },
 			[&p](const auto& c) { return c.sgn(p) == Sign::ZERO; }
 		);
