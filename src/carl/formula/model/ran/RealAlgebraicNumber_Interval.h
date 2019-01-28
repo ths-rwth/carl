@@ -168,7 +168,7 @@ namespace ran {
 			Number pivot = carl::sample(interval());
 			assert(interval().contains(pivot));
 			if (newone) {
-				assert(is_consistent());
+				// assert(is_consistent());
 				auto psgn = polynomial().sgn(pivot);
 				if (psgn == Sign::ZERO) {
 					interval() = Interval<Number>(pivot, pivot);
@@ -180,7 +180,6 @@ namespace ran {
 				} else {
 					interval().setUpper(pivot);
 				}
-				assert(is_consistent());
 			} else {
 				if (polynomial().isRoot(pivot)) {
 					interval() = Interval<Number>(pivot, pivot);
@@ -194,7 +193,6 @@ namespace ran {
 			}
 			refinementCount()++;
 			assert(interval().isConsistent());
-			assert(is_consistent());
 		}
 			
 		/** Refine the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
@@ -205,12 +203,11 @@ namespace ran {
 		 */
 		bool refineAvoiding(const Number& n, bool newone = true) const {
 			if (newone) {
-				assert(is_consistent());
+				// assert(is_consistent());
 				if (interval().contains(n)) {
 					auto psgn = carl::sgn(polynomial().evaluate(n));
 					if (psgn == Sign::ZERO) {
 						interval() = Interval<Number>(n, n);
-						assert(is_consistent());
 						return true;
 					}
 					auto lsgn = carl::sgn(polynomial().evaluate(interval().lower()));
@@ -220,7 +217,6 @@ namespace ran {
 						interval().setUpper(n);
 					}
 					refinementCount()++;
-					assert(is_consistent());
 				} else if (interval().lower() != n && interval().upper() != n) {
 					return false;
 				}
@@ -231,7 +227,6 @@ namespace ran {
 				
 				if (polynomial().isRoot(newBound)) {
 					interval() = Interval<Number>(newBound, newBound);
-					assert(is_consistent());
 					return false;
 				}
 				
@@ -247,7 +242,6 @@ namespace ran {
 						newBound = carl::sample(Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT));
 						if (polynomial().isRoot(newBound)) {
 							interval() = Interval<Number>(newBound, newBound);
-							assert(is_consistent());
 							return false;
 						}
 						interval().setUpper(oldBound);
@@ -257,15 +251,12 @@ namespace ran {
 						newBound = carl::sample(Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT));
 						if (polynomial().isRoot(newBound)) {
 							interval() = Interval<Number>(newBound, newBound);
-							assert(is_consistent());
 							return false;
 						}
 						interval().setLower(oldBound);
 						interval().setUpper(newBound);
 					}
 				}
-				std::cout << polynomial().sgn(interval().lower()) << " " << polynomial().sgn(interval().upper())  << std::endl;
-				assert(is_consistent());
 				return false;
 			} else {
 				if (interval().contains(n)) {
