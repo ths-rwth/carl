@@ -580,6 +580,9 @@ namespace carl {
             } else {
 				#ifdef CONTRACTION_DEBUG
 				std::cout << __func__ << ": result: " << result1 << std::endl;
+				std::cout << __func__ << ": center: " << centerInterval << std::endl;
+				std::cout << __func__ << ": center sub: " << centerInterval.sub(result1) << std::endl;
+				std::cout << __func__ << ": intersecting " << intervals.at(variable) << " and " << centerInterval.sub(result1) << std::endl;
 				#endif
                 resA = carl::set_intersection(intervals.at(variable), centerInterval.sub(result1));
 				if (variable.type() == VariableType::VT_INT) {
