@@ -89,6 +89,11 @@ Z3Content<Number> evaluate(const MultivariatePolynomial<Number>& p, const std::m
 	return evaluateZ3(p, m);
 }
 
+template<typename Number, typename Poly>
+bool evaluate(const Constraint<Poly>& c, const std::map<Variable, Z3Content<Number>>& m) {
+	return evaluateZ3(c, m);
+}
+
 template<typename Number>
 const Interval<Number>& get_interval(const Z3Content<Number>& n) {
 	return n.z3_ran().getInterval();

@@ -10,7 +10,6 @@
 #include "ConstraintPool.h"
 #include "../converter/OldGinacConverter.h"
 
-using namespace std;
 
 namespace carl
 {
@@ -299,13 +298,13 @@ namespace carl
     }
 
     template<typename Pol>
-    void ConstraintPool<Pol>::print( ostream& _out ) const
+    void ConstraintPool<Pol>::print( std::ostream& _out ) const
     {
         CONSTRAINT_POOL_LOCK_GUARD
-        _out << "Constraint pool:" << endl;
+        _out << "Constraint pool:" << std::endl;
         for( auto constraint = mConstraints.begin(); constraint != mConstraints.end(); ++constraint )
-            _out << "    " << **constraint << "  [id=" << (*constraint)->mID << ", hash=" << (*constraint)->hash() << ", usages=" << (*constraint)->mUsages << "]" << endl;
-        _out << "---------------------------------------------------" << endl;
+            _out << "    " << **constraint << "  [id=" << (*constraint)->mID << ", hash=" << (*constraint)->hash() << ", usages=" << (*constraint)->mUsages << "]" << std::endl;
+        _out << "---------------------------------------------------" << std::endl;
     }
 
     template<typename Pol>

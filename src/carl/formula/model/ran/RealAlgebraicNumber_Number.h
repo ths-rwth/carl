@@ -61,6 +61,12 @@ NumberContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const st
 	return res.constantPart();
 }
 
+template<typename Number, typename Poly>
+bool evaluate(const Constraint<Poly>& c, const std::map<Variable, NumberContent<Number>>& m) {
+	auto res = evaluate(c.lhs(), m);
+	return evaluate(res.value(), c.relation());
+}
+
 template<typename Number>
 Interval<Number> get_interval(const NumberContent<Number>& n) {
 	return Interval<Number>(n.value());

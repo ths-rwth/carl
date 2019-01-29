@@ -43,6 +43,22 @@ namespace carl {
 
     template ran::Z3Content<mpq_class> evaluateZ3(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, ran::Z3Content<mpq_class>>& evalMap);
 
+    template<typename Number, typename Poly>
+    bool evaluateZ3(const Constraint<Poly>& constraint, const std::map<Variable, ran::Z3Content<Number>>& evalMap) {
+        polynomial::polynomial_ref poly = z3().toZ3IntCoeff(constraint.lhs());
+        algebraic_numbers::anum res;
+        nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
+        for(auto const &pair : evalMap) {
+            polynomial::var var = z3().toZ3(pair.first);
+            const algebraic_numbers::anum& val = pair.second.z3_ran().content();
+            map.set(var, val);
+        }
+        int rs = z3().anumMan().eval_sign_at(poly, map);
+        return evaluate(rs, constraint.relation());
+    }
+
+    template bool evaluateZ3(const Constraint<MultivariatePolynomial<mpq_class>>& constraint, const std::map<Variable, ran::Z3Content<mpq_class>>& evalMap);
+
 }
 
 #endif
