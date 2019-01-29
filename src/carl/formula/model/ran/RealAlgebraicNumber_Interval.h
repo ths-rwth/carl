@@ -449,66 +449,66 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 }
 
 template<typename Number, typename Poly>
-bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m) {
-	// TODO needs some profound considerations ...
+bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m, bool use_intervals = false) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << c << " on " << m);
-	Number min_width = Number(1)/(Number(65536)); // (1/2)^16, taken from Z3
-
-	// first try to evaluate c using interval arithmetic
 	Poly p = c.lhs();
-	//for(int i = 0; i < 3; i++) {
-	while(true) {
-		// evaluate
-		std::map<Variable, Interval<Number>> varToInterval;
-		for (const auto& var : p.gatherVariables()) {
-			varToInterval[var] = m.at(var).interval();
-		}
-		
-		CARL_LOG_DEBUG("carl.ran",  "Evaluate " << p << " on " << varToInterval);
-		auto res = IntervalEvaluation::evaluate(p, varToInterval);
-		CARL_LOG_DEBUG("carl.ran",  "Interval evaluation obtained " << res);
 
-		if (res.isPositive()) {
-			CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
-			return carl::evaluate(Sign::POSITIVE, c.relation());
-		} else if (res.isNegative()) {
-			CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
-			return carl::evaluate(Sign::NEGATIVE, c.relation());
-		} else if (res.isZero()) {
-			CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
-			return carl::evaluate(Sign::ZERO, c.relation());
-		}
-	
-		// refine RANs
-		bool refined = false;
-		for (const auto& a : varToInterval) {
-			if (a.second.diameter() > min_width) {
-				if (p.has(a.first)) { // is var still in p?
-					CARL_LOG_DEBUG("carl.ran", "Refine " <<  m.at(a.first) << " (" << a.first << ")");
-					m.at(a.first).refine();
-					// if RAN converted to a number, plug it in
-					if (is_number(m.at(a.first))) {
-						CARL_LOG_DEBUG("carl.ran",  m.at(a.first) << " (" << a.first << ") simplified to a number, plugging in");
-						p.substituteIn(a.first, Poly(get_number(m.at(a.first))));
-					}
-					refined = true;
-				}				
+	if (use_intervals) { // TODO needs some profound considerations ...
+		CARL_LOG_DEBUG("carl.ran", "Evaluate constraint using interval arithmetic");
+		static Number min_width = Number(1)/(Number(65536)); // (1/2)^16, taken from Z3
+		while(true) {
+			// evaluate
+			std::map<Variable, Interval<Number>> varToInterval;
+			for (const auto& var : p.gatherVariables()) {
+				varToInterval[var] = m.at(var).interval();
 			}
-		}
-		if (!refined) {
-			CARL_LOG_DEBUG("carl.ran", "Nothing to refine");
-			break; // nothing to refine
-		}
+			
+			CARL_LOG_DEBUG("carl.ran",  "Evaluate " << p << " on " << varToInterval);
+			auto res = IntervalEvaluation::evaluate(p, varToInterval);
+			CARL_LOG_DEBUG("carl.ran",  "Interval evaluation obtained " << res);
 
-		// if all variables are substituted we're done
-		if (p.gatherVariables().size() == 0) {
-			CARL_LOG_DEBUG("carl.ran", c << " simplified to " << p << " ~ 0");
-			assert(p.isNumber());
-			return carl::evaluate(p.constantPart(), c.relation());
+			if (res.isPositive()) {
+				CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
+				return carl::evaluate(Sign::POSITIVE, c.relation());
+			} else if (res.isNegative()) {
+				CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
+				return carl::evaluate(Sign::NEGATIVE, c.relation());
+			} else if (res.isZero()) {
+				CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
+				return carl::evaluate(Sign::ZERO, c.relation());
+			}
+		
+			// refine RANs
+			bool refined = false;
+			for (const auto& a : varToInterval) {
+				if (a.second.diameter() > min_width) {
+					if (p.has(a.first)) { // is var still in p?
+						CARL_LOG_DEBUG("carl.ran", "Refine " <<  m.at(a.first) << " (" << a.first << ")");
+						m.at(a.first).refine();
+						// if RAN converted to a number, plug it in
+						if (is_number(m.at(a.first))) {
+							CARL_LOG_DEBUG("carl.ran",  m.at(a.first) << " (" << a.first << ") simplified to a number, plugging in");
+							p.substituteIn(a.first, Poly(get_number(m.at(a.first))));
+						}
+						refined = true;
+					}				
+				}
+			}
+			if (!refined) {
+				CARL_LOG_DEBUG("carl.ran", "Nothing to refine");
+				break; // nothing to refine
+			}
+
+			// if all variables are substituted we're done
+			if (p.gatherVariables().size() == 0) {
+				CARL_LOG_DEBUG("carl.ran", c << " simplified to " << p << " ~ 0");
+				assert(p.isNumber());
+				return carl::evaluate(p.constantPart(), c.relation());
+			}
 		}
 	}
 
-	CARL_LOG_DEBUG("carl.ran", "Falling back to polynomial evaluation");
+	CARL_LOG_DEBUG("carl.ran", "Evaluate constraint by evaluating poly");
 	IntervalContent<Number> res = evaluate(p, m);
 	return evaluate(res.sgn(), c.relation());
 }
