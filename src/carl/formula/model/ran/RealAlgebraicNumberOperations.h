@@ -58,61 +58,6 @@ namespace carl {
 			[](auto& l, auto& u){ return RealAlgebraicNumber<Number>(ran::sample_between(l, u), false); }
 			, lower.mContent, upper.mContent
 		);
-		//CARL_LOG_FUNC("carl.ran", lower << ", " << upper);
-		//if(lower.isThom() || upper.isThom()) {
-		//	RealAlgebraicNumber<Number> res;
-		//	if(lower.isThom() && upper.isThom()) {
-		//		res =  RealAlgebraicNumber<Number>(ThomEncoding<Number>::intermediatePoint(*(lower.mTE), *(upper.mTE)), false);
-		//	} else if(lower.isNumeric() && upper.isThom()) {
-		//		res = RealAlgebraicNumber<Number>(ThomEncoding<Number>::intermediatePoint(lower.value(), *(upper.mTE)), false);
-		//	} else {
-		//		assert(lower.isThom() && upper.isNumeric());
-		//		res = RealAlgebraicNumber<Number>(ThomEncoding<Number>::intermediatePoint(*(lower.mTE), upper.value()), false);
-		//	}
-		//	CARL_LOG_TRACE("carl.ran", "selecting sample " << res);
-		//	return res;
-		//} else if (lower.isZ3Ran() || upper.isZ3Ran()) {
-		//	auto res = sampleBetweenZ3(lower, upper);
-		//	CARL_LOG_TRACE("carl.ran", "selecting sample " << res << " between " << lower << " and " << upper);
-		//	return res;
-		//} else if (lower.isNumeric() || upper.isNumeric() || lower.isInterval() || upper.isInterval()) {
-		//	Interval<Number> i;
-		//	if (lower.isNumeric()) i.set(lower.value(), lower.value());
-		//	else i.set(lower.upper(), lower.upper());
-		//	if (upper.isNumeric()) i.setUpper(upper.value());
-		//	else i.setUpper(upper.lower());
-		//	while (i.isEmpty()) {
-		//		if (!lower.isNumeric()) {
-		//			lower.refine();
-		//			if (lower.isNumeric()) i.setLower(lower.value());
-		//			else i.setLower(lower.upper());
-		//		}
-		//		if (!upper.isNumeric()) {
-		//			upper.refine();
-		//			if (upper.isNumeric()) i.setUpper(upper.value());
-		//			else i.setUpper(upper.lower());
-		//		}
-		//	}
-		//	CARL_LOG_TRACE("carl.ran", "Selecting from (" << lower << ", " << upper << ") -> " << sample(i, false) << " (from " << i << ")");
-		//	switch (heuristic) {
-		//		case RANSampleHeuristic::Center:
-		//			return RealAlgebraicNumber<Number>(center(i), false);
-		//		case RANSampleHeuristic::CenterInt:
-		//			return RealAlgebraicNumber<Number>(sample(i, false), false);
-		//		case RANSampleHeuristic::LeftInt:
-		//			return RealAlgebraicNumber<Number>(sample_left(i), false);
-		//		case RANSampleHeuristic::RightInt:
-		//			return RealAlgebraicNumber<Number>(sample_right(i), false);
-		//		case RANSampleHeuristic::ZeroInt:
-		//			return RealAlgebraicNumber<Number>(sample_zero(i), false);
-		//		case RANSampleHeuristic::InftyInt:
-		//			return RealAlgebraicNumber<Number>(sample_infty(i), false);
-		//		default:
-		//			CARL_LOG_WARN("carl.ran", "Using unknown sampling heuristic " << heuristic << ", fallback to sample.");
-		//			return RealAlgebraicNumber<Number>(sample(i, false), false);
-		//	}
-		//}
-		//assert(false);
 	}
 	template<typename Number>
 	RealAlgebraicNumber<Number> sampleAbove(const RealAlgebraicNumber<Number>& n) {
