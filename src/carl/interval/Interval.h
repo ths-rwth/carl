@@ -106,7 +106,7 @@ namespace carl
 	std::ostream& operator<<(std::ostream& os, const LowerBound<Number>& lb) {
 		return os << "Lower(" << lb.number << "," << lb.bound_type << ")";
 	}
-	
+
 	template<typename Number>
 	struct UpperBound {
 		const Number& number;
@@ -327,6 +327,12 @@ namespace carl
         mLowerBoundType(o.mLowerBoundType),
         mUpperBoundType(o.mUpperBoundType) { }
 
+        template<typename Other, DisableIf<std::is_same<Number, Other >> = dummy >
+        explicit Interval(const Interval<Other>& o)
+        {
+            *this = Interval<Number>(carl::convert<Other,Number>(o.lower()), o.lowerBoundType(), carl::convert<Other,Number>(o.upper()), o.upperBoundType());
+        }
+
         /**
          * Constructor which constructs a pointinterval from a passed double.
          * @param n The passed double.
@@ -335,7 +341,7 @@ namespace carl
         explicit Interval(const double& n) :
         mContent(carl::Interval<Number>::BoostInterval(n, n)),
         mLowerBoundType(BoundType::WEAK),
-        mUpperBoundType(BoundType::WEAK) { 
+        mUpperBoundType(BoundType::WEAK) {
 			Policy::sanitize(*this);
 		}
 
