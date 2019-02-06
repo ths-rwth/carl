@@ -199,12 +199,13 @@ public:
 	 * @param level LogLevel.
 	 * @return If the message shall be forwarded.
 	 */
-	bool check(std::string channel, LogLevel level) const noexcept {
-		auto it = mData.find(channel);
-		while (!channel.empty() && it == mData.end()) {
-			auto n = channel.rfind('.');
-			channel = (n == std::string::npos) ? "" : channel.substr(0, n);
-			it = mData.find(channel);
+	bool check(const std::string& channel, LogLevel level) const noexcept {
+		auto tmp = channel;
+		auto it = mData.find(tmp);
+		while (!tmp.empty() && it == mData.end()) {
+			auto n = tmp.rfind('.');
+			tmp = (n == std::string::npos) ? "" : tmp.substr(0, n);
+			it = mData.find(tmp);
 		}
 		if (it == mData.end()) {
 			std::cout << "Did not find something for \"" << channel << "\"" << std::endl;
