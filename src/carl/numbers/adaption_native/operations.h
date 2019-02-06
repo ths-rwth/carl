@@ -204,7 +204,7 @@ inline Number highestPower(const Number& n) {
 
 	Number res = n;
 	for (uint i = 0; i < iterations; i++) {
-		res |= res >> (1 << i);
+		res |= res >> (1u << i);
 	}
 	res -= res >> 1;
 	return res;

@@ -122,8 +122,6 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
  */
 class Sink {
 public:
-	virtual ~Sink() noexcept = default;
-
 	/**
 	 * Abstract logging interface.
 	 * The intended usage is to write any log output to the output stream returned by this function.
@@ -149,7 +147,7 @@ public:
 /**
  * Logging sink for file output.
  */
-class FileSink: public Sink {
+class FileSink final: public Sink {
 	/// File output stream.
 	std::ofstream os;
 public:
