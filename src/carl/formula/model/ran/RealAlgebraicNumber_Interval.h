@@ -347,7 +347,7 @@ IntervalContent<Number> abs(const IntervalContent<Number>& n) {
 }
 
 template<typename Number>
-const Number& branching_point(const IntervalContent<Number>& n) {
+Number branching_point(const IntervalContent<Number>& n) {
 	return carl::sample(n.interval());
 }
 
