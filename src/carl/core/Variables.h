@@ -59,21 +59,24 @@ public:
 		return mVariables.empty();
 	}
 	std::size_t size() const {
-		compact();
+		compact(true);
 		return mVariables.size();
 	}
 	void add(VarTypes v) {
 		mVariables.emplace_back(v);
 		++mAddedSinceCompact;
+		compact();
 	}
 	void add(std::initializer_list<VarTypes> i) {
 		mVariables.insert(end(), i.begin(), i.end());
 		mAddedSinceCompact += i.size();
+		compact();
 	}
 	template<typename Iterator>
 	void add(const Iterator& b, const Iterator& e) {
 		mVariables.insert(end(), b, e);
 		mAddedSinceCompact += static_cast<std::size_t>(std::distance(b, e));
+		compact();
 	}
 	template<typename Iterator, typename F>
 	void add(const Iterator& b, const Iterator& e, F&& f) {
@@ -93,7 +96,7 @@ public:
 		return res;
 	}
 	std::vector<Variable> underlyingVariables() const {
-		compact();
+		compact(true);
 		std::vector<Variable> res;
 		std::for_each(begin(), end(), [&res](const auto& var) {
 			std::visit(overloaded {
