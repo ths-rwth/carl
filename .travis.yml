@@ -93,6 +93,15 @@ matrix:
           packages: [*packages_base, libstdc++-8-dev]
     - stage: build
       os: linux
+      compiler: clang++-8.0
+      env: CC=clang CXX=clang++
+      script: source .ci/build.sh
+      addons:
+        apt:
+          sources: [*sources_base, llvm-toolchain-xenial-8]
+          packages: [*packages_base, libstdc++-8-dev]
+    - stage: build
+      os: linux
       compiler: g++-7
       env: CC=gcc-7 CXX=g++-7
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
@@ -192,6 +201,9 @@ matrix:
           sources: [*sources_base]
           packages: [*packages_base, g++-7]
   allow_failures:
+    - stage: build
+      os: linux
+      env: CC=clang CXX=clang++
     - stage: build
       os: linux
       env: CC=clang CXX=clang++ TASK=tidy
