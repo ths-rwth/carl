@@ -43,7 +43,15 @@ matrix:
       {%- set sources = ["*sources_base"] + job.addons.apt.sources %}
       {%- set packages = ["*packages_base"] + job.addons.apt.packages %}
         apt:
-          sources: [{{ sources|join(', ') }}]
+          sources:
+      {%- for s in sources %}
+        {%- if s is mapping %}
+          - sourceline: '{{ s.sourceline }}'
+            key_url: {{ s.key_url }}
+        {%- else %}
+          - {{ s }}
+        {%- endif %}
+      {%- endfor %}
           packages: [{{ packages|join(', ') }}]
     {%- endif %}
     {%- if job.addons.coverity_scan %}
