@@ -240,9 +240,6 @@ matrix:
   allow_failures:
     - stage: build
       os: linux
-      env: CC=clang-8 CXX=clang++-8
-    - stage: build
-      os: linux
       env: CC=clang-9 CXX=clang++-9
     - stage: build
       os: linux
