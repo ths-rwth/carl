@@ -150,18 +150,34 @@ matrix:
       os: osx
       osx_image: xcode9.3
       script: source .ci/build.sh
+      addons:
+        homebrew:
+          packages:
+          - llvm
     - stage: build
       os: osx
       osx_image: xcode9.4
       script: source .ci/build.sh
+      addons:
+        homebrew:
+          packages:
+          - llvm
     - stage: build
       os: osx
       osx_image: xcode10
       script: source .ci/build.sh
+      addons:
+        homebrew:
+          packages:
+          - llvm
     - stage: build
       os: osx
       osx_image: xcode10.1
       script: source .ci/build.sh
+      addons:
+        homebrew:
+          packages:
+          - llvm
     - stage: build
       os: linux
       compiler: g++-8

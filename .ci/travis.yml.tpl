@@ -54,6 +54,13 @@ matrix:
       {%- endfor %}
           packages: [{{ packages|join(', ') }}]
     {%- endif %}
+    {%- if job.addons.homebrew %}
+        homebrew:
+          packages:
+      {%- for p in job.addons.homebrew.packages %}
+          - {{ p }}
+      {%- endfor %}
+    {%- endif %}
     {%- if job.addons.coverity_scan %}
         coverity_scan:
           project:

@@ -15,20 +15,6 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 
 	export PATH="$PREFIX/bin:$PATH"
 
-elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
-
-	brew update --quiet
-	brew upgrade cmake
-	brew install llvm
-
-	if [[ ${CXX} == "g++-5" ]]; then
-		brew install gcc@5
-		brew link --overwrite gcc@5
-	elif [[ ${CXX} == "g++-6" ]]; then
-		brew install gcc@6
-		brew link --overwrite gcc@6
-	fi
-
 fi
 
 export CC=$CC

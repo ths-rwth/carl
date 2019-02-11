@@ -29,22 +29,26 @@ def addon_apt(sources, packages):
 		}
 	}
 
+def addon_brew(packages):
+	"""Standard addon for homebrew."""
+	return {
+		"homebrew": {
+			"packages": packages
+		}
+	}
+
 # List of predefined properties.
 # Can be extended.
 properties = {
 	"dependencies": {"stage": "dependencies", "script": ["TASK=dependencies"]},
 	"build": {"stage": "build"},
 
-	"xcode7.3": {"os": "osx", "osx_image": "xcode7.3", "env": []},
-	"xcode8.2": {"os": "osx", "osx_image": "xcode8.2", "env": []},
-	"xcode8.3": {"os": "osx", "osx_image": "xcode8.3", "env": []},
-	"xcode9": {"os": "osx", "osx_image": "xcode9", "env": []},
-	"xcode9.1": {"os": "osx", "osx_image": "xcode9.1", "env": []},
-	"xcode9.2": {"os": "osx", "osx_image": "xcode9.2", "env": []},	
-	"xcode9.3": {"os": "osx", "osx_image": "xcode9.3", "env": []},
-	"xcode9.4": {"os": "osx", "osx_image": "xcode9.4", "env": []},
-	"xcode10": {"os": "osx", "osx_image": "xcode10", "env": []},
-	"xcode10.1": {"os": "osx", "osx_image": "xcode10.1", "env": []},
+	"xcode9.1": {"os": "osx", "osx_image": "xcode9.1", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode9.2": {"os": "osx", "osx_image": "xcode9.2", "env": [], "addons": addon_brew(["llvm"])},	
+	"xcode9.3": {"os": "osx", "osx_image": "xcode9.3", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode9.4": {"os": "osx", "osx_image": "xcode9.4", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode10": {"os": "osx", "osx_image": "xcode10", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode10.1": {"os": "osx", "osx_image": "xcode10.1", "env": [], "addons": addon_brew(["llvm"])},
 	"linux": {"os": "linux"},
 
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-xenial-3.8"], ["clang-3.8", "libstdc++-6-dev"])},
