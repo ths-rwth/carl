@@ -4,11 +4,11 @@
 
 #include <boost/program_options.hpp>
 
-#include <filesystem>
 #include <vector>
 
+#if __has_include(<filesystem>)
+#include <filesystem>
 namespace std {
-
 inline void validate(boost::any& v, const std::vector<std::string>& values, std::filesystem::path*, int) {
 	namespace pov = boost::program_options::validators;
 	namespace fs = std::filesystem;
@@ -19,8 +19,8 @@ inline void validate(boost::any& v, const std::vector<std::string>& values, std:
 		v = fs::absolute(p);
 	}
 }
-
 }
+#endif
 
 namespace carl::settings {
 
