@@ -39,7 +39,7 @@ std::ostream& operator<<(std::ostream& os, SettingsPrinter sp) {
 }
 
 void SettingsParser::warn_for_unrecognized(const po::parsed_options& parsed) const {
-	auto res = po::collect_unrecognized(parsed.options, po::include_positional);
+	auto res = po::collect_unrecognized(parsed.options, po::exclude_positional);
 	for (const auto& s: res) {
 		warn_for_unrecognized_option(s);
 	}
