@@ -1,7 +1,13 @@
 #include "SettingsParser.h"
 
 #include <boost/any.hpp>
+#if __has_include(<filesystem>)
 #include <filesystem>
+namespace fs = std::filesystem;
+#else
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
 
 namespace carl::settings {
 
@@ -53,8 +59,8 @@ void SettingsParser::parse_command_line(int argc, char* argv[]) {
 }
 
 void SettingsParser::parse_config_file() {
-	std::filesystem::path configfile(mValues[this->name_of_config_file()].as<std::string>());
-	if (std::filesystem::is_regular_file(configfile)) {
+	fs::path configfile(mValues[this->name_of_config_file()].as<std::string>());
+	if (fs::is_regular_file(configfile)) {
 		auto parsed = po::parse_config_file<char>(configfile.c_str(), mAllOptions, true);
 		warn_for_unrecognized(parsed);
 		po::store(parsed, mValues);
