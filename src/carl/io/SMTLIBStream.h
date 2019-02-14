@@ -97,7 +97,7 @@ private:
 			value = model.evaluated(m.first);
 			*this << "\t(define-fun " << m.first << " () ";
 			if (m.first.isVariable()) {
-				*this << m.first.asVariable().getType() << std::endl;
+				*this << m.first.asVariable().type() << std::endl;
 			} else if (m.first.isBVVariable()) {
 				*this << m.first.asBVVariable().sort() << std::endl;
 			} else if (m.first.isUVariable()) {
