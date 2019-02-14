@@ -82,7 +82,7 @@ protected:
 	virtual void warn_for_unrecognized_option(const std::string& s) const {
 		CARL_LOG_WARN("carl.settings", "Ignoring unrecognized option " << s);
 	}
-	virtual void warn_config_file(const std::filesystem::path& file) const {
+	virtual void warn_config_file(const std::string& file) const {
 		CARL_LOG_WARN("carl.settings", "Could not load config file " << file);
 	}
 	virtual std::string name_of_config_file() const {
