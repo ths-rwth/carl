@@ -324,7 +324,7 @@ namespace carl
         Pol tmp = mpContent->mLhs.substitute( _assignment );
         if( tmp.isConstant() )
         {
-            result = carl::evaluate( (tmp.isZero() ? typename Pol::NumberType( 0 ) : tmp.trailingTerm().coeff()), relation() ) ? 1 : 0;
+            result = carl::evaluate( (isZero(tmp) ? typename Pol::NumberType( 0 ) : tmp.trailingTerm().coeff()), relation() ) ? 1 : 0;
         }
 //        std::cout << "result is " << result << std::endl;
 //        std::cout << std::endl;
@@ -735,7 +735,7 @@ namespace carl
                 break;
         }
         _out << "   The number of monomials: " << lhs().nrTerms() << std::endl;
-        _out << "   The maximal degree:      " << (lhs().isZero() ? 0 : lhs().totalDegree()) << std::endl;
+        _out << "   The maximal degree:      " << (carl::isZero(lhs()) ? 0 : lhs().totalDegree()) << std::endl;
         _out << "   The constant part:       " << constantPart() << std::endl;
         _out << "   Variables:" << std::endl;
         for( auto vi = mpContent->mVarInfoMap.begin(); vi != mpContent->mVarInfoMap.end(); ++vi )

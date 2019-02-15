@@ -152,7 +152,7 @@ template<typename Number>
 template<typename Number>
 	void Interval<Number>::center_assign()
 	{
-		this->set(BoostInterval(this->center()));
+		this->set(BoostInterval(carl::center(*this)));
 	}
 
 	template<typename Number>
