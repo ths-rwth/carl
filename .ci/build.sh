@@ -103,7 +103,7 @@ elif [[ ${TASK} == "tidy" ]]; then
 
 	fold "reconfigure" cmake -D DEVELOPER=ON -D THREAD_SAFE=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=OFF -D USE_COCOA=ON -D USE_GINAC=OFF ../ || return 1
 	
-	/usr/bin/time make tidy || return 1
+	/usr/bin/time make tidy
 
 elif [[ ${TASK} == "addons" ]]; then
 	
