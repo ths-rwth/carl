@@ -107,6 +107,34 @@ public:
 		});
 		return res;
 	}
+
+	template<typename T>
+	auto filter_type() const {
+		return filter([](const auto& v) {
+			return std::holds_alternative<T>(v);
+		});
+	}
+	auto filter_type(VariableType vt) const {
+		return filter([vt](const auto& v) {
+			return std::holds_alternative<carl::Variable>(v) && std::get<carl::Variable>(v).type() == vt;
+		});
+	}
+
+	auto boolean() const {
+		return filter_type(VariableType::VT_BOOL);
+	}
+	auto integer() const {
+		return filter_type(VariableType::VT_INT);
+	}
+	auto real() const {
+		return filter_type(VariableType::VT_REAL);
+	}
+	auto bitvector() const {
+		return filter_type<BVVariable>();
+	}
+	auto uninterpreted() const {
+		return filter_type<BVVariable>();
+	}
 };
 
 inline void swap(carlVariables::VarTypes& lhs, carlVariables::VarTypes& rhs) {
