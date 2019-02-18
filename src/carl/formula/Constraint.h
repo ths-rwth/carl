@@ -539,7 +539,7 @@ namespace carl
             {
                 for( auto var = mpContent->mVariables.begin(); var != mpContent->mVariables.end(); ++var )
                 {
-                    if( var->getType() != VariableType::VT_INT )
+                    if( var->type() != VariableType::VT_INT )
                         return false;
                 }
                 return true;
@@ -552,7 +552,7 @@ namespace carl
             {
                 for( auto var = mpContent->mVariables.begin(); var != mpContent->mVariables.end(); ++var )
                 {
-                    if( var->getType() != VariableType::VT_REAL )
+                    if( var->type() != VariableType::VT_REAL )
                         return false;
                 }
                 return true;

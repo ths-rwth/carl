@@ -50,8 +50,8 @@ inline std::ostream& operator<<(std::ostream& os, const TimingCollector& tc) {
 #define CARL_TIME_START() carl::TimingCollector::getInstance().start()
 #define CARL_TIME_FINISH(name, start) carl::TimingCollector::getInstance().finish(name, start)
 #else
-#define CARL_TIME_START() TimingCollector::time_point()
-#define CARL_TIME_FINISH(name, start) static_cast<TimingCollector::time_point>(start)
+#define CARL_TIME_START() carl::TimingCollector::time_point()
+#define CARL_TIME_FINISH(name, start) static_cast<carl::TimingCollector::time_point>(start)
 #endif
 
 }

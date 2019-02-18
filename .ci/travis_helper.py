@@ -29,22 +29,26 @@ def addon_apt(sources, packages):
 		}
 	}
 
+def addon_brew(packages):
+	"""Standard addon for homebrew."""
+	return {
+		"homebrew": {
+			"packages": packages
+		}
+	}
+
 # List of predefined properties.
 # Can be extended.
 properties = {
 	"dependencies": {"stage": "dependencies", "script": ["TASK=dependencies"]},
 	"build": {"stage": "build"},
 
-	"xcode7.3": {"os": "osx", "osx_image": "xcode7.3", "env": []},
-	"xcode8.2": {"os": "osx", "osx_image": "xcode8.2", "env": []},
-	"xcode8.3": {"os": "osx", "osx_image": "xcode8.3", "env": []},
-	"xcode9": {"os": "osx", "osx_image": "xcode9", "env": []},
-	"xcode9.1": {"os": "osx", "osx_image": "xcode9.1", "env": []},
-	"xcode9.2": {"os": "osx", "osx_image": "xcode9.2", "env": []},	
-	"xcode9.3": {"os": "osx", "osx_image": "xcode9.3", "env": []},
-	"xcode9.4": {"os": "osx", "osx_image": "xcode9.4", "env": []},
-	"xcode10": {"os": "osx", "osx_image": "xcode10", "env": []},
-	"xcode10.1": {"os": "osx", "osx_image": "xcode10.1", "env": []},
+	"xcode9.1": {"os": "osx", "osx_image": "xcode9.1", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode9.2": {"os": "osx", "osx_image": "xcode9.2", "env": [], "addons": addon_brew(["llvm"])},	
+	"xcode9.3": {"os": "osx", "osx_image": "xcode9.3", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode9.4": {"os": "osx", "osx_image": "xcode9.4", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode10": {"os": "osx", "osx_image": "xcode10", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode10.1": {"os": "osx", "osx_image": "xcode10.1", "env": [], "addons": addon_brew(["llvm"])},
 	"linux": {"os": "linux"},
 
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-xenial-3.8"], ["clang-3.8", "libstdc++-6-dev"])},
@@ -52,7 +56,9 @@ properties = {
 	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0", "addons": addon_apt(["llvm-toolchain-xenial-4.0"], ["clang-4.0", "libstdc++-6-dev"])},
 	"clang-5.0": {"env": ["CC=clang-5.0 CXX=clang++-5.0"], "compiler": "clang++-5.0", "addons": addon_apt(["llvm-toolchain-xenial-5.0"], ["clang-5.0", "libstdc++-8-dev"])},
 	"clang-6.0": {"env": ["CC=clang-6.0 CXX=clang++-6.0"], "compiler": "clang++-6.0", "addons": addon_apt(["llvm-toolchain-xenial-6.0"], ["clang-6.0", "libstdc++-8-dev"])},
-	"clang-7.0": {"env": ["CC=clang CXX=clang++"], "compiler": "clang++-7.0", "addons": addon_apt(["llvm-toolchain-xenial-7"], ["libstdc++-8-dev"])},
+	"clang-7.0": {"env": ["CC=clang-7 CXX=clang++-7"], "compiler": "clang++-7.0", "addons": addon_apt(["llvm-toolchain-xenial-7"], ["clang-7", "libstdc++-8-dev"])},
+	"clang-8.0": {"env": ["CC=clang-8 CXX=clang++-8"], "compiler": "clang++-8.0", "addons": addon_apt(["llvm-toolchain-xenial-8"], ["clang-8", "libstdc++-8-dev"])},
+	"clang-9.0": {"env": ["CC=clang-9 CXX=clang++-9"], "compiler": "clang++-9.0", "addons": addon_apt([{"sourceline": "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial main", "key_url": "https://apt.llvm.org/llvm-snapshot.gpg.key"}], ["clang-9", "libstdc++-8-dev"])},
 	"g++-5": {"env": ["CC=gcc-5 CXX=g++-5"], "compiler": "g++-5"},
 	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6", "addons": addon_apt([],["g++-6"])},
 	"g++-7": {"env": ["CC=gcc-7 CXX=g++-7"], "compiler": "g++-7", "addons": addon_apt([],["g++-7"])},

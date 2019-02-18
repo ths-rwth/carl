@@ -11,7 +11,7 @@ namespace carl {
  * It is reimplemented here to avoid including all of boost/functional/hash.hpp for this single line of code.
  */
 inline void hash_combine(std::size_t& seed, std::size_t value) {
-	seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
+	seed ^= value + 0x9e3779b9 + (seed<<6u) + (seed>>2u);
 }
 
 /**
@@ -83,7 +83,7 @@ struct hash_inserter {
 	}
 	hash_inserter& operator*() { return *this; }
 	hash_inserter& operator++() { return *this; }
-	hash_inserter operator++(int) { return *this; }
+	const hash_inserter operator++(int) { return *this; }
 };
 
 } // namespace carl

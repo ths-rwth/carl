@@ -115,7 +115,7 @@ public:
     {
         mVariableNames.clear();
 		mNextIDs.fill(1);
-		for (auto pv: mPersistentVariables) {
+		for (const auto& pv: mPersistentVariables) {
 			Variable v = pv.first;
 			while (nextID(v.type()) < v.id()) {
 				getFreshVariable(v.type());

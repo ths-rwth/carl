@@ -176,6 +176,10 @@ private:
 	}
 
 public:
+	SortManager(const SortManager&) = delete;
+	SortManager(SortManager&&) = delete;
+	SortManager& operator=(const SortManager&) = delete;
+	SortManager& operator=(SortManager&&) = delete;
 	~SortManager() noexcept override = default;
 
 	void clear() {

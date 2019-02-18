@@ -169,7 +169,7 @@ namespace carl
                 CONSTRAINT_POOL_LOCK_GUARD
                 for( auto constraint = mConstraints.begin(); constraint != mConstraints.end(); ++constraint )
                 {
-                    std::size_t maxdeg = (*constraint)->mLhs.isZero() ? 0 : (*constraint)->mLhs.totalDegree();
+                    std::size_t maxdeg = isZero((*constraint)->mLhs) ? 0 : (*constraint)->mLhs.totalDegree();
                     if(maxdeg > result) 
                         result = maxdeg;
                 }

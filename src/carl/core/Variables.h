@@ -59,21 +59,24 @@ public:
 		return mVariables.empty();
 	}
 	std::size_t size() const {
-		compact();
+		compact(true);
 		return mVariables.size();
 	}
 	void add(VarTypes v) {
 		mVariables.emplace_back(v);
 		++mAddedSinceCompact;
+		compact();
 	}
 	void add(std::initializer_list<VarTypes> i) {
 		mVariables.insert(end(), i.begin(), i.end());
 		mAddedSinceCompact += i.size();
+		compact();
 	}
 	template<typename Iterator>
 	void add(const Iterator& b, const Iterator& e) {
 		mVariables.insert(end(), b, e);
 		mAddedSinceCompact += static_cast<std::size_t>(std::distance(b, e));
+		compact();
 	}
 	template<typename Iterator, typename F>
 	void add(const Iterator& b, const Iterator& e, F&& f) {
@@ -93,7 +96,7 @@ public:
 		return res;
 	}
 	std::vector<Variable> underlyingVariables() const {
-		compact();
+		compact(true);
 		std::vector<Variable> res;
 		std::for_each(begin(), end(), [&res](const auto& var) {
 			std::visit(overloaded {
@@ -103,6 +106,34 @@ public:
 			}, var);
 		});
 		return res;
+	}
+
+	template<typename T>
+	auto filter_type() const {
+		return filter([](const auto& v) {
+			return std::holds_alternative<T>(v);
+		});
+	}
+	auto filter_type(VariableType vt) const {
+		return filter([vt](const auto& v) {
+			return std::holds_alternative<carl::Variable>(v) && std::get<carl::Variable>(v).type() == vt;
+		});
+	}
+
+	auto boolean() const {
+		return filter_type(VariableType::VT_BOOL);
+	}
+	auto integer() const {
+		return filter_type(VariableType::VT_INT);
+	}
+	auto real() const {
+		return filter_type(VariableType::VT_REAL);
+	}
+	auto bitvector() const {
+		return filter_type<BVVariable>();
+	}
+	auto uninterpreted() const {
+		return filter_type<BVVariable>();
 	}
 };
 

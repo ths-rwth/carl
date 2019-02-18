@@ -1,12 +1,16 @@
 # Include dir
+STRING(REPLACE ":" ";" CPATH "$ENV{CPATH}")
 find_path(GMP_INCLUDE_DIR
 	NAMES gmp.h
+	HINTS ${CPATH}
 	DOC "Include directory for GMP"
 )
 
 # Library files
+STRING(REPLACE ":" ";" LIBRARY_PATH "$ENV{LIBRARY_PATH}")
 find_library(GMP_LIBRARY
 	NAMES gmp
+	HINTS ${LIBRARY_PATH}
 	PATHS /usr/local/lib
 )
 
