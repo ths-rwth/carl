@@ -1580,3 +1580,4 @@ namespace std {
 
 #include "operators.h"
 #include "Interval.tpp"
+#include "conversion.h"
