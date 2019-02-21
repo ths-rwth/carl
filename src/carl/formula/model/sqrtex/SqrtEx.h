@@ -114,7 +114,7 @@ namespace carl
              */
             bool isPolynomial() const
             {
-                return mFactor.isZero() && mDenominator.isConstant();
+                return carl::isZero(mFactor) && mDenominator.isConstant();
             }
 
             /**
@@ -123,7 +123,7 @@ namespace carl
             Poly asPolynomial() const
             {
                 assert( isPolynomial() );
-                assert( !mDenominator.isZero() );
+                assert( !carl::isZero(mDenominator) );
                 return mConstantPart / mDenominator.constantPart();
             }
 
@@ -151,7 +151,7 @@ namespace carl
              */
             bool isRational() const
             {
-                return mConstantPart.isConstant() && mDenominator.isConstant() && mRadicand.isZero();
+                return mConstantPart.isConstant() && mDenominator.isConstant() && carl::isZero(mRadicand);
             }
             
             /**
@@ -181,8 +181,8 @@ namespace carl
              */
             bool isInteger() const
             {
-                return radicand().isZero() && denominator().isOne() && 
-                       (constantPart().isZero() || (constantPart().isConstant() && carl::isInteger( constantPart().lcoeff() ) ) );
+                return carl::isZero(radicand()) && carl::isOne(denominator()) && 
+                       (carl::isZero(constantPart()) || (constantPart().isConstant() && carl::isInteger( constantPart().lcoeff() ) ) );
             }
             
             /**
