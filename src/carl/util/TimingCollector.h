@@ -8,33 +8,49 @@
 #include <map>
 
 namespace carl {
+namespace timing {
+
+/// The clock type used here.
+using clock = std::chrono::high_resolution_clock;
+/// The duration type used here.
+using duration = std::chrono::duration<std::size_t,std::milli>;
+/// The type of a time point.
+using time_point = clock::time_point;
+
+/// Return the current time point.
+inline auto now() {
+	return clock::now();
+}
+/// Return the duration since the given start time point.
+inline auto since(time_point start) {
+	return std::chrono::duration_cast<duration>(clock::now() - start);
+}
+/// Return a zero duration.
+inline auto zero() {
+	return duration::zero();
+}
+
+}
 
 class TimingCollector: public Singleton<TimingCollector> {
 public:
-	/// The clock type used here.
-	using clock = std::chrono::high_resolution_clock;
-	/// The duration type used here.
-	using duration = std::chrono::duration<std::size_t,std::milli>;
-	/// The type of a time point.
-	using time_point = clock::time_point;
 private:
 	struct TimingInformation {
 		std::size_t count = 0;
-		duration overall = duration::zero();
+		timing::duration overall = timing::zero();
 	};
 	std::map<std::string,TimingInformation> mData;
 public:
 	const auto& data() const {
 		return mData;
 	}
-	time_point start() const {
-		return clock::now();
+	timing::time_point start() const {
+		return timing::now();
 	}
-	void finish(const std::string& name, clock::time_point start) {
-		auto diff = std::chrono::duration_cast<duration>(clock::now() - start);
+	void finish(const std::string& name, timing::time_point start) {
 		auto& d = mData[name];
 		++d.count;
-		d.overall += diff;
+		d.overall += timing::since(start);
 	}
 };
 
