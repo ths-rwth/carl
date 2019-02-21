@@ -52,17 +52,25 @@ void SettingsParser::warn_for_unrecognized(const po::parsed_options& parsed) con
 	}
 }
 
-void SettingsParser::parse_command_line(int argc, char* argv[]) {
-	auto parsed = po::command_line_parser(argc, argv).allow_unregistered().options(mAllOptions).positional(mPositional).run();
-	warn_for_unrecognized(parsed);
+void SettingsParser::parse_command_line(int argc, char* argv[], bool allow_unregistered) {
+	auto parser = po::command_line_parser(argc, argv).options(mAllOptions).positional(mPositional);
+	if (allow_unregistered) {
+		parser.allow_unregistered();
+	}
+	auto parsed = parser.run();
+	if (allow_unregistered) {
+		warn_for_unrecognized(parsed);
+	}
 	po::store(parsed, mValues);
 }
 
-void SettingsParser::parse_config_file() {
+void SettingsParser::parse_config_file(bool allow_unregistered) {
 	fs::path configfile(mValues[this->name_of_config_file()].as<std::string>());
 	if (fs::is_regular_file(configfile)) {
-		auto parsed = po::parse_config_file<char>(configfile.c_str(), mAllOptions, true);
-		warn_for_unrecognized(parsed);
+		auto parsed = po::parse_config_file<char>(configfile.c_str(), mAllOptions, allow_unregistered);
+		if (allow_unregistered) {
+			warn_for_unrecognized(parsed);
+		}
 		po::store(parsed, mValues);
 	} else {
 		warn_config_file(configfile);
@@ -81,11 +89,11 @@ void SettingsParser::finalize() {
 	}
 }
 
-void SettingsParser::parse_options(int argc, char* argv[]) {
+void SettingsParser::parse_options(int argc, char* argv[], bool allow_unregistered) {
 	argv_zero = argv[0];
-	parse_command_line(argc, argv);
+	parse_command_line(argc, argv, allow_unregistered);
 	if (mValues.count(this->name_of_config_file())) {
-		parse_config_file();
+		parse_config_file(allow_unregistered);
 	}
 	po::notify(mValues);
 	finalize_settings();

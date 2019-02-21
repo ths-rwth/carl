@@ -73,9 +73,9 @@ protected:
 	/// Checks for unrecognized options that were found.
 	void warn_for_unrecognized(const po::parsed_options& parsed) const;
 	/// Parses the command line.
-	void parse_command_line(int argc, char* argv[]);
+	void parse_command_line(int argc, char* argv[], bool allow_unregistered);
 	/// Parses the config file if one was configured.
-	void parse_config_file();
+	void parse_config_file(bool allow_unregistered);
 	/// Calls the finalizer functions.
 	void finalize_settings();
 
@@ -104,8 +104,12 @@ public:
 		mFinalizer.emplace_back([this,f](){ f(mValues); });
 	}
 
-	/// Parse the options.
-	void parse_options(int argc, char* argv[]);
+	/**
+	 * Parse the options.
+	 * If allow_unregistered is set to true, we allow them but call warn_for_unrecognized_option() for each one.
+	 * Otherwise an exception is raised when an unrecognized option is encountered.
+	 */
+	void parse_options(int argc, char* argv[], bool allow_unregistered = true);
 
 	/**
 	 * Print a help page.
