@@ -152,6 +152,14 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 
 }
 
+/**
+ * Converts the given formula to CNF.
+ * @param f Formula to convert.
+ * @param keep_constraints Indicates whether to keep constraints or allow to change them in resolveNegation().
+ * @param simplify_constraints Indicates whether we attempt to simplify combinations of constraints with ConstraintBounds.
+ * @param tseitin_equivalence Indicates whether we use implications or equivalences for tseitin variables.
+ * @return The formula in CNF.
+ */
 template<typename Poly>
 Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool simplify_combinations = false, bool tseitin_equivalence = true) {
 	if (!simplify_combinations && f.propertyHolds(PROP_IS_IN_CNF)) {
