@@ -996,7 +996,6 @@ namespace carl
                                         Formula<Pol> notTVar( FormulaType::NOT, tseitinVar );
                                         Formula<Pol> tmpOr( OR, {notTVar, subsubformula} );
                                         subformulasToTransformTmp.push_back( std::move( tmpOr ) );
-                                        subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
                                     }
                                 }
                                 if( _tseitinWithEquivalence )
@@ -1009,7 +1008,6 @@ namespace carl
                                             tmpSubformulas.emplace_back( NOT, subsubformula );
                                     }
                                     subformulasToTransformTmp.emplace_back( OR, std::move(tmpSubformulas) );
-                                    subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
                                 }
                                 subsubformulas.push_back( tseitinVar );
                                 break;

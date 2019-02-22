@@ -315,11 +315,6 @@ namespace carl
                 return mpContent->mProperties;
             }
 
-            bool isTseitinClause() const
-            {
-                return mpContent->mTseitinClause;
-            }
-
             const Variables& variables() const
             {
                 COLLECT_VARIABLES_LOCK_GUARD
