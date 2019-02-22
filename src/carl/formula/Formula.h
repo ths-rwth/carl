@@ -1103,86 +1103,9 @@ namespace carl
 	inline std::ostream& operator<<(std::ostream& os, const Formula<P>& f) {
 		return os << *f.mpContent;
 	}
-
-	/**
-	 * This class provides a generic visitor for the above Formula class.
-	 */
-	template<typename Formula>
-	struct FormulaVisitor {
-		/**
-		 * Recursively calls func on every subformula.
-		 * @param formula Formula to visit.
-		 * @param func Function to call.
-		 */
-		void visit(const Formula& formula, const std::function<void(Formula)>& func);
-		/**
-		 * Recursively calls func on every subformula and return a new formula.
-		 * On every call of func, the passed formula is replaced by the result.
-		 * @param formula Formula to visit.
-		 * @param func Function to call.
-		 * @return New formula.
-		 */
-		Formula visitResult(const Formula& formula, const std::function<Formula(Formula)>& func);
-	};
-
-    template<typename Formula>
-    struct FormulaSubstitutor {
-    private:
-        FormulaVisitor<Formula> visitor;
-
-		struct Substitutor {
-			const std::map<Formula,Formula>& replacements;
-            explicit Substitutor(const std::map<Formula,Formula>& repl): replacements(repl) {}
-            Formula operator()(const Formula& formula) {
-				auto it = replacements.find(formula);
-				if (it == replacements.end()) return formula;
-				return it->second;
-            }
-		};
-
-        struct PolynomialSubstitutor {
-            const std::map<Variable,typename Formula::PolynomialType>& replacements;
-            explicit PolynomialSubstitutor(const std::map<Variable,typename Formula::PolynomialType>& repl): replacements(repl) {}
-            Formula operator()(const Formula& formula) {
-                if (formula.getType() != FormulaType::CONSTRAINT) return formula;
-                return Formula(formula.constraint().lhs().substitute(replacements), formula.constraint().relation());
-            }
-        };
-
-        struct BitvectorSubstitutor {
-            const std::map<BVVariable,BVTerm>& replacements;
-            explicit BitvectorSubstitutor(const std::map<BVVariable,BVTerm>& repl): replacements(repl) {}
-            Formula operator()(const Formula& formula) {
-                if (formula.getType() != FormulaType::BITVECTOR) return formula;
-                BVTerm lhs = formula.bvConstraint().lhs().substitute(replacements);
-                BVTerm rhs = formula.bvConstraint().rhs().substitute(replacements);
-                return Formula(BVConstraint::create(formula.bvConstraint().relation(), lhs, rhs));
-            }
-        };
-
-        struct UninterpretedSubstitutor {
-            const std::map<UVariable,UFInstance>& replacements;
-            explicit UninterpretedSubstitutor(const std::map<UVariable,UFInstance>& repl): replacements(repl) {}
-            Formula operator()(const Formula& formula) {
-                if (formula.getType() != FormulaType::UEQ) return formula;
-
-            }
-        };
-    public:
-        template<typename Source, typename Target>
-        Formula substitute(const Formula& formula, const Source& source, const Target& target) {
-            std::map<Source,Target> tmp;
-            tmp.emplace(source, target);
-            return substitute(formula, tmp);
-        }
-
-		Formula substitute(const Formula& formula, const std::map<Formula,Formula>& replacements);
-        Formula substitute(const Formula& formula, const std::map<Variable,typename Formula::PolynomialType>& replacements);
-        Formula substitute(const Formula& formula, const std::map<BVVariable,BVTerm>& replacements);
-        Formula substitute(const Formula& formula, const std::map<UVariable,UFInstance>& replacements);
-    };
-
 }    // namespace carl
+
+#include "helpers/FormulaVisitor.h"
 
 namespace std
 {
