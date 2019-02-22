@@ -3,6 +3,7 @@
 #include "../../core/logging.h"
 
 #include "../Formula.h"
+#include "../helpers/to_cnf.h"
 
 #include <iostream>
 #include <map>
@@ -64,7 +65,7 @@ private:
 	
 public:
 	bool operator()(const Formula<Pol>& formula) {
-		Formula<Pol> f = formula.toCNF();
+		Formula<Pol> f = carl::to_cnf(formula);
 		if (f.getType() == TRUE) {
 			CARL_LOG_INFO("carl.dimacs", "Added TRUE to DIMACSExporter. Skipping...");
 			return true;
