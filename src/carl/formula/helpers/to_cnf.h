@@ -26,7 +26,8 @@ std::vector<Formula<Poly>> construct_iff(const Formula<Poly>& lhs, const std::ve
 
 template<typename Poly>
 using TseitinConstraints = std::vector<Formula<Poly>>;
-
+template<typename Poly>
+using ConstraintBounds = FastMap<Poly, std::map<typename Poly::NumberType, std::pair<Relation,Formula<Poly>>>>;
 
 /**
  * Converts an OR to cnf.
@@ -35,13 +36,14 @@ using TseitinConstraints = std::vector<Formula<Poly>>;
 template<typename Poly>
 Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simplify_combinations, bool tseitin_equivalence, TseitinConstraints<Poly>& tseitin) {
 	// Checks for immediate tautologies among constraints
-	ConstraintBounds constraint_bounds;
+	ConstraintBounds<Poly> constraint_bounds;
 	// Resulting subformulas
 	Formulas<Poly> subformulas;
 	// Queue of subformulas to process
 	std::vector<Formula<Poly>> subformula_queue = { f };
 	while (!subformula_queue.empty()) {
 		auto current = subformula_queue.back();
+		CARL_LOG_DEBUG("carl.formula.cnf", "Processing " << current << " from " << subformula_queue);
 		subformula_queue.pop_back();
 
 		switch (current.getType()) {
@@ -67,10 +69,16 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 					subformulas.emplace_back(current);
 				}
 				break;
-			case FormulaType::NOT:
+			case FormulaType::NOT: {
 				// Resolve negation
-				subformula_queue.emplace_back(current.resolveNegation(keep_constraints));
+				auto resolved = current.resolveNegation(keep_constraints);
+				if (resolved.isLiteral()) {
+					subformulas.emplace_back(resolved);
+				} else {
+					subformula_queue.emplace_back(resolved);
+				}
 				break;
+			}
 			case FormulaType::IMPLIES:
 				// (=> A B) -> (not A), B
 				subformula_queue.emplace_back(!current.premise());
@@ -78,32 +86,34 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 				break;
 			case FormulaType::ITE:
 				// (ite C T E) -> (and (=> C T) (=> (not C) E)) -> (and (or (not C) T) (or C E))
-				subformula_queue.emplace_back(FormulaType::AND, {
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::AND, {
 					Formula<Poly>(FormulaType::OR, {
 						!current.condition(), current.firstCase()
 					}),
 					Formula<Poly>(FormulaType::OR, {
 						current.condition(), current.secondCase()
 					})
-				});
+				}));
 				break;
 			case FormulaType::IFF: {
 				// (iff A ...) -> (and A ...), (and (not A) ...)
-				Formula<Poly> subA;
-				Formula<Poly> subB;
+				Formulas<Poly> subA;
+				Formulas<Poly> subB;
 				for (const auto& sub: current.subformulas()) {
 					subA.emplace_back(sub);
 					subB.emplace_back(!sub);
 				}
-				subformula_queue.emplace_back(FormulaType::AND, std::move(subA));
-				subformula_queue.emplace_back(FormulaType::AND, std::move(subB));
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::AND, std::move(subA)));
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::AND, std::move(subB)));
+				break;
 			}
 			case FormulaType::XOR: {
 				// (xor A B) -> (and A (not B)), (and (not A) B)
 				auto lhs = current.connectPrecedingSubformulas();
 				const auto& rhs = current.subformulas().back();
-				subformula_queue.emplace_back(FormulaType::AND, { lhs, !rhs });
-				subformula_queue.emplace_back(FormulaType::AND, { !lhs, rhs });
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::AND, { lhs, !rhs }));
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::AND, { !lhs, rhs }));
+				break;
 			}
 			case FormulaType::OR:
 				// Simply add subformulas to the queue
@@ -113,14 +123,20 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 				break;
 			case FormulaType::AND: {
 				// Replace by a fresh tseitin variable.
-				auto tseitinVar = FormulaPool<Pol>::getInstance().createTseitinVar(current);
+				auto tseitinVar = FormulaPool<Poly>::getInstance().createTseitinVar(current);
 				if (tseitin_equivalence) {
-					tseitin.emplace_back(FormulaType::IFF, { tseitinVar, current });
+					tseitin.emplace_back(Formula<Poly>(FormulaType::IFF, { tseitinVar, current }));
 				} else {
-					tseitin.emplace_back(FormulaType::IMPLIES, { tseitinVar, current });
+					tseitin.emplace_back(Formula<Poly>(FormulaType::IMPLIES, { tseitinVar, current }));
 				}
 				subformulas.emplace_back(tseitinVar);
+				break;
 			}
+			case FormulaType::EXISTS:
+			case FormulaType::FORALL:
+				CARL_LOG_ERROR("carl.formula.cnf", "Cannot transform quantified formula to CNF");
+				assert(false);
+				break;
 		}
 	}
 	if (simplify_combinations && Formula<Poly>::swapConstraintBounds(constraint_bounds, subformulas, false)) {
@@ -137,7 +153,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 }
 
 template<typename Poly>
-Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints, bool simplify_combinations, bool tseitin_equivalence) {
+Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool simplify_combinations = false, bool tseitin_equivalence = true) {
 	if (!simplify_combinations && f.propertyHolds(PROP_IS_IN_CNF)) {
 		if (keep_constraints) {
 			return f;
@@ -150,13 +166,14 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints, bool simplif
 	}
 
 	// Checks for immediate conflicts among constraints
-	ConstraintBounds constraint_bounds;
+	formula_to_cnf::ConstraintBounds<Poly> constraint_bounds;
 	// Resulting subformulas
 	Formulas<Poly> subformulas;
 	// Queue of subformulas to process
 	std::vector<Formula<Poly>> subformula_queue = { f };
 	while (!subformula_queue.empty()) {
 		auto current = subformula_queue.back();
+		CARL_LOG_DEBUG("carl.formula.cnf", "Processing " << current << " from " << subformula_queue);
 		subformula_queue.pop_back();
 
 		switch (current.getType()) {
@@ -182,59 +199,67 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints, bool simplif
 					subformulas.emplace_back(current);
 				}
 				break;
-			case FormulaType::NOT:
+			case FormulaType::NOT: {
 				// Resolve negation
-				subformula_queue.emplace_back(current.resolveNegation(keep_constraints));
+				auto resolved = current.resolveNegation(keep_constraints);
+				if (resolved.isLiteral()) {
+					subformulas.emplace_back(resolved);
+				} else {
+					subformula_queue.emplace_back(resolved);
+				}
 				break;
+			}
 			case FormulaType::IMPLIES:
 				// (=> A B) -> (or (not A) B)
-				subformula_queue.emplace_back(FormulaType::OR, {
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, {
 					!current.premise(), current.conclusion()
-				});
+				}));
 				break;
 			case FormulaType::ITE:
 				// (ite C T E) -> (=> C T), (=> (not C) E) -> (or (not C) T), (or C E)
-				subformula_queue.emplace_back(FormulaType::OR, {
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, {
 					!current.condition(), current.firstCase()
-				});
-				subformula_queue.emplace_back(FormulaType::OR, {
+				}));
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, {
 					current.condition(), current.secondCase()
-				});
+				}));
 				break;
 			case FormulaType::IFF:
 				if (current.subformulas().size() == 2) {
 					const auto& lhs = current.subformulas().front();
 					const auto& rhs = current.subformulas().back();
 					if (lhs.getType() == FormulaType::AND) {
-						auto tmp = construct_iff(rhs, lhs.subformulas());
+						auto tmp = formula_to_cnf::construct_iff(rhs, lhs.subformulas());
 						subformula_queue.insert(subformula_queue.end(), tmp.begin(), tmp.end());
 					} else if (rhs.getType() == FormulaType::AND) {
-						auto tmp = construct_iff(lhs, rhs.subformulas());
+						auto tmp = formula_to_cnf::construct_iff(lhs, rhs.subformulas());
 						subformula_queue.insert(subformula_queue.end(), tmp.begin(), tmp.end());
 					} else {
 						// (iff A B) -> (or !A B), (or A !B)
-						subformula_queue.emplace_back(FormulaType::OR, { !lhs, rhs });
-						subformula_queue.emplace_back(FormulaType::OR, { lhs, !rhs });
+						subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, { !lhs, rhs }));
+						subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, { lhs, !rhs }));
 					}
 				} else {
 					// (iff A ...) -> (or (and A ...) (and (not A) ...))
-					Formula<Poly> subA;
-					Formula<Poly> subB;
+					Formulas<Poly> subA;
+					Formulas<Poly> subB;
 					for (const auto& sub: current.subformulas()) {
 						subA.emplace_back(sub);
 						subB.emplace_back(!sub);
 					}
-					subformula_queue.emplace_back(FormulaType::OR, {
+					subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, {
 						Formula<Poly>(FormulaType::AND, std::move(subA)),
 						Formula<Poly>(FormulaType::AND, std::move(subB))
-					});
+					}));
 				}
+				break;
 			case FormulaType::XOR: {
 				// (xor A B) -> (or A B), (or (not A) (not B))
 				auto lhs = current.connectPrecedingSubformulas();
 				const auto& rhs = current.subformulas().back();
-				subformula_queue.emplace_back(FormulaType::OR, { lhs, rhs });
-				subformula_queue.emplace_back(FormulaType::OR, { !lhs, !rhs });
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, { lhs, rhs }));
+				subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, { !lhs, !rhs }));
+				break;
 			}
 			case FormulaType::AND:
 				// Simply add subformulas to the queue
@@ -244,7 +269,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints, bool simplif
 				break;
 			case FormulaType::OR: {
 				// Call to_cnf_or() to obtain a clause of literals res and the newly created tseitin variables defined in tseitin.
-				TseitinConstraints<Poly> tseitin;
+				formula_to_cnf::TseitinConstraints<Poly> tseitin;
 				auto res = formula_to_cnf::to_cnf_or(current, keep_constraints, simplify_combinations, tseitin_equivalence, tseitin);
 				if (res.isFalse()) {
 					return Formula<Poly>(FormulaType::FALSE);
@@ -253,16 +278,21 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints, bool simplif
 				subformulas.emplace_back(res);
 				break;
 			}
+			case FormulaType::EXISTS:
+			case FormulaType::FORALL:
+				CARL_LOG_ERROR("carl.formula.cnf", "Cannot transform quantified formula to CNF");
+				assert(false);
+				break;
 		}
-		if (simplify_combinations && Formula<Poly>::swapConstraintBounds(constraint_bounds, subformulas, true)) {
-			return Formula<Poly>(FormulaType::FALSE);
-		} else if (subformulas.empty()) {
-			return Formula<Poly>(FormulaType::TRUE);
-		} else if (subformulas.size() == 1) {
-			return subformulas.front();
-		}
-		return Formula<Poly>(FormulaType::AND, std::move(subformulas));
 	}
+	if (simplify_combinations && Formula<Poly>::swapConstraintBounds(constraint_bounds, subformulas, true)) {
+		return Formula<Poly>(FormulaType::FALSE);
+	} else if (subformulas.empty()) {
+		return Formula<Poly>(FormulaType::TRUE);
+	} else if (subformulas.size() == 1) {
+		return subformulas.front();
+	}
+	return Formula<Poly>(FormulaType::AND, std::move(subformulas));
 }
 
 }
