@@ -65,7 +65,6 @@ void validate(boost::any& v, const std::vector<std::string>& values, carl::setti
 		("Ei", static_cast<std::size_t>(2) << 60)
 	;
 	if (qi::parse(s.begin(), s.end(), qi::ulong_long >> unit >> qi::eoi, value, factor)) {
-		std::cout << "Parsed " << value << " * " << factor << std::endl;
 		v = binary_quantity(value * factor);
 	} else {
 		throw po::invalid_option_value(s);
