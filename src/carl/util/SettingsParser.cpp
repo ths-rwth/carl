@@ -1,6 +1,6 @@
 #include "SettingsParser.h"
 
-#include "Settings.h"
+#include "settings_utils.h"
 
 #include <boost/any.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -40,6 +40,63 @@ void validate(boost::any& v, const std::vector<std::string>& values, carl::setti
 	}
 }
 
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::binary_quantity*, int) {
+	namespace pov = boost::program_options::validators;
+	namespace qi = boost::spirit::qi;
+
+	std::string s(pov::get_single_string(values));
+
+	std::size_t value = 0;
+	std::size_t factor;
+	qi::symbols<char, std::size_t> unit;
+	unit.add
+		("", 1)
+		("K", static_cast<std::size_t>(2) << 10)
+		("Ki", static_cast<std::size_t>(2) << 10)
+		("M", static_cast<std::size_t>(2) << 20)
+		("Mi", static_cast<std::size_t>(2) << 20)
+		("G", static_cast<std::size_t>(2) << 30)
+		("Gi", static_cast<std::size_t>(2) << 30)
+		("T", static_cast<std::size_t>(2) << 40)
+		("Ti", static_cast<std::size_t>(2) << 40)
+		("P", static_cast<std::size_t>(2) << 50)
+		("Pi", static_cast<std::size_t>(2) << 50)
+		("E", static_cast<std::size_t>(2) << 60)
+		("Ei", static_cast<std::size_t>(2) << 60)
+	;
+	if (qi::parse(s.begin(), s.end(), qi::ulong_long >> unit >> qi::eoi, value, factor)) {
+		std::cout << "Parsed " << value << " * " << factor << std::endl;
+		v = binary_quantity(value * factor);
+	} else {
+		throw po::invalid_option_value(s);
+	}
+}
+
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::metric_quantity*, int) {
+	namespace pov = boost::program_options::validators;
+	namespace qi = boost::spirit::qi;
+
+	std::string s(pov::get_single_string(values));
+
+	std::size_t value = 0;
+	std::size_t factor;
+	qi::symbols<char, std::size_t> unit;
+	unit.add
+		("", 1)
+		("K", 1000)
+		("M", 1000000)
+		("G", 1000000000)
+		("T", 1000000000000)
+		("P", 1000000000000000)
+		("E", 1000000000000000000)
+	;
+	if (qi::parse(s.begin(), s.end(), qi::ulong_long >> unit >> qi::eoi, value, factor)) {
+		v = metric_quantity(value * factor);
+	} else {
+		throw po::invalid_option_value(s);
+	}
+}
+
 std::ostream& operator<<(std::ostream& os, const boost::any& val) {
 	if (val.empty()) {
 		return os << "<empty>";
@@ -51,6 +108,10 @@ std::ostream& operator<<(std::ostream& os, const boost::any& val) {
 		return os << boost::any_cast<std::string>(val);
 	} else if (boost::any_cast<carl::settings::duration>(&val)) {
 		return os << boost::any_cast<carl::settings::duration>(val);
+	} else if (boost::any_cast<carl::settings::binary_quantity>(&val)) {
+		return os << boost::any_cast<carl::settings::binary_quantity>(val);
+	} else if (boost::any_cast<carl::settings::metric_quantity>(&val)) {
+		return os << boost::any_cast<carl::settings::metric_quantity>(val);
 	}
 	return os << "Unknown type";
 }
