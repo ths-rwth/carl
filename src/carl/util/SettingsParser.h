@@ -2,6 +2,8 @@
 
 #include "../core/logging.h"
 
+#include "Settings.h"
+
 #include <boost/program_options.hpp>
 
 #include <vector>
@@ -22,7 +24,16 @@ inline void validate(boost::any& v, const std::vector<std::string>& values, std:
 }
 #endif
 
+#include <chrono>
+
 namespace carl::settings {
+
+/**
+ * Custom validator for duration that wraps some std::chrono::duration.
+ * Accepts the format <number><suffix> where suffix is one of the following:
+ * ns, µs, us, ms, s, m, h
+ */
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::duration*, int);
 
 /**
  * Hook to be called when settings have been parsed.

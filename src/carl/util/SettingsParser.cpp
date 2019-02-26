@@ -1,6 +1,9 @@
 #include "SettingsParser.h"
 
+#include "Settings.h"
+
 #include <boost/any.hpp>
+#include <boost/spirit/include/qi.hpp>
 #if __has_include(<filesystem>)
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -11,6 +14,32 @@ namespace fs = std::experimental::filesystem;
 
 namespace carl::settings {
 
+// Adapted from https://stackoverflow.com/questions/45071699/
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::duration*, int) {
+	namespace pov = boost::program_options::validators;
+	namespace qi = boost::spirit::qi;
+
+	std::string s(pov::get_single_string(values));
+
+	long value = 0;
+	std::chrono::nanoseconds factor;
+	qi::symbols<char, std::chrono::nanoseconds> unit;
+	unit.add
+		("ns", std::chrono::nanoseconds(1))
+		("µs", std::chrono::microseconds(1))
+		("us", std::chrono::microseconds(1))
+		("ms", std::chrono::milliseconds(1))
+		("s", std::chrono::seconds(1))
+		("m", std::chrono::minutes(1))
+		("h", std::chrono::hours(1))
+	;
+	if (qi::parse(s.begin(), s.end(), qi::long_ >> unit >> qi::eoi, value, factor)) {
+		v = duration(value * factor);
+	} else {
+		throw po::invalid_option_value(s);
+	}
+}
+
 std::ostream& operator<<(std::ostream& os, const boost::any& val) {
 	if (val.empty()) {
 		return os << "<empty>";
@@ -20,6 +49,8 @@ std::ostream& operator<<(std::ostream& os, const boost::any& val) {
 		return os << boost::any_cast<std::size_t>(val);
 	} else if (boost::any_cast<std::string>(&val)) {
 		return os << boost::any_cast<std::string>(val);
+	} else if (boost::any_cast<carl::settings::duration>(&val)) {
+		return os << boost::any_cast<carl::settings::duration>(val);
 	}
 	return os << "Unknown type";
 }
