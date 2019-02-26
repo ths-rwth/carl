@@ -30,9 +30,9 @@ std::pair<std::intmax_t,std::size_t> get_proper_suffix(std::intmax_t value, cons
 struct duration: public std::chrono::nanoseconds {
 	template<typename... Args>
 	duration(Args&&... args): std::chrono::nanoseconds(std::forward<Args>(args)...) {}
-	template<typename T>
-	operator T() const {
-		return static_cast<T>(*this);
+	template<typename R, typename P>
+	operator std::chrono::duration<R,P>() const {
+		return std::chrono::duration_cast<std::chrono::duration<R,P>>(std::chrono::nanoseconds(*this));
 	}
 };
 
