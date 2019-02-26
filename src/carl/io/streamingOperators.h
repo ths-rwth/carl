@@ -238,7 +238,7 @@ namespace detail {
 	struct stream_joined_impl {
 		std::string glue;
 		const T& values;
-		const F& callable;
+		F callable;
 	};
 	template<typename T, typename F>
 	std::ostream& operator<<(std::ostream& os, const stream_joined_impl<T,F>& sji) {
