@@ -79,7 +79,6 @@ matrix:
         apt:
           sources:
           - *sources_base
-          - llvm-toolchain-xenial-5.0
           packages: [*packages_base, clang-5.0, libstdc++-8-dev]
     - stage: build
       os: linux

@@ -54,7 +54,7 @@ properties = {
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-xenial-3.8"], ["clang-3.8", "libstdc++-6-dev"])},
 	"clang-3.9": {"env": ["CC=clang-3.9 CXX=clang++-3.9"], "compiler": "clang++-3.9", "addons": addon_apt(["llvm-toolchain-xenial-3.9"], ["clang-3.9", "libstdc++-6-dev"])},
 	"clang-4.0": {"env": ["CC=clang-4.0 CXX=clang++-4.0"], "compiler": "clang++-4.0", "addons": addon_apt(["llvm-toolchain-xenial-4.0"], ["clang-4.0", "libstdc++-6-dev"])},
-	"clang-5.0": {"env": ["CC=clang-5.0 CXX=clang++-5.0"], "compiler": "clang++-5.0", "addons": addon_apt(["llvm-toolchain-xenial-5.0"], ["clang-5.0", "libstdc++-8-dev"])},
+	"clang-5.0": {"env": ["CC=clang-5.0 CXX=clang++-5.0"], "compiler": "clang++-5.0", "addons": addon_apt([], ["clang-5.0", "libstdc++-8-dev"])},
 	"clang-6.0": {"env": ["CC=clang-6.0 CXX=clang++-6.0"], "compiler": "clang++-6.0", "addons": addon_apt(["llvm-toolchain-xenial-6.0"], ["clang-6.0", "libstdc++-8-dev"])},
 	"clang-7.0": {"env": ["CC=clang-7 CXX=clang++-7"], "compiler": "clang++-7.0", "addons": addon_apt(["llvm-toolchain-xenial-7"], ["clang-7", "libstdc++-8-dev"])},
 	"clang-8.0": {"env": ["CC=clang-8 CXX=clang++-8"], "compiler": "clang++-8.0", "addons": addon_apt(["llvm-toolchain-xenial-8"], ["clang-8", "libstdc++-8-dev"])},
