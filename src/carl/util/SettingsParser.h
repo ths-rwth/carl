@@ -51,6 +51,34 @@ void validate(boost::any& v, const std::vector<std::string>& values, carl::setti
 
 namespace po = boost::program_options;
 
+/**
+ * Inserts value into variables_map if it is not yet set.
+ * This method is intended as a helper for finalizer functions.
+ */
+template<typename T>
+void default_to(po::variables_map& values, const std::string& name, const T& value) {
+	auto it = values.find(name);
+	if (it == values.end()) {
+		values.emplace(name, po::variable_value(boost::any(value), true));
+	} else if (it->second.defaulted()) {
+		values.at(name) = po::variable_value(boost::any(value), false);
+	}
+}
+
+/**
+ * Inserts or overwrites value into variables_map.
+ * This method is intended as a helper for finalizer functions.
+ */
+template<typename T>
+void overwrite_to(po::variables_map& values, const std::string& name, const T& value) {
+	auto it = values.find(name);
+	if (it == values.end()) {
+		values.emplace(name, po::variable_value(boost::any(value), true));
+	} else {
+		values.at(name) = po::variable_value(boost::any(value), false);
+	}
+}
+
 // Predeclaration.
 class SettingsParser;
 
