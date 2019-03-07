@@ -11,6 +11,7 @@ namespace fs = std::filesystem;
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #endif
+#include <algorithm>
 
 namespace carl::settings {
 
@@ -168,10 +169,10 @@ void SettingsParser::parse_config_file(bool allow_unregistered) {
 	}
 }
 
-void SettingsParser::finalize_settings() {
-	for (const auto& f: mFinalizer) {
-		f();
-	}
+bool SettingsParser::finalize_settings() {
+	return std::any_of(mFinalizer.begin(), mFinalizer.end(),
+		[](const auto& f){ return f(); }
+	);
 }
 
 void SettingsParser::finalize() {
@@ -187,7 +188,9 @@ void SettingsParser::parse_options(int argc, char* argv[], bool allow_unregister
 		parse_config_file(allow_unregistered);
 	}
 	po::notify(mValues);
-	finalize_settings();
+	if (finalize_settings()) {
+		po::notify(mValues);
+	}
 }
 
 }

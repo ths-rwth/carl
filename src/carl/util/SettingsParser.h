@@ -113,7 +113,7 @@ protected:
 	/// Stores the individual options until the parser is finalized.
 	std::vector<po::options_description> mOptions;
 	/// Stores hooks for setting object finalizer functions.
-	std::vector<std::function<void()>> mFinalizer;
+	std::vector<std::function<bool()>> mFinalizer;
 
 	/// Checks for unrecognized options that were found.
 	void warn_for_unrecognized(const po::parsed_options& parsed) const;
@@ -122,7 +122,7 @@ protected:
 	/// Parses the config file if one was configured.
 	void parse_config_file(bool allow_unregistered);
 	/// Calls the finalizer functions.
-	void finalize_settings();
+	bool finalize_settings();
 
 	virtual void warn_for_unrecognized_option(const std::string& s) const {
 		CARL_LOG_WARN("carl.settings", "Ignoring unrecognized option " << s);
@@ -144,9 +144,15 @@ public:
 	po::options_description& add(const std::string& title) {
 		return mOptions.emplace_back(po::options_description(title));
 	}
+	/**
+	 * Adds a finalizer function to be called after parsing.
+	 * boost::program_options::notify() is called before running the finalizer functions.
+	 * The finalizer function should accept a boost::program_options::variables_map as its only argument and should return a bool indicating whether it changed the variables map.
+	 * If any finalizer changed the variables map, boost::program_options::notify() is called again afterwards.
+	 */
 	template<typename F>
 	void add_finalizer(F&& f) {
-		mFinalizer.emplace_back([this,f](){ f(mValues); });
+		mFinalizer.emplace_back([this,f](){ return f(mValues); });
 	}
 
 	/**
