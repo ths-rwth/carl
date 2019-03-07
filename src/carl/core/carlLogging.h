@@ -165,15 +165,10 @@ public:
  */
 class Filter {
 	/// Mapping from channels to (minimal) log levels.
-	std::map<std::string, LogLevel> mData;
+	std::map<std::string, LogLevel> mData = {
+		std::make_pair(std::string(""), LogLevel::LVL_DEFAULT)
+	};
 public:
-	/**
-	 * Constructor.
-	 * @param level Default minimal log level.
-	 */
-	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT) {
-		(*this)("", level);
-	}
 	/**
 	 * Returns the internal filter data.
 	 */
