@@ -2,31 +2,12 @@
 
 #include <fstream>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <string>
 
 #include "../Formula.h"
 #include "../../core/logging.h"
-
-
-#ifdef USE_BOOST_REGEX
-#include <boost/regex.hpp>
-namespace benchmax {
-	using boost::regex;
-	using boost::regex_match;
-	using boost::smatch;
-	using boost::regex_iterator;
-}
-#else
-#include <stdexcept>
-#include <regex>
-namespace benchmax {
-	using std::regex;
-	using std::regex_match;
-	using std::smatch;
-	using std::sregex_iterator;
-}
-#endif
 
 namespace carl {
 
@@ -35,7 +16,7 @@ class DIMACSImporter {
 private:
 	std::ifstream in;
 	std::vector<Formula<Pol>> variables;
-	regex headerRegex;
+	std::regex headerRegex;
 	
 	Formula<Pol> parseLine(const std::string& line) const {
 		std::vector<Formula<Pol>> vars;
@@ -62,8 +43,8 @@ private:
 			if (line == "reset") break;
 			if (line.front() == 'c') continue;
 			if (line.front() == 'p') {
-				smatch m;
-				if (!regex_match(line, m, headerRegex)) {
+				std::smatch m;
+				if (!std::regex_match(line, m, headerRegex)) {
 					CARL_LOG_ERROR("carl.formula", "DIMACS line starting with \"p\" does not match header format: \"" << line << "\".");
 				}
 				std::size_t varCount = std::stoull(m[1]);
