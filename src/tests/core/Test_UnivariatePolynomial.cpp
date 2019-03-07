@@ -126,10 +126,10 @@ TYPED_TEST(UnivariatePolynomialIntTest, GCD)
     UnivariatePolynomial<Rational> t(x);
 	
     UnivariatePolynomial<TypeParam> A1(x, {(TypeParam)0, (TypeParam)2});
-	const GaloisField<TypeParam>* gf5 = new GaloisField<TypeParam>(5);
-    UnivariatePolynomial<GFNumber<TypeParam>> a1 = A1.toFiniteDomain(gf5);
+	auto gf5 = std::make_unique<GaloisField<TypeParam>>(5);
+    UnivariatePolynomial<GFNumber<TypeParam>> a1 = A1.toFiniteDomain(gf5.get());
 	UnivariatePolynomial<TypeParam> A2(x, 1, 5);
-	UnivariatePolynomial<GFNumber<TypeParam>> a2 = A2.toFiniteDomain(gf5);
+	UnivariatePolynomial<GFNumber<TypeParam>> a2 = A2.toFiniteDomain(gf5.get());
 	UnivariatePolynomial<GFNumber<TypeParam>> s1(x);
 	UnivariatePolynomial<GFNumber<TypeParam>> t1(x);
     UnivariatePolynomial<GFNumber<TypeParam>> gp = carl::extended_gcd(a1,a2,s1,t1);
@@ -161,11 +161,11 @@ TYPED_TEST(UnivariatePolynomialIntTest, toFiniteDomain)
     Variable x = freshRealVariable("x");
 
     UnivariatePolynomial<TypeParam> pol(x, {(TypeParam)1, (TypeParam)2});
-    const GaloisField<TypeParam>* gf5 = new GaloisField<TypeParam>(5);
-    UnivariatePolynomial<GFNumber<TypeParam>> polF = pol.toFiniteDomain(gf5);
+    auto gf5 = std::make_unique<GaloisField<TypeParam>>(5);
+    UnivariatePolynomial<GFNumber<TypeParam>> polF = pol.toFiniteDomain(gf5.get());
     std::cout << polF << std::endl;
     UnivariatePolynomial<TypeParam> pol5(x, {(TypeParam)1, (TypeParam)5});
-    UnivariatePolynomial<GFNumber<TypeParam>> pol5F = pol5.toFiniteDomain(gf5);
+    UnivariatePolynomial<GFNumber<TypeParam>> pol5F = pol5.toFiniteDomain(gf5.get());
     std::cout << pol5F << std::endl;
 }
 
@@ -174,8 +174,8 @@ TYPED_TEST(UnivariatePolynomialIntTest, normalizeCoefficients)
     Variable x = freshRealVariable("x");
 
 	UnivariatePolynomial<TypeParam> pol(x, {(TypeParam)1, (TypeParam)2});
-    const GaloisField<TypeParam>* gf5 = new GaloisField<TypeParam>(5);
-    UnivariatePolynomial<GFNumber<TypeParam>> polF = pol.toFiniteDomain(gf5);
+    auto gf5 = std::make_unique<GaloisField<TypeParam>>(5);
+    UnivariatePolynomial<GFNumber<TypeParam>> polF = pol.toFiniteDomain(gf5.get());
 
 	pol.normalizeCoefficients();
 	polF.normalizeCoefficients();

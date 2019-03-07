@@ -19,7 +19,7 @@ typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 TEST(RationalFunction, Construction)
 {
     StringParser sp;
-    std::shared_ptr<CachePol> pCacheA( new CachePol );
+    auto pCacheA = std::make_shared<CachePol>();
     sp.setVariables({"x", "y", "z", "t", "u"});
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("3*x*y + x");
     Pol p2 = sp.parseMultivariatePolynomial<Rational>("5*y + 3*x");
@@ -50,7 +50,7 @@ TEST(RationalFunction, Construction)
 
     RFunc r3(p5, p6);
 
-    std::shared_ptr<CachePol> pCache( new CachePol );
+    auto pCache = std::make_shared<CachePol>();
 
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
@@ -103,7 +103,7 @@ TEST(RationalFunction, Multiplication)
     EXPECT_FALSE(needs_cache<Pol>::value);
     EXPECT_TRUE(needs_cache<FPol>::value);
 
-    std::shared_ptr<CachePol> pCache( new CachePol );
+    auto pCache = std::make_shared<CachePol>();
 
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
@@ -166,7 +166,7 @@ TEST(RationalFunction, Division)
     EXPECT_EQ(p5, r4.denominator());
     EXPECT_EQ(p2, r4.nominator());
 
-    std::shared_ptr<CachePol> pCache( new CachePol );
+    auto pCache = std::make_shared<CachePol>();
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
     FPol fp3(p3, pCache);
@@ -201,7 +201,7 @@ TEST(RationalFunction, Addition)
     RFunc r3 = r1 + r2;
     EXPECT_EQ(p4, r3.denominator());
 
-    std::shared_ptr<CachePol> pCache( new CachePol );
+    auto pCache = std::make_shared<CachePol>();
 
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
@@ -245,7 +245,7 @@ TEST(RationalFunction, Subtraction)
     std::cout << "Calculate: " << r4 << " - " << r5 << " = " << r6 << std::endl;
     EXPECT_EQ(p6, r6.nominator());
 
-    std::shared_ptr<CachePol> pCache( new CachePol );
+    auto pCache = std::make_shared<CachePol>();
 
     FPol fp0(p0, pCache);
     FPol fp1(p1, pCache);
@@ -279,7 +279,7 @@ TEST(RationalFunction, Hash)
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("1");
     Pol p2 = sp.parseMultivariatePolynomial<Rational>("1+x");
 
-    std::shared_ptr<CachePol> pCache( new CachePol );
+    auto pCache = std::make_shared<CachePol>();
 
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
@@ -299,7 +299,7 @@ TEST(RationalFunction, Derivative)
 
     Pol p3 = sp.parseMultivariatePolynomial<Rational>("-3*x^2 + 4*x + -3");
 
-	std::shared_ptr<CachePol> pCache( new CachePol );
+	auto pCache = std::make_shared<CachePol>();
 	FPol fp1(p1, pCache);
 	FPol fp2(p2, pCache);
 	FPol fp3(p3, pCache);
@@ -323,7 +323,7 @@ TEST(RationalFunction, Simplification)
     Pol q3 = sp.parseMultivariatePolynomial<Rational>("2*x*y+(-2)*y+3");
     Pol p4 = p3*q2*q2;
     
-    std::shared_ptr<CachePol> pCache( new CachePol );
+    auto pCache = std::make_shared<CachePol>();
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
     FPol fq1(q1, pCache);
@@ -349,7 +349,7 @@ TEST(RationalFunction, Evaluation)
     Pol p1({Rational(3)*x});
     Pol p2(Rational(2));
 
-    std::shared_ptr<CachePol> pCache( new CachePol );
+    auto pCache = std::make_shared<CachePol>();
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
 
