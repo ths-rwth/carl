@@ -49,14 +49,6 @@ void validate(boost::any& v, const std::vector<std::string>& values, carl::setti
  */
 void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::metric_quantity*, int);
 
-/**
- * Hook to be called when settings have been parsed.
- * This allows to compute some advanced settings like a common prefix of paths.
- * This is the generic (no-op) version that individual settings may specialize.
- */
-template<typename T, typename V>
-inline void finalize_settings(T&, const V&) {}
-
 namespace po = boost::program_options;
 
 // Predeclaration.
