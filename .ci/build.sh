@@ -57,6 +57,14 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	
 	cd ../ && sonar-scanner -X -Dproject.settings=build/sonarcloud.properties && cd build/
 
+elif [[ ${TASK} == "clang-ubsan" ]]; then
+
+	fold "reconfigure" cmake -D CLANG_SANITIZER=undefined ../
+
+	/usr/bin/time make ${MAKE_PARALLEL} carl || return 1
+	/usr/bin/time make ${MAKE_PARALLEL} || return 1
+	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
+
 elif [[ ${TASK} == "doxygen" ]]; then
 	
 	fold "reconfigure" cmake -D DOCUMENTATION_CREATE_PDF=ON -D BUILD_DOXYGEN=ON ../
