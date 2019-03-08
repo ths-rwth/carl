@@ -1,7 +1,7 @@
 option(EXPORT_TO_CMAKE "Export the project to CMake for easy inclusion" ON)
 
 # Add all targets to the build-tree export set
-export(EXPORT carl_Targets FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
+export(EXPORT carlTargets FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
 
 
 # Export the package for use from the build-tree

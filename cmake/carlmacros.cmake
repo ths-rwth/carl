@@ -258,3 +258,14 @@ macro(target_include_dirs_from target sys type)
 		endif()
 	endforeach()
 endmacro(target_include_dirs_from)
+
+macro(install_libraries)
+	include(GNUInstallDirs)
+	install(
+		TARGETS ${ARGN}
+		EXPORT carlTargets
+		RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+		LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+		ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+	)
+endmacro(install_libraries)

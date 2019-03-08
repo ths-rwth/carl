@@ -8,7 +8,7 @@ install(
 
 install(
 	TARGETS carl-shared carl-static
-	EXPORT carl_Targets
+	EXPORT carlTargets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -16,4 +16,4 @@ install(
 
 install(FILES ${CMAKE_BINARY_DIR}/carlConfig.install.cmake DESTINATION ${CMAKE_INSTALL_DIR} RENAME carlConfig.cmake)
 install(FILES ${CMAKE_BINARY_DIR}/carlConfigVersion.cmake DESTINATION ${CMAKE_INSTALL_DIR})
-install(EXPORT carl_Targets FILE carlTargets.cmake DESTINATION ${CMAKE_INSTALL_DIR})
+install(EXPORT carlTargets FILE carlTargets.cmake DESTINATION ${CMAKE_INSTALL_DIR})
