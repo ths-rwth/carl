@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../core/logging.h"
-
 #include "settings_utils.h"
 
 #include <boost/program_options.hpp>
@@ -125,10 +123,10 @@ protected:
 	bool finalize_settings();
 
 	virtual void warn_for_unrecognized_option(const std::string& s) const {
-		CARL_LOG_WARN("carl.settings", "Ignoring unrecognized option " << s);
+		std::cerr << "Ignoring unrecognized option " << s << std::endl;
 	}
 	virtual void warn_config_file(const std::string& file) const {
-		CARL_LOG_WARN("carl.settings", "Could not load config file " << file);
+		std::cerr << "Could not load config file " << file << std::endl;
 	}
 	virtual std::string name_of_config_file() const {
 		return "config";

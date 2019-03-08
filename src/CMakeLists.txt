@@ -1,5 +1,6 @@
 # Libraries..
 add_subdirectory(carl)
+add_subdirectory(carl-settings)
 
 # For unit tests.
 # We decided to always compile them, if gtest is present,
