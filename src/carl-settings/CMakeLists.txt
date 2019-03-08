@@ -9,4 +9,4 @@ target_include_dirs_from(carl-settings-objects "" PUBLIC Boost_program_options_S
 target_link_libraries(carl-settings-shared Boost_program_options_SHARED)
 target_link_libraries(carl-settings-static Boost_program_options_STATIC)
 
-install_libraries(carl-settings-shared carl-settings-static)
+install_libraries(carl carl-settings-shared carl-settings-static)
