@@ -1,24 +1,15 @@
-# include directories.
-#message(STATUS "Including ${include_dirs}")
-#include_directories(
-#	${include_dirs}
-#)
 
-set(LIB_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
-
-# include util in library.
+# include util to properly set up variables for configure_everything()
 add_subdirectory(util)
-
-include(GNUInstallDirs)
 
 # Configure all .in files
 configure_everything()
 
-file(GLOB_RECURSE carl_lib_sources "*.cpp")
-add_new_libraries(carl ${LIB_VERSION} "${carl_lib_sources}" "resources")
+file(GLOB_RECURSE carl_sources "*.cpp")
+add_new_libraries(carl "${PROJECT_VERSION_LIB}" "${carl_sources}" "resources")
 
-set(BOOST_LIBS_SHARED "Boost_program_options_SHARED;Boost_system_SHARED")
-set(BOOST_LIBS_STATIC "Boost_program_options_STATIC;Boost_system_STATIC")
+set(BOOST_LIBS_SHARED "Boost_system_SHARED")
+set(BOOST_LIBS_STATIC "Boost_system_STATIC")
 target_include_dirs_from(carl-objects SYSTEM PUBLIC EIGEN3 GMPXX_SHARED GMP_SHARED ${BOOST_LIBS_SHARED} ${CMAKE_DL_LIBS} pthread)
 target_link_libraries(carl-shared PUBLIC EIGEN3 GMPXX_SHARED GMP_SHARED ${BOOST_LIBS_SHARED} ${CMAKE_DL_LIBS} ${LIB_FILESYSTEM} pthread)
 target_link_libraries(carl-static PUBLIC EIGEN3 GMPXX_STATIC GMP_STATIC ${BOOST_LIBS_STATIC} ${CMAKE_DL_LIBS} ${LIB_FILESYSTEM} pthread)
