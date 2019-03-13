@@ -28,19 +28,4 @@ add_subdirectory(pycarl)
 
 add_subdirectory(microbenchmarks)
 
-if (CLANG_TIDY)
-	add_custom_target(tidy-tests
-		COMMAND ${CLANG_TIDY} -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${carl_lib_sources}
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/carl/
-	)
-	file(GLOB dirs LIST_DIRECTORIES true RELATIVE "${CMAKE_SOURCE_DIR}/src/tests/" "*")
-	foreach(dir ${dirs})
-		if(IS_DIRECTORY "${CMAKE_SOURCE_DIR}/src/tests/${dir}")
-			file(GLOB_RECURSE sources_${dir} "${CMAKE_SOURCE_DIR}/src/tests/${dir}/*.cpp")
-			add_custom_target(tidy-tests-${dir}
-				COMMAND ${CLANG_TIDY} -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${sources_${dir}}
-				WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/tests/
-			)
-		endif()
-	endforeach()
-endif()
+clang_tidy_recurse("${CMAKE_SOURCE_DIR}/src/tests" "test")

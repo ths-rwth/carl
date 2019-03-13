@@ -9,3 +9,5 @@ add_subdirectory(tests)
 
 # For examples.
 add_subdirectory(examples EXCLUDE_FROM_ALL)
+
+clang_tidy_recurse("${CMAKE_SOURCE_DIR}/src" "")

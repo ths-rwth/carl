@@ -1,6 +1,11 @@
 find_program(CLANG_TIDY clang-tidy)
 if(NOT CLANG_TIDY)
 	message(STATUS "Did not find clang-tidy, target tidy is disabled.")
+
+	macro(clang_tidy directory DESC)
+	endmacro(clang_tidy)
+	macro(clang_tidy_recurse directory DESC)
+	endmacro(clang_tidy_recurse)
 else()
 	message(STATUS "Found clang-tidy, use \"make tidy\" to run it.")
 	if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # Matches "Clang" and "AppleClang"
@@ -44,6 +49,26 @@ else()
 
 	set(CLANG_TIDY_CHECKS "-checks='${CLANG_TIDY_CHECKS}'")
 	#message(STATUS "Enabled checks for clang-tidy: ${CLANG_TIDY_CHECKS}")
+
+	macro(clang_tidy directory DESC)
+		if(IS_DIRECTORY "${directory}")
+			file(GLOB_RECURSE sources_${directory} "${directory}/*.cpp")
+			add_custom_target(tidy-${DESC}
+				COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR}/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${sources_${directory}}
+				WORKING_DIRECTORY ${directory}
+			)
+		endif()
+	endmacro(clang_tidy)
+	macro(clang_tidy_recurse directory DESC)
+		file(GLOB dirs LIST_DIRECTORIES true RELATIVE "${directory}" "*")
+		foreach(dir ${dirs})
+			if("${DESC}" STREQUAL "")
+				clang_tidy("${directory}/${dir}" "${dir}")
+			else()
+				clang_tidy("${directory}/${dir}" "${DESC}-${dir}")
+			endif()
+		endforeach()
+	endmacro(clang_tidy_recurse)
 endif()
 
 find_program(CLANG_FORMAT clang-format)

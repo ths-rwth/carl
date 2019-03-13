@@ -50,19 +50,4 @@ endif()
 cotire(carl)
 include(install)
 
-if (CLANG_TIDY)
-	add_custom_target(tidy
-		COMMAND ${CLANG_TIDY} -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${carl_lib_sources}
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/carl/
-	)
-	file(GLOB dirs LIST_DIRECTORIES true RELATIVE "${CMAKE_SOURCE_DIR}/src/carl/" "*")
-	foreach(dir ${dirs})
-		if(IS_DIRECTORY "${CMAKE_SOURCE_DIR}/src/carl/${dir}")
-			file(GLOB_RECURSE sources_${dir} "${CMAKE_SOURCE_DIR}/src/carl/${dir}/*.cpp")
-			add_custom_target(tidy-${dir}
-				COMMAND ${CLANG_TIDY} -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${sources_${dir}}
-				WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/carl/
-			)
-		endif()
-	endforeach()
-endif()
+clang_tidy_recurse("${CMAKE_SOURCE_DIR}/src/carl" "")
