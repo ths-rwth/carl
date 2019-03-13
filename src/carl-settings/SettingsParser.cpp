@@ -16,7 +16,7 @@ namespace fs = std::experimental::filesystem;
 namespace carl::settings {
 
 // Adapted from https://stackoverflow.com/questions/45071699/
-void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::duration*, int) {
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::duration* /*unused*/, int /*unused*/) {
 	namespace pov = boost::program_options::validators;
 	namespace qi = boost::spirit::qi;
 
@@ -41,7 +41,7 @@ void validate(boost::any& v, const std::vector<std::string>& values, carl::setti
 	}
 }
 
-void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::binary_quantity*, int) {
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::binary_quantity* /*unused*/, int /*unused*/) {
 	namespace pov = boost::program_options::validators;
 	namespace qi = boost::spirit::qi;
 
@@ -52,18 +52,18 @@ void validate(boost::any& v, const std::vector<std::string>& values, carl::setti
 	qi::symbols<char, std::size_t> unit;
 	unit.add
 		("", 1)
-		("K", static_cast<std::size_t>(2) << 10)
-		("Ki", static_cast<std::size_t>(2) << 10)
-		("M", static_cast<std::size_t>(2) << 20)
-		("Mi", static_cast<std::size_t>(2) << 20)
-		("G", static_cast<std::size_t>(2) << 30)
-		("Gi", static_cast<std::size_t>(2) << 30)
-		("T", static_cast<std::size_t>(2) << 40)
-		("Ti", static_cast<std::size_t>(2) << 40)
-		("P", static_cast<std::size_t>(2) << 50)
-		("Pi", static_cast<std::size_t>(2) << 50)
-		("E", static_cast<std::size_t>(2) << 60)
-		("Ei", static_cast<std::size_t>(2) << 60)
+		("K", static_cast<std::size_t>(2) << 10u)
+		("Ki", static_cast<std::size_t>(2) << 10u)
+		("M", static_cast<std::size_t>(2) << 20u)
+		("Mi", static_cast<std::size_t>(2) << 20u)
+		("G", static_cast<std::size_t>(2) << 30u)
+		("Gi", static_cast<std::size_t>(2) << 30u)
+		("T", static_cast<std::size_t>(2) << 40u)
+		("Ti", static_cast<std::size_t>(2) << 40u)
+		("P", static_cast<std::size_t>(2) << 50u)
+		("Pi", static_cast<std::size_t>(2) << 50u)
+		("E", static_cast<std::size_t>(2) << 60u)
+		("Ei", static_cast<std::size_t>(2) << 60u)
 	;
 	if (qi::parse(s.begin(), s.end(), qi::ulong_long >> unit >> qi::eoi, value, factor)) {
 		v = binary_quantity(value * factor);
@@ -72,7 +72,7 @@ void validate(boost::any& v, const std::vector<std::string>& values, carl::setti
 	}
 }
 
-void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::metric_quantity*, int) {
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::metric_quantity* /*unused*/, int /*unused*/) {
 	namespace pov = boost::program_options::validators;
 	namespace qi = boost::spirit::qi;
 
@@ -100,17 +100,17 @@ void validate(boost::any& v, const std::vector<std::string>& values, carl::setti
 std::ostream& operator<<(std::ostream& os, const boost::any& val) {
 	if (val.empty()) {
 		return os << "<empty>";
-	} else if (boost::any_cast<bool>(&val)) {
+	} else if (boost::any_cast<bool>(&val) != nullptr) {
 		return os << std::boolalpha << boost::any_cast<bool>(val);
-	} else if (boost::any_cast<std::size_t>(&val)) {
+	} else if (boost::any_cast<std::size_t>(&val) != nullptr) {
 		return os << boost::any_cast<std::size_t>(val);
-	} else if (boost::any_cast<std::string>(&val)) {
+	} else if (boost::any_cast<std::string>(&val) != nullptr) {
 		return os << boost::any_cast<std::string>(val);
-	} else if (boost::any_cast<carl::settings::duration>(&val)) {
+	} else if (boost::any_cast<carl::settings::duration>(&val) != nullptr) {
 		return os << boost::any_cast<carl::settings::duration>(val);
-	} else if (boost::any_cast<carl::settings::binary_quantity>(&val)) {
+	} else if (boost::any_cast<carl::settings::binary_quantity>(&val) != nullptr) {
 		return os << boost::any_cast<carl::settings::binary_quantity>(val);
-	} else if (boost::any_cast<carl::settings::metric_quantity>(&val)) {
+	} else if (boost::any_cast<carl::settings::metric_quantity>(&val) != nullptr) {
 		return os << boost::any_cast<carl::settings::metric_quantity>(val);
 	}
 	return os << "Unknown type";
@@ -184,7 +184,7 @@ void SettingsParser::finalize() {
 void SettingsParser::parse_options(int argc, char* argv[], bool allow_unregistered) {
 	argv_zero = argv[0];
 	parse_command_line(argc, argv, allow_unregistered);
-	if (mValues.count(this->name_of_config_file())) {
+	if (mValues.count(this->name_of_config_file()) != 0) {
 		parse_config_file(allow_unregistered);
 	}
 	po::notify(mValues);

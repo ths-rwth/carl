@@ -28,10 +28,12 @@ std::pair<std::intmax_t,std::size_t> get_proper_suffix(std::intmax_t value, cons
  * - access values with `std::chrono::seconds(d)`
  */
 struct duration: public std::chrono::nanoseconds {
+	duration() = default;
 	template<typename... Args>
+	// NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions): we actually want to implicitly convert here.
 	duration(Args&&... args): std::chrono::nanoseconds(std::forward<Args>(args)...) {}
 	template<typename R, typename P>
-	operator std::chrono::duration<R,P>() const {
+	explicit operator std::chrono::duration<R,P>() const {
 		return std::chrono::duration_cast<std::chrono::duration<R,P>>(std::chrono::nanoseconds(*this));
 	}
 };
@@ -57,14 +59,14 @@ private:
 	std::size_t mN = 0;
 public:
 	binary_quantity() = default;
-	binary_quantity(std::size_t n): mN(n) {}
+	explicit binary_quantity(std::size_t n): mN(n) {}
 	auto n() const { return mN; }
-	auto kibi() const { return mN >> 10; }
-	auto mebi() const { return mN >> 20; }
-	auto gibi() const { return mN >> 30; }
-	auto tebi() const { return mN >> 40; }
-	auto pebi() const { return mN >> 50; }
-	auto exbi() const { return mN >> 60; }
+	auto kibi() const { return mN >> 10u; }
+	auto mebi() const { return mN >> 20u; }
+	auto gibi() const { return mN >> 30u; }
+	auto tebi() const { return mN >> 40u; }
+	auto pebi() const { return mN >> 50u; }
+	auto exbi() const { return mN >> 60u; }
 };
 
 /// Streaming operator for binary quantity. Auto-detects proper suffix.
@@ -88,7 +90,7 @@ private:
 	std::size_t mN = 0;
 public:
 	metric_quantity() = default;
-	metric_quantity(std::size_t n): mN(n) {}
+	explicit metric_quantity(std::size_t n): mN(n) {}
 	auto n() const { return mN; }
 	auto kilo() const { return mN / 1000; }
 	auto mega() const { return mN / 1000000; }

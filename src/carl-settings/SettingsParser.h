@@ -8,8 +8,9 @@
 
 #if __has_include(<filesystem>)
 #include <filesystem>
+// NOLINTNEXTLINE(cert-dcl58-cpp): sorry but we need this.
 namespace std {
-inline void validate(boost::any& v, const std::vector<std::string>& values, std::filesystem::path*, int) {
+inline void validate(boost::any& v, const std::vector<std::string>& values, std::filesystem::path* /*unused*/, int /*unused*/) {
 	namespace pov = boost::program_options::validators;
 	namespace fs = std::filesystem;
 	fs::path p(pov::get_single_string(values));
@@ -31,21 +32,21 @@ namespace carl::settings {
  * Accepts the format <number><suffix> where suffix is one of the following:
  * ns, µs, us, ms, s, m, h
  */
-void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::duration*, int);
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::duration* /*unused*/, int /*unused*/);
 
 /**
  * Custom validator for binary quantities.
  * Accepts the format <number><suffix> where suffix is one of the following:
  * K,Ki,M,Mi,G,Gi,T,Ti,P,Pi,E,Ei (X and Xi are synonymous)
  */
-void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::binary_quantity*, int);
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::binary_quantity* /*unused*/, int /*unused*/);
 
 /**
  * Custom validator for metric quantities.
  * Accepts the format <number><suffix> where suffix is one of the following:
  * K,M,G,T,P,E
  */
-void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::metric_quantity*, int);
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::metric_quantity* /*unused*/, int /*unused*/);
 
 namespace po = boost::program_options;
 
@@ -86,7 +87,7 @@ struct OptionPrinter {
 	const SettingsParser& parser;
 };
 /// Streaming operator for a option printer.
-std::ostream& operator<<(std::ostream& os, OptionPrinter);
+std::ostream& operator<<(std::ostream& os, OptionPrinter op);
 
 /// Helper class to nicely print the settings that were parsed.
 struct SettingsPrinter {
@@ -94,11 +95,11 @@ struct SettingsPrinter {
 	const SettingsParser& parser;
 };
 /// Streaming operator for a settings printer.
-std::ostream& operator<<(std::ostream& os, SettingsPrinter);
+std::ostream& operator<<(std::ostream& os, SettingsPrinter sp);
 
 class SettingsParser {
-	friend std::ostream& settings::operator<<(std::ostream& os, settings::OptionPrinter);
-	friend std::ostream& settings::operator<<(std::ostream& os, settings::SettingsPrinter);
+	friend std::ostream& settings::operator<<(std::ostream& os, settings::OptionPrinter op);
+	friend std::ostream& settings::operator<<(std::ostream& os, settings::SettingsPrinter sp);
 protected:
 	/// Stores the name of the current binary.
 	char* argv_zero = nullptr;
