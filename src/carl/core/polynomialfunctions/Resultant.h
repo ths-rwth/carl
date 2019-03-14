@@ -308,7 +308,7 @@ UnivariatePolynomial<Coeff> discriminant(
 	Coeff redCoeff = sign * p.lcoeff();
 	bool result = res.divideBy(redCoeff, res);
 	assert(result);
-	CARL_LOG_TRACE("carl.cad", "discriminant(" << p << ") = " << res);
+	CARL_LOG_TRACE("carl.core.discriminant", "discriminant(" << p << ") = " << res);
 	return res;
 }
 
