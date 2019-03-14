@@ -11,3 +11,10 @@ add_subdirectory(tests)
 add_subdirectory(examples EXCLUDE_FROM_ALL)
 
 clang_tidy_recurse("${CMAKE_SOURCE_DIR}/src" "")
+
+if(CLANG_TIDY)
+	add_custom_target(tidy
+		COMMENT "Running clang-tidy"
+		DEPENDS tidy-carl tidy-carl-settings
+	)
+endif()
