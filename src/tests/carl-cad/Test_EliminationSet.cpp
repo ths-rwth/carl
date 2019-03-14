@@ -3,9 +3,9 @@
 #include <memory>
 #include <list>
 
-#include "carl/core/UnivariatePolynomial.h"
-#include "carl/cad/EliminationSet.h"
-#include "carl/util/platform.h"
+#include <carl/core/UnivariatePolynomial.h>
+#include <carl/util/platform.h>
+#include <carl-cad/EliminationSet.h>
 
 #include "../Common.h"
 

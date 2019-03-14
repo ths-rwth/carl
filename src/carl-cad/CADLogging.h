@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "../core/logging.h"
-#include "../util/Timer.h"
+#include <carl/core/logging.h>
+#include <carl/util/Timer.h>
 
 namespace carl {
 namespace cad {

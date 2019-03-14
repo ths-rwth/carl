@@ -14,9 +14,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "../util/pointerOperations.h"
-#include "../core/UnivariatePolynomial.h"
-#include "../core/logging.h"
+#include <carl/util/pointerOperations.h>
+#include <carl/core/UnivariatePolynomial.h>
+#include <carl/core/logging.h>
 
 #include "CADTypes.h"
 #include "CADSettings.h"

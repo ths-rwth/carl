@@ -3,7 +3,7 @@
 #include <memory>
 #include <list>
 
-#include "carl/cad/ConflictGraph.h"
+#include <carl-cad/ConflictGraph.h>
 #include "carl/util/platform.h"
 
 #include "../Common.h"

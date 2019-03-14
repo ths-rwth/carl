@@ -4,9 +4,9 @@
 #include <list>
 #include <vector>
 
-#include "../../carl/core/logging.h"
-#include "../../carl/cad/Constraint.h"
-#include "../../carl/interval/Interval.h"
+#include <carl/core/logging.h>
+#include <carl/interval/Interval.h>
+#include <carl-cad/Constraint.h>
 
 #include "../Common.h"
 

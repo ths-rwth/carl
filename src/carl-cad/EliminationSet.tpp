@@ -6,7 +6,7 @@
 #include "EliminationSet.h"
 #include "CADLogging.h"
 
-#include "../core/polynomialfunctions/SquareFreePart.h"
+#include <carl/core/polynomialfunctions/SquareFreePart.h>
 
 namespace carl {
 namespace cad {

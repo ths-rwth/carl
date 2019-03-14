@@ -8,9 +8,9 @@
 
 #include <memory>
 
-#include "../core/MultivariatePolynomial.h"
-#include "../core/UnivariatePolynomial.h"
-#include "../core/logging.h"
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/core/UnivariatePolynomial.h>
+#include <carl/core/logging.h>
 
 namespace carl {
 namespace cad {

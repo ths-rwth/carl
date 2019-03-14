@@ -8,9 +8,9 @@
 
 #include <algorithm>
 
-#include "../core/logging.h"
-#include "../core/carlLogging.h"
-#include "../core/rootfinder/RootFinder.h"
+#include <carl/core/logging.h>
+#include <carl/core/carlLogging.h>
+#include <carl/core/rootfinder/RootFinder.h>
 
 namespace carl {
 namespace cad {

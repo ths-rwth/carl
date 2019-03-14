@@ -10,9 +10,9 @@
 
 #include <cassert>
 
-#include "../formula/model/ran/RealAlgebraicNumber.h"
-#include "../util/debug.h"
-#include "../numbers/numbers.h"
+#include <carl/formula/model/ran/RealAlgebraicNumber.h>
+#include <carl/util/debug.h>
+#include <carl/numbers/numbers.h>
 
 namespace carl {
 namespace cad {

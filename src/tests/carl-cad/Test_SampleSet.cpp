@@ -2,8 +2,8 @@
 
 #include <list>
 
-#include "carl/cad/SampleSet.h"
-#include "carl/util/platform.h"
+#include <carl/util/platform.h>
+#include <carl-cad/SampleSet.h>
 
 #include "../Common.h"
 

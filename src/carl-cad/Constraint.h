@@ -12,13 +12,13 @@
 #include <set>
 #include <vector>
 
-#include "../core/logging.h"
-#include "../core/MultivariatePolynomial.h"
-#include "../core/Sign.h"
-#include "../core/Variable.h"
-#include "../formula/model/ran/RealAlgebraicPoint.h"
-#include "../formula/model/ran/RealAlgebraicNumberEvaluation.h"
-#include "../interval/IntervalEvaluation.h"
+#include <carl/core/logging.h>
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/core/Sign.h>
+#include <carl/core/Variable.h>
+#include <carl/formula/model/ran/RealAlgebraicPoint.h>
+#include <carl/formula/model/ran/RealAlgebraicNumberEvaluation.h>
+#include <carl/interval/IntervalEvaluation.h>
 #include "CADSettings.h"
 #include "Variables.h"
 

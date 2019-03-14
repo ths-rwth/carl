@@ -14,8 +14,8 @@
 #include "ConflictGraph.h"
 #include "Constraint.h"
 #include "Variables.h"
-#include "../formula/model/ran/RealAlgebraicPoint.h"
-#include "../io/streamingOperators.h"
+#include <carl/formula/model/ran/RealAlgebraicPoint.h>
+#include <carl/io/streamingOperators.h>
 
 namespace carl {
 namespace cad {

@@ -13,11 +13,11 @@ add_dependencies(TestCommon resources GTESTCORE_STATIC GTESTMAIN_STATIC)
 # Unit Tests
 ################################
 add_subdirectory(util)
+add_subdirectory(carl-cad)
 add_subdirectory(numbers)
 #add_subdirectory(numbers_boost)
 add_subdirectory(core)
 add_subdirectory(formula)
-add_subdirectory(cad)
 add_subdirectory(groebner)
 add_subdirectory(interval)
 add_subdirectory(benchmarks)

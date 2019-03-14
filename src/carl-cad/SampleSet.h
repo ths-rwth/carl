@@ -14,8 +14,8 @@
 #include <utility>
 #include <vector>
 
-#include "../core/logging.h"
-#include "../formula/model/ran/RealAlgebraicNumber.h"
+#include <carl/core/logging.h>
+#include <carl/formula/model/ran/RealAlgebraicNumber.h>
 
 #include "CADSettings.h"
 

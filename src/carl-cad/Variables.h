@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "../core/Variable.h"
+#include <carl/core/Variable.h>
 
 namespace carl {
 namespace cad {

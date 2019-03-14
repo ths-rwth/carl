@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "carl/core/logging.h"
-#include "carl/cad/CAD.h"
-#include "carl/cad/Constraint.h"
+#include <carl-cad/CAD.h>
+#include <carl-cad/Constraint.h>
 #include "carl/util/platform.h"
 
 

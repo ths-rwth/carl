@@ -12,12 +12,12 @@
 
 #include "CAD.h"
 
-#include "../core/logging.h"
-#include "../interval/IntervalEvaluation.h"
-#include "../formula/model/ran/RealAlgebraicNumberSettings.h"
-#include "../core/rootfinder/RootFinder.h"
-#include "../thom/ThomRootFinder.h"
-#include "../core/polynomialfunctions/SquareFreePart.h"
+#include <carl/core/logging.h>
+#include <carl/interval/IntervalEvaluation.h>
+#include <carl/formula/model/ran/RealAlgebraicNumberSettings.h>
+#include <carl/core/rootfinder/RootFinder.h>
+#include <carl/thom/ThomRootFinder.h>
+#include <carl/core/polynomialfunctions/SquareFreePart.h>
 
 #define PERFORM_PARTIAL_CHECK false
 

@@ -35,12 +35,12 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../core/UnivariatePolynomial.h"
-#include "../core/MultivariatePolynomial.h"
-#include "../core/Variable.h"
-#include "../formula/model/ran/RealAlgebraicNumber.h"
-#include "../formula/model/ran/RealAlgebraicPoint.h"
-#include "../util/carlTree.h"
+#include <carl/core/UnivariatePolynomial.h>
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/core/Variable.h>
+#include <carl/formula/model/ran/RealAlgebraicNumber.h>
+#include <carl/formula/model/ran/RealAlgebraicPoint.h>
+#include <carl/util/carlTree.h>
 
 #include "CADConstraints.h"
 #include "CADPolynomials.h"

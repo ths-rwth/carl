@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../core/logging.h"
-#include "../core/Variable.h"
-
-#include "../core/polynomialfunctions/Resultant.h"
+#include <carl/core/logging.h>
+#include <carl/core/Variable.h>
+#include <carl/core/polynomialfunctions/Resultant.h>
 
 namespace carl {
 namespace cad {
