@@ -154,7 +154,7 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 		res.push_back(interval.upper());
 	///@todo Add carl::floating_point_exception and use this here.
     #ifdef USE_CLN_NUMBERS
-	} catch (cln::floating_point_exception) {
+	} catch (const cln::floating_point_exception&) {
 		finder.addQueue(interval, SplittingStrategy::BINARYSAMPLE);
 		return;
 	}
