@@ -41,6 +41,18 @@ matrix:
           packages: [*packages_base, g++-8]
     - stage: dependencies
       os: linux
+      compiler: clang++-9.0
+      env: CC=clang-9 CXX=clang++-9 TASK=tidy
+      script: TASK=dependencies source .ci/build.sh
+      addons:
+        apt:
+          sources:
+          - *sources_base
+          - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial main'
+            key_url: https://apt.llvm.org/llvm-snapshot.gpg.key
+          packages: [*packages_base, clang-9, libstdc++-8-dev]
+    - stage: dependencies
+      os: linux
       compiler: clang++-7.0
       env: CC=clang-7 CXX=clang++-7 TASK=coverity
       script: TASK=dependencies source .ci/build.sh
@@ -314,6 +326,9 @@ matrix:
           - *sources_base
           packages: [*packages_base, g++-7]
   allow_failures:
+    - stage: dependencies
+      os: linux
+      env: CC=clang-9 CXX=clang++-9 TASK=tidy
     - stage: dependencies
       os: linux
       env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
