@@ -95,8 +95,8 @@ std::vector<MultivariatePolynomial<C,O,P>> irreducibleFactors(const Multivariate
 	#endif
 	#if defined USE_GINAC
 		,
-		[includeConstants](const MultivariatePolynomial<cln::cl_RA,O,P>& p){ return std::vector<MultivariatePolynomial<C,O,P>>({p}); },
-		[includeConstants](const MultivariatePolynomial<cln::cl_I,O,P>& p){ return std::vector<MultivariatePolynomial<C,O,P>>({p}); }
+		[](const MultivariatePolynomial<cln::cl_RA,O,P>& p){ return std::vector<MultivariatePolynomial<cln::cl_RA,O,P>>({p}); },
+		[](const MultivariatePolynomial<cln::cl_I,O,P>& p){ return std::vector<MultivariatePolynomial<cln::cl_I,O,P>>({p}); }
 	#endif
 	};
 	return s(p);
