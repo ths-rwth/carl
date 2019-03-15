@@ -209,7 +209,7 @@ matrix:
           sources:
           - *sources_base
           packages: [*packages_base, g++-8, doxygen, ghostscript, latex-xcolor, lmodern, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra]
-    - stage: build
+    - stage: check
       os: linux
       compiler: clang++-9.0
       env: CC=clang-9 CXX=clang++-9 TASK=tidy
@@ -221,7 +221,7 @@ matrix:
           - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial main'
             key_url: https://apt.llvm.org/llvm-snapshot.gpg.key
           packages: [*packages_base, clang-9, libstdc++-8-dev]
-    - stage: build
+    - stage: check
       os: linux
       compiler: clang++-7.0
       env: CC=clang-7 CXX=clang++-7 TASK=coverity
@@ -281,7 +281,7 @@ matrix:
           organization: "smtrat-github"
           token:
             secure: "nIGn6M7vkwD6HAKgS94QZIIU+A+dWOgqXzJ7lnAdGLXUx3cStVMO1LuOANttGyeGSJNj8Fa+YzwCx5EMQDvZW/b8cuoRld+I4gbmszUB6BXwQ6JJvpFczHrPpwyeo2LKrBN549aBCtOaLzw7rVPDzcdC6T39IvxpPXVCMTTjoq7Mp12HSWS8Ra8YIsOnJfYKVSxjCwcY9ICac70zpA6uKuWBNL13EBM+IpLACLFDKMcaIdb2CGyRvtbt7u8BOU9mjulRtpg1Ndc3eGEIIJJXM8lQTA+iMB6iapGWYbMB5Gwifrwy59UTgNbdR/6sWP5E5kxBGxn1lyp9VP6ChSS/b3Szhh0jUWaqBxoAK0Kh4KBeW7eeLvaUALuPmoNneGUZACrbNDq6aVzHUgwEKQTxF0reDkG3ZaEU+1NCukvLaI58OBxenb5bMOlEWzUMSMMuNO0MgVKXc3Nvr4oEm0USP6Ixky1AUTKTVDY87HHuQ+kCM/L5MQUQTwtQPuWF1zkDry+6A2LNABySla9AAtxlUth7rGvLwaTz2o3yMOIohQb12r8LqXnjESVcENk0f0gbyqeqM7aPcXAyqc6YDW9LBDSsWWa9SqxEfwz2zktzsWfKfCZWi4Fn7CaPdHGsGlSaGsXGovrT1DbyQPiTND0R1cinfrOqZBgwjWOB6JTol+g="
-    - stage: build
+    - stage: check
       os: linux
       compiler: clang++-9.0
       env: CC=clang-9 CXX=clang++-9 TASK=clang-ubsan
@@ -320,10 +320,10 @@ matrix:
     - stage: build
       os: linux
       env: CC=clang-9 CXX=clang++-9
-    - stage: build
+    - stage: check
       os: linux
       env: CC=clang-9 CXX=clang++-9 TASK=tidy
-    - stage: build
+    - stage: check
       os: linux
       env: CC=clang-7 CXX=clang++-7 TASK=coverity
     - stage: build
@@ -332,7 +332,7 @@ matrix:
     - stage: check
       os: linux
       env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
-    - stage: build
+    - stage: check
       os: linux
       env: CC=clang-9 CXX=clang++-9 TASK=clang-ubsan
     - stage: build
