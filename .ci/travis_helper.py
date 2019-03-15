@@ -37,11 +37,18 @@ def addon_brew(packages):
 		}
 	}
 
+def addon_cache(*dirs):
+	"""Standard addon for caching."""
+	return {
+		"cache": dirs
+	}
+
 # List of predefined properties.
 # Can be extended.
 properties = {
 	"dependencies": {"stage": "dependencies", "script": ["TASK=dependencies"]},
 	"build": {"stage": "build"},
+	"check": {"stage": "check"},
 
 	"xcode9.1": {"os": "osx", "osx_image": "xcode9.1", "env": [], "addons": addon_brew(["llvm"])},
 	"xcode9.2": {"os": "osx", "osx_image": "xcode9.2", "env": [], "addons": addon_brew(["llvm"])},	
@@ -65,7 +72,9 @@ properties = {
 	"g++-8": {"env": ["CC=gcc-8 CXX=g++-8"], "compiler": "g++-8", "addons": addon_apt([],["g++-8"])},
 
 	"task.coverity": {"env": ["TASK=coverity"]},
-	"task.sonarcloud": {"env": ["TASK=sonarcloud"]},
+	"task.sonarcloud": {"env": ["TASK=sonarcloud"], "addons": addon_cache("$HOME/usr/", "$HOME/.sonar/cache", "build/")},
+	"task.sonarcloud-build": {"script": ["TASK=sonarcloud-build"]},
+	"task.sonarcloud-scan": {"script": ["TASK=sonarcloud-scan"]},
 	"task.clang-ubsan": {"env": ["TASK=clang-ubsan"]},
 	"task.doxygen": {"if": "branch = master", "env": ["TASK=doxygen"], "addons": addon_apt([],["doxygen", "ghostscript", "latex-xcolor", "lmodern", "pgf", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra"])},
 	"task.pycarl": {"env": ["TASK=pycarl"], "addons": addon_apt([],["python3"])},

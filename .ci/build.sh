@@ -46,12 +46,15 @@ elif [[ ${TASK} == "coverity" ]]; then
 	fold "build-tests" /usr/bin/time make ${MAKE_PARALLEL} || return 1
 	kill $!
 
-elif [[ ${TASK} == "sonarcloud" ]]; then
+elif [[ ${TASK} == "sonarcloud-build" ]]; then
 	
 	fold "reconfigure" cmake -D COVERAGE=ON ../ || return 1
 	
 	WRAPPER="build-wrapper-linux-x86-64 --out-dir ../bw-output"
 	fold "build" $WRAPPER make ${MAKE_PARALLEL} || return 1
+	
+elif [[ ${TASK} == "sonarcloud-scan" ]]; then
+
 	fold "collect-coverage" make coverage-collect
 	
 	cd ../ && sonar-scanner -X -Dproject.settings=build/sonarcloud.properties && cd build/

@@ -38,6 +38,14 @@ matrix:
       script: {{ job.script|join(' ') }}
   {%- endif %}
   {%- if job.addons %}
+    {%- if job.addons.cache %}
+      cache:
+        apt: true
+        directories:
+      {%- for dir in job.addons.cache %}
+          - {{ dir }}
+      {%- endfor %}
+    {%- endif %}
       addons:
     {%- if job.addons.apt %}
       {%- set sources = ["*sources_base"] + job.addons.apt.sources %}

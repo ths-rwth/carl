@@ -55,12 +55,22 @@ matrix:
       compiler: clang++-7.0
       env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
       script: TASK=dependencies source .ci/build.sh
+      cache:
+        apt: true
+        directories:
+          - $HOME/usr/
+          - $HOME/.sonar/cache
+          - build/
       addons:
         apt:
           sources:
           - *sources_base
           - llvm-toolchain-xenial-7
           packages: [*packages_base, clang-7, libstdc++-8-dev]
+        sonarcloud:
+          organization: "smtrat-github"
+          token:
+            secure: "nIGn6M7vkwD6HAKgS94QZIIU+A+dWOgqXzJ7lnAdGLXUx3cStVMO1LuOANttGyeGSJNj8Fa+YzwCx5EMQDvZW/b8cuoRld+I4gbmszUB6BXwQ6JJvpFczHrPpwyeo2LKrBN549aBCtOaLzw7rVPDzcdC6T39IvxpPXVCMTTjoq7Mp12HSWS8Ra8YIsOnJfYKVSxjCwcY9ICac70zpA6uKuWBNL13EBM+IpLACLFDKMcaIdb2CGyRvtbt7u8BOU9mjulRtpg1Ndc3eGEIIJJXM8lQTA+iMB6iapGWYbMB5Gwifrwy59UTgNbdR/6sWP5E5kxBGxn1lyp9VP6ChSS/b3Szhh0jUWaqBxoAK0Kh4KBeW7eeLvaUALuPmoNneGUZACrbNDq6aVzHUgwEKQTxF0reDkG3ZaEU+1NCukvLaI58OBxenb5bMOlEWzUMSMMuNO0MgVKXc3Nvr4oEm0USP6Ixky1AUTKTVDY87HHuQ+kCM/L5MQUQTwtQPuWF1zkDry+6A2LNABySla9AAtxlUth7rGvLwaTz2o3yMOIohQb12r8LqXnjESVcENk0f0gbyqeqM7aPcXAyqc6YDW9LBDSsWWa9SqxEfwz2zktzsWfKfCZWi4Fn7CaPdHGsGlSaGsXGovrT1DbyQPiTND0R1cinfrOqZBgwjWOB6JTol+g="
     - stage: dependencies
       os: linux
       compiler: g++-7
@@ -233,7 +243,34 @@ matrix:
       os: linux
       compiler: clang++-7.0
       env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
-      script: source .ci/build.sh
+      script: TASK=sonarcloud-build source .ci/build.sh
+      cache:
+        apt: true
+        directories:
+          - $HOME/usr/
+          - $HOME/.sonar/cache
+          - build/
+      addons:
+        apt:
+          sources:
+          - *sources_base
+          - llvm-toolchain-xenial-7
+          packages: [*packages_base, clang-7, libstdc++-8-dev]
+        sonarcloud:
+          organization: "smtrat-github"
+          token:
+            secure: "nIGn6M7vkwD6HAKgS94QZIIU+A+dWOgqXzJ7lnAdGLXUx3cStVMO1LuOANttGyeGSJNj8Fa+YzwCx5EMQDvZW/b8cuoRld+I4gbmszUB6BXwQ6JJvpFczHrPpwyeo2LKrBN549aBCtOaLzw7rVPDzcdC6T39IvxpPXVCMTTjoq7Mp12HSWS8Ra8YIsOnJfYKVSxjCwcY9ICac70zpA6uKuWBNL13EBM+IpLACLFDKMcaIdb2CGyRvtbt7u8BOU9mjulRtpg1Ndc3eGEIIJJXM8lQTA+iMB6iapGWYbMB5Gwifrwy59UTgNbdR/6sWP5E5kxBGxn1lyp9VP6ChSS/b3Szhh0jUWaqBxoAK0Kh4KBeW7eeLvaUALuPmoNneGUZACrbNDq6aVzHUgwEKQTxF0reDkG3ZaEU+1NCukvLaI58OBxenb5bMOlEWzUMSMMuNO0MgVKXc3Nvr4oEm0USP6Ixky1AUTKTVDY87HHuQ+kCM/L5MQUQTwtQPuWF1zkDry+6A2LNABySla9AAtxlUth7rGvLwaTz2o3yMOIohQb12r8LqXnjESVcENk0f0gbyqeqM7aPcXAyqc6YDW9LBDSsWWa9SqxEfwz2zktzsWfKfCZWi4Fn7CaPdHGsGlSaGsXGovrT1DbyQPiTND0R1cinfrOqZBgwjWOB6JTol+g="
+    - stage: check
+      os: linux
+      compiler: clang++-7.0
+      env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
+      script: TASK=sonarcloud-scan source .ci/build.sh
+      cache:
+        apt: true
+        directories:
+          - $HOME/usr/
+          - $HOME/.sonar/cache
+          - build/
       addons:
         apt:
           sources:
@@ -290,6 +327,9 @@ matrix:
       os: linux
       env: CC=clang-7 CXX=clang++-7 TASK=coverity
     - stage: build
+      os: linux
+      env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
+    - stage: check
       os: linux
       env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
     - stage: build
