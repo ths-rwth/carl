@@ -52,6 +52,17 @@ matrix:
           packages: [*packages_base, clang-7, libstdc++-8-dev]
     - stage: dependencies
       os: linux
+      compiler: clang++-7.0
+      env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
+      script: TASK=dependencies source .ci/build.sh
+      addons:
+        apt:
+          sources:
+          - *sources_base
+          - llvm-toolchain-xenial-7
+          packages: [*packages_base, clang-7, libstdc++-8-dev]
+    - stage: dependencies
+      os: linux
       compiler: g++-7
       env: CC=gcc-7 CXX=g++-7 TASK=pycarl
       script: TASK=dependencies MAKE_PARALLEL=-j1 source .ci/build.sh
@@ -266,6 +277,9 @@ matrix:
           - *sources_base
           packages: [*packages_base, g++-7]
   allow_failures:
+    - stage: dependencies
+      os: linux
+      env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
     - stage: build
       os: linux
       env: CC=clang-9 CXX=clang++-9

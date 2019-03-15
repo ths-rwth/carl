@@ -47,7 +47,7 @@ jobs = [
 	job("4-tidy", ["build", "linux", "clang-9.0", "task.tidy", "build.sh", "mayfail"]),
 	job("5-checker", ["dependencies", "linux", "clang-7.0", "task.coverity", "build.sh"]),
 	job("5-checker", ["build", "linux", "clang-7.0", "task.coverity", "addon.coverity", "mayfail"]),
-	#job("5-checker", ["dependencies", "linux", "clang-7.0", "task.sonarcloud", "j1", "build.sh"]),
+	job("5-checker", ["dependencies", "linux", "clang-7.0", "task.sonarcloud", "build.sh", "mayfail"]),
 	job("5-checker", ["build", "linux", "clang-7.0", "task.sonarcloud", "addon.sonarcloud", "build.sh", "mayfail"]),
 	job("5-checker", ["build", "linux", "clang-9.0", "task.clang-ubsan", "build.sh", "mayfail"]),
 	job("6-addons", ["dependencies", "linux", "g++-7", "task.pycarl", "j1", "build.sh"]),
