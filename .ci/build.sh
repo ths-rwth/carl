@@ -108,6 +108,7 @@ elif [[ ${TASK} == "pycarl" ]]; then
 	
 elif [[ ${TASK} == "tidy" ]]; then
 
+	fold "build-resources" $WRAPPER make ${MAKE_PARALLEL} resources || return 1
 	fold "reconfigure" cmake -D DEVELOPER=ON -D THREAD_SAFE=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=OFF -D USE_COCOA=ON -D USE_GINAC=OFF ../ || return 1
 	
 	/usr/bin/time make tidy
