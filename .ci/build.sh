@@ -51,8 +51,7 @@ elif [[ ${TASK} == "sonarcloud" ]]; then
 	fold "reconfigure" cmake -D COVERAGE=ON ../ || return 1
 	
 	WRAPPER="build-wrapper-linux-x86-64 --out-dir ../bw-output"
-	fold "build" $WRAPPER make ${MAKE_PARALLEL} carl || return 1
-	fold "build-tests" $WRAPPER make ${MAKE_PARALLEL} || return 1
+	fold "build" $WRAPPER make ${MAKE_PARALLEL} || return 1
 	fold "collect-coverage" make coverage-collect
 	
 	cd ../ && sonar-scanner -X -Dproject.settings=build/sonarcloud.properties && cd build/
