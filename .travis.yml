@@ -73,6 +73,7 @@ matrix:
           - $HOME/usr/
           - $HOME/.sonar/cache
           - build/
+          - bw-output/
       addons:
         apt:
           sources:
@@ -262,6 +263,7 @@ matrix:
           - $HOME/usr/
           - $HOME/.sonar/cache
           - build/
+          - bw-output/
       addons:
         apt:
           sources:
@@ -283,6 +285,7 @@ matrix:
           - $HOME/usr/
           - $HOME/.sonar/cache
           - build/
+          - bw-output/
       addons:
         apt:
           sources:

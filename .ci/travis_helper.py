@@ -72,7 +72,7 @@ properties = {
 	"g++-8": {"env": ["CC=gcc-8 CXX=g++-8"], "compiler": "g++-8", "addons": addon_apt([],["g++-8"])},
 
 	"task.coverity": {"env": ["TASK=coverity"]},
-	"task.sonarcloud": {"env": ["TASK=sonarcloud"], "addons": addon_cache("$HOME/usr/", "$HOME/.sonar/cache", "build/")},
+	"task.sonarcloud": {"env": ["TASK=sonarcloud"], "addons": addon_cache("$HOME/usr/", "$HOME/.sonar/cache", "build/", "bw-output/")},
 	"task.sonarcloud-build": {"script": ["TASK=sonarcloud-build"]},
 	"task.sonarcloud-scan": {"script": ["TASK=sonarcloud-scan"]},
 	"task.clang-ubsan": {"env": ["TASK=clang-ubsan"]},
