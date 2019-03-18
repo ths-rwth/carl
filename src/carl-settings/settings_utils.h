@@ -27,7 +27,7 @@ std::pair<std::intmax_t,std::size_t> get_proper_suffix(std::intmax_t value, cons
  * - use boost to parse values as durations
  * - access values with `std::chrono::seconds(d)`
  */
-struct duration: public std::chrono::nanoseconds {
+struct duration: std::chrono::nanoseconds {
 	duration() = default;
 	template<typename... Args>
 	// NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions): we actually want to implicitly convert here.
@@ -61,12 +61,12 @@ public:
 	binary_quantity() = default;
 	explicit binary_quantity(std::size_t n): mN(n) {}
 	auto n() const { return mN; }
-	auto kibi() const { return mN >> 10u; }
-	auto mebi() const { return mN >> 20u; }
-	auto gibi() const { return mN >> 30u; }
-	auto tebi() const { return mN >> 40u; }
-	auto pebi() const { return mN >> 50u; }
-	auto exbi() const { return mN >> 60u; }
+	auto kibi() const { return mN >> 10U; }
+	auto mebi() const { return mN >> 20U; }
+	auto gibi() const { return mN >> 30U; }
+	auto tebi() const { return mN >> 40U; }
+	auto pebi() const { return mN >> 50U; }
+	auto exbi() const { return mN >> 60U; }
 };
 
 /// Streaming operator for binary quantity. Auto-detects proper suffix.

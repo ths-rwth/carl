@@ -52,18 +52,18 @@ void validate(boost::any& v, const std::vector<std::string>& values, carl::setti
 	qi::symbols<char, std::size_t> unit;
 	unit.add
 		("", 1)
-		("K", static_cast<std::size_t>(2) << 10u)
-		("Ki", static_cast<std::size_t>(2) << 10u)
-		("M", static_cast<std::size_t>(2) << 20u)
-		("Mi", static_cast<std::size_t>(2) << 20u)
-		("G", static_cast<std::size_t>(2) << 30u)
-		("Gi", static_cast<std::size_t>(2) << 30u)
-		("T", static_cast<std::size_t>(2) << 40u)
-		("Ti", static_cast<std::size_t>(2) << 40u)
-		("P", static_cast<std::size_t>(2) << 50u)
-		("Pi", static_cast<std::size_t>(2) << 50u)
-		("E", static_cast<std::size_t>(2) << 60u)
-		("Ei", static_cast<std::size_t>(2) << 60u)
+		("K", static_cast<std::size_t>(2) << 10U)
+		("Ki", static_cast<std::size_t>(2) << 10U)
+		("M", static_cast<std::size_t>(2) << 20U)
+		("Mi", static_cast<std::size_t>(2) << 20U)
+		("G", static_cast<std::size_t>(2) << 30U)
+		("Gi", static_cast<std::size_t>(2) << 30U)
+		("T", static_cast<std::size_t>(2) << 40U)
+		("Ti", static_cast<std::size_t>(2) << 40U)
+		("P", static_cast<std::size_t>(2) << 50U)
+		("Pi", static_cast<std::size_t>(2) << 50U)
+		("E", static_cast<std::size_t>(2) << 60U)
+		("Ei", static_cast<std::size_t>(2) << 60U)
 	;
 	if (qi::parse(s.begin(), s.end(), qi::ulong_long >> unit >> qi::eoi, value, factor)) {
 		v = binary_quantity(value * factor);
