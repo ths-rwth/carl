@@ -13,7 +13,7 @@ std::pair<std::intmax_t,std::size_t> get_proper_suffix(std::intmax_t value, cons
 	std::size_t id = 0;
 	std::intmax_t mult = 1;
 	for (; id < a.size()-1; ++id) {
-		if (value % (a[id].second * mult) != 0) {
+		if (value < (a[id].second * mult)) {
 			break;
 		}
 		mult *= a[id].second;
