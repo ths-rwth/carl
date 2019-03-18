@@ -8,8 +8,8 @@ if (COVERAGE)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping -mllvm -enable-name-compression=false")
 
 		add_custom_target(coverage-collect
-			COMMAND ${CMAKE_SOURCE_DIR}/cmake/coverage-clang.sh ${CMAKE_BINARY_DIR}
-			WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
+			COMMAND ${CMAKE_SOURCE_DIR}/cmake/coverage-clang.sh
+			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 		)
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage --coverage -g -O0")

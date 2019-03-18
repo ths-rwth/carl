@@ -1,17 +1,15 @@
 #!/bin/sh
 
-CMAKE_BINARY_DIR=$1
-
-mkdir -p ${CMAKE_BINARY_DIR}/coverage
-mkdir -p ${CMAKE_BINARY_DIR}/coverage-out
-rm -f ${CMAKE_BINARY_DIR}/coverage/*
-rm -f ${CMAKE_BINARY_DIR}/coverage-out/*
+mkdir -p coverage/*
+mkdir -p coverage-out/*
+rm -f coverage/*
+rm -f coverage-out/*
 
 make
-make test LLVM_PROFILE_FILE=${CMAKE_BINARY_DIR}/coverage/%p.profraw
+make test LLVM_PROFILE_FILE=coverage/%p.profraw
 
 echo "Merging profile data..."
-llvm-profdata merge -sparse ${CMAKE_BINARY_DIR}/coverage/*.profraw -o ${CMAKE_BINARY_DIR}/llvm.profdata
+llvm-profdata merge -sparse coverage/*.profraw -o llvm.profdata
 
 echo "Dumping coverage data..."
 llvm-cov show -instr-profile llvm.profdata libcarl.so > coverage-out/coverage.txt
@@ -20,3 +18,4 @@ for f in `ls bin/` ; do
 done
 echo "Merging coverage data..."
 cat coverage-out/*.txt > coverage.txt
+
