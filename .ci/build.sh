@@ -70,9 +70,8 @@ elif [[ ${TASK} == "clang-ubsan" ]]; then
 
 	fold "reconfigure" cmake -D CLANG_SANITIZER=undefined ../
 
-	/usr/bin/time make ${MAKE_PARALLEL} carl || return 1
-	/usr/bin/time make ${MAKE_PARALLEL} || return 1
-	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
+	fold "build" /usr/bin/time make ${MAKE_PARALLEL} || return 1
+	fold "tests" /usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
 
 elif [[ ${TASK} == "doxygen" ]]; then
 	
@@ -121,20 +120,18 @@ elif [[ ${TASK} == "tidy" ]]; then
 	fold "build-resources" $WRAPPER make ${MAKE_PARALLEL} resources || return 1
 	fold "reconfigure" cmake -D DEVELOPER=ON -D THREAD_SAFE=ON -D USE_BLISS=ON -D USE_CLN_NUMBERS=OFF -D USE_COCOA=ON -D USE_GINAC=OFF ../ || return 1
 	
-	/usr/bin/time make tidy
+	fold "tidy" /usr/bin/time make tidy
 
 elif [[ ${TASK} == "addons" ]]; then
 	
 	fold "reconfigure" cmake -D BUILD_ADDONS=ON -D BUILD_ADDON_PARSER=ON -D BUILD_ADDON_PYCARL=ON -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON -D USE_GINAC=ON -D USE_COCOA=ON ../ || return 1
 	
-	/usr/bin/time make ${MAKE_PARALLEL} carl || return 1
-	/usr/bin/time make ${MAKE_PARALLEL} || return 1
-	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
+	fold "build" /usr/bin/time make ${MAKE_PARALLEL} || return 1
+	fold "tests" /usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
 	
 else
-	/usr/bin/time make ${MAKE_PARALLEL} carl || return 1
-	/usr/bin/time make ${MAKE_PARALLEL} || return 1
-	/usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
+	fold "build" /usr/bin/time make ${MAKE_PARALLEL} || return 1
+	fold "tests" /usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
 fi
 
 cd ../
