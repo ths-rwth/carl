@@ -28,6 +28,14 @@ function keep_waiting() {
     sleep 60
   done
 }
+function start_keep_waiting() {
+  keep_waiting &
+  disown
+  keep_waiting_id=$!
+}
+function stop_keep_waiting() {
+  kill $keep_waiting_id
+}
 
 if [ -z "$MAKE_PARALLEL" ]; then
 	MAKE_PARALLEL="-j2"
@@ -35,16 +43,16 @@ fi
 
 if [[ ${TASK} == "dependencies" ]]; then
 	
-	keep_waiting &
+	start_keep_waiting
 	fold "build-resources" /usr/bin/time make ${MAKE_PARALLEL} resources || return 1
-	kill $!
+	stop_keep_waiting
 	
 elif [[ ${TASK} == "coverity" ]]; then
 
-	keep_waiting &
+	start_keep_waiting
 	fold "build" /usr/bin/time make ${MAKE_PARALLEL} carl || return 1
 	fold "build-tests" /usr/bin/time make ${MAKE_PARALLEL} || return 1
-	kill $!
+	stop_keep_waiting
 
 elif [[ ${TASK} == "sonarcloud-build" ]]; then
 	
