@@ -5,7 +5,7 @@ if (COVERAGE)
 		#message(SEND_ERROR "Coverage collection with clang is not supported yet.")
 		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g -O0")
 		#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping -mllvm -enable-name-compression=false")
 
 		add_custom_target(coverage-collect
 			COMMAND ${CMAKE_SOURCE_DIR}/cmake/coverage-clang.sh ${CMAKE_BINARY_DIR}
