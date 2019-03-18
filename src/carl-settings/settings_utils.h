@@ -28,12 +28,12 @@ std::pair<std::intmax_t,std::size_t> get_proper_suffix(std::intmax_t value, cons
  * - access values with `std::chrono::seconds(d)`
  */
 struct duration: std::chrono::nanoseconds {
-	duration() = default;
+	constexpr duration() = default;
 	template<typename... Args>
 	// NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions): we actually want to implicitly convert here.
-	duration(Args&&... args): std::chrono::nanoseconds(std::forward<Args>(args)...) {}
+	constexpr duration(Args&&... args): std::chrono::nanoseconds(std::forward<Args>(args)...) {}
 	template<typename R, typename P>
-	explicit operator std::chrono::duration<R,P>() const {
+	explicit constexpr operator std::chrono::duration<R,P>() const {
 		return std::chrono::duration_cast<std::chrono::duration<R,P>>(std::chrono::nanoseconds(*this));
 	}
 };
@@ -58,15 +58,15 @@ struct binary_quantity {
 private:
 	std::size_t mN = 0;
 public:
-	binary_quantity() = default;
-	explicit binary_quantity(std::size_t n): mN(n) {}
-	auto n() const { return mN; }
-	auto kibi() const { return mN >> 10U; }
-	auto mebi() const { return mN >> 20U; }
-	auto gibi() const { return mN >> 30U; }
-	auto tebi() const { return mN >> 40U; }
-	auto pebi() const { return mN >> 50U; }
-	auto exbi() const { return mN >> 60U; }
+	constexpr binary_quantity() = default;
+	explicit constexpr binary_quantity(std::size_t n): mN(n) {}
+	constexpr auto n() const { return mN; }
+	constexpr auto kibi() const { return mN >> 10U; }
+	constexpr auto mebi() const { return mN >> 20U; }
+	constexpr auto gibi() const { return mN >> 30U; }
+	constexpr auto tebi() const { return mN >> 40U; }
+	constexpr auto pebi() const { return mN >> 50U; }
+	constexpr auto exbi() const { return mN >> 60U; }
 };
 
 /// Streaming operator for binary quantity. Auto-detects proper suffix.
@@ -89,15 +89,15 @@ struct metric_quantity {
 private:
 	std::size_t mN = 0;
 public:
-	metric_quantity() = default;
-	explicit metric_quantity(std::size_t n): mN(n) {}
-	auto n() const { return mN; }
-	auto kilo() const { return mN / 1000; }
-	auto mega() const { return mN / 1000000; }
-	auto giga() const { return mN / 1000000000; }
-	auto tera() const { return mN / 1000000000000; }
-	auto peta() const { return mN / 1000000000000000; }
-	auto exa()  const { return mN / 1000000000000000000; }
+	constexpr metric_quantity() = default;
+	explicit constexpr metric_quantity(std::size_t n): mN(n) {}
+	constexpr auto n() const { return mN; }
+	constexpr auto kilo() const { return mN / 1000; }
+	constexpr auto mega() const { return mN / 1000000; }
+	constexpr auto giga() const { return mN / 1000000000; }
+	constexpr auto tera() const { return mN / 1000000000000; }
+	constexpr auto peta() const { return mN / 1000000000000000; }
+	constexpr auto exa()  const { return mN / 1000000000000000000; }
 };
 
 /// Streaming operator for metric quantity. Auto-detects proper suffix.
