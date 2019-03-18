@@ -40,7 +40,10 @@ class UFInstanceContent {
         /// The uninterpreted function instance's arguments.
         std::vector<UTerm> mArgs;
 
-        UFInstanceContent(); // The default constructor is disabled.
+    public:
+        UFInstanceContent() = delete;
+        UFInstanceContent(const UFInstanceContent&) = delete;
+		UFInstanceContent(UFInstanceContent&&) = delete;
 
         /**
          * Constructs the content of an uninterpreted function instance.
@@ -60,9 +63,6 @@ class UFInstanceContent {
             mUninterpretedFunction(uf),
             mArgs(args) {}
 
-        UFInstanceContent(const UFInstanceContent&); // The copy constructor is disabled.
-
-    public:
         /**
          * @return The underlying function of the uninterpreted function instance
          */
@@ -151,7 +151,7 @@ class UFInstanceManager : public Singleton<UFInstanceManager> {
         /// Stores all instantiated uninterpreted function instance's contents and maps them to their unique id.
         FastPointerMap<UFInstanceContent, std::size_t> mUFInstanceIdMap;
         /// Maps the unique ids to the instantiated uninterpreted function instance's content.
-        std::vector<const UFInstanceContent*> mUFInstances;
+        std::vector<std::unique_ptr<UFInstanceContent>> mUFInstances;
 
         /**
          * Constructs an uninterpreted function instances manager.
@@ -163,7 +163,6 @@ class UFInstanceManager : public Singleton<UFInstanceManager> {
         }
         ~UFInstanceManager() override {
             mUFInstanceIdMap.clear();
-            for (auto& ptr: mUFInstances) delete ptr;
             mUFInstances.clear();
         }
 
@@ -174,7 +173,7 @@ class UFInstanceManager : public Singleton<UFInstanceManager> {
          * @param ufic The uninterpreted function instance's content to store.
          * @return The uninterpreted function instance corresponding to the given content.
          */
-        UFInstance newUFInstance(const UFInstanceContent* ufic);
+        UFInstance newUFInstance(std::unique_ptr<UFInstanceContent>&& ufic);
 
     public:
         /**
@@ -204,9 +203,9 @@ class UFInstanceManager : public Singleton<UFInstanceManager> {
          * @return The resulting uninterpreted function instance.
          */
         UFInstance newUFInstance(const UninterpretedFunction& uf, std::vector<UTerm>&& args) {
-            auto result = new UFInstanceContent(uf, std::move(args));
+            auto result = std::make_unique<UFInstanceContent>(uf, std::move(args));
             assert(argsCorrect(*result));
-            return newUFInstance(result);
+            return newUFInstance(std::move(result));
         }
 
         /**
@@ -216,9 +215,9 @@ class UFInstanceManager : public Singleton<UFInstanceManager> {
          * @return The resulting uninterpreted function instance.
          */
         UFInstance newUFInstance(const UninterpretedFunction& uf, const std::vector<UTerm>& args) {
-            auto result = new UFInstanceContent(uf, args);
+            auto result = std::make_unique<UFInstanceContent>(uf, args);
             assert(argsCorrect(*result));
-            return newUFInstance(result);
+            return newUFInstance(std::move(result));
         }
 
         /**

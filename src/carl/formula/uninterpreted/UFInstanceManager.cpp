@@ -10,17 +10,16 @@
 
 namespace carl
 {
-    UFInstance UFInstanceManager::newUFInstance(const UFInstanceContent* ufic) {
-        auto iter = mUFInstanceIdMap.find(ufic);
+    UFInstance UFInstanceManager::newUFInstance(std::unique_ptr<UFInstanceContent>&& ufic) {
+        auto iter = mUFInstanceIdMap.find(ufic.get());
         // Check if this uninterpreted function content has already been created
         if(iter != mUFInstanceIdMap.end()) {
-            delete ufic;
             return UFInstance(iter->second);
         }
         // Create the uninterpreted function instance
-        mUFInstanceIdMap.emplace(ufic, mUFInstances.size());
+        mUFInstanceIdMap.emplace(ufic.get(), mUFInstances.size());
         UFInstance ufi(mUFInstances.size());
-        mUFInstances.push_back(ufic);
+        mUFInstances.emplace_back(std::move(ufic));
         return ufi;
     }
 
