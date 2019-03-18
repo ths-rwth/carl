@@ -40,6 +40,38 @@ TEST(settings_utils, duration) {
 	EXPECT_EQ(getOutput(duration(std::chrono::hours(5))), "5h");
 }
 
+TEST(settings_utils, duration_validate) {
+	using namespace carl::settings;
+	boost::any res;
+	validate(res, { "5ns" }, static_cast<duration*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(duration));
+	EXPECT_EQ(boost::any_cast<duration>(res), duration(std::chrono::nanoseconds(5)));
+
+	validate(res, { "5µs" }, static_cast<duration*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(duration));
+	EXPECT_EQ(boost::any_cast<duration>(res), duration(std::chrono::microseconds(5)));
+
+	validate(res, { "5us" }, static_cast<duration*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(duration));
+	EXPECT_EQ(boost::any_cast<duration>(res), duration(std::chrono::microseconds(5)));
+
+	validate(res, { "5ms" }, static_cast<duration*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(duration));
+	EXPECT_EQ(boost::any_cast<duration>(res), duration(std::chrono::milliseconds(5)));
+	
+	validate(res, { "5s" }, static_cast<duration*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(duration));
+	EXPECT_EQ(boost::any_cast<duration>(res), duration(std::chrono::seconds(5)));
+
+	validate(res, { "5m" }, static_cast<duration*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(duration));
+	EXPECT_EQ(boost::any_cast<duration>(res), duration(std::chrono::minutes(5)));
+	
+	validate(res, { "5h" }, static_cast<duration*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(duration));
+	EXPECT_EQ(boost::any_cast<duration>(res), duration(std::chrono::hours(5)));
+}
+
 TEST(settings_utils, binary_quantity) {
 	using namespace carl::settings;
 	{
@@ -132,6 +164,62 @@ TEST(settings_utils, binary_quantity) {
 	}
 }
 
+TEST(settings_utils, binary_quantity_validate) {
+	using namespace carl::settings;
+	boost::any res;
+	validate(res, { "5" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL));
+
+	validate(res, { "5Ki" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024));
+
+	validate(res, { "5K" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024));
+
+	validate(res, { "5Mi" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024));
+
+	validate(res, { "5M" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024));
+
+	validate(res, { "5Gi" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024 * 1024));
+	
+	validate(res, { "5G" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024 * 1024));
+	
+	validate(res, { "5Ti" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024 * 1024 * 1024));
+
+	validate(res, { "5T" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024 * 1024 * 1024));
+
+	validate(res, { "5Pi" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024 * 1024 * 1024 * 1024));
+	
+	validate(res, { "5P" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024 * 1024 * 1024 * 1024));
+	
+	validate(res, { "5Ei" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024 * 1024 * 1024 * 1024 * 1024));
+
+	validate(res, { "5E" }, static_cast<binary_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(binary_quantity));
+	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024 * 1024 * 1024 * 1024 * 1024));
+}
+
 TEST(settings_utils, metric_quantity) {
 	using namespace carl::settings;
 	{
@@ -222,4 +310,36 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.exa() == 5);
 		EXPECT_EQ(getOutput(m), "5E");
 	}
+}
+
+TEST(settings_utils, metric_quantity_validate) {
+	using namespace carl::settings;
+	boost::any res;
+	validate(res, { "5" }, static_cast<metric_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(metric_quantity));
+	EXPECT_EQ(boost::any_cast<metric_quantity>(res), metric_quantity(5));
+
+	validate(res, { "5K" }, static_cast<metric_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(metric_quantity));
+	EXPECT_EQ(boost::any_cast<metric_quantity>(res), metric_quantity(5000));
+
+	validate(res, { "5M" }, static_cast<metric_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(metric_quantity));
+	EXPECT_EQ(boost::any_cast<metric_quantity>(res), metric_quantity(5000000));
+	
+	validate(res, { "5G" }, static_cast<metric_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(metric_quantity));
+	EXPECT_EQ(boost::any_cast<metric_quantity>(res), metric_quantity(5000000000));
+
+	validate(res, { "5T" }, static_cast<metric_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(metric_quantity));
+	EXPECT_EQ(boost::any_cast<metric_quantity>(res), metric_quantity(5000000000000));
+	
+	validate(res, { "5P" }, static_cast<metric_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(metric_quantity));
+	EXPECT_EQ(boost::any_cast<metric_quantity>(res), metric_quantity(5000000000000000));
+
+	validate(res, { "5E" }, static_cast<metric_quantity*>(nullptr), 0);
+	EXPECT_TRUE(res.type() == typeid(metric_quantity));
+	EXPECT_EQ(boost::any_cast<metric_quantity>(res), metric_quantity(5000000000000000000));
 }
