@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/any.hpp>
+
 #include <array>
 #include <chrono>
 #include <iostream>
@@ -49,6 +51,13 @@ inline std::ostream& operator<<(std::ostream& os, const duration& d) {
 }
 
 /**
+ * Custom validator for duration that wraps some std::chrono::duration.
+ * Accepts the format <number><suffix> where suffix is one of the following:
+ * ns, µs, us, ms, s, m, h
+ */
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::duration* /*unused*/, int /*unused*/);
+
+/**
  * Helper type to parse quantities with binary SI-style suffixes.
  * Intended usage:
  * - use boost to parse values as quantity
@@ -68,6 +77,14 @@ public:
 	constexpr auto pebi() const { return mN >> 50U; }
 	constexpr auto exbi() const { return mN >> 60U; }
 };
+/// Compare two binary quantities for equality.
+constexpr bool operator==(binary_quantity lhs, binary_quantity rhs) {
+	return lhs.n() == rhs.n();
+}
+/// Compare two binary quantities.
+constexpr bool operator<(binary_quantity lhs, binary_quantity rhs) {
+	return lhs.n() < rhs.n();
+}
 
 /// Streaming operator for binary quantity. Auto-detects proper suffix.
 inline std::ostream& operator<<(std::ostream& os, const binary_quantity& q) {
@@ -78,6 +95,13 @@ inline std::ostream& operator<<(std::ostream& os, const binary_quantity& q) {
 	auto res = get_proper_suffix(static_cast<std::intmax_t>(q.n()), suffixes);
 	return os << res.first << suffixes[res.second].first;
 }
+
+/**
+ * Custom validator for binary quantities.
+ * Accepts the format <number><suffix> where suffix is one of the following:
+ * Ki,Mi,Gi,Ti,Pi,Ei
+ */
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::binary_quantity* /*unused*/, int /*unused*/);
 
 /**
  * Helper type to parse quantities with SI-style suffixes.
@@ -99,6 +123,14 @@ public:
 	constexpr auto peta() const { return mN / 1000000000000000; }
 	constexpr auto exa()  const { return mN / 1000000000000000000; }
 };
+/// Compare two metric quantities for equality.
+constexpr bool operator==(metric_quantity lhs, metric_quantity rhs) {
+	return lhs.n() == rhs.n();
+}
+/// Compare two metric quantities.
+constexpr bool operator<(metric_quantity lhs, metric_quantity rhs) {
+	return lhs.n() < rhs.n();
+}
 
 /// Streaming operator for metric quantity. Auto-detects proper suffix.
 inline std::ostream& operator<<(std::ostream& os, const metric_quantity& q) {
@@ -109,5 +141,12 @@ inline std::ostream& operator<<(std::ostream& os, const metric_quantity& q) {
 	auto res = get_proper_suffix(static_cast<std::intmax_t>(q.n()), suffixes);
 	return os << res.first << suffixes[res.second].first;
 }
+
+/**
+ * Custom validator for metric quantities.
+ * Accepts the format <number><suffix> where suffix is one of the following:
+ * K,M,G,T,P,E
+ */
+void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::metric_quantity* /*unused*/, int /*unused*/);
 
 }

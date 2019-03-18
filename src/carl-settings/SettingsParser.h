@@ -27,27 +27,6 @@ inline void validate(boost::any& v, const std::vector<std::string>& values, std:
 
 namespace carl::settings {
 
-/**
- * Custom validator for duration that wraps some std::chrono::duration.
- * Accepts the format <number><suffix> where suffix is one of the following:
- * ns, µs, us, ms, s, m, h
- */
-void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::duration* /*unused*/, int /*unused*/);
-
-/**
- * Custom validator for binary quantities.
- * Accepts the format <number><suffix> where suffix is one of the following:
- * K,Ki,M,Mi,G,Gi,T,Ti,P,Pi,E,Ei (X and Xi are synonymous)
- */
-void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::binary_quantity* /*unused*/, int /*unused*/);
-
-/**
- * Custom validator for metric quantities.
- * Accepts the format <number><suffix> where suffix is one of the following:
- * K,M,G,T,P,E
- */
-void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::metric_quantity* /*unused*/, int /*unused*/);
-
 namespace po = boost::program_options;
 
 /**
