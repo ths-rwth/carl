@@ -25,6 +25,12 @@ public:
 		}
 		mSets[set].set(element);
 	}
+	void set(std::size_t set, const Bitset& elements) {
+		while (set >= mSets.size()) {
+			mSets.emplace_back();
+		}
+		mSets[set] |= elements;
+	}
 	const auto& get_set(std::size_t set) const {
 		return mSets[set];
 	}

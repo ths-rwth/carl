@@ -10,7 +10,8 @@ namespace carl::covering {
 template<typename Set>
 class TypedSetCover {
 public:
-	friend std::ostream& operator<<(std::ostream& os, const TypedSetCover& tsc);
+	template<typename T>
+	friend std::ostream& operator<<(std::ostream& os, const TypedSetCover<T>& tsc);
 private:
 	SetCover mSetCover;
 	std::vector<Set> mSets;
@@ -28,6 +29,13 @@ public:
 	void set(const Set& s, std::size_t element) {
 		mSetCover.set(get_set_id(s), element);
 	}
+	void set(const Set& s, const Bitset& elements) {
+		mSetCover.set(get_set_id(s), elements);
+	}
+
+	operator const SetCover&() const {
+		return mSetCover;
+	}
 
 	template<typename F>
 	std::vector<Set> get_cover(F&& heuristic) {
@@ -38,5 +46,10 @@ public:
 		return res;
 	}
 };
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const TypedSetCover<T>& tsc) {
+	return os << static_cast<const SetCover&>(tsc);
+}
 
 }
