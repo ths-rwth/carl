@@ -1,6 +1,7 @@
 # Libraries..
 add_subdirectory(carl)
 add_subdirectory(carl-cad)
+add_subdirectory(carl-covering)
 add_subdirectory(carl-settings)
 
 # For unit tests.
