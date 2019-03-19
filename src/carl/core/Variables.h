@@ -86,7 +86,7 @@ public:
 	}
 
 	void erase(VarTypes v) {
-		mVariables.erase(std::remove(begin(), end(), v));
+		mVariables.erase(std::remove(begin(), end(), v), end());
 	}
 
 	template<typename F>
