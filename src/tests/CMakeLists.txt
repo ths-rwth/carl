@@ -14,6 +14,7 @@ add_dependencies(TestCommon resources GTESTCORE_STATIC GTESTMAIN_STATIC)
 ################################
 add_subdirectory(util)
 add_subdirectory(carl-cad)
+add_subdirectory(carl-covering)
 add_subdirectory(carl-settings)
 add_subdirectory(numbers)
 #add_subdirectory(numbers_boost)
