@@ -65,6 +65,13 @@ namespace carl
 		using Arg = std::shared_ptr<const Monomial>;
 		using Content = std::vector<std::pair<Variable, uint>>;
 		~Monomial();
+
+		/**
+		 * Default constructor.
+		 */
+		Monomial() = delete;
+		Monomial(const Monomial& rhs) = delete;
+		Monomial(Monomial&& rhs) = delete;
 	private:
 		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents.
 		Content mExponents;
@@ -77,13 +84,6 @@ namespace carl
 
 		using exponents_it = Content::iterator ;
 		using exponents_cIt = Content::const_iterator;
-
-		/**
-		 * Default constructor.
-		 */
-		Monomial() = delete;
-		Monomial(const Monomial& rhs) = delete;
-		Monomial(Monomial&& rhs) = delete;
 
 		/**
 		 * Calculates the hash and stores it to mHash.

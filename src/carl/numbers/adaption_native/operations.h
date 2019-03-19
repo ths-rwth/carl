@@ -37,16 +37,16 @@ inline bool isNegative(double n) {
 }
 
 inline bool isNaN(double d) {
-	if (std::is_same<decltype(std::isnan(d)), bool>::value) {
+	if constexpr (std::is_same<decltype(std::isnan(d)), bool>::value) {
 		return std::isnan(d);
-	} else if (std::is_same<decltype(std::isnan(d)), int>::value) {
+	} else if constexpr (std::is_same<decltype(std::isnan(d)), int>::value) {
 		return std::isnan(d) != 0;
 	}
 }
 inline bool isInf(double d) {
-	if (std::is_same<decltype(std::isinf(d)), bool>::value) {
+	if constexpr (std::is_same<decltype(std::isinf(d)), bool>::value) {
 		return std::isinf(d);
-	} else if (std::is_same<decltype(std::isinf(d)), int>::value) {
+	} else if constexpr (std::is_same<decltype(std::isinf(d)), int>::value) {
 		return std::isinf(d) != 0;
 	}
 }

@@ -289,8 +289,6 @@ struct is_subset_of_rationals {
 	/// Default value of this trait.
 	static constexpr bool value = is_rational<T>::value;
 };
-template<typename T>
-constexpr bool is_subset_of_rationals<T>::value;
 
 template<typename T>
 struct is_polynomial: std::false_type {};
