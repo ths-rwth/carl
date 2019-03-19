@@ -1,8 +1,23 @@
 #include "SetCover.h"
 
 #include <cassert>
+#include <numeric>
 
 namespace carl::covering {
+
+void SetCover::set(std::size_t set, std::size_t element) {
+	while (set >= mSets.size()) {
+		mSets.emplace_back();
+	}
+	mSets[set].set(element);
+}
+
+void SetCover::set(std::size_t set, const Bitset& elements) {
+	while (set >= mSets.size()) {
+		mSets.emplace_back();
+	}
+	mSets[set] |= elements;
+}
 
 std::size_t SetCover::element_count() const {
 	std::size_t max = 0;
@@ -24,6 +39,14 @@ std::size_t SetCover::largest_set() const {
 		}
 	}
 	return largest_id;
+}
+
+Bitset SetCover::get_uncovered() const {
+	return std::accumulate(mSets.begin(), mSets.end(), Bitset(),
+		[](const auto& lhs, const auto& rhs){
+			return lhs | rhs;
+		}
+	);
 }
 
 void SetCover::select_set(std::size_t s) {

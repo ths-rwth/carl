@@ -8,6 +8,10 @@
 
 namespace carl::covering::heuristic {
 
+/**
+ * Preprocessing heuristic:
+ * Selects essential sets which are the only once covering some element.
+ */
 inline auto select_essential(SetCover& sc) {
 	Bitset selected;
 	bool has_selected = true;

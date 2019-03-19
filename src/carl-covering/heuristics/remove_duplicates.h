@@ -6,6 +6,11 @@
 
 namespace carl::covering::heuristic {
 
+/**
+ * Preprocessing heuristic:
+ * Compresses the matrix by removing duplicate columns.
+ * The order of the columns changes!
+ */
 inline auto remove_duplicates(SetCover& sc) {
 	std::vector<Bitset> columns;
 	for (std::size_t i = 0; i < sc.set_count(); ++i) {
