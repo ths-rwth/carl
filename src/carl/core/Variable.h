@@ -114,8 +114,8 @@ private:
 	*/
 	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0) noexcept
 		: mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | static_cast<std::size_t>(type)) {
-		assert(rank < (1 << RESERVED_FOR_RANK));
-		assert(0 < id && id < (std::size_t(1) << AVAILABLE));
+		assert(rank < (1UL << RESERVED_FOR_RANK));
+		assert(0 < id && id < (1UL << AVAILABLE));
 		assert(VariableType::MIN_TYPE <= type && type <= VariableType::MAX_TYPE);
 	}
 
