@@ -54,17 +54,6 @@ matrix:
     - stage: dependencies
       os: linux
       compiler: clang++-7.0
-      env: CC=clang-7 CXX=clang++-7 TASK=coverity
-      script: TASK=dependencies source .ci/build.sh
-      addons:
-        apt:
-          sources:
-          - *sources_base
-          - llvm-toolchain-xenial-7
-          packages: [*packages_base, clang-7, libstdc++-8-dev]
-    - stage: dependencies
-      os: linux
-      compiler: clang++-7.0
       env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
       script: TASK=dependencies source .ci/build.sh
       cache:
@@ -234,24 +223,6 @@ matrix:
           - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial main'
             key_url: https://apt.llvm.org/llvm-snapshot.gpg.key
           packages: [*packages_base, clang-9, libstdc++-8-dev]
-    - stage: check
-      os: linux
-      compiler: clang++-7.0
-      env: CC=clang-7 CXX=clang++-7 TASK=coverity
-      addons:
-        apt:
-          sources:
-          - *sources_base
-          - llvm-toolchain-xenial-7
-          packages: [*packages_base, clang-7, libstdc++-8-dev]
-        coverity_scan:
-          project:
-            name: "smtrat/carl"
-            description: "CArL"
-          notification_email: "gereon.kremer@cs.rwth-aachen.de"
-          build_command_prepend: "cov-configure --template --comptype clangcc --compiler $CXX"
-          build_command: ".ci/build.sh"
-          branch_pattern: "master"
     - stage: build
       os: linux
       compiler: clang++-7.0
@@ -341,9 +312,6 @@ matrix:
     - stage: check
       os: linux
       env: CC=clang-9 CXX=clang++-9 TASK=tidy
-    - stage: check
-      os: linux
-      env: CC=clang-7 CXX=clang++-7 TASK=coverity
     - stage: build
       os: linux
       env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
