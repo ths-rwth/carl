@@ -53,6 +53,12 @@ TEST(Settings, all) {
 	});
 	EXPECT_NO_THROW(parser.finalize());
 	EXPECT_NO_THROW(parser.parse_options(argc, argv));
-	EXPECT_NO_THROW(parser.print_help());
-	EXPECT_NO_THROW(parser.print_options());
+	{
+		std::stringstream ss;
+		EXPECT_NO_THROW(ss << parser.print_help());
+	}
+	{
+		std::stringstream ss;
+		EXPECT_NO_THROW(ss << parser.print_options());
+	}
 }
