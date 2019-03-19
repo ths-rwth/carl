@@ -1,6 +1,7 @@
 sonar.projectKey=${PROJECT_FULLNAME}
 sonar.projectName=${${PROJECT_FULLNAME}_NAME}
 sonar.projectVersion=${PROJECT_VERSION}
+sonar.sourceEncoding=UTF-8
 
 # =====================================================
 #   Meta-data for the project
@@ -20,6 +21,8 @@ sonar.links.issue=https://github.com/smtrat/carl/issues
 sonar.language=cpp
 sonar.sources=src/
 sonar.cpp.file.suffixes=.h,.tpp,.cpp
+sonar.log.level=INFO
+sonar.verbose=false
 
 # Properties specific to the C/C++ analyzer:
 sonar.cfamily.build-wrapper-output=bw-output
