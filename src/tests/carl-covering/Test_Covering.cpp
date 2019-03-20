@@ -25,6 +25,11 @@ TEST(Covering, SetCover) {
 	EXPECT_EQ(sc.element_count(), 4);
 	EXPECT_EQ(sc.largest_set(), 1);
 	EXPECT_EQ(sc.get_uncovered(), carl::Bitset({1}));
+
+	{
+		std::stringstream ss;
+		EXPECT_NO_THROW(ss << sc);
+	}
 }
 
 TEST(Covering, TypedSetCover) {
