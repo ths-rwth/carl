@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <boost/program_options/errors.hpp>
 #include <carl-settings/settings_utils.h>
 
 #include "../Common.h"
@@ -70,6 +71,11 @@ TEST(settings_utils, duration_validate) {
 	validate(res, { "5h" }, static_cast<duration*>(nullptr), 0);
 	EXPECT_TRUE(res.type() == typeid(duration));
 	EXPECT_EQ(boost::any_cast<duration>(res), duration(std::chrono::hours(5)));
+
+	EXPECT_THROW(validate(res, { "" }, static_cast<duration*>(nullptr), 0), boost::program_options::invalid_option_value);
+	EXPECT_THROW(validate(res, { "ms" }, static_cast<duration*>(nullptr), 0), boost::program_options::invalid_option_value);
+	EXPECT_THROW(validate(res, { "5r" }, static_cast<duration*>(nullptr), 0), boost::program_options::invalid_option_value);
+	EXPECT_THROW(validate(res, { "abc" }, static_cast<duration*>(nullptr), 0), boost::program_options::invalid_option_value);
 }
 
 TEST(settings_utils, binary_quantity) {
@@ -218,6 +224,11 @@ TEST(settings_utils, binary_quantity_validate) {
 	validate(res, { "5E" }, static_cast<binary_quantity*>(nullptr), 0);
 	EXPECT_TRUE(res.type() == typeid(binary_quantity));
 	EXPECT_EQ(boost::any_cast<binary_quantity>(res), binary_quantity(5UL * 1024 * 1024 * 1024 * 1024 * 1024 * 1024));
+
+	EXPECT_THROW(validate(res, { "" }, static_cast<binary_quantity*>(nullptr), 0), boost::program_options::invalid_option_value);
+	EXPECT_THROW(validate(res, { "K" }, static_cast<binary_quantity*>(nullptr), 0), boost::program_options::invalid_option_value);
+	EXPECT_THROW(validate(res, { "5L" }, static_cast<binary_quantity*>(nullptr), 0), boost::program_options::invalid_option_value);
+	EXPECT_THROW(validate(res, { "abc" }, static_cast<binary_quantity*>(nullptr), 0), boost::program_options::invalid_option_value);
 }
 
 TEST(settings_utils, metric_quantity) {
@@ -342,4 +353,9 @@ TEST(settings_utils, metric_quantity_validate) {
 	validate(res, { "5E" }, static_cast<metric_quantity*>(nullptr), 0);
 	EXPECT_TRUE(res.type() == typeid(metric_quantity));
 	EXPECT_EQ(boost::any_cast<metric_quantity>(res), metric_quantity(5000000000000000000));
+
+	EXPECT_THROW(validate(res, { "" }, static_cast<metric_quantity*>(nullptr), 0), boost::program_options::invalid_option_value);
+	EXPECT_THROW(validate(res, { "K" }, static_cast<metric_quantity*>(nullptr), 0), boost::program_options::invalid_option_value);
+	EXPECT_THROW(validate(res, { "5L" }, static_cast<metric_quantity*>(nullptr), 0), boost::program_options::invalid_option_value);
+	EXPECT_THROW(validate(res, { "abc" }, static_cast<metric_quantity*>(nullptr), 0), boost::program_options::invalid_option_value);
 }
