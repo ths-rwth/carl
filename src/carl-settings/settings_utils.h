@@ -30,7 +30,7 @@ std::pair<std::intmax_t,std::size_t> get_proper_suffix(std::intmax_t value, cons
  * - access values with `std::chrono::seconds(d)`
  */
 struct duration: std::chrono::nanoseconds {
-	constexpr duration() = default;
+	duration() = default;
 	template<typename... Args>
 	// NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions): we actually want to implicitly convert here.
 	constexpr duration(Args&&... args): std::chrono::nanoseconds(std::forward<Args>(args)...) {}
