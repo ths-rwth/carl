@@ -13,8 +13,10 @@ function fold_end {
 }
 function fold {
 	fold_start "$1"
-	${@:2}
+	eval ${@:2}
+	rc=$?
 	fold_end "$1"
+	return $rc
 }
 
 mkdir -p build || return 1
