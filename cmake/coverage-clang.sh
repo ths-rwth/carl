@@ -3,9 +3,10 @@
 DIR=`pwd`
 
 mkdir -p coverage/
-mkdir -p coverage-out/
+mkdir -p coverage-html/
 rm -f coverage/*
-rm -f coverage-out/*
+rm -rf coverage-html/*
+
 
 make
 make test LLVM_PROFILE_FILE=$DIR/coverage/%p.profraw
@@ -14,12 +15,8 @@ echo "Merging profile data..."
 llvm-profdata merge -sparse coverage/*.profraw -o llvm.profdata
 
 echo "Dumping coverage data..."
-llvm-cov show -instr-profile llvm.profdata libcarl.so > coverage-out/coverage.txt
-llvm-cov show -instr-profile llvm.profdata libcarl-cad.so > coverage-out/coverage-cad.txt
-llvm-cov show -instr-profile llvm.profdata libcarl-settings.so > coverage-out/coverage-settings.txt
-for f in `ls bin/` ; do 
-	llvm-cov show -instr-profile llvm.profdata bin/$f > coverage-out/coverage-$f.txt
-done
-echo "Merging coverage data..."
-cat coverage-out/*.txt > coverage.txt
+ARG1=`ls libcarl*.so | /usr/bin/grep -v carl-cad | sed 's/^/ -object /' | xargs`
+ARG2=`find bin/ -type f | sed 's/^/ -object /' | xargs`
+eval "llvm-cov show -instr-profile llvm.profdata libcarl.so $ARG1 $ARG2 > coverage.txt"
+eval "llvm-cov show -Xdemangler c++filt -instr-profile llvm.profdata -format html -output-dir coverage-html/ libcarl.so $ARG1 $ARG2"
 
