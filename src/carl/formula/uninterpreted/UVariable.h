@@ -29,6 +29,10 @@ public:
 	 * The resulting object will not be a valid variable, but a dummy object.
 	 */
 	UVariable() = default;
+	UVariable(const UVariable&) = default;
+	UVariable(UVariable&&) = default;
+	UVariable& operator=(const UVariable&) = default;
+	UVariable& operator=(UVariable&&) = default;
 
 	explicit UVariable(Variable var)
 		: mVar(var),
