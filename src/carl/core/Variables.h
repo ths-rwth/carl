@@ -41,14 +41,14 @@ public:
 	}
 
 	auto begin() const {
-		compact();
+		compact(true);
 		return mVariables.begin();
 	}
 	auto end() const {
 		return mVariables.end();
 	}
 	auto begin() {
-		compact();
+		compact(true);
 		return mVariables.begin();
 	}
 	auto end() {
