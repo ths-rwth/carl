@@ -277,9 +277,13 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 		if (!tmp.has(i.first)) {
 			if (p.has(i.first)) {
 				CARL_LOG_DEBUG("carl.ran", i.first << " vanished from " << tmp << " but was present in " << p);
-				if (i.second.isInterval()) {
+				if (i.second.isNumeric()) {
+					varToInterval[i.first] = Interval<Number>(i.second.value(), BoundType::WEAK, i.second.value(), BoundType::WEAK);
+				} else if (i.second.isInterval()) {
 					// Variable vanished, add it to varToInterval
 					varToInterval[i.first] = i.second.getInterval();
+				} else {
+					CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
 				}
 			}
 			continue;
@@ -287,6 +291,7 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 		if (i.second.isNumeric()) {
 			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
 			tmp.substituteIn(i.first, Coeff(i.second.value()));
+			varToInterval[i.first] = Interval<Number>(i.second.value(), BoundType::WEAK, i.second.value(), BoundType::WEAK);
 		} else if (i.second.isInterval()) {
 			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
 			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
