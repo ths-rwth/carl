@@ -22,6 +22,8 @@ sonar.language=cpp
 sonar.sources=src/
 sonar.c.file.suffixes=.c
 sonar.cpp.file.suffixes=.h,.tpp,.cpp
+sonar.java.file.suffixes=
+sonar.python.file.suffixes=
 sonar.log.level=INFO
 sonar.verbose=false
 
