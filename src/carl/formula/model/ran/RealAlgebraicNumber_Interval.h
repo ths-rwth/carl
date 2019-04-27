@@ -367,6 +367,9 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 				if (!is_number(i.second)) {
 					// Variable vanished, add it to varToInterval
 					varToInterval[i.first] = i.second.interval();
+				} else {
+					assert(i.second.interval().isPointInterval());
+					varToInterval[i.first] = i.second.interval();
 				}
 			}
 			continue;
@@ -374,6 +377,7 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 		if (is_number(i.second)) {
 			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
 			tmp.substituteIn(i.first, Coeff(get_number(i.second)));
+			varToInterval[i.first] = i.second.interval();
 		} else {
 			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
 			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
