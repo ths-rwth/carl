@@ -91,6 +91,59 @@ TEST(RootFinder, evalRoots)
 	EXPECT_TRUE(roots.front() == xval);
 }
 
+TEST(RootFinder, tryRealRoots)
+{
+	carl::Variable x = freshRealVariable("x");
+	carl::Variable y = freshRealVariable("y");
+	carl::Variable z = freshRealVariable("z");
+
+	//UMPolynomial p(x, { MPolynomial(0), -MPolynomial(2)*MPolynomial(y)-z });
+	UMPolynomial p(x, { MPolynomial(0), -MPolynomial(y)-z });
+
+	UPolynomial ypoly(y, {-8, 0, 3});
+	carl::Interval<Rational> yint(Rational(209)/128, carl::BoundType::STRICT, Rational(2509)/1536, carl::BoundType::STRICT);
+	carl::RealAlgebraicNumber<Rational> yval(ypoly, yint);
+
+	//UPolynomial zpoly(y, {-32, 0, 3});
+	//carl::Interval<Rational> zint(Rational(38)/12, carl::BoundType::STRICT, Rational(10)/3, carl::BoundType::STRICT);
+	//carl::RealAlgebraicNumber<Rational> zval(zpoly, zint);
+	UPolynomial zpoly(y, {-8, 0, 3});
+	carl::Interval<Rational> zint(Rational(19)/12, carl::BoundType::STRICT, Rational(5)/3, carl::BoundType::STRICT);
+	carl::RealAlgebraicNumber<Rational> zval(zpoly, zint);
+
+	{
+		UPolynomial py(y, { -8, 0, 3 });
+		UPolynomial pz(z, { -8, 0, 3 });
+
+		yval = carl::realRootsZ3(py, Interval<Rational>::unboundedInterval())[1];
+		zval = carl::realRootsZ3(pz, Interval<Rational>::unboundedInterval())[1];
+	}
+
+    //-1*x*y + -1*x*z < 0
+	//{
+	//	y = (IR ]209/128, 2509/1536[, (3)*__r^2 + -8 R),
+	//	z = (IR ]19/12, 5/3[, __r^2 + -8/3 R)
+	//}
+
+	std::map<carl::Variable, carl::RealAlgebraicNumber<Rational>> m = {
+		{ y, yval }, {z, zval }
+	};
+	std::cout << "y = z? " << (yval == zval) << std::endl;
+	std::cout << p << std::endl;
+	std::cout << m << std::endl;
+	auto roots = carl::rootfinder::realRoots(p, m);
+	std::cout << "-> " << roots << std::endl;
+
+	carl::LazardEvaluation<Rational,MPolynomial> le((MPolynomial(p)));
+	le.substitute(y, yval);
+	le.substitute(z, zval);
+	std::cout << "Lazard: " << le.getLiftingPoly() << std::endl;
+	{
+		auto roots = carl::rootfinder::realRoots(le.getLiftingPoly().toUnivariatePolynomial(x), m);
+		std::cout << "-> " << roots << std::endl;
+	}
+}
+
 TEST(RootFinder, Chebyshev)
 {
 	carl::Chebyshev<Rational> chebyshev(freshRealVariable("x"));
