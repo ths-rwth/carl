@@ -1,8 +1,10 @@
+
 #include <gtest/gtest.h>
 
 #include <carl/core/rootfinder/RootFinder.h>
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/polynomialfunctions/Chebyshev.h>
+#include "carl/core/polynomialfunctions/LazardEvaluation.h"
 
 #include "../Common.h"
 
@@ -115,8 +117,8 @@ TEST(RootFinder, tryRealRoots)
 		UPolynomial py(y, { -8, 0, 3 });
 		UPolynomial pz(z, { -8, 0, 3 });
 
-		yval = carl::realRootsZ3(py, Interval<Rational>::unboundedInterval())[1];
-		zval = carl::realRootsZ3(pz, Interval<Rational>::unboundedInterval())[1];
+		//yval = carl::realRootsZ3(py, Interval<Rational>::unboundedInterval())[1];
+		//zval = carl::realRootsZ3(pz, Interval<Rational>::unboundedInterval())[1];
 	}
 
     //-1*x*y + -1*x*z < 0
