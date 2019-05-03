@@ -2,6 +2,9 @@
 
 #include "SetCover.h"
 
+#include <map>
+#include <vector>
+
 namespace carl::covering {
 
 /**
