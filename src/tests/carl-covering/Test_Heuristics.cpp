@@ -14,6 +14,12 @@ TypedSetCover<int> get_example() {
 	return tsc;
 }
 
+TEST(heuristics, exact) {
+	TypedSetCover<int> tsc = get_example();
+	auto cover = tsc.get_cover(heuristic::exact);
+	EXPECT_EQ(cover, std::vector<int>({2,3,4}));
+}
+
 TEST(heuristics, greedy) {
 	TypedSetCover<int> tsc = get_example();
 	auto cover = tsc.get_cover(heuristic::greedy);
