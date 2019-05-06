@@ -31,7 +31,7 @@ template<typename T, typename F>
 Bitset greedy_weighted(TypedSetCover<T>& tsc, F&& weight, std::size_t bound = 12) {
 	std::vector<double> weights;
 	for (std::size_t sid = 0; sid < tsc.set_cover().set_count(); ++sid) {
-		weights.emplace_back(weight(tsc.set_cover().get_set(sid)));
+		weights.emplace_back(weight(tsc.get_set(sid)));
 	}
 	return greedy_weighted(tsc.set_cover(), weights, bound);
 }
