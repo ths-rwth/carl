@@ -43,8 +43,21 @@ public:
 		mSetCover.set(get_set_id(s), elements);
 	}
 
+	const Set& get_set(std::size_t sid) const {
+		assert(sid < mSets.size());
+		return mSets[sid];
+	}
+
 	/// Returns the underlying set cover.
 	operator const SetCover&() const {
+		return mSetCover;
+	}
+	/// Returns the underlying set cover.
+	const auto& set_cover() const {
+		return mSetCover;
+	}
+	/// Returns the underlying set cover.
+	auto& set_cover() {
 		return mSetCover;
 	}
 

@@ -27,12 +27,44 @@ std::size_t SetCover::element_count() const {
 	return max;
 }
 
+void SetCover::prune_sets() {
+	for (auto& d: mSets) {
+		if (d.none()) {
+			d = Bitset();
+		}
+	}
+}
+
+std::size_t SetCover::set_count() const {
+	return mSets.size();
+}
+
+std::size_t SetCover::active_set_count() const {
+	return static_cast<std::size_t>(std::count_if(mSets.begin(), mSets.end(),
+		[](const auto& d){ return d.any(); }
+	));
+}
+
 std::size_t SetCover::largest_set() const {
 	assert(mSets.size() > 0);
 	std::size_t largest_id = 0;
 	std::size_t largest_size = mSets[0].count();
 	for (std::size_t id = 1; id < mSets.size(); id++) {
 		std::size_t size = mSets[id].count();
+		if (size > largest_size) {
+			largest_id = id;
+			largest_size = size;
+		}
+	}
+	return largest_id;
+}
+
+std::size_t SetCover::largest_set(const std::vector<double>& weights) const {
+	assert(mSets.size() > 0);
+	std::size_t largest_id = 0;
+	double largest_size = mSets[0].count() * weights[0];
+	for (std::size_t id = 1; id < mSets.size(); id++) {
+		double size = mSets[id].count() * weights[id];
 		if (size > largest_size) {
 			largest_id = id;
 			largest_size = size;
