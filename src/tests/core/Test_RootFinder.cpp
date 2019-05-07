@@ -100,17 +100,17 @@ TEST(RootFinder, tryRealRoots)
 	carl::Variable z = freshRealVariable("z");
 
 	//UMPolynomial p(x, { MPolynomial(0), -MPolynomial(2)*MPolynomial(y)-z });
-	UMPolynomial p(x, { MPolynomial(0), -MPolynomial(y)-z });
+	UMPolynomial p(x, { MPolynomial(0), MPolynomial(y)+z });
 
-	UPolynomial ypoly(y, {-8, 0, 3});
-	carl::Interval<Rational> yint(Rational(209)/128, carl::BoundType::STRICT, Rational(2509)/1536, carl::BoundType::STRICT);
+	UPolynomial ypoly(y, {-2, 0, 1});
+	carl::Interval<Rational> yint(Rational(1), carl::BoundType::STRICT, Rational(2), carl::BoundType::STRICT);
 	carl::RealAlgebraicNumber<Rational> yval(ypoly, yint);
 
-	//UPolynomial zpoly(y, {-32, 0, 3});
+	//UPolynomial zpoly(y, {-32, 0, 1});
 	//carl::Interval<Rational> zint(Rational(38)/12, carl::BoundType::STRICT, Rational(10)/3, carl::BoundType::STRICT);
 	//carl::RealAlgebraicNumber<Rational> zval(zpoly, zint);
-	UPolynomial zpoly(y, {-8, 0, 3});
-	carl::Interval<Rational> zint(Rational(19)/12, carl::BoundType::STRICT, Rational(5)/3, carl::BoundType::STRICT);
+	UPolynomial zpoly(y, {-2, 0, 1});
+	carl::Interval<Rational> zint(Rational(1), carl::BoundType::STRICT, Rational(2), carl::BoundType::STRICT);
 	carl::RealAlgebraicNumber<Rational> zval(zpoly, zint);
 
 	{
