@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../../formula/model/Model.h"
-#include "../../formula/model/evaluation/ModelEvaluation.h"
+#include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
 
 #ifdef USE_COCOA
 
@@ -72,7 +71,7 @@ template<typename Rational, typename Poly>
 class LazardEvaluation {
 private:
 	CoCoA::ring mQ = CoCoA::RingQQ();
-	Model<Rational, Poly> mModel;
+	std::map<Variable,RealAlgebraicNumber<Rational>> mModel;
 	
 	detail_lazard::CoCoAConverter cc;
 	std::map<Variable, CoCoA::RingElem> mSymbolsThere;
@@ -91,11 +90,9 @@ private:
 	
 	bool evaluatesToZero(const CoCoA::RingElem& p, const detail_lazard::CoCoAConverter::ConversionInfo& ci) const {
 		auto mp = cc.convertMV<Poly>(p, ci);
-		auto res = carl::model::evaluate(mp, mModel);
+		auto res = carl::RealAlgebraicNumberEvaluation::evaluate(mp, mModel);
 		CARL_LOG_DEBUG("carl.lazard", "Evaluated " << p << " -> " << mp << " -> " << res);
-		assert(res.isRational() || res.isRAN());
-		if (res.isRational()) return carl::isZero(res.asRational());
-		return carl::isZero(res.asRAN());
+		return carl::isZero(res);
 	}
 	
 	void extendRing(const CoCoA::ring& ring, const CoCoA::RingElem& p) {
