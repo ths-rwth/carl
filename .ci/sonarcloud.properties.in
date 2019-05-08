@@ -20,12 +20,13 @@ sonar.links.issue=https://github.com/smtrat/carl/issues
 # SQ standard properties
 sonar.language=cpp
 sonar.sources=src/
-sonar.c.file.suffixes=.c
-sonar.cpp.file.suffixes=.h,.tpp,.cpp
-sonar.java.file.suffixes=
-sonar.python.file.suffixes=
 sonar.log.level=INFO
 sonar.verbose=false
+
+sonar.lang.patterns.c=.c
+sonar.lang.patterns.cpp=.h,.tpp,.cpp
+sonar.lang.patterns.java=
+sonar.lang.patterns.python=
 
 # Properties specific to the C/C++ analyzer:
 sonar.cfamily.build-wrapper-output=bw-output

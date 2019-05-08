@@ -1,4 +1,7 @@
-#include "greedy.h"
+#include "exact.h"
+
+#include "remove_duplicates.h"
+#include "select_essential.h"
 
 #include <carl/core/logging.h>
 
@@ -20,7 +23,7 @@ std::optional<Bitset> exact_of_size(const SetCover& sc, const Bitset& uncovered,
 		if (uncovered.is_subset_of(covered)) {
 			Bitset result;
 			for (std::size_t id = 0; id < selection.size(); ++id) {
-				result.set(id, id_map[selection[id]]);
+				result.set(id_map[id], selection[id]);
 			}
 			return result;
 		}
@@ -29,7 +32,18 @@ std::optional<Bitset> exact_of_size(const SetCover& sc, const Bitset& uncovered,
 }
 
 Bitset exact(SetCover& sc) {
+	Bitset pre;
+	pre |= carl::covering::heuristic::remove_duplicates(sc);
+	CARL_LOG_DEBUG("carl.covering", "Removed duplicates: " << pre << std::endl << sc);
+	pre |= carl::covering::heuristic::select_essential(sc);
+	CARL_LOG_DEBUG("carl.covering", "Selected essential: " << pre << std::endl << sc);
+
 	const auto uncovered = sc.get_uncovered();
+	if (uncovered.none()) {
+		CARL_LOG_DEBUG("carl.covering", "trivially solved by preprocessing");
+		return pre;
+	}
+	CARL_LOG_DEBUG("carl.covering", "Remaining: " << uncovered);
 
 	// Maps local ids to ids in sc. We only consider active sets for local ids.
 	std::vector<std::size_t> id_map;
@@ -40,11 +54,12 @@ Bitset exact(SetCover& sc) {
 	for (std::size_t size = 0; size < sc.active_set_count(); ++size) {
 		auto res = exact_of_size(sc, uncovered, id_map, size);
 		if (res) {
-			return *res;
+			CARL_LOG_DEBUG("carl.covering", "Got exact covering of size " << size << " -> " << *res);
+			return pre | *res;
 		}
 	}
 
-	CARL_LOG_ERROR("smtrat.mis", "Did not find an exact set cover.")
+	CARL_LOG_ERROR("carl.covering", "Did not find an exact set cover.")
 	return Bitset();
 }
 
