@@ -68,8 +68,6 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
  */
 template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m);
-template<typename Number>
-RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m);
 
 /**
  * Compute a univariate polynomial with rational coefficients that has the roots of 'p' whose coefficient variables have been substituted by the roots given in m.
@@ -205,65 +203,7 @@ bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
 	);
 }
 
-
-/**
- * Evaluate the given polynomial with the given values for the variables.
- * Asserts that all variables of p have an assignment in m and that m has no additional assignments.
- *
- * @param p Polynomial to be evaluated
- * @param m Variable assignment
- * @return Evaluation result
- */
-template<typename Number>
-RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m) {
-	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
-	assert(m.size() > 0);
-	auto poly = p.toUnivariatePolynomial(m.begin()->first);
-	if (m.size() == 1 && m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
-		return RealAlgebraicNumber<Number>();
-	}
-	Variable v = freshRealVariable();
-	// compute the result polynomial and the initial result interval
-	std::map<Variable, Interval<Number>> varToInterval;
-	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m, varToInterval);
-	assert(!varToInterval.empty());
-	poly = p.toUnivariatePolynomial(varToInterval.begin()->first);
-	CARL_LOG_DEBUG("carl.ran", "res = " << res);
-	CARL_LOG_DEBUG("carl.ran", "varToInterval = " << varToInterval);
-	CARL_LOG_DEBUG("carl.ran", "poly = " << poly);
-	Interval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
-	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
-
-	auto sturmSeq = sturm_sequence(res);
-	// the interval should include at least one root.
-	assert(!carl::isZero(res));
-	assert(
-		res.sgn(interval.lower()) == Sign::ZERO ||
-		res.sgn(interval.upper()) == Sign::ZERO ||
-		count_real_roots(sturmSeq, interval) >= 1
-	);
-	while (
-		res.sgn(interval.lower()) == Sign::ZERO ||
-		res.sgn(interval.upper()) == Sign::ZERO ||
-		count_real_roots(sturmSeq, interval) != 1) {
-		// refine the result interval until it isolates exactly one real root of the result polynomial
-		for (auto it = m.begin(); it != m.end(); it++) {
-			it->second.refine();
-			if (it->second.isNumeric()) {
-				return evaluate(p, m);
-			} else if (it->second.isInterval()) {
-				varToInterval[it->first] = it->second.getInterval();
-			} else {
-				CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
-			}
-		}
-		interval = IntervalEvaluation::evaluate(poly, varToInterval);
-	}
-	CARL_LOG_DEBUG("carl.ran", "Result is " << RealAlgebraicNumber<Number>(res, interval, sturmSeq));
-	return RealAlgebraicNumber<Number>(res, interval, sturmSeq);
-}
-
-
+// TODO this is a duplicate of the version in RealAlgebraicNumber_Interval:
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluatePolynomial(
 		const UnivariatePolynomial<Coeff>& p,
