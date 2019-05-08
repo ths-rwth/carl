@@ -54,6 +54,8 @@ option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( RAN_USE_THOM "Enable real algebraic numbers based on thom encodings" OFF )
 option( RAN_USE_Z3 "Enable real algebraic numbers from z3" OFF )
 
+option( ROOTFINDER_LE "Use LazardEvaluation in RootFinder" OFF )
+
 set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

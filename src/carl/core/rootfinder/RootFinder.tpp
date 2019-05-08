@@ -14,6 +14,10 @@
 
 #include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
 
+#ifdef ROOTFINDER_LE
+#include "../polynomialfunctions/LazardEvaluation.h"
+#endif
+
 namespace carl {
 namespace rootfinder {
 
@@ -69,7 +73,17 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 	} else {
 		CARL_LOG_TRACE("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 		assert(IRmap.find(polyCopy.mainVar()) == IRmap.end());
-		UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(polyCopy, IRmap);
+
+		#ifdef ROOTFINDER_LE
+			LazardEvaluation<Number,MultivariatePolynomial<Number>> le((MultivariatePolynomial<Number>(polyCopy)));
+			for(auto const& [var, val] : IRmap)
+				le.substitute(var, val);
+
+			UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(le.getLiftingPoly().toUnivariatePolynomial(polyCopy.mainVar()), IRmap);
+		#else
+			UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(polyCopy, IRmap);
+		#endif
+
 		if (carl::isZero(evaledpoly)) return {};
 		CARL_LOG_TRACE("carl.core.rootfinder", "Calling on " << evaledpoly);
 		auto res = realRoots(evaledpoly, interval, pivoting);

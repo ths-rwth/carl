@@ -16,3 +16,5 @@
 
 #cmakedefine RAN_USE_THOM
 #cmakedefine RAN_USE_Z3
+
+#cmakedefine ROOTFINDER_LE
