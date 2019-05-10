@@ -23,11 +23,6 @@ sonar.sources=src/
 sonar.log.level=INFO
 sonar.verbose=false
 
-sonar.lang.patterns.c=.c
-sonar.lang.patterns.cpp=.h,.tpp,.cpp
-sonar.lang.patterns.java=
-sonar.lang.patterns.python=
-
 # Properties specific to the C/C++ analyzer:
 sonar.cfamily.build-wrapper-output=bw-output
 sonar.cfamily.gcov.reportsPath=.

@@ -14,6 +14,6 @@ RUN		cd carl/ &&\
 		mkdir -p build/ &&\
 		ls &&\
 		cd build/ &&\
-		cmake ../ &&\
+		cmake -DUSE_COCOA=ON ../ &&\
 		make &&\
 		make test
