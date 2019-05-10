@@ -77,8 +77,9 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		#ifdef ROOTFINDER_LE
 			LazardEvaluation<Number,MultivariatePolynomial<Number>> le((MultivariatePolynomial<Number>(polyCopy)));
 			for(auto const& [var, val] : IRmap)
-				le.substitute(var, val);
+				le.substitute(var, val, false);
 
+			CARL_LOG_TRACE("carl.core.rootfinder", "LE got " << le.getLiftingPoly().toUnivariatePolynomial(polyCopy.mainVar()));
 			UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(le.getLiftingPoly().toUnivariatePolynomial(polyCopy.mainVar()), IRmap);
 		#else
 			UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(polyCopy, IRmap);
