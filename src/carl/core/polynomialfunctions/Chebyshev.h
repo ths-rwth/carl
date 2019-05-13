@@ -11,7 +11,7 @@ namespace carl {
 template<typename Number>
 struct Chebyshev {
 	Variable mVar;
-	Chebyshev(Variable v): mVar(v) {}
+	explicit Chebyshev(Variable v): mVar(v) {}
 
 	UnivariatePolynomial<Number> operator()(std::size_t n) const {
 		UnivariatePolynomial<Number> t0(mVar, Number(1), 0);
