@@ -54,6 +54,9 @@ Bitset exact(SetCover& sc) {
 	for (std::size_t size = 0; size < sc.active_set_count(); ++size) {
 		auto res = exact_of_size(sc, uncovered, id_map, size);
 		if (res) {
+			for (auto bit: *res) {
+				sc.select_set(bit);
+			}
 			CARL_LOG_DEBUG("carl.covering", "Got exact covering of size " << size << " -> " << *res);
 			return pre | *res;
 		}
