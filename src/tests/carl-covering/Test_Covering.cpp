@@ -41,7 +41,7 @@ TEST(Covering, TypedSetCover) {
 	tsc.set(1, 1);
 	tsc.set(1, 3);
 
-	const SetCover& sc = tsc;
+	const auto& sc = static_cast<SetCover>(tsc);
 
 	EXPECT_EQ(sc.set_count(), 2);
 	EXPECT_EQ(sc.get_set(0), carl::Bitset({0, 2, 3}));
