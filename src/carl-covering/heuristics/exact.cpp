@@ -12,7 +12,7 @@ namespace carl::covering::heuristic {
 std::optional<Bitset> exact_of_size(const SetCover& sc, const Bitset& uncovered, const std::vector<std::size_t>& id_map, std::size_t size) {
 	std::vector<bool> selection(id_map.size() - size, false);
 	selection.resize(id_map.size(), true);
-	
+
 	do {
 		Bitset covered;
 		for (std::size_t id = 0; id < selection.size(); ++id) {

@@ -49,7 +49,7 @@ std::size_t SetCover::largest_set() const {
 	assert(mSets.size() > 0);
 	std::size_t largest_id = 0;
 	std::size_t largest_size = mSets[0].count();
-	for (std::size_t id = 1; id < mSets.size(); id++) {
+	for (std::size_t id = 1; id < mSets.size(); ++id) {
 		std::size_t size = mSets[id].count();
 		if (size > largest_size) {
 			largest_id = id;
@@ -63,7 +63,7 @@ std::size_t SetCover::largest_set(const std::vector<double>& weights) const {
 	assert(mSets.size() > 0);
 	std::size_t largest_id = 0;
 	double largest_size = mSets[0].count() * weights[0];
-	for (std::size_t id = 1; id < mSets.size(); id++) {
+	for (std::size_t id = 1; id < mSets.size(); ++id) {
 		double size = mSets[id].count() * weights[id];
 		if (size > largest_size) {
 			largest_id = id;
