@@ -121,7 +121,7 @@ private:
 			if (evaluatesToZero(f, ci)) {
 				CARL_LOG_DEBUG("carl.lazard", "Factor " << f << " is zero in assignment.");
 				if (CoCoA::deg(f) == 1) {
-					auto cf = -(f - CoCoA::LF(f));
+					auto cf =-(f -CoCoA::LF(f)) / CoCoA::CoeffEmbeddingHom(CoCoA::owner(f))(CoCoA::LC(f));
 					return std::make_pair(true, cc.convertMV<Poly>(cf, ci));
 				} else {
 					extendRing(ci.mRing, f);
@@ -136,7 +136,7 @@ private:
 public:
 	LazardEvaluation(const Poly& p): mLiftingPoly(p) {}
 	
-	void substitute(Variable v, const RealAlgebraicNumber<Rational>& r) {
+	void substitute(Variable v, const RealAlgebraicNumber<Rational>& r, bool divideZeroFactors = true) {
 		mModel.emplace(v, r);
 		auto red = getSubstitution(v, r);
 		Poly newPoly;
@@ -147,7 +147,7 @@ public:
 			CARL_LOG_DEBUG("carl.lazard", "Obtained reductor " << red.second);
 			newPoly = mLiftingPoly.remainder(red.second);
 		}
-		while (carl::isZero(newPoly)) {
+		while (carl::isZero(newPoly) && divideZeroFactors) {
 			if (red.first) {
 				mLiftingPoly = mLiftingPoly.quotient(v - red.second);
 				newPoly = mLiftingPoly.substitute(v, red.second);
