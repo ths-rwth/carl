@@ -1,4 +1,4 @@
-/** 
+/**
  * @file   Timer.h
  * @author Sebastian Junges
  * @author Gereon Kremer
@@ -33,7 +33,7 @@ public:
 		clock::duration d(clock::now() - mStart);
 		return std::chrono::duration_cast<duration>(d).count();
 	}
-	
+
 	/**
 	 * Reset the start point to now.
 	 */
