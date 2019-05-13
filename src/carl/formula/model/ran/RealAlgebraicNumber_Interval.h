@@ -395,6 +395,37 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	return tmp.switchVariable(v).toNumberCoefficients();
 }
 
+template<typename Number, typename Coeff>
+UnivariatePolynomial<Number> evaluatePolynomial(
+		const UnivariatePolynomial<Coeff>& p,
+		const std::map<Variable, IntervalContent<Number>>& m
+) {
+	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
+	Variable v = p.mainVar();
+	UnivariatePolynomial<Coeff> tmp = p;
+	for (const auto& i: m) {
+		if (!tmp.has(i.first)) {
+			continue;
+		}
+		if (is_number(i.second)) {
+			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
+			tmp.substituteIn(i.first, Coeff(get_number(i.second)));
+		} else {
+			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
+			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
+			UnivariatePolynomial<Coeff> p2(i.first, i.second.polynomial().template convert<Coeff>().coefficients());
+			CARL_LOG_DEBUG("carl.ran", "Simplifying " << tmp.switchVariable(i.first) << " with " << p2);
+			tmp = tmp.switchVariable(i.first).prem(p2);
+			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp);
+			tmp = carl::resultant(tmp, p2);
+			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
+		}
+		CARL_LOG_DEBUG("carl.ran", "Substituted " << i.first << " -> " << i.second << ", result: " << tmp);
+	}
+	CARL_LOG_DEBUG("carl.ran", "Result: " << tmp.switchVariable(v).toNumberCoefficients());
+	return tmp.switchVariable(v).toNumberCoefficients();
+}
+
 /**
  * Evaluate the given polynomial with the given values for the variables.
  * Asserts that all variables of p have an assignment in m and that m has no additional assignments.

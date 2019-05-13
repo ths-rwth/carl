@@ -10,15 +10,9 @@
 #include <map>
 #include <vector>
 
-
-
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicPoint.h"
 
-
-#include "../../../core/MultivariatePolynomial.h"
-#include "../../../core/polynomialfunctions/Resultant.h"
-#include "../../../interval/IntervalEvaluation.h"
 #include "../../../util/SFINAE.h"
 
 namespace carl {
@@ -79,12 +73,12 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, co
  * @param varToInterval
  * @return a univariate polynomial with rational coefficients (and p's main variable) that has the roots of p whose coefficient variables have been substituted by the roots given in m
  */
-template<typename Number, typename Coeff>
-UnivariatePolynomial<Number> evaluatePolynomial(
-		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
-		std::map<Variable, Interval<Number>>& varToInterval
-);
+// template<typename Number, typename Coeff>
+// UnivariatePolynomial<Number> evaluatePolynomial(
+// 		const UnivariatePolynomial<Coeff>& p,
+// 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
+// 		std::map<Variable, Interval<Number>>& varToInterval
+// );
 template<typename Number>
 MultivariatePolynomial<Number> evaluatePolynomial(
 		const MultivariatePolynomial<Number>& p,
@@ -98,15 +92,13 @@ MultivariatePolynomial<Number> evaluatePolynomial(
  * The map varToInterval gives back an assignment of variables to the isolating intervals of the roots for each variable.
  * @param p polynomial to be evaluated in the given variables. This should be a univariate polynomial in a variable <i>not</i> occurring in variables.
  * @param m map assigning each variable of p an interval-represented RealAlgebraicNumber
- * @param varToInterval
  * @return rational univariate polynomial having all real roots of the polynomial whose coefficients are evaluated according to m
  * @see Constraint::satisfiedBy and CAD::samples for usages of this method
  */
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluateCoefficients(
 		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
-		std::map<Variable, Interval<Number>>& varToInterval
+		const std::map<Variable, RealAlgebraicNumber<Number>>& m
 );
 
 
@@ -203,98 +195,43 @@ bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
 	);
 }
 
-// TODO this is a duplicate of the version in RealAlgebraicNumber_Interval:
-template<typename Number, typename Coeff>
-UnivariatePolynomial<Number> evaluatePolynomial(
-		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
-		std::map<Variable, Interval<Number>>& varToInterval
-) {
-	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
-	Variable v = p.mainVar();
-	UnivariatePolynomial<Coeff> tmp = p;
-	for (const auto& i: m) {
-		if (!tmp.has(i.first)) {
-			if (p.has(i.first)) {
-				CARL_LOG_DEBUG("carl.ran", i.first << " vanished from " << tmp << " but was present in " << p);
-				if (i.second.isNumeric()) {
-					varToInterval[i.first] = Interval<Number>(i.second.value(), BoundType::WEAK, i.second.value(), BoundType::WEAK);
-				} else if (i.second.isInterval()) {
-					// Variable vanished, add it to varToInterval
-					varToInterval[i.first] = i.second.getInterval();
-				} else {
-					CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
-				}
-			}
-			continue;
-		}
-		if (i.second.isNumeric()) {
-			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
-			tmp.substituteIn(i.first, Coeff(i.second.value()));
-			varToInterval[i.first] = Interval<Number>(i.second.value(), BoundType::WEAK, i.second.value(), BoundType::WEAK);
-		} else if (i.second.isInterval()) {
-			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
-			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
-			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
-			CARL_LOG_DEBUG("carl.ran", "Simplifying " << tmp.switchVariable(i.first) << " with " << p2);
-			tmp = tmp.switchVariable(i.first).prem(p2);
-			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp);
-			tmp = carl::resultant(tmp, p2);
-			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
-			varToInterval[i.first] = i.second.getInterval();
-		} else {
-			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
-		}
-		CARL_LOG_DEBUG("carl.ran", "Substituted " << i.first << " -> " << i.second << ", result: " << tmp);
-	}
-	CARL_LOG_DEBUG("carl.ran", "Result: " << tmp.switchVariable(v).toNumberCoefficients());
-	return tmp.switchVariable(v).toNumberCoefficients();
-}
-
 template<typename Number,  typename Coeff>
 UnivariatePolynomial<Number> evaluatePolynomial(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m
 ) {
-	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
-	Variable v = p.mainVar();
-	UnivariatePolynomial<Coeff> tmp = p;
-	for (const auto& i: m) {
-		if (!tmp.has(i.first)) {
-			// Variable vanished, skip it
-			continue;
-		}
-		if (i.second.isNumeric()) {
-			CARL_LOG_DEBUG("carl.ran", "Direct substitution: " << i.first << " = " << i.second);
-			tmp.substituteIn(i.first, Coeff(i.second.value()));
-		} else if (i.second.isInterval()) {
-			CARL_LOG_DEBUG("carl.ran", "IR substitution: " << i.first << " = " << i.second);
-			i.second.simplifyByPolynomial(i.first, MultivariatePolynomial<Number>(tmp));
-			UnivariatePolynomial<Coeff> p2(i.first, i.second.getIRPolynomial().template convert<Coeff>().coefficients());
-			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp.switchVariable(i.first));
-			tmp = tmp.switchVariable(i.first).prem(p2);
-			CARL_LOG_DEBUG("carl.ran", "Using " << p2 << " with " << tmp);
-			tmp = carl::resultant(tmp, p2);
-			CARL_LOG_DEBUG("carl.ran", "-> " << tmp);
+	CARL_LOG_TRACE("carl.ran", "EvaluatePolynomial " << p << " on " << m);
+	UnivariatePolynomial<Coeff> pol(p);
+	RANMap<Number> IRmap;
+	
+	for (const auto& r: m) {
+		if (r.second.isNumeric()) {
+			// Plug in numeric representations
+			pol.substituteIn(r.first, Coeff(r.second.value()));
 		} else {
-			CARL_LOG_WARN("carl.ran", "Unknown type of RAN.");
+			// Defer interval representations
+			IRmap.emplace(r.first, r.second);
 		}
-		CARL_LOG_DEBUG("carl.ran", "Substituted " << i.first << " -> " << i.second << ", result: " << tmp);
 	}
-	CARL_LOG_DEBUG("carl.ran", "Result: " << MultivariatePolynomial<Number>(tmp));
-	return tmp.switchVariable(v).toNumberCoefficients();
+	if (pol.isNumber()) {
+		return UnivariatePolynomial<Number>(p.mainVar(), pol.constantPart());
+	}
+
+	return overload_on_map<UnivariatePolynomial<Number>>(
+		[&p](auto& map){ return UnivariatePolynomial<Number>(ran::evaluatePolynomial(p, map)); },
+		IRmap
+	);
 }
 
 
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluateCoefficients(
 		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
-		std::map<Variable, Interval<Number>>& varToInterval
+		const std::map<Variable, RealAlgebraicNumber<Number>>& m
 ) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
 	assert(m.find(p.mainVar()) == m.end());
-	return evaluatePolynomial(p, m, varToInterval);
+	return evaluatePolynomial(p, m);
 }
 
 }

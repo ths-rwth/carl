@@ -136,6 +136,15 @@ bool evaluate(const Constraint<Poly>& c, std::map<Variable, ThomContent<Number>>
 	return evaluate(res, c.relation());
 }
 
+template<typename Number, typename Coeff>
+UnivariatePolynomial<Number> evaluatePolynomial(
+		const UnivariatePolynomial<Coeff>& p,
+		const std::map<Variable, ThomContent<Number>>& m
+) {
+	assert(false);
+	return UnivariatePolynomial<Number>(p.mainVar());
+}
+
 template<typename Number>
 ThomContent<Number> abs(const ThomContent<Number>& n) {
 	assert(false);

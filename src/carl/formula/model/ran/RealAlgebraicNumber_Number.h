@@ -67,6 +67,15 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, NumberContent<
 	return evaluate(res.value(), c.relation());
 }
 
+template<typename Number, typename Coeff>
+UnivariatePolynomial<Number> evaluatePolynomial(
+		const UnivariatePolynomial<Coeff>& p,
+		const std::map<Variable, NumberContent<Number>>& m
+) {
+	assert(false);
+	return UnivariatePolynomial<Number>(p.mainVar());
+}
+
 template<typename Number>
 Interval<Number> get_interval(const NumberContent<Number>& n) {
 	return Interval<Number>(n.value());
