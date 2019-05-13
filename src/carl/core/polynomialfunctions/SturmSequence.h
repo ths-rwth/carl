@@ -24,7 +24,6 @@ std::vector<UnivariatePolynomial<Coeff>> sturm_sequence(const UnivariatePolynomi
 
 /**
  * Computes the sturm sequence of a polynomial as defined at @cite GCL92, page 333, example 22.
- * 
  * The sturm sequence of p is defined as:
  * - p_0 = p
  * - p_1 = p'

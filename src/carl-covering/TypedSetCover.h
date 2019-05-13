@@ -49,7 +49,7 @@ public:
 	}
 
 	/// Returns the underlying set cover.
-	operator const SetCover&() const {
+	explicit operator const SetCover&() const {
 		return mSetCover;
 	}
 	/// Returns the underlying set cover.

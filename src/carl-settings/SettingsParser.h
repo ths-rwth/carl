@@ -112,6 +112,9 @@ protected:
 		return "config";
 	}
 public:
+	/// Virtual destructor.
+	~SettingsParser() = default;
+
 	/// Finalizes the parser.
 	void finalize();
 
@@ -143,7 +146,7 @@ public:
 	/**
 	 * Print a help page.
 	 * Returns a helper object so that it can be used as follows:
-	 *   std::cout << parser.print_help() << std::endl;
+	 *   `std::cout << parser.print_help() << std::endl;`
 	 */
 	OptionPrinter print_help() const {
 		return OptionPrinter{*this};
@@ -152,7 +155,7 @@ public:
 	/**
 	 * Print the parsed settings.
 	 * Returns a helper object so that it can be used as follows:
-	 *   std::cout << parser.print_options() << std::endl;
+	 *   `std::cout << parser.print_options() << std::endl;`
 	 */
 	SettingsPrinter print_options() const {
 		return SettingsPrinter{*this};

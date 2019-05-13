@@ -33,7 +33,7 @@ inline std::pair<std::size_t,Monomial::Arg> derivative(const Monomial::Arg& m, V
 	auto it = std::find_if(m->begin(), m->end(),
 		[v](const auto& e){ return e.first == v; }
 	);
-	if (it == m->end() || it->second < n) {
+	if ((it == m->end()) || (it->second < n)) {
 		CARL_LOG_DEBUG("carl.core", "derivative(" << m << ", " << v << ", " << n << ") = 0");
 		return std::make_pair(0, nullptr);
 	} else if (it->second == n) {

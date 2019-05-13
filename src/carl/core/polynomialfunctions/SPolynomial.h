@@ -11,7 +11,7 @@ MultivariatePolynomial<C,O,P> SPolynomial(const MultivariatePolynomial<C,O,P>& p
 	assert(p.nrTerms() != 0);
 	assert(q.nrTerms() != 0);
 
-	if (p.nrTerms() == 1 && q.nrTerms() == 1) {
+	if ((p.nrTerms() == 1) && (q.nrTerms() == 1)) {
 		return MultivariatePolynomial<C,O,P>();
 	} else if (p.nrTerms() == 1) {
 		return -(p.lterm().calcLcmAndDivideBy(q.lmon()) * q.tail());

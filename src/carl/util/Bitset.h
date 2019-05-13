@@ -7,7 +7,7 @@
 #include <boost/dynamic_bitset.hpp>
 
 namespace carl {
-	
+
 	/**
 	 * This class is a simple wrapper around boost::dynamic_bitset.
 	 * Its purpose is to allow for on-the-fly resizing of the bitset.
@@ -27,7 +27,7 @@ namespace carl {
 		static auto constexpr npos = BaseType::npos;
 		/// Number of bits in each storage block.
 		static auto constexpr bits_per_block = BaseType::bits_per_block;
-		
+
 		/**
 		 * Iterate for iterate over all bits of a Bitset that are set to true.
 		 *

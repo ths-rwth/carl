@@ -31,7 +31,7 @@ TEST(heuristics, remove_duplicates) {
 	auto cover = tsc.get_cover(heuristic::remove_duplicates);
 	EXPECT_EQ(cover, std::vector<int>());
 
-	const SetCover& sc = tsc;
+	const SetCover& sc = tsc.set_cover();
 	// Take care, the columns are reordered!
 	EXPECT_EQ(sc.set_count(), 5);
 	EXPECT_EQ(sc.get_set(0), carl::Bitset({3}));
@@ -49,7 +49,7 @@ TEST(heuristics, select_essential) {
 	auto cover = tsc.get_cover(heuristic::select_essential);
 	EXPECT_EQ(cover, std::vector<int>({2, 4}));
 
-	const SetCover& sc = tsc;
+	const SetCover& sc = tsc.set_cover();
 	// Take care, the columns are reordered!
 	EXPECT_EQ(sc.set_count(), 5);
 	EXPECT_EQ(sc.get_set(0), carl::Bitset());
