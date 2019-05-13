@@ -33,7 +33,6 @@ inline auto zero() {
 }
 
 class TimingCollector: public Singleton<TimingCollector> {
-public:
 private:
 	struct TimingInformation {
 		std::size_t count = 0;
