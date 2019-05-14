@@ -3,6 +3,7 @@
 #include <carl/core/Relation.h>
 
 #include "../get_output.h"
+#include "../invalid_output.h"
 
 TEST(Relation, Values)
 {
