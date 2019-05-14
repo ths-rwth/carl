@@ -5,7 +5,6 @@
 #include <carl-settings/Settings.h>
 #include <carl-settings/SettingsParser.h>
 
-#include <boost/any.hpp>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;

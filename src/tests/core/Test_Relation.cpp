@@ -1,6 +1,8 @@
-#include "../Common.h"
+#include <gtest/gtest.h>
 
 #include <carl/core/Relation.h>
+
+#include "../get_output.h"
 
 TEST(Relation, Values)
 {
@@ -14,14 +16,14 @@ TEST(Relation, Values)
 
 TEST(Relation, Output)
 {
-	EXPECT_EQ("=", getOutput(carl::Relation::EQ));
-	EXPECT_EQ("!=", getOutput(carl::Relation::NEQ));
-	EXPECT_EQ("<", getOutput(carl::Relation::LESS));
-	EXPECT_EQ(">", getOutput(carl::Relation::GREATER));
-	EXPECT_EQ("<=", getOutput(carl::Relation::LEQ));
-	EXPECT_EQ(">=", getOutput(carl::Relation::GEQ));
+	EXPECT_EQ("=", get_output(carl::Relation::EQ));
+	EXPECT_EQ("!=", get_output(carl::Relation::NEQ));
+	EXPECT_EQ("<", get_output(carl::Relation::LESS));
+	EXPECT_EQ(">", get_output(carl::Relation::GREATER));
+	EXPECT_EQ("<=", get_output(carl::Relation::LEQ));
+	EXPECT_EQ(">=", get_output(carl::Relation::GEQ));
 #ifdef CARL_BUILD_DEBUG
-	EXPECT_DEATH(getOutput(invalid_value<carl::Relation>()), "Invalid relation");
+	EXPECT_DEATH(get_output(invalid_value<carl::Relation>()), "Invalid relation");
 #endif
 }
 

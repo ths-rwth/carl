@@ -3,7 +3,7 @@
 #include <carl/formula/bitvector/BVVariable.h>
 #include <carl/formula/SortManager.h>
 
-#include "../Common.h"
+#include "../get_output.h"
 
 TEST(BVVariable, Basics)
 {
@@ -25,6 +25,6 @@ TEST(BVVariable, Basics)
 	EXPECT_TRUE(v3 < v4);
 	EXPECT_EQ(v2, a);
 	EXPECT_EQ(v4, b);
-	EXPECT_EQ(getOutput(v2), "a");
-	EXPECT_EQ(getOutput(v4), "b");
+	EXPECT_EQ(get_output(v2), "a");
+	EXPECT_EQ(get_output(v4), "b");
 }

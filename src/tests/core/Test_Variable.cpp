@@ -3,7 +3,7 @@
 #include <carl/core/Variable.h>
 #include <carl/core/VariablePool.h>
 
-#include "../Common.h"
+#include "../util.h"
 
 TEST(Variable, Equals)
 {

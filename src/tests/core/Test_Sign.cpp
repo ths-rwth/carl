@@ -8,6 +8,7 @@
 #include <typeinfo>
 
 #include "../Common.h"
+#include "../get_output.h"
 
 template<typename T>
 class SignTest : public testing::Test {};

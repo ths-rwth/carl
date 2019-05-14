@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <boost/any.hpp>
 #include <boost/program_options/errors.hpp>
 #include <carl-settings/settings_utils.h>
 
-#include "../Common.h"
+#include "../get_output.h"
 
 TEST(settings_utils, get_proper_suffix) {
 	using namespace carl::settings;
@@ -33,12 +34,12 @@ TEST(settings_utils, duration) {
 	static_assert(duration(std::chrono::milliseconds(1)) == std::chrono::nanoseconds(1000000));
 	static_assert(duration(std::chrono::seconds(1)) == std::chrono::nanoseconds(1000000000));
 
-	EXPECT_EQ(getOutput(duration(std::chrono::nanoseconds(5))), "5ns");
-	EXPECT_EQ(getOutput(duration(std::chrono::microseconds(5))), "5µs");
-	EXPECT_EQ(getOutput(duration(std::chrono::milliseconds(5))), "5ms");
-	EXPECT_EQ(getOutput(duration(std::chrono::seconds(5))), "5s");
-	EXPECT_EQ(getOutput(duration(std::chrono::minutes(5))), "5m");
-	EXPECT_EQ(getOutput(duration(std::chrono::hours(5))), "5h");
+	EXPECT_EQ(get_output(duration(std::chrono::nanoseconds(5))), "5ns");
+	EXPECT_EQ(get_output(duration(std::chrono::microseconds(5))), "5µs");
+	EXPECT_EQ(get_output(duration(std::chrono::milliseconds(5))), "5ms");
+	EXPECT_EQ(get_output(duration(std::chrono::seconds(5))), "5s");
+	EXPECT_EQ(get_output(duration(std::chrono::minutes(5))), "5m");
+	EXPECT_EQ(get_output(duration(std::chrono::hours(5))), "5h");
 }
 
 TEST(settings_utils, duration_validate) {
@@ -89,7 +90,7 @@ TEST(settings_utils, binary_quantity) {
 		static_assert(b.tebi() == 0);
 		static_assert(b.pebi() == 0);
 		static_assert(b.exbi() == 0);
-		EXPECT_EQ(getOutput(b), "0");
+		EXPECT_EQ(get_output(b), "0");
 	}
 	{
 		constexpr auto b = binary_quantity(5);
@@ -100,7 +101,7 @@ TEST(settings_utils, binary_quantity) {
 		static_assert(b.tebi() == 0);
 		static_assert(b.pebi() == 0);
 		static_assert(b.exbi() == 0);
-		EXPECT_EQ(getOutput(b), "5");
+		EXPECT_EQ(get_output(b), "5");
 	}
 	{
 		constexpr auto b = binary_quantity(5000);
@@ -111,7 +112,7 @@ TEST(settings_utils, binary_quantity) {
 		static_assert(b.tebi() == 0);
 		static_assert(b.pebi() == 0);
 		static_assert(b.exbi() == 0);
-		EXPECT_EQ(getOutput(b), "4Ki");
+		EXPECT_EQ(get_output(b), "4Ki");
 	}
 	{
 		constexpr auto b = binary_quantity(5000000);
@@ -122,7 +123,7 @@ TEST(settings_utils, binary_quantity) {
 		static_assert(b.tebi() == 0);
 		static_assert(b.pebi() == 0);
 		static_assert(b.exbi() == 0);
-		EXPECT_EQ(getOutput(b), "4Mi");
+		EXPECT_EQ(get_output(b), "4Mi");
 	}
 	{
 		constexpr auto b = binary_quantity(5000000000);
@@ -133,7 +134,7 @@ TEST(settings_utils, binary_quantity) {
 		static_assert(b.tebi() == 0);
 		static_assert(b.pebi() == 0);
 		static_assert(b.exbi() == 0);
-		EXPECT_EQ(getOutput(b), "4Gi");
+		EXPECT_EQ(get_output(b), "4Gi");
 	}
 	{
 		constexpr auto b = binary_quantity(5000000000000);
@@ -144,7 +145,7 @@ TEST(settings_utils, binary_quantity) {
 		static_assert(b.tebi() == 4);
 		static_assert(b.pebi() == 0);
 		static_assert(b.exbi() == 0);
-		EXPECT_EQ(getOutput(b), "4Ti");
+		EXPECT_EQ(get_output(b), "4Ti");
 	}
 	{
 		constexpr auto b = binary_quantity(5000000000000000);
@@ -155,7 +156,7 @@ TEST(settings_utils, binary_quantity) {
 		static_assert(b.tebi() == 4547);
 		static_assert(b.pebi() == 4);
 		static_assert(b.exbi() == 0);
-		EXPECT_EQ(getOutput(b), "4Pi");
+		EXPECT_EQ(get_output(b), "4Pi");
 	}
 	{
 		constexpr auto b = binary_quantity(5000000000000000000);
@@ -166,7 +167,7 @@ TEST(settings_utils, binary_quantity) {
 		static_assert(b.tebi() == 4547473);
 		static_assert(b.pebi() == 4440);
 		static_assert(b.exbi() == 4);
-		EXPECT_EQ(getOutput(b), "4Ei");
+		EXPECT_EQ(get_output(b), "4Ei");
 	}
 }
 
@@ -242,7 +243,7 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.tera() == 0);
 		static_assert(m.peta() == 0);
 		static_assert(m.exa() == 0);
-		EXPECT_EQ(getOutput(m), "0");
+		EXPECT_EQ(get_output(m), "0");
 	}
 	{
 		constexpr auto m = metric_quantity(5);
@@ -253,7 +254,7 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.tera() == 0);
 		static_assert(m.peta() == 0);
 		static_assert(m.exa() == 0);
-		EXPECT_EQ(getOutput(m), "5");
+		EXPECT_EQ(get_output(m), "5");
 	}
 	{
 		constexpr auto m = metric_quantity(5000);
@@ -264,7 +265,7 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.tera() == 0);
 		static_assert(m.peta() == 0);
 		static_assert(m.exa() == 0);
-		EXPECT_EQ(getOutput(m), "5K");
+		EXPECT_EQ(get_output(m), "5K");
 	}
 	{
 		constexpr auto m = metric_quantity(5000000);
@@ -275,7 +276,7 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.tera() == 0);
 		static_assert(m.peta() == 0);
 		static_assert(m.exa() == 0);
-		EXPECT_EQ(getOutput(m), "5M");
+		EXPECT_EQ(get_output(m), "5M");
 	}
 	{
 		constexpr auto m = metric_quantity(5000000000);
@@ -286,7 +287,7 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.tera() == 0);
 		static_assert(m.peta() == 0);
 		static_assert(m.exa() == 0);
-		EXPECT_EQ(getOutput(m), "5G");
+		EXPECT_EQ(get_output(m), "5G");
 	}
 	{
 		constexpr auto m = metric_quantity(5000000000000);
@@ -297,7 +298,7 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.tera() == 5);
 		static_assert(m.peta() == 0);
 		static_assert(m.exa() == 0);
-		EXPECT_EQ(getOutput(m), "5T");
+		EXPECT_EQ(get_output(m), "5T");
 	}
 	{
 		constexpr auto m = metric_quantity(5000000000000000);
@@ -308,7 +309,7 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.tera() == 5000);
 		static_assert(m.peta() == 5);
 		static_assert(m.exa() == 0);
-		EXPECT_EQ(getOutput(m), "5P");
+		EXPECT_EQ(get_output(m), "5P");
 	}
 	{
 		constexpr auto m = metric_quantity(5000000000000000000);
@@ -319,7 +320,7 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.tera() == 5000000);
 		static_assert(m.peta() == 5000);
 		static_assert(m.exa() == 5);
-		EXPECT_EQ(getOutput(m), "5E");
+		EXPECT_EQ(get_output(m), "5E");
 	}
 }
 

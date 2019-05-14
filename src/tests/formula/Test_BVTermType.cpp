@@ -3,39 +3,39 @@
 #include <carl/formula/bitvector/BVTerm.h>
 #include <carl/formula/bitvector/BVTermPool.h>
 
-#include "../Common.h"
+#include "../get_output.h"
 
 TEST(BVTermType, Output)
 {
-	EXPECT_TRUE(getOutput(carl::BVTermType::CONSTANT) == "CONSTANT");
-	EXPECT_TRUE(getOutput(carl::BVTermType::VARIABLE) == "VARIABLE");
-	EXPECT_TRUE(getOutput(carl::BVTermType::CONCAT) == "concat");
-	EXPECT_TRUE(getOutput(carl::BVTermType::EXTRACT) == "extract");
-	EXPECT_TRUE(getOutput(carl::BVTermType::NOT) == "bvnot");
-	EXPECT_TRUE(getOutput(carl::BVTermType::NEG) == "bvneg");
-	EXPECT_TRUE(getOutput(carl::BVTermType::AND) == "bvand");
-	EXPECT_TRUE(getOutput(carl::BVTermType::OR) == "bvor");
-	EXPECT_TRUE(getOutput(carl::BVTermType::XOR) == "bvxor");
-	EXPECT_TRUE(getOutput(carl::BVTermType::NAND) == "bvnand");
-	EXPECT_TRUE(getOutput(carl::BVTermType::NOR) == "bvnor");
-	EXPECT_TRUE(getOutput(carl::BVTermType::XNOR) == "bvxnor");
-	EXPECT_TRUE(getOutput(carl::BVTermType::ADD) == "bvadd");
-	EXPECT_TRUE(getOutput(carl::BVTermType::SUB) == "bvsub");
-	EXPECT_TRUE(getOutput(carl::BVTermType::MUL) == "bvmul");
-	EXPECT_TRUE(getOutput(carl::BVTermType::DIV_U) == "bvudiv");
-	EXPECT_TRUE(getOutput(carl::BVTermType::DIV_S) == "bvsdiv");
-	EXPECT_TRUE(getOutput(carl::BVTermType::MOD_U) == "bvurem");
-	EXPECT_TRUE(getOutput(carl::BVTermType::MOD_S1) == "bvsrem");
-	EXPECT_TRUE(getOutput(carl::BVTermType::MOD_S2) == "bvsmod");
-	EXPECT_TRUE(getOutput(carl::BVTermType::EQ) == "bvcomp");
-	EXPECT_TRUE(getOutput(carl::BVTermType::LSHIFT) == "bvshl");
-	EXPECT_TRUE(getOutput(carl::BVTermType::RSHIFT_LOGIC) == "bvlshr");
-	EXPECT_TRUE(getOutput(carl::BVTermType::RSHIFT_ARITH) == "bvashr");
-	EXPECT_TRUE(getOutput(carl::BVTermType::LROTATE) == "rotate_left");
-	EXPECT_TRUE(getOutput(carl::BVTermType::RROTATE) == "rotate_right");
-	EXPECT_TRUE(getOutput(carl::BVTermType::EXT_U) == "zero_extend");
-	EXPECT_TRUE(getOutput(carl::BVTermType::EXT_S) == "sign_extend");
-	EXPECT_TRUE(getOutput(carl::BVTermType::REPEAT) == "repeat");
+	EXPECT_TRUE(get_output(carl::BVTermType::CONSTANT) == "CONSTANT");
+	EXPECT_TRUE(get_output(carl::BVTermType::VARIABLE) == "VARIABLE");
+	EXPECT_TRUE(get_output(carl::BVTermType::CONCAT) == "concat");
+	EXPECT_TRUE(get_output(carl::BVTermType::EXTRACT) == "extract");
+	EXPECT_TRUE(get_output(carl::BVTermType::NOT) == "bvnot");
+	EXPECT_TRUE(get_output(carl::BVTermType::NEG) == "bvneg");
+	EXPECT_TRUE(get_output(carl::BVTermType::AND) == "bvand");
+	EXPECT_TRUE(get_output(carl::BVTermType::OR) == "bvor");
+	EXPECT_TRUE(get_output(carl::BVTermType::XOR) == "bvxor");
+	EXPECT_TRUE(get_output(carl::BVTermType::NAND) == "bvnand");
+	EXPECT_TRUE(get_output(carl::BVTermType::NOR) == "bvnor");
+	EXPECT_TRUE(get_output(carl::BVTermType::XNOR) == "bvxnor");
+	EXPECT_TRUE(get_output(carl::BVTermType::ADD) == "bvadd");
+	EXPECT_TRUE(get_output(carl::BVTermType::SUB) == "bvsub");
+	EXPECT_TRUE(get_output(carl::BVTermType::MUL) == "bvmul");
+	EXPECT_TRUE(get_output(carl::BVTermType::DIV_U) == "bvudiv");
+	EXPECT_TRUE(get_output(carl::BVTermType::DIV_S) == "bvsdiv");
+	EXPECT_TRUE(get_output(carl::BVTermType::MOD_U) == "bvurem");
+	EXPECT_TRUE(get_output(carl::BVTermType::MOD_S1) == "bvsrem");
+	EXPECT_TRUE(get_output(carl::BVTermType::MOD_S2) == "bvsmod");
+	EXPECT_TRUE(get_output(carl::BVTermType::EQ) == "bvcomp");
+	EXPECT_TRUE(get_output(carl::BVTermType::LSHIFT) == "bvshl");
+	EXPECT_TRUE(get_output(carl::BVTermType::RSHIFT_LOGIC) == "bvlshr");
+	EXPECT_TRUE(get_output(carl::BVTermType::RSHIFT_ARITH) == "bvashr");
+	EXPECT_TRUE(get_output(carl::BVTermType::LROTATE) == "rotate_left");
+	EXPECT_TRUE(get_output(carl::BVTermType::RROTATE) == "rotate_right");
+	EXPECT_TRUE(get_output(carl::BVTermType::EXT_U) == "zero_extend");
+	EXPECT_TRUE(get_output(carl::BVTermType::EXT_S) == "sign_extend");
+	EXPECT_TRUE(get_output(carl::BVTermType::REPEAT) == "repeat");
 }
 
 TEST(BVTermType, typeIsUnary)

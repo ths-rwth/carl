@@ -5,8 +5,6 @@
 #include <carl/formula/model/uninterpreted/SortValue.h>
 #include <carl/formula/model/uninterpreted/SortValueManager.h>
 
-#include "../Common.h"
-
 TEST(Sort, DefaultConstruction)
 {
 	::testing::FLAGS_gtest_death_test_style = "threadsafe";

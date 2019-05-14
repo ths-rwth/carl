@@ -2,9 +2,9 @@
 
 #include <carl/formula/bitvector/BVValue.h>
 
-#include <boost/dynamic_bitset.hpp>
-
-#include "../Common.h"
+#include "../get_output.h"
+#include "../number_types.h"
+#include "../util.h"
 
 using BDB = carl::BVValue::Base;
 
@@ -44,11 +44,11 @@ TYPED_TEST(BVValueTest, width)
 TYPED_TEST(BVValueTest, toString)
 {
 	EXPECT_EQ("#b00000000000000000000000000000000", this->bv32_0.toString());
-	EXPECT_EQ("#b00000000000000000000000000000000", getOutput(this->bv32_0));
+	EXPECT_EQ("#b00000000000000000000000000000000", get_output(this->bv32_0));
 	EXPECT_EQ("#b00000000000000000000000000000001", this->bv32_1.toString());
-	EXPECT_EQ("#b00000000000000000000000000000001", getOutput(this->bv32_1));
+	EXPECT_EQ("#b00000000000000000000000000000001", get_output(this->bv32_1));
 	EXPECT_EQ("#b00111111111111111111111111111111", this->bv32_e30.toString());
-	EXPECT_EQ("#b00111111111111111111111111111111", getOutput(this->bv32_e30));
+	EXPECT_EQ("#b00111111111111111111111111111111", get_output(this->bv32_e30));
 }
 
 TYPED_TEST(BVValueTest, isZero)

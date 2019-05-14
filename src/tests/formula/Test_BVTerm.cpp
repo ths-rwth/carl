@@ -3,8 +3,6 @@
 #include <carl/formula/bitvector/BVTerm.h>
 #include <carl/formula/bitvector/BVTermPool.h>
 
-#include "../Common.h"
-
 TEST(BVTerm, Empty)
 {
 	carl::BVTerm bvt;

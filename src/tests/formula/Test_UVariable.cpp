@@ -7,7 +7,7 @@
 #include <carl/formula/model/uninterpreted/SortValueManager.h>
 #include <carl/formula/model/evaluation/ModelEvaluation.h>
 
-#include "../Common.h"
+#include "../get_output.h"
 
 TEST(UVariable, Basics)
 {
@@ -27,8 +27,8 @@ TEST(UVariable, Basics)
 	EXPECT_TRUE(v3 < v4);
 	EXPECT_EQ(v2.variable(), a);
 	EXPECT_EQ(v4.variable(), b);
-	EXPECT_EQ(getOutput(v2), "a");
-	EXPECT_EQ(getOutput(v4), "b");
+	EXPECT_EQ(get_output(v2), "a");
+	EXPECT_EQ(get_output(v4), "b");
 	EXPECT_EQ(std::hash<carl::UVariable>()(v2), std::hash<carl::UVariable>()(v3));
 }
 
