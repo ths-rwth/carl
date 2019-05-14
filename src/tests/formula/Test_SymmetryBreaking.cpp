@@ -4,7 +4,7 @@
 #include <carl/formula/Formula.h>
 #include <carl/formula/symmetry/symmetry.h>
 
-#include "../Common.h"
+#include "../number_types.h"
 
 typedef carl::MultivariatePolynomial<Rational> Pol;
 typedef carl::Constraint<Pol> Constr;
