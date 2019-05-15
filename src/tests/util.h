@@ -11,7 +11,8 @@ using ComparisonList = std::vector<boost::variant<T...>>;
 template<typename Iterator>
 struct ComparisonOperator {
 	using result_type = void;
-	Iterator it1, it2;
+	Iterator it1;
+	Iterator it2;
 	ComparisonOperator(): it1(), it2() {}
 	void set(const Iterator& i1, const Iterator& i2) {
 		it1 = i1;
@@ -31,7 +32,8 @@ struct ComparisonOperator {
 template<typename Iterator, typename Less>
 struct SingleComparisonOperator {
 	using result_type = void;
-	Iterator it1, it2;
+	Iterator it1;
+	Iterator it2;
 	const Less& less;
 	explicit SingleComparisonOperator(const Less& l): less(l) {}
 	void set(const Iterator& i1, const Iterator& i2) {
@@ -47,8 +49,8 @@ struct SingleComparisonOperator {
 template<typename List>
 void expectRightOrder(const List& list) {
 	ComparisonOperator<typename List::const_iterator> c;
-	for (auto it1 = list.begin(); it1 != list.end(); it1++) {
-		for (auto it2 = list.begin(); it2 != list.end(); it2++) {
+	for (auto it1 = list.begin(); it1 != list.end(); ++it1) {
+		for (auto it2 = list.begin(); it2 != list.end(); ++it2) {
 			c.set(it1, it2);
 			boost::apply_visitor(c, *it1, *it2);
 		}
@@ -58,8 +60,8 @@ void expectRightOrder(const List& list) {
 template<typename List, typename Less>
 void expectRightOrder(const List& list, const Less& less) {
 	SingleComparisonOperator<typename List::const_iterator, Less> c(less);
-	for (auto it1 = list.begin(); it1 != list.end(); it1++) {
-		for (auto it2 = list.begin(); it2 != list.end(); it2++) {
+	for (auto it1 = list.begin(); it1 != list.end(); ++it1) {
+		for (auto it2 = list.begin(); it2 != list.end(); ++it2) {
 			c.set(it1, it2);
 			boost::apply_visitor(c, *it1, *it2);
 		}
@@ -68,8 +70,8 @@ void expectRightOrder(const List& list, const Less& less) {
 
 template<typename List>
 void checkEqual(const List& list) {
-	for (auto it1 = list.begin(); it1 != list.end(); it1++) {
-		for (auto it2 = list.begin(); it2 != list.end(); it2++) {
+	for (auto it1 = list.begin(); it1 != list.end(); ++it1) {
+		for (auto it2 = list.begin(); it2 != list.end(); ++it2) {
 			EXPECT_EQ(it1 == it2, *it1 == *it2) << *it1 << " == " << *it2;
 		}
 	}
@@ -82,8 +84,8 @@ void checkEqual(const std::initializer_list<T>& list) {
 
 template<typename List>
 void checkLess(const List& list) {
-	for (auto it1 = list.begin(); it1 != list.end(); it1++) {
-		for (auto it2 = list.begin(); it2 != list.end(); it2++) {
+	for (auto it1 = list.begin(); it1 != list.end(); ++it1) {
+		for (auto it2 = list.begin(); it2 != list.end(); ++it2) {
 			EXPECT_EQ(it1 < it2, *it1 < *it2) << *it1 << " < " << *it2;
 		}
 	}

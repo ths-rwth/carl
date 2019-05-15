@@ -113,7 +113,7 @@ protected:
 	}
 public:
 	/// Virtual destructor.
-	~SettingsParser() = default;
+	virtual ~SettingsParser() = default;
 
 	/// Finalizes the parser.
 	void finalize();

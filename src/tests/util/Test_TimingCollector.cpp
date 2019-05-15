@@ -1,4 +1,7 @@
 #define TIMING
+
+#include "../get_output.h"
+
 #include <carl/util/TimingCollector.h>
 #include <gtest/gtest.h>
 
@@ -11,5 +14,5 @@ TEST(TimingCollector, Basics)
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	CARL_TIME_FINISH("dummy", start);
 	
-	std::cout << carl::TimingCollector::getInstance() << std::endl;
+	get_output(carl::TimingCollector::getInstance());
 }

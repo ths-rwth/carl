@@ -3,10 +3,7 @@
 #include <carl/config.h>
 #include <carl/numbers/numbers.h>
 
-#include <gtest/gtest.h>
-
 using Rational = mpq_class;
-//using Integer = mpz_class;
 
 using IntegerTypes = testing::Types<
 	#ifdef USE_CLN_NUMBERS

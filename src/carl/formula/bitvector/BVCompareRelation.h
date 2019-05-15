@@ -100,7 +100,7 @@ namespace std
 
 		std::size_t operator()(const carl::BVCompareRelation& _rel) const
 		{
-			return std::size_t(_rel);
+			return static_cast<std::size_t>(_rel);
 		}
 	};
 
