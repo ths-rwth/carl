@@ -16,7 +16,7 @@
 #include <iostream>
 #include "carl/util/platform.h"
 
-#include "../Common.h"
+#include "../number_types.h"
 
 using namespace carl;
 

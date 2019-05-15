@@ -1,7 +1,8 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
-#include "carl/interval/Interval.h"
-#include "../Common.h"
+#include <carl/interval/Interval.h>
+
+#include "../number_types.h"
 
 using namespace carl;
 

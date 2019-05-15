@@ -16,7 +16,7 @@ CLANG_WARNING_RESET
 #include "carl/interval/set_theory.h"
 #include "carl/core/VariablePool.h"
 
-#include "../Common.h"
+#include "../number_types.h"
 
 using namespace carl;
 

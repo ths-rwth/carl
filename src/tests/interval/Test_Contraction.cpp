@@ -1,11 +1,11 @@
-#include "gtest/gtest.h"
-#include "carl/interval/Interval.h"
-#include "carl/core/VariablePool.h"
-#include "carl/interval/IntervalEvaluation.h"
-#include "carl/interval/Contraction.h"
-#include "carl/util/platform.h"
+#include <gtest/gtest.h>
+#include <carl/interval/Interval.h>
+#include <carl/core/VariablePool.h>
+#include <carl/interval/IntervalEvaluation.h>
+#include <carl/interval/Contraction.h>
+#include <carl/util/platform.h>
 
-#include "../Common.h"
+#include "../number_types.h"
 
 using namespace carl;
 
