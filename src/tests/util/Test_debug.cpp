@@ -1,6 +1,5 @@
-#include "../Common.h"
-
 #include <carl/util/debug.h>
+#include <gtest/gtest.h>
 
 TEST(Debug, callingFunction)
 {

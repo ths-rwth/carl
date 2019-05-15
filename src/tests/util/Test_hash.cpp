@@ -1,6 +1,5 @@
-#include "../Common.h"
-
 #include <carl/util/hash.h>
+#include <gtest/gtest.h>
 
 TEST(Hash, hash_add)
 {

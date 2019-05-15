@@ -1,5 +1,5 @@
-#include "gtest/gtest.h"
-#include "../../carl/numbers/numbers.h"
+#include <gtest/gtest.h>
+#include <carl/numbers/numbers.h>
 
 TEST(GMP, Debug)
 {

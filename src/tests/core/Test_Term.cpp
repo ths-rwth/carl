@@ -1,13 +1,12 @@
 #include <gtest/gtest.h>
-#include <carl/core/Variable.h>
-#include <carl/core/VariablePool.h>
+#include <carl/core/polynomialfunctions/Derivative.h>
 #include <carl/core/Monomial.h>
 #include <carl/core/Term.h>
-#include <list>
+#include <carl/core/Variable.h>
+#include <carl/core/VariablePool.h>
 
-#include <carl/core/polynomialfunctions/Derivative.h>
-
-#include "../Common.h"
+#include "../number_types.h"
+#include "../util.h"
 
 using namespace carl;
 

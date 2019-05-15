@@ -1,6 +1,5 @@
-#include <gtest/gtest.h>
-
 #include <carl-covering/carl-covering.h>
+#include <gtest/gtest.h>
 
 using namespace carl::covering;
 

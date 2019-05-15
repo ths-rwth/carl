@@ -1,8 +1,7 @@
-#include <gtest/gtest.h>
-
 #include <boost/any.hpp>
 #include <boost/program_options/errors.hpp>
 #include <carl-settings/settings_utils.h>
+#include <gtest/gtest.h>
 
 #include "../get_output.h"
 

@@ -1,7 +1,8 @@
-#include "../Common.h"
-
 #define TIMING
 #include <carl/util/TimingCollector.h>
+#include <gtest/gtest.h>
+
+#include <chrono>
 #include <thread>
 
 TEST(TimingCollector, Basics)

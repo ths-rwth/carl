@@ -1,6 +1,5 @@
-#include "../Common.h"
-
 #include <carl/util/tuple_util.h>
+#include <gtest/gtest.h>
 
 int foo(int x, int y) {
 	return x + y;

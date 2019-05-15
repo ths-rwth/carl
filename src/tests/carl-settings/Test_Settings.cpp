@@ -1,11 +1,9 @@
-#include <gtest/gtest.h>
-
+#include <boost/program_options.hpp>
 #include <carl/util/Singleton.h>
 #include <carl-settings/settings_utils.h>
 #include <carl-settings/Settings.h>
 #include <carl-settings/SettingsParser.h>
-
-#include <boost/program_options.hpp>
+#include <gtest/gtest.h>
 
 namespace po = boost::program_options;
 

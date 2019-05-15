@@ -1,9 +1,10 @@
-#include "../Common.h"
-
 #include <carl/util/Timer.h>
+#include <gtest/gtest.h>
 
 #include <chrono>
 #include <thread>
+
+#include "../get_output.h"
 
 TEST(Timer, Basics)
 {
@@ -14,5 +15,5 @@ TEST(Timer, Basics)
 	t.reset();
 	std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 	EXPECT_TRUE(t.passed() >= delay);
-	EXPECT_TRUE(std::stoll(getOutput(t)) >= 50);
+	EXPECT_TRUE(std::stoll(get_output(t)) >= 50);
 }

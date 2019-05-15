@@ -1,6 +1,5 @@
-#include "gtest/gtest.h"
-
 #include <carl/numbers/numbers.h>
+#include <gtest/gtest.h>
 
 using namespace carl;
 

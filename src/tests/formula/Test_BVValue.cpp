@@ -1,6 +1,5 @@
-#include "gtest/gtest.h"
-
 #include <carl/formula/bitvector/BVValue.h>
+#include <gtest/gtest.h>
 
 #include "../get_output.h"
 #include "../number_types.h"

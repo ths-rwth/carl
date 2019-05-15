@@ -1,7 +1,6 @@
-#include "../Common.h"
-
 #include <boost/variant.hpp>
 #include <carl/util/variant_util.h>
+#include <gtest/gtest.h>
 
 struct A {};
 struct B {};

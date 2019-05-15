@@ -1,7 +1,7 @@
-#include "../Common.h"
-
 #include <carl/numbers/numbers.h>
 #include <gtest/gtest.h>
+
+#include "../number_types.h"
 
 using namespace carl;
 

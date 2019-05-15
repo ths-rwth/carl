@@ -1,7 +1,6 @@
-#include "gtest/gtest.h"
-
 #include <carl/formula/bitvector/BVVariable.h>
 #include <carl/formula/SortManager.h>
+#include <gtest/gtest.h>
 
 #include "../get_output.h"
 

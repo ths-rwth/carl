@@ -1,10 +1,9 @@
-#include "../Common.h"
-
-#include <carl/numbers/numbers.h>
-
 #include <boost/concept_check.hpp>
+#include <carl/numbers/numbers.h>
 #include <gtest/gtest.h>
 
+#include "../number_types.h"
+#include "../require_type.h"
 
 template<typename T>
 struct HashCheck {

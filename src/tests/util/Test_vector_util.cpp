@@ -1,6 +1,5 @@
-#include "gtest/gtest.h"
-
 #include <carl/util/vector_util.h>
+#include <gtest/gtest.h>
 
 #include <vector>
 

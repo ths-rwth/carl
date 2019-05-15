@@ -1,9 +1,8 @@
-#include "gtest/gtest.h"
-
 #include <carl/formula/Sort.h>
 #include <carl/formula/SortManager.h>
 #include <carl/formula/model/uninterpreted/SortValue.h>
 #include <carl/formula/model/uninterpreted/SortValueManager.h>
+#include <gtest/gtest.h>
 
 TEST(Sort, DefaultConstruction)
 {
