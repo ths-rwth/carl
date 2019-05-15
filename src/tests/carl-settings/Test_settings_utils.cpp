@@ -81,6 +81,18 @@ TEST(settings_utils, duration_validate) {
 TEST(settings_utils, binary_quantity) {
 	using namespace carl::settings;
 	{
+		// Ensures code coverage of the respective functions.
+		constexpr auto b = binary_quantity();
+		EXPECT_EQ(b.n(), 0);
+		EXPECT_EQ(b.kibi(), 0);
+		EXPECT_EQ(b.mebi(), 0);
+		EXPECT_EQ(b.gibi(), 0);
+		EXPECT_EQ(b.tebi(), 0);
+		EXPECT_EQ(b.pebi(), 0);
+		EXPECT_EQ(b.exbi(), 0);
+		EXPECT_EQ(get_output(b), "0");
+	}
+	{
 		constexpr auto b = binary_quantity();
 		static_assert(b.n() == 0);
 		static_assert(b.kibi() == 0);
@@ -168,6 +180,7 @@ TEST(settings_utils, binary_quantity) {
 		static_assert(b.exbi() == 4);
 		EXPECT_EQ(get_output(b), "4Ei");
 	}
+	EXPECT_TRUE(binary_quantity(5) < binary_quantity(10));
 }
 
 TEST(settings_utils, binary_quantity_validate) {
@@ -233,6 +246,18 @@ TEST(settings_utils, binary_quantity_validate) {
 
 TEST(settings_utils, metric_quantity) {
 	using namespace carl::settings;
+	{
+		// Ensures code coverage of the respective functions.
+		constexpr auto m = metric_quantity();
+		EXPECT_EQ(m.n(), 0);
+		EXPECT_EQ(m.kilo(), 0);
+		EXPECT_EQ(m.mega(), 0);
+		EXPECT_EQ(m.giga(), 0);
+		EXPECT_EQ(m.tera(), 0);
+		EXPECT_EQ(m.peta(), 0);
+		EXPECT_EQ(m.exa(), 0);
+		EXPECT_EQ(get_output(m), "0");
+	}
 	{
 		constexpr auto m = metric_quantity();
 		static_assert(m.n() == 0);
@@ -321,6 +346,7 @@ TEST(settings_utils, metric_quantity) {
 		static_assert(m.exa() == 5);
 		EXPECT_EQ(get_output(m), "5E");
 	}
+	EXPECT_TRUE(metric_quantity(5) < metric_quantity(10));
 }
 
 TEST(settings_utils, metric_quantity_validate) {
