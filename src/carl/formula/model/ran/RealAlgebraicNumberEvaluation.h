@@ -223,16 +223,5 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 	);
 }
 
-
-template<typename Number, typename Coeff>
-UnivariatePolynomial<Number> evaluateCoefficients(
-		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m
-) {
-	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
-	assert(m.find(p.mainVar()) == m.end());
-	return evaluatePolynomial(p, m);
-}
-
 }
 }
