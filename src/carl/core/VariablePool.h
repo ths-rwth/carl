@@ -11,14 +11,11 @@
 
 #include <array>
 #include <map>
-#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
 
-
-namespace carl 
-{
+namespace carl {
 
 /**
  * This class generates new variables and stores human-readable names for them.
@@ -27,9 +24,9 @@ namespace carl
  *
  * All methods that modify the pool, that are getInstance(), getFreshVariable() and setName(), are thread-safe.
  */
-class VariablePool : public Singleton<VariablePool>
-{
-friend Singleton<VariablePool>;
+class VariablePool : public Singleton<VariablePool> {
+	friend Singleton<VariablePool>;
+
 private:
 	/**
 	 * Contains the id of the next variable to be created for each type.
@@ -55,11 +52,11 @@ private:
 		assert(static_cast<std::size_t>(vt) < mNextIDs.size());
 		return mNextIDs[static_cast<std::size_t>(vt)];
 	}
-	
+
 	/**
 	 * Contains persistent variables that are restored after clear was called.
 	 */
-	std::vector<std::pair<Variable,std::string>> mPersistentVariables;
+	std::vector<std::pair<Variable, std::string>> mPersistentVariables;
 
 	/**
 	 * Stores human-readable names for variables that can be set via setVariableName().
@@ -70,15 +67,14 @@ private:
 	 * Stores a prefix for printing variables that have no human-readable name.
 	 */
 	std::string mVariablePrefix;
-    
-    
-    #ifdef THREAD_SAFE
-    #define FRESHVAR_LOCK_GUARD std::lock_guard<std::mutex> lock1( freshVarMutex );
-    #define SETNAME_LOCK_GUARD std::lock_guard<std::mutex> lock2( setNameMutex );
-    #else
-    #define FRESHVAR_LOCK_GUARD
-    #define SETNAME_LOCK_GUARD
-    #endif
+
+#ifdef THREAD_SAFE
+#define FRESHVAR_LOCK_GUARD std::lock_guard<std::mutex> lock1(freshVarMutex);
+#define SETNAME_LOCK_GUARD std::lock_guard<std::mutex> lock2(setNameMutex);
+#else
+#define FRESHVAR_LOCK_GUARD
+#define SETNAME_LOCK_GUARD
+#endif
 
 protected:
 	/**
@@ -104,18 +100,16 @@ protected:
 	Variable getFreshVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 public:
-	
 	Variable getFreshPersistentVariable(VariableType type = VariableType::VT_REAL) noexcept;
 	Variable getFreshPersistentVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 	/**
 	 * Clears everything already created in this pool.
 	 */
-	void clear() noexcept
-    {
-        mVariableNames.clear();
+	void clear() noexcept {
+		mVariableNames.clear();
 		mNextIDs.fill(1);
-		for (const auto& pv: mPersistentVariables) {
+		for (const auto& pv : mPersistentVariables) {
 			Variable v = pv.first;
 			while (nextID(v.type()) < v.id()) {
 				getFreshVariable(v.type());
@@ -126,8 +120,7 @@ public:
 				getFreshVariable(v.type());
 			}
 		}
-    }
-
+	}
 
 	/**
 	 * Searches in the friendly names list for a variable with the given name.
@@ -161,7 +154,7 @@ public:
 	void setPrefix(std::string prefix = "_") noexcept {
 		mVariablePrefix = std::move(prefix);
 	}
-   
+
 	/**
 	 * Returns the number of variables initialized by the pool.
 	 * @return Number of variables.
@@ -174,14 +167,13 @@ public:
 	 * Print variable names to the stream.
 	 */
 	void printVariableNamesToStream(std::ostream& os = std::cout) {
-		for(auto const& v : mVariableNames) {
+		for (auto const& v : mVariableNames) {
 			os << v.second << " ";
 		}
 	}
 
 	friend Variable freshVariable(VariableType vt) noexcept;
 	friend Variable freshVariable(const std::string& name, VariableType vt);
-
 };
 
 inline Variable freshVariable(VariableType vt) noexcept {
@@ -226,4 +218,4 @@ inline void printRegisteredVariableNames() {
 	return VariablePool::getInstance().printVariableNamesToStream();
 }
 
-}
+} // namespace carl

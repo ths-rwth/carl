@@ -23,7 +23,7 @@
 
 namespace carl {
 
-/*
+
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l);
 template<typename T>
@@ -48,7 +48,7 @@ template<typename T, typename... Tail>
 inline std::ostream& operator<<(std::ostream& os, const std::variant<T, Tail...>& v);
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v);
-*/
+
 
 /**
  * Allows to easily output some container with all elements separated by some string.
@@ -106,7 +106,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
  */
 template<typename Key, typename Value, typename Comparator>
 inline std::ostream& operator<<(std::ostream& os, const std::map<Key, Value, Comparator>& m) {
-	return os << "{" << stream_joined(", ", m, [](auto& os, const auto& p){ os << p.first << " : " << p.second; }) << "}";
+	return os << "{" << stream_joined(", ", m, [](auto& o, const auto& p){ o << p.first << " : " << p.second; }) << "}";
 }
 
 /**
@@ -118,7 +118,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::map<Key, Value, Com
  */
 template<typename Key, typename Value, typename Comparator>
 inline std::ostream& operator<<(std::ostream& os, const std::multimap<Key, Value, Comparator>& m) {
-	return os << "{" << stream_joined(", ", m, [](auto& os, const auto& p){ os << p.first << " : " << p.second; }) << "}";
+	return os << "{" << stream_joined(", ", m, [](auto& o, const auto& p){ o << p.first << " : " << p.second; }) << "}";
 }
 
 /**
@@ -194,7 +194,7 @@ std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t) {
  */
 template<typename Key, typename Value, typename H, typename E, typename A>
 inline std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value, H, E, A>& m) {
-	return os << "{" << stream_joined(", ", m, [](auto& os, const auto& p){ os << p.first << " : " << p.second; }) << "}";
+	return os << "{" << stream_joined(", ", m, [](auto& o, const auto& p){ o << p.first << " : " << p.second; }) << "}";
 }
 
 /**

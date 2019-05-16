@@ -13,6 +13,7 @@
 #include "../formula/Sort.h"
 #include "../numbers/numbers.h"
 #include "../util/tuple_util.h"
+#include "streamingOperators.h"
 
 #include <iostream>
 #include <sstream>
@@ -49,14 +50,8 @@ private:
 			case FormulaType::XOR:
 			case FormulaType::IMPLIES:
 			case FormulaType::ITE:
-			{
-				*this << "(" << f.getType();
-				for (const auto& cur: f.subformulas()) {
-					*this << " " << cur;
-				}
-				*this << ")";
+				*this << "(" << f.getType() << " " << stream_joined(" ", f.subformulas()) << ")";
 				break;
-			}
 			case FormulaType::NOT:
 				*this << "(" << f.getType() << " " << f.subformula() << ")";
 				break;
@@ -86,6 +81,8 @@ private:
 			case FormulaType::FORALL:
 				CARL_LOG_ERROR("carl.smtlibstream", "Printing exists or forall is not implemented yet.");
 				break;
+			default:
+				CARL_LOG_ERROR("carl.smtlibstream", "Not supported formula type: " << f.getType());
 		}
 	}
 	
@@ -141,9 +138,7 @@ private:
 		if (m.exponents().empty()) *this << "1";
 		else if (m.exponents().size() == 1) *this << m.exponents().front();
 		else {
-			*this << "(*";
-			for (const auto& e: m.exponents()) *this << " " << e;
-			*this << ")";
+			*this << "(* " << stream_joined(" ", m.exponents()) << ")";
 		}
 	}
 	
@@ -192,11 +187,7 @@ private:
 	}
 
 	void write(const UFInstance& ufi) {
-		*this << "(" << ufi.uninterpretedFunction().name();
-		for (const auto& a: ufi.args()) {
-			*this << " " << a;
-		}
-		*this << ")";
+		*this << "(" << ufi.uninterpretedFunction().name() << " " << stream_joined(" ", ufi.args()) << ")";
 	}
 	
 	template<typename Coeff>
@@ -248,13 +239,8 @@ public:
 		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
 	}
 	void declare(UninterpretedFunction uf) {
-		*this << "(declare-fun " << uf.name() << " (";
-		const auto& sorts = uf.domain();
-		for (std::size_t i = 0; i < sorts.size(); ++i) {
-			if (i != 0) *this << " ";
-			*this << sorts[i];
-		}
-		*this << ") " << uf.codomain() << ")" << std::endl;
+		*this << "(declare-fun " << uf.name() << " (" << stream_joined(" ", uf.domain()) << ") ";
+		*this << uf.codomain() << ")" << std::endl;
 	}
 	void declare(Variable v) {
 		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file   Definiteness.h
  * @author Sebastian Junges
  * @author Florian Corzilius
@@ -25,7 +25,7 @@ namespace carl
 		/// Indicates that \f$y > 0 \forall y \in Y\f$.
 		POSITIVE = 4
 	};
-	
+
 	inline std::ostream& operator<<(std::ostream& os, Definiteness d) {
 		switch (d) {
 			case Definiteness::NEGATIVE:

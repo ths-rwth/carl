@@ -1603,7 +1603,7 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 template<typename Coefficient>
 template<typename C, EnableIf<is_number<C>>>
 bool UnivariatePolynomial<Coefficient>::isConsistent() const {
-	if (!mCoefficients.empty() > 0) {
+	if (!mCoefficients.empty()) {
 		assert(!carl::isZero(lcoeff()));
 	}
 	return true;
