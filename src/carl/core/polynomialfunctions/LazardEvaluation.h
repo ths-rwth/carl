@@ -115,8 +115,9 @@ private:
 		}
 		detail_lazard::CoCoAConverter::ConversionInfo ci = buildPolyRing(v);
 		CoCoA::RingElem p = cc.convertUV(r.getIRPolynomial().replaceVariable(v), ci);
+		CARL_LOG_DEBUG("carl.lazard", "Factorization of " << p << " on " << ci.mRing);
 		auto factorization = CoCoA::factor(p);
-		CARL_LOG_DEBUG("carl.lazard", "Factorization of " << p << " on " << ci.mRing << ": " << factorization);
+		CARL_LOG_DEBUG("carl.lazard", "-> " << factorization);
 		for (const auto& f: factorization.myFactors()) {
 			if (evaluatesToZero(f, ci)) {
 				CARL_LOG_DEBUG("carl.lazard", "Factor " << f << " is zero in assignment.");
