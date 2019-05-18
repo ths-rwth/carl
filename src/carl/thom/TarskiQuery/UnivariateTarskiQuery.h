@@ -19,7 +19,7 @@ Sign signAtMinusInf(const UnivariatePolynomial<Number>& p) {
                 return carl::sgn(p.lcoeff());
         }
         else {                                  // odd degree
-                return carl::sgn(-p.lcoeff());
+                return carl::sgn(Number(-p.lcoeff()));
         }
 }
 
