@@ -201,6 +201,14 @@ matrix:
           packages:
           - llvm
     - stage: build
+      os: osx
+      osx_image: xcode10.2
+      script: source .ci/build.sh
+      addons:
+        homebrew:
+          packages:
+          - llvm
+    - stage: build
       os: linux
       compiler: g++-8
       env: CC=gcc-8 CXX=g++-8 TASK=doxygen

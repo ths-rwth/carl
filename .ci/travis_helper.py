@@ -56,6 +56,7 @@ properties = {
 	"xcode9.4": {"os": "osx", "osx_image": "xcode9.4", "env": [], "addons": addon_brew(["llvm"])},
 	"xcode10": {"os": "osx", "osx_image": "xcode10", "env": [], "addons": addon_brew(["llvm"])},
 	"xcode10.1": {"os": "osx", "osx_image": "xcode10.1", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode10.2": {"os": "osx", "osx_image": "xcode10.2", "env": [], "addons": addon_brew(["llvm"])},
 	"linux": {"os": "linux"},
 
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-xenial-3.8"], ["clang-3.8", "libstdc++-6-dev"])},
