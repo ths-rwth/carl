@@ -137,9 +137,7 @@ include(clang-tidy)
 include(coverage)
 
 # Configure documentation
-if (TARGET Doxygen::doxygen)
-	add_subdirectory(doxygen-conf)
-endif()
+add_subdirectory(doxygen-conf)
 
 # Include actual library
 add_subdirectory(src)

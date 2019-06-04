@@ -1,109 +1,70 @@
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#                                                             #
-# File: doxygen-conf/CMakeLists.txt                           #
-#                                                             #
-# Project name: CARL                                          #
-# Contact: Florian Corzilius <corzilius@cs.rwth-aachen.de>,   #
-#          Ulrich Loup <loup@cs.rwth-aachen.de>               #
-# Project sourceforge page: http://smtrat.sourceforge.net/    #
-# Development status: beta                                    #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Version: 2012-02-21                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-# Quick self-configuration if only doc is built
-if("${PROJECT_NAME}" STREQUAL "")
-	cmake_minimum_required (VERSION 2.8 FATAL_ERROR)
-	project(CArL-doxygen NONE)
-	set(CMAKE_CURRENT_BINARY_DIR "build")
-	set(CMAKE_SOURCE_DIR "..")
-	set(PROJECT_SOURCE_DIR "..")
-	include(FindDoxygen)
-endif()
-
-# Cmake doxygen settings
-# # # # # # # # # # # # #
-
-option(DOCUMENTATION_CREATE_PDF "Create PDF reference manual" OFF )
-option(DOCUMENTATION_INCLUDE_SOURCE_REFERENCE "Include source reference in manual" ON)
+option(DOC_CREATE_DOXYGEN "Create Doxygen HTML" ON)
+option(DOC_CREATE_PDF "Create PDF reference manual" OFF)
+option(DOC_INCLUDE_SOURCES "Include source reference in manual" ON)
 
 # Cmake modules needed
 # # # # # # # # # # # #
 
-find_package( HTMLHelp )
-find_package( LATEX )
+if(NOT TARGET Doxygen::doxygen)
+	message(STATUS "Doxygen not available, no documentation can be built.")
+	return()
+endif()
 
-if( HTML_HELP_COMPILER )
-  set(DOXYGEN_HTMLHELP YES )
-else( HTML_HELP_COMPILER )
-  set(DOXYGEN_HTMLHELP NO )
-endif( HTML_HELP_COMPILER )
+if(TARGET Doxygen::dot)
+  set(DOXYGEN_HAVE_DOT YES)
+else(TARGET Doxygen::dot)
+  set(DOXYGEN_HAVE_DOT NO)
+endif(TARGET Doxygen::dot)
 
-if( LATEX_COMPILER OR PDFLATEX_COMPILER )
-  set(DOXYGEN_LATEX YES )
-else( LATEX_COMPILER OR PDFLATEX_COMPILER )
-  set(DOXYGEN_LATEX NO )
-endif( LATEX_COMPILER OR PDFLATEX_COMPILER )
+# Look for a LaTeX compiler
+if(DOC_CREATE_PDF)
+	find_package(LATEX COMPONENTS PDFLATEX BIBTEX)
 
-if( PDFLATEX_COMPILER AND DOCUMENTATION_CREATE_PDF )
-  set(DOXYGEN_PDFLATEX YES )
-else( PDFLATEX_COMPILER AND DOCUMENTATION_CREATE_PDF )
-  set(DOXYGEN_PDFLATEX NO )
-endif( PDFLATEX_COMPILER AND DOCUMENTATION_CREATE_PDF )
+	if(LATEX_FOUND)
+		set(DOXYGEN_CREATE_PDF YES)
+	else(LATEX_FOUND)
+		message(STATUS "Did not find pdflatex, no pdf manual can be built.")
+		set(DOXYGEN_CREATE_PDF NO)
+	endif(LATEX_FOUND)
+endif()
 
-if( DOCUMENTATION_CREATE_PDF )
-  set(DOXYGEN_PDF_HYPERLINKS YES )
-else( DOCUMENTATION_CREATE_PDF )
-  set(DOXYGEN_PDF_HYPERLINKS NO )
-endif( DOCUMENTATION_CREATE_PDF )
+set(DOC_OUTPUT_DIR ${PROJECT_BINARY_DIR}/doc)
 
-if( DOT )
-  set(HAVE_DOT YES )
-else( DOT )
-  set(HAVE_DOT NO )
-endif( DOT )
+set(DOC_SOURCE_DIR ${PROJECT_SOURCE_DIR}/doc/markdown)
 
-# Doxygen settings
-# # # # # # # # # #
+if(DOC_INCLUDE_SOURCES)
+	set(DOC_SOURCE_DIR ${DOC_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src)
+endif(DOC_INCLUDE_SOURCES)
+STRING(REGEX REPLACE ";" " " DOXYGEN_INPUT_LIST "${DOC_SOURCE_DIR}" )
 
-set(DOXYGEN_LANGUAGE "English" CACHE STRING "Language used by doxygen")
-mark_as_advanced(DOXYGEN_LANGUAGE)
 
-set(DOXYGEN_SOURCE_DIR ${PROJECT_SOURCE_DIR}/doc/markdown)
-
-if( DOCUMENTATION_INCLUDE_SOURCE_REFERENCE )
-	set(DOXYGEN_SOURCE_DIR ${DOXYGEN_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src)
-endif( DOCUMENTATION_INCLUDE_SOURCE_REFERENCE ) 
-
-set(DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/doc)
-
-STRING(REGEX REPLACE ";" " " DOXYGEN_INPUT_LIST "${DOXYGEN_SOURCE_DIR}" )
-
-# Generate doxygen.conf
-# # # # # # # # # # # #
-
-configure_file(doxygen.conf.in ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
+configure_file(doxygen.conf.in ${DOC_OUTPUT_DIR}/config/doxygen.conf)
 
 # Target for running doxygen
-add_custom_target(doc-doxygen
-	COMMAND Doxygen::doxygen ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
-	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf Doxygen::doxygen
+add_custom_command(
+	OUTPUT ${DOC_OUTPUT_DIR}/xml/index.xml
+	COMMAND Doxygen::doxygen ${DOC_OUTPUT_DIR}/config/doxygen.conf
+	DEPENDS ${DOC_OUTPUT_DIR}/config/doxygen.conf
 )
 
-# Target for building the whole documentation
+add_custom_target(doc-doxygen
+	DEPENDS ${DOC_OUTPUT_DIR}/xml/index.xml
+)
+
+# umbrella target for the whole documentation
 add_custom_target(doc
 	DEPENDS doc-doxygen
 )
 
-if(DOXYGEN_PDFLATEX)
-	set(TEX_DIR ${DOXYGEN_OUTPUT_DIR}/latex)
+if(DOXYGEN_CREATE_PDF)
+	set(TEX_DIR ${DOC_OUTPUT_DIR}/latex)
 	add_custom_target(doc-pdf
 		BYPRODUCTS ${TEX_DIR}/refman.pdf
 		COMMAND ${PDFLATEX_COMPILER} refman.tex
 		COMMAND ${PDFLATEX_COMPILER} refman.tex
-		COMMAND mv ${TEX_DIR}/refman.pdf ${DOXYGEN_OUTPUT_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION_LIB}.pdf
+		COMMAND mv ${TEX_DIR}/refman.pdf ${DOC_OUTPUT_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION_LIB}.pdf
 		WORKING_DIRECTORY ${TEX_DIR}
 		DEPENDS doc-doxygen
 	)
 	add_dependencies(doc doc-pdf)
-endif(DOXYGEN_PDFLATEX)
+endif(DOXYGEN_CREATE_PDF)
