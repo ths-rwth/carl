@@ -77,7 +77,7 @@ elif [[ ${TASK} == "clang-ubsan" ]]; then
 
 elif [[ ${TASK} == "doxygen" ]]; then
 	
-	fold "reconfigure" cmake -D DOCUMENTATION_CREATE_PDF=ON -D BUILD_DOXYGEN=ON ../
+	fold "reconfigure" cmake -D DOC_CREATE_PDF=ON -D BUILD_DOXYGEN=ON ../
 	
 	fold "build-doc" make doc || return 1
 	
