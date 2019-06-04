@@ -1,5 +1,6 @@
 option(DOC_CREATE_DOXYGEN "Create Doxygen HTML" ON)
 option(DOC_CREATE_PDF "Create PDF reference manual" OFF)
+option(DOC_CREATE_SPHINX "Create Sphinx HTML" OFF)
 option(DOC_INCLUDE_SOURCES "Include source reference in manual" ON)
 
 # Cmake modules needed
@@ -68,3 +69,22 @@ if(DOXYGEN_CREATE_PDF)
 	)
 	add_dependencies(doc doc-pdf)
 endif(DOXYGEN_CREATE_PDF)
+
+if(DOC_CREATE_SPHINX)
+	configure_file(conf.py.in ${DOC_OUTPUT_DIR}/config/conf.py)
+	add_custom_command(
+		OUTPUT ${DOC_OUTPUT_DIR}/sphinx/index.html
+		COMMAND sphinx-build -a -E -v -b html
+			-Dbreathe_default_project=carl -Dbreathe_projects.carl=${DOC_OUTPUT_DIR}/xml
+			-c ${DOC_OUTPUT_DIR}/config
+			${CMAKE_CURRENT_SOURCE_DIR} ${DOC_OUTPUT_DIR}/sphinx
+		WORKING_DIRECTORY ${DOC_OUTPUT_DIR}/config
+		DEPENDS ${DOC_OUTPUT_DIR}/xml/index.xml
+	)
+	add_custom_target(doc-sphinx
+		DEPENDS
+			doc-doxygen
+			${DOC_OUTPUT_DIR}/sphinx/index.html
+	)
+	add_dependencies(doc doc-sphinx)
+endif(DOC_CREATE_SPHINX)
