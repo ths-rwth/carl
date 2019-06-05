@@ -16,7 +16,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 	export PATH="$PREFIX/bin:$PATH"
 
 	if [[ ${TASK} == "doxygen" ]]; then
-		pip install Sphinx breathe exhale
+		pip3 install Sphinx breathe exhale
 	fi
 
 fi
