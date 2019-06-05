@@ -211,7 +211,7 @@ matrix:
     - stage: build
       os: linux
       compiler: g++-8
-      env: CC=gcc-8 CXX=g++-8 TASK=doxygen
+      env: CC=gcc-8 CXX=g++-8 TASK=documentation
       if: branch = master
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:

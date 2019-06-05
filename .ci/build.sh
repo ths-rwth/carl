@@ -75,7 +75,7 @@ elif [[ ${TASK} == "clang-ubsan" ]]; then
 	fold "build" /usr/bin/time make ${MAKE_PARALLEL} || return 1
 	fold "tests" /usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
 
-elif [[ ${TASK} == "doxygen" ]]; then
+elif [[ ${TASK} == "documentation" ]]; then
 	
 	fold "reconfigure" cmake -D DOC_CREATE_PDF=ON -D DOC_CREATE_SPHINX=ON -D BUILD_DOXYGEN=ON ../
 	
@@ -83,7 +83,7 @@ elif [[ ${TASK} == "doxygen" ]]; then
 	
 	fold_start "commit"
 	git config --global user.email "gereon.kremer@cs.rwth-aachen.de"
-	git config --global user.name "Travis doxygen daemon"
+	git config --global user.name "Travis documentation daemon"
 	
 	git clone https://${GH_TOKEN}@github.com/smtrat/smtrat.github.io.git
 	cd smtrat.github.io/ || return 1

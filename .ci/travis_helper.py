@@ -77,7 +77,7 @@ properties = {
 	"task.sonarcloud-build": {"script": ["TASK=sonarcloud-build"]},
 	"task.sonarcloud-scan": {"script": ["TASK=sonarcloud-scan"]},
 	"task.clang-ubsan": {"env": ["TASK=clang-ubsan"]},
-	"task.doxygen": {"if": "branch = master", "env": ["TASK=doxygen"], "addons": addon_apt([],["doxygen", "ghostscript", "latex-xcolor", "lmodern", "pgf", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra"])},
+	"task.documentation": {"if": "branch = master", "env": ["TASK=documentation"], "addons": addon_apt([],["doxygen", "ghostscript", "latex-xcolor", "lmodern", "pgf", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra"])},
 	"task.pycarl": {"env": ["TASK=pycarl"], "addons": addon_apt([],["python3"])},
 	"task.addons": {"env": ["TASK=addons"]},
 	"task.tidy": {"env": ["TASK=tidy"]},
