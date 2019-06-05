@@ -39,6 +39,8 @@ jobs = [
 	job("1-gcc", ["build", "linux", "g++-7", "j1", "build.sh"]),
 	job("1-gcc", ["dependencies", "linux", "g++-8", "build.sh"]),
 	job("1-gcc", ["build", "linux", "g++-8", "j1", "build.sh"]),
+	job("1-gcc", ["dependencies", "linux", "g++-9", "build.sh"]),
+	job("1-gcc", ["build", "linux", "g++-9", "j1", "build.sh"]),
 	job("2-macos", ["build", "xcode9.3", "build.sh"]),
 	job("2-macos", ["build", "xcode9.4", "build.sh"]),
 	job("2-macos", ["build", "xcode10", "build.sh"]),

@@ -41,6 +41,16 @@ matrix:
           packages: [*packages_base, g++-8]
     - stage: dependencies
       os: linux
+      compiler: g++-9
+      env: CC=gcc-9 CXX=g++-9
+      script: TASK=dependencies source .ci/build.sh
+      addons:
+        apt:
+          sources:
+          - *sources_base
+          packages: [*packages_base, g++-9]
+    - stage: dependencies
+      os: linux
       compiler: clang++-9.0
       env: CC=clang-9 CXX=clang++-9 TASK=tidy
       script: TASK=dependencies source .ci/build.sh
@@ -168,6 +178,16 @@ matrix:
           sources:
           - *sources_base
           packages: [*packages_base, g++-8]
+    - stage: build
+      os: linux
+      compiler: g++-9
+      env: CC=gcc-9 CXX=g++-9
+      script: MAKE_PARALLEL=-j1 source .ci/build.sh
+      addons:
+        apt:
+          sources:
+          - *sources_base
+          packages: [*packages_base, g++-9]
     - stage: build
       os: osx
       osx_image: xcode9.3
