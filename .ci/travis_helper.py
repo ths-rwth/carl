@@ -71,6 +71,7 @@ properties = {
 	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6", "addons": addon_apt([],["g++-6"])},
 	"g++-7": {"env": ["CC=gcc-7 CXX=g++-7"], "compiler": "g++-7", "addons": addon_apt([],["g++-7"])},
 	"g++-8": {"env": ["CC=gcc-8 CXX=g++-8"], "compiler": "g++-8", "addons": addon_apt([],["g++-8"])},
+	"g++-9": {"env": ["CC=gcc-9 CXX=g++-9"], "compiler": "g++-9", "addons": addon_apt([],["g++-9"])},
 
 	"task.coverity": {"env": ["TASK=coverity"]},
 	"task.sonarcloud": {"env": ["TASK=sonarcloud"], "addons": addon_cache("$HOME/usr/", "$HOME/.sonar/cache", "build/", "bw-output/")},

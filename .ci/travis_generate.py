@@ -55,10 +55,10 @@ jobs = [
 	job("5-checker", ["build", "linux", "clang-7.0", "task.sonarcloud", "task.sonarcloud-build", "addon.sonarcloud", "build.sh", "mayfail"]),
 	job("5-checker", ["check", "linux", "clang-7.0", "task.sonarcloud", "task.sonarcloud-scan", "addon.sonarcloud", "build.sh", "mayfail"]),
 	job("5-checker", ["check", "linux", "clang-9.0", "task.clang-ubsan", "build.sh", "mayfail"]),
-	job("6-addons", ["dependencies", "linux", "g++-7", "task.pycarl", "j1", "build.sh"]),
-	job("6-addons", ["build", "linux", "g++-7", "task.pycarl", "j1", "build.sh", "mayfail"]),
-	job("6-addons", ["dependencies", "linux", "g++-7", "task.addons", "j1", "build.sh"]),
-	job("6-addons", ["build", "linux", "g++-7", "task.addons", "j1", "build.sh", "mayfail"]),
+	job("6-addons", ["dependencies", "linux", "g++-8", "task.pycarl", "j1", "build.sh"]),
+	job("6-addons", ["build", "linux", "g++-8", "task.pycarl", "j1", "build.sh", "mayfail"]),
+	job("6-addons", ["dependencies", "linux", "g++-8", "task.addons", "j1", "build.sh"]),
+	job("6-addons", ["build", "linux", "g++-8", "task.addons", "j1", "build.sh", "mayfail"]),
 ]
 
 cached = [
