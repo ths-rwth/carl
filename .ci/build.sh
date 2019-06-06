@@ -79,7 +79,9 @@ elif [[ ${TASK} == "documentation" ]]; then
 	
 	fold "reconfigure" cmake -D DOC_CREATE_PDF=ON -D DOC_CREATE_SPHINX=ON -D BUILD_DOXYGEN=ON ../
 	
+	start_keep_waiting
 	fold "build-doc" make doc || return 1
+	stop_keep_waiting
 	
 	fold_start "commit"
 	git config --global user.email "gereon.kremer@cs.rwth-aachen.de"
