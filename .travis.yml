@@ -1,7 +1,5 @@
 language: generic
 dist: xenial
-python:
-  - "3.7"
 
 cache:
   apt: true
@@ -240,7 +238,7 @@ matrix:
         apt:
           sources:
           - *sources_base
-          packages: [*packages_base, g++-8, doxygen, ghostscript, latex-xcolor, lmodern, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra]
+          packages: [*packages_base, g++-8, doxygen, ghostscript, latex-xcolor, lmodern, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra, python3-pip]
     - stage: check
       os: linux
       compiler: clang++-9.0

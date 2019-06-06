@@ -1,7 +1,5 @@
 language: generic
 dist: xenial
-python:
-  - "3.7"
 
 cache:
   apt: true
