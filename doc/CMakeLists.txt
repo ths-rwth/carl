@@ -74,7 +74,7 @@ if(DOC_CREATE_SPHINX)
 	configure_file(conf.py.in ${DOC_OUTPUT_DIR}/config/conf.py)
 	add_custom_command(
 		OUTPUT ${DOC_OUTPUT_DIR}/sphinx/index.html
-		COMMAND sphinx-build -b html -q
+		COMMAND sphinx-build -b html -Q
 			-Dbreathe_default_project=carl -Dbreathe_projects.carl=${DOC_OUTPUT_DIR}/xml
 			-c ${DOC_OUTPUT_DIR}/config
 			${CMAKE_CURRENT_SOURCE_DIR} ${DOC_OUTPUT_DIR}/sphinx
