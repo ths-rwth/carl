@@ -238,7 +238,7 @@ matrix:
         apt:
           sources:
           - *sources_base
-          packages: [*packages_base, g++-8, doxygen, ghostscript, latex-xcolor, lmodern, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra, python3-pip]
+          packages: [*packages_base, g++-8, doxygen, ghostscript, latex-xcolor, lmodern, pgf, texinfo, texlive, texlive-font-utils, texlive-latex-extra, python3-pip, python3-setuptools]
     - stage: check
       os: linux
       compiler: clang++-9.0

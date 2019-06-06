@@ -36,7 +36,7 @@ extensions = [
 
 exhale_args = {
 	# These arguments are required
-	"containmentFolder":     "../../../doxygen-conf/api",
+	"containmentFolder":     "../../../doc/api",
 	"rootFileName":          "library_root.rst",
 	"rootFileTitle":         "Library API",
 	"doxygenStripFromPath":  "..",

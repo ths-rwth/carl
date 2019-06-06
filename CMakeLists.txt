@@ -137,7 +137,7 @@ include(clang-tidy)
 include(coverage)
 
 # Configure documentation
-add_subdirectory(doxygen-conf)
+add_subdirectory(doc)
 
 # Include actual library
 add_subdirectory(src)
