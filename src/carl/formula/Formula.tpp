@@ -766,8 +766,8 @@ namespace carl
         #ifdef CONSTRAINT_BOUND_DEBUG
         std::cout << "try to add the bound  " << relation << boundValue << "  for the polynomial  " << poly << std::endl;
         #endif
-        auto resA = _constraintBounds.insert( make_pair( std::move(poly), std::move( std::map<typename Pol::NumberType, std::pair<Relation, Formula<Pol>>>() ) ) );
-        auto resB = resA.first->second.insert( make_pair( boundValue, make_pair( relation, _constraint ) ) );
+        auto resA = _constraintBounds.insert( std::make_pair( std::move(poly), std::move( std::map<typename Pol::NumberType, std::pair<Relation, Formula<Pol>>>() ) ) );
+        auto resB = resA.first->second.insert( std::make_pair( boundValue, std::make_pair( relation, _constraint ) ) );
         if( resB.second || resB.first->second.first == relation )
             return resB.first->second.second;
         switch( relation )
