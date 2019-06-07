@@ -417,7 +417,7 @@ namespace carl
     }
 
     template<typename Pol>
-    void Formula<Pol>::printProposition( ostream& _out, const string _init ) const
+    void Formula<Pol>::printProposition( std::ostream& _out, const std::string _init ) const
     {
         _out << _init;
         for( unsigned i = 0; i < properties().size(); ++i )
@@ -426,7 +426,7 @@ namespace carl
                 _out << " ";
             _out << properties()[i];
         }
-        _out << endl;
+        _out << std::endl;
     }
 
     template<typename Pol>
@@ -482,7 +482,7 @@ namespace carl
                         default:
                         {
                             assert( false );
-                            cerr << "Unexpected relation symbol!" << endl;
+                            std::cerr << "Unexpected relation symbol!" << std::endl;
                             return *this;
                         }
                     }
@@ -553,7 +553,7 @@ namespace carl
                 break;
             default:
                 assert( false );
-                cerr << "Unexpected type of formula!" << endl;
+                std::cerr << "Unexpected type of formula!" << std::endl;
                 return *this;
         }
         assert( newType != subformula().getType() );
@@ -671,7 +671,7 @@ namespace carl
     }
 
     template<typename Pol>
-    Formula<Pol> Formula<Pol>::substitute( const map<Variable, Formula<Pol>>& _booleanSubstitutions, const map<Variable, Pol>& _arithmeticSubstitutions ) const
+    Formula<Pol> Formula<Pol>::substitute( const std::map<Variable, Formula<Pol>>& _booleanSubstitutions, const std::map<Variable, Pol>& _arithmeticSubstitutions ) const
     {
         switch( getType() )
         {
@@ -737,7 +737,7 @@ namespace carl
     Formula<Pol> Formula<Pol>::addConstraintBound( ConstraintBounds& _constraintBounds, const Formula<Pol>& _constraint, bool _inConjunction )
     {
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "add from a " << (_inConjunction ? "conjunction" : "disjunction") << " to " << &_constraintBounds << ":   " << _constraint << endl;
+        std::cout << "add from a " << (_inConjunction ? "conjunction" : "disjunction") << " to " << &_constraintBounds << ":   " << _constraint << std::endl;
         #endif
         bool negated = _constraint.getType() == FormulaType::NOT;
         assert( _constraint.getType() == FormulaType::CONSTRAINT || (negated && _constraint.subformula().getType() == FormulaType::CONSTRAINT ) );
@@ -764,9 +764,9 @@ namespace carl
         boundValue *= cf;
         poly *= cf;
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "try to add the bound  " << relation << boundValue << "  for the polynomial  " << poly << endl;
+        std::cout << "try to add the bound  " << relation << boundValue << "  for the polynomial  " << poly << std::endl;
         #endif
-        auto resA = _constraintBounds.insert( make_pair( std::move(poly), std::move( map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>() ) ) );
+        auto resA = _constraintBounds.insert( make_pair( std::move(poly), std::move( std::map<typename Pol::NumberType, std::pair<Relation, Formula<Pol>>>() ) ) );
         auto resB = resA.first->second.insert( make_pair( boundValue, make_pair( relation, _constraint ) ) );
         if( resB.second || resB.first->second.first == relation )
             return resB.first->second.second;
@@ -1028,20 +1028,20 @@ namespace carl
     bool Formula<Pol>::swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoFormulas, bool _inConjunction )
     {
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "swap from " << &_constraintBounds << " to a " << (_inConjunction ? "conjunction" : "disjunction") << endl;
+        std::cout << "swap from " << &_constraintBounds << " to a " << (_inConjunction ? "conjunction" : "disjunction") << std::endl;
         #endif
         while( !_constraintBounds.empty() )
         {
             #ifdef CONSTRAINT_BOUND_DEBUG
-            cout << "for the bounds of  " << _constraintBounds.begin()->first << endl;
+            std::cout << "for the bounds of  " << _constraintBounds.begin()->first << std::endl;
             #endif
-            const map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>& bounds = _constraintBounds.begin()->second;
+            const std::map<typename Pol::NumberType, std::pair<Relation, Formula<Pol>>>& bounds = _constraintBounds.begin()->second;
             assert( !bounds.empty() );
             if( bounds.size() == 1 )
             {
                 _intoFormulas.push_back( bounds.begin()->second.second );
                 #ifdef CONSTRAINT_BOUND_DEBUG
-                cout << "   just add the only bound" << endl;
+                std::cout << "   just add the only bound" << std::endl;
                 #endif
             }
             else
@@ -1054,7 +1054,7 @@ namespace carl
                 for( ; iter != bounds.end(); ++iter )
                 {
                     #ifdef CONSTRAINT_BOUND_DEBUG
-                    cout << "   bound is  " << iter->second.first << iter->first << endl;
+                    std::cout << "   bound is  " << iter->second.first << iter->first << std::endl;
                     #endif
                     if( (_inConjunction && iter->second.first == Relation::NEQ)
                         || (!_inConjunction && iter->second.first == Relation::EQ) )
@@ -1068,14 +1068,14 @@ namespace carl
                                     || (!_inConjunction && mostSignificantUpperBound != bounds.end()) )
                                 {
                                     #ifdef CONSTRAINT_BOUND_DEBUG
-                                    cout << "      case: " << __LINE__ << endl;
+                                    std::cout << "      case: " << __LINE__ << std::endl;
                                     #endif
                                     _intoFormulas.push_back( iter->second.second );
                                 }
                                 else
                                 {
                                     #ifdef CONSTRAINT_BOUND_DEBUG
-                                    cout << "      case: " << __LINE__ << endl;
+                                    std::cout << "      case: " << __LINE__ << std::endl;
                                     #endif
                                     lessSignificantCases.push_back( iter->second.second );
                                 }
@@ -1090,14 +1090,14 @@ namespace carl
                             || moreSignificantCase != bounds.end() )
                         {
                             #ifdef CONSTRAINT_BOUND_DEBUG
-                            cout << "      case: " << __LINE__ << endl;
+                            std::cout << "      case: " << __LINE__ << std::endl;
                             #endif
                             break;
                         }
                         else
                         {
                             #ifdef CONSTRAINT_BOUND_DEBUG
-                            cout << "      case: " << __LINE__ << endl;
+                            std::cout << "      case: " << __LINE__ << std::endl;
                             #endif
                             if( _inConjunction ) // update the strongest upper bound
                                 mostSignificantLowerBound = iter;
@@ -1114,7 +1114,7 @@ namespace carl
                         if( moreSignificantCase != bounds.end() || (_inConjunction ? mostSignificantUpperBound : mostSignificantLowerBound) != bounds.end() )
                         {
                             #ifdef CONSTRAINT_BOUND_DEBUG
-                            cout << "      case: " << __LINE__ << endl;
+                            std::cout << "      case: " << __LINE__ << std::endl;
                             #endif
                             break;
                         }
@@ -1123,7 +1123,7 @@ namespace carl
                         else
                         {
                             #ifdef CONSTRAINT_BOUND_DEBUG
-                            cout << "      case: " << __LINE__ << endl;
+                            std::cout << "      case: " << __LINE__ << std::endl;
                             #endif
                             moreSignificantCase = iter;
                         }
@@ -1133,21 +1133,21 @@ namespace carl
                     else
                     {
                         #ifdef CONSTRAINT_BOUND_DEBUG
-                        cout << "      case: " << __LINE__ << endl;
+                        std::cout << "      case: " << __LINE__ << std::endl;
                         #endif
                         assert( !_inConjunction || iter->second.first == Relation::LEQ || iter->second.first == Relation::LESS );
                         assert( _inConjunction || iter->second.first == Relation::GEQ || iter->second.first == Relation::GREATER );
                         if( _inConjunction && mostSignificantUpperBound == bounds.end() ) // first upper bound found = strongest upper bound
                         {
                             #ifdef CONSTRAINT_BOUND_DEBUG
-                            cout << "      case: " << __LINE__ << endl;
+                            std::cout << "      case: " << __LINE__ << std::endl;
                             #endif
                             mostSignificantUpperBound = iter;
                         }
                         else if( !_inConjunction && mostSignificantLowerBound == bounds.end() ) // first lower bound found = weakest lower bound
                         {
                             #ifdef CONSTRAINT_BOUND_DEBUG
-                            cout << "      case: " << __LINE__ << endl;
+                            std::cout << "      case: " << __LINE__ << std::endl;
                             #endif
                             mostSignificantLowerBound = iter;
                         }
@@ -1167,8 +1167,8 @@ namespace carl
                         || !( !_inConjunction || mostSignificantUpperBound == bounds.end() || mostSignificantLowerBound == bounds.end()
                              || mostSignificantLowerBound->first > mostSignificantUpperBound->first ) )
                     {
-                        cout << "mostSignificantUpperBound:   " << mostSignificantUpperBound->first << "  [" << mostSignificantUpperBound->second.second << "]" << endl;
-                        cout << "mostSignificantLowerBound:   " << mostSignificantLowerBound->first << "  [" << mostSignificantLowerBound->second.second << "]" << endl;
+                        std::cout << "mostSignificantUpperBound:   " << mostSignificantUpperBound->first << "  [" << mostSignificantUpperBound->second.second << "]" << std::endl;
+                        std::cout << "mostSignificantLowerBound:   " << mostSignificantLowerBound->first << "  [" << mostSignificantLowerBound->second.second << "]" << std::endl;
                     }
                     #endif
                     assert( !_inConjunction || mostSignificantUpperBound == bounds.end() || mostSignificantLowerBound == bounds.end()
@@ -1187,7 +1187,7 @@ namespace carl
         if( _constraintBounds.empty() )
         {
             #ifdef CONSTRAINT_BOUND_DEBUG
-            cout << endl;
+            std::cout << std::endl;
             #endif
             return false;
         }
@@ -1195,7 +1195,7 @@ namespace carl
         {
             _constraintBounds.clear();
             #ifdef CONSTRAINT_BOUND_DEBUG
-            cout << "is " << (_inConjunction ? "invalid" : "valid") << endl << endl;
+            std::cout << "is " << (_inConjunction ? "invalid" : "valid") << endl << std::endl;
             #endif
             return true;
         }
