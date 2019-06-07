@@ -9,9 +9,10 @@ foreach (variableName ${variableNames})
 		set(ISADV "false")
 	endif()
 	get_property(TYPE CACHE ${variableName} PROPERTY TYPE)
-	set(VARLIST "${VARLIST}\n\tprint(${ISADV}, \"${TYPE}\", \"${variableName}\", R\"VAR(${${variableName}})VAR\");")
+	string(LENGTH "${${variableName}}" VALLEN)
+	if(VALLEN LESS_EQUAL 512)
+		set(VARLIST "${VARLIST}\n\tprint(${ISADV}, \"${TYPE}\", \"${variableName}\", R\"VAR(${${variableName}})VAR\");")
+	endif()
 endforeach()
 
 set(VARLIST "${VARLIST}" PARENT_SCOPE)
-
-#configure_file( ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp.in ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp )
