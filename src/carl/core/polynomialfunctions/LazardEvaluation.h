@@ -22,6 +22,16 @@ namespace detail_lazard {
 		mpq_class convert(const CoCoA::BigRat& n) const {
 			return mpq_class(CoCoA::mpqref(n));
 		}
+		#ifdef USE_CLN_NUMBERS
+		CoCoA::BigRat convert(const cln::cl_RA& n) const {
+			CARL_LOG_ERROR("carl.lazard", "No conversion from cl_RA to BigRat.");
+			return 0;
+		}
+		cln::cl_RA convert(const CoCoA::BigRat& n) const {
+			CARL_LOG_ERROR("carl.lazard", "No conversion from BigRat to cl_RA.");
+			return 0;
+		}
+		#endif
 
 		template<typename Poly>
 		Poly convertMV(const CoCoA::RingElem& p, const ConversionInfo& ci) const {
