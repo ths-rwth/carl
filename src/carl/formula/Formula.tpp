@@ -12,8 +12,6 @@
 #include "FormulaPool.h"
 #include "ConstraintPool.h"
 
-using namespace std;
-
 namespace carl
 {
     template<typename Pol>

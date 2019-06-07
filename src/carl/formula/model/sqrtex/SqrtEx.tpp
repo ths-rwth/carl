@@ -7,7 +7,6 @@
 
 namespace carl
 {
-    using namespace std;
 
 	template<typename Poly>
     SqrtEx<Poly>::SqrtEx():
