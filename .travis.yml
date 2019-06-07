@@ -337,9 +337,6 @@ matrix:
     - stage: build
       os: linux
       env: CC=clang-9 CXX=clang++-9
-    - stage: build
-      os: osx
-      osx_image: xcode10.2
     - stage: check
       os: linux
       env: CC=clang-9 CXX=clang++-9 TASK=tidy
