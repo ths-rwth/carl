@@ -77,7 +77,7 @@ elif [[ ${TASK} == "clang-ubsan" ]]; then
 
 elif [[ ${TASK} == "documentation" ]]; then
 	
-	fold "reconfigure" cmake -D DOC_CREATE_PDF=ON -D DOC_CREATE_SPHINX=ON -D BUILD_DOXYGEN=ON ../
+	fold "reconfigure" cmake -D DOC_CREATE_PDF=ON -D DOC_CREATE_SPHINX=OFF -D BUILD_DOXYGEN=ON ../
 	
 	start_keep_waiting
 	fold "build-doc" make doc || return 1
@@ -94,7 +94,6 @@ elif [[ ${TASK} == "documentation" ]]; then
 	
 	# Update cloned copy
 	cp -r ../doc/html/* carl/ || return 1
-	cp -r ../doc/sphinx carl/ || return 1
 	cp ../doc/*.pdf . || return 1
 	
 	git add . || return 1
