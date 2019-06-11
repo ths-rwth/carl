@@ -64,7 +64,7 @@ jobs = [
 cached = [
 	"$HOME/usr/",
 	"$HOME/.sonar/cache",
-	"$HOME/build/resources",
+	"$HOME/build/smtrat/carl/build/resources",
 ]
 
 render_template(jobs, cached)
