@@ -26,8 +26,9 @@ namespace detail_lazard {
 			}
 			#ifdef USE_CLN_NUMBERS
 			else if constexpr(std::is_same<T,cln::cl_RA>::value) {
-				CARL_LOG_ERROR("carl.lazard", "No conversion from BigRat to cl_RA.");
-				return T(0);
+				std::stringstream ss;
+				ss << n;
+				return T(ss.str().c_str());
 			}
 			#endif
 			else {
@@ -36,8 +37,9 @@ namespace detail_lazard {
 		}
 		#ifdef USE_CLN_NUMBERS
 		CoCoA::BigRat convert(const cln::cl_RA& n) const {
-			CARL_LOG_ERROR("carl.lazard", "No conversion from cl_RA to BigRat.");
-			return CoCoA::BigRat();
+			std::stringstream ss;
+			ss << n;
+			return CoCoA::BigRatFromString(ss.str());
 		}
 		#endif
 
