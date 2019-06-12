@@ -386,7 +386,7 @@ public:
 	MultivariatePolynomial& stripLT();
     
 	bool hasSingleVariable() const {
-		return (nrTerms() > 0) && lterm().isSingleVariable();
+		return gatherVariables().size() == 1;
 	}
     
     /**
