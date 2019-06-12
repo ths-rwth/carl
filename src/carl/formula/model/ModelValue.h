@@ -132,9 +132,9 @@ namespace carl
 			return *this;
 		}
 		
-		template<typename F, typename Return = void>
-		Return visit(F&& f) const {
-			return std::visit([&f](const auto& v){ return f(v); }, mData);
+		template<typename F>
+		auto visit(F&& f) const {
+			return std::visit(f, mData);
 		}
 
 		/**
