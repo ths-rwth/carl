@@ -1,19 +1,19 @@
 #pragma once
 
-#include "../core/Monomial.h"
-#include "../core/MultivariatePolynomial.h"
-#include "../core/Relation.h"
-#include "../core/Term.h"
-#include "../core/UnivariatePolynomial.h"
-#include "../core/Variable.h"
-#include "../formula/Constraint.h"
-#include "../formula/Formula.h"
-#include "../formula/Logic.h"
-#include "../formula/model/Model.h"
-#include "../formula/Sort.h"
-#include "../numbers/numbers.h"
-#include "../util/tuple_util.h"
-#include "streamingOperators.h"
+#include <carl/core/Monomial.h>
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/core/Relation.h>
+#include <carl/core/Term.h>
+#include <carl/core/UnivariatePolynomial.h>
+#include <carl/core/Variable.h>
+#include <carl/formula/Constraint.h>
+#include <carl/formula/Formula.h>
+#include <carl/formula/Logic.h>
+#include <carl-model/Model.h>
+#include <carl/formula/Sort.h>
+#include <carl/numbers/numbers.h>
+#include <carl/util/tuple_util.h>
+#include <carl/io/streamingOperators.h>
 
 #include <iostream>
 #include <sstream>

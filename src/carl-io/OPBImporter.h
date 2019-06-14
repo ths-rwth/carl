@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../core/logging.h"
-#include "../../core/Relation.h"
-#include "../Formula.h"
+#include <carl/core/logging.h>
+#include <carl/core/Relation.h>
+#include <carl/formula/Formula.h>
 
 #include <iostream>
 #include <map>

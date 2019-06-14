@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../core/logging.h"
+#include <carl/core/logging.h>
 
-#include "../Formula.h"
-#include "../helpers/to_cnf.h"
+#include <carl/formula/Formula.h>
+#include <carl/formula/helpers/to_cnf.h>
 
 #include <iostream>
 #include <map>

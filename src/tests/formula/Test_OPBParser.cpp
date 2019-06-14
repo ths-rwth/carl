@@ -2,7 +2,7 @@
 
 #include "../Common.h"
 
-#include <carl/formula/parser/OPBImporter.h>
+#include <carl-io/OPBImporter.h>
 
 using namespace carl;
 using Poly = carl::MultivariatePolynomial<mpq_class>;
