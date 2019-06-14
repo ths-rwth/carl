@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Model.h"
-#include "../mvroot/MultivariateRoot.h"
+#include <carl/formula/model/mvroot/MultivariateRoot.h>
 
 namespace carl {
 namespace model {

@@ -2,9 +2,9 @@
 
 #include "../Model.h"
 
-#include "../../uninterpreted/UEquality.h"
-#include "../../uninterpreted/UFInstance.h"
-#include "../uninterpreted/SortValue.h"
+#include <carl/formula/uninterpreted/UEquality.h>
+#include <carl/formula/uninterpreted/UFInstance.h>
+#include <carl/formula/model/uninterpreted/SortValue.h>
 
 namespace carl {
 namespace model {

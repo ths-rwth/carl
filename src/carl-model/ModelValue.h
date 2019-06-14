@@ -1,13 +1,13 @@
 #pragma once
 
 
-#include "../../util/variant_util.h"
-#include "../bitvector/BVValue.h"
-#include "mvroot/MultivariateRoot.h"
-#include "ran/RealAlgebraicNumber.h"
+#include <carl/util/variant_util.h>
+#include <carl/formula/bitvector/BVValue.h>
+#include <carl/formula/model/mvroot/MultivariateRoot.h>
+#include <carl/formula/model/ran/RealAlgebraicNumber.h>
 #include "sqrtex/SqrtEx.h"
-#include "uninterpreted/SortValue.h"
-#include "uninterpreted/UFModel.h"
+#include <carl/formula/model/uninterpreted/SortValue.h>
+#include <carl/formula/model/uninterpreted/UFModel.h>
 
 #include <memory>
 #include <variant>

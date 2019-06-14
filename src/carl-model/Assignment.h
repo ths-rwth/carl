@@ -11,11 +11,11 @@
 
 #include "Model.h"
 
-#include "../Formula.h"
-#include "ran/RealAlgebraicNumber.h"
+#include <carl/formula/Formula.h>
+#include <carl/formula/model/ran/RealAlgebraicNumber.h>
 #include "sqrtex/SqrtEx.h"
-#include "uninterpreted/SortValue.h"
-#include "uninterpreted/UFModel.h"
+#include <carl/formula/model/uninterpreted/SortValue.h>
+#include <carl/formula/model/uninterpreted/UFModel.h>
 
 #include <map>
 

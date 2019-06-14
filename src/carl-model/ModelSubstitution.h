@@ -6,8 +6,8 @@
 
 #include <boost/optional.hpp>
 
-#include "../Formula.h"
-#include "mvroot/MultivariateRoot.h"
+#include <carl/formula/Formula.h>
+#include <carl/formula/model/mvroot/MultivariateRoot.h>
 #include "ModelValue.h"
 #include "ModelVariable.h"
 

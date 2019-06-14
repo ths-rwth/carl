@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../Formula.h"
+#include <carl/formula/Formula.h>
 #include "../Model.h"
 
 #include "ModelEvaluation_Constraint.h"
 
-#include "../../../core/logging.h"
+#include <carl/core/logging.h>
 
 namespace carl {
 namespace model {

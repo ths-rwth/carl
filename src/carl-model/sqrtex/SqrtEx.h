@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "../../Constraint.h"
+#include <carl/formula/Constraint.h>
 
-#include "../../../core/Variable.h"
-#include "../../../numbers/numbers.h"
+#include <carl/core/Variable.h>
+#include <carl/numbers/numbers.h>
 
 #include <cassert>
 #include <iostream>

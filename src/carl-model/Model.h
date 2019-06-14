@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../core/logging.h"
+#include <carl/core/logging.h>
 
 #include "ModelVariable.h"
 #include "ModelValue.h"

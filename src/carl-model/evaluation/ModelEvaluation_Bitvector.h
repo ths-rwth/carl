@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Model.h"
-#include "../../bitvector/BVConstraint.h"
-#include "../../bitvector/BVTerm.h"
+#include <carl/formula/bitvector/BVConstraint.h>
+#include <carl/formula/bitvector/BVTerm.h>
 
 namespace carl {
 namespace model {

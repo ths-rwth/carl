@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../Model.h"
-#include "../../../core/rootfinder/RootFinder.h"
-#include "../../../core/MultivariatePolynomial.h"
-#include "../../../core/UnivariatePolynomial.h"
+#include <carl/core/rootfinder/RootFinder.h>
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/core/UnivariatePolynomial.h>
 
 namespace carl {
 namespace model {

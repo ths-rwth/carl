@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../../core/Variable.h"
-#include "../bitvector/BVVariable.h"
-#include "../uninterpreted/UVariable.h"
-#include "../uninterpreted/UninterpretedFunction.h"
-#include "../../util/variant_util.h"
+#include <carl/core/Variable.h>
+#include <carl/formula/bitvector/BVVariable.h>
+#include <carl/formula/uninterpreted/UVariable.h>
+#include <carl/formula/uninterpreted/UninterpretedFunction.h>
+#include <carl/util/variant_util.h>
 
 #include <cassert>
 #include <variant>

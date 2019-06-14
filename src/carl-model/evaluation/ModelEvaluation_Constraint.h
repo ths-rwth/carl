@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Model.h"
-#include "../../Constraint.h"
-#include "../../Formula.h"
+#include <carl/formula/Constraint.h>
+#include <carl/formula/Formula.h>
 
 #include "ModelEvaluation_Polynomial.h"
 
