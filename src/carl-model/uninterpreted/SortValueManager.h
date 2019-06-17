@@ -14,8 +14,8 @@
 #include <utility>
 #include <vector>
 
-#include "../../../util/Common.h"
-#include "../../../util/Singleton.h"
+#include <carl/util/Common.h>
+#include <carl/util/Singleton.h>
 #include "SortValue.h"
 
 namespace carl {

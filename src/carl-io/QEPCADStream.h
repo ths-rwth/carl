@@ -116,7 +116,7 @@ private:
 	
 	template<typename Coeff>
 	void write(const MultivariatePolynomial<Coeff>& mp) {
-		if (mp.isZero()) *this << "0";
+		if (carl::isZero(mp)) *this << "0";
 		else if (mp.nrTerms() == 1) *this << mp.lterm();
 		else {
 			for (auto it = mp.rbegin(); it != mp.rend(); it++) {

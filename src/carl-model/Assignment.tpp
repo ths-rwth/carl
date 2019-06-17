@@ -6,7 +6,7 @@
  */
 
 #include "Assignment.h"
-#include <carl/formula/model/uninterpreted/SortValueManager.h>
+#include <carl-model/uninterpreted/SortValueManager.h>
 
 namespace carl
 {

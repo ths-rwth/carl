@@ -6,8 +6,8 @@
 #include <carl/formula/model/mvroot/MultivariateRoot.h>
 #include <carl/formula/model/ran/RealAlgebraicNumber.h>
 #include "sqrtex/SqrtEx.h"
-#include <carl/formula/model/uninterpreted/SortValue.h>
-#include <carl/formula/model/uninterpreted/UFModel.h>
+#include "uninterpreted/SortValue.h"
+#include "uninterpreted/UFModel.h"
 
 #include <memory>
 #include <variant>

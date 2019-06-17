@@ -4,7 +4,7 @@
 
 #include <carl/formula/uninterpreted/UEquality.h>
 #include <carl/formula/uninterpreted/UFInstance.h>
-#include <carl/formula/model/uninterpreted/SortValue.h>
+#include "../uninterpreted/SortValue.h"
 
 namespace carl {
 namespace model {

@@ -6,8 +6,8 @@
 #include <sstream>
 #include <string>
 
-#include "../Formula.h"
-#include "../../core/logging.h"
+#include <carl/formula/Formula.h>
+#include <carl/core/logging.h>
 
 namespace carl {
 

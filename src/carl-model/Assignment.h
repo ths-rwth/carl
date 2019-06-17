@@ -14,8 +14,8 @@
 #include <carl/formula/Formula.h>
 #include <carl/formula/model/ran/RealAlgebraicNumber.h>
 #include "sqrtex/SqrtEx.h"
-#include <carl/formula/model/uninterpreted/SortValue.h>
-#include <carl/formula/model/uninterpreted/UFModel.h>
+#include <carl-model/uninterpreted/SortValue.h>
+#include <carl-model/uninterpreted/UFModel.h>
 
 #include <map>
 

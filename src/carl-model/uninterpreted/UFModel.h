@@ -9,8 +9,8 @@
 
 #include "SortValue.h"
 
-#include "../../uninterpreted/UFManager.h"
-#include "../../uninterpreted/UninterpretedFunction.h"
+#include <carl/formula/uninterpreted/UFManager.h>
+#include <carl/formula/uninterpreted/UninterpretedFunction.h>
 
 #include <iostream>
 #include <map>

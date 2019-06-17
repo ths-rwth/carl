@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../../../util/hash.h"
-#include "../../Sort.h"
+#include <carl/util/hash.h>
+#include <carl/formula/Sort.h>
 
 #include <cassert>
 #include <iostream>
