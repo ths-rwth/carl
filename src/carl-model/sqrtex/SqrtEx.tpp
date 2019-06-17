@@ -120,7 +120,7 @@ namespace carl
             }
             else
             {
-//                cout << "        to " << *this << endl;
+//                std::cout << "        to " << *this << std::endl;
                 return; // Sqrt expression corresponds to 0.
             }
         }
@@ -149,7 +149,7 @@ namespace carl
         mConstantPart *= carl::getNum( sqrtExFactor );
         mFactor *= carl::getNum( sqrtExFactor );
         mDenominator *= carl::getDenom( sqrtExFactor );
-//        cout << "       to  " << *this << endl;
+//        std::cout << "       to  " << *this << std::endl;
         //TODO: implement this method further
     }
 

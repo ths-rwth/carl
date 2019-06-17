@@ -186,7 +186,7 @@ void CAD<Number>::printConstraints(const std::string& filename) const {
  */
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
-	//os << endl << cad.getSetting() << endl;
+	//os << std::endl << cad.getSetting() << std::endl;
 	os << "Variables: " << cad.mVariables << std::endl;
 	os << "Elimination sets:" << std::endl;
 	unsigned level = 0;

@@ -1195,7 +1195,7 @@ namespace carl
         {
             _constraintBounds.clear();
             #ifdef CONSTRAINT_BOUND_DEBUG
-            std::cout << "is " << (_inConjunction ? "invalid" : "valid") << endl << std::endl;
+            std::cout << "is " << (_inConjunction ? "invalid" : "valid") << std::endl << std::endl;
             #endif
             return true;
         }
