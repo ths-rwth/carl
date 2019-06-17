@@ -38,12 +38,14 @@ namespace boost { namespace spirit { namespace traits {
 			r /= carl::pow(cln::cl_RA(10), static_cast<unsigned>(-exp));
 	}
 #endif
+#if BOOST_VERSION < 107000
 	template<> inline bool is_equal_to_one(const cln::cl_I& value) {
 		return carl::isOne(value);
 	}
 	template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
 		return carl::isOne(value);
 	}
+#endif
 }}}
 
 #endif

@@ -33,10 +33,12 @@ namespace boost { namespace spirit { namespace traits {
 			n /= carl::pow(mpq_class(10), unsigned(-exp));
 	}
 #endif
+#if BOOST_VERSION < 107000
 	template<> inline bool is_equal_to_one(const mpz_class& value) {
 		return carl::isOne(value);
 	}
 	template<> inline bool is_equal_to_one(const mpq_class& value) {
 		return carl::isOne(value);
 	}
+#endif
 }}}

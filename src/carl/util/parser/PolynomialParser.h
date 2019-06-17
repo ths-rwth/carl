@@ -20,9 +20,11 @@ namespace boost { namespace spirit { namespace traits {
             r = acc / carl::pow(cln::cl_RA(10), unsigned(-exp));
 		return true;
     }
+#if BOOST_VERSION < 107000
     template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
         return value == 1;
     }
+#endif
 }}}
 #endif
 namespace boost { namespace spirit { namespace traits {
@@ -33,9 +35,11 @@ namespace boost { namespace spirit { namespace traits {
             r = acc / carl::pow(mpq_class(10), unsigned(-exp));
 		return true;
     }
+#if BOOST_VERSION < 107000
     template<> inline bool is_equal_to_one(const mpq_class& value) {
         return value == 1;
     }
+#endif
     template<> inline mpq_class negate(bool neg, const mpq_class& n) {
         return neg ? mpq_class(-n) : n;
     }
@@ -49,9 +53,11 @@ namespace boost { namespace spirit { namespace traits {
         else
             n /= carl::pow(cln::cl_RA(10), unsigned(-exp));
     }
+#if BOOST_VERSION < 107000
     template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
         return value == 1;
     }
+#endif
 }}}
 #endif
 namespace boost { namespace spirit { namespace traits {
