@@ -68,6 +68,7 @@ matrix:
       {%- for p in job.addons.homebrew.packages %}
           - {{ p }}
       {%- endfor %}
+          update: true
     {%- endif %}
     {%- if job.addons.coverity_scan %}
         coverity_scan:

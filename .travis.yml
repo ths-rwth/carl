@@ -196,6 +196,7 @@ matrix:
         homebrew:
           packages:
           - llvm
+          update: true
     - stage: build
       os: osx
       osx_image: xcode9.4
@@ -204,6 +205,7 @@ matrix:
         homebrew:
           packages:
           - llvm
+          update: true
     - stage: build
       os: osx
       osx_image: xcode10
@@ -212,6 +214,7 @@ matrix:
         homebrew:
           packages:
           - llvm
+          update: true
     - stage: build
       os: osx
       osx_image: xcode10.1
@@ -220,6 +223,7 @@ matrix:
         homebrew:
           packages:
           - llvm
+          update: true
     - stage: build
       os: osx
       osx_image: xcode10.2
@@ -228,6 +232,7 @@ matrix:
         homebrew:
           packages:
           - llvm
+          update: true
     - stage: build
       os: linux
       compiler: g++-8
