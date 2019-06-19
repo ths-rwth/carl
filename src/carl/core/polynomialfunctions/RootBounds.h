@@ -67,5 +67,65 @@ Coeff lagrangeBound(const UnivariatePolynomial<Coeff>& p) {
 	return 2 * max;
 }
 
+/*
+ * Computes an upper bound on the value of the positive real roots of the given univariate polynomial due to Lagrange.
+ * 
+ * See https://en.wikipedia.org/wiki/Geometrical_properties_of_polynomial_roots#Other_bounds
+ *
+ * The bound is defined as $\f 2 * \max \{ \frac{-a_{n-k}}{a_n}^{1/k} \mid 1 \leq k \leq n, a_k < 0 \} $\f where $a_n > 0$ is the leading coefficient.
+ * If a_n < 0, the coefficients are multiplied by -1 as this does not change the roots. Accordingly, it is then defined as
+ * $\f 2 * \max \{ \frac{-a_{n-k}}{a_n}^{1/k} \mid 1 \leq k \leq n, a_k > 0 \} $\f where $a_n < 0$ is the leading coefficient.
+ * If the set in $\max$ is empty, then there are no positive real roots and we return $0$.
+ * If $p$ is constant, we return $0$.
+ */
+template<typename Coeff>
+Coeff lagrangePositiveUpperBound(const UnivariatePolynomial<Coeff>& p) {
+
+	std::cout << p << std::endl;
+
+	static_assert(is_field<Coeff>::value, "Lagrange bounds are only defined for field-coefficients");
+	if (p.isConstant()) return carl::constant_zero<Coeff>::get();
+
+	Coeff max;
+	Coeff lc = p.lcoeff();
+
+	for (std::size_t i = 1; i <= p.degree(); ++i) {
+		std::cout << "coeff:" << p.coefficients()[p.degree()-i] << std::endl;
+		if (carl::isZero(p.coefficients()[p.degree()-i])) continue;
+		if (carl::isPositive(lc * p.coefficients()[p.degree()-i])) continue;
+
+		auto cur = carl::abs(p.coefficients()[p.degree()-i]) / carl::abs(lc);
+		if (i > 1) {
+			cur = carl::root_safe(cur, i).second;
+		}
+		std::cout << cur << std::endl;
+		max = std::max(max, cur);
+	}
+	return 2 * max;
+}
+
+/**
+ * Computes a lower bound on the value of the positive real roots of the given univariate polynomial.
+ * 
+ * Let Q(x) = x^q*P(1/x). Then P(1/a) = 0 \implies Q(a) = 0. Thus a <= b \forall a with Q(a) = 0 \implies 1/b <= a' \forall a' with P(a') = 0.
+ * Note that the coefficients of Q are the ones of P in reverse order.
+ */
+template<typename Coeff>
+Coeff lagrangePositiveLowerBound(const UnivariatePolynomial<Coeff>& p) {
+	auto r = lagrangePositiveUpperBound(p.reverseCoefficients());
+	if (r == 0) return 0;
+	return 1/r;
+}
+
+/**
+ * Computes an upper bound on the value of the negative real roots of the given univariate polynomial.
+ * 
+ * Note that the positive roots of P(-x) are the negative roots of P(x).
+ * 
+ */
+template<typename Coeff>
+Coeff lagrangeNegativeUpperBound(const UnivariatePolynomial<Coeff>& p) {
+	return -lagrangePositiveLowerBound(p.negateVariable());
+}
 
 }

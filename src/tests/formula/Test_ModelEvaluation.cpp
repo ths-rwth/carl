@@ -71,6 +71,19 @@ TEST(ModelEvaluation, EvaluateRANIR)
 	EXPECT_TRUE(res.asBool());
 }
 
+TEST(ModelEvaluation, EvaluateRANIRConstraint)
+{
+	Variable x = freshRealVariable("x");
+	ModelT m;
+	IntervalT i(Rational(27)/32, BoundType::STRICT, Rational(7)/8, BoundType::STRICT);
+	UnivariatePolynomial<Rational> p(x, {Rational(-3), Rational(0), Rational(4)}); // 4*r^2 -3
+	m.assign(x, RANT(p, i)); // x = (IR ]27/32, 7/8[, (4)*__r^2 + -3 R)
+	FormulaT f = FormulaT(ConstraintT(Pol(x), Relation::LEQ));
+	auto res = model::evaluate(f, m);
+	EXPECT_TRUE(res.isBool());
+	EXPECT_FALSE(res.asBool());
+}
+
 TEST(ModelEvaluation, EvaluateWithMVR)
 {
 	Variable x = freshRealVariable("x");

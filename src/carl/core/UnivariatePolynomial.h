@@ -516,7 +516,19 @@ public:
 		}
 		return res;
 	}
-	
+
+	/**
+	 * Reverse coefficients safely.
+	 */
+	UnivariatePolynomial reverseCoefficients() const {
+		UnivariatePolynomial<Coefficient> res(*this);
+		std::reverse(res.mCoefficients.begin(), res.mCoefficients.end());
+		while(carl::isZero(*std::prev(res.mCoefficients.end())) && std::prev(res.mCoefficients.end()) != res.mCoefficients.begin()) {
+			res.mCoefficients.erase(std::prev(res.mCoefficients.end()));
+		}
+		assert(res.isConsistent());
+		return res;
+	}
 	
 	/**
 	 * Divides the polynomial by another polynomial.

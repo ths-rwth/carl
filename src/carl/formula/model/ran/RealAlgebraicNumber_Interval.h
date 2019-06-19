@@ -5,6 +5,7 @@
 #include "../../../core/polynomialfunctions/RootCounting.h"
 #include "../../../core/polynomialfunctions/SquareFreePart.h"
 #include "../../../core/polynomialfunctions/SturmSequence.h"
+#include "../../../core/polynomialfunctions/RootBounds.h"
 
 #include "../../../interval/Interval.h"
 #include "../../../interval/IntervalEvaluation.h"
@@ -447,6 +448,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	// compute the result polynomial and the initial result interval
 	std::map<Variable, Interval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m, varToInterval);
+	// Note that res cannot be zero as v is a fresh variable in v-p.
 	assert(!varToInterval.empty());
 	poly = p.toUnivariatePolynomial(varToInterval.begin()->first);
 	CARL_LOG_DEBUG("carl.ran", "res = " << res);
@@ -484,7 +486,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 }
 
 template<typename Number, typename Poly>
-bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m, bool use_intervals = false) {
+bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m, bool use_intervals = false, bool use_root_bounds = true) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << c << " on " << m);
 	Poly p = c.lhs();
 
@@ -504,13 +506,29 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 
 			if (res.isPositive()) {
 				CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
-				return carl::evaluate(Sign::POSITIVE, c.relation());
+				return evaluate(Sign::POSITIVE, c.relation());
 			} else if (res.isNegative()) {
 				CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
-				return carl::evaluate(Sign::NEGATIVE, c.relation());
+				return evaluate(Sign::NEGATIVE, c.relation());
 			} else if (res.isZero()) {
 				CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
-				return carl::evaluate(Sign::ZERO, c.relation());
+				return evaluate(Sign::ZERO, c.relation());
+			} else if (res.isSemiNegative()) {
+				if (c.relation() == Relation::GREATER) {
+					CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
+					return false;
+				} else if (c.relation() == Relation::LEQ) {
+					CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
+					return true;
+				}
+			} else if (res.isSemiPositive()) {
+				if (c.relation() == Relation::LESS) {
+					CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
+					return false;
+				} else if (c.relation() == Relation::GEQ) {
+					CARL_LOG_DEBUG("carl.ran", "Obtained result by interval evaluation");
+					return true;
+				}
 			}
 		
 			// refine RANs
@@ -543,9 +561,106 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		}
 	}
 
-	CARL_LOG_DEBUG("carl.ran", "Evaluate constraint by evaluating poly");
-	IntervalContent<Number> res = evaluate(p, m);
-	return evaluate(res.sgn(), c.relation());
+	if (!use_root_bounds) {
+		CARL_LOG_DEBUG("carl.ran", "Evaluate constraint by evaluating poly");
+		IntervalContent<Number> res = evaluate(p, m);
+		return evaluate(res.sgn(), c.relation());
+	}
+
+	CARL_LOG_DEBUG("carl.ran", "Evaluate constraint using resultants and root bounds");
+	assert(m.size() > 0);
+	auto poly = p.toUnivariatePolynomial(m.begin()->first);
+	if (m.size() == 1 && m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
+		CARL_LOG_DEBUG("carl.ran", "Got " << IntervalContent<Number>());
+		return evaluate(Sign::ZERO, c.relation());
+	}
+	Variable v = freshRealVariable();
+	// compute the result polynomial and the initial result interval
+	std::map<Variable, Interval<Number>> varToInterval;
+	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m, varToInterval);
+	// Note that res cannot be zero as v is a fresh variable in v-p.
+	assert(!varToInterval.empty());
+	poly = p.toUnivariatePolynomial(varToInterval.begin()->first);
+	CARL_LOG_DEBUG("carl.ran", "res = " << res);
+	CARL_LOG_DEBUG("carl.ran", "varToInterval = " << varToInterval);
+	CARL_LOG_DEBUG("carl.ran", "poly = " << poly);
+	Interval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
+	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
+
+	// Let pos_lb a lower bound on the positive real roots and neg_ub an upper bound on the negative real roots
+	// Then if the zero of res is in the interval (neg_ub,pos_lb), then it must be zero.
+
+	// compute root bounds
+	auto pos_lb = lagrangePositiveLowerBound(res);
+	CARL_LOG_TRACE("carl.ran", "positive root lower bound: " << pos_lb);
+	if (pos_lb == 0) {
+		// no positive root exists
+		CARL_LOG_DEBUG("carl.ran", "p <= 0");
+		if (c.relation() == Relation::GREATER) {
+			return false;
+		} else if (c.relation() == Relation::LEQ) {
+			return true;
+		}
+	}
+	auto neg_ub = lagrangeNegativeUpperBound(res);
+	CARL_LOG_TRACE("carl.ran", "negative root upper bound: " << neg_ub);
+	if (neg_ub == 0) {
+		// no negative root exists
+		CARL_LOG_DEBUG("carl.ran", "p >= 0");
+		if (c.relation() == Relation::LESS) {
+			return false;
+		} else if (c.relation() == Relation::GEQ) {
+			return true;
+		}
+	}
+
+	if (pos_lb == 0 && neg_ub == 0) {
+		// no positive or negative zero exists
+		CARL_LOG_DEBUG("carl.ran", "p = 0");
+		return evaluate(Sign::ZERO, c.relation());
+	}
+
+	assert(!carl::isZero(res));
+
+	// refine the interval until it is either positive or negative or is contained in (neg_ub,pos_lb)
+	CARL_LOG_DEBUG("carl.ran", "Refine until interval is in ("<< neg_ub<<","<<pos_lb<<") or interval is positive or negative");
+	while (!( (neg_ub < interval.lower() || neg_ub == 0) && (interval.upper() < pos_lb || pos_lb == 0) )) 
+	{
+
+		for (auto it = m.begin(); it != m.end(); it++) {
+			it->second.refine();
+			if (is_number(it->second)) {
+				return evaluate(c, m);
+			} else {
+				varToInterval[it->first] = it->second.interval();
+			}
+		}
+		interval = IntervalEvaluation::evaluate(poly, varToInterval);
+		if (interval.isNegative()) {
+			CARL_LOG_DEBUG("carl.ran", "p < 0");
+			return evaluate(Sign::NEGATIVE, c.relation());
+		} else if (interval.isPositive()) {
+			CARL_LOG_DEBUG("carl.ran", "p > 0");
+			return evaluate(Sign::POSITIVE, c.relation());
+		} else if (interval.isSemiNegative()) {
+			CARL_LOG_DEBUG("carl.ran", "p <= 0");
+			if (c.relation() == Relation::GREATER) {
+				return false;
+			} else if (c.relation() == Relation::LEQ) {
+				return true;
+			}
+		} else if (interval.isSemiPositive()) {
+			CARL_LOG_DEBUG("carl.ran", "p >= 0");
+			if (c.relation() == Relation::LESS) {
+				return false;
+			} else if (c.relation() == Relation::GEQ) {
+				return true;
+			}
+		}
+	}
+	
+	CARL_LOG_DEBUG("carl.ran", "p = 0");
+	return evaluate(Sign::ZERO, c.relation());
 }
 
 template<typename Number>
