@@ -39,11 +39,14 @@ jobs = [
 	job("1-gcc", ["build", "linux", "g++-7", "j1", "build.sh"]),
 	job("1-gcc", ["dependencies", "linux", "g++-8", "build.sh"]),
 	job("1-gcc", ["build", "linux", "g++-8", "j1", "build.sh"]),
-	job("2-macos", ["build", "xcode9.3", "build.sh"]),
-	job("2-macos", ["build", "xcode9.4", "build.sh"]),
-	job("2-macos", ["build", "xcode10", "build.sh"]),
-	job("2-macos", ["build", "xcode10.1", "build.sh"]),
-	job("3-docs", ["build", "linux", "g++-8", "task.doxygen", "j1", "build.sh"]),
+	job("1-gcc", ["dependencies", "linux", "g++-9", "build.sh"]),
+	job("1-gcc", ["build", "linux", "g++-9", "j1", "build.sh"]),
+	job("2-macos", ["build", "xcode9.3", "build.sh", "mayfail"]),
+	job("2-macos", ["build", "xcode9.4", "build.sh", "mayfail"]),
+	job("2-macos", ["build", "xcode10", "build.sh", "mayfail"]),
+	job("2-macos", ["build", "xcode10.1", "build.sh", "mayfail"]),
+	job("2-macos", ["build", "xcode10.2", "build.sh", "mayfail"]),
+	job("3-docs", ["build", "linux", "g++-8", "task.documentation", "j1", "build.sh"]),
 	job("4-tidy", ["dependencies", "linux", "clang-9.0", "task.tidy", "build.sh", "mayfail"]),
 	job("4-tidy", ["check", "linux", "clang-9.0", "task.tidy", "build.sh", "mayfail"]),
 	#job("5-checker", ["dependencies", "linux", "clang-7.0", "task.coverity", "build.sh"]),
@@ -52,16 +55,16 @@ jobs = [
 	job("5-checker", ["build", "linux", "clang-7.0", "task.sonarcloud", "task.sonarcloud-build", "addon.sonarcloud", "build.sh", "mayfail"]),
 	job("5-checker", ["check", "linux", "clang-7.0", "task.sonarcloud", "task.sonarcloud-scan", "addon.sonarcloud", "build.sh", "mayfail"]),
 	job("5-checker", ["check", "linux", "clang-9.0", "task.clang-ubsan", "build.sh", "mayfail"]),
-	job("6-addons", ["dependencies", "linux", "g++-7", "task.pycarl", "j1", "build.sh"]),
-	job("6-addons", ["build", "linux", "g++-7", "task.pycarl", "j1", "build.sh", "mayfail"]),
-	job("6-addons", ["dependencies", "linux", "g++-7", "task.addons", "j1", "build.sh"]),
-	job("6-addons", ["build", "linux", "g++-7", "task.addons", "j1", "build.sh", "mayfail"]),
+	job("6-addons", ["dependencies", "linux", "g++-8", "task.pycarl", "j1", "build.sh"]),
+	job("6-addons", ["build", "linux", "g++-8", "task.pycarl", "j1", "build.sh", "mayfail"]),
+	job("6-addons", ["dependencies", "linux", "g++-8", "task.addons", "j1", "build.sh"]),
+	job("6-addons", ["build", "linux", "g++-8", "task.addons", "j1", "build.sh", "mayfail"]),
 ]
 
 cached = [
 	"$HOME/usr/",
 	"$HOME/.sonar/cache",
-	"build/resources",
+	"$HOME/build/smtrat/carl/build/resources",
 ]
 
 render_template(jobs, cached)

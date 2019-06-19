@@ -56,6 +56,7 @@ properties = {
 	"xcode9.4": {"os": "osx", "osx_image": "xcode9.4", "env": [], "addons": addon_brew(["llvm"])},
 	"xcode10": {"os": "osx", "osx_image": "xcode10", "env": [], "addons": addon_brew(["llvm"])},
 	"xcode10.1": {"os": "osx", "osx_image": "xcode10.1", "env": [], "addons": addon_brew(["llvm"])},
+	"xcode10.2": {"os": "osx", "osx_image": "xcode10.2", "env": [], "addons": addon_brew(["llvm"])},
 	"linux": {"os": "linux"},
 
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-xenial-3.8"], ["clang-3.8", "libstdc++-6-dev"])},
@@ -70,13 +71,14 @@ properties = {
 	"g++-6": {"env": ["CC=gcc-6 CXX=g++-6"], "compiler": "g++-6", "addons": addon_apt([],["g++-6"])},
 	"g++-7": {"env": ["CC=gcc-7 CXX=g++-7"], "compiler": "g++-7", "addons": addon_apt([],["g++-7"])},
 	"g++-8": {"env": ["CC=gcc-8 CXX=g++-8"], "compiler": "g++-8", "addons": addon_apt([],["g++-8"])},
+	"g++-9": {"env": ["CC=gcc-9 CXX=g++-9"], "compiler": "g++-9", "addons": addon_apt([],["g++-9"])},
 
 	"task.coverity": {"env": ["TASK=coverity"]},
 	"task.sonarcloud": {"env": ["TASK=sonarcloud"], "addons": addon_cache("$HOME/usr/", "$HOME/.sonar/cache", "build/", "bw-output/")},
 	"task.sonarcloud-build": {"script": ["TASK=sonarcloud-build"]},
 	"task.sonarcloud-scan": {"script": ["TASK=sonarcloud-scan"]},
 	"task.clang-ubsan": {"env": ["TASK=clang-ubsan"]},
-	"task.doxygen": {"if": "branch = master", "env": ["TASK=doxygen"], "addons": addon_apt([],["doxygen", "ghostscript", "latex-xcolor", "lmodern", "pgf", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra"])},
+	"task.documentation": {"if": "branch = master", "env": ["TASK=documentation"], "addons": addon_apt([],["doxygen", "ghostscript", "latex-xcolor", "lmodern", "pgf", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra", "python3-pip", "python3-setuptools"])},
 	"task.pycarl": {"env": ["TASK=pycarl"], "addons": addon_apt([],["python3"])},
 	"task.addons": {"env": ["TASK=addons"]},
 	"task.tidy": {"env": ["TASK=tidy"]},

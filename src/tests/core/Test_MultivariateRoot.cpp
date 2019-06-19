@@ -2,8 +2,8 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/formula/model/mvroot/MultivariateRoot.h"
 #include "carl/formula/Formula.h"
-#include "carl/formula/model/Model.h"
-#include "carl/formula/model/evaluation/ModelEvaluation.h"
+#include <carl-model/Model.h>
+#include "carl-model/evaluation/ModelEvaluation.h"
 
 #include "../Common.h"
 

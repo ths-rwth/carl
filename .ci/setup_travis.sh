@@ -15,6 +15,10 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 
 	export PATH="$PREFIX/bin:$PATH"
 
+	if [[ ${TASK} == "documentation" ]]; then
+		pip3 install Sphinx breathe exhale
+	fi
+
 fi
 
 export CC=$CC

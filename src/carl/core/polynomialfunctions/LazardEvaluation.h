@@ -19,9 +19,29 @@ namespace detail_lazard {
 		CoCoA::BigRat convert(const mpq_class& n) const {
 			return CoCoA::BigRatFromMPQ(n.get_mpq_t());
 		}
-		mpq_class convert(const CoCoA::BigRat& n) const {
-			return mpq_class(CoCoA::mpqref(n));
+		template<typename T>
+		T convert(const CoCoA::BigRat& n) const {
+			if constexpr(std::is_same<T,mpq_class>::value) {
+				return mpq_class(CoCoA::mpqref(n));
+			}
+			#ifdef USE_CLN_NUMBERS
+			else if constexpr(std::is_same<T,cln::cl_RA>::value) {
+				std::stringstream ss;
+				ss << n;
+				return T(ss.str().c_str());
+			}
+			#endif
+			else {
+				CARL_LOG_ERROR("carl.lazard", "Unsupported number type.");
+			}
 		}
+		#ifdef USE_CLN_NUMBERS
+		CoCoA::BigRat convert(const cln::cl_RA& n) const {
+			std::stringstream ss;
+			ss << n;
+			return CoCoA::BigRatFromString(ss.str());
+		}
+		#endif
 
 		template<typename Poly>
 		Poly convertMV(const CoCoA::RingElem& p, const ConversionInfo& ci) const {
@@ -30,7 +50,7 @@ namespace detail_lazard {
 				Poly coeff;
 				CoCoA::BigRat numcoeff;
 				if (CoCoA::IsRational(numcoeff, CoCoA::coeff(i))) {
-					coeff = Poly(convert(numcoeff));
+					coeff = Poly(convert<typename Poly::CoeffType>(numcoeff));
 				} else {
 					coeff = convertMV<Poly>(CoCoA::CanonicalRepr(CoCoA::coeff(i)), ci);
 				}
@@ -115,8 +135,9 @@ private:
 		}
 		detail_lazard::CoCoAConverter::ConversionInfo ci = buildPolyRing(v);
 		CoCoA::RingElem p = cc.convertUV(r.getIRPolynomial().replaceVariable(v), ci);
+		CARL_LOG_DEBUG("carl.lazard", "Factorization of " << p << " on " << ci.mRing);
 		auto factorization = CoCoA::factor(p);
-		CARL_LOG_DEBUG("carl.lazard", "Factorization of " << p << " on " << ci.mRing << ": " << factorization);
+		CARL_LOG_DEBUG("carl.lazard", "-> " << factorization);
 		for (const auto& f: factorization.myFactors()) {
 			if (evaluatesToZero(f, ci)) {
 				CARL_LOG_DEBUG("carl.lazard", "Factor " << f << " is zero in assignment.");

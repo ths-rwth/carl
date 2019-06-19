@@ -7,7 +7,7 @@ if (COMPARE_WITH_Z3)
 	target_link_libraries(runCoreTests ${Z3_LIBRARIES})
 endif()
 
-target_link_libraries(runCoreTests TestCommon)
+target_link_libraries(runCoreTests TestCommon carl-model-shared)
 
 add_test(NAME core COMMAND runCoreTests)
 add_dependencies(all-tests runCoreTests)

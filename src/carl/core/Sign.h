@@ -8,6 +8,7 @@
 #pragma once
 
 #include "logging.h"
+#include "../numbers/numbers.h"
 
 #include <functional>
 #include <iostream>
@@ -51,8 +52,8 @@ inline std::ostream& operator<<(std::ostream& os, const Sign& sign) {
  */
 template<typename Number>
 Sign sgn(const Number& n) {
-	if (n < Number(0)) return Sign::NEGATIVE;
-	if (n > Number(0)) return Sign::POSITIVE;
+	if (n < constant_zero<Number>::get()) return Sign::NEGATIVE;
+	if (n > constant_zero<Number>::get()) return Sign::POSITIVE;
 	return Sign::ZERO;
 }
 
@@ -84,9 +85,7 @@ std::size_t sign_variations(InputIterator begin, InputIterator end) {
  * The function accepts an object range and an additional function f.
  * If the objects are not of type Sign, the function f can be used to convert the objects to a Sign on the fly.
  * As for the number of sign variations in the evaluations of polynomials <code>p</code> at a position <code>x</code>, this might look like this:
- * <code>
- * signVariations(p.begin(), p.end(), [&x](const Polynomial& p){ return sgn(p.evaluate(x)); });
- * </code>
+ * `signVariations(p.begin(), p.end(), [&x](const Polynomial& p){ return sgn(p.evaluate(x)); });`
  * @param begin Start of object range.
  * @param end End of object range.
  * @param f Function object to convert objects to Sign.

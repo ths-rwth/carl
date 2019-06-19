@@ -36,15 +36,15 @@ namespace carl
 
 	void UTerm::gatherUFs(std::set<UninterpretedFunction>& ufs) const {
 		return std::visit(overloaded {
-			[](UVariable) {},
+			[](UVariable) { /* nothing to do here */ },
 			[&ufs](UFInstance ufi) { ufi.gatherUFs(ufs); },
 		}, mTerm);
 	}
 
 	bool operator==(const UTerm& lhs, const UTerm& rhs) {
 		return std::visit(overloaded {
-			[](UVariable lhs, UVariable rhs) { return lhs == rhs; },
-			[](UFInstance lhs, UFInstance rhs) { return lhs.id() == rhs.id(); },
+			[](UVariable l, UVariable r) { return l == r; },
+			[](UFInstance l, UFInstance r) { return l.id() == r.id(); },
 			[](const auto&, const auto&) { return false; },
 		}, lhs.asVariant(), rhs.asVariant());
 	}
@@ -55,8 +55,8 @@ namespace carl
 
 	bool operator<(const UTerm& lhs, const UTerm& rhs) {
 		return std::visit(overloaded {
-			[](UVariable lhs, UVariable rhs) { return lhs < rhs; },
-			[](UFInstance lhs, UFInstance rhs) { return lhs.id() < rhs.id(); },
+			[](UVariable l, UVariable r) { return l < r; },
+			[](UFInstance l, UFInstance r) { return l.id() < r.id(); },
 			[](UVariable, UFInstance) { return true; },
 			[](const auto&, const auto&) { return false; },
 		}, lhs.asVariant(), rhs.asVariant());

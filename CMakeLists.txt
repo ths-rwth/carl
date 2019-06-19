@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # Include own macros.
 include(carlmacros)
 
-set_version(19 04)
+set_version(19 06)
 
 set(PROJECT_FULLNAME "carl")
 set(PROJECT_DESCRIPTION "Computer ARithmetic Library")
@@ -38,9 +38,9 @@ option( COMPARE_WITH_Z3 "Compile benchmarks that compare to z3" OFF )
 option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )
 export_option(USE_CLN_NUMBERS)
-option( USE_COCOA "Use CoCoALib" OFF )
+option( USE_COCOA "Use CoCoALib" ON )
 export_option(USE_COCOA)
-option( USE_BLISS "Use bliss" OFF )
+option( USE_BLISS "Use bliss" ON )
 export_option(USE_BLISS)
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 export_option(USE_MPFR_FLOAT)
@@ -54,7 +54,7 @@ option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( RAN_USE_THOM "Enable real algebraic numbers based on thom encodings" OFF )
 option( RAN_USE_Z3 "Enable real algebraic numbers from z3" OFF )
 
-option( ROOTFINDER_LE "Use LazardEvaluation in RootFinder" OFF )
+option( ROOTFINDER_LE "Use LazardEvaluation in RootFinder" ON )
 
 set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -137,9 +137,7 @@ include(clang-tidy)
 include(coverage)
 
 # Configure documentation
-if (TARGET Doxygen::doxygen)
-	add_subdirectory(doxygen-conf)
-endif()
+add_subdirectory(doc)
 
 # Include actual library
 add_subdirectory(src)

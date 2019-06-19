@@ -1,9 +1,9 @@
 #include <carl/formula/uninterpreted/UVariable.h>
 #include <carl/formula/SortManager.h>
 #include <carl/formula/Formula.h>
-#include <carl/formula/model/Model.h>
-#include <carl/formula/model/uninterpreted/SortValueManager.h>
-#include <carl/formula/model/evaluation/ModelEvaluation.h>
+#include <carl-model/Model.h>
+#include <carl-model/uninterpreted/SortValueManager.h>
+#include <carl-model/evaluation/ModelEvaluation.h>
 #include <gtest/gtest.h>
 
 #include "../get_output.h"

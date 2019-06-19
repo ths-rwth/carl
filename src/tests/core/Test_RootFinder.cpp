@@ -136,6 +136,7 @@ TEST(RootFinder, tryRealRoots)
 	auto roots = carl::rootfinder::realRoots(p, m);
 	std::cout << "-> " << roots << std::endl;
 
+	#ifdef USE_COCOA
 	carl::LazardEvaluation<Rational,MPolynomial> le((MPolynomial(p)));
 	le.substitute(y, yval);
 	le.substitute(z, zval);
@@ -144,6 +145,7 @@ TEST(RootFinder, tryRealRoots)
 		auto roots = carl::rootfinder::realRoots(le.getLiftingPoly().toUnivariatePolynomial(x), m);
 		std::cout << "-> " << roots << std::endl;
 	}
+	#endif
 }
 
 TEST(RootFinder, Chebyshev)

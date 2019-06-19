@@ -245,7 +245,7 @@ namespace carl
         mLastConstructedConstraintWasKnown = false;
         unsigned constraintConsistent = _constraint->isConsistent();
 		CARL_LOG_DEBUG("carl.formula.constraint", "Consistent? " << constraintConsistent);
-//        cout << *_constraint << " is consistent: " << constraintConsistent << endl;
+//        std::cout << *_constraint << " is consistent: " << constraintConsistent << std::endl;
 		///@todo Use appropriate constant instead of 2.
         if( constraintConsistent == 2 ) // Constraint contains variables.
         {
