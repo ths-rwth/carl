@@ -12,7 +12,7 @@
 #include <cassert>
 
 namespace carl {
-	
+
 bool UFModel::extend(const std::vector<SortValue>& args, const SortValue& value) {
 	auto ret = mValues.emplace(args, value);
 	assert(ret.second || ret.first->second == value); // Checks if the same arguments are not tried to map to different values.
@@ -34,22 +34,22 @@ std::ostream& operator<<(std::ostream& os, const UFModel& ufm) {
 	for (const auto& arg : ufm.function().domain()) {
 		if (id > 1) os << " ";
 		os << "(x!" << id << " " << arg << ")";
-		id++;
+		++id;
 	}
 	os << ") " << ufm.function().codomain() << " ";
 	// Print implementation
 	for (const auto& instance : ufm.values()) {
 		os << "(ite (and ";
-		std::size_t id = 1;
+		std::size_t iid = 1;
 		for (const auto& param : instance.first) {
-			if (id > 0) os << " ";
-			os << "(= x!" << id << " " << param << ")";
-			id++;
+			if (iid > 0) os << " ";
+			os << "(= x!" << iid << " " << param << ")";
+			++iid;
 		}
 		os << ") " << instance.second << " ";
 	}
 	os << ufm.values().begin()->second;
-	for (std::size_t i = 0; i < ufm.values().size(); i++)
+	for (std::size_t i = 0; i < ufm.values().size(); ++i)
 		os << ")";
 	os << ")";
 	return os;
