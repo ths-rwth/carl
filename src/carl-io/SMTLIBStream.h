@@ -195,7 +195,7 @@ private:
 		if (up.isConstant()) *this << up.constantPart();
 		else {
 			*this << "(+";
-			for (std::size_t i = 0; i < up.coefficients().size(); +i) {
+			for (std::size_t i = 0; i < up.coefficients().size(); ++i) {
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];
 				if (exp == 0) *this << " " << coeff;
