@@ -118,7 +118,7 @@ private:
 		if (carl::isZero(mp)) *this << "0";
 		else if (mp.nrTerms() == 1) *this << mp.lterm();
 		else {
-			for (auto it = mp.rbegin(); it != mp.rend(); it++) {
+			for (auto it = mp.rbegin(); it != mp.rend(); ++it) {
 				if (it != mp.rbegin()) *this << " + ";
 				*this << *it;
 			}
@@ -152,7 +152,7 @@ private:
 	void write(const UnivariatePolynomial<Coeff>& up) {
 		if (up.isConstant()) *this << up.constantPart();
 		else {
-			for (std::size_t i = 0; i < up.coefficients().size(); i++) {
+			for (std::size_t i = 0; i < up.coefficients().size(); ++i) {
 				if (i > 0) *this << " + ";
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];

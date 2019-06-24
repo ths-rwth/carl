@@ -103,7 +103,7 @@ private:
 		if (m.second == 0) *this << "1";
 		else if (m.second == 1) *this << m.first;
 		else {
-			for (std::size_t i = 0; i < m.second; i++) *this << " " << m.first;
+			for (std::size_t i = 0; i < m.second; ++i) *this << " " << m.first;
 		}
 	}
 	void write(const Monomial& m) {
@@ -119,7 +119,7 @@ private:
 		if (carl::isZero(mp)) *this << "0";
 		else if (mp.nrTerms() == 1) *this << mp.lterm();
 		else {
-			for (auto it = mp.rbegin(); it != mp.rend(); it++) {
+			for (auto it = mp.rbegin(); it != mp.rend(); ++it) {
 				if (it != mp.rbegin()) *this << " + ";
 				*this << *it;
 			}
@@ -153,7 +153,7 @@ private:
 	void write(const UnivariatePolynomial<Coeff>& up) {
 		if (up.isConstant()) *this << up.constantPart();
 		else {
-			for (std::size_t i = 0; i < up.coefficients().size(); i++) {
+			for (std::size_t i = 0; i < up.coefficients().size(); ++i) {
 				if (i > 0) *this << " + ";
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];

@@ -130,7 +130,7 @@ private:
 		else if (m.second == 1) *this << m.first;
 		else {
 			*this << "(*";
-			for (std::size_t i = 0; i < m.second; i++) *this << " " << m.first;
+			for (std::size_t i = 0; i < m.second; ++i) *this << " " << m.first;
 			*this << ")";
 		}
 	}
@@ -148,7 +148,7 @@ private:
 		else if (mp.nrTerms() == 1) *this << mp.lterm();
 		else {
 			*this << "(+";
-			for (auto it = mp.rbegin(); it != mp.rend(); it++) {
+			for (auto it = mp.rbegin(); it != mp.rend(); ++it) {
 				*this << " " << *it;
 			}
 			*this << ")";
@@ -195,7 +195,7 @@ private:
 		if (up.isConstant()) *this << up.constantPart();
 		else {
 			*this << "(+";
-			for (std::size_t i = 0; i < up.coefficients().size(); i++) {
+			for (std::size_t i = 0; i < up.coefficients().size(); +i) {
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];
 				if (exp == 0) *this << " " << coeff;
@@ -373,7 +373,7 @@ namespace detail {
 	template<typename... Args>
 	struct SMTLIBOutputContainer {
 		std::tuple<Args...> mData;
-		SMTLIBOutputContainer(Args&&... args): mData(std::forward<Args>(args)...) {}
+		explicit SMTLIBOutputContainer(Args&&... args): mData(std::forward<Args>(args)...) {}
 	};
 	template<typename... Args>
 	std::ostream& operator<<(std::ostream& os, const SMTLIBOutputContainer<Args...>& soc) {
