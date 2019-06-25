@@ -33,6 +33,7 @@ public:
 	UVariable(UVariable&&) = default;
 	UVariable& operator=(const UVariable&) = default;
 	UVariable& operator=(UVariable&&) = default;
+	~UVariable() = default;
 
 	explicit UVariable(Variable var)
 		: mVar(var),
