@@ -627,6 +627,8 @@ namespace carl
             case FormulaType::UEQ:
             case FormulaType::BITVECTOR:
             case FormulaType::TRUE:
+			case FormulaType::VARCOMPARE:
+			case FormulaType::VARASSIGN:
             {
                 if (negated) return Formula<Pol>( NOT, *this );
                 else return *this;
