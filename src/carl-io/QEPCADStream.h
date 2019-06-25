@@ -32,14 +32,7 @@ private:
 	
 	template<typename Pol>
 	void write(const Formulas<Pol>& f, const std::string& op) {
-		bool first = true;
-		for (const auto& cur: f) {
-			if (!first) {
-				*this << " " << op << " ";
-			}
-			*this << cur;
-			first = false;
-		}
+		*this << carl::stream_joined(" " + op + " ", f);
 	}
 	
 	template<typename Pol>
@@ -110,7 +103,7 @@ private:
 		if (m.exponents().empty()) *this << "1";
 		else if (m.exponents().size() == 1) *this << m.exponents().front();
 		else {
-			for (const auto& e: m.exponents()) *this << " " << e;
+			*this << " " << carl::stream_joined(" ", m.exponents());
 		}
 	}
 	
