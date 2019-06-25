@@ -367,6 +367,9 @@ public:
 		return mTerms.erase(pos);
 	}
     
+	const TermsType& getTerms() const {
+		return mTerms;
+	}
 	TermsType& getTerms() {
 		return mTerms;
 	}
