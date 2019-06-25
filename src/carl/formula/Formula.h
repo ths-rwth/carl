@@ -1006,17 +1006,6 @@ namespace carl
              */
             Formula connectPrecedingSubformulas() const;
 
-			/**
-			 * Transforms this formula to its quantifier free equivalent.
-			 * The quantifiers are represented by the parameter variables. Each entry in variables contains all variables between two quantifier alternations.
-			 * The even entries (starting with 0) are quantified existentially, the odd entries are quantified universally.
-			 * @param variables Contains the quantified variables.
-			 * @param level Used for internal recursion.
-			 * @param negated Used for internal recursion.
-			 * @return The quantifier-free version of this formula.
-			 */
-			Formula toQF(QuantifiedVariables& variables, unsigned level = 0, bool negated = false) const;
-
             /**
              * Substitutes all occurrences of the given variable in this formula by the given polynomial.
              * @param _var The variable to substitute.
