@@ -486,7 +486,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 }
 
 template<typename Number, typename Poly>
-bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m, bool use_intervals = false, bool use_root_bounds = true) {
+bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalContent<Number>>& m, bool use_intervals = false, bool use_root_bounds = false) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << c << " on " << m);
 	Poly p = c.lhs();
 
