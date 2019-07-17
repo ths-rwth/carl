@@ -38,8 +38,8 @@ export_target(DEP_TARGETS GMPXX_SHARED)
 export_target(DEP_TARGETS GMPXX_STATIC GMP_STATIC)
 export_target(DEP_TARGETS EIGEN3)
 
-export_target_recursive(DEP_TARGETS Boost::shared INTERFACE_LINK_LIBRARIES)
-export_target_recursive(DEP_TARGETS Boost::static INTERFACE_LINK_LIBRARIES)
+export_target_recursive(DEP_TARGETS Boost_SHARED INTERFACE_LINK_LIBRARIES)
+export_target_recursive(DEP_TARGETS Boost_STATIC INTERFACE_LINK_LIBRARIES)
 
 export_target(DEP_TARGETS Doxygen::doxygen)
 

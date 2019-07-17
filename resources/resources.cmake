@@ -76,7 +76,7 @@ if(NOT Boost_FOUND)
 	include(resources/boost.cmake)
 	unset(Boost_ZIPHASH)
 endif()
-print_resource_info("Boost" Boost::shared ${Boost_VERSION})
+print_resource_info("Boost" Boost_SHARED ${Boost_VERSION})
 
 ##### Eigen3
 if(NOT FORCE_SHIPPED_RESOURCES)
