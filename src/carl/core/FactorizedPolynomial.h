@@ -193,7 +193,10 @@ namespace carl
         {
             if( existsFactorization( *this ) )
             {
-                return mpCache->get( mCacheRef ).getHash();
+                // Getting the hash of mCacheRef does not work because rehashing might occur.
+                // To have a consistent hash we need to compute the hash of the expanded polynomial.
+                // Note that building the polynomial can greatly increase the hashing time.
+                return std::hash<P>()(this->polynomialWithCoefficient());
             }
             return std::hash<CoeffType>()( mCoefficient );
         }
