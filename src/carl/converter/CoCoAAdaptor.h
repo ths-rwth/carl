@@ -142,11 +142,19 @@ public:
 	}
 
 public:
-	explicit CoCoAAdaptor(const std::vector<Variable>& vars):
-		mSymbolBack(vars),
-		mRing(CoCoA::NewPolyRing(mQ, long(mSymbolBack.size())))
+	explicit CoCoAAdaptor(const std::vector<Variable>& vars, bool lex_order = false):
+		mSymbolBack(vars), mRing(CoCoA::NewPolyRing(mQ, 1))
 	{
-		std::sort(mSymbolBack.begin(), mSymbolBack.end());
+		if (lex_order) {
+			std::vector<CoCoA::symbol> indets;
+			for (auto s: mSymbolBack) {
+				indets.emplace_back(s.name());
+			}
+			mRing = CoCoA::NewPolyRing(mQ, indets, CoCoA::lex);
+		} else {
+			std::sort(mSymbolBack.begin(), mSymbolBack.end());
+			mRing = CoCoA::NewPolyRing(mQ, long(mSymbolBack.size()));
+		}
 		auto indets = CoCoA::indets(mRing);
 
 		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
