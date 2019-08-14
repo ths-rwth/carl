@@ -14,9 +14,13 @@
 
 #include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
 
+#include "../../formula/model/ran/RealAlgebraicNumberIntervalExtra.h"
+
 #ifdef ROOTFINDER_LE
 #include "../polynomialfunctions/LazardEvaluation.h"
 #endif
+
+#define USE_GB_EVALUATION false
 
 namespace carl {
 namespace rootfinder {
@@ -74,17 +78,46 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		CARL_LOG_TRACE("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 		assert(IRmap.find(polyCopy.mainVar()) == IRmap.end());
 
+		std::vector<UnivariatePolynomial<Number>> evaledpolys;
+
+		#if USE_GB_EVALUATION
+		evaledpolys.emplace_back(RealAlgebraicNumberEvaluation::substitute_rans_into_polynomial(polyCopy, IRmap));
+		#else
+
 		#ifdef ROOTFINDER_LE
+			CARL_LOG_DEBUG("carl.core.rootfinder", "Pushing " << polyCopy << " to LE");
 			LazardEvaluation<Number,MultivariatePolynomial<Number>> le((MultivariatePolynomial<Number>(polyCopy)));
 			for(auto const& [var, val] : IRmap)
 				le.substitute(var, val, false);
 
-			CARL_LOG_TRACE("carl.core.rootfinder", "LE got " << le.getLiftingPoly().toUnivariatePolynomial(polyCopy.mainVar()));
-			UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(le.getLiftingPoly().toUnivariatePolynomial(polyCopy.mainVar()), IRmap);
+			CARL_LOG_DEBUG("carl.core.rootfinder", "LE got " << le.getLiftingPoly().toUnivariatePolynomial(polyCopy.mainVar()));
+			evaledpolys.emplace_back(RealAlgebraicNumberEvaluation::evaluatePolynomial(le.getLiftingPoly().toUnivariatePolynomial(polyCopy.mainVar()), IRmap));
 		#else
-			UnivariatePolynomial<Number> evaledpoly = RealAlgebraicNumberEvaluation::evaluatePolynomial(polyCopy, IRmap);
+			evaledpolys.emplace_back(RealAlgebraicNumberEvaluation::evaluatePolynomial(polyCopy, IRmap));
+		#endif
 		#endif
 
+		if (evaledpolys.empty()) return {};
+		CARL_LOG_DEBUG("carl.core.rootfinder", "Calling on " << evaledpolys);
+		
+		Constraint<MultivariatePolynomial<Number>> cons(MultivariatePolynomial<Number>(polyCopy), Relation::EQ);
+		std::vector<RealAlgebraicNumber<Number>> roots;
+		for (const auto& p: evaledpolys) {
+			auto res = realRoots(p, interval, pivoting);
+			for (const auto& r: res) {
+				CARL_LOG_DEBUG("carl.core.rootfinder", "Checking " << polyCopy.mainVar() << " = " << r);
+				IRmap[polyCopy.mainVar()] = r;
+				CARL_LOG_DEBUG("carl.core.rootfinder", "Evaluating " << cons << " on " << IRmap);
+				if (RealAlgebraicNumberEvaluation::evaluate(cons, IRmap)) {
+					roots.emplace_back(r);
+				} else {
+					CARL_LOG_DEBUG("carl.core.rootfinder", "Purging spurious root " << r)
+				}
+			}
+		}
+		return roots;
+
+		/*
 		if (carl::isZero(evaledpoly)) return {};
 		CARL_LOG_TRACE("carl.core.rootfinder", "Calling on " << evaledpoly);
 		auto res = realRoots(evaledpoly, interval, pivoting);
@@ -101,7 +134,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 				it++;
 			}
 		}
-		return res;
+		return res;*/
 	}
 }
 
