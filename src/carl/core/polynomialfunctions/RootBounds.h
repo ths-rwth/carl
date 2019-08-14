@@ -81,8 +81,6 @@ Coeff lagrangeBound(const UnivariatePolynomial<Coeff>& p) {
 template<typename Coeff>
 Coeff lagrangePositiveUpperBound(const UnivariatePolynomial<Coeff>& p) {
 
-	std::cout << p << std::endl;
-
 	static_assert(is_field<Coeff>::value, "Lagrange bounds are only defined for field-coefficients");
 	if (p.isConstant()) return carl::constant_zero<Coeff>::get();
 
@@ -90,7 +88,6 @@ Coeff lagrangePositiveUpperBound(const UnivariatePolynomial<Coeff>& p) {
 	Coeff lc = p.lcoeff();
 
 	for (std::size_t i = 1; i <= p.degree(); ++i) {
-		std::cout << "coeff:" << p.coefficients()[p.degree()-i] << std::endl;
 		if (carl::isZero(p.coefficients()[p.degree()-i])) continue;
 		if (carl::isPositive(lc * p.coefficients()[p.degree()-i])) continue;
 
@@ -98,7 +95,6 @@ Coeff lagrangePositiveUpperBound(const UnivariatePolynomial<Coeff>& p) {
 		if (i > 1) {
 			cur = carl::root_safe(cur, i).second;
 		}
-		std::cout << cur << std::endl;
 		max = std::max(max, cur);
 	}
 	return 2 * max;
