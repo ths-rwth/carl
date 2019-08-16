@@ -313,7 +313,7 @@ public:
 		if constexpr (carl::is_number<Coefficient>::value) {
 			return degree();
 		} else {
-			if (carl::isZero(*this)) return 0;
+			if (isZero()) return 0;
 			uint max = 0;
 			for (std::size_t deg = 0; deg < mCoefficients.size(); deg++) {
 				if (!mCoefficients[deg].isZero()) {
