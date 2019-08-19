@@ -93,6 +93,7 @@ void AbstractRootFinder<Number>::addRoot(const RealAlgebraicNumber<Number>& root
 	if (reducePolynomial && root.isNumeric()) {
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Eliminating root from " << mPolynomial);
 		mPolynomial.eliminateRoot(root.value());
+		mSturmSequence.reset();
 		CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << mPolynomial);
 	}
 	mRoots.push_back(root);
@@ -101,7 +102,11 @@ void AbstractRootFinder<Number>::addRoot(const RealAlgebraicNumber<Number>& root
 template<typename Number>
 void AbstractRootFinder<Number>::addRoot(const Interval<Number>& interval) {
 	CARL_LOG_DEBUG("carl.core.rootfinder", "Constructing RAN from " << mPolynomial << " and " << interval);
-	this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, interval));
+	//assert(mPolynomial == carl::squareFreePart(mPolynomial));
+	if (!mSturmSequence) {
+		mSturmSequence = sturm_sequence(mPolynomial);
+	}
+	this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, interval, *mSturmSequence));
 }
 
 template<typename Number>
@@ -138,8 +143,11 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 				} else {
 					// Root is within interval (res.first, res.second)
 					Interval<Number> r(res.first, BoundType::STRICT, res.second, BoundType::STRICT);
-					this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, (Number(-b) - r) / Number(2*a)), false);
-					this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, (Number(-b) + r) / Number(2*a)), false);
+					if (!mSturmSequence) {
+						mSturmSequence = sturm_sequence(mPolynomial);
+					}
+					this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, (Number(-b) - r) / Number(2*a), *mSturmSequence), false);
+					this->addRoot(RealAlgebraicNumber<Number>(mPolynomial, (Number(-b) + r) / Number(2*a), *mSturmSequence), false);
 				}
 			} else {
 				// No root.

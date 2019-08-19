@@ -47,6 +47,10 @@ private:
 	 */
 	UnivariatePolynomial<Number> mPolynomial;
 	/**
+	 * Caches the sturm sequence of mPolynomial
+	 */
+	std::optional<std::vector<UnivariatePolynomial<Number>>> mSturmSequence;
+	/**
 	 * Interval to be searched.
 	 */
 	Interval<Number> mInterval;

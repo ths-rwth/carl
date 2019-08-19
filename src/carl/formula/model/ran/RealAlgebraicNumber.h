@@ -162,6 +162,10 @@ public:
 		mContent(std::in_place_type<IntervalContent>, p, i),
 		mIsRoot(isRoot)
 	{}
+	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, const std::vector<UnivariatePolynomial<Number>>& seq, bool isRoot = true):
+		mContent(std::in_place_type<IntervalContent>, p, i, seq),
+		mIsRoot(isRoot)
+	{}
 
 	explicit RealAlgebraicNumber(const NumberContent& ran, bool isRoot = true):
 		mContent(ran), mIsRoot(isRoot)

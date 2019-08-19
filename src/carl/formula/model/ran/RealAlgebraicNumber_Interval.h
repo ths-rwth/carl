@@ -32,7 +32,12 @@ namespace ran {
 			Content(Polynomial&& p, const Interval<Number>& i, std::vector<UnivariatePolynomial<Number>>&& seq):
 				polynomial(std::move(p)), interval(i), sturmSequence(std::move(seq))
 			{
-				assert(polynomial == carl::squareFreePart(polynomial));
+				// assert(polynomial == carl::squareFreePart(polynomial));
+			}
+			Content(const Polynomial& p, const Interval<Number>& i, const std::vector<UnivariatePolynomial<Number>>& seq):
+				polynomial(p), interval(i), sturmSequence(seq)
+			{
+				// assert(polynomial == carl::squareFreePart(polynomial));
 			}
 			Content(const Polynomial& p, const Interval<Number>& i):
 				polynomial(carl::squareFreePart(p)), interval(i), sturmSequence(carl::sturm_sequence(polynomial))
@@ -61,7 +66,29 @@ namespace ran {
 			CARL_LOG_DEBUG("carl.ran.ir", "Creating " << *this);
 			assert(!carl::isZero(polynomial()) && polynomial().degree() > 0);
 			assert(interval().isOpenInterval() || interval().isPointInterval());
-			assert(interval().isPointInterval() || count_real_roots(polynomial(), interval()) == 1);
+			assert(interval().isPointInterval() || count_real_roots(sturm_sequence(), interval()) == 1);
+			assert(is_consistent());
+			if (polynomial().degree() == 1) {
+				Number a = polynomial().coefficients()[1];
+				Number b = polynomial().coefficients()[0];
+				interval() = Interval<Number>(Number(-b / a));
+			} else {
+				if (interval().contains(0)) refineAvoiding(0);
+				refineToIntegrality();
+			}
+		}
+
+		IntervalContent(
+			const Polynomial& p,
+			const Interval<Number> i,
+			const std::vector<UnivariatePolynomial<Number>>& seq
+		):
+			mContent(std::make_shared<Content>(replaceVariable(p), i, seq))
+		{
+			CARL_LOG_DEBUG("carl.ran.ir", "Creating " << *this);
+			assert(!carl::isZero(polynomial()) && polynomial().degree() > 0);
+			assert(interval().isOpenInterval() || interval().isPointInterval());
+			assert(interval().isPointInterval() || count_real_roots(sturm_sequence(), interval()) == 1);
 			assert(is_consistent());
 			if (polynomial().degree() == 1) {
 				Number a = polynomial().coefficients()[1];
