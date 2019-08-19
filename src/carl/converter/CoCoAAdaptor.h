@@ -148,7 +148,7 @@ public:
 		if (lex_order) {
 			std::vector<CoCoA::symbol> indets;
 			for (auto s: mSymbolBack) {
-				indets.emplace_back(s.name());
+				indets.emplace_back(s.safe_name());
 			}
 			mRing = CoCoA::NewPolyRing(mQ, indets, CoCoA::lex);
 		} else {
