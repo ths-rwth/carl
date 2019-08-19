@@ -158,6 +158,14 @@ public:
 	}
 
 	/**
+	 * Retrieves a unique name of the variable of the form `<type><id>`.
+	 * While `<type>` consists of lowercase letters, `<id>` is a decimal number.
+	 * This unique name is meant to be used wherever a unique but notationally simple identifier is required, for example when interfacing with other systems.
+	 * @return Variable name.
+	 */
+	std::string safe_name() const;
+
+	/**
 	 * Retrieves the rank of the variable.
 	 * @return Variable rank.
 	 */

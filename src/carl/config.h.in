@@ -12,7 +12,6 @@
 #cmakedefine USE_CLN_NUMBERS
 #cmakedefine USE_COCOA
 #cmakedefine USE_GINAC
-#cmakedefine BOOST_HAS_STACKTRACE
 
 #cmakedefine RAN_USE_THOM
 #cmakedefine RAN_USE_Z3

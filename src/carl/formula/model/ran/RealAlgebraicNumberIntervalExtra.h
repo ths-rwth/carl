@@ -74,5 +74,54 @@ bool vanishes(
 	}
 }
 
+template<typename Number, typename Coeff>
+UnivariatePolynomial<Number> substitute_rans_into_polynomial(
+		const UnivariatePolynomial<Coeff>& p,
+		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
+		bool make_polys_minimal = false
+) {
+	std::vector<MultivariatePolynomial<Number>> polys;
+	std::vector<Variable> varOrder;
+
+	if (make_polys_minimal) {
+		FieldExtensions<Number, MultivariatePolynomial<Number>> fe;
+		for (const auto& vic: m) {
+			varOrder.emplace_back(vic.first);
+			auto res = fe.extend(vic.first, vic.second);
+			if (res.first) {
+				polys.emplace_back(vic.first - res.second);
+			} else {
+				polys.emplace_back(res.second);
+			}
+		}
+		polys.emplace_back(p);
+	} else {
+		for (const auto& vic: m) {
+			varOrder.emplace_back(vic.first);
+			polys.emplace_back(vic.second.getIRPolynomial().replaceVariable(vic.first));
+		}
+		polys.emplace_back(p);
+	}
+	varOrder.emplace_back(p.mainVar());
+	try {
+		CARL_LOG_DEBUG("carl.ran", "Creating CoCoAAdaptor for " << varOrder);
+		CoCoAAdaptor<MultivariatePolynomial<Number>> ca(varOrder, true);
+		CARL_LOG_DEBUG("carl.ran", "Computing GBasis of " << polys);
+		auto res = ca.GBasis(polys);
+		CARL_LOG_DEBUG("carl.ran", "GBasis of " << polys << " is " << res);
+		for (const auto& poly: res) {
+			carlVariables vars;
+			poly.gatherVariables(vars);
+			if (vars == carlVariables({ p.mainVar() })) {
+				CARL_LOG_DEBUG("carl.ran", "-> " << poly)
+				return poly.toUnivariatePolynomial();
+			}
+		}
+	} catch (const CoCoA::ErrorInfo& e) {
+		std::cerr << e << " -> " << CoCoA::context(e) << std::endl;
+	}
+	return UnivariatePolynomial<Number>(p.mainVar());
+}
+
 }
 }
