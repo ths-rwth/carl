@@ -8,6 +8,8 @@
 #include "../UnivariatePolynomial.h"
 #include "IncrementalRootFinder.h"
 
+#include "RealRootIsolation.h"
+
 #include <boost/optional.hpp>
 
 #include <list>
@@ -31,16 +33,26 @@ template<typename Coeff, typename Number, typename Finder = IncrementalRootFinde
 std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
-		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
+		SplittingStrategy pivoting = SplittingStrategy::DEFAULT,
+		bool new_root_isolator = false
 ) {
 	CARL_LOG_DEBUG("carl.core.rootfinder", polynomial << " within " << interval);
 	#ifdef RAN_USE_Z3
 	auto r = realRootsZ3(polynomial, interval);
-	#else
-	auto r = Finder(polynomial, interval, pivoting).getAllRoots();
-	#endif
 	CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
 	return r;
+	#else
+	if (new_root_isolator) {
+		RealRootIsolation rri(polynomial, interval);
+		auto r = rri.get_roots();
+		CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
+		return r;
+	} else {
+		auto r = Finder(polynomial, interval, pivoting).getAllRoots();
+		CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
+		return r;
+	}
+	#endif
 }
 
 /**
