@@ -11,26 +11,40 @@ namespace carl::rootfinder {
 
 using carl::operator<<;
 
+/**
+ * Compact class to isolate real roots from a univariate polynomial using bisection.
+ * 
+ * After some rather easy preprocessing (make polynomial square-free, eliminate zero roots, solve low-degree polynomial trivially, use root bounds to shrink the interval) 
+ * we employ bisection which can optionally be initialized by approximations.
+ */
 template<typename Number>
 class RealRootIsolation {
-	static constexpr bool initialize_bisection_by_eigenvalues = true;
+	/// Initialize bisection intervals using approximations.
+	static constexpr bool initialize_bisection_by_approximation = true;
 
+	/// The polynomial.
 	UnivariatePolynomial<Number> mPolynomial;
+	/// The list of roots.
 	std::vector<RealAlgebraicNumber<Number>> mRoots;
+	/// The bounding interval.
 	Interval<Number> mInterval;
+	/// The sturm sequence for mPolynomial.
 	std::optional<std::vector<UnivariatePolynomial<Number>>> mSturmSequence;
 
+	/// Return the sturm sequence for mPolynomial, create it if necessary.
 	const auto& sturm_sequence() {
 		if (!mSturmSequence) {
 			mSturmSequence = carl::sturm_sequence(mPolynomial);
 		}
 		return *mSturmSequence;
 	}
+	/// Reset the sturm sequence, used if the polynomial was modified.
 	void reset_sturm_sequence() {
 		mSturmSequence.reset();
 	}
 
-	void isolate_zero_roots() {
+	/// Handle zero roots (p(0) == 0)
+	void eliminate_zero_roots() {
 		if (mPolynomial.zeroIsRoot()) {
 			if (mInterval.contains(0)) {
 				mRoots.emplace_back(0);
@@ -39,6 +53,7 @@ class RealRootIsolation {
 		}
 	}
 
+	/// Directly solve low-degree polynomials.
 	bool isolate_roots_trivially() {
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Trying to trivially solve mPolynomial " << mPolynomial);
 		switch (mPolynomial.degree()) {
@@ -86,22 +101,26 @@ class RealRootIsolation {
 		return true;
 	}
 
+	/// Use root bounds to shrink mInterval.
 	void update_root_bounds() {
-		auto bound = carl::cauchyBound(mPolynomial);
+		auto bound = carl::lagrangeBound(mPolynomial);
 		mInterval = carl::set_intersection(mInterval, carl::Interval<Number>(-bound, bound));
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Updated bounds to " << mInterval);
 	}
 
+	/// Add a root to mRoots and simplify polynomial accordingly (essentially divide by x-n)
 	void add_root(const Number& n) {
 		assert(mPolynomial.isRoot(n));
 		reset_sturm_sequence();
 		mPolynomial.eliminateRoot(n);
 		mRoots.emplace_back(n);
 	}
+	/// Add a root to mRoots, based on an isolating interval.
 	void add_root(const Interval<Number>& i) {
 		mRoots.emplace_back(mPolynomial, i, sturm_sequence());
 	}
 
+	/// Check whether the interval bounds are roots.
 	bool check_interval_bounds() {
 		bool found_root = false;
 		if (mInterval.lowerBoundType() == BoundType::WEAK) {
@@ -119,7 +138,20 @@ class RealRootIsolation {
 		return found_root;
 	}
 
-	void bisect_by_eigenvalues(std::vector<Interval<Number>>& queue) {
+	/**
+	 * Initialize the bisection queue using approximations.
+	 * 
+	 * The main idea is that the eigenvalues of the companion matrix are the root of a polynomial.
+	 * This is implemented in eigen::root_approximation.
+	 * We do:
+	 * - convert coefficients to doubles
+	 * - call eigen::root_approximation
+	 * - make approximations smaller, sort them, remove duplicates
+	 * - convert approximations to rationals
+	 * - create interval endpoints so that each interval contains a single approximation
+	 * - initialize queue from these endpoints
+	 */
+	void bisect_by_approximation(std::vector<Interval<Number>>& queue) {
 		assert(queue.empty());
 		// Convert polynomial coeffs to double
 		std::vector<double> coeffs;
@@ -170,10 +202,11 @@ class RealRootIsolation {
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Queue: " << queue);
 	}
 
+	/// Perform bisection
 	void isolate_by_bisection() {
 		std::vector<Interval<Number>> queue;
-		if (initialize_bisection_by_eigenvalues) {
-			bisect_by_eigenvalues(queue);
+		if (initialize_bisection_by_approximation) {
+			bisect_by_approximation(queue);
 		} else {
 			queue.emplace_back(mInterval);
 		}
@@ -212,9 +245,10 @@ public:
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Reduced " << polynomial << " to " << mPolynomial);
 	}
 
+	/// Compute the roots of mPolynomial within mInterval.
 	std::vector<RealAlgebraicNumber<Number>> get_roots() {
 		// Check for p(0) == 0
-		isolate_zero_roots();
+		eliminate_zero_roots();
 		// Handle other easy cases
 		while (true) {
 			// Degree of at most 2 -> use p-q-formula
