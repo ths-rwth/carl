@@ -215,18 +215,13 @@ public:
 
 private:
 	/**
-	 * Caches the sturm sequence of the polynomial
-	 */
-	std::list<UnivariatePolynomial<Number>> sturmSequence;
-
-	/**
 	 * The current default strategy.
 	 */
 	SplittingStrategy splittingStrategy;
 	/**
 	 * Interval queue containing all items that must still be processed.
 	 */
-	std::priority_queue<QueueItem, std::vector<QueueItem>, IntervalSizeComparator> queue;
+	std::priority_queue<QueueItem, std::vector<QueueItem>, Comparator> queue;
 public:
 
 	/**
