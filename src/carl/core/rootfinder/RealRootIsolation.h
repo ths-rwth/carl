@@ -4,6 +4,7 @@
 #include "../../formula/model/ran/RealAlgebraicNumber.h"
 #include "../../interval/set_theory.h"
 #include "../../interval/sampling.h"
+#include "../polynomialfunctions/Factorization_univariate.h"
 #include "../polynomialfunctions/SignVariations.h"
 #include "../../io/streamingOperators.h"
 
@@ -21,6 +22,8 @@ template<typename Number>
 class RealRootIsolation {
 	/// Initialize bisection intervals using approximations.
 	static constexpr bool initialize_bisection_by_approximation = true;
+	/// Factorize polynomial and handle factors individually.
+	static constexpr bool simplify_by_factorization = false;
 
 	/// The polynomial.
 	UnivariatePolynomial<Number> mPolynomial;
@@ -240,20 +243,15 @@ class RealRootIsolation {
 		}
 	}
 
-public:
-	RealRootIsolation(const UnivariatePolynomial<Number>& polynomial, const Interval<Number>& interval): mPolynomial(carl::squareFreePart(polynomial)), mInterval(interval) {
-		CARL_LOG_DEBUG("carl.core.rootfinder", "Reduced " << polynomial << " to " << mPolynomial);
-	}
-
-	/// Compute the roots of mPolynomial within mInterval.
-	std::vector<RealAlgebraicNumber<Number>> get_roots() {
+	/// Do actual root isolation.
+	void compute_roots() {
 		// Check for p(0) == 0
 		eliminate_zero_roots();
 		// Handle other easy cases
 		while (true) {
 			// Degree of at most 2 -> use p-q-formula
 			if (isolate_roots_trivially()) {
-				return mRoots;
+				return;
 			}
 			// Use bounds to make interval smaller
 			update_root_bounds();
@@ -265,7 +263,27 @@ public:
 
 		// Now do actual bisection
 		isolate_by_bisection();
+	}
 
+public:
+	RealRootIsolation(const UnivariatePolynomial<Number>& polynomial, const Interval<Number>& interval): mPolynomial(carl::squareFreePart(polynomial)), mInterval(interval) {
+		CARL_LOG_DEBUG("carl.core.rootfinder", "Reduced " << polynomial << " to " << mPolynomial);
+	}
+
+	/// Compute the roots of mPolynomial within mInterval.
+	std::vector<RealAlgebraicNumber<Number>> get_roots() {
+		if (simplify_by_factorization) {
+			auto factors = carl::factorization(mPolynomial);
+			auto interval = mInterval;
+			for (const auto& factor: factors) {
+				mPolynomial = factor.first;
+				mInterval = interval;
+				reset_sturm_sequence();
+				compute_roots();
+			}
+		} else {
+			compute_roots();
+		}
 		return mRoots;
 	}
 
