@@ -120,6 +120,7 @@ public:
 					monContent.emplace_back(mSymbolBack[i], exponents[i]);
 					tdeg += std::size_t(exponents[i]);
 				}
+				std::sort(monContent.begin(), monContent.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first < p2.first; });
 				res += typename Poly::TermType(std::move(coeff), createMonomial(std::move(monContent), tdeg));
 			}
 		}
