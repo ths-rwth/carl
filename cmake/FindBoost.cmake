@@ -2,7 +2,7 @@
 string(REPLACE ":" ";" CPATH "$ENV{CPATH}")
 find_path(Boost_INCLUDE_DIR
 	NAMES boost/version.hpp
-	HINTS ${CPATH}
+	HINTS ${CPATH} $ENV{BOOST_ROOT}/include
 	PATHS /usr/include
 	DOC "Include directory for Boost"
 )
@@ -25,7 +25,7 @@ foreach(component ${Boost_FIND_COMPONENTS})
 	unset(lib_shared CACHE)
 	find_library(lib_shared
 		NAMES boost_${component}
-		HINTS ${LIBRARY_PATH}
+		HINTS ${LIBRARY_PATH} $ENV{BOOST_ROOT}/lib
 		PATHS /usr/local/lib
 	)
 	if (NOT lib_shared)
@@ -41,7 +41,7 @@ foreach(component ${Boost_FIND_COMPONENTS})
 	unset(lib_static CACHE)
 	find_library(lib_static
 		NAMES boost_${component}
-		HINTS ${LIBRARY_PATH}
+		HINTS ${LIBRARY_PATH} $ENV{BOOST_ROOT}/lib
 		PATHS /usr/local/lib
 	)
 	if (NOT lib_static)
