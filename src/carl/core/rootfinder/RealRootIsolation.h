@@ -247,6 +247,10 @@ class RealRootIsolation {
 	void compute_roots() {
 		// Check for p(0) == 0
 		eliminate_zero_roots();
+		// Handle zero polynomial
+		if (carl::isZero(mPolynomial)) {
+			return;
+		}
 		// Handle other easy cases
 		while (true) {
 			// Degree of at most 2 -> use p-q-formula
