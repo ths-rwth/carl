@@ -154,7 +154,7 @@ class RealRootIsolation {
 	 * - create interval endpoints so that each interval contains a single approximation
 	 * - initialize queue from these endpoints
 	 */
-	void bisect_by_approximation(std::vector<Interval<Number>>& queue) {
+	void bisect_by_approximation(std::deque<Interval<Number>>& queue) {
 		assert(queue.empty());
 		// Convert polynomial coeffs to double
 		std::vector<double> coeffs;
@@ -207,7 +207,7 @@ class RealRootIsolation {
 
 	/// Perform bisection
 	void isolate_by_bisection() {
-		std::vector<Interval<Number>> queue;
+		std::deque<Interval<Number>> queue;
 		if (initialize_bisection_by_approximation) {
 			bisect_by_approximation(queue);
 		} else {
@@ -215,8 +215,8 @@ class RealRootIsolation {
 		}
 
 		while (!queue.empty()) {
-			auto cur = queue.back();
-			queue.pop_back();
+			auto cur = queue.front();
+			queue.pop_front();
 
 			auto variations = carl::sign_variations(mPolynomial, cur);
 			
@@ -274,7 +274,7 @@ public:
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Reduced " << polynomial << " to " << mPolynomial);
 	}
 
-	/// Compute the roots of mPolynomial within mInterval.
+	/// Compute and sort the roots of mPolynomial within mInterval.
 	std::vector<RealAlgebraicNumber<Number>> get_roots() {
 		if (simplify_by_factorization) {
 			auto factors = carl::factorization(mPolynomial);
@@ -288,6 +288,7 @@ public:
 		} else {
 			compute_roots();
 		}
+		std::sort(mRoots.begin(), mRoots.end());
 		return mRoots;
 	}
 

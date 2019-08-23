@@ -28,6 +28,7 @@ namespace rootfinder {
 
 /**
  * Find all real roots of a univariate 'polynomial' with numeric coefficients within a given 'interval'.
+ * The roots are sorted in ascending order.
  */
 template<typename Coeff, typename Number, typename Finder = IncrementalRootFinder<Number>, EnableIf<std::is_same<Coeff, Number>> = dummy>
 std::vector<RealAlgebraicNumber<Number>> realRoots(
@@ -58,6 +59,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 /**
  * Find all real roots of a univariate 'polynomial' with non-numeric coefficients within a given 'interval'.
  * However, all coefficients must be types that contain numeric numbers that are retrievable by using .constantPart();
+ * The roots are sorted in ascending order.
  */
 template<typename Coeff, typename Number, DisableIf<std::is_same<Coeff, Number>> = dummy>
 std::vector<RealAlgebraicNumber<Number>> realRoots(
@@ -74,6 +76,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
  * Find all real roots of a univariate 'polynomial' with non-numeric coefficients within a given 'interval'.
  * However, all coefficients must be types that contain numeric numbers that are retrievable by using .constantPart();
  * Note that this is a convenience method with swapped arguments to omit the interval but give a strategy.
+ * The roots are sorted in ascending order.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
 std::vector<RealAlgebraicNumber<Number>> realRoots(
@@ -99,6 +102,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
  *   <li>the main variable of 'p' must not be in 'm'</li>
  *   <li>all variables from the coefficients of 'p' must be in 'm'</li>
  * </ul>
+ * The roots are sorted in ascending order.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
 std::vector<RealAlgebraicNumber<Number>> realRoots(

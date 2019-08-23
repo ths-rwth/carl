@@ -20,6 +20,7 @@
 #include <utility>
 #include <variant>
 #include <vector>
+#include <deque>
 
 namespace carl {
 
@@ -48,6 +49,8 @@ template<typename T, typename... Tail>
 inline std::ostream& operator<<(std::ostream& os, const std::variant<T, Tail...>& v);
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v);
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, const std::deque<T>& v);
 
 
 /**
@@ -230,6 +233,18 @@ inline std::ostream& operator<<(std::ostream& os, const std::variant<T, Tail...>
  */
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
+	return os << "[" << v.size() << ": " << stream_joined(", ", v) << "]";
+}
+
+/**
+ * Output a std::deque with arbitrary content.
+ * The format is `[<length>: <item>, <item>, ...]`
+ * @param os Output stream.
+ * @param v vector to be printed.
+ * @return Output stream.
+ */
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, const std::deque<T>& v) {
 	return os << "[" << v.size() << ": " << stream_joined(", ", v) << "]";
 }
 
