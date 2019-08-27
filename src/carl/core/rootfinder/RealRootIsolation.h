@@ -86,7 +86,6 @@ class RealRootIsolation {
 					add_trivial_root(-b / (2*a));
 				} else if (rad > 0) {
 					std::pair<Number, Number> res = carl::sqrt_fast(rad);
-					std::cout << "sqrt of " << rad << " is " << res << std::endl;
 					if (res.first == res.second) {
 						// Root could be calculated exactly
 						add_trivial_root((-b - res.first) / (2*a));
