@@ -3,6 +3,7 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Eigenvalues>
 
+#include <cmath>
 #include <vector>
 
 namespace carl {
@@ -25,10 +26,14 @@ std::vector<double> root_approximation(const std::vector<double>& coeffs) {
 	Eigen::VectorXcd eigenvalues = m.eigenvalues();
 	
 	// Save real parts to tmp
-	std::vector<double> tmp(std::size_t(eigenvalues.size()));
+	std::vector<double> tmp;
 	for (uint i = 0; i < std::size_t(eigenvalues.size()); ++i) {
-		if (eigenvalues[Index(i)].imag() > eigenvalues[Index(i)].real() / 4) tmp[i] = 0;
-		else tmp[i] = eigenvalues[Index(i)].real();
+		if (!std::isfinite(eigenvalues[Index(i)].real()) || !std::isfinite(eigenvalues[Index(i)].imag())) {
+			continue;
+		}
+		if (eigenvalues[Index(i)].imag() < eigenvalues[Index(i)].real() / 4) {
+			tmp.emplace_back(eigenvalues[Index(i)].real());
+		}
 	}
 	return tmp;
 }
