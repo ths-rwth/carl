@@ -60,13 +60,16 @@ class RealRootIsolation {
 	bool isolate_roots_trivially() {
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Trying to trivially solve mPolynomial " << mPolynomial);
 		switch (mPolynomial.degree()) {
-			case 0: break;
+			case 0: {
+				CARL_LOG_TRACE("carl.core.rootfinder", "Constant polynomial, thus no roots");
+				break;
+			}
 			case 1: {
 				CARL_LOG_DEBUG("carl.core.rootfinder", "Trivially solving linear mPolynomial " << mPolynomial);
 				const auto& a = mPolynomial.coefficients()[1];
 				const auto& b = mPolynomial.coefficients()[0];
 				assert(!carl::isZero(a));
-				mRoots.emplace_back(-b / a);
+				add_trivial_root(-b / a);
 				break;
 			}
 			case 2: {
@@ -80,18 +83,19 @@ class RealRootIsolation {
 				*/
 				Number rad = b*b - 4*a*c;
 				if (rad == 0) {
-					mRoots.emplace_back(-b / (2*a));
+					add_trivial_root(-b / (2*a));
 				} else if (rad > 0) {
 					std::pair<Number, Number> res = carl::sqrt_fast(rad);
+					std::cout << "sqrt of " << rad << " is " << res << std::endl;
 					if (res.first == res.second) {
 						// Root could be calculated exactly
-						mRoots.emplace_back((-b - res.first) / (2*a));
-						mRoots.emplace_back((-b + res.first) / (2*a));
+						add_trivial_root((-b - res.first) / (2*a));
+						add_trivial_root((-b + res.first) / (2*a));
 					} else {
 						// Root is within interval (res.first, res.second)
 						Interval<Number> r(res.first, BoundType::STRICT, res.second, BoundType::STRICT);
-						mRoots.emplace_back(mPolynomial, (Number(-b) - r) / Number(2*a), sturm_sequence());
-						mRoots.emplace_back(mPolynomial, (Number(-b) + r) / Number(2*a), sturm_sequence());
+						add_trivial_root((Number(-b) - r) / Number(2*a));
+						add_trivial_root((Number(-b) + r) / Number(2*a));
 					}
 				} else {
 					// No root.
@@ -104,6 +108,17 @@ class RealRootIsolation {
 		return true;
 	}
 
+	void add_trivial_root(const Number& n) {
+		CARL_LOG_TRACE("carl.core.rootfinder", "Add trivial root " << n);
+		assert(mPolynomial.isRoot(n));
+		mRoots.emplace_back(n);
+	}
+
+	void add_trivial_root(const Interval<Number>& i) {
+		CARL_LOG_TRACE("carl.core.rootfinder", "Add trivial root " << i);
+		mRoots.emplace_back(mPolynomial, i, sturm_sequence());
+	}
+
 	/// Use root bounds to shrink mInterval.
 	void update_root_bounds() {
 		auto bound = carl::lagrangeBound(mPolynomial);
@@ -113,6 +128,7 @@ class RealRootIsolation {
 
 	/// Add a root to mRoots and simplify polynomial accordingly (essentially divide by x-n)
 	void add_root(const Number& n) {
+		CARL_LOG_TRACE("carl.core.rootfinder", "Add root " << n);
 		assert(mPolynomial.isRoot(n));
 		reset_sturm_sequence();
 		mPolynomial.eliminateRoot(n);
@@ -120,6 +136,7 @@ class RealRootIsolation {
 	}
 	/// Add a root to mRoots, based on an isolating interval.
 	void add_root(const Interval<Number>& i) {
+		CARL_LOG_TRACE("carl.core.rootfinder", "Add root " << i);
 		mRoots.emplace_back(mPolynomial, i, sturm_sequence());
 	}
 
@@ -278,8 +295,10 @@ public:
 	std::vector<RealAlgebraicNumber<Number>> get_roots() {
 		if (simplify_by_factorization) {
 			auto factors = carl::factorization(mPolynomial);
+			CARL_LOG_DEBUG("carl.core.rootfinder", "Factorized " << mPolynomial << " to " << factors);
 			auto interval = mInterval;
 			for (const auto& factor: factors) {
+				CARL_LOG_DEBUG("carl.core.rootfinder", "Coputing root of factor " << factor);
 				mPolynomial = factor.first;
 				mInterval = interval;
 				reset_sturm_sequence();
