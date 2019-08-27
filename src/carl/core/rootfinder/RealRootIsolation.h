@@ -205,12 +205,14 @@ class RealRootIsolation {
 		// Get interval endpoints
 		std::vector<Number> endpoints;
 		endpoints.emplace_back(mInterval.lower());
-		for (std::size_t i = 0; i < roots.size() - 1; ++i) {
-			auto tmp = carl::sample(Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT));
-			if (mPolynomial.isRoot(tmp)) {
-				add_root(tmp);
+		if (roots.size() > 0) {
+			for (std::size_t i = 0; i < roots.size() - 1; ++i) {
+				auto tmp = carl::sample(Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT));
+				if (mPolynomial.isRoot(tmp)) {
+					add_root(tmp);
+				}
+				endpoints.emplace_back(tmp);
 			}
-			endpoints.emplace_back(tmp);
 		}
 		endpoints.emplace_back(mInterval.upper());
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Endpoints: " << endpoints);
