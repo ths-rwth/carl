@@ -120,6 +120,11 @@ TYPED_TEST(RationalNumbers, Sqrt_fast) {
     EXPECT_EQ(TypeParam(21), s.first);
     EXPECT_EQ(TypeParam(22), s.second);
   }
+  {
+		auto s = carl::sqrt_fast(TypeParam(9)/4);
+    EXPECT_EQ(s.first, TypeParam(3)/2);
+    EXPECT_EQ(s.second, TypeParam(3)/2);
+	}
 }
 
 TYPED_TEST(RationalNumbers, Squareroot_exact) {

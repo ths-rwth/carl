@@ -110,21 +110,21 @@ namespace carl
 
         if (carl::isZero(num_rem)) {
             if (carl::isZero(den_rem)) {
-                mpq_class exact_root = num / den;
+                mpq_class exact_root = mpq_class(num) / den;
                 return std::make_pair(exact_root, exact_root);
             } else {
-                mpq_class lower = num / (den + 1);
-                mpq_class upper = num / den;
+                mpq_class lower = mpq_class(num) / (den + 1);
+                mpq_class upper = mpq_class(num) / den;
                 return std::make_pair(lower, upper);
             }
         } else {
             if (carl::isZero(den_rem)) {
-                mpq_class lower = num / den;
-                mpq_class upper = (num + 1) / den;
+                mpq_class lower = mpq_class(num) / den;
+                mpq_class upper = (mpq_class(num) + 1) / den;
                 return std::make_pair(lower, upper);
             } else {
-                mpq_class lower = num / (den + 1);
-                mpq_class upper = (num + 1) / den;
+                mpq_class lower = mpq_class(num) / (den + 1);
+                mpq_class upper = (mpq_class(num) + 1) / den;
                 return std::make_pair(lower, upper);
             }
         }

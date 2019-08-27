@@ -6,6 +6,10 @@
 #include <carl/core/polynomialfunctions/Chebyshev.h>
 #include "carl/core/polynomialfunctions/LazardEvaluation.h"
 
+#include <carl/formula/Formula.h>
+#include <carl-model/Model.h>
+#include <carl-model/evaluation/ModelEvaluation.h>
+
 #include "../Common.h"
 
 typedef carl::UnivariatePolynomial<Rational> UPolynomial;
@@ -180,3 +184,26 @@ TEST(RootFinder, Comparison)
 
 	std::cout << ran1 << " == " << ran2 << std::endl;
 }
+
+using MPoly = carl::MultivariatePolynomial<mpq_class>;
+TEST(RootFinder, FactorizationBug)
+{
+	carl::Variable x = carl::freshRealVariable("x");
+	Poly p = Poly(x, {2,-7,7,-2});
+	// 2 + -7*x + 7*x^2 + -2*x^3 < 0
+	std::cout << p << std::endl;
+
+	auto ran1 = carl::rootfinder::realRoots(p);
+	std::cout << ran1 << std::endl;
+	// should be: 1/2, 1, 2
+
+	for (const auto& root: ran1) {
+		carl::Model<mpq_class,MPoly> m;
+		m.assign(x, root);
+		auto f = Formula<MPoly>(Constraint<MPoly>(MPoly(p), Relation::EQ));
+		auto res = carl::model::evaluate(f, m);
+		EXPECT_TRUE(res.asBool());
+	}
+}
+
+
