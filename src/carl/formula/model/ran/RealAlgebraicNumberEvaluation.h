@@ -65,20 +65,12 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, co
 
 /**
  * Compute a univariate polynomial with rational coefficients that has the roots of 'p' whose coefficient variables have been substituted by the roots given in m.
- * The map varToInterval gives back an assignment of variables to the isolating intervals of the roots for each variable.
  * Note that the resulting polynomial has the main variable of p in the end.
  *
  * @param p
  * @param m
- * @param varToInterval
  * @return a univariate polynomial with rational coefficients (and p's main variable) that has the roots of p whose coefficient variables have been substituted by the roots given in m
  */
-// template<typename Number, typename Coeff>
-// UnivariatePolynomial<Number> evaluatePolynomial(
-// 		const UnivariatePolynomial<Coeff>& p,
-// 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
-// 		std::map<Variable, Interval<Number>>& varToInterval
-// );
 template<typename Number>
 MultivariatePolynomial<Number> evaluatePolynomial(
 		const MultivariatePolynomial<Number>& p,
@@ -89,7 +81,6 @@ MultivariatePolynomial<Number> evaluatePolynomial(
  * Evaluate the coefficients of the given polynomial p w.r.t. the given evaluation map m.
  * The algorithm assumes that all variables in m are coefficient variables.
  *
- * The map varToInterval gives back an assignment of variables to the isolating intervals of the roots for each variable.
  * @param p polynomial to be evaluated in the given variables. This should be a univariate polynomial in a variable <i>not</i> occurring in variables.
  * @param m map assigning each variable of p an interval-represented RealAlgebraicNumber
  * @return rational univariate polynomial having all real roots of the polynomial whose coefficients are evaluated according to m

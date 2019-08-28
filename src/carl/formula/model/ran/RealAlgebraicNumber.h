@@ -380,24 +380,6 @@ public:
 		);
 	}
 
-	void simplifyByPolynomial(Variable var, const MultivariatePolynomial<Number>& poly) const {
-		assert(isInterval());
-		UnivariatePolynomial<Number> irp(var, getIRPolynomial().template convert<Number>().coefficients());
-		CARL_LOG_DEBUG("carl.ran", "gcd(" << irp << ", " << poly << ")");
-		auto gmv = carl::gcd(MultivariatePolynomial<Number>(irp), poly);
-		CARL_LOG_DEBUG("carl.ran", "Simplyfing, gcd = " << gmv);
-		if (carl::isOne(gmv)) return;
-		auto g = gmv.toUnivariatePolynomial();
-		if (isRootOf(g)) {
-			CARL_LOG_DEBUG("carl.ran", "Is a root of " << g);
-			std::get<IntervalContent>(mContent).setPolynomial(g);
-		} else {
-			CARL_LOG_DEBUG("carl.ran", "Is not a root of " << g);
-			CARL_LOG_DEBUG("carl.ran", "Dividing " << std::get<IntervalContent>(mContent).polynomial() << " by " << g);
-			std::get<IntervalContent>(mContent).setPolynomial(std::get<IntervalContent>(mContent).polynomial().divideBy(g.replaceVariable(ran::IntervalContent<Number>::auxVariable)).quotient);
-		}
-	}
-	
 	RealAlgebraicNumber<Number> abs() const {
 		return call_on_content(
 			[this](const auto& c) { return RealAlgebraicNumber<Number>(ran::abs(c), mIsRoot); }
