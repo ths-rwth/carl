@@ -135,9 +135,11 @@ namespace ran {
 			return carl::isZero(interval());
 		}
 		bool is_integral() const {
+			refineToIntegrality();
 			return interval().isPointInterval() && carl::isInteger(interval().lower());
 		}
 		Number integer_below() const {
+			refineToIntegrality();
 			return carl::floor(interval().lower());
 		}
 
@@ -342,7 +344,7 @@ namespace ran {
 			}
 		}
 		
-		void refineToIntegrality() {
+		void refineToIntegrality() const {
 			while (!interval().isPointInterval() && interval().containsInteger()) {
 				refine();
 			}

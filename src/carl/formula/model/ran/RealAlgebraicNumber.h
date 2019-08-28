@@ -277,14 +277,12 @@ public:
 #endif
 
 	bool isIntegral() const {
-		refineToIntegrality();
 		return call_on_content(
 			[](const auto& c) { return c.is_integral(); }
 		);
 	}
 
 	Number integerBelow() const {
-		refineToIntegrality();
 		return call_on_content(
 			[](const auto& c) { return c.integer_below(); }
 		);
