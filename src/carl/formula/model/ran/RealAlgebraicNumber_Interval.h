@@ -6,6 +6,7 @@
 #include "../../../core/polynomialfunctions/SquareFreePart.h"
 #include "../../../core/polynomialfunctions/SturmSequence.h"
 #include "../../../core/polynomialfunctions/RootBounds.h"
+#include "../../../core/polynomialfunctions/AlgebraicSubstitution.h"
 
 #include "../../../interval/Interval.h"
 #include "../../../interval/IntervalEvaluation.h"
@@ -386,6 +387,12 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 		const std::map<Variable, IntervalContent<Number>>& m
 ) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
+	std::vector<UnivariatePolynomial<Number>> polys;
+	for (const auto& i: m) {
+		polys.emplace_back(i.second.polynomial().replaceVariable(i.first));
+	}
+	return carl::algebraic_substitution(p, polys);
+
 	Variable v = p.mainVar();
 	UnivariatePolynomial<Coeff> tmp = p;
 	for (const auto& i: m) {
@@ -432,7 +439,12 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	}
 	Variable v = freshRealVariable();
 	// compute the result polynomial
-	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m);
+	std::vector<UnivariatePolynomial<Number>> algebraic_information;
+	for (const auto& cur: m) {
+		algebraic_information.emplace_back(cur.second.polynomial().replaceVariable(cur.first));
+	}
+	//UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m);
+	UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 	// Note that res cannot be zero as v is a fresh variable in v-p.
 	// compute the initial result interval
 	std::map<Variable, Interval<Number>> varToInterval;
