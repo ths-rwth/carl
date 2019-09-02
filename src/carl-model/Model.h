@@ -13,8 +13,7 @@ namespace carl
 	 * in CARL, and a ModelValue to abstract over the different kinds of values
 	 * for these variables.
 	 * Most notably, a value can be a "carl::ModelSubstitution" whose value depends
-	 * on the values of other variables in the Model. If such other variables are
-	 * erased from the model, this substitution is evaluated and replaced by the result.
+	 * on the values of other variables in the Model.
 	 */
 	template<typename Rational, typename Poly>
 	class Model {
@@ -88,17 +87,6 @@ namespace carl
 		}
 		typename Map::iterator erase(const typename Map::const_iterator& it) {
 			if (it == mData.end()) return mData.end();
-			for (auto& m: mData) {
-				const auto& val = m.second;
-				if (!val.isSubstitution()) continue;
-				const auto& subs = val.asSubstitution();
-				if (subs->dependsOn(it->first)) {
-					CARL_LOG_DEBUG("carl.formula.model", "Evaluating " << m.first << " ->  " << subs << " as " << it->first << " is removed from the model.");
-					// Prevent memory error due to deallocation in operator=()
-					auto tmp = subs->evaluate(*this);
-					m.second = tmp;
-				}
-			}
 			return mData.erase(it);
 		}
         void clean() {
