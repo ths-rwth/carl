@@ -62,6 +62,18 @@ public:
 		compact(true);
 		return mVariables.size();
 	}
+	bool has(Variable var) const {
+		return std::any_of(begin(), end(),
+			[&var](const auto& v) {
+				return std::visit(overloaded {
+					[&var](Variable v){ return v == var; },
+					[&var](BVVariable v){ return v.variable() == var; },
+					[&var](UVariable v){ return v.variable() == var; },
+				}, v);
+			}
+		);
+	}
+
 	void add(VarTypes v) {
 		mVariables.emplace_back(v);
 		++mAddedSinceCompact;
