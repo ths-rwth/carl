@@ -10,6 +10,8 @@
 #include <carl-model/Model.h>
 #include <carl-model/evaluation/ModelEvaluation.h>
 
+#include <boost/optional/optional_io.hpp>
+
 #include "../Common.h"
 
 typedef carl::UnivariatePolynomial<Rational> UPolynomial;
@@ -207,3 +209,36 @@ TEST(RootFinder, FactorizationBug)
 }
 
 
+TEST(RootFinder, AnotherBug)
+{
+	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable y = carl::freshRealVariable("y");
+	carl::Variable r = carl::freshRealVariable("r");
+
+	// -4*x + -2*x*y + 2*x^3 + x^3*y
+	MPolynomial p = MPolynomial(Rational(-4))*x + Rational(-2)*x*y + Rational(2)*x*x*x + x*x*x*y;
+	std::cout << p << std::endl;
+
+	// x =(IR ]66148871326817845/2305843009213693952, 66148871326817845/1152921504606846976[, (10)*__r^5 + (-1)*__r^4 + (-40)*__r^3 + (3)*__r^2 + (40)*__r^1 + -2 R)
+	Poly ranp(r, {-2, 40, 3,-40, -1, 10});
+	Interval<Rational> rani(66148871326817845_mpq/2305843009213693952_mpq, BoundType::STRICT, 66148871326817845_mpq/1152921504606846976_mpq, BoundType::STRICT);
+	auto ran = RealAlgebraicNumber<Rational>(ranp, rani);
+	carl::Model<mpq_class,MPoly> m;
+	m.assign(x, ran);
+
+	// proove that y=-2 is a root
+	{
+		carl::Model<mpq_class,MPolynomial> m2;
+		m2.assign(y, Rational(-2));
+		auto f = Formula<MPolynomial>(Constraint<MPolynomial>(p, Relation::EQ));
+		auto res = carl::model::evaluate(f, m2);
+		EXPECT_TRUE(res.isBool());
+		EXPECT_TRUE(res.asBool());
+	}
+
+	auto roots = carl::model::tryRealRoots(p, y, m);
+	std::cout << roots << std::endl;
+	EXPECT_TRUE(roots);
+	EXPECT_TRUE(roots->size() > 0);
+	EXPECT_TRUE(std::find(roots->begin(), roots->end(), RealAlgebraicNumber<Rational>(Rational(-2))) != roots->end());
+}
