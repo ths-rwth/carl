@@ -439,11 +439,10 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	}
 	Variable v = freshRealVariable();
 	// compute the result polynomial
-	std::vector<UnivariatePolynomial<Number>> algebraic_information;
+	std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
 	for (const auto& cur: m) {
-		algebraic_information.emplace_back(cur.second.polynomial().replaceVariable(cur.first));
+		algebraic_information.emplace_back(cur.second.polynomial().replaceVariable(cur.first).template convert<MultivariatePolynomial<Number>>());
 	}
-	//UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m);
 	UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 	// Note that res cannot be zero as v is a fresh variable in v-p.
 	// compute the initial result interval
@@ -579,7 +578,11 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		}
 		Variable v = freshRealVariable();
 		// compute the result polynomial
-		UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m);
+		std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
+		for (const auto& cur: m) {
+			algebraic_information.emplace_back(cur.second.polynomial().replaceVariable(cur.first).template convert<MultivariatePolynomial<Number>>());
+		}
+		UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 		// Note that res cannot be zero as v is a fresh variable in v-p.
 		// compute the initial result interval
 		std::map<Variable, Interval<Number>> varToInterval;

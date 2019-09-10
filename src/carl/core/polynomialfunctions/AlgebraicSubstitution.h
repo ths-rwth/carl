@@ -28,25 +28,21 @@ namespace carl {
  * Essentially we take all polynomials and compute a Gröbner basis with respect to an elimination order, having the remaining variable at the end.
  * The result is then the polynomial in the last variable only.
  */
-template<typename Number, typename Coeff>
-UnivariatePolynomial<Number> algebraic_substitution_groebner(const UnivariatePolynomial<Coeff>& p, const std::vector<UnivariatePolynomial<Number>>& polynomials) {
-	std::vector<Variable> varOrder;
-	std::vector<MultivariatePolynomial<Number>> polys;
-	for (const auto& poly: polynomials) {
-		varOrder.emplace_back(poly.mainVar());
-		polys.emplace_back(poly);
-	}
-	varOrder.emplace_back(p.mainVar());
-	polys.emplace_back(p);
+template<typename Number>
+UnivariatePolynomial<Number> algebraic_substitution_groebner(
+	const std::vector<MultivariatePolynomial<Number>>& polynomials,
+	const std::vector<Variable>& variables
+) {
+	Variable target = variables.back();
 	try {
-		CoCoAAdaptor<MultivariatePolynomial<Number>> ca(varOrder, true);
-		CARL_LOG_DEBUG("carl.algsubs", "Computing GBasis of " << polys << " with order " << varOrder);
-		auto res = ca.GBasis(polys);
+		CoCoAAdaptor<MultivariatePolynomial<Number>> ca(variables, true);
+		CARL_LOG_DEBUG("carl.algsubs", "Computing GBasis of " << polynomials << " with order " << variables);
+		auto res = ca.GBasis(polynomials);
 		CARL_LOG_DEBUG("carl.algsubs", "-> " << res);
 		for (const auto& poly: res) {
 			carlVariables vars;
 			poly.gatherVariables(vars);
-			if (vars == carlVariables({ p.mainVar() })) {
+			if (vars == carlVariables({ target })) {
 				CARL_LOG_DEBUG("carl.algsubs", "-> " << poly)
 				return poly.toUnivariatePolynomial();
 			}
@@ -54,31 +50,82 @@ UnivariatePolynomial<Number> algebraic_substitution_groebner(const UnivariatePol
 	} catch (const CoCoA::ErrorInfo& e) {
 		CARL_LOG_ERROR("carl.algsubs", "Computation of GBasis failed: " << e << " -> " << CoCoA::context(e));
 	}
-	return UnivariatePolynomial<Number>(p.mainVar());
+	return UnivariatePolynomial<Number>(target);
+}
+
+/**
+ * Implements algebraic substitution by Gröbner basis computation.
+ * Essentially we take all polynomials and compute a Gröbner basis with respect to an elimination order, having the remaining variable at the end.
+ * The result is then the polynomial in the last variable only.
+ */
+template<typename Number>
+UnivariatePolynomial<Number> algebraic_substitution_groebner(
+	const UnivariatePolynomial<MultivariatePolynomial<Number>>& p,
+	const std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>>& polynomials
+) {
+	std::vector<MultivariatePolynomial<Number>> polys;
+	std::vector<Variable> varOrder;
+	for (const auto& poly: polynomials) {
+		polys.emplace_back(poly);
+		varOrder.emplace_back(poly.mainVar());
+	}
+	polys.emplace_back(p);
+	varOrder.emplace_back(p.mainVar());
+
+	CARL_LOG_DEBUG("carl.algsubs", "Converted " << p << " and " << polynomials << " to " << polys << " under " << varOrder);
+	return algebraic_substitution_groebner(polys, varOrder);
 }
 
 /**
  * Implements algebraic substitution by resultant computation.
  * We iteratively compute the resultant of the input polynomial with each of the defining polynomials.
  * Eventually we obtain a polynomial univariate in the remaining variable, our result.
+ * 
+ * Note that we assume that the polynomials are in a triangular form where any polynomial may contain variables that are ``defined'' by the previous polynomials.
  */
-template<typename Number, typename Coeff>
-UnivariatePolynomial<Number> algebraic_substitution_resultant(const UnivariatePolynomial<Coeff>& p, const std::vector<UnivariatePolynomial<Number>>& polynomials) {
+template<typename Number>
+UnivariatePolynomial<Number> algebraic_substitution_resultant(
+	const UnivariatePolynomial<MultivariatePolynomial<Number>>& p,
+	const std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>>& polynomials
+) {
 	Variable v = p.mainVar();
-	UnivariatePolynomial<Coeff> cur = p;
-	for (const auto& poly: polynomials) {
+	UnivariatePolynomial<MultivariatePolynomial<Number>> cur = p;
+	for (auto it = polynomials.rbegin(); it != polynomials.rend(); ++it) {
+		const auto& poly = *it;
 		if (!cur.has(poly.mainVar())) {
 			continue;
 		}
-		UnivariatePolynomial<Coeff> poly_mv = poly.template convert<Coeff>();
-		cur = cur.switchVariable(poly.mainVar()).prem(poly_mv);
-		CARL_LOG_DEBUG("carl.algsubs", "Computing resultant of " << cur << " and " << poly_mv);
-		cur = carl::resultant(cur, poly_mv);
+		cur = cur.switchVariable(poly.mainVar()).prem(poly);
+		CARL_LOG_DEBUG("carl.algsubs", "Computing resultant of " << cur << " and " << poly);
+		cur = carl::resultant(cur, poly);
 		CARL_LOG_DEBUG("carl.algsubs", "-> " << cur);
 	}
 	UnivariatePolynomial<Number> result = cur.switchVariable(v).toNumberCoefficients();
 	CARL_LOG_DEBUG("carl.algsubs", "Result: " << result);
 	return result;
+}
+
+/**
+ * Implements algebraic substitution by resultant computation.
+ * We iteratively compute the resultant of the input polynomial with each of the defining polynomials.
+ * Eventually we obtain a polynomial univariate in the remaining variable, our result.
+ * 
+ * Note that we assume that the polynomials are in a triangular form where any polynomial may contain variables that are ``defined'' by the previous polynomials.
+ */
+template<typename Number>
+UnivariatePolynomial<Number> algebraic_substitution_resultant(
+	const std::vector<MultivariatePolynomial<Number>>& polynomials,
+	const std::vector<Variable>& variables
+) {
+	auto p = polynomials.back().toUnivariatePolynomial(variables.back());
+	std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> polys;
+
+	for (std::size_t i = 0; i < polynomials.size() - 1; ++i) {
+		polys.emplace_back(polynomials[i].toUnivariatePolynomial(variables[i]));
+	}
+
+	CARL_LOG_DEBUG("carl.algsubs", "Converted " << polynomials << " under " << variables << " to " << p << " and " << polys);
+	return algebraic_substitution_resultant(p, polys);
 }
 
 /// Indicates which strategy to use: resultants or Gröbner bases.
@@ -90,8 +137,12 @@ enum class AlgebraicSubstitutionStrategy {
  * Computes the algebraic substitution of the given defining polynomials into a multivariate polynomial p.
  * The result is a univariate polynomial in the main variable of p.
  */
-template<typename Number, typename Coeff>
-UnivariatePolynomial<Number> algebraic_substitution(const UnivariatePolynomial<Coeff>& p, const std::vector<UnivariatePolynomial<Number>>& polynomials, AlgebraicSubstitutionStrategy strategy = AlgebraicSubstitutionStrategy::RESULTANT) {
+template<typename Number>
+UnivariatePolynomial<Number> algebraic_substitution(
+	const UnivariatePolynomial<MultivariatePolynomial<Number>>& p,
+	const std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>>& polynomials,
+	AlgebraicSubstitutionStrategy strategy = AlgebraicSubstitutionStrategy::RESULTANT
+) {
 	CARL_LOG_DEBUG("carl.algsubs", "Substituting " << polynomials << " into " << p);
 	switch (strategy) {
 		case AlgebraicSubstitutionStrategy::GROEBNER:
@@ -101,5 +152,23 @@ UnivariatePolynomial<Number> algebraic_substitution(const UnivariatePolynomial<C
 	}
 }
 
+/**
+ * Computes the algebraic substitution of the given defining polynomials into a multivariate polynomial p.
+ * The result is a univariate polynomial in the main variable of p.
+ */
+template<typename Number>
+UnivariatePolynomial<Number> algebraic_substitution(
+	const std::vector<MultivariatePolynomial<Number>>& polynomials,
+	const std::vector<Variable>& variables,
+	AlgebraicSubstitutionStrategy strategy = AlgebraicSubstitutionStrategy::RESULTANT
+) {
+	CARL_LOG_WARN("carl.algsubs", "Substituting " << polynomials << " into " << polynomials.back());
+	switch (strategy) {
+		case AlgebraicSubstitutionStrategy::GROEBNER:
+			return algebraic_substitution_groebner(polynomials, variables);
+		case AlgebraicSubstitutionStrategy::RESULTANT:
+			return algebraic_substitution_resultant(polynomials, variables);
+	}
+}
 
 }
