@@ -17,28 +17,13 @@ inline bool operator<(const LowerBound<Number>& lhs, const LowerBound<Number>& r
 			return lhs.number < rhs.number;
 		case BoundType::WEAK:
 			if (lhs.number < rhs.number) return true;
-			if (rhs.bound_type == BoundType::STRICT) return lhs.number == rhs.number;
-			return false;
+			return rhs.bound_type == BoundType::STRICT && lhs.number == rhs.number;
 	}
 }
 
 template<typename Number>
 inline bool operator<=(const LowerBound<Number>& lhs, const LowerBound<Number>& rhs) {
-	if (rhs.bound_type == BoundType::INFTY) return lhs.bound_type == BoundType::INFTY;
-
-	switch (lhs.bound_type) {
-		case BoundType::INFTY:
-			return true;
-		case BoundType::STRICT:
-			if (lhs.number < rhs.number) {
-				return true;
-			}
-			return (lhs.number == rhs.number && rhs.bound_type == BoundType::STRICT);
-		case BoundType::WEAK:
-			if (lhs.number < rhs.number) return true;
-			if (rhs.bound_type == BoundType::WEAK) return lhs.number == rhs.number;
-			return false;
-	}
+	return !(rhs < lhs);
 }
 
 template<typename Number>
@@ -53,13 +38,7 @@ inline bool operator<(const UpperBound<Number>& lhs, const LowerBound<Number>& r
 
 template<typename Number>
 inline bool operator<=(const LowerBound<Number>& lhs, const UpperBound<Number>& rhs) {
-	if (lhs.bound_type == BoundType::INFTY) return true;
-	if (rhs.bound_type == BoundType::INFTY) return true;
-	if (lhs.bound_type == BoundType::STRICT || rhs.bound_type == BoundType::STRICT) {
-		return lhs.number < rhs.number;
-	}
-	assert(lhs.bound_type == BoundType::WEAK && rhs.bound_type == BoundType::WEAK);
-	return lhs.number <= rhs.number;
+	return !(rhs < lhs);
 }
 
 template<typename Number>
@@ -79,21 +58,7 @@ inline bool operator<(const UpperBound<Number>& lhs, const UpperBound<Number>& r
 
 template<typename Number>
 inline bool operator<=(const UpperBound<Number>& lhs, const UpperBound<Number>& rhs) {
-	if (lhs.bound_type == BoundType::INFTY) return rhs.bound_type == BoundType::INFTY;
-
-	switch (rhs.bound_type) {
-		case BoundType::INFTY:
-			return true;
-		case BoundType::STRICT:
-			if (lhs.number < rhs.number) {
-				return true;
-			}
-			return (lhs.number == rhs.number && lhs.bound_type == BoundType::STRICT);
-		case BoundType::WEAK:
-			if (lhs.number < rhs.number) return true;
-			if (lhs.bound_type == BoundType::WEAK) return lhs.number == rhs.number;
-			return false;
-	}
+	return !(rhs < lhs);
 }
 
 /**
