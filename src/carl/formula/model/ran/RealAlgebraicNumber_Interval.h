@@ -473,7 +473,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	{
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (auto it = m.begin(); it != m.end(); it++) {
-			if (varToInterval.find(it->first) != varToInterval.end()) continue;
+			if (varToInterval.find(it->first) == varToInterval.end()) continue;
 			it->second.refine();
 			if (is_number(it->second)) {
 				return evaluate(p, m);
