@@ -163,10 +163,12 @@ bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
 	RANMap<Number> IRmap;
 	
 	for (const auto& r: m) {
+		if (!pol.has(r.first)) continue;
 		//assert(pol.has(it->first));
 		if (r.second.isNumeric()) {
 			// Plug in numeric representations
 			pol.substituteIn(r.first, MultivariatePolynomial<Number>(r.second.value()));
+			CARL_LOG_TRACE("carl.ran", "Substituting " << r.first << " = " << r.second.value());
 		} else {
 			// Defer interval representations
 			IRmap.emplace(r.first, r.second);
@@ -179,6 +181,7 @@ bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
 	// need to evaluate polynomial on non-trivial RANs
 
 	Constraint<Poly> constr(pol, c.relation());
+	CARL_LOG_TRACE("carl.ran", "Remaining " << constr << " on " << IRmap);
 
 	return overload_on_map<bool>(
 		[&constr](auto& map){ return bool(ran::evaluate(constr, map)); },
