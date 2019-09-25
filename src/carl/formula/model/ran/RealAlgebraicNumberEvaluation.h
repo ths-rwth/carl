@@ -77,21 +77,6 @@ MultivariatePolynomial<Number> evaluatePolynomial(
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m
 );
 
-/**
- * Evaluate the coefficients of the given polynomial p w.r.t. the given evaluation map m.
- * The algorithm assumes that all variables in m are coefficient variables.
- *
- * @param p polynomial to be evaluated in the given variables. This should be a univariate polynomial in a variable <i>not</i> occurring in variables.
- * @param m map assigning each variable of p an interval-represented RealAlgebraicNumber
- * @return rational univariate polynomial having all real roots of the polynomial whose coefficients are evaluated according to m
- * @see Constraint::satisfiedBy and CAD::samples for usages of this method
- */
-template<typename Number, typename Coeff>
-UnivariatePolynomial<Number> evaluateCoefficients(
-		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m
-);
-
 
 ////////////////////////////////////////
 ////////////////////////////////////////
