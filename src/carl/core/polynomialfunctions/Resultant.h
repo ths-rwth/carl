@@ -302,7 +302,7 @@ UnivariatePolynomial<Coeff> discriminant(
 	SubresultantStrategy strategy
 ) {
 	UnivariatePolynomial<Coeff> res = resultant(p, derivative(p), strategy);
-	if (p.isLinearInMainVar()) return res;
+	if (res.isNumber()) return res;
 	uint d = p.degree();
 	Coeff sign = ((d*(d-1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);
 	Coeff redCoeff = sign * p.lcoeff();

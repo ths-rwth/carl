@@ -7,6 +7,7 @@
 #include "../polynomialfunctions/Factorization_univariate.h"
 #include "../polynomialfunctions/SignVariations.h"
 #include "../../io/streamingOperators.h"
+#include "EigenWrapper.h"
 
 namespace carl::rootfinder {
 

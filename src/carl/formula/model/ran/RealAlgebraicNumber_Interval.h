@@ -448,7 +448,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	// compute the initial result interval
 	std::map<Variable, Interval<Number>> varToInterval;
 	for (const auto& [var, ran] : m) {
-		assert(p.has(var));
+		if (!p.has(var)) continue;
 		varToInterval.emplace(var,ran.interval());
 	}
 	assert(!varToInterval.empty());
@@ -473,6 +473,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	{
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (auto it = m.begin(); it != m.end(); it++) {
+			if (varToInterval.find(it->first) == varToInterval.end()) continue;
 			it->second.refine();
 			if (is_number(it->second)) {
 				return evaluate(p, m);
