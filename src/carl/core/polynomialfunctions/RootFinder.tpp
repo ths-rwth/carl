@@ -24,8 +24,7 @@ template<typename Coeff, typename Number>
 std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& poly,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& varToRANMap,
-		const Interval<Number>& interval,
-		SplittingStrategy pivoting
+		const Interval<Number>& interval
 ) {
 	#ifdef RAN_USE_Z3
 	return realRootsZ3(poly, varToRANMap, interval);
@@ -66,7 +65,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 	}
 	if (IRmap.empty()) {
 		assert(polyCopy.isUnivariate());
-		return realRoots(polyCopy, interval, pivoting);
+		return realRoots(polyCopy, interval);
 	} else {
 		CARL_LOG_TRACE("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 		assert(IRmap.find(polyCopy.mainVar()) == IRmap.end());
@@ -80,7 +79,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		
 		Constraint<MultivariatePolynomial<Number>> cons(MultivariatePolynomial<Number>(polyCopy), Relation::EQ);
 		std::vector<RealAlgebraicNumber<Number>> roots;
-		auto res = realRoots(*evaledpoly, interval, pivoting);
+		auto res = realRoots(*evaledpoly, interval);
 		for (const auto& r: res) {
 			CARL_LOG_DEBUG("carl.core.rootfinder", "Checking " << polyCopy.mainVar() << " = " << r);
 			IRmap[polyCopy.mainVar()] = r;
@@ -92,25 +91,6 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 			}
 		}
 		return roots;
-
-		/*
-		if (carl::isZero(evaledpoly)) return {};
-		CARL_LOG_TRACE("carl.core.rootfinder", "Calling on " << evaledpoly);
-		auto res = realRoots(evaledpoly, interval, pivoting);
-		MultivariatePolynomial<Number> mvpoly(polyCopy);
-		CARL_LOG_TRACE("carl.core.rootfinder", "Checking " << res << " on " << mvpoly);
-		for (auto it = res.begin(); it != res.end();) {
-			CARL_LOG_TRACE("carl.core.rootfinder", "Checking " << polyCopy.mainVar() << " = " << *it);
-			IRmap[polyCopy.mainVar()] = *it;
-			CARL_LOG_TRACE("carl.core.rootfinder", "Evaluating " << mvpoly << " on " << IRmap);
-			if (!RealAlgebraicNumberEvaluation::evaluate(mvpoly, IRmap).isZero()) {
-				CARL_LOG_TRACE("carl.core.rootfinder", "Purging spurious root " << *it);
-				it = res.erase(it);
-			} else {
-				it++;
-			}
-		}
-		return res;*/
 	}
 }
 
@@ -119,8 +99,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& poly,
 		const std::list<Variable>& variables,
 		const std::list<RealAlgebraicNumber<Number>>& values,
-		const Interval<Number>& interval,
-		SplittingStrategy pivoting
+		const Interval<Number>& interval
 ) {
 	std::map<Variable, RealAlgebraicNumber<Number>> varToRANMap;
 
@@ -132,7 +111,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		varit++;
 		valit++;
 	}
-	return realRoots(poly, varToRANMap, interval, pivoting);
+	return realRoots(poly, varToRANMap, interval);
 }
 
 }

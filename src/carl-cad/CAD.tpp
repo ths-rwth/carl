@@ -15,7 +15,7 @@
 #include <carl/core/logging.h>
 #include <carl/interval/IntervalEvaluation.h>
 #include <carl/formula/model/ran/RealAlgebraicNumberSettings.h>
-#include <carl/core/rootfinder/RootFinder.h>
+#include <carl/core/polynomialfunctions/RootFinder.h>
 #include <carl/thom/ThomRootFinder.h>
 #include <carl/core/polynomialfunctions/SquareFreePart.h>
 
@@ -389,9 +389,9 @@ void CAD<Number>::tryEquationSeparation(bool useBounds, bool onlyStrictBounds) {
 	if (!hasWeak) {
 		if (!useBounds && !hasStrict && mVariables.size() <= 1) {
 			// root-only samples not valid in general!
-			alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::SplittingStrategy::DEFAULT, setting));
+			alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, setting));
 		} else if (onlyStrictBounds && !hasEquations) {
-			alterSetting(cad::CADSettings::getSettings(cad::INEQUALITIESONLY, rootfinder::SplittingStrategy::DEFAULT, setting));
+			alterSetting(cad::CADSettings::getSettings(cad::INEQUALITIESONLY, setting));
 		}
 	}
 	// else: mixed case, no optimization possible without zero-dimensional assumption
@@ -841,7 +841,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		valit++;
 	}
 	CARL_LOG_FUNC("carl.cad", *p << " on " << m);
-	auto roots = carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy);
+	auto roots = carl::rootfinder::realRoots(*p, m, bounds);
 	if (roots.empty()) {
 		return this->samples(
 			openVariableCount,

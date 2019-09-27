@@ -6,7 +6,6 @@
 #include "../logging.h"
 #include "../Sign.h"
 #include "../UnivariatePolynomial.h"
-#include "IncrementalRootFinder.h"
 
 #include "RealRootIsolation.h"
 
@@ -30,29 +29,21 @@ namespace rootfinder {
  * Find all real roots of a univariate 'polynomial' with numeric coefficients within a given 'interval'.
  * The roots are sorted in ascending order.
  */
-template<typename Coeff, typename Number, typename Finder = IncrementalRootFinder<Number>, EnableIf<std::is_same<Coeff, Number>> = dummy>
+template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, EnableIf<std::is_same<Coeff, Number>> = dummy>
 std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
-		SplittingStrategy pivoting = SplittingStrategy::DEFAULT,
-		bool new_root_isolator = false
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
 	CARL_LOG_DEBUG("carl.core.rootfinder", polynomial << " within " << interval);
 	#ifdef RAN_USE_Z3
-	auto r = realRootsZ3(polynomial, interval);
-	CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
-	return r;
+		auto r = realRootsZ3(polynomial, interval);
+		CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
+		return r;
 	#else
-	if (new_root_isolator) {
 		RealRootIsolation rri(polynomial, interval);
 		auto r = rri.get_roots();
 		CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
 		return r;
-	} else {
-		auto r = Finder(polynomial, interval, pivoting).getAllRoots();
-		CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
-		return r;
-	}
 	#endif
 }
 
@@ -61,30 +52,13 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
  * However, all coefficients must be types that contain numeric numbers that are retrievable by using .constantPart();
  * The roots are sorted in ascending order.
  */
-template<typename Coeff, typename Number, DisableIf<std::is_same<Coeff, Number>> = dummy>
+template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, DisableIf<std::is_same<Coeff, Number>> = dummy>
 std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
-		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
-) {
-	assert(polynomial.isUnivariate());
-	return realRoots(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constantPart(); })), interval, pivoting);
-}
-
-
-/**
- * Find all real roots of a univariate 'polynomial' with non-numeric coefficients within a given 'interval'.
- * However, all coefficients must be types that contain numeric numbers that are retrievable by using .constantPart();
- * Note that this is a convenience method with swapped arguments to omit the interval but give a strategy.
- * The roots are sorted in ascending order.
- */
-template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-std::vector<RealAlgebraicNumber<Number>> realRoots(
-		const UnivariatePolynomial<Coeff>& polynomial,
-		SplittingStrategy pivoting = SplittingStrategy::DEFAULT,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
-	return realRoots(polynomial, interval, pivoting);
+	assert(polynomial.isUnivariate());
+	return realRoots(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constantPart(); })), interval);
 }
 
 ////////////////////////////////////////
@@ -108,8 +82,7 @@ template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>:
 std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
-		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 );
 
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
@@ -117,8 +90,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable>& variables,
 		const std::list<RealAlgebraicNumber<Number>>& values,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
-		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 );
 
 /////////////////////////
@@ -133,10 +105,9 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 template<typename Coeff, typename Number= typename UnderlyingNumberType<Coeff>::type>
 uint countRealRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
-		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
-	return realRoots(polynomial, interval, pivoting).size();
+	return realRoots(polynomial, interval).size();
 }
 }
 }

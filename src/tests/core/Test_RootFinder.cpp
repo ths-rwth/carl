@@ -1,7 +1,7 @@
 
 #include <gtest/gtest.h>
 
-#include <carl/core/rootfinder/RootFinder.h>
+#include <carl/core/polynomialfunctions/RootFinder.h>
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/polynomialfunctions/Chebyshev.h>
 #include "carl/core/polynomialfunctions/LazardEvaluation.h"
@@ -181,10 +181,9 @@ TEST(RootFinder, Comparison)
 	662971140168469203991742914981670449102848000000000_mpq, -221093370976852468477758191983112847898368000000_mpq,
 	35982863100180637437263547995778211974592000_mpq, -222040198421806427031529186994264976123_mpq});
 
-	auto ran1 = carl::rootfinder::realRoots(p, carl::Interval<mpq_class>::unboundedInterval(), carl::rootfinder::SplittingStrategy::DEFAULT, false);
-	auto ran2 = carl::rootfinder::realRoots(p, carl::Interval<mpq_class>::unboundedInterval(), carl::rootfinder::SplittingStrategy::DEFAULT, true);
+	auto ran1 = carl::rootfinder::realRoots(p, carl::Interval<mpq_class>::unboundedInterval());
 
-	std::cout << ran1 << " == " << ran2 << std::endl;
+	std::cout << ran1 << std::endl;
 }
 
 using MPoly = carl::MultivariatePolynomial<mpq_class>;

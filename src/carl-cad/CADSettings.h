@@ -10,7 +10,7 @@
 
 #include <carl/core/logging.h>
 #include <carl/core/carlLogging.h>
-#include <carl/core/rootfinder/RootFinder.h>
+#include <carl/core/polynomialfunctions/RootFinder.h>
 
 namespace carl {
 namespace cad {
@@ -148,8 +148,6 @@ public:
 	IntegerHandling integerHandling;
 	/// the order in which the polynomials in each elimination level are sorted
 	PolynomialComparisonOrder order;
-	/// standard strategy to be used for real root isolation
-	rootfinder::SplittingStrategy splittingStrategy;
 
 	/**
 	 * Generate a CADSettings instance of the respective preset type.
@@ -160,10 +158,8 @@ public:
 	 */
 	static CADSettings getSettings(
 			unsigned setting = DEFAULT,
-			rootfinder::SplittingStrategy isolationStrategy = rootfinder::SplittingStrategy::DEFAULT,
 			CADSettings cadSettings = CADSettings() )
 	{
-		cadSettings.splittingStrategy = isolationStrategy;
 		if (setting & RATIONALSAMPLE) {
 			cadSettings.autoSeparateEquations = false;
 			cadSettings.sampleOrdering = SampleOrdering::RatRoot;
@@ -292,8 +288,7 @@ private:
 		splitInteger(true),
 		ignoreRoots(false),
 		integerHandling(IntegerHandling::SPLIT_ASSIGNMENT),
-		order(PolynomialComparisonOrder::Default),
-		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
+		order(PolynomialComparisonOrder::Default)
 	{}
 
 public:
@@ -318,8 +313,7 @@ public:
 		splitInteger(s.splitInteger),
 		ignoreRoots(s.ignoreRoots),
 		integerHandling(s.integerHandling),
-		order(PolynomialComparisonOrder::Default),
-		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
+		order(PolynomialComparisonOrder::Default)
 	{}
 };
 
