@@ -37,8 +37,9 @@ namespace carl
     template<typename Pol>
     FormulaPool<Pol>::~FormulaPool()
     {
-//        assert( mPool.size() == 2 );
+        assert( mPool.size() == 2 );
         mPool.clear();
+        // TODO BUG: ConstraintPool is destructed before FormulaPool, so this leads to errors:
         delete mpTrue;
         delete mpFalse;
     }

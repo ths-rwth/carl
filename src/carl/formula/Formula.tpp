@@ -206,21 +206,13 @@ namespace carl
             case FormulaType::TRUE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-#ifdef __VS
-                addConstraintProperties( *_content.mpConstraintVS, _content.mProperties );
-#else
-		addConstraintProperties( _content.mConstraint, _content.mProperties );
-#endif
-		break;
+		        addConstraintProperties( std::get<Constraint<Pol>>(_content.mContent), _content.mProperties );
+		        break;
             }
             case FormulaType::FALSE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-#ifdef __VS
-                addConstraintProperties( *_content.mpConstraintVS, _content.mProperties );
-#else
-		addConstraintProperties( _content.mConstraint, _content.mProperties );
-#endif
+		        addConstraintProperties( std::get<Constraint<Pol>>(_content.mContent), _content.mProperties );
                 break;
             }
             case FormulaType::BOOL:
@@ -230,11 +222,7 @@ namespace carl
             }
             case FormulaType::NOT:
             {
-#ifdef __VS
-                Condition subFormulaConds = _content.mpSubformulaVS->mpContent->mProperties;
-#else
-                Condition subFormulaConds = _content.mSubformula.mpContent->mProperties;
-#endif
+                Condition subFormulaConds = std::get<Formula<Pol>>(_content.mContent).mpContent->mProperties;
                 if( PROP_IS_AN_ATOM <= subFormulaConds )
                     _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_IN_CNF | PROP_IS_LITERAL_CONJUNCTION;
                 _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
@@ -243,11 +231,7 @@ namespace carl
             case FormulaType::OR:
             {
                 _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-#ifdef __VS
-				for (auto subFormula = _content.mpSubformulasVS->begin(); subFormula != _content.mpSubformulasVS->end(); ++subFormula)
-#else
-				for (auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula)
-#endif
+				for (auto subFormula = std::get<Formulas<Pol>>(_content.mContent).begin(); subFormula != std::get<Formulas<Pol>>(_content.mContent).end(); ++subFormula)
 				{
 					Condition subFormulaConds = subFormula->properties();
                     if( !(PROP_IS_A_LITERAL<=subFormulaConds) )
@@ -264,11 +248,7 @@ namespace carl
             case FormulaType::AND:
             {
                 _content.mProperties |= PROP_IS_LITERAL_CONJUNCTION | PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-#ifdef __VS
-		for (auto subFormula = _content.mpSubformulasVS->begin(); subFormula != _content.mpSubformulasVS->end(); ++subFormula)
-#else
-		for (auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula)
-#endif
+		        for (auto subFormula = std::get<Formulas<Pol>>(_content.mContent).begin(); subFormula != std::get<Formulas<Pol>>(_content.mContent).end(); ++subFormula)
                 {
                     Condition subFormulaConds = subFormula->properties();
                     if( !(PROP_IS_A_CLAUSE<=subFormulaConds) )
@@ -296,11 +276,7 @@ namespace carl
             case FormulaType::XOR:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
-#ifdef __VS
-				for (auto subFormula = _content.mpSubformulasVS->begin(); subFormula != _content.mpSubformulasVS->end(); ++subFormula)
-#else
-				for (auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula)
-#endif
+				for (auto subFormula = std::get<Formulas<Pol>>(_content.mContent).begin(); subFormula != std::get<Formulas<Pol>>(_content.mContent).end(); ++subFormula)
                 {
                     Condition subFormulaConds = subFormula->properties();
                     if( !(PROP_IS_IN_NNF<=subFormulaConds) )
@@ -312,11 +288,7 @@ namespace carl
             case FormulaType::CONSTRAINT:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-#ifdef __VS
-                addConstraintProperties( *_content.mpConstraintVS, _content.mProperties );
-#else
-				addConstraintProperties(_content.mConstraint, _content.mProperties);
-#endif
+				addConstraintProperties(std::get<Constraint<Pol>>(_content.mContent), _content.mProperties);
                 break;
             }
 			case FormulaType::VARCOMPARE:

@@ -3,6 +3,7 @@
 #include "../core/logging.h"
 
 #include <iostream>
+#include <variant>
 
 namespace carl {
     // Forward declaration.
@@ -117,23 +118,7 @@ namespace carl {
         {
             return (mFormula == _qc.mFormula) && (mVariables == _qc.mVariables);
         }
-    };
-    
-    template<typename Pol>
-    struct ArithmeticConstraintContent
-    {
-        Formula<Pol> mLhs;
-        Relation mRelation;
-        
-        ArithmeticConstraintContent(Formula<Pol>&& _lhs, Relation _rel):
-            mLhs(std::move(_lhs)),
-            mRelation(_rel)
-        {}
-        bool operator==(const ArithmeticConstraintContent& _acc) const {
-            return (mLhs == _acc.mLhs) && (mRelation == _acc.mRelation);
-        }
-    };
-	
+    };	
 	
     template<typename Pol>
     class FormulaContent
@@ -159,56 +144,15 @@ namespace carl {
             /// The type of this formula.
             FormulaType mType;
             /// The content of this formula.
-            union
-            {
-#ifdef __VS
-                /// The variable, in case this formula wraps a variable.
-                carl::Variable* mpVariableVS;
-                /// The polynomial, in case this formula wraps a polynomial.
-                Pol* mpPolynomialVS;
-                /// The arithmetic constraint over a formula.
-                ArithmeticConstraintContent<Pol>* mpArithmeticVS;
-                /// The constraint, in case this formula wraps a constraint.
-                Constraint<Pol>* mpConstraintVS;
-				/// A constraint comparing a single variable with a value. 
-				VariableComparison<Pol>* mpVariableComparisonVS;
-				/// A constraint assigning a single variable to a value. 
-				VariableAssignment<Pol>* mpVariableAssignmentVS;
-                /// The bitvector constraint.
-                BVConstraint* mpBVConstraintVS;
-                /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
-                UEquality* mpUIEqualityVS;
-                /// The only sub-formula, in case this formula is an negation.
-                Formula<Pol>* mpSubformulaVS;
-                /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-                Formulas<Pol>* mpSubformulasVS;
-                /// The quantifed variables and the bound formula, in case this formula is a quantified formula.
-                QuantifierContent<Pol>* mpQuantifierContentVS;
-#else
-				/// The variable, in case this formula wraps a variable.
-				carl::Variable mVariable;
-				/// The polynomial, in case this formula wraps a polynomial.
-				Pol mPolynomial;
-				/// The arithmetic constraint over a formula.
-				ArithmeticConstraintContent<Pol> mArithmetic;
-				/// The constraint, in case this formula wraps a constraint.
-				Constraint<Pol> mConstraint;
-				/// A constraint comparing a single variable with a value. 
-				VariableComparison<Pol> mVariableComparison;
-				/// A constraint assigning a single variable to a value. 
-				VariableAssignment<Pol> mVariableAssignment;
-				/// The bitvector constraint.
-				BVConstraint mBVConstraint;
-				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
-				UEquality mUIEquality;
-				/// The only sub-formula, in case this formula is an negation.
-				Formula<Pol> mSubformula;
-				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-				Formulas<Pol> mSubformulas;
-				/// The quantifed variables and the bound formula, in case this formula is a quantified formula.
-				QuantifierContent<Pol> mQuantifierContent;
-#endif
-            };
+            std::variant<carl::Variable, // The variable, in case this formula wraps a variable.
+                        Constraint<Pol>, // The constraint, in case this formula wraps a constraint.
+                        VariableComparison<Pol>, // A constraint comparing a single variable with a value. 
+                        VariableAssignment<Pol>, // A constraint assigning a single variable to a value. 
+                        BVConstraint, // The bitvector constraint.
+                        UEquality, // The uninterpreted equality, in case this formula wraps an uninterpreted equality.
+                        Formula<Pol>, // The only sub-formula, in case this formula is an negation.
+                        Formulas<Pol>, // The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
+                        QuantifierContent<Pol>> mContent; // The quantifed variables and the bound formula, in case this formula is a quantified formula.
             /// The negation
             const FormulaContent<Pol> *mNegation = nullptr;
             /// The propositions of this formula.
@@ -239,8 +183,6 @@ namespace carl {
              */
             FormulaContent(Variable _variable);
             
-            FormulaContent(Formula<Pol>&& _lhs, Relation _rel);
-
             /**
              * Constructs a formula being a constraint.
              * @param _constraint The pointer to the constraint.
@@ -286,63 +228,8 @@ namespace carl {
             /**
              * Destructor.
              */
-            ~FormulaContent()
-            {
-                /*union
-                {
-                    /// The variable, in case this formula wraps a variable.
-                    carl::Variable mVariable;
-                    /// The polynomial, in case this formula wraps a polynomial.
-                    Pol mPolynomial;
-                    /// The arithmetic constraint over a formula.
-                    ArithmeticConstraintContent<Pol> mArithmetic;
-                    /// The constraint, in case this formula wraps a constraint.
-                    Constraint<Pol> mConstraint;
-                    /// The bitvector constraint.
-                    BVConstraint mBVConstraint;
-                    /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
-                    UEquality mUIEquality;
-                    /// The only sub-formula, in case this formula is an negation.
-                    Formula<Pol> mSubformula;
-                    /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-                    Formulas<Pol> mSubformulas;
-                    /// The quantifed variables and the bound formula, in case this formula is a quantified formula.
-                    QuantifierContent<Pol> mQuantifierContent;
-                };*/
-                switch (mType) {
-                    case FormulaType::TRUE: break;
-                    case FormulaType::FALSE: break;
-                    case FormulaType::BOOL: break;
-#ifdef __VS
-					case FormulaType::NOT: { mpSubformulaVS->~Formula(); break; }
-#else
-					case FormulaType::NOT: { mSubformula.~Formula(); break; }
-#endif
-                    case FormulaType::IMPLIES: 
-                    case FormulaType::AND: ;
-                    case FormulaType::OR: ;
-                    case FormulaType::XOR: ;
-                    case FormulaType::IFF: ;
-#ifdef __VS
-					case FormulaType::ITE: { mpSubformulasVS->~vector(); break; }
-                    case FormulaType::EXISTS: ;
-					case FormulaType::FORALL: { mpQuantifierContentVS->~QuantifierContent(); break; }
-					case FormulaType::CONSTRAINT: { mpConstraintVS->~Constraint(); break; }
-					case FormulaType::VARCOMPARE: { mpVariableComparisonVS->~VariableComparison(); break; }
-					case FormulaType::BITVECTOR: { mpBVConstraintVS->~BVConstraint(); break; }
-					case FormulaType::UEQ: { mpUIEqualityVS->~UEquality(); break; }
-#else
-					case FormulaType::ITE: { mSubformulas.~vector(); break; }
-					case FormulaType::EXISTS:;
-					case FormulaType::FORALL: { mQuantifierContent.~QuantifierContent(); break; }
-					case FormulaType::CONSTRAINT: { mConstraint.~Constraint(); break; }
-					case FormulaType::VARCOMPARE: { mVariableComparison.~VariableComparison(); break; }
-					case FormulaType::VARASSIGN: { mVariableAssignment.~VariableAssignment(); break; }
-					case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
-					case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
-#endif
-                }
-
+            ~FormulaContent() {
+                // TODO NOTE: in case of true, false, bool: mContent was not destroyed ...
                 if( mpVariables != nullptr )
                     delete mpVariables;
             }
@@ -385,43 +272,43 @@ namespace carl {
 	 * @param os The stream to print on.
 	 * @param f
 	 */
-	template<typename P>
-	std::ostream& operator<<(std::ostream& os, const FormulaContent<P>& f) {
+	template<typename Pol>
+	std::ostream& operator<<(std::ostream& os, const FormulaContent<Pol>& f) {
 		switch (f.mType) {
 			case FormulaType::FALSE:
 				return os << formulaTypeToString(f.mType);
 			case FormulaType::TRUE:
 				return os << formulaTypeToString(f.mType);
 			case FormulaType::BOOL:
-				return os << f.mVariable;
+				return os << std::get<carl::Variable>(f.mContent);
 			case FormulaType::CONSTRAINT:
-				return os << f.mConstraint;
+				return os << std::get<Constraint<Pol>>(f.mContent);
 			case FormulaType::VARASSIGN:
-				return os << f.mVariableAssignment;
+				return os << std::get<VariableAssignment<Pol>>(f.mContent);
 			case FormulaType::VARCOMPARE:
-				return os << f.mVariableComparison;
+				return os << std::get<VariableComparison<Pol>>(f.mContent);
 			case FormulaType::BITVECTOR:
-				return os << f.mBVConstraint;
+				return os << std::get<BVConstraint>(f.mContent);
 			case FormulaType::UEQ:
-				return os << f.mUIEquality;
+				return os << std::get<UEquality>(f.mContent);
 			case FormulaType::NOT:
-				return os << "!(" << f.mSubformula << ")";
+				return os << "!(" << std::get<Formula<Pol>>(f.mContent) << ")";
 			case FormulaType::EXISTS:
 				os << "(exists";
-				for (auto v: f.mQuantifierContent.mVariables) os << " " << v;
-				return os << ")(" << f.mQuantifierContent.mFormula << ")";
+				for (auto v: std::get<QuantifierContent<Pol>>(f.mContent).mVariables) os << " " << v;
+				return os << ")(" << std::get<QuantifierContent<Pol>>(f.mContent).mFormula << ")";
 			case FormulaType::FORALL:
 				os << "(forall";
-				for (auto v: f.mQuantifierContent.mVariables) os << " " << v;
-				return os << ")(" << f.mQuantifierContent.mFormula << ")";
+				for (auto v: std::get<QuantifierContent<Pol>>(f.mContent).mVariables) os << " " << v;
+				return os << ")(" << std::get<QuantifierContent<Pol>>(f.mContent).mFormula << ")";
 			default:
 				assert(f.isNary());
-				return os << "(" << carl::stream_joined(" " + formulaTypeToString(f.mType) + " ", f.mSubformulas) << ")";
+				return os << "(" << carl::stream_joined(" " + formulaTypeToString(f.mType) + " ", std::get<Formulas<Pol>>(f.mContent)) << ")";
 		}
 	}
 
-	template<typename P>
-	std::ostream& operator<<(std::ostream& os, const FormulaContent<P>* fc) {
+	template<typename Pol>
+	std::ostream& operator<<(std::ostream& os, const FormulaContent<Pol>* fc) {
 		assert(fc != nullptr);
 		return os << *fc;
 	}

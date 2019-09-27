@@ -145,37 +145,19 @@ namespace carl
 				return va < va.negation();
 			}
             bool isBaseFormula(const FormulaContent<Pol>* f) const {
+                // C++20:
+                // return std::visit([]<T>(const T& a, const T& b) { return a < b; }, f->mContent, f->mNegation->mContent);
 				if (f->mType == FormulaType::CONSTRAINT) {
-#ifdef __VS
-					return *f->mpConstraintVS < *f->mNegation->mpConstraintVS;
-#else
-					return f->mConstraint < f->mNegation->mConstraint;
-#endif
-				}
-				if (f->mType == FormulaType::VARCOMPARE) {
-#ifdef __VS
-					return *f->mpVariableComparisonVS < *f->mNegation->mpVariableComparisonVS;
-#else
-					return f->mVariableComparison < f->mNegation->mVariableComparison;
-#endif
-				}
-				if (f->mType == FormulaType::VARASSIGN) {
-#ifdef __VS
-					return *f->mpVariableAssignmentVS < *f->mNegation->mpVariableAssignmentVS;
-#else
-					return f->mVariableAssignment < f->mNegation->mVariableAssignment;
-#endif
-				}
-				if (f->mType == FormulaType::UEQ) {
-#ifdef __VS
-					return *f->mpUIEqualityVS < *f->mNegation->mpUIEqualityVS;
-#else
-					return f->mUIEquality < f->mNegation->mUIEquality;
-#endif
-				}
-				return f->mType != FormulaType::NOT;
-				assert(false);
-				return true;
+					return std::get<Constraint<Pol>>(f->mContent) < std::get<Constraint<Pol>>(f->mNegation->mContent);
+				} else if (f->mType == FormulaType::VARCOMPARE) {
+					return std::get<VariableComparison<Pol>>(f->mContent) < std::get<VariableComparison<Pol>>(f->mNegation->mContent);
+				} else if (f->mType == FormulaType::VARASSIGN) {
+					return std::get<VariableAssignment<Pol>>(f->mContent) < std::get<VariableAssignment<Pol>>(f->mNegation->mContent);
+				} else if (f->mType == FormulaType::UEQ) {
+					return std::get<UEquality>(f->mContent) < std::get<UEquality>(f->mNegation->mContent);
+				} else {
+                    return f->mType != FormulaType::NOT;
+                }
             }
 
             const FormulaContent<Pol>* getBaseFormula(const FormulaContent<Pol>* f) const {
@@ -198,30 +180,17 @@ namespace carl
             }
 
             FormulaContent<Pol>* createNegatedContent(const FormulaContent<Pol>* f) const {
-                if (f->mType == FormulaType::CONSTRAINT) {
-#ifdef __VS
-                    return new FormulaContent<Pol>(f->mpConstraintVS->negation());
-#else
-                    return new FormulaContent<Pol>(f->mConstraint.negation());
-#endif
-				} else if (f->mType == FormulaType::VARCOMPARE) {
-#ifdef __VS
-					return new FormulaContent<Pol>(f->mpVariableComparisonVS->negation());
-#else
-					return new FormulaContent<Pol>(f->mVariableComparison.negation());
-#endif
-				} else if (f->mType == FormulaType::VARASSIGN) {
-#ifdef __VS
-					return new FormulaContent<Pol>(f->mpVariableAssignmentVS->negation());
-#else
-					return new FormulaContent<Pol>(f->mVariableAssignment.negation());
-#endif
-				} else if (f->mType == FormulaType::UEQ) {
-#ifdef __VS
-					return new FormulaContent<Pol>(f->mpUIEqualityVS.negation());
-#else
-					return new FormulaContent<Pol>(f->mUIEquality.negation());
-#endif
+                if (f->mType == FormulaType::CONSTRAINT ||
+                    f->mType == FormulaType::VARCOMPARE ||
+                    f->mType == FormulaType::VARASSIGN ||
+                    f->mType == FormulaType::UEQ) {
+                    return std::visit(overloaded {
+                        [](const Constraint<Pol>& a) { return new FormulaContent<Pol>(a.negation()); },
+                        [](const VariableComparison<Pol>& a) { return new FormulaContent<Pol>(a.negation()); },
+                        [](const VariableAssignment<Pol>& a) { return new FormulaContent<Pol>(a.negation()); },
+                        [](const UEquality& a) { return new FormulaContent<Pol>(a.negation()); },
+                        [](const auto&) { assert(false); return new FormulaContent<Pol>(FormulaType::FALSE); }
+                    }, f->mContent);
 				} else {
                     return new FormulaContent<Pol>(NOT, std::move(Formula<Pol>(f)));
                 }
