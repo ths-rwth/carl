@@ -94,15 +94,6 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, Z3Content<Numb
 	return evaluateZ3(c, m);
 }
 
-template<typename Number, typename Coeff>
-UnivariatePolynomial<Number> evaluatePolynomial(
-		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, Z3Content<Number>>& m
-) {
-	assert(false);
-	return UnivariatePolynomial<Number>(p.mainVar());
-}
-
 template<typename Number>
 const Interval<Number>& get_interval(const Z3Content<Number>& n) {
 	return n.z3_ran().getInterval();

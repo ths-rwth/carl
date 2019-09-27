@@ -63,20 +63,6 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
 template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m);
 
-/**
- * Compute a univariate polynomial with rational coefficients that has the roots of 'p' whose coefficient variables have been substituted by the roots given in m.
- * Note that the resulting polynomial has the main variable of p in the end.
- *
- * @param p
- * @param m
- * @return a univariate polynomial with rational coefficients (and p's main variable) that has the roots of p whose coefficient variables have been substituted by the roots given in m
- */
-template<typename Number>
-MultivariatePolynomial<Number> evaluatePolynomial(
-		const MultivariatePolynomial<Number>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m
-);
-
 
 ////////////////////////////////////////
 ////////////////////////////////////////
@@ -170,34 +156,6 @@ bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
 
 	return overload_on_map<bool>(
 		[&constr](auto& map){ return bool(ran::evaluate(constr, map)); },
-		IRmap
-	);
-}
-
-template<typename Number,  typename Coeff>
-UnivariatePolynomial<Number> evaluatePolynomial(
-		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m
-) {
-	CARL_LOG_TRACE("carl.ran", "EvaluatePolynomial " << p << " on " << m);
-	UnivariatePolynomial<Coeff> pol(p);
-	RANMap<Number> IRmap;
-	
-	for (const auto& r: m) {
-		if (r.second.isNumeric()) {
-			// Plug in numeric representations
-			pol.substituteIn(r.first, Coeff(r.second.value()));
-		} else {
-			// Defer interval representations
-			IRmap.emplace(r.first, r.second);
-		}
-	}
-	if (pol.isNumber()) {
-		return UnivariatePolynomial<Number>(p.mainVar(), pol.constantPart());
-	}
-
-	return overload_on_map<UnivariatePolynomial<Number>>(
-		[&p](auto& map){ return UnivariatePolynomial<Number>(ran::evaluatePolynomial(p, map)); },
 		IRmap
 	);
 }
