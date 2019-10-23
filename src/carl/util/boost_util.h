@@ -1,5 +1,7 @@
 #pragma once
 
+#if BOOST_VERSION < 107100
+
 #include "hash.h"
 
 #include <boost/dynamic_bitset.hpp>
@@ -16,3 +18,5 @@ struct hash<boost::dynamic_bitset<Block,Allocator>> {
 };
 
 }
+
+#endif
