@@ -12,6 +12,9 @@
 
 namespace carl {
 
+/**
+ * Write formulas to the DIMAS format.
+ */
 template<typename Pol>
 class DIMACSExporter {
 private:

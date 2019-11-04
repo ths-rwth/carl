@@ -21,6 +21,9 @@
 
 namespace carl {
 
+/**
+ * Allows to print carl data structures in SMTLIB syntax.
+ */
 class SMTLIBStream {
 private:
 	std::stringstream mStream;
@@ -232,27 +235,34 @@ private:
 	}
 	
 public:
+	/// Declare a logic via `set-logic`.
 	void declare(Logic l) {
 		*this << "(set-logic " << l << ")" << std::endl;
 	}
+	/// Declare a sort via `declare-sort`.
 	void declare(Sort s) {
 		*this << "(declare-sort " << s << " " << s.arity() << ")" << std::endl;
 	}
+	/// Declare a fresh function via `declare-fun`.
 	void declare(UninterpretedFunction uf) {
 		*this << "(declare-fun " << uf.name() << " (" << stream_joined(" ", uf.domain()) << ") ";
 		*this << uf.codomain() << ")" << std::endl;
 	}
+	/// Declare a fresh variable via `declare-fun`.
 	void declare(Variable v) {
 		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
 	}
+	/// Declare an uninterpreted variable via `declare-fun`.
 	void declare(UVariable v) {
 		*this << "(declare-fun " << v << " () " << v.domain() << ")" << std::endl;
 	}
+	/// Declare a set of functions.
 	void declare(const std::set<UninterpretedFunction>& ufs) {
 		for (auto uf: ufs) {
 			declare(uf);
 		}
 	}
+	/// Declare a set of variables.
 	void declare(const carlVariables& vars) {
 		for (const auto& v: vars) {
 			std::visit(overloaded {
@@ -262,6 +272,7 @@ public:
 			}, v);
 		}
 	}
+	/// Generic initializer including the logic, a set of variables and a set of functions.
 	void initialize(Logic l, const carlVariables& vars, const std::set<UninterpretedFunction>& ufs = {}) {
 		declare(l);
 		std::set<Sort> sorts;
@@ -279,6 +290,7 @@ public:
 		declare(vars);
 	}
 	
+	/// Generic initializer including the logic and variables and functions from a set of formulas.
 	template<typename Pol>
 	void initialize(Logic l, std::initializer_list<Formula<Pol>> formulas) {
 		carlVariables vars;
@@ -290,58 +302,70 @@ public:
 		initialize(l, vars, ufs);
 	}
 
+	/// Set information via `set-info`.
 	void setInfo(const std::string& name, const std::string& value) {
 		*this << "(set-info :" << name << " " << value << ")" << std::endl;
 	}
 	
+	/// Assert a formula via `assert`.
 	template<typename Pol>
 	void assertFormula(const Formula<Pol>& formula) {
 		*this << "(assert " << formula << ")" << std::endl;
 	}
 	
+	/// Minimize an objective via custom `minimize`.
 	template<typename Pol>
 	void minimize(const Pol& objective) {
 		*this << "(minimize " << objective << ")" << std::endl;
 	}
 	
+	/// Check satisfiability via `check-sat`.
 	void checkSat() {
 		*this << "(check-sat)" << std::endl;
 	}
 	
+	/// Print assertions via `get-assertions`.
 	void getAssertions() {
 		*this << "(get-assertions)" << std::endl;
 	}
 
+	/// Print model via `get-model`.
 	void getModel() {
 		*this << "(get-model)" << std::endl;
 	}
 	
+	/// Write some data to this stream.
 	template<typename T>
 	SMTLIBStream& operator<<(T&& t) {
 		write(static_cast<const std::decay_t<T>&>(t));
 		return *this;
 	}
 	
+	/// Write io operators (like `std::endl`) directly to the underlying stream.
 	SMTLIBStream& operator<<(std::ostream& (*os)(std::ostream&)) {
 		write(os);
 		return *this;
 	}
 
+	/// Return the written data as a string.
 	auto str() const {
 		return mStream.str();
 	}
 	
+	/// Return the underlying stream buffer.
 	auto content() const {
 		return mStream.rdbuf();
 	}
 };
 
+/// Write the written data to some `std::ostream`.
 inline std::ostream& operator<<(std::ostream& os, const SMTLIBStream& ss) {
 	return os << ss.content();
 }
 
 namespace detail {
 
+/// Shorthand to allow writing SMTLIB scripts in one line.
 template<typename Pol>
 struct SMTLIBScriptContainer {
 	Logic mLogic;
@@ -351,6 +375,7 @@ struct SMTLIBScriptContainer {
 	SMTLIBScriptContainer(Logic l, std::initializer_list<Formula<Pol>> f, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel) {}
 	SMTLIBScriptContainer(Logic l, std::initializer_list<Formula<Pol>> f, const Pol& objective, bool getModel = false): mLogic(l), mFormulas(f), mGetModel(getModel), mObjective(objective) {}
 };
+/// Actually write an SMTLIBScriptContainer to an std::ostream.
 template<typename Pol>
 std::ostream& operator<<(std::ostream& os, const SMTLIBScriptContainer<Pol>& sc) {
 	SMTLIBStream sls;
@@ -364,6 +389,7 @@ std::ostream& operator<<(std::ostream& os, const SMTLIBScriptContainer<Pol>& sc)
 
 }
 
+/// Shorthand to allow writing SMTLIB scripts in one line.
 template<typename Pol, typename... Args>
 detail::SMTLIBScriptContainer<Pol> outputSMTLIB(Logic l, std::initializer_list<Formula<Pol>> formulas, Args&&... args) {
 	return detail::SMTLIBScriptContainer<Pol>(l, formulas, std::forward<Args>(args)...);
@@ -383,6 +409,7 @@ namespace detail {
 	}
 }
 
+/// Generic shorthand to write arbitrary data to an SMTLIBStream and return the result.
 template<typename... Args>
 detail::SMTLIBOutputContainer<Args...> asSMTLIB(Args&&... args) {
 	return detail::SMTLIBOutputContainer<Args...>(std::forward<Args>(args)...);

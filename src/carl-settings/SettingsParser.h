@@ -76,6 +76,9 @@ struct SettingsPrinter {
 /// Streaming operator for a settings printer.
 std::ostream& operator<<(std::ostream& os, SettingsPrinter sp);
 
+/**
+ * Base class for a settings parser.
+ */
 class SettingsParser {
 	friend std::ostream& settings::operator<<(std::ostream& os, settings::OptionPrinter op);
 	friend std::ostream& settings::operator<<(std::ostream& os, settings::SettingsPrinter sp);
@@ -102,12 +105,15 @@ protected:
 	/// Calls the finalizer functions.
 	bool finalize_settings();
 
+	/// Prints a warning if an option was unrecognized. Can be overridden.
 	virtual void warn_for_unrecognized_option(const std::string& s) const {
 		std::cerr << "Ignoring unrecognized option " << s << std::endl;
 	}
+	/// Prints a warning if loading the config file failed. Can be overridden.
 	virtual void warn_config_file(const std::string& file) const {
 		std::cerr << "Could not load config file " << file << std::endl;
 	}
+	/// Gives the option name for the config file name. Can be overridden.
 	virtual std::string name_of_config_file() const {
 		return "config";
 	}

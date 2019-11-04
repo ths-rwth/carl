@@ -11,6 +11,11 @@
 
 namespace carl {
 
+/**
+ * Parser for the DIMACS format.
+ * 
+ * Allows for solving multiple formulas from one file by adding lines that only contain "reset".
+ */
 template<typename Pol>
 class DIMACSImporter {
 private:
@@ -60,15 +65,18 @@ private:
 	}
 	
 public:
+	/// Load the given file.
 	DIMACSImporter(const std::string& filename):
 		in(filename),
 		headerRegex("p cnf (\\d+) (\\d+)")
 	{}
 	
+	/// Checks if there is another formula to parse.
 	bool hasNext() const {
 		return !in.eof();
 	}
 	
+	/// Parses and returns the next formula (until the next reset line).
 	Formula<Pol> next() {
 		return parseFormula();
 	}

@@ -11,6 +11,14 @@
 
 namespace carl::settings {
 
+/**
+ * Helper method to obtain proper (unit) suffix entry from a value and a given set of possible suffixes.
+ * 
+ * Can be called, for example, with a value of nanoseconds and the following array `a = { {"ns", 1000}, {"µs", 1000}, {"ms", 1000}, {"s", 60}, {"m", 60}, {"h", 1} }`.
+ * This method will find the largest suffix such that the value will not be zero if represented with respect to this suffix.
+ * The return value is the value converted to this unit suffix and the index into the array to retrieve the appropriate suffix string.
+ * For the above example, `get_proper_suffix(30000000000, a) = {30, 3}`, that is `30s`.
+ */
 template<typename Array>
 std::pair<std::intmax_t,std::size_t> get_proper_suffix(std::intmax_t value, const Array& a) {
 	std::size_t id = 0;
@@ -53,8 +61,8 @@ inline std::ostream& operator<<(std::ostream& os, const duration& d) {
 
 /**
  * Custom validator for duration that wraps some std::chrono::duration.
- * Accepts the format <number><suffix> where suffix is one of the following:
- * ns, µs, us, ms, s, m, h
+ * Accepts the format `<number><suffix>` where suffix is one of the following:
+ * `ns,µs,us,ms,s,m,h`.
  */
 void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::duration* /*unused*/, int /*unused*/);
 
@@ -99,8 +107,8 @@ inline std::ostream& operator<<(std::ostream& os, const binary_quantity& q) {
 
 /**
  * Custom validator for binary quantities.
- * Accepts the format <number><suffix> where suffix is one of the following:
- * Ki,Mi,Gi,Ti,Pi,Ei
+ * Accepts the format `<number><suffix>` where suffix is one of the following:
+ * `Ki,Mi,Gi,Ti,Pi,Ei`.
  */
 void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::binary_quantity* /*unused*/, int /*unused*/);
 
@@ -145,8 +153,8 @@ inline std::ostream& operator<<(std::ostream& os, const metric_quantity& q) {
 
 /**
  * Custom validator for metric quantities.
- * Accepts the format <number><suffix> where suffix is one of the following:
- * K,M,G,T,P,E
+ * Accepts the format `<number><suffix>` where suffix is one of the following:
+ * `K,M,G,T,P,E`.
  */
 void validate(boost::any& v, const std::vector<std::string>& values, carl::settings::metric_quantity* /*unused*/, int /*unused*/);
 
