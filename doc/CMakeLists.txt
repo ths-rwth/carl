@@ -38,6 +38,7 @@ if(DOC_INCLUDE_SOURCES)
 endif(DOC_INCLUDE_SOURCES)
 STRING(REGEX REPLACE ";" " " DOXYGEN_INPUT_LIST "${DOC_SOURCE_DIR}" )
 
+file(GLOB_RECURSE DOC_SOURCES "${PROJECT_SOURCE_DIR}/src/**/*.cpp" "${PROJECT_SOURCE_DIR}/src/**/*.h" "${PROJECT_SOURCE_DIR}/src/**/*.tpp")
 
 configure_file(doxygen.conf.in ${DOC_OUTPUT_DIR}/config/doxygen.conf)
 
@@ -45,7 +46,7 @@ configure_file(doxygen.conf.in ${DOC_OUTPUT_DIR}/config/doxygen.conf)
 add_custom_command(
 	OUTPUT ${DOC_OUTPUT_DIR}/xml/index.xml
 	COMMAND Doxygen::doxygen ${DOC_OUTPUT_DIR}/config/doxygen.conf
-	DEPENDS ${DOC_OUTPUT_DIR}/config/doxygen.conf
+	DEPENDS ${DOC_OUTPUT_DIR}/config/doxygen.conf ${DOC_SOURCES}
 )
 
 add_custom_target(doc-doxygen
