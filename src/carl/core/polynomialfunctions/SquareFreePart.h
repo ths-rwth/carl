@@ -2,6 +2,7 @@
 
 #include "Derivative.h"
 #include "GCD.h"
+#include "to_univariate_polynomial.h"
 
 #include "../../converter/CoCoAAdaptor.h"
 #include "../logging.h"
@@ -44,7 +45,7 @@ UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p)
 template<typename Coeff, DisableIf<is_subset_of_rationals<Coeff>> = dummy>
 UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p) {
 	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
-	return carl::squareFreePart(MultivariatePolynomial<typename carl::UnderlyingNumberType<Coeff>::type>(p)).toUnivariatePolynomial(p.mainVar());
+	return carl::to_univariate_polynomial(carl::squareFreePart(MultivariatePolynomial<typename carl::UnderlyingNumberType<Coeff>::type>(p)), p.mainVar());
 }
 
 }

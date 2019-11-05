@@ -140,11 +140,11 @@ std::vector<typename GroebnerBase<Number>::Monomial> GroebnerBase<Number>::bor()
 
 template<typename Number>
 std::set<Variable> GroebnerBase<Number>::gatherVariables() const {
-        std::set<Variable> vars;
+        carlVariables vars;
         for(const auto& p : this->get()) {
-                p.gatherVariables(vars);
+                carl::variables(p, vars);
         }
-        return vars;
+        return vars.underlyingVariableSet();
 }
 
         

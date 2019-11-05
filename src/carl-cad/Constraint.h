@@ -158,7 +158,7 @@ private:
 	 * @return v if the check was successful
 	 */
 	const std::vector<Variable> checkVariables(const cad::MultiPolynomial<Number>& p, const std::vector<Variable>& v) const {
-		std::set<Variable> occuring = p.gatherVariables();
+		std::set<Variable> occuring = carl::variables(p).underlyingVariableSet();
 		for (Variable var: v) {
 			occuring.erase(var);
 		}

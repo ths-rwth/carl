@@ -233,7 +233,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 				}
 				for (uint d = qDeg + 1; d < pDeg; d++) {
 					Coeff t = h[d-1] * variable;
-					UnivariatePolynomial<Coeff> reducedNewB = t.toUnivariatePolynomial(variable).coefficients()[qDeg] * q;
+					UnivariatePolynomial<Coeff> reducedNewB = carl::to_univariate_polynomial(t, variable).coefficients()[qDeg] * q;
 					bool res = reducedNewB.divideBy(lcoeffQ, reducedNewB);
 					assert(res || reducedNewB.isConstant());
 					h[d] = Coeff(t - reducedNewB);

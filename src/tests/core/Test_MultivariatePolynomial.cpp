@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/polynomialfunctions/SPolynomial.h"
+#include "carl/core/polynomialfunctions/to_univariate_polynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/Interval.h"
 #include <list>
@@ -67,24 +68,24 @@ TEST(MultivariatePolynomial, remainder)
 
 
 
-TEST(MultivariatePolynomial, toUnivariatePolynomial)
+TEST(MultivariatePolynomial, to_univariate_polynomial)
 {
     Variable x = freshRealVariable("x");
 	Variable y = freshRealVariable("y");
 	{
 		MultivariatePolynomial<Rational> p({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
 		UnivariatePolynomial<Rational> res(x, {(Rational)0, (Rational)1, (Rational)-1, (Rational)3});
-		ASSERT_EQ(p.toUnivariatePolynomial(), res);
+		ASSERT_EQ(carl::to_univariate_polynomial(p), res);
 	}
 	{
 		MultivariatePolynomial<Rational> p({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
 		UnivariatePolynomial<MultivariatePolynomial<Rational>> res(x, {(Rational)0, (Rational)1, (Rational)-1, (Rational)3});
-		ASSERT_EQ(p.toUnivariatePolynomial(x), res);
+		ASSERT_EQ(carl::to_univariate_polynomial(p, x), res);
 	}
 	{
 		MultivariatePolynomial<Rational> p({(Rational)1*x*y, (Rational)-1*x*x, (Rational)3*x*x*x});
 		UnivariatePolynomial<MultivariatePolynomial<Rational>> res(x, {MultivariatePolynomial<Rational>((Rational)0), MultivariatePolynomial<Rational>((Rational)1*y), MultivariatePolynomial<Rational>((Rational)-1), MultivariatePolynomial<Rational>((Rational)3)});
-		ASSERT_EQ(res, p.toUnivariatePolynomial(x));
+		ASSERT_EQ(res, carl::to_univariate_polynomial(p, x));
 	}
 }
 
@@ -673,7 +674,7 @@ TEST(MultivariatePolynomialTest, Resultant)
 #endif
 
 //	std::cout << "##### CArL #####" << std::endl;
-//	auto res = p.toUnivariatePolynomial(x).resultant_z3(q.toUnivariatePolynomial(x));
+//	auto res = carl::to_univariate_polynomial(p, x).resultant_z3(carl::to_univariate_polynomial(q, x));
 //	std::cout << "Result: " << res << std::endl;
 }
 

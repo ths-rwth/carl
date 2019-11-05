@@ -7,6 +7,8 @@
 #include "../core/MonomialPool.h"
 #include "../core/Term.h"
 #include "../core/Variable.h"
+#include "../core/Variables.h"
+#include "../core/MultivariatePolynomial.h"
 #include "../util/Common.h"
 #include "../util/TimingCollector.h"
 
@@ -78,6 +80,11 @@ public:
 		std::set<Variable> vars;
 		for (const auto& p: polys) p.gatherVariables(vars);
 		return std::vector<Variable>(vars.begin(), vars.end());
+	}
+	static carlVariables variables(const std::vector<Poly>& polys) {
+		carlVariables vars;
+		for (const auto& p: polys) carl::variables(p, vars);
+		return vars;
 	}
 
 	CoCoA::RingElem convert(const Poly& p) const {
@@ -163,7 +170,7 @@ public:
 		}
 	}
 	CoCoAAdaptor(const std::vector<Poly>& polys):
-		CoCoAAdaptor(collectVariables(polys))
+		CoCoAAdaptor(variables(polys).underlyingVariables())
 	{}
 	CoCoAAdaptor(const std::initializer_list<Poly>& polys):
 		CoCoAAdaptor(std::vector<Poly>(polys))

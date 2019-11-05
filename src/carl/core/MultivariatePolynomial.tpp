@@ -13,8 +13,6 @@
 #include "logging.h"
 #include "../numbers/numbers.h"
 
-#include "polynomialfunctions/CoprimePart.h"
-
 #include <algorithm>
 #include <memory>
 #include <mutex>

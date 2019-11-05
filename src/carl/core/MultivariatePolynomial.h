@@ -21,7 +21,6 @@
 #include "../numbers/numbers.h"
 #include "../util/TermAdditionManager.h"
 #include "polynomialfunctions/SPolynomial.h"
-#include "polynomialfunctions/CoprimePart.h"
 #include "polynomialfunctions/SoSDecomposition.h"
 
 
@@ -596,16 +595,6 @@ public:
 	[[deprecated("use carl::SPolynomial(p,q) instead.")]]
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q) {
 		return carl::SPolynomial(p,q);
-	}
-
-	/**
-	* Calculates the part ofthe Polynomial, that is coprime to q. Only works with CoCoA.
-	* @param q
-	* @return
-	*/
-	[[deprecated("use carl::coprimePart(p,q) instead.")]]
-	MultivariatePolynomial coprimePart(const MultivariatePolynomial& q) const {
-		return carl::coprimePart(*this, q);
 	}
 
 	void square();

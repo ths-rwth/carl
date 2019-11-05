@@ -103,8 +103,8 @@ public:
 		}
 		CARL_LOG_DEBUG("carl.contractor", p << " with " << v << " -> " << *this);
 		carlVariables vars;
-		mNumerator.gatherVariables(vars);
-		mDenominator.gatherVariables(vars);
+		carl::variables(mNumerator, vars);
+		carl::variables(mDenominator, vars);
 		mDependees = vars.underlyingVariables();
 	}
 

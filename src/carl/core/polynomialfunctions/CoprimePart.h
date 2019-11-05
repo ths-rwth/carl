@@ -8,6 +8,9 @@ namespace carl {
 template<typename C, typename O, typename P>
 class MultivariatePolynomial;
 
+/**
+* Calculates the coprime part of p and q.
+*/
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> coprimePart(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q) {
 	if (p.isConstant() || q.isConstant()) {

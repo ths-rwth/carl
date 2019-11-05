@@ -605,8 +605,8 @@ void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable
 	Variable var = v.front();
 	if (!mVariables.empty()) var = mVariables.first();
 
-	UPolynomial* up = new UPolynomial(carl::squareFreePart(p.toUnivariatePolynomial(var)));
-	CARL_LOG_TRACE("carl.cad", "Adding" << std::endl << "original   " << p.toUnivariatePolynomial(var) << std::endl << "simplified " << *up);
+	UPolynomial* up = new UPolynomial(carl::squareFreePart(carl::to_univariate_polynomial(p, var)));
+	CARL_LOG_TRACE("carl.cad", "Adding" << std::endl << "original   " << carl::to_univariate_polynomial(p, var) << std::endl << "simplified " << *up);
 	if (polynomials.isScheduled(up)) {
 		// same polynomial was already considered in scheduled polynomials
 		delete up;

@@ -66,7 +66,7 @@ namespace cad {
 			for (const auto& coeff: p->coefficients()) {
 				if (doesNotVanish(coeff)) {
 					CARL_LOG_DEBUG("carl.cad.projection", "coeff " << coeff << " does not vanish. We only need the lcoeff()");
-					i.insert(p->lcoeff().toUnivariatePolynomial(variable), {p}, false);
+					i.insert(carl::to_univariate_polynomial(p->lcoeff(), variable), {p}, false);
 					return;
 				}
 			}
@@ -74,7 +74,7 @@ namespace cad {
 			for (const auto& coeff: p->coefficients()) {
 				if (coeff.isConstant()) continue;
 				CARL_LOG_DEBUG("carl.cad.projection", "\t-> " << coeff);
-				i.insert(coeff.toUnivariatePolynomial(variable), {p}, false);
+				i.insert(carl::to_univariate_polynomial(coeff, variable), {p}, false);
 			}
 		}
         template<typename Inserter>
@@ -90,7 +90,7 @@ namespace cad {
             for (const auto& coeff: p->coefficients()) {
 				if (coeff.isConstant()) continue;
 				CARL_LOG_DEBUG("carl.cad.projection", "\t-> " << coeff);
-                i.insert(coeff.toUnivariatePolynomial(variable), {p}, false);
+                i.insert(carl::to_univariate_polynomial(coeff, variable), {p}, false);
             }
         }
     };

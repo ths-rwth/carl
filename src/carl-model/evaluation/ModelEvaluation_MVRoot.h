@@ -49,8 +49,8 @@ namespace model {
 		CARL_LOG_DEBUG("carl.model.evaluation", "Substituting " << m << " into " << mvr);
 		substituteIn(mvr, m);
 		
-		auto map = collectRANIR(mvr.gatherVariables(), m);
-		if (map.size() == mvr.gatherVariables().size()) {
+		auto map = collectRANIR(carl::variables(mvr).underlyingVariableSet(), m);
+		if (map.size() == carl::variables(mvr).size()) {
 			CARL_LOG_DEBUG("carl.model.evaluation", "Fully evaluating " << mvr << " over " << map);
 			auto r = mvr.evaluate(map);
 			if (r) {
