@@ -148,7 +148,7 @@ TEST(RootFinder, tryRealRoots)
 	le.substitute(z, zval);
 	std::cout << "Lazard: " << le.getLiftingPoly() << std::endl;
 	{
-		auto roots = carl::rootfinder::realRoots(le.getLiftingPoly().toUnivariatePolynomial(x), m);
+		auto roots = carl::rootfinder::realRoots(carl::to_univariate_polynomial(le.getLiftingPoly(), x), m);
 		std::cout << "-> " << roots << std::endl;
 	}
 	#endif

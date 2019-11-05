@@ -13,6 +13,7 @@
 #include "MultivariateTarskiQuery.h"
 #include "UnivariateTarskiQuery.h"
 
+#include "../../core/polynomialfunctions/to_univariate_polynomial.h"
 
 namespace carl {
         
@@ -48,7 +49,7 @@ public:
                 // univariate manager
                 if(std::distance(first, last) == 1 && first->isUnivariate()) {
                         CARL_LOG_TRACE("carl.thom.tarski.manager", "as a UNIVARIATE manager");
-                        mZ = first->toUnivariatePolynomial();
+                        mZ = carl::to_univariate_polynomial(*first);
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", !carl::isZero(mZ), "");
                         mDer = derivative(mZ);
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", this->isUnivariateManager(), "");
@@ -88,7 +89,7 @@ public:
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", p.isUnivariate(), "");
                         UnivariatePolynomial<Number> pUniv(Variable::NO_VARIABLE);
                         if(p.isConstant()) pUniv = UnivariatePolynomial<Number>(mZ.mainVar(), p.lcoeff());
-                        else pUniv = p.toUnivariatePolynomial();
+                        else pUniv = carl::to_univariate_polynomial(p);
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", pUniv.mainVar() == mZ.mainVar(),
                                 "cannot compute tarski query of " << p << " on " << mZ);
                         res = univariateTarskiQuery(pUniv, mZ, mDer);

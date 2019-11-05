@@ -7,6 +7,7 @@
 #include "../../../core/polynomialfunctions/SturmSequence.h"
 #include "../../../core/polynomialfunctions/RootBounds.h"
 #include "../../../core/polynomialfunctions/AlgebraicSubstitution.h"
+#include "../../../core/polynomialfunctions/to_univariate_polynomial.h"
 
 #include "../../../interval/Interval.h"
 #include "../../../interval/IntervalEvaluation.h"
@@ -357,7 +358,7 @@ namespace ran {
 			auto gmv = carl::gcd(MultivariatePolynomial<Number>(irp), poly);
 			CARL_LOG_DEBUG("carl.ran", "Simplyfing, gcd = " << gmv);
 			if (carl::isOne(gmv)) return;
-			auto g = gmv.toUnivariatePolynomial();
+			auto g = carl::to_univariate_polynomial(gmv);
 			if (is_root_of(g)) {
 				CARL_LOG_DEBUG("carl.ran", "Is a root of " << g);
 				setPolynomial(g);
@@ -394,7 +395,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
 	assert(m.size() > 0);
 	if (m.size() == 1) {
-		auto poly = p.toUnivariatePolynomial(m.begin()->first);
+		auto poly = carl::to_univariate_polynomial(p, m.begin()->first);
 		if (m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
 			CARL_LOG_DEBUG("carl.ran", "Returning " << IntervalContent<Number>());
 			return IntervalContent<Number>();
@@ -534,7 +535,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		CARL_LOG_DEBUG("carl.ran", "Evaluate constraint using resultants and root bounds");
 		assert(m.size() > 0);
 		if (m.size() == 1) {
-			auto poly = p.toUnivariatePolynomial(m.begin()->first);
+			auto poly = carl::to_univariate_polynomial(p, m.begin()->first);
 			if (m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
 				CARL_LOG_DEBUG("carl.ran", "Got " << IntervalContent<Number>());
 				return evaluate(Sign::ZERO, c.relation());

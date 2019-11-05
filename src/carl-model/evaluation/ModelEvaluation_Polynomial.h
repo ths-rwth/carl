@@ -2,6 +2,7 @@
 
 #include "../Model.h"
 #include <carl/core/polynomialfunctions/RootFinder.h>
+#include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/UnivariatePolynomial.h>
 
@@ -88,7 +89,7 @@ namespace model {
 	auto realRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
 		auto map = collectRANIR(tmp.gatherVariables(), m);
-		return carl::rootfinder::realRoots(tmp.toUnivariatePolynomial(v), map);
+		return carl::rootfinder::realRoots(carl::to_univariate_polynomial(tmp, v), map);
 	}
 	template<typename Rational, typename Poly>
 	auto realRoots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
@@ -107,7 +108,7 @@ namespace model {
 			CARL_LOG_DEBUG("carl.formula.model", "Sizes of " << map << " and " << tmp.gatherVariables() << " do not match. This will not work...");
 			return boost::none;
 		}
-		return carl::rootfinder::realRoots(tmp.toUnivariatePolynomial(v), map);
+		return carl::rootfinder::realRoots(carl::to_univariate_polynomial(tmp, v), map);
 	}
 }
 }

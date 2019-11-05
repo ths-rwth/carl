@@ -19,7 +19,9 @@
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"
 #include "../../converter/CoCoAAdaptor.h"
+
 #include "Resultant.h"
+#include "to_univariate_polynomial.h"
 
 namespace carl {
 
@@ -42,7 +44,7 @@ UnivariatePolynomial<Number> algebraic_substitution_groebner(
 		for (const auto& poly: res) {
 			if (carl::variables(poly) == carlVariables({ target })) {
 				CARL_LOG_DEBUG("carl.algsubs", "-> " << poly)
-				return poly.toUnivariatePolynomial();
+				return carl::to_univariate_polynomial(poly);
 			}
 		}
 	} catch (const CoCoA::ErrorInfo& e) {
@@ -115,11 +117,11 @@ UnivariatePolynomial<Number> algebraic_substitution_resultant(
 	const std::vector<MultivariatePolynomial<Number>>& polynomials,
 	const std::vector<Variable>& variables
 ) {
-	auto p = polynomials.back().toUnivariatePolynomial(variables.back());
+	auto p = carl::to_univariate_polynomial(polynomials.back(), variables.back());
 	std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> polys;
 
 	for (std::size_t i = 0; i < polynomials.size() - 1; ++i) {
-		polys.emplace_back(polynomials[i].toUnivariatePolynomial(variables[i]));
+		polys.emplace_back(carl::to_univariate_polynomial(polynomials[i], variables[i]));
 	}
 
 	CARL_LOG_DEBUG("carl.algsubs", "Converted " << polynomials << " under " << variables << " to " << p << " and " << polys);

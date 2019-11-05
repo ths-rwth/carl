@@ -123,7 +123,7 @@ public:
 	 */
 	boost::optional<RAN> evaluate(const EvalMap& m) const {
 		CARL_LOG_DEBUG("carl.rootexpression", "Evaluate: " << *this << " against: " << m);
-		auto poly = mPoly.toUnivariatePolynomial(sVar);
+		auto poly = carl::to_univariate_polynomial(mPoly, sVar);
 		auto roots = rootfinder::realRoots(poly, m);
 		CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << roots);
 		if (roots.size() < mK) {

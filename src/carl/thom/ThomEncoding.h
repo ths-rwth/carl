@@ -179,7 +179,7 @@ public:
 	bool makesPolynomialZero(const Polynomial& pol, Variable::Arg pol_mainVar) const {
 		assert(!carl::isZero(pol));
 		assert(mMainVar != pol_mainVar);
-		UnivariatePolynomial<Polynomial> pol_univ = pol.toUnivariatePolynomial(pol_mainVar);
+		UnivariatePolynomial<Polynomial> pol_univ = carl::to_univariate_polynomial(pol, pol_mainVar);
 		// maybe check first if pol_univ has some constant coefficient...
 		for(const auto& t : pol_univ.coefficients()) {
 			assert(this->dimension() >= carl::variables(t).size());

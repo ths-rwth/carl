@@ -3,6 +3,7 @@
 #include "Content.h"
 #include "Derivative.h"
 #include "PrimitivePart.h"
+#include "to_univariate_polynomial.h"
 
 #include <list>
 #include <vector>
@@ -247,7 +248,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 				assert(res || sum.isConstant());
 
 				UnivariatePolynomial<Coeff> t(variable, {0, h.back()});
-				UnivariatePolynomial<Coeff> reducedNewB = ((t + normalizedSum) * lcoeffQ - t.coefficients()[qDeg].toUnivariatePolynomial(variable));
+				UnivariatePolynomial<Coeff> reducedNewB = ((t + normalizedSum) * lcoeffQ - carl::to_univariate_polynomial(t.coefficients()[qDeg], variable));
 				reducedNewB.divideBy(p.lcoeff(), reducedNewB);
 				if (delta % 2 == 0) {
 					q = -reducedNewB;
