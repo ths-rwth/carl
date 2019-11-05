@@ -458,6 +458,7 @@ namespace carl
 		 * Fill the set of variables with the variables from this monomial.
 		 * @param variables Variables.
 		 */
+		[[deprecated("Use carl::variables() instead.")]]
 		void gatherVariables(std::set<Variable>& variables) const
 		{
 			for (const auto& it: mExponents) {
@@ -469,6 +470,7 @@ namespace carl
 		 * Fill the variables with the variables from this monomial.
 		 * @param variables Variables.
 		 */
+		[[deprecated("Use carl::variables() instead.")]]
 		void gatherVariables(carlVariables& variables) const {
 			variables.add(mExponents.begin(), mExponents.end(), [](const auto& e){ return e.first; });
 		}

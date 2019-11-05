@@ -95,12 +95,13 @@ public:
 	 * the root-variable "_z". For example, with an underlying poly p(x,y,_z)
 	 * we return {x,y}.
 	 */
+	[[deprecated("Use carl::variables() instead.")]]
 	std::set<Variable> gatherVariables() const {
 		Variables var = mPoly.gatherVariables();
 		var.erase(sVar);
 		return var;
 	}
-
+	[[deprecated("Use carl::variables() instead.")]]
 	void gatherVariables(carlVariables& vars) const {
 		carl::variables(mPoly, vars);
 		vars.erase(sVar);

@@ -427,8 +427,11 @@ public:
 	 * Iterates through all terms to find variables occuring in this polynomial.
 	 * @param vars Holds the variables occuring in the polynomial at return.
 	 */
+	[[deprecated("Use carl::variables() instead.")]]
 	void gatherVariables(std::set<Variable>& vars) const;
+	[[deprecated("Use carl::variables() instead.")]]
 	void gatherVariables(carlVariables& vars) const;
+	[[deprecated("Use carl::variables() instead.")]]
 	std::set<Variable> gatherVariables() const;
 	
 	/**
@@ -620,7 +623,9 @@ public:
 	 * Note that the current polynomial must mention one and only one variable,
 	 * i.e., be indeed univariate.
 	 */
+	[[deprecated("use carl::to_univariate_polynomial(p) instead.")]]
 	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
+	[[deprecated("use carl::to_univariate_polynomial(p, v) instead.")]]
 	UnivariatePolynomial<MultivariatePolynomial> toUnivariatePolynomial(Variable::Arg mainVar) const;
 	
 	const Term<Coeff>& operator[](std::size_t index) const {

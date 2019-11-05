@@ -378,6 +378,7 @@ public:
 	 * Gathers all variables that occur in the polynomial.
 	 * @return Set of variables.
 	 */
+	[[deprecated("Use carl::variables() instead.")]]
 	std::set<Variable> gatherVariables() const {
 		if constexpr (carl::is_number<Coefficient>::value) {
 			return std::set<Variable>({mainVar()});
@@ -395,6 +396,7 @@ public:
 	 * Gathers all variables that occur in the polynomial.
 	 * @return Set of variables.
 	 */
+	[[deprecated("Use carl::variables() instead.")]]
 	void gatherVariables(std::set<Variable>& vars) const {
 		vars = {mainVar()};
 		if constexpr (!carl::is_number<Coefficient>::value) {
