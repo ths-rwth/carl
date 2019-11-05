@@ -23,8 +23,8 @@ namespace carl {
 			assert(mv.isVariable());
 			return Formula<Poly>(VariableComparison<Poly>(mv.asVariable(), mRoot, Relation::EQ));
 		}
-		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const {
-			return model::evaluate(mRoot, model);
+		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& m) const {
+			return model::evaluate(mRoot, m);
 		}
 		virtual bool dependsOn(const ModelVariable& var) const {
 			if (!var.isVariable()) return false;
