@@ -18,6 +18,7 @@
 #include "../core/Variables.h"
 #include "../core/VariableInformation.h"
 #include "../core/VariablesInformation.h"
+#include "../core/polynomialfunctions/Complexity.h"
 #include "../interval/Interval.h"
 #include "../interval/IntervalEvaluation.h"
 #include "../util/Common.h"
@@ -617,7 +618,7 @@ namespace carl
              */
             size_t complexity() const
             {
-                return 1 + mpContent->mLhs.complexity();
+				return 1 + carl::complexity(mpContent->mLhs);
             }
             
             /**

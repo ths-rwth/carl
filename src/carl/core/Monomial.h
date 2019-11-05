@@ -301,13 +301,6 @@ namespace carl
 		std::size_t nrVariables() const {
 			return mExponents.size();
 		}
-        
-        /**
-         * @return An approximation of the complexity of this monomial.
-         */
-        std::size_t complexity() const {
-            return mTotalDegree;
-        }
 
 		/**
 		 * Retrieves the single variable of the monomial.

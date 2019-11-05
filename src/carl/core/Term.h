@@ -153,14 +153,6 @@ public:
 	}
 
 	/**
-         * @return An approximation of the complexity of this monomial.
-         */
-	std::size_t complexity() const {
-		if (!mMonomial) return 1;
-		return mMonomial->complexity() + 1;
-	}
-
-	/**
 		 * @param v The variable to check for its occurrence.
 		 * @return true, if the variable occurs in this term.
 		 */

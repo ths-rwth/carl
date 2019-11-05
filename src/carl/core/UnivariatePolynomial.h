@@ -324,18 +324,6 @@ public:
 			return max;
 		}
 	}
-	
-	/**
-	* @return An approximation of the complexity of this polynomial.
-	*/
-	std::size_t complexity() const {
-		std::size_t result = 0;
-		for (std::size_t deg = 0; deg < mCoefficients.size(); ++deg) {
-			if (mCoefficients[deg].isZero()) continue;
-			result += mCoefficients[deg].complexity() + deg;
-		}
-		return result;
-	}
 
 	/**
 	 * Removes the leading term from the polynomial.

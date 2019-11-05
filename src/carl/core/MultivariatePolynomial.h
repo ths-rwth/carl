@@ -318,15 +318,7 @@ public:
     std::size_t size() const {
         return mTerms.size();
     }
-    
-    /**
-     * @return An approximation of the complexity of this polynomial.
-     */
-    std::size_t complexity() const {
-		return std::accumulate(begin(), end(), static_cast<std::size_t>(0),
-			[](std::size_t cur, const auto& t){ return cur + t.complexity(); }
-		);
-    }
+
 	/**
 	 * Check if the polynomial has a constant term that is not zero.
 	 */
