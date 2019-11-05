@@ -40,9 +40,7 @@ UnivariatePolynomial<Number> algebraic_substitution_groebner(
 		auto res = ca.GBasis(polynomials);
 		CARL_LOG_DEBUG("carl.algsubs", "-> " << res);
 		for (const auto& poly: res) {
-			carlVariables vars;
-			poly.gatherVariables(vars);
-			if (vars == carlVariables({ target })) {
+			if (carl::variables(poly) == carlVariables({ target })) {
 				CARL_LOG_DEBUG("carl.algsubs", "-> " << poly)
 				return poly.toUnivariatePolynomial();
 			}

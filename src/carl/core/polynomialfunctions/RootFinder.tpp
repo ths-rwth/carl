@@ -46,7 +46,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 	UnivariatePolynomial<Coeff> polyCopy(poly);
 	std::map<Variable, RealAlgebraicNumber<Number>> IRmap;
 
-	for (Variable v: polyCopy.gatherVariables()) {
+	for (Variable v: carl::variables(polyCopy).underlyingVariables()) {
 		if (v == poly.mainVar()) continue;
 		if (varToRANMap.count(v) == 0) {
 			CARL_LOG_TRACE("carl.core.rootfinder", "poly still contains unassigned variable " << v);

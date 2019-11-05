@@ -461,7 +461,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		while(true) {
 			// evaluate
 			std::map<Variable, Interval<Number>> varToInterval;
-			for (const auto& var : p.gatherVariables()) {
+			for (const auto& var : carl::variables(p).underlyingVariables()) {
 				varToInterval[var] = m.at(var).interval();
 			}
 			
@@ -518,7 +518,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 			}
 
 			// if all variables are substituted we're done
-			if (p.gatherVariables().size() == 0) {
+			if (carl::variables(p).empty()) {
 				CARL_LOG_DEBUG("carl.ran", c << " simplified to " << p << " ~ 0");
 				assert(p.isNumber());
 				return carl::evaluate(p.constantPart(), c.relation());

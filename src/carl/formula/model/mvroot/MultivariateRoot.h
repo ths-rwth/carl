@@ -102,7 +102,7 @@ public:
 	}
 
 	void gatherVariables(carlVariables& vars) const {
-		mPoly.gatherVariables(vars);
+		carl::variables(mPoly, vars);
 		vars.erase(sVar);
 	}
 
@@ -153,6 +153,17 @@ inline bool operator<(const MultivariateRoot<Poly>& lhs, const MultivariateRoot<
 template<typename P>
 std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
 	return os << "rootExpr(" << mr.poly() << ", " << mr.k() << ", " << MultivariateRoot<P>::var() << ")";
+}
+
+/**
+ * Add the variables mentioned in underlying polynomial, excluding
+ * the root-variable "_z". For example, with an underlying poly p(x,y,_z)
+ * we return {x,y}.
+ */
+template<typename Poly>
+void variables(const MultivariateRoot<Poly>& mr, carlVariables& vars) {
+	carl::variables(mr.poly(), vars);
+	vars.erase(mr.var());
 }
 
 }

@@ -120,6 +120,19 @@ public:
 		return res;
 	}
 
+	std::set<Variable> underlyingVariableSet() const {
+		compact(true);
+		std::set<Variable> res;
+		std::for_each(begin(), end(), [&res](const auto& var) {
+			std::visit(overloaded {
+				[&res](Variable v){ res.insert(v); },
+				[&res](BVVariable v){ res.insert(v.variable()); },
+				[&res](UVariable v){ res.insert(v.variable()); },
+			}, var);
+		});
+		return res;
+	}
+
 	template<typename T>
 	auto filter_type() const {
 		return filter([](const auto& v) {
@@ -162,6 +175,14 @@ inline bool operator==(const carlVariables& lhs, const carlVariables& rhs) {
 }
 inline std::ostream& operator<<(std::ostream& os, const carlVariables& vars) {
 	return os << vars.mVariables;
+}
+
+/// Return the variables as collected by the methods above.
+template<typename T>
+inline carlVariables variables(const T& t) {
+	carlVariables vars;
+	variables(t, vars);
+	return vars;
 }
 
 }

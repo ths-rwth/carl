@@ -133,41 +133,42 @@ namespace carl
         // Left-hand side is a non-linear univariate monomial
         if( mVariables.size() == 1 && !mLhs.isLinear() && mLhs.nrTerms() == 1 )
         {
+			Variable var = mVariables.underlyingVariables()[0];
             switch( rel )
             {
                 case Relation::EQ:
-                    return new ConstraintContent( *mVariables.begin(), rel );
+                    return new ConstraintContent( var, rel );
                 case Relation::NEQ:
-                    return new ConstraintContent( *mVariables.begin(), rel );
+                    return new ConstraintContent( var, rel );
                 case Relation::LEQ:
                     if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-                        return new ConstraintContent( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
+                        return new ConstraintContent( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( var ) * PolyT( var ), rel );
                     else
-                        return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
+                        return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( var ), rel );
                 case Relation::GEQ:
                     if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-                        return new ConstraintContent( PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
+                        return new ConstraintContent( PolyT( var ) * PolyT( var ), rel );
                     else
-                        return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
+                        return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( var ), rel );
                 case Relation::LESS:
                     if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-                        return new ConstraintContent( *mVariables.begin(), Relation::NEQ );
+                        return new ConstraintContent( var, Relation::NEQ );
                     else
                     {
                         if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-                            return new ConstraintContent( PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
+                            return new ConstraintContent( PolyT( var ) * PolyT( var ), rel );
                         else
-                            return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
+                            return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( var ), rel );
                     }
                 case Relation::GREATER:
                     if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-                        return new ConstraintContent( *mVariables.begin(), Relation::NEQ );
+                        return new ConstraintContent( var, Relation::NEQ );
                     else
                     {
                         if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-                            return new ConstraintContent( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel ); 
+                            return new ConstraintContent( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( var ) * PolyT( var ), rel ); 
                         else
-                            return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel ); 
+                            return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( var ), rel ); 
                     }
                 default:
                     assert( false );
@@ -225,7 +226,7 @@ namespace carl
     template<typename Pol>
     void ConstraintContent<Pol>::initLazy()
     {
-        mLhs.gatherVariables( mVariables );
+		carl::variables(mLhs, mVariables);
     }
 
     template<typename Pol>
@@ -338,9 +339,10 @@ namespace carl
             return carl::evaluate( constantPart(), relation() ) ? 1 : 0;
         else
         {
-            auto varIter = variables().begin();
+			auto vars = variables().underlyingVariables();
+            auto varIter = vars.begin();
             auto varIntervalIter = _solutionInterval.begin();
-            while( varIter != variables().end() && varIntervalIter != _solutionInterval.end() )
+            while( varIter != vars.end() && varIntervalIter != _solutionInterval.end() )
             {
                 if( *varIter < varIntervalIter->first )
                 {
@@ -356,7 +358,7 @@ namespace carl
                     ++varIntervalIter;
                 }
             }
-            if( varIter != variables().end() )
+            if( varIter != vars.end() )
                 return 2;
             Interval<double> solutionSpace = IntervalEvaluation::evaluate( lhs(), _solutionInterval );
             if( solutionSpace.isEmpty() )
@@ -447,9 +449,10 @@ namespace carl
             return carl::evaluate( constantPart(), relation() ) ? 1 : 0;
         else
         {
-            auto varIter = variables().begin();
+			auto vars = variables().underlyingVariables();
+            auto varIter = vars.begin();
             auto varIntervalIter = _solutionInterval.begin();
-            while( varIter != variables().end() && varIntervalIter != _solutionInterval.end() )
+            while( varIter != vars.end() && varIntervalIter != _solutionInterval.end() )
             {
                 if( *varIter < varIntervalIter->first )
                 {
@@ -465,7 +468,7 @@ namespace carl
                     ++varIntervalIter;
                 }
             }
-            if( varIter != variables().end() )
+            if( varIter != vars.end() )
                 return 2;
             Interval<double> solutionSpace = IntervalEvaluation::evaluate( lhs(), _solutionInterval );
             if( solutionSpace.isEmpty() )
@@ -625,7 +628,7 @@ namespace carl
     template<typename Pol>
     bool Constraint<Pol>::hasFinitelyManySolutionsIn( const Variable& _var ) const
     {
-        if( variables().find( _var ) == variables().end() )
+        if( variables().has( _var ))
             return true;
         if( relation() == Relation::EQ )
         {
@@ -699,13 +702,7 @@ namespace carl
 
 	template<typename Pol>
 	bool Constraint<Pol>::isPseudoBoolean() const {
-		std::set<carl::Variable> variables = lhs().gatherVariables();
-		for (const auto& var : variables) {
-			if (var.type() != carl::VariableType::VT_BOOL) {
-				return false;
-			}
-		}
-		return true;
+		return !variables().boolean().empty();
 	}
 
     template<typename Pol>

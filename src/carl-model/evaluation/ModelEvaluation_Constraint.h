@@ -27,7 +27,7 @@ namespace model {
 		substituteIn(c, m);
 		
 		auto map = collectRANIR(c.lhs().gatherVariables(), m);
-		if (map.size() == c.lhs().gatherVariables().size()) {
+		if (map.size() == carl::variables(c.lhs()).size()) {
 			res = RealAlgebraicNumberEvaluation::evaluate(c, map);
 			return;
 		}

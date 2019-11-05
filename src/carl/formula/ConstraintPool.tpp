@@ -68,7 +68,7 @@ namespace carl
         auto iterBoolPair = mConstraints.insert( constraint );
         if( iterBoolPair.second )
         {
-            constraint->mVariables.insert(_var);
+            constraint->mVariables.add(_var);
             constraint->initEager();
             constraint->mID = mIdAllocator;
             ++mIdAllocator;

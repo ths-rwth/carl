@@ -353,6 +353,12 @@ inline bool isZero(const Term<Coeff>& term) {
 	return carl::isZero(term.coeff());
 }
 
+/// Add the variables of the given term to the variables.
+template<typename Coeff>
+void variables(const Term<Coeff>& t, carlVariables& vars) {
+	if (t.monomial()) variables(*t.monomial(), vars);
+}
+
 /**
  * Checks whether a term is one.
  */

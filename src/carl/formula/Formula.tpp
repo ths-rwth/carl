@@ -72,7 +72,7 @@ namespace carl
                     _vars.insert( boolean() );
                 break;
             case FormulaType::CONSTRAINT:
-                for( auto var : constraint().variables() )
+                for( auto var : constraint().variables().underlyingVariables() )
                 {
                     if( _integerVars )
                         _vars.insert( var );

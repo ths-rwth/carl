@@ -114,7 +114,7 @@ namespace carl {
 		void gatherVariables(carlVariables& vars) const {
 			vars.add(mVar);
 			std::visit(overloaded {
-				[&vars](const MR& mr) { mr.gatherVariables(vars); },
+				[&vars](const MR& mr) { carl::variables(mr, vars); },
 				[](const RAN&) {}
 			}, mValue);
 		}

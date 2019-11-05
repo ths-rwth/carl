@@ -50,7 +50,7 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly, typename ModelPoly>
 	void substituteIn(Poly& p, const Model<Rational,ModelPoly>& m) {
-		for (auto var: p.gatherVariables()) {
+		for (auto var: carl::variables(p).underlyingVariables()) {
 			auto it = m.find(var);
 			if (it == m.end()) continue;
 			const ModelValue<Rational,ModelPoly>& value = m.evaluated(var);
@@ -77,7 +77,7 @@ namespace model {
 		substituteIn(p, m);
 		
 		auto map = collectRANIR(p.gatherVariables(), m);
-		if (map.size() == p.gatherVariables().size()) {
+		if (map.size() == carl::variables(p).size()) {
             res = RealAlgebraicNumberEvaluation::evaluate(p, map);
 			return;
 		}
@@ -103,7 +103,7 @@ namespace model {
 		CARL_LOG_DEBUG("carl.formula.model", p << " over " << m << " = " << tmp);
 		auto map = collectRANIR(tmp.gatherVariables(), m);
 		CARL_LOG_DEBUG("carl.formula.model", "Remaining: " << map);
-		if (map.size() + 1 != tmp.gatherVariables().size()) {
+		if (map.size() + 1 != carl::variables(tmp).size()) {
 			CARL_LOG_DEBUG("carl.formula.model", "Sizes of " << map << " and " << tmp.gatherVariables() << " do not match. This will not work...");
 			return boost::none;
 		}

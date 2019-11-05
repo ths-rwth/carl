@@ -28,7 +28,7 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void substituteIn(MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
-		for (auto var: mvr.gatherVariables()) {
+		for (auto var: carl::variables(mvr).underlyingVariables()) {
 			auto it = m.find(var);
 			if (it == m.end()) continue;
 			const ModelValue<Rational,Poly>& value = m.evaluated(var);

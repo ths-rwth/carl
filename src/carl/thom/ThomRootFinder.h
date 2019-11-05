@@ -57,7 +57,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
         for(const auto& entry : m) {
                 CARL_LOG_ASSERT("carl.thom.rootfinder", entry.first == entry.second.mainVar(), "invalid map Variable -> Thom encoding");
         }
-        for(const auto& v : p.gatherVariables()) {
+        for(const auto& v : carl::variables(p).underlyingVariables()) {
                 if(v != mainVar) {
                         CARL_LOG_ASSERT("carl.thom.rootfinder", m.find(v) != m.end(), "there is a variable which is in p but not in m");
                 }
@@ -67,7 +67,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 return realRootsThom<Number>(p, mainVar, nullptr, interval);
         }
         CARL_LOG_ASSERT("carl.thom.rootfinder", m.size() > 0, "");
-        CARL_LOG_ASSERT("carl.thom.rootfinder", m.size() == p.gatherVariables().size() - 1, "");
+        CARL_LOG_ASSERT("carl.thom.rootfinder", m.size() == carl::variables(p).size() - 1, "");
         
         ThomEncoding<Number> point = ThomEncoding<Number>::analyzeTEMap(m);
         std::shared_ptr<ThomEncoding<Number>> point_ptr = std::make_shared<ThomEncoding<Number>>(point);

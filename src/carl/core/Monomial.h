@@ -767,6 +767,11 @@ namespace carl
 		return m->pow(exp);
 	}
 
+	/// Add the variables of the given monomial to the variables.
+	inline void variables(const Monomial& m, carlVariables& vars) {
+		vars.add(m.begin(), m.end(), [](const auto& e){ return e.first; });
+	}
+
 	struct hashLess {
 		bool operator()(const Monomial& lhs, const Monomial& rhs) const {
 			return lhs.hash() < rhs.hash();

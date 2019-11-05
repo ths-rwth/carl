@@ -817,6 +817,14 @@ public:
 		if (isZero(rhs)) return os << "0";
 		return os << carl::stream_joined(" + ", rhs);
 	}
+
+	/// Add the variables of the given polynomial to the variables.
+	template<typename Coeff, typename Ordering, typename Policies>
+	void variables(const MultivariatePolynomial<Coeff,Ordering,Policies>& p, carlVariables& vars) {
+		for (const auto& t : p) {
+			variables(t, vars);
+		}
+	}
 } // namespace carl
 
 /**

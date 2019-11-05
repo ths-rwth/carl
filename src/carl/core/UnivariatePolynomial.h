@@ -1039,6 +1039,17 @@ bool isOne(const UnivariatePolynomial<Coefficient>& p) {
 	return p.coefficients().size() == 1 && carl::isOne(p.coefficients().front());
 }
 
+/// Add the variables of the given polynomial to the variables.
+template<typename Coeff>
+void variables(const UnivariatePolynomial<Coeff>& p, carlVariables& vars) {
+	vars.add(p.mainVar());
+	if constexpr (!carl::is_number<Coeff>::value) {
+		for (const auto& c : p.coefficients()) {
+			variables(c, vars);
+		}
+	}
+}
+
 }
 
 namespace std {

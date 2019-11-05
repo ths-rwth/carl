@@ -15,6 +15,7 @@
 #include "../config.h"
 #include "../core/Definiteness.h"
 #include "../core/Relation.h"
+#include "../core/Variables.h"
 #include "../core/VariableInformation.h"
 #include "../core/VariablesInformation.h"
 #include "../interval/Interval.h"
@@ -121,7 +122,7 @@ namespace carl
             /// The factorization of the polynomial considered by this constraint.
             mutable Factors<Pol> mFactorization;
             /// A container which includes all variables occurring in the polynomial considered by this constraint.
-            Variables mVariables;
+            carlVariables mVariables;
             /// A map which stores information about properties of the variables in this constraint.
             mutable VarInfoMap<Pol> mVarInfoMap;
             /// Definiteness of the polynomial in this constraint.
@@ -247,7 +248,7 @@ namespace carl
             uint maxDegree() const
             {
                 uint result = 0;
-                for (const auto& var: mVariables) {
+                for (const auto& var: mVariables.underlyingVariables()) {
                     uint deg = maxDegree(var);
                     if (deg > result) result = deg;
                 }
@@ -261,12 +262,7 @@ namespace carl
              */
             bool hasIntegerValuedVariable() const
             {
-                for( auto var = mVariables.begin(); var != mVariables.end(); ++var )
-                {
-                    if( var->type() == VariableType::VT_INT )
-                        return true;
-                }
-                return false;
+				return !mVariables.integer().empty();
             }
             
             /**
@@ -276,12 +272,7 @@ namespace carl
              */
             bool hasRealValuedVariable() const
             {
-                for( auto var = mVariables.begin(); var != mVariables.end(); ++var )
-                {
-                    if( var->type() == VariableType::VT_REAL )
-                        return true;
-                }
-                return false;
+				return !mVariables.real().empty();
             }
             
             /**
@@ -384,7 +375,7 @@ namespace carl
             /**
              * @return A container containing all variables occurring in the polynomial of this constraint.
              */
-            const Variables& variables() const
+            const auto& variables() const
             {
                 return mpContent->mVariables;
             }
@@ -529,7 +520,7 @@ namespace carl
              */
             bool hasVariable( const Variable& _var ) const
             {
-                return mpContent->mVariables.find( _var ) != mpContent->mVariables.end();
+				return mpContent->mVariables.has(_var);
             }
             
             /**
@@ -537,12 +528,7 @@ namespace carl
              */
             bool integerValued() const
             {
-                for( auto var = mpContent->mVariables.begin(); var != mpContent->mVariables.end(); ++var )
-                {
-                    if( var->type() != VariableType::VT_INT )
-                        return false;
-                }
-                return true;
+				return mpContent->mVariables.size() == mpContent->mVariables.integer().size();
             }
             
             /**
@@ -550,12 +536,7 @@ namespace carl
              */
             bool realValued() const
             {
-                for( auto var = mpContent->mVariables.begin(); var != mpContent->mVariables.end(); ++var )
-                {
-                    if( var->type() != VariableType::VT_REAL )
-                        return false;
-                }
-                return true;
+				return mpContent->mVariables.size() == mpContent->mVariables.real().size();
             }
             
             /**
@@ -583,7 +564,7 @@ namespace carl
              */
             bool isBound(bool negated = false) const
             {
-				if (mpContent->mVariables.size() != 1 || maxDegree(*mpContent->mVariables.begin()) != 1) return false;
+				if (mpContent->mVariables.size() != 1 || maxDegree(mpContent->mVariables.underlyingVariables()[0]) != 1) return false;
 				if (negated) {
 					return mpContent->mRelation != Relation::EQ;
 				} else {
