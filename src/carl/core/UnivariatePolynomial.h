@@ -309,6 +309,7 @@ public:
 	 * @see @cite GCL92, page 38
 	 * @return Total degree.
 	 */
+	[[deprecated("use carl::total_degree(p) instead.")]]
 	uint totalDegree() const {
 		if constexpr (carl::is_number<Coefficient>::value) {
 			return degree();
