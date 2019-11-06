@@ -9,6 +9,7 @@
 #include "../core/Variable.h"
 #include "../core/Variables.h"
 #include "../core/MultivariatePolynomial.h"
+#include "../numbers/conversion/cln_gmp.h"
 #include "../util/Common.h"
 #include "../util/TimingCollector.h"
 
@@ -75,6 +76,25 @@ public:
 		CoCoA::IsRational(r, n);
 		res = convert(r);
 	}
+
+#ifdef USE_CLN_NUMBERS
+	CoCoA::BigInt convert(const cln::cl_I& n) const {
+		return convert(carl::convert<cln::cl_I, mpz_class>(n));
+	}
+	CoCoA::BigRat convert(const cln::cl_RA& n) const {
+		return convert(carl::convert<cln::cl_RA, mpq_class>(n));
+	}
+	void convert(cln::cl_I& res, const CoCoA::RingElem& n) const {
+		CoCoA::BigInt i;
+		CoCoA::IsInteger(i, n);
+		res = carl::convert<mpz_class, cln::cl_I>(convert(i));
+	}
+	void convert(cln::cl_RA& res, const CoCoA::RingElem& n) const {
+		CoCoA::BigRat r;
+		CoCoA::IsRational(r, n);
+		res = carl::convert<mpq_class, cln::cl_RA>(convert(r));
+	}
+#endif
 
 	static std::vector<Variable> collectVariables(const std::vector<Poly>& polys) {
 		std::set<Variable> vars;
