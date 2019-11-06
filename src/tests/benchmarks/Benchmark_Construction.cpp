@@ -135,7 +135,7 @@ namespace carl {
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
 			//return std::get<0>(args).quotient(std::get<1>(args));
 			CMP<Coeff> res;
-			std::get<0>(args).divideBy(std::get<1>(args), res);
+			carl::try_divide(std::get<0>(args), std::get<1>(args), res);
 			return std::forward<const CMP<Coeff>>(res);
 		}
 		#ifdef USE_COCOA
@@ -161,7 +161,7 @@ namespace carl {
 	struct PremExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>,CVAR>& args) {
-			CMP<Coeff> res = std::get<0>(args).prem(std::get<1>(args), std::get<2>(args));
+			CMP<Coeff> res = carl::pseudo_remainder(std::get<0>(args), std::get<1>(args), std::get<2>(args));
 			return std::forward<const CMP<Coeff>>(res);
 		}
         #ifdef USE_GINAC

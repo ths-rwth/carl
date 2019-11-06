@@ -481,6 +481,7 @@ public:
 	 * @return 
 	 */
 	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
+	[[deprecated("Use carl::try_divide() instead.")]]
 	bool divideBy(const MultivariatePolynomial& divisor, MultivariatePolynomial& quotient) const;
 	
 	/**
@@ -498,6 +499,7 @@ public:
 	 * @return 
 	 * @see MultivariatePolynomial::divideBy
 	 */
+	[[deprecated("Use carl::quotient() instead.")]]
 	MultivariatePolynomial quotient(const MultivariatePolynomial& divisor) const;
 	/**
 	 * Calculates the remainder
@@ -505,7 +507,9 @@ public:
 	 * @return 
 	 * @see MultivariatePolynomial::divideBy
 	 */
+	[[deprecated("Use carl::remainder() instead.")]]
 	MultivariatePolynomial remainder(const MultivariatePolynomial& divisor) const;
+	[[deprecated("Use carl::pseudo_remainder() instead.")]]
 	MultivariatePolynomial prem(const MultivariatePolynomial& divisor, Variable::Arg var) const;
 	
 	[[deprecated("Use carl::derivative() instead.")]]
@@ -761,12 +765,6 @@ public:
 	template<typename C, typename O, typename P>
 	bool isZero(const MultivariatePolynomial<C,O,P>& p) {
 		return p.nrTerms() == 0;
-	}
-
-	template<typename C, typename O, typename P>
-	MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q)
-	{
-		return p.quotient(q);
 	}
 
 	template<typename C, typename O, typename P>

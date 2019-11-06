@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Remainder.h"
+
 #include "../UnivariatePolynomial.h"
 #include "../Variable.h"
 
@@ -18,7 +20,7 @@ UnivariatePolynomial<Coeff> gcd_recursive(const UnivariatePolynomial<Coeff>& a, 
 //		if(b.isConstant()) return b;
 //	}
 	else {
-		return gcd_recursive(b, a.remainder(b));
+		return gcd_recursive(b, remainder(a, b));
 	}
 }
 

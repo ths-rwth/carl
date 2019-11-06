@@ -55,14 +55,14 @@ TEST(UnivariatePolynomial, Reduction)
 	{
 		UnivariatePolynomial<Rational> p(x, {(Rational)1, (Rational)1,(Rational)0, (Rational)0,(Rational)1});
 		UnivariatePolynomial<Rational> q(x, {(Rational)1,(Rational)1});
-		auto res = p.remainder(q);
+		auto res = carl::remainder(p, q);
 		ASSERT_EQ(res.degree(), (unsigned)0);
 		ASSERT_EQ(res.lcoeff(), 1);
 	}
 	{
 		UnivariatePolynomial<MultivariatePolynomial<Rational>> p(x, {MultivariatePolynomial<Rational>(1), MultivariatePolynomial<Rational>(1),MultivariatePolynomial<Rational>(0), MultivariatePolynomial<Rational>(0), MultivariatePolynomial<Rational>(1)});
 		UnivariatePolynomial<MultivariatePolynomial<Rational>> q(x, {MultivariatePolynomial<Rational>(1), MultivariatePolynomial<Rational>(1)});
-		auto res = p.remainder(q, MultivariatePolynomial<Rational>(1));
+		auto res = carl::remainder(p, q, MultivariatePolynomial<Rational>(1));
 		ASSERT_EQ(res.degree(), (unsigned)0);
 		ASSERT_EQ(res.lcoeff(), MultivariatePolynomial<Rational>(1));
 	}

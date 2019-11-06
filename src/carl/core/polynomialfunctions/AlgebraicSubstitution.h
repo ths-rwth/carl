@@ -20,6 +20,7 @@
 #include "../UnivariatePolynomial.h"
 #include "../../converter/CoCoAAdaptor.h"
 
+#include "Remainder.h"
 #include "Resultant.h"
 #include "to_univariate_polynomial.h"
 

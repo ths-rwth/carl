@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FieldExtensions.h"
+#include "Quotient.h"
 
 #ifdef USE_COCOA
 
@@ -23,15 +24,15 @@ public:
 			newPoly = mLiftingPoly.substitute(v, red.second);
 		} else {
 			CARL_LOG_DEBUG("carl.lazard", "Obtained reductor " << red.second);
-			newPoly = mLiftingPoly.remainder(red.second);
+			newPoly = carl::remainder(mLiftingPoly, red.second);
 		}
 		while (carl::isZero(newPoly) && divideZeroFactors) {
 			if (red.first) {
-				mLiftingPoly = mLiftingPoly.quotient(v - red.second);
+				mLiftingPoly = carl::quotient(mLiftingPoly, v - red.second);
 				newPoly = mLiftingPoly.substitute(v, red.second);
 			} else {
-				mLiftingPoly = mLiftingPoly.quotient(red.second);
-				newPoly = mLiftingPoly.remainder(red.second);
+				mLiftingPoly = carl::quotient(mLiftingPoly, red.second);
+				newPoly = carl::remainder(mLiftingPoly, red.second);
 			}
 			CARL_LOG_DEBUG("carl.lazard", "Reducing to " << mLiftingPoly);
 		}

@@ -2,7 +2,9 @@
 
 #include "Content.h"
 #include "Derivative.h"
+#include "Division.h"
 #include "PrimitivePart.h"
+#include "Remainder.h"
 #include "to_univariate_polynomial.h"
 
 #include <list>
@@ -96,7 +98,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 	CARL_LOG_TRACE("carl.core.resultant", "subresLcoeff = " << subresLcoeff);
 
 	UnivariatePolynomial<Coeff> tmp = q;
-	q = p.prem(-q);
+	q = pseudo_remainder(p, -q);
 	p = tmp;
 	CARL_LOG_TRACE("carl.core.resultant", "q = p.prem(-q) = " << q);
 	CARL_LOG_TRACE("carl.core.resultant", "p = " << p);
@@ -137,7 +139,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 					CARL_LOG_TRACE("carl.core.resultant", "Part 2: Generic strategy");
 					UnivariatePolynomial<Coeff> reductionCoeff = q.lcoeff().pow(delta - 1) * q;
 					Coeff dividant = subresLcoeff.pow(delta-1);
-					bool res = reductionCoeff.divideBy(dividant, c);
+					bool res = carl::try_divide(reductionCoeff, dividant, c);
 					if (res) {
 						subresultants.push_front(c);
 						assert(!carl::isZero(c));
@@ -170,16 +172,16 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 					while (exponent != 1) {
 						exponent /= 2;
 						CARL_LOG_TRACE("carl.core.resultant", "exponent = " << exponent);
-						bool res = (reductionCoeff*reductionCoeff).divideBy(subresLcoeff, reductionCoeff);
+						bool res = carl::try_divide(reductionCoeff*reductionCoeff, subresLcoeff, reductionCoeff);
 						if (res && deltaReduced >= exponent) {
-							(reductionCoeff*lcoeffQ).divideBy(subresLcoeff, reductionCoeff);
+							carl::try_divide(reductionCoeff*lcoeffQ, subresLcoeff, reductionCoeff);
 							deltaReduced -= exponent;
 						}
 					}
 					CARL_LOG_TRACE("carl.core.resultant", "reductionCoeff = " << reductionCoeff);
 					reductionCoeff *= q;
 					CARL_LOG_TRACE("carl.core.resultant", "reductionCoeff = " << reductionCoeff);
-					bool res = reductionCoeff.divideBy(subresLcoeff, c);
+					bool res = carl::try_divide(reductionCoeff, subresLcoeff, c);
 					if (res) {
 						subresultants.push_front(c);
 						assert(!carl::isZero(c));
@@ -213,8 +215,8 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 				 * the above division was successful (in this case, reducedNewB remains unchanged).
 				 * If it was successful, the resulting term is safely added to the list, yielding an optimized resultant.
 				 */
-				UnivariatePolynomial<Coeff> reducedNewB = p.prem(-q);
-				bool r = reducedNewB.divideBy(subresLcoeff.pow(delta)*p.lcoeff(), q);
+				UnivariatePolynomial<Coeff> reducedNewB = pseudo_remainder(p, -q);
+				bool r = carl::try_divide(reducedNewB, subresLcoeff.pow(delta)*p.lcoeff(), q);
 				assert(r);
 				break;
 			}
@@ -234,7 +236,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 				for (uint d = qDeg + 1; d < pDeg; d++) {
 					Coeff t = h[d-1] * variable;
 					UnivariatePolynomial<Coeff> reducedNewB = carl::to_univariate_polynomial(t, variable).coefficients()[qDeg] * q;
-					bool res = reducedNewB.divideBy(lcoeffQ, reducedNewB);
+					bool res = carl::try_divide(reducedNewB, lcoeffQ, reducedNewB);
 					assert(res || reducedNewB.isConstant());
 					h[d] = Coeff(t - reducedNewB);
 				}
@@ -244,12 +246,12 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 					sum += h[d] * p.coefficients()[d];
 				}
 				UnivariatePolynomial<Coeff> normalizedSum(p.mainVar());
-				bool res = sum.divideBy(p.lcoeff(), normalizedSum);
+				bool res = carl::try_divide(sum, p.lcoeff(), normalizedSum);
 				assert(res || sum.isConstant());
 
 				UnivariatePolynomial<Coeff> t(variable, {0, h.back()});
 				UnivariatePolynomial<Coeff> reducedNewB = ((t + normalizedSum) * lcoeffQ - carl::to_univariate_polynomial(t.coefficients()[qDeg], variable));
-				reducedNewB.divideBy(p.lcoeff(), reducedNewB);
+				carl::try_divide(reducedNewB, p.lcoeff(), reducedNewB);
 				if (delta % 2 == 0) {
 					q = -reducedNewB;
 				} else {
@@ -307,7 +309,7 @@ UnivariatePolynomial<Coeff> discriminant(
 	uint d = p.degree();
 	Coeff sign = ((d*(d-1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);
 	Coeff redCoeff = sign * p.lcoeff();
-	bool result = res.divideBy(redCoeff, res);
+	bool result = carl::try_divide(res, redCoeff, res);
 	assert(result);
 	CARL_LOG_TRACE("carl.core.discriminant", "discriminant(" << p << ") = " << res);
 	return res;
@@ -380,15 +382,15 @@ namespace resultant_debug {
 			std::size_t delta = degA - degB;
 			//std::cout << "1: delta = " << delta << std::endl;
 			if (degA % 2 == 1 && degB % 2 == 1) s = -s;
-			R = A.prem(B, q.mainVar());
+			R = carl::pseudo_remainder(A, B, q.mainVar());
 			A = B;
 			//std::cout << "R = " << R << std::endl;
 			//std::cout << "g = " << g << std::endl;
-			div_res = R.divideBy(g, B);
+			div_res = carl::try_divide(R, g, B);
 			assert(div_res);
 			for (std::size_t i = 0; i < delta; i++) {
 				//std::cout << "i = " << i << std::endl;
-				div_res = B.divideBy(h, B);
+				div_res = carl::try_divide(B, h, B);
 				assert(div_res);
 			}
 			g = A.lcoeff(q.mainVar());
@@ -398,7 +400,7 @@ namespace resultant_debug {
 			//std::cout << "Pow done" << delta << std::endl;
 			if (delta > 1) {
 				for (std::size_t i = 0; i < delta - 1; i++) {
-					div_res = new_h.divideBy(h, new_h);
+					div_res = carl::try_divide(new_h, h, new_h);
 					assert(div_res);
 				}
 			}
@@ -409,7 +411,7 @@ namespace resultant_debug {
 				new_h = carl::pow(new_h, degA);
 				if (degA > 1) {
 					for (std::size_t i = 0; i < degA - 1; i++) {
-						div_res = new_h.divideBy(h, new_h);
+						div_res = carl::try_divide(new_h, h, new_h);
 						assert(div_res);
 					}
 				}

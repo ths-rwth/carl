@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "carl/core/UnivariatePolynomial.h"
+#include "carl/core/polynomialfunctions/Quotient.h"
 #include "carl/core/polynomialfunctions/SPolynomial.h"
 #include "carl/core/polynomialfunctions/to_univariate_polynomial.h"
 #include "carl/core/VariablePool.h"
@@ -63,7 +64,7 @@ TEST(MultivariatePolynomial, remainder)
     MultivariatePolynomial<Rational> py( y );
     MultivariatePolynomial<Rational> p( px - Rational(3) );
     MultivariatePolynomial<Rational> p4( p * p * p * p );
-    EXPECT_TRUE( carl::isZero(p4.remainder( p )) );
+    EXPECT_TRUE( carl::isZero(carl::remainder(p4, p)) );
 }
 
 
@@ -537,7 +538,7 @@ TEST(MultivariatePolynomial, Quotient)
     MultivariatePolynomial<Rational> m1 = x*x - one;
     MultivariatePolynomial<Rational> m2 = x - one;
     MultivariatePolynomial<Rational> res = x + one;
-    EXPECT_EQ(res, m1.quotient(m2));
+    EXPECT_EQ(res, carl::quotient(m1, m2));
 }
 
 TEST(MultivariatePolynomial, Quotient2)
@@ -547,17 +548,17 @@ TEST(MultivariatePolynomial, Quotient2)
     Variable t = carl::VariablePool::getInstance().findVariableWithName("t");
     MultivariatePolynomial<Rational> p1 = sp.parseMultivariatePolynomial<Rational>("t^3*u^6+(-3)*t*u^5+(-1)*u^6+(-3)*t^2*u^6+3*t*u^6+(-1)*t^3*u^5+(-1)*t^3+(-3)*t+3*t^2+(-3)*u+3*t^3*u+9*t*u+(-9)*t^2*u+5*u^2+(-5)*t^3*u^2+(-15)*t*u^2+15*t^2*u^2+3*t^2*u^4+(-3)*t*u^4+(-1)*t^3*u^4+(-4)*u^3+u^4+(-12)*t^2*u^3+12*t*u^3+4*t^3*u^3+u^5+3*t^2*u^5+1");
     MultivariatePolynomial<Rational> p2 = sp.parseMultivariatePolynomial<Rational>("u^2+(-1)*u+1");
-    EXPECT_TRUE( p1.quotient(p2).has(t) );
-    EXPECT_EQ( p1.quotient(p2)*p2, p1 );
+    EXPECT_TRUE( carl::quotient(p1, p2).has(t) );
+    EXPECT_EQ( carl::quotient(p1, p2)*p2, p1 );
     MultivariatePolynomial<Rational> p3 = sp.parseMultivariatePolynomial<Rational>("t^2+(-1)*u+1");
     MultivariatePolynomial<Rational> p4 = p2*p3;
-    EXPECT_EQ( p4.quotient(p2)*p2, p4 );
-    EXPECT_EQ( p4.quotient(p3)*p3, p4 );
+    EXPECT_EQ( carl::quotient(p4, p2)*p2, p4 );
+    EXPECT_EQ( carl::quotient(p4, p3)*p3, p4 );
     MultivariatePolynomial<Rational> p5 = sp.parseMultivariatePolynomial<Rational>("u+1");
     MultivariatePolynomial<Rational> p6 = sp.parseMultivariatePolynomial<Rational>("t+1");
     MultivariatePolynomial<Rational> p7 = p5*p6;
-    EXPECT_EQ( p7, p7.quotient(p5)*p5 );
-    EXPECT_EQ( p7, p7.quotient(p6)*p6 );
+    EXPECT_EQ( p7, carl::quotient(p7, p5)*p5 );
+    EXPECT_EQ( p7, carl::quotient(p7, p6)*p6 );
 }
 
 TYPED_TEST(MultivariatePolynomialTest, MultivariatePolynomialMultiplication)

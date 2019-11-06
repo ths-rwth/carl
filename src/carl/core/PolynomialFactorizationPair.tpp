@@ -504,8 +504,8 @@ namespace carl
                     else
                     {
                         //New common factor
-                        P remainA = polA.quotient( polGCD );
-                        P remainB = polB.quotient( polGCD );
+                        P remainA = carl::quotient(polA, polGCD );
+                        P remainB = carl::quotient(polB, polGCD );
                         carl::exponent exponentCommon = exponentA < exponentB ? exponentA : exponentB;
                         std::shared_ptr<Cache<PolynomialFactorizationPair<P>>> cache = factorA.pCache();
                         //Set new part of GCD

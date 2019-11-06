@@ -487,14 +487,19 @@ public:
 	[[deprecated("Use carl::derivative() instead.")]]
 	UnivariatePolynomial derivative(uint nth = 1) const;
 
+	[[deprecated("Use carl::remainder() instead.")]]
 	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
+	[[deprecated("Use carl::remainder() instead.")]]
 	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor) const;
 	/**
 	 * Calculates the pseudo-remainder.
 	 * @see @cite GCL92, page 55, Pseudo-Division Property
 	 */
+	[[deprecated("Use carl::pseudo_remainder() instead.")]]
 	UnivariatePolynomial prem_old(const UnivariatePolynomial& divisor) const;
+	[[deprecated("Use carl::pseudo_remainder() instead.")]]
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
+	[[deprecated("Use carl::signed_pseudo_remainder() instead.")]]
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
 	/**
@@ -529,6 +534,7 @@ public:
 	 * @return this / divisor.
 	 */
 	template<typename C = Coefficient, EnableIf<is_integer<C>> = dummy>
+	[[deprecated("use carl::divide()")]]
 	DivisionResult<UnivariatePolynomial> divideBy(const UnivariatePolynomial& divisor) const;
 
 	/**
@@ -559,6 +565,7 @@ public:
 	 * @return If remainder was zero.
 	 */
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy, DisableIf<is_number<C>> = dummy>
+	[[deprecated("Use carl::try_divide() instead.")]]
 	bool divideBy(const Coefficient& divisor, UnivariatePolynomial& quotient) const;
 
 	/**

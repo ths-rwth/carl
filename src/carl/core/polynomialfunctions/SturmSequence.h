@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../UnivariatePolynomial.h"
 #include "Derivative.h"
+#include "Remainder.h"
+
+#include "../UnivariatePolynomial.h"
 
 namespace carl {
 
@@ -16,7 +18,7 @@ std::vector<UnivariatePolynomial<Coeff>> sturm_sequence(const UnivariatePolynomi
 	if (isZero(p) || isZero(q)) return seq;
 
 	for (std::size_t k = 2; ; ++k) {
-		auto tmp = - seq[k-2].remainder(seq[k-1]);
+		auto tmp = - remainder(seq[k-2], seq[k-1]);
 		if (isZero(tmp)) return seq;
 		seq.emplace_back(std::move(tmp));
 	}

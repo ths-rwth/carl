@@ -15,6 +15,7 @@
 #include "Sign.h"
 
 #include "polynomialfunctions/Derivative.h"
+#include "polynomialfunctions/Division.h"
 
 #include <algorithm>
 #include <iomanip>

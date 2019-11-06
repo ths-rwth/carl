@@ -2,6 +2,7 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/FactorizedPolynomial.h"
 #include "carl/core/polynomialfunctions/LCM.h"
+#include "carl/core/polynomialfunctions/Quotient.h"
 #include "carl/util/stringparser.h"
 #include "carl/util/platform.h"
 #include "carl/numbers/numbers.h"
@@ -300,8 +301,8 @@ TEST(FactorizedPolynomial, GCD)
     FPol fg2( g2, pCache );
 
     Pol pGCD = Pol(2)*gcd( pA, pB );
-    Pol pRestA = pA.quotient( pGCD );
-    Pol pRestB = pB.quotient( pGCD );
+    Pol pRestA = carl::quotient(pA, pGCD );
+    Pol pRestB = carl::quotient(pB, pGCD );
     FPol fpGCD = gcd( fpA, fpB, fpRestA, fpRestB );
     EXPECT_EQ( pGCD, computePolynomial( fpGCD ) );
     EXPECT_EQ( pRestA, computePolynomial( fpRestA ) );
@@ -360,8 +361,8 @@ TEST(FactorizedPolynomial, Flattening)
     FPol fpRestC;
 
     Pol pGCD = gcd( pA, pB );
-    Pol pRestA = pA.quotient( pGCD );
-    Pol pRestB = pB.quotient( pGCD );
+    Pol pRestA = carl::quotient(pA, pGCD );
+    Pol pRestB = carl::quotient(pB, pGCD );
     FPol fpGCD = gcd( fpA, fpB, fpRestA, fpRestB );
 
     EXPECT_EQ( pGCD, computePolynomial( fpGCD ) );
@@ -369,8 +370,8 @@ TEST(FactorizedPolynomial, Flattening)
     EXPECT_EQ( pRestB, computePolynomial( fpRestB ) );
 
     Pol pGCD2 = gcd( pA, pC );
-    pRestA = pA.quotient( pGCD2 );
-    Pol pRestC = pC.quotient( pGCD2 );
+    pRestA = carl::quotient(pA, pGCD2 );
+    Pol pRestC = carl::quotient(pC, pGCD2 );
     FPol fpGCD2 = gcd( fpA, fpC, fpRestA, fpRestC );
 
     EXPECT_EQ( pGCD2, computePolynomial( fpGCD2 ) );
@@ -477,7 +478,7 @@ TEST(FactorizedPolynomial, Quotient)
     FPol fp3 = fp1 * fp2;
     FPol fp4 = fp3 * fp2;
 
-    Pol pQuot = p4.quotient(p3);
+    Pol pQuot = carl::quotient(p4, p3);
     FPol fpQuot = fp4.quotient(fp3);
     EXPECT_EQ( pQuot, computePolynomial( fpQuot ) );
 }
@@ -501,7 +502,7 @@ TEST(FactorizedPolynomial, Destructor)
 
     auto pfp5 = std::make_unique<FPol>( fp1 * fp1 );
 
-    Pol pQuot = p4.quotient(p3);
+    Pol pQuot = carl::quotient(p4, p3);
     FPol fpQuot = fp4.quotient(fp3);
     EXPECT_EQ( pQuot, computePolynomial( fpQuot ) );
 }
