@@ -66,7 +66,7 @@ inline Relation turn_around(Relation r) {
 			CARL_LOG_ERROR("carl.relation", "Invalid relation " << std::underlying_type_t<Relation>(r));
 			assert(false && "Invalid relation");
 	}
-	return Relation::EQ
+	return Relation::EQ;
 }
 
 inline std::string toString(Relation r) {
