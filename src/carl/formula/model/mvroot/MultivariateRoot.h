@@ -2,6 +2,7 @@
 
 #include "../../../core/logging.h"
 #include "../../../core/polynomialfunctions/RootFinder.h"
+#include "../../../core/polynomialfunctions/Substitution.h"
 #include "../../../core/Variable.h"
 #include "../../../numbers/numbers.h"
 #include "../ran/RealAlgebraicNumber.h"
@@ -75,7 +76,7 @@ public:
 	 * root-variable replaced by the given variable.
 	 */
 	Poly poly(Variable var) const {
-		return mPoly.substitute(sVar, Poly(var));
+		return carl::substitute(mPoly, sVar, Poly(var));
 	}
 
 	/**
@@ -112,7 +113,7 @@ public:
 	 * replaced by the given polynomial.
 	 */
 	void substituteIn(Variable var, const Poly& poly) {
-		mPoly.substituteIn(var, poly);
+		carl::substitute_inplace(mPoly, var, poly);
 	}
 
 	/**

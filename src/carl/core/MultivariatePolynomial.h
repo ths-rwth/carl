@@ -557,18 +557,21 @@ public:
 	 * Replace the given variable by the given polynomial within this multivariate polynomial.
 	 */
 	///@todo find new lterm
+	[[deprecated("use carl::substitute_inplace() instead.")]]
 	void substituteIn(Variable::Arg var, const MultivariatePolynomial& value);
 	
 	/**
 	 * Replace the given variable by the given value.
 	 * @return A new polynomial without resulting from this substitution.
 	 */
+	[[deprecated("use carl::substitute() instead.")]]
 	MultivariatePolynomial substitute(Variable::Arg var, const MultivariatePolynomial& value) const;
 	
 	/**
 	 * Replace all variables by a value given in their map.
 	 * @return A new polynomial without the variables in map.
 	 */
+	[[deprecated("use carl::substitute() instead.")]]
 	MultivariatePolynomial substitute(const std::map<Variable, MultivariatePolynomial>& substitutions) const;
 	
 	/**
@@ -576,6 +579,7 @@ public:
 	 * @return A new polynomial without the variables in map.
 	 */
 	template<typename SubstitutionType = Coeff>
+	[[deprecated("use carl::substitute() instead.")]]
 	MultivariatePolynomial substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
 	
 	/**
@@ -583,6 +587,7 @@ public:
 	 * @param substitutions
 	 * @return 
 	 */
+	[[deprecated("use carl::substitute() instead.")]]
 	MultivariatePolynomial substitute(const std::map<Variable, Term<Coeff>>& substitutions) const;
 	
 	/**

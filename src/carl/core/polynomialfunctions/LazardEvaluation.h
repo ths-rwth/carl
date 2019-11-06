@@ -2,6 +2,7 @@
 
 #include "FieldExtensions.h"
 #include "Quotient.h"
+#include "Substitution.h"
 
 #ifdef USE_COCOA
 
@@ -21,7 +22,7 @@ public:
 		Poly newPoly;
 		if (red.first) {
 			CARL_LOG_DEBUG("carl.lazard", "Substituting " << v << " by " << red.second);
-			newPoly = mLiftingPoly.substitute(v, red.second);
+			newPoly = carl::substitute(mLiftingPoly, v, red.second);
 		} else {
 			CARL_LOG_DEBUG("carl.lazard", "Obtained reductor " << red.second);
 			newPoly = carl::remainder(mLiftingPoly, red.second);
@@ -29,7 +30,7 @@ public:
 		while (carl::isZero(newPoly) && divideZeroFactors) {
 			if (red.first) {
 				mLiftingPoly = carl::quotient(mLiftingPoly, v - red.second);
-				newPoly = mLiftingPoly.substitute(v, red.second);
+				newPoly = carl::substitute(mLiftingPoly, v, red.second);
 			} else {
 				mLiftingPoly = carl::quotient(mLiftingPoly, red.second);
 				newPoly = carl::remainder(mLiftingPoly, red.second);

@@ -508,7 +508,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 						// if RAN converted to a number, plug it in
 						if (is_number(m.at(a.first))) {
 							CARL_LOG_DEBUG("carl.ran",  m.at(a.first) << " (" << a.first << ") simplified to a number, plugging in");
-							p.substituteIn(a.first, Poly(get_number(m.at(a.first))));
+							carl::substitute_inplace(p, a.first, Poly(get_number(m.at(a.first))));
 						}
 						refined = true;
 					}				

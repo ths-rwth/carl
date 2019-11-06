@@ -13,7 +13,7 @@ namespace model {
 	 */
 	template<typename Rational>
 	void substituteIn(MultivariatePolynomial<Rational>& p, Variable var, const Rational& r) {
-		p.substituteIn(var, MultivariatePolynomial<Rational>(r));
+		carl::substitute_inplace(p, var, MultivariatePolynomial<Rational>(r));
 	}
 	template<typename Poly, typename Rational>
 	void substituteIn(UnivariatePolynomial<Poly>& p, Variable var, const Rational& r) {
@@ -38,7 +38,7 @@ namespace model {
 	 */
 	template<typename Rational>
 	void substituteIn(MultivariatePolynomial<Rational>& p, Variable var, const MultivariatePolynomial<Rational>& r) {
-		p.substituteIn(var, r);
+		carl::substitute_inplace(p, var, r);
 	}
 	template<typename Poly, typename Rational>
 	void substituteIn(UnivariatePolynomial<Poly>& p, Variable var, const Poly& r) {

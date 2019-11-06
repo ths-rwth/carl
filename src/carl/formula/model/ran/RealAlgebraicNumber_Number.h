@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../../core/polynomialfunctions/Substitution.h"
+
 namespace carl {
 namespace ran {
 
@@ -55,7 +57,7 @@ template<typename Number>
 NumberContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable, NumberContent<Number>>& m) {
 	MultivariatePolynomial<Number> res = p;
 	for (const auto& e: m) {
-		res.substituteIn(e.first, MultivariatePolynomial<Number>(e.second.value()));
+		carl::substitute_inplace(res, e.first, MultivariatePolynomial<Number>(e.second.value()));
 	}
 	assert(res.isConstant());
 	return res.constantPart();

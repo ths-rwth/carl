@@ -245,7 +245,7 @@ public:
 		if (isConstant())
 			return *this;
 		else {
-			return RationalFunction(nominatorAsPolynomial().substitute(substitutions), denominatorAsPolynomial().substitute(substitutions));
+			return RationalFunction(carl::substitute(nominatorAsPolynomial(), substitutions), carl::substitute(denominatorAsPolynomial(), substitutions));
 		}
 	}
 

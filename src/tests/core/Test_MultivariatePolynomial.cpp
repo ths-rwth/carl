@@ -252,7 +252,7 @@ TEST(MultivariatePolynomial, Substitute)
     Variable v1 = freshRealVariable("v1");
 	{
 		MultivariatePolynomial<Rational> p(v0);
-		p.substituteIn(v0, MultivariatePolynomial<Rational>(-1));
+		carl::substitute_inplace(p, v0, MultivariatePolynomial<Rational>(-1));
 		ASSERT_EQ(p, MultivariatePolynomial<Rational>(-1));
 	}
     MultivariatePolynomial<Rational> mp((Rational)1/(Rational)6 * v0);
@@ -261,9 +261,9 @@ TEST(MultivariatePolynomial, Substitute)
     mp2 += (Rational)4 * v1;
     std::map<Variable, MultivariatePolynomial<Rational>> substitutions;
     substitutions[v0] = MultivariatePolynomial<Rational>((Rational)12);
-    EXPECT_EQ(mp2, mp.substitute(substitutions));
+    EXPECT_EQ(mp2, carl::substitute(mp, substitutions));
     substitutions[v0] = MultivariatePolynomial<Rational>((Rational)0);
-    EXPECT_EQ(MultivariatePolynomial<Rational>((Rational)4 * v1), mp.substitute(substitutions));
+    EXPECT_EQ(MultivariatePolynomial<Rational>((Rational)4 * v1), carl::substitute(mp, substitutions));
     Variable x = freshRealVariable("x");
 
     #ifdef USE_GINAC
@@ -367,30 +367,30 @@ TEST(MultivariatePolynomial, Substitute)
     substitutions5g[yg] = szg;
     substitutions5g[zg] = svyg;
 
-    EXPECT_EQ(f1.substitute(substitutions0), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions0g), vars));
-    EXPECT_EQ(f1.substitute(substitutions1), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions1g), vars));
-    EXPECT_EQ(f1.substitute(substitutions2), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions2g), vars));
-    EXPECT_EQ(f1.substitute(substitutions3), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions3g), vars));
-    EXPECT_EQ(f1.substitute(substitutions4), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions4g), vars));
-    EXPECT_EQ(f1.substitute(substitutions5), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions5g), vars));
+    EXPECT_EQ(carl::substitute(f1, substitutions0), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions0g), vars));
+    EXPECT_EQ(carl::substitute(f1, substitutions1), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions1g), vars));
+    EXPECT_EQ(carl::substitute(f1, substitutions2), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions2g), vars));
+    EXPECT_EQ(carl::substitute(f1, substitutions3), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions3g), vars));
+    EXPECT_EQ(carl::substitute(f1, substitutions4), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions4g), vars));
+    EXPECT_EQ(carl::substitute(f1, substitutions5), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions5g), vars));
 
-    EXPECT_EQ(f2.substitute(substitutions0), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions0g), vars));
-    EXPECT_EQ(f2.substitute(substitutions1), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions1g), vars));
-    EXPECT_EQ(f2.substitute(substitutions2), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions2g), vars));
-    EXPECT_EQ(f2.substitute(substitutions3), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions3g), vars));
-    EXPECT_EQ(f2.substitute(substitutions4), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions4g), vars));
-    EXPECT_EQ(f2.substitute(substitutions5), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions5g), vars));
+    EXPECT_EQ(carl::substitute(f2, substitutions0), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions0g), vars));
+    EXPECT_EQ(carl::substitute(f2, substitutions1), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions1g), vars));
+    EXPECT_EQ(carl::substitute(f2, substitutions2), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions2g), vars));
+    EXPECT_EQ(carl::substitute(f2, substitutions3), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions3g), vars));
+    EXPECT_EQ(carl::substitute(f2, substitutions4), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions4g), vars));
+    EXPECT_EQ(carl::substitute(f2, substitutions5), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions5g), vars));
     #endif
 
     EvaluationMap<Rational> evMapA;
     evMapA[x] = carl::constant_zero<Rational>::get();
     MultivariatePolynomial<Rational> pxA({x});
-    EXPECT_EQ(pxA.substitute(evMapA),carl::constant_zero<Rational>::get());
+    EXPECT_EQ(carl::substitute(pxA, evMapA),carl::constant_zero<Rational>::get());
     
     EvaluationMap<Rational> evMapB;
     evMapB[x] = Rational(-1);
     MultivariatePolynomial<Rational> pxB = pxA + (Rational)1;
-    EXPECT_EQ(pxB.substitute(evMapB),carl::constant_zero<Rational>::get());
+    EXPECT_EQ(carl::substitute(pxB, evMapB),carl::constant_zero<Rational>::get());
 
 	{
 		Variable x = freshRealVariable("x");
@@ -401,10 +401,10 @@ TEST(MultivariatePolynomial, Substitute)
 		std::map<Variable,P> repl;
 		repl.emplace(z, P());
 		std::cout << p << std::endl;
-		P res = p.substitute(repl);
+		P res = carl::substitute(p, repl);
 		std::cout << "-> " << p << std::endl;
 		std::cout << "-> " << res << std::endl;
-		p.substituteIn(z, P());
+		carl::substitute_inplace(p, z, P());
 		std::cout << "-> " << p << std::endl;
 	}
 }

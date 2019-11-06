@@ -11,6 +11,7 @@
 #pragma once
 
 #include "RootFinder.h"
+#include "Substitution.h"
 
 #include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
 #include "../../formula/model/ran/RealAlgebraicNumberIntervalExtra.h"
@@ -54,7 +55,7 @@ std::vector<RealAlgebraicNumber<Number>> realRoots(
 		}
 		assert(varToRANMap.count(v) > 0);
 		if (varToRANMap.at(v).isNumeric()) {
-			polyCopy.substituteIn(v, Coeff(varToRANMap.at(v).value()));
+			substitute_inplace(polyCopy, v, Coeff(varToRANMap.at(v).value()));
 		} else {
 			IRmap.emplace(v, varToRANMap.at(v));
 		}

@@ -13,6 +13,8 @@
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicPoint.h"
 
+#include "../../../core/polynomialfunctions/Substitution.h"
+
 #include "../../../util/SFINAE.h"
 
 namespace carl {
@@ -79,7 +81,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
 		assert(pol.has(variables[i]));
 		if (point[i].isNumeric()) {
 			// Plug in numeric representations
-			pol.substituteIn(variables[i], MultivariatePolynomial<Coeff>(point[i].value()));
+			carl::substitute_inplace(pol, variables[i], MultivariatePolynomial<Coeff>(point[i].value()));
 		} else {
 			// Defer interval representations
 			RANs.emplace(variables[i], point[i]);
@@ -102,7 +104,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, co
 		//assert(pol.has(it->first));
 		if (r.second.isNumeric()) {
 			// Plug in numeric representations
-			pol.substituteIn(r.first, MultivariatePolynomial<Number>(r.second.value()));
+			carl::substitute_inplace(pol, r.first, MultivariatePolynomial<Number>(r.second.value()));
 		} else {
 			// Defer interval representations
 			IRmap.emplace(r.first, r.second);
@@ -138,7 +140,7 @@ bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
 		//assert(pol.has(it->first));
 		if (r.second.isNumeric()) {
 			// Plug in numeric representations
-			pol.substituteIn(r.first, MultivariatePolynomial<Number>(r.second.value()));
+			carl::substitute_inplace(pol, r.first, MultivariatePolynomial<Number>(r.second.value()));
 			CARL_LOG_TRACE("carl.ran", "Substituting " << r.first << " = " << r.second.value());
 		} else {
 			// Defer interval representations

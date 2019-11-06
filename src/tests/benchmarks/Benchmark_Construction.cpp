@@ -6,6 +6,7 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/polynomialfunctions/GCD.h"
 #include "carl/core/polynomialfunctions/Resultant.h"
+#include "carl/core/polynomialfunctions/Substitution.h"
 #include "BenchmarkTest.h"
 #include "framework/BenchmarkGenerator.h"
 
@@ -228,7 +229,7 @@ namespace carl {
 	struct SubstituteExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CVAR,CMP<Coeff>>& args) {
-			return std::forward<const CMP<Coeff>>(std::get<0>(args).substitute(std::get<1>(args), std::get<2>(args)));
+			return std::forward<const CMP<Coeff>>(carl::substitute(std::get<0>(args), std::get<1>(args), std::get<2>(args)));
 		}
         #ifdef USE_GINAC
 		GMP operator()(const std::tuple<GMP,GVAR,GMP>& args) {

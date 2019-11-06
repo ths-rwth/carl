@@ -9,6 +9,7 @@
 #include "UnivariatePolynomial.h"
 
 #include "polynomialfunctions/Division.h"
+#include "polynomialfunctions/Substitution.h"
 
 #pragma once
 
@@ -670,15 +671,15 @@ namespace carl
         }
         if (factorizedTrivially()) {
             // Only has one factor
-            P subResult = polynomial().substitute(substitutions);
+            P subResult = carl::substitute(polynomial(), substitutions);
             if (subResult.isConstant()) {
                 FactorizedPolynomial<P> result(subResult.constantPart() * mCoefficient);
-                assert(computePolynomial(result) == computePolynomial(*this).substitute(substitutions));
+                assert(computePolynomial(result) == carl::substitute(computePolynomial(*this), substitutions));
                 return std::move(result);
             } else {
                 FactorizedPolynomial<P> result(std::move(subResult), mpCache);
                 result *= mCoefficient;
-                assert(computePolynomial(result) == computePolynomial(*this).substitute(substitutions));
+                assert(computePolynomial(result) == carl::substitute(computePolynomial(*this), substitutions));
                 return std::move(result);
             }
         } else {
@@ -697,7 +698,7 @@ namespace carl
                 }
             }
             FactorizedPolynomial<P> result(std::move(resultFactorization), resultCoeff, mpCache);
-            assert(computePolynomial(result) == computePolynomial(*this).substitute(substitutions));
+            assert(computePolynomial(result) == carl::substitute(computePolynomial(*this), substitutions));
             return std::move(result);
         }
     }

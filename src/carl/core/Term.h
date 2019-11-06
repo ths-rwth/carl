@@ -249,7 +249,9 @@ public:
 
 	Definiteness definiteness() const;
 
+	[[deprecated("Use carl::substitute() instead.")]]
 	Term substitute(const std::map<Variable, Coefficient>& substitutions) const;
+	[[deprecated("Use carl::substitute() instead.")]]
 	Term substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
 	Coefficient evaluate(const std::map<Variable, Coefficient>& map) const;
 

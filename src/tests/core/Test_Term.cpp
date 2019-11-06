@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <carl/core/polynomialfunctions/Derivative.h>
+#include <carl/core/polynomialfunctions/Substitution.h>
 #include <carl/core/Monomial.h>
 #include <carl/core/Term.h>
 #include <carl/core/Variable.h>
@@ -84,7 +85,7 @@ TYPED_TEST(TermTest, Substitute)
     t *= v0 * v0 * v1;
     std::map<Variable, Term<TypeParam>> substitutes;
     substitutes.emplace(v1, c4);
-    Term<TypeParam> res = t.substitute(substitutes);
+    Term<TypeParam> res = carl::substitute(t, substitutes);
     EXPECT_EQ(12, res.coeff());
     EXPECT_EQ((unsigned)2, res.tdeg());
 }

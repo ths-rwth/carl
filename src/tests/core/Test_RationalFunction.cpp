@@ -143,7 +143,7 @@ TEST(RationalFunction, Multiplication)
     if( !AutoSimplify )
         rfC.simplify();
     std::cout << rfC << std::endl;
-    EXPECT_TRUE( isZero(computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ).remainder( computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) )) );
+    EXPECT_TRUE( isZero(carl::remainder(computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ), computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) )) );
 }
 
 TEST(RationalFunction, Division)
@@ -393,7 +393,7 @@ TEST(RationalFunction, Substitute)
     EXPECT_EQ(subX, cmp);
    
     Pol poly(Rational(2) * x + x*y + z / Rational(2));
-    Pol polySub = poly.substitute(replacement);
+    Pol polySub = carl::substitute(poly, replacement);
     EXPECT_EQ(polySub, z / Rational(2) + Rational(2) * y + Rational(4));
 }
 

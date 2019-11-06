@@ -342,6 +342,9 @@ public:
 	const std::vector<Coefficient>& coefficients() const {
 		return mCoefficients;
 	}
+	std::vector<Coefficient>& coefficients() {
+		return mCoefficients;
+	}
 
 	/**
 	 * Retrieves the main variable of this polynomial.
@@ -607,11 +610,14 @@ public:
 
 	Coefficient evaluate(const Coefficient& value) const;
 	
+	[[deprecated("Use carl::substitute_inplace() instead.")]]
 	void substituteIn(Variable var, const Coefficient& value);
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	[[deprecated("Use carl::substitute() instead.")]]
 	UnivariatePolynomial substitute(Variable var, const Coefficient& value) const;
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	[[deprecated("Use carl::substitute() instead.")]]
 	UnivariatePolynomial substitute(Variable var, const Coefficient& value) const;
 
 	/**

@@ -9,6 +9,7 @@
 
 #include "SignDetermination/SignDetermination.h"
 #include "ThomRootFinder.h"
+#include "../core/polynomialfunctions/Substitution.h"
 
 // some settings
 #define INITIAL_OFFSET (Number(1)/10)
@@ -456,7 +457,7 @@ public:
 
 	ThomEncoding<Number> operator+(const Number& rhs) const {
 		Polynomial subs = Polynomial(mMainVar) - rhs;
-		Polynomial p = mP.substitute(mMainVar, subs);
+		Polynomial p = carl::substitute(mP, mMainVar, subs);
 		std::list<ThomEncoding<Number>> roots = realRootsThom(p, mMainVar, mPoint);
 		for(const auto& r: roots) {
 			if (relevantSignCondition() == r.mSc) return r;
