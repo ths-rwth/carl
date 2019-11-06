@@ -10,13 +10,21 @@
 
 namespace carl {
 
+using VariableVariant = std::variant<Variable,BVVariable,UVariable>;
+inline Variable underlying_variable(const VariableVariant& var) {
+	return std::visit(overloaded {
+		[](Variable v){ return v; },
+		[](BVVariable v){ return v.variable(); },
+		[](UVariable v){ return v.variable(); },
+	}, var);
+}
+
 class carlVariables {
 public:
 	friend bool operator==(const carlVariables& lhs, const carlVariables& rhs);
 	friend std::ostream& operator<<(std::ostream& os, const carlVariables& vars);
-	using VarTypes = std::variant<Variable,BVVariable,UVariable>;
 private:
-	mutable std::vector<VarTypes> mVariables;
+	mutable std::vector<VariableVariant> mVariables;
 	mutable std::size_t mAddedSinceCompact = 0;
 
 	void compact(bool force = false) const {
@@ -28,7 +36,7 @@ private:
 	}
 public:
 	carlVariables() = default;
-	explicit carlVariables(std::initializer_list<VarTypes> i):
+	explicit carlVariables(std::initializer_list<VariableVariant> i):
 		mVariables(i)
 	{}
 	template<typename Iterator>
@@ -74,12 +82,12 @@ public:
 		);
 	}
 
-	void add(VarTypes v) {
+	void add(VariableVariant v) {
 		mVariables.emplace_back(v);
 		++mAddedSinceCompact;
 		compact();
 	}
-	void add(std::initializer_list<VarTypes> i) {
+	void add(std::initializer_list<VariableVariant> i) {
 		mVariables.insert(end(), i.begin(), i.end());
 		mAddedSinceCompact += i.size();
 		compact();
@@ -97,7 +105,7 @@ public:
 		);
 	}
 
-	void erase(VarTypes v) {
+	void erase(VariableVariant v) {
 		mVariables.erase(std::remove(mVariables.begin(), mVariables.end(), v), mVariables.end());
 	}
 
@@ -111,11 +119,7 @@ public:
 		compact(true);
 		std::vector<Variable> res;
 		std::for_each(begin(), end(), [&res](const auto& var) {
-			std::visit(overloaded {
-				[&res](Variable v){ res.emplace_back(v); },
-				[&res](BVVariable v){ res.emplace_back(v.variable()); },
-				[&res](UVariable v){ res.emplace_back(v.variable()); },
-			}, var);
+			res.emplace_back(underlying_variable(var));
 		});
 		return res;
 	}
@@ -162,7 +166,7 @@ public:
 	}
 };
 
-inline void swap(carlVariables::VarTypes& lhs, carlVariables::VarTypes& rhs) {
+inline void swap(VariableVariant& lhs, VariableVariant& rhs) {
 	auto tmp = lhs;
 	lhs = rhs;
 	rhs = tmp;
