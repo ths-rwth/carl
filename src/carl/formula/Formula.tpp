@@ -665,7 +665,7 @@ namespace carl
         if( multipliedByMinusOne )
         {
             boundValue = constraint.constantPart();
-            relation = carl::turnAroundRelation( relation );
+            relation = carl::turn_around( relation );
             poly = Pol( -lhs + boundValue );
         }
         else

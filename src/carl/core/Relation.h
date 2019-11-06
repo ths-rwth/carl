@@ -33,8 +33,10 @@ inline std::ostream& operator<<(std::ostream& os, const Relation& r) {
 	return os;
 }
 
-inline Relation inverse(Relation r)
-{
+/**
+ * Inverts the given relation symbol.
+ */
+inline Relation inverse(Relation r) {
 	switch (r) {
 		case Relation::EQ:		return Relation::NEQ;
 		case Relation::NEQ:		return Relation::EQ;
@@ -47,6 +49,24 @@ inline Relation inverse(Relation r)
 			assert(false && "Invalid relation");
 	}
 	return Relation::EQ;
+}
+
+/**
+ * Turns around the given relation symbol, in the sense that LESS (LEQ) and GREATER (GEQ) are swapped.
+ */
+inline Relation turn_around(Relation r) {
+	switch (r) {
+		case Relation::EQ:		return Relation::EQ;
+		case Relation::NEQ:		return Relation::NEQ;
+		case Relation::LESS:	return Relation::GREATER;
+		case Relation::LEQ:		return Relation::GEQ;
+		case Relation::GREATER:	return Relation::LESS;
+		case Relation::GEQ:		return Relation::LEQ;
+		default:
+			CARL_LOG_ERROR("carl.relation", "Invalid relation " << std::underlying_type_t<Relation>(r));
+			assert(false && "Invalid relation");
+	}
+	return Relation::EQ
 }
 
 inline std::string toString(Relation r) {

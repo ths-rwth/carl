@@ -72,33 +72,6 @@ namespace carl
     {
         return _poly;
     }
-
-    /**
-     * Turns around the given relation symbol.
-     * @param _rel The relation symbol to invert.
-     * @return The resulting inverted relation symbol.
-     */
-    inline Relation turnAroundRelation( const Relation& _rel )
-    {
-        switch( _rel )
-        {
-            case Relation::EQ:
-                return Relation::EQ;
-            case Relation::NEQ:
-                return Relation::NEQ;
-            case Relation::LEQ:
-                return Relation::GEQ;
-            case Relation::GEQ:
-                return Relation::LEQ;
-            case Relation::LESS:
-                return Relation::GREATER;
-            case Relation::GREATER:
-                return Relation::LESS;
-            default:
-                assert( false );
-                return Relation::EQ;
-        }
-    }
     
     /**
      * Represent a polynomial (in)equality against zero.
