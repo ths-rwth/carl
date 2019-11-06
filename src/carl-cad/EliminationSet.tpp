@@ -310,7 +310,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 			this->erase(p);
 			return {};
 		}
-		UPolynomial* pNewVar = new UPolynomial(p->switchVariable(variable));
+		UPolynomial* pNewVar = new UPolynomial(switch_main_variable(*p, variable));
 		destination.insert(pNewVar, this->getParentsOf(p));
 		if( setting.removeConstants || p->isNumber()) /* remove constant from this level and discard numerics completely */
 			this->erase(p);
@@ -389,7 +389,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		this->erase(p);
 		return {};
 	}
-	const UPolynomial* pNewVar = this->polynomialOwner->take(new UPolynomial(p->switchVariable(variable)));
+	const UPolynomial* pNewVar = this->polynomialOwner->take(new UPolynomial(switch_main_variable(*p, variable)));
 	destination.insert(pNewVar, this->getParentsOf(p), avoidSingle);
 	if( setting.removeConstants ) { /* remove constant from this level */
 		DOT_NODE("elimination", p, "shape=box");
@@ -481,8 +481,8 @@ void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to,
 		assert(p->isConsistent());
 		if(p->isConstant()) {
 			if (!p->isNumber()) { // discard numerics completely
-				DOT_EDGE("elimination", p, p->switchVariable(variable), "label=\"constant\"");
-				to.insert(p->switchVariable(variable), this->getParentsOf(p));
+				DOT_EDGE("elimination", p, switch_main_variable(*p, variable), "label=\"constant\"");
+				to.insert(switch_main_variable(*p, variable), this->getParentsOf(p));
 			} else {
 				DOT_NODE("elimination", p, "shape=box");
 				DOT_EDGE("elimination", p, p, "label=\"number\"");

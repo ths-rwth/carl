@@ -52,13 +52,13 @@ namespace cad {
 		template<typename Inserter>
 		void Brown(const Poly& p, const Poly& q, Variable::Arg variable, Inserter& i) const {
 			CARL_LOG_DEBUG("carl.cad.projection", "resultant(" << p << ", " << q << ")");
-			i.insert(carl::resultant(*p, *q).switchVariable(variable), {p, q}, false);
+			i.insert(switch_main_variable(carl::resultant(*p, *q), variable), {p, q}, false);
 		}
 		template<typename Inserter>
 		void Brown(const Poly& p, Variable::Arg variable, Inserter& i) const {
 			// Insert discriminant
 			CARL_LOG_DEBUG("carl.cad.projection", "discriminant(" << p << ")");
-			i.insert(carl::discriminant(*p).switchVariable(variable), {p}, false);
+			i.insert(switch_main_variable(carl::discriminant(*p), variable), {p}, false);
 			if (doesNotVanish(p->lcoeff())) {
 				CARL_LOG_DEBUG("carl.cad.projection", "lcoeff = " << p->lcoeff() << " does not vanish. No further polynomials needed.");
 				return;
@@ -80,13 +80,13 @@ namespace cad {
         template<typename Inserter>
         void McCallum(const Poly& p, const Poly& q, Variable::Arg variable, Inserter& i) const {
 			CARL_LOG_DEBUG("carl.cad.projection", "resultant(" << p << ", " << q << ")");
-            i.insert(carl::resultant(*p, *q).switchVariable(variable), {p, q}, false);
+            i.insert(switch_main_variable(carl::resultant(*p, *q), variable), {p, q}, false);
         }
         template<typename Inserter>
         void McCallum(const Poly& p, Variable::Arg variable, Inserter& i) const {
             // Insert discriminant
 			CARL_LOG_DEBUG("carl.cad.projection", "discriminant(" << p << ")");
-            i.insert(carl::discriminant(*p).switchVariable(variable), {p}, false);
+            i.insert(switch_main_variable(carl::discriminant(*p), variable), {p}, false);
             for (const auto& coeff: p->coefficients()) {
 				if (coeff.isConstant()) continue;
 				CARL_LOG_DEBUG("carl.cad.projection", "\t-> " << coeff);

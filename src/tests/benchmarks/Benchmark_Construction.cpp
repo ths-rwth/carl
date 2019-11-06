@@ -65,8 +65,8 @@ namespace carl {
 		ResultantGenerator(const BenchmarkInformation& bi): BaseGenerator(bi) {}
 		type operator()() const {
 			auto v = g.randomVariable();
-			auto p1 = g.newMP<C>().toUnivariatePolynomial(v);
-			auto p2 = g.newMP<C>().toUnivariatePolynomial(v);
+			auto p1 = carl::to_univariate_polynomial(g.newMP<C>(), v);
+			auto p2 = carl::to_univariate_polynomial(g.newMP<C>(), v);
 			return std::make_tuple(p1, p2);
 		}
 	};

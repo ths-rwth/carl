@@ -2,6 +2,8 @@
 
 #include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
 
+#include "Representation.h"
+
 #ifdef USE_COCOA
 
 #include <CoCoA/library.H>
@@ -141,7 +143,7 @@ public:
 			return std::make_pair(true, Poly(r.value()));
 		}
 		detail_field_extensions::CoCoAConverter::ConversionInfo ci = buildPolyRing(v);
-		CoCoA::RingElem p = cc.convertUV(r.getIRPolynomial().replaceVariable(v), ci);
+		CoCoA::RingElem p = cc.convertUV(replace_main_variable(r.getIRPolynomial(), v), ci);
 		CARL_LOG_DEBUG("carl.lazard", "Factorization of " << p << " on " << ci.mRing);
 		auto factorization = CoCoA::factor(p);
 		CARL_LOG_DEBUG("carl.lazard", "-> " << factorization);

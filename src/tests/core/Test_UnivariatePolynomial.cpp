@@ -6,6 +6,7 @@
 #include "carl/core/polynomialfunctions/Resultant.h"
 #include "carl/core/polynomialfunctions/Factorization_univariate.h"
 #include "carl/core/polynomialfunctions/Derivative.h"
+#include "carl/core/polynomialfunctions/Representation.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 
@@ -335,7 +336,7 @@ TYPED_TEST(UnivariatePolynomialIntTest, switchVariable)
 	UnivariatePolynomial<TypeParam> p(x, {1,2,3});
 	MultivariatePolynomial<TypeParam> mp = TypeParam(3)*x*x + TypeParam(2)*x + TypeParam(1);
 	UnivariatePolynomial<MultivariatePolynomial<TypeParam>> res(y, {mp});
-	auto q = p.switchVariable(y);
+	auto q = carl::switch_main_variable(p, y);
 	EXPECT_EQ(q, res);
 }
 

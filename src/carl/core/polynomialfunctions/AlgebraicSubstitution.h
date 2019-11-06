@@ -95,12 +95,12 @@ UnivariatePolynomial<Number> algebraic_substitution_resultant(
 		if (!cur.has(poly.mainVar())) {
 			continue;
 		}
-		cur = cur.switchVariable(poly.mainVar()).prem(poly);
+		cur = pseudo_remainder(switch_main_variable(cur, poly.mainVar()), poly);
 		CARL_LOG_DEBUG("carl.algsubs", "Computing resultant of " << cur << " and " << poly);
 		cur = carl::resultant(cur, poly);
 		CARL_LOG_DEBUG("carl.algsubs", "-> " << cur);
 	}
-	UnivariatePolynomial<Number> result = cur.switchVariable(v).toNumberCoefficients();
+	UnivariatePolynomial<Number> result = switch_main_variable(cur, v).toNumberCoefficients();
 	CARL_LOG_DEBUG("carl.algsubs", "Result: " << result);
 	return result;
 }

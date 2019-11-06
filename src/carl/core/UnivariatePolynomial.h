@@ -356,6 +356,7 @@ public:
 	 * @param newVar New main variable.
 	 * @return Restructured polynomial.
 	 */
+	[[deprecated("Use carl::switch_main_variable() instead.")]]
 	UnivariatePolynomial<MultivariatePolynomial<NumberType>> switchVariable(Variable newVar) const {
 		assert(isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
@@ -366,6 +367,7 @@ public:
 	 * @param newVar New main variable.
 	 * @return New polynomial.
 	 */
+	[[deprecated("Use carl::replace_main_variable() instead.")]]
 	UnivariatePolynomial replaceVariable(Variable newVar) const {
 		if constexpr (carl::is_number<Coefficient>::value) {
 			return UnivariatePolynomial<Coefficient>(newVar, mCoefficients);

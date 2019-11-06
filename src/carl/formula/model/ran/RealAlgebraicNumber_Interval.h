@@ -5,6 +5,7 @@
 #include "../../../core/polynomialfunctions/RootCounting.h"
 #include "../../../core/polynomialfunctions/SquareFreePart.h"
 #include "../../../core/polynomialfunctions/SturmSequence.h"
+#include "../../../core/polynomialfunctions/Representation.h"
 #include "../../../core/polynomialfunctions/RootBounds.h"
 #include "../../../core/polynomialfunctions/AlgebraicSubstitution.h"
 #include "../../../core/polynomialfunctions/to_univariate_polynomial.h"
@@ -49,7 +50,7 @@ namespace ran {
 		mutable std::shared_ptr<Content> mContent;
 
 		static Polynomial replaceVariable(const Polynomial& p) {
-			return p.replaceVariable(auxVariable);
+			return carl::replace_main_variable(p, auxVariable);
 		}
 	public:
 
@@ -405,7 +406,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	// compute the result polynomial
 	std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
 	for (const auto& cur: m) {
-		algebraic_information.emplace_back(cur.second.polynomial().replaceVariable(cur.first).template convert<MultivariatePolynomial<Number>>());
+		algebraic_information.emplace_back(replace_main_variable(cur.second.polynomial(), cur.first).template convert<MultivariatePolynomial<Number>>());
 	}
 	UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 	// Note that res cannot be zero as v is a fresh variable in v-p.
@@ -545,7 +546,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		// compute the result polynomial
 		std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
 		for (const auto& cur: m) {
-			algebraic_information.emplace_back(cur.second.polynomial().replaceVariable(cur.first).template convert<MultivariatePolynomial<Number>>());
+			algebraic_information.emplace_back(replace_main_variable(cur.second.polynomial(), cur.first).template convert<MultivariatePolynomial<Number>>());
 		}
 		UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 		// Note that res cannot be zero as v is a fresh variable in v-p.

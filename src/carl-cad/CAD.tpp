@@ -15,6 +15,7 @@
 #include <carl/core/logging.h>
 #include <carl/interval/IntervalEvaluation.h>
 #include <carl/formula/model/ran/RealAlgebraicNumberSettings.h>
+#include <carl/core/polynomialfunctions/Representation.h>
 #include <carl/core/polynomialfunctions/RootFinder.h>
 #include <carl/thom/ThomRootFinder.h>
 #include <carl/core/polynomialfunctions/SquareFreePart.h>
@@ -243,7 +244,7 @@ bool CAD<Number>::prepareElimination() {
 	for (const auto& p: polynomials.getScheduled()) {
 		auto tmp = p;
 		if (p->mainVar() != mVariables.front()) {
-			tmp = new UPolynomial(p->switchVariable(mVariables.front()));
+			tmp = new UPolynomial(switch_main_variable(*p, mVariables.front()));
 			this->polynomials.take(tmp);
 		}
 		this->polynomials.addPolynomial(tmp);
@@ -569,7 +570,7 @@ cad::Answer CAD<Number>::check(
 				if (p->mainVar() == mVariables.front()) {
 					this->eliminationSets.front().insert(p);
 				} else {
-					this->eliminationSets.front().insert(this->polynomials.take(new UPolynomial(p->switchVariable(mVariables.front()))));
+					this->eliminationSets.front().insert(this->polynomials.take(new UPolynomial(switch_main_variable(*p, mVariables.front()))));
 				}
 			}
 		} else {

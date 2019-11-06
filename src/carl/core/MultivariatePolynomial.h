@@ -147,6 +147,9 @@ public:
 	bool isOrdered() const {
 		return mOrdered;
 	}
+	void reset_ordered() const {
+		mOrdered = false;
+	}
 	/**
 	 * Ensure that the terms are ordered.
      */
