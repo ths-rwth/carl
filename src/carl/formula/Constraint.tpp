@@ -322,7 +322,7 @@ namespace carl
 //        for( auto iter = _assignment.begin(); iter != _assignment.end(); ++iter )
 //            std::cout << iter->first << " in " << iter->second << std::endl;
         unsigned result = 2;
-        Pol tmp = mpContent->mLhs.substitute( _assignment );
+        Pol tmp = carl::substitute(mpContent->mLhs, _assignment);
         if( tmp.isConstant() )
         {
             result = carl::evaluate( (isZero(tmp) ? typename Pol::NumberType( 0 ) : tmp.trailingTerm().coeff()), relation() ) ? 1 : 0;

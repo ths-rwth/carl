@@ -214,7 +214,7 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 	for (const auto& term: p) {
 		tam.template addTerm<false>(id, substitute(term, substitutions));
 	}
-	tam.readTerms(id, result.mTerms);
+	tam.readTerms(id, result.getTerms());
 	result.reset_ordered();
 	result.template makeMinimallyOrdered<false, true>();
 	assert(result.isConsistent());

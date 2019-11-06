@@ -12,6 +12,7 @@
 #ifdef USE_GINAC
 
 #include "../core/VariablePool.h"
+#include "../core/Variables.h"
 #include "../numbers/numbers.h"
 #include "../util/Common.h"
 #include "../util/SFINAE.h"
@@ -108,9 +109,7 @@ namespace carl
         void gatherVariables(const Poly& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap)
         {
             std::lock_guard<std::recursive_mutex> lock( mMutex );
-            std::set<Variable> carlVars;
-            poly.gatherVariables(carlVars);
-			for (auto var: carlVars) {
+			for (auto var: carl::variables(poly).underlyingVariables()) {
                 GiNaC::symbol vg(var.name());
                 if( carlToGinacVarMap.emplace(var, vg).second )
                 {

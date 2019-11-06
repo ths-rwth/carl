@@ -608,7 +608,7 @@ namespace carl
             }
             case FormulaType::CONSTRAINT:
             {
-                Pol lhsSubstituted = constraint().lhs().substitute( _arithmeticSubstitutions );
+                Pol lhsSubstituted = carl::substitute(constraint().lhs(), _arithmeticSubstitutions);
                 return Formula<Pol>( lhsSubstituted, constraint().relation() );
             }
             case FormulaType::NOT:
