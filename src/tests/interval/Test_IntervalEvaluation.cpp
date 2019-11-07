@@ -34,7 +34,7 @@ TEST(IntervalEvaluation, Monomial)
     MultivariatePolynomial<Rational> e6({(Rational)12*a,(Rational)3*b, (Rational)1*c*c,(Rational)-1*d*d*d});
 //    MultivariatePolynomial<Rational> e7({(Rational)1*a,(Rational)1*b*, Monomial(c,2),(Rational)-1*Monomial(d,3)});
     MultivariatePolynomial<Rational> e7({a,c});
-    e7 = e7.pow(2)*b*d+a;
+    e7 = carl::pow(e7, 2)*b*d+a;
 
 //    e7     = a + b * pow( c + a, 2 ) * d;
 

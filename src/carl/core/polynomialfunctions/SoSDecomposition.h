@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Power.h"
+
 #include "../MultivariatePolynomial.h"
 
 namespace carl {
 
 template<typename C, typename O, typename P>
-std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> SoSDecomposition(const MultivariatePolynomial<C,O,P>& p, bool not_trivial = false) {
+std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> sos_decomposition(const MultivariatePolynomial<C,O,P>& p, bool not_trivial = false) {
 	std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> result;
 	if (carl::isNegative(p.lcoeff())) {
 		return result;
@@ -60,7 +62,7 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> SoSDecomposition(const M
 		if (coeffIter != varInfos.coeffs().end()) {
 			MultivariatePolynomial<C,O,P> qr = coeffIter->second/(C(2)*lcoeffIter->second.constantPart());
 			result.emplace_back(lcoeffIter->second.constantPart(), MultivariatePolynomial<C,O,P>(var)+qr);
-			rem -= qr.pow(2)*lcoeffIter->second.constantPart();
+			rem -= carl::pow(qr, 2)*lcoeffIter->second.constantPart();
 		} else {
 			result.emplace_back(lcoeffIter->second.constantPart(), MultivariatePolynomial<C,O,P>(var));
 		}

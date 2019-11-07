@@ -21,7 +21,7 @@
 #include "../numbers/numbers.h"
 #include "../util/TermAdditionManager.h"
 #include "polynomialfunctions/SPolynomial.h"
-#include "polynomialfunctions/SoSDecomposition.h"
+//#include "polynomialfunctions/SoSDecomposition.h"
 
 
 namespace carl
@@ -295,16 +295,16 @@ public:
 	 * Retrieves information about the definiteness of the polynomial.
 	 * @return Definiteness of this.
 	 */
-	Definiteness definiteness( bool _fullEffort = true ) const;
+	//Definiteness definiteness( bool _fullEffort = true ) const;
     
     /**
      * @param _notTrivial If this flag is true, this polynomial is not yet in form of a sos (the method than avoids checking this).
      * @return The sum-of-squares (sos) decomposition ((q1,p1), .., (qn,pn)) with this = q1*p1^2+..+qn*pn^2, qi being positive rational numbers and pi being polynomials.
      *          If the result is empty, no sos could be found (which does not mean, that there exists no one).
      */
-    auto sosDecomposition(bool not_trivial = false) const {
-		return carl::SoSDecomposition(*this, not_trivial);
-	}
+    //auto sosDecomposition(bool not_trivial = false) const {
+	//	return carl::SoSDecomposition(*this, not_trivial);
+	//}
 
 	/**
 	 * Calculate the number of terms.
@@ -611,8 +611,9 @@ public:
 
 	void square();
 
+	[[deprecated("use carl::pow() instead.")]]
 	MultivariatePolynomial pow(std::size_t exp) const;
-	
+	[[deprecated("use carl::pow_naive() instead.")]]
 	MultivariatePolynomial naive_pow(unsigned exp) const;
 	
 	MultivariatePolynomial<typename IntegralType<Coeff>::type, Ordering, Policies> toIntegerDomain() const;
@@ -772,11 +773,11 @@ public:
 		return p.nrTerms() == 0;
 	}
 
-	template<typename C, typename O, typename P>
-	MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, std::size_t exp)
-	{
-		return p.pow(exp);
-	}
+	//template<typename C, typename O, typename P>
+	//MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, std::size_t exp)
+	//{
+	//	return p.pow(exp);
+	//}
 
     /// @name Division operators
 	/// @{

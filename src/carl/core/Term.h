@@ -269,7 +269,7 @@ public:
 	void gatherVariables(carlVariables& variables) const {
 		if (mMonomial) mMonomial->gatherVariables(variables);
 	}
-
+	[[deprecated("Use carl::pow() instead.")]]
 	Term pow(uint exp) const {
 		if (mMonomial) {
 			return Term(carl::pow(coeff(), exp), mMonomial->pow(exp));

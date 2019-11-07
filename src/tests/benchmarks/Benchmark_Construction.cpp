@@ -204,7 +204,7 @@ namespace carl {
 	struct PowerExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,unsigned>& args) {
-			return std::forward<const CMP<Coeff>>(std::get<0>(args).pow(std::get<1>(args)));
+			return std::forward<const CMP<Coeff>>(carl::pow(std::get<0>(args), std::get<1>(args)));
 		}
         #ifdef USE_COCOA
 		CoMP operator()(const std::tuple<CoMP,unsigned>& args) {

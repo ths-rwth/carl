@@ -30,8 +30,8 @@ TEST(Formula, Construction)
     // Next we see an example how to create polynomials, which form the left-hand sides of the constraints:
     Pol px( x );
     Pol py( y );
-    Pol lhsA = px.pow(2) - py;
-    Pol lhsB = Rational(4) * px + py - Rational(8) * py.pow(7);
+    Pol lhsA = carl::pow(px, 2) - py;
+    Pol lhsB = Rational(4) * px + py - Rational(8) * carl::pow(py, 7);
     Pol lhsD = px*py;
     Pol pi1( i1 );
     Pol pi2( i2 );

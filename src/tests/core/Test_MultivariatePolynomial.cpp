@@ -686,13 +686,13 @@ TEST(MultivariatePolynomialTest, Definiteness)
     Variable y = freshRealVariable("y");
     Variable z = freshRealVariable("z");
     MultivariatePolynomial<Rational> p1({(Rational)6*x*x, (Rational)49*y*y, (Rational)51*z*z, (Rational)-82*y*z, (Rational)20*x*z, (Rational)-4*x*y});
-    EXPECT_TRUE(p1.definiteness() == Definiteness::POSITIVE_SEMI);
+    EXPECT_TRUE(carl::definiteness(p1) == Definiteness::POSITIVE_SEMI);
     MultivariatePolynomial<Rational> p2 = p1 + Rational(1);
-    EXPECT_TRUE(p2.definiteness() == Definiteness::POSITIVE);
+    EXPECT_TRUE(carl::definiteness(p2) == Definiteness::POSITIVE);
     MultivariatePolynomial<Rational> p3 = -p1 - Rational(1);
-    EXPECT_TRUE(p3.definiteness() == Definiteness::NEGATIVE);
+    EXPECT_TRUE(carl::definiteness(p3) == Definiteness::NEGATIVE);
     MultivariatePolynomial<Rational> p4 = -p1;
-    EXPECT_TRUE(p4.definiteness() == Definiteness::NEGATIVE_SEMI);
+    EXPECT_TRUE(carl::definiteness(p4) == Definiteness::NEGATIVE_SEMI);
     MultivariatePolynomial<Rational> p5({(Rational)30156*w*w,
                                          (Rational)-79766*w*x,
                                          (Rational)62266*w*y,
@@ -703,5 +703,5 @@ TEST(MultivariatePolynomialTest, Definiteness)
                                          (Rational)33867*y*y,
                                          (Rational)55312*y*z,
                                          (Rational)100000*z*z});
-    EXPECT_TRUE(p5.definiteness() == Definiteness::POSITIVE_SEMI);
+    EXPECT_TRUE(carl::definiteness(p5) == Definiteness::POSITIVE_SEMI);
 }

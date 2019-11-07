@@ -43,7 +43,7 @@ namespace cad {
         bool doesNotVanish(const PolyCoeff& p) const {
             if (carl::isZero(p)) return false;
             if (p.isConstant()) return true;
-            auto def = p.definiteness();
+            auto def = carl::definiteness(p);
             if (def == Definiteness::POSITIVE) return true;
             if (def == Definiteness::NEGATIVE) return true;
             return false;

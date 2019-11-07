@@ -424,8 +424,8 @@ TEST(UnivariatePolynomial, resultant3)
 	MultivariatePolynomial<Rational> mt(t);
 	MultivariatePolynomial<Rational> one((Rational)1);
 
-	UnivariatePolynomial<MultivariatePolynomial<Rational>> p(a, {mt.pow(10) + mt.pow(8), mt.pow(8) + mt.pow(6), mt.pow(4)});
-	UnivariatePolynomial<MultivariatePolynomial<Rational>> q(a, {mt.pow(4), mt.pow(2), mt.pow(2), one});
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> p(a, {carl::pow(mt, 10) + carl::pow(mt, 8), carl::pow(mt, 8) + carl::pow(mt, 6), carl::pow(mt, 4)});
+	UnivariatePolynomial<MultivariatePolynomial<Rational>> q(a, {carl::pow(mt, 4), carl::pow(mt, 2), carl::pow(mt, 2), one});
 	//UnivariatePolynomial<MultivariatePolynomial<Rational>> r(b, MultivariatePolynomial<Rational>(Term<Rational>(t)*t*t*t));
 
 	std::cout << "resultant[" << p << ", " << q << "] =\n\t" << carl::resultant(p, q) << std::endl;

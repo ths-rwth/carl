@@ -38,7 +38,7 @@ namespace carl
                             assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
                             auto iter = vars.find(subterm);
                             assert(iter != vars.end());
-                            carlSummand *= createPolynomial(iter->second).pow(exp);
+                            carlSummand *= carl::pow(createPolynomial(iter->second), exp);
                         }
                         else assert(false);
                     }
@@ -64,7 +64,7 @@ namespace carl
                     assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
                     auto iter = vars.find(subterm);
                     assert(iter != vars.end());
-                    result += createPolynomial(iter->second).pow(exp);
+                    result += carl::pow(createPolynomial(iter->second), exp);
                 }
                 else assert(false);
             }
@@ -95,7 +95,7 @@ namespace carl
                     assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
                     auto iter = vars.find(subterm);
                     assert(iter != vars.end());
-                    result *= createPolynomial(iter->second).pow(exp);
+                    result *= carl::pow(createPolynomial(iter->second), exp);
                 }
                 else assert( false );
             }
@@ -120,7 +120,7 @@ namespace carl
             assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
             auto iter = vars.find(subterm);
             assert(iter != vars.end());
-            result = createPolynomial(iter->second).pow(exp);
+            result = carl::pow(createPolynomial(iter->second), exp);
         }
         else assert( false );
         return result;

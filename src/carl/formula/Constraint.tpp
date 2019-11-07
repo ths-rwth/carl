@@ -12,6 +12,7 @@
 #include "../converter/OldGinacConverter.h"
 #endif
 #include "ConstraintPool.h"
+#include "../core/polynomialfunctions/Definiteness.h"
 #include "../core/polynomialfunctions/Factorization.h"
 
 
@@ -65,7 +66,7 @@ namespace carl
                 mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
             }
         }
-        mLhsDefinitess = mLhs.definiteness( FULL_EFFORT_FOR_DEFINITENESS_CHECK );
+        mLhsDefinitess = carl::definiteness(mLhs, FULL_EFFORT_FOR_DEFINITENESS_CHECK );
 		CARL_LOG_DEBUG("carl.formula.constraint", "definiteness: " << mLhsDefinitess);
     }
 

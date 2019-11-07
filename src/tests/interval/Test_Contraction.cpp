@@ -37,7 +37,7 @@ TEST(Contraction, SimpleNewton)
     MultivariatePolynomial<Rational> e5({(Rational)1*a,(Rational)1*b,Term<Rational>(7)});
     MultivariatePolynomial<Rational> e6({(Rational)12*a,(Rational)3*b, (Rational)1*c*c,(Rational)-1*d*d*d});
     MultivariatePolynomial<Rational> e7({a,c});
-    e7 = e7.pow(2)*b*d+a;
+    e7 = carl::pow(e7, 2)*b*d+a;
 
     Interval<double> resultA, resultB, overapprox;
     PolynomialContraction<SimpleNewton> e1_contractor(e1);

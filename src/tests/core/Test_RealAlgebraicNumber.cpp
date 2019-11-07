@@ -19,7 +19,7 @@ TEST(RealAlgebraicNumber, Evaluation)
 	MultivariatePolynomial<Rational> mpx(x);
 	MultivariatePolynomial<Rational> mpy(y);
 
-	MultivariatePolynomial<Rational> lin(Rational(-72)*mpx.pow(6) + Rational(3024)*mpx.pow(4) + Rational(-60480)*mpx.pow(2));
+	MultivariatePolynomial<Rational> lin(Rational(-72)*carl::pow(mpx, 6) + Rational(3024)*carl::pow(mpx, 4) + Rational(-60480)*carl::pow(mpx, 2));
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> p(y, {
 		MultivariatePolynomial<Rational>(0),
 		lin,

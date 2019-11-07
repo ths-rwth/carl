@@ -96,7 +96,7 @@ namespace carl
         Poly cpDenominator = mDenominator * ccDenominator;
         gcdA = carl::gcd( cpGcdA, cpDenominator )*carl::gcd(ccGcdA,ccDenominator);
         // Make sure that the polynomial to divide by cannot be negative, otherwise the sign of the square root expression could change.
-        if( !(gcdA == constant_one<Poly>::get()) && gcdA.definiteness() == carl::Definiteness::POSITIVE_SEMI )
+        if( !(gcdA == constant_one<Poly>::get()) && carl::definiteness(gcdA) == carl::Definiteness::POSITIVE_SEMI )
         {
             if( !isZero(mConstantPart) )
             {

@@ -452,6 +452,7 @@ namespace carl
 		 * @param exp Exponent.
 		 * @return this to the power of exp.
 		 */
+		[[deprecated("Use carl::pow() instead.")]]
 		Monomial::Arg pow(uint exp) const;
 		
 		/**
@@ -759,9 +760,6 @@ namespace carl
 	}
 	
 	Monomial::Arg pow(Variable v, std::size_t exp);
-	inline Monomial::Arg pow(const Monomial::Arg& m, std::size_t exp) {
-		return m->pow(exp);
-	}
 
 	/// Add the variables of the given monomial to the variables.
 	inline void variables(const Monomial& m, carlVariables& vars) {

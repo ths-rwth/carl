@@ -313,7 +313,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const {
 	}
 }
 
-template<typename Coeff, typename Ordering, typename Policies>
+/*template<typename Coeff, typename Ordering, typename Policies>
 Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness( bool _fullEffort ) const
 {
 	// Todo: handle constant polynomials
@@ -371,7 +371,7 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness( bool
         return Definiteness::NON;
     }
 	return result;
-}
+}*/
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::tail(bool makeFullyOrdered) const

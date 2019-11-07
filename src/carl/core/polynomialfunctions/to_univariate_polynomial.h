@@ -36,7 +36,7 @@ UnivariatePolynomial<MultivariatePolynomial<C,O,P>> to_univariate_polynomial(con
 		}
 	}
 	// Convert result back to MultivariatePolynomial and check that the result is equal to p
-	assert(MultivariatePolynomial<C>(UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs)) == p);
+	assert(MultivariatePolynomial<C>(UnivariatePolynomial<MultivariatePolynomial<C>>(v, coeffs)) == p);
 	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs);
 }
 

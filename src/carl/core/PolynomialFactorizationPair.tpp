@@ -12,6 +12,7 @@
 #include "Definiteness.h"
 #include "FactorizedPolynomial.h"
 #include "logging.h"
+#include "polynomialfunctions/Definiteness.h"
 #include "polynomialfunctions/GCD.h"
 
 namespace carl
@@ -96,7 +97,7 @@ namespace carl
             {
                 // No factorization -> set polynomial
                 assert( existsFactorization( mFactorization.begin()->first ) );
-                mpPolynomial = new P( mFactorization.begin()->first.content().mpPolynomial->pow( mFactorization.begin()->second ) );
+                mpPolynomial = new P( carl::pow(*mFactorization.begin()->first.content().mpPolynomial, mFactorization.begin()->second ) );
                 assert( mpPolynomial != nullptr );
             }
         }
@@ -263,7 +264,7 @@ namespace carl
         P result( 1 );
         for (auto ft = _factorization.begin(); ft != _factorization.end(); ft++ )
         {
-            result *= computePolynomial( ft->first ).pow( ft->second );
+            result *= carl::pow(computePolynomial( ft->first ), ft->second );
         }
         return result;
     }
@@ -334,7 +335,7 @@ namespace carl
             mIrreducible = 1;
             return true;
         }
-        Definiteness definiteness =  mpPolynomial->definiteness();
+        Definiteness definiteness = carl::definiteness(*mpPolynomial);
         if ( definiteness == Definiteness::POSITIVE || definiteness == Definiteness::NEGATIVE )
         {
             mIrreducible = 1;

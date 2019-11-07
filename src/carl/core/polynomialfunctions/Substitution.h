@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Degree.h"
+#include "Power.h"
 
 #include "../Monomial.h"
 
@@ -126,13 +127,13 @@ void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const Mu
 		// Next var^e
 		auto expResultB = expResultA;
 		// Calculate first one
-		expResultB->second.first = value.pow(expResultB->first);
+		expResultB->second.first = carl::pow(value, expResultB->first);
 		expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
 		++expResultB;
 		while(expResultB != expResults.end())
 		{
 			// Calculate next var^e based on the last one.
-			expResultB->second.first = expResultA->second.first * value.pow(expResultB->first - expResultA->first);
+			expResultB->second.first = expResultA->second.first * carl::pow(value, expResultB->first - expResultA->first);
 			expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
 			++expResultA;
 			++expResultB;
@@ -271,7 +272,7 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 			assert(sub != substitutions.end());
 			++sub;
 		}
-		expResultB->second = sub->second.pow(expResultB->first.second);
+		expResultB->second = carl::pow(sub->second, expResultB->first.second);
 		++expResultB;
 		while(expResultB != expResults.end())
 		{
@@ -286,11 +287,11 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 					++sub;
 				}
 				assert(sub->first == expResultB->first.first);
-				expResultB->second = sub->second.pow(expResultB->first.second);
+				expResultB->second = pow(sub->second, expResultB->first.second);
 			}
 			else
 			{
-				expResultB->second = expResultA->second * sub->second.pow(expResultB->first.second-expResultA->first.second);
+				expResultB->second = expResultA->second * pow(sub->second, expResultB->first.second-expResultA->first.second);
 			}
 			++expResultA;
 			++expResultB;

@@ -91,7 +91,7 @@ namespace carl {
 			if (std::holds_alternative<RAN>(mValue)) {
 				const auto& ran = std::get<RAN>(mValue);
 				if (ran.isNumeric()) return Poly(mVar) - ran.value();
-				return Poly(ran.getIRPolynomial().replaceVariable(mVar));
+				return Poly(carl::replace_main_variable(ran.getIRPolynomial(), mVar));
 			} else {
 				const auto& mr = std::get<MR>(mValue);
 				return mr.poly(mVar);

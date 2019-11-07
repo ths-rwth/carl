@@ -572,6 +572,7 @@ public:
 	 * @param exp Exponent.
 	 * @return This to the power of exp.
 	 */
+	[[deprecated("Use carl::pow() instead.")]]
 	UnivariatePolynomial pow(std::size_t exp) const;
 
 	Coefficient evaluate(const Coefficient& value) const;

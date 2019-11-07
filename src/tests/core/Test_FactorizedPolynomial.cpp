@@ -215,7 +215,7 @@ TEST(FactorizedPolynomial, Construction)
     ftest *= fp7;
     ftest *= fp2;
     fres *= ftest;
-    EXPECT_EQ( (f5*f7.pow(5)*f2), computePolynomial( fres ) );
+    EXPECT_EQ( (f5*carl::pow(f7, 5)*f2), computePolynomial( fres ) );
 
     //Addition
     Pol fAdd = fA + fB;

@@ -3,6 +3,7 @@
 #include "Content.h"
 #include "Derivative.h"
 #include "Division.h"
+#include "Power.h"
 #include "PrimitivePart.h"
 #include "Remainder.h"
 #include "to_univariate_polynomial.h"
@@ -94,7 +95,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 	// BUG in Duco's article(?):
 	//ex subresLcoeff = GiNaC::pow( a.lcoeff(), a.degree() - b.degree() );	// initialized on the basis of the smaller-degree polynomial
 	//Coeff subresLcoeff(a.lcoeff()); // initialized on the basis of the smaller-degree polynomial
-	Coeff subresLcoeff = q.lcoeff().pow(p.degree() - q.degree());
+	Coeff subresLcoeff = carl::pow(q.lcoeff(), p.degree() - q.degree());
 	CARL_LOG_TRACE("carl.core.resultant", "subresLcoeff = " << subresLcoeff);
 
 	UnivariatePolynomial<Coeff> tmp = q;
@@ -137,8 +138,8 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 			switch (strategy) {
 				case SubresultantStrategy::Generic: {
 					CARL_LOG_TRACE("carl.core.resultant", "Part 2: Generic strategy");
-					UnivariatePolynomial<Coeff> reductionCoeff = q.lcoeff().pow(delta - 1) * q;
-					Coeff dividant = subresLcoeff.pow(delta-1);
+					UnivariatePolynomial<Coeff> reductionCoeff = carl::pow(q.lcoeff(), delta - 1) * q;
+					Coeff dividant = carl::pow(subresLcoeff, delta-1);
 					bool res = carl::try_divide(reductionCoeff, dividant, c);
 					if (res) {
 						subresultants.push_front(c);
@@ -216,7 +217,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 				 * If it was successful, the resulting term is safely added to the list, yielding an optimized resultant.
 				 */
 				UnivariatePolynomial<Coeff> reducedNewB = pseudo_remainder(p, -q);
-				bool r = carl::try_divide(reducedNewB, subresLcoeff.pow(delta)*p.lcoeff(), q);
+				bool r = carl::try_divide(reducedNewB, carl::pow(subresLcoeff, delta)*p.lcoeff(), q);
 				assert(r);
 				break;
 			}
@@ -228,10 +229,10 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 				std::vector<Coeff> h(pDeg);
 
 				for (uint d = 0; d < qDeg; d++) {
-					h[d] = lcoeffC * Coeff(variable).pow(d);
+					h[d] = lcoeffC * carl::pow(Coeff(variable), d);
 				}
 				if (pDeg != qDeg) { // => aDeg > bDeg
-					h[qDeg] = Coeff(lcoeffC * Coeff(variable).pow(qDeg) - c); // H_e
+					h[qDeg] = Coeff(lcoeffC * carl::pow(Coeff(variable), qDeg) - c); // H_e
 				}
 				for (uint d = qDeg + 1; d < pDeg; d++) {
 					Coeff t = h[d-1] * variable;
@@ -336,12 +337,12 @@ namespace resultant_debug {
 			if (q.isConstant()) {
 				return UnivariatePolynomial<Coeff>(q.mainVar(), Coeff(1));
 			} else {
-				return p.pow(q.degree());
+				return carl::pow(p, q.degree());
 			}
 		}
 		if (q.isConstant()) {
 			//std::cout << "B is const" << std::endl;
-		   return q.pow(q.degree());
+		   return carl::pow(q, q.degree());
 		}
 
 		UnivariatePolynomial<Coeff> nA(q.normalized());
@@ -454,11 +455,11 @@ namespace resultant_debug {
 			if (q.isConstant()) {
 				return UnivariatePolynomial<Coeff>(p.mainVar(), Coeff(1));
 			} else {
-				return p.pow(q.degree());
+				return carl::pow(p, q.degree());
 			}
 		}
 		if (q.isConstant()) {
-		   return q.pow(p.degree());
+		   return carl::pow(q, p.degree());
 		}
 		if (p == q) return UnivariatePolynomial<Coeff>(p.mainVar());
 

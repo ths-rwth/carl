@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Power.h"
+
 #include "../logging.h"
 #include "../../converter/CoCoAAdaptor.h"
 #include "../../converter/OldGinacConverter.h"
@@ -23,7 +25,7 @@ namespace helper {
 	void sanitizeFactors(const MultivariatePolynomial<C,O,P>& reference, Factors<MultivariatePolynomial<C,O,P>>& factors) {
 		MultivariatePolynomial<C,O,P> p(1);
 		for (const auto& f: factors) {
-			p *= f.first.pow(f.second);
+			p *= carl::pow(f.first, f.second);
 		}
 		if (p == reference) return;
 		if (p == -reference) {
