@@ -301,7 +301,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		const CADSettings& setting
 		)
 {
-	if (p->isConstant())
+	if (is_constant(*p))
 	{ /* constants can just be moved from this level to the next */
 		if (p->isNumber())
 		//if( GiNaC::is_exactly_a<numeric>( *p )) /* discard numerics completely */
@@ -418,13 +418,13 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 	if (this->mPairedEliminationQueue.empty()) {
 		if (!this->mSingleEliminationQueue.empty()) {
 			p = this->mSingleEliminationQueue.front();
-			if (p->isConstant()) {
+			if (is_constant(*p)) {
 				return this->eliminateConstant(p, this->mSingleEliminationQueue, this->mPairedEliminationQueue, false, destination, variable, setting);
 			}
 		} else return {};
 	} else {
 		p = this->mPairedEliminationQueue.front();
-		if (p->isConstant()) {
+		if (is_constant(*p)) {
 			return this->eliminateConstant(p, this->mPairedEliminationQueue, this->mSingleEliminationQueue, false, destination, variable, setting);
 		}
 		avoidSingle = synchronous;
@@ -479,7 +479,7 @@ void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to,
 	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
 		assert(p->isConsistent());
-		if(p->isConstant()) {
+		if(is_constant(*p)) {
 			if (!p->isNumber()) { // discard numerics completely
 				DOT_EDGE("elimination", p, switch_main_variable(*p, variable), "label=\"constant\"");
 				to.insert(switch_main_variable(*p, variable), this->getParentsOf(p));
@@ -500,7 +500,7 @@ void EliminationSet<Coefficient>::removeConstants() {
 	if (this->empty()) return;
 	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
-		if (p->isConstant()) {   // found candidate for removal
+		if (is_constant(*p)) {   // found candidate for removal
 			DOT_NODE("elimination", p, "shape=box");
 			DOT_EDGE("elimination", p, p, "label=\"constant\"");
 			toDelete.push_front(p);

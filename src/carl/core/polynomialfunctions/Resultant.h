@@ -333,9 +333,9 @@ namespace resultant_debug {
 			return UnivariatePolynomial<Coeff>(q.mainVar());
 		}
 
-		if (p.isConstant()) {
+		if (is_constant(p)) {
 			//std::cout << "A is const" << std::endl;
-			if (q.isConstant()) {
+			if (is_constant(q)) {
 				return UnivariatePolynomial<Coeff>(q.mainVar(), Coeff(1));
 			} else {
 				return carl::pow(p, q.degree());

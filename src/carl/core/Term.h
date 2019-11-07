@@ -320,23 +320,6 @@ public:
 		if (lhs && rhs) return monomialLess(*lhs, *rhs);
 		return !lhs;
 	}
-	/**
-		 * Calculates the gcd of (t1, t2).
-		 * If t1 or t2 are not set, undefined.
-		 * If t1 or t2 is zero, undefined.
-         * @param t1 first term
-         * @param t2 second term
-         * @return gcd of t1 and t2.
-         */
-	static Term gcd(const std::shared_ptr<const Term>& t1, const std::shared_ptr<const Term>& t2);
-	/**
-		 * Calculates the gcd of (t1, t2).
-		 * If t1 or t2 is zero, undefined.
-         * @param t1 first term
-         * @param t2 second term
-         * @return gcd of t1 and t2.
-         */
-	static Term gcd(const Term& t1, const Term& t2);
 };
 
 /**
