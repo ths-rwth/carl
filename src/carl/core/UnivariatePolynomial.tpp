@@ -207,46 +207,6 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable var
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) const
-{
-	if (nth == 0) return *this;
-
-	UnivariatePolynomial<Coeff> result(mMainVar);
-	if (this->isConstant()) {
-		return result;
-	}
-	result.mCoefficients.reserve(mCoefficients.size()-nth);
-	// nth == 1 is most common case and can be implemented more efficient.
-	if (nth == 1) {
-		auto it = std::next(mCoefficients.begin());
-		for (std::size_t i = 1; it != mCoefficients.end(); it++, i++) {
-			result.mCoefficients.push_back(Coeff(i) * *it);
-		}
-		CARL_LOG_DEBUG("carl.core", "1st derivative of " << *this << " = " << result);
-		return result;
-	}
-	else
-	{
-		// here we handle nth > 1.
-		std::size_t c = 1;
-		for (std::size_t k = 2; k <= nth; ++k) {
-			c *= k;
-		}
-		auto it = mCoefficients.begin();
-		std::size_t i = nth;
-		for(it += sint(nth); it != mCoefficients.end(); ++it)
-		{
-			result.mCoefficients.push_back(Coeff(c) * *it);
-			++i;
-			c /= (i - nth);
-			c *= i;
-		}
-		CARL_LOG_DEBUG("carl.core", nth << " derivative of " << *this << " = " << result);
-		return result;
-	}
-}
-
-template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
 	assert(!carl::isZero(divisor));

@@ -21,7 +21,7 @@ UnivariatePolynomial<MultivariatePolynomial<typename UnderlyingNumberType<Coeff>
 }
 
 /**
- * Replaces the main variable.
+ * Replaces the main variable in p.
  * @param newVar New main variable.
  * @return New polynomial.
  */

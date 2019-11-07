@@ -355,32 +355,6 @@ public:
 	}
 
 	/**
-	 * Switches the main variable using a purely syntactical restructuring.
-	 * The resulting polynomial will be algebraicly identical, but have the given variable as its main variable.
-	 * @param newVar New main variable.
-	 * @return Restructured polynomial.
-	 */
-	[[deprecated("Use carl::switch_main_variable() instead.")]]
-	UnivariatePolynomial<MultivariatePolynomial<NumberType>> switchVariable(Variable newVar) const {
-		assert(isConsistent());
-		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
-	}
-	
-	/**
-	 * Replaces the main variable.
-	 * @param newVar New main variable.
-	 * @return New polynomial.
-	 */
-	[[deprecated("Use carl::replace_main_variable() instead.")]]
-	UnivariatePolynomial replaceVariable(Variable newVar) const {
-		if constexpr (carl::is_number<Coefficient>::value) {
-			return UnivariatePolynomial<Coefficient>(newVar, mCoefficients);
-		} else {
-			return MultivariatePolynomial<NumberType>(*this).substitute(mainVar(), MultivariatePolynomial<NumberType>(newVar)).toUnivariatePolynomial(newVar);
-		}
-	}
-
-	/**
 	 * Gathers all variables that occur in the polynomial.
 	 * @return Set of variables.
 	 */
@@ -482,14 +456,6 @@ public:
 	 * @return The unit part of the polynomial.
 	 */
 	Coefficient unitPart() const;
-	
-	/**
-	 * The n'th derivative of the polynomial in its main variable.
-	 * @param nth how many times the derivative should be applied.
-	 * @return A polynomial \f$(d/dx)^n p(x)\f$ where \f$p(x)\f$ is the input polynomial.
-	 */
-	[[deprecated("Use carl::derivative() instead.")]]
-	UnivariatePolynomial derivative(uint nth = 1) const;
 
 	[[deprecated("Use carl::remainder() instead.")]]
 	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
