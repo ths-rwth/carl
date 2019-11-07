@@ -718,9 +718,6 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
-	template<typename Integer>
-	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& poly, FactorMap<Coefficient>& linearFactors, const Integer& maxInt = 0 );
-
 	Coefficient syntheticDivision(const Coefficient& zeroOfDivisor);
 
 	/**
