@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Content.h"
+#include "Degree.h"
 #include "Derivative.h"
 #include "Division.h"
 #include "Power.h"
@@ -83,7 +84,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 	subresultants.push_front(q);
 
 	// SPECIAL CASE: both, p and q, are constant
-	if (q.isConstant()) {
+	if (is_constant(q)) {
 		CARL_LOG_TRACE("carl.core.resultant", "q is constant.");
 		return subresultants;
 	}
@@ -238,7 +239,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 					Coeff t = h[d-1] * variable;
 					UnivariatePolynomial<Coeff> reducedNewB = carl::to_univariate_polynomial(t, variable).coefficients()[qDeg] * q;
 					bool res = carl::try_divide(reducedNewB, lcoeffQ, reducedNewB);
-					assert(res || reducedNewB.isConstant());
+					assert(res || is_constant(reducedNewB));
 					h[d] = Coeff(t - reducedNewB);
 				}
 
@@ -248,7 +249,7 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 				}
 				UnivariatePolynomial<Coeff> normalizedSum(p.mainVar());
 				bool res = carl::try_divide(sum, p.lcoeff(), normalizedSum);
-				assert(res || sum.isConstant());
+				assert(res || is_constant(sum));
 
 				UnivariatePolynomial<Coeff> t(variable, {0, h.back()});
 				UnivariatePolynomial<Coeff> reducedNewB = ((t + normalizedSum) * lcoeffQ - carl::to_univariate_polynomial(t.coefficients()[qDeg], variable));
@@ -293,7 +294,7 @@ UnivariatePolynomial<Coeff> resultant(
 	if (carl::isZero(p) || carl::isZero(q)) return UnivariatePolynomial<Coeff>(p.mainVar());
 	UnivariatePolynomial<Coeff> resultant = subresultants(p.normalized(), q.normalized(), strategy).front();
 	CARL_LOG_TRACE("carl.core.resultant", "resultant(" << p << ", " << q << ") = " << resultant);
-	if (resultant.isConstant()) {
+	if (is_constant(resultant)) {
 		return resultant;
 	} else {
 		return UnivariatePolynomial<Coeff>(p.mainVar());

@@ -24,7 +24,7 @@ CLANG_WARNING_RESET
 	}
 	else
 	{
-		assert(!p.isConstant()); // Othewise, the derivative is zero and the next assertion is thrown.
+		assert(!is_constant(p)); // Othewise, the derivative is zero and the next assertion is thrown.
 		UnivariatePolynomial<Coeff> b = derivative(p);
 		CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: b = " << b);
 		UnivariatePolynomial<Coeff> s(p.mainVar());
@@ -322,7 +322,7 @@ template<typename Coeff>
 FactorMap<Coeff> factorization(const UnivariatePolynomial<Coeff>& p) {
     CARL_LOG_TRACE("carl.core.upoly", "UnivFactor: " << p);
 	FactorMap<Coeff> result;
-	if(p.isConstant()) // Constant.
+	if(is_constant(p)) // Constant.
 	{
 		CARL_LOG_TRACE("carl.core.upoly", "UnivFactor: add the factor (" << p << ")^" << 1 );
 		result.emplace(p, 1);
@@ -366,7 +366,7 @@ FactorMap<Coeff> factorization(const UnivariatePolynomial<Coeff>& p) {
 //				factor *= pow(expFactorPair->second.coprimeFactor(), expFactorPair->first);
 //				expFactorPair->second /= cpf;
 //			}
-			if(!expFactorPair->second.isConstant() || !carl::isOne(expFactorPair->second.lcoeff()))
+			if(!is_constant(expFactorPair->second) || !carl::isOne(expFactorPair->second.lcoeff()))
 			{
 				auto retVal = result.emplace(expFactorPair->second, expFactorPair->first);
 				CARL_LOG_TRACE("carl.core.upoly", "UnivFactor: add the factor (" << expFactorPair->second << ")^" << expFactorPair->first );

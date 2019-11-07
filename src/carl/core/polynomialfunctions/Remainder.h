@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Degree.h"
 #include "Quotient.h"
 #include "to_univariate_polynomial.h"
 
@@ -17,7 +18,7 @@ UnivariatePolynomial<Coeff> remainder_helper(const UnivariatePolynomial<Coeff>& 
 	if(dividend.degree() < divisor.degree()) return dividend;
 	assert(dividend.degree() >= divisor.degree());
 	// Remainder in a field is zero by definition.
-	if (is_field<Coeff>::value && divisor.isConstant()) {
+	if (is_field<Coeff>::value && is_constant(divisor)) {
 		return UnivariatePolynomial<Coeff>(dividend.mainVar());
 	}
 

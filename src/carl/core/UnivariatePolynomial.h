@@ -181,7 +181,7 @@ public:
 	 * Checks if the polynomial is equal to zero.
 	 * @return If polynomial is zero.
 	 */
-	[[deprecated("use carl::isZero(p) instead.")]]
+	[[deprecated("use carl::is_zero(p) instead.")]]
 	bool isZero() const
 	{
 		return mCoefficients.size() == 0;
@@ -191,7 +191,7 @@ public:
 	 * Checks if the polynomial is equal to one.
 	 * @return If polynomial is one.
 	 */
-	[[deprecated("use carl::isOne(p) instead.")]]
+	[[deprecated("use carl::is_one(p) instead.")]]
 	bool isOne() const
 	{
 		return mCoefficients.size() == 1 && mCoefficients.back() == Coefficient(1);
@@ -237,6 +237,7 @@ public:
 	 * Checks whether the polynomial is constant with respect to the main variable.
 	 * @return If polynomial is constant.
 	 */
+	[[deprecated("use carl::is_constant(p) instead.")]]
 	bool isConstant() const
 	{
 		assert(isConsistent());
