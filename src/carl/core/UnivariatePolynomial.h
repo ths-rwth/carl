@@ -457,21 +457,6 @@ public:
 	 */
 	Coefficient unitPart() const;
 
-	[[deprecated("Use carl::remainder() instead.")]]
-	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
-	[[deprecated("Use carl::remainder() instead.")]]
-	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor) const;
-	/**
-	 * Calculates the pseudo-remainder.
-	 * @see @cite GCL92, page 55, Pseudo-Division Property
-	 */
-	[[deprecated("Use carl::pseudo_remainder() instead.")]]
-	UnivariatePolynomial prem_old(const UnivariatePolynomial& divisor) const;
-	[[deprecated("Use carl::pseudo_remainder() instead.")]]
-	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
-	[[deprecated("Use carl::signed_pseudo_remainder() instead.")]]
-	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
-
 	/**
 	 * Constructs a new polynomial `q` such that \f$ q(x) = p(-x) \f$ where `p` is this polynomial.
 	 * @return New polynomial with negated variable.

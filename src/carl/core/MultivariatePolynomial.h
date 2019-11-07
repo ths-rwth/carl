@@ -486,16 +486,6 @@ public:
 	 */
 	[[deprecated("Use carl::quotient() instead.")]]
 	MultivariatePolynomial quotient(const MultivariatePolynomial& divisor) const;
-	/**
-	 * Calculates the remainder
-	 * @param divisor
-	 * @return 
-	 * @see MultivariatePolynomial::divideBy
-	 */
-	[[deprecated("Use carl::remainder() instead.")]]
-	MultivariatePolynomial remainder(const MultivariatePolynomial& divisor) const;
-	[[deprecated("Use carl::pseudo_remainder() instead.")]]
-	MultivariatePolynomial prem(const MultivariatePolynomial& divisor, Variable::Arg var) const;
 
     /**
      * Calculates the square of this multivariate polynomial if it is a square.

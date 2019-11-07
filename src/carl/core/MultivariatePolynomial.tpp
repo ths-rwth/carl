@@ -651,59 +651,6 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 	return result;
 }
 
-template<typename C, typename O, typename P>
-MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const MultivariatePolynomial& divisor) const
-{
-	static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	assert(!carl::isZero(divisor));
-	if(this == &divisor || carl::isOne(divisor) || *this == divisor)
-	{
-		return MultivariatePolynomial<C,O,P>();
-	}
-
-	MultivariatePolynomial<C,O,P> remainder;
-	MultivariatePolynomial p = *this;
-	while(!carl::isZero(p))
-	{
-		if(p.lterm().tdeg() < divisor.lterm().tdeg())
-		{
-			assert(!p.lterm().divisible(divisor.lterm()));
-			if( O::degreeOrder )
-			{
-				remainder += p;
-                assert(remainder.isConsistent());
-				return remainder;
-			}
-			remainder += p.lterm();
-			p.stripLT();
-		}
-		else
-		{
-			Term<C> factor;
-			if (p.lterm().divide(divisor.lterm(), factor)) {
-				p.subtractProduct(factor, divisor);
-				//p -= factor * divisor;
-			}
-			else
-			{
-				remainder += p.lterm();
-				p.stripLT();
-			}
-		}
-	}
-	assert(remainder.isConsistent());
-	assert(*this == quotient(divisor) * divisor + remainder);
-	return remainder;
-}
-
-template<typename C, typename O, typename P>
-MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::prem(const MultivariatePolynomial& divisor, Variable::Arg var) const
-{
-	assert(!carl::isZero(divisor));
-	return MultivariatePolynomial(this->toUnivariatePolynomial(var).prem(divisor.toUnivariatePolynomial(var)));
-	return this->remainder(divisor);
-}
-
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
