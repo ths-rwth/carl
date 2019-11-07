@@ -246,15 +246,15 @@ class RealRootIsolation {
 			}
 			if (variations == 1) {
 				CARL_LOG_DEBUG("carl.core.rootfinder", "A single root within " << cur);
-				assert(!mPolynomial.isRoot(cur.lower()));
-				assert(!mPolynomial.isRoot(cur.upper()));
+				assert(!carl::is_root_of(mPolynomial, cur.lower()));
+				assert(!carl::is_root_of(mPolynomial, cur.upper()));
 				assert(count_real_roots(mPolynomial, cur) == 1);
 				add_root(cur);
 				continue;
 			}
 
 			auto pivot = carl::sample(cur);
-			if (mPolynomial.isRoot(pivot)) {
+			if (carl::is_root_of(mPolynomial, pivot)) {
 				add_root(pivot);
 			}
 			CARL_LOG_DEBUG("carl.core.rootfinder", "Splitting " << cur << " at " << pivot);

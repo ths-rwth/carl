@@ -583,7 +583,7 @@ namespace carl
             return mCoefficient;
         }
         if (factorizedTrivially()) {
-            return SubstitutionType(mCoefficient) * polynomial().evaluate(substitutions);
+            return SubstitutionType(mCoefficient) * carl::evaluate(polynomial(), substitutions);
         } else {
             SubstitutionType result = mCoefficient;
             for (const auto& factor : content().factorization()) {
@@ -593,7 +593,7 @@ namespace carl
                 }
                 result *= carl::pow(subResult, factor.second);
             }
-            assert(result == computePolynomial(*this).evaluate(substitutions));
+            assert(result == carl::evaluate(computePolynomial(*this), substitutions));
             return result;
         }
     }
