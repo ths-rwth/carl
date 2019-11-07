@@ -634,16 +634,6 @@ public:
 	UnivariatePolynomial<NewCoeff> convert(const std::function<NewCoeff(const Coefficient&)>& f) const;
 
 	/**
-	 * Notice, Cauchy bounds are only defined for polynomials over fields.
-	 * 
-	 * This is 
-	 * @return 
-	 */
-	[[deprecated("use carl::cauchyBound() or an alternative from RootBounds.h instead")]]
-	Coefficient cauchyBound() const;
-	Coefficient modifiedCauchyBound() const;
-
-	/**
 	 * The maximum norm of a polynomial is the maximum absolute value of the coefficients of
 	 * the corresponding integral polynomial (as calculated by coprimeCoefficients()).
 	 * @return Maximum-norm of the polynomial in case it has numeric coefficients.

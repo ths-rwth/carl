@@ -356,29 +356,6 @@ UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert(const std::f
 }
 
 template<typename Coeff>
-Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
-{
-	// We could also use SFINAE, but this gives clearer error messages.
-	// Just in case, if we want to use SFINAE, the right statement would be
-	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
-	static_assert(is_field<Coeff>::value, "Cauchy bounds are only defined for field-coefficients");
-	// For constants, the cauchy bound is always zero.
-	if (this->mCoefficients.size() <= 1) {
-		return Coeff(0);
-	}
-	Coeff maxCoeff = carl::abs(mCoefficients.front());
-	for(typename std::vector<Coeff>::const_iterator it = ++mCoefficients.begin(); it != --mCoefficients.end(); ++it)
-	{
-		Coeff absOfCoeff = carl::abs( *it );
-		if(absOfCoeff > maxCoeff) 
-		{
-			maxCoeff = absOfCoeff;
-		}
-	}
-	return 1 + maxCoeff/carl::abs(lcoeff());
-}
-
-template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 {
 	if(carl::isZero(*this))
@@ -594,16 +571,6 @@ bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& divisor) c
 {
 	///@todo Is this correct?
 	return carl::isZero(divisor.divideBy(*this).remainder);
-}
-
-template<typename Coeff>
-Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
-{
-	// We could also use SFINAE, but this gives clearer error messages.
-	// Just in case, if we want to use SFINAE, the right statement would be
-	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
-	static_assert(is_field<Coeff>::value, "Modified Cauchy bounds are only defined for field-coefficients");
-	CARL_LOG_NOTIMPLEMENTED();
 }
 
 template<typename Coeff>
