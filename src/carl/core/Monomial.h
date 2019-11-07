@@ -475,15 +475,7 @@ namespace carl
 		void gatherVariables(carlVariables& variables) const {
 			variables.add(mExponents.begin(), mExponents.end(), [](const auto& e){ return e.first; });
 		}
-		
-		/**
-		 * Computes the (partial) derivative of this monomial with respect to the given variable.
-		 * @param v Variable.
-		 * @return Partial derivative, consisting of constant factor and the remaining monomial.
-		 */
-		[[deprecated("Use carl::derivative() instead.")]]
-		std::pair<std::size_t,Monomial::Arg> derivative(Variable v) const;
-		
+
 		/**
 		 * Applies the given substitutions to this monomial.
 		 * Every variable may be substituted by some value.

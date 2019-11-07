@@ -1123,46 +1123,6 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::sqrt(MultivariatePolynomia
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::derivative(Variable::Arg v, unsigned nth) const
-{
-	///@todo this method is broken:
-	/// - support nth > 1
-	/// - allow 0
-	/// - fix ordering issues with result
-	assert(!carl::isZero(*this));
-	assert(this->isConsistent());
-	// TODO n > 1 not yet implemented!
-	assert(nth == 1);
-	TermsType tmpTerms;
-	for(const auto& t : mTerms) {
-		tmpTerms.push_back(t.derivative(v));
-		if (carl::isZero(tmpTerms.back())) tmpTerms.pop_back();
-	}
-	MultivariatePolynomial result(std::move(tmpTerms), true, mOrdered);
-    assert(result.isConsistent());
-	return result;
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
-{
-	assert(this->isConsistent());
-	auto id = mTermAdditionManager.getId(mTerms.size() * mTerms.size());
-	Term<Coeff> newlterm;
-	for (auto it1 = mTerms.rbegin(); it1 != mTerms.rend(); it1++) {
-		if (it1 == mTerms.rbegin()) newlterm = it1->pow(2);
-		else mTermAdditionManager.template addTerm<false>(id, it1->pow(2));
-		for (auto it2 = it1+1; it2 != mTerms.rend(); it2++) {
-			mTermAdditionManager.template addTerm<false>(id, Coeff(2) * *it1 * *it2);
-		}
-	}
-	mOrdered = false;
-	mTermAdditionManager.readTerms(id, mTerms);
-	if (!carl::isZero(newlterm)) mTerms.push_back(newlterm);
-	assert(isConsistent());
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(std::size_t exp) const
 {
 	//std::cout << "pw(" << *this << " ^ " << exp << ")" << std::endl;

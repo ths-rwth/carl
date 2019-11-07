@@ -6,6 +6,7 @@
 #include <boost/variant.hpp>
 
 #include <carl/core/polynomialfunctions/Derivative.h>
+#include <carl/core/polynomialfunctions/Power.h>
 
 #include "../Common.h"
 
@@ -249,9 +250,9 @@ TEST(Monomial, pow)
 	carl::Monomial::Arg one;
 	carl::Monomial::Arg m1 = x*y*y;
 	carl::Monomial::Arg m2 = x*x*y*y*y*y;
-	EXPECT_EQ(one, m1->pow(0));
-	EXPECT_EQ(m1, m1->pow(1));
-	EXPECT_EQ(m2, m1->pow(2));
+	EXPECT_EQ(one, carl::pow(m1, 0));
+	EXPECT_EQ(m1, carl::pow(m1, 1));
+	EXPECT_EQ(m2, carl::pow(m1, 2));
 }
 
 TEST(Monomial, CalcLCM)

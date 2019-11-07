@@ -26,7 +26,9 @@ const T& derivative(const T& t, Variable, std::size_t n = 1) {
 }
 
 /**
- * Computes the n'th derivative of m with respect to v.
+ * Computes the (partial) derivative of this monomial with respect to the given variable.
+ * @param v Variable.
+ * @return Partial derivative, consisting of constant factor and the remaining monomial.
  */
 inline std::pair<std::size_t,Monomial::Arg> derivative(const Monomial::Arg& m, Variable v, std::size_t n = 1) {
 	if (n == 0) return std::make_pair(1, m);

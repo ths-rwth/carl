@@ -174,34 +174,6 @@ namespace carl
 		return createMonomial(std::move(newExps), expsum);
 	}
 	
-	std::pair<std::size_t,Monomial::Arg> Monomial::derivative(Variable v) const {
-		CARL_LOG_FUNC("carl.core.monomial", *this << ", " << v);
-	    
-	     // Linear implementation, as we expect very small monomials.
-	    auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
-	    if(it == mExponents.cend())
-	    {
-	        return std::make_pair(0, nullptr);
-	    } else if (it->second == 1) {
-			// If the exponent is one, the variable does not occur in the new monomial.
-			if (mExponents.size() == 1) {
-				// If it was the only variable, we get the one-term.
-				return std::make_pair(1, nullptr);
-			} else {
-				std::vector<std::pair<Variable, exponent>> newExps;
-				newExps.assign(mExponents.begin(), it);
-				newExps.insert(newExps.end(), it+1, mExponents.end());
-				return std::make_pair(1, createMonomial(std::move(newExps), mTotalDegree-1));
-			}
-		} else {
-			// We have to decrease the exponent of the variable by one.
-			std::vector<std::pair<Variable, exponent>> newExps;
-			newExps.assign(mExponents.begin(), mExponents.end());
-			newExps[uint(it - mExponents.begin())].second -= exponent(1);
-			return std::make_pair(it->second, createMonomial(std::move(newExps), mTotalDegree-1));
-		}
-	}
-	
 	Monomial::Arg Monomial::gcd(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
 	{
             if(!lhs && !rhs) return nullptr;

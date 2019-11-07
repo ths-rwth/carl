@@ -125,18 +125,6 @@ bool Term<Coefficient>::divide(const Term& t, Term& res) const
 }
 
 template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::derivative(Variable v) const
-{
-	if(!mMonomial)
-	{
-		// Derivatives of constants are zero.
-		return Term<Coefficient>(carl::constant_zero<Coefficient>().get());
-	}
-	auto derivative = mMonomial->derivative(v);
-	return Term<Coefficient>(Coefficient(mCoeff) * derivative.first, derivative.second);
-}
-
-template<typename Coefficient>
 Definiteness Term<Coefficient>::definiteness() const
 {
 	if(mMonomial)

@@ -46,14 +46,8 @@ MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, std::s
 	MultivariatePolynomial<C,O,P> res(constant_one<C>::get());
 	MultivariatePolynomial<C,O,P> mult(p);
 	while(exp > 0) {
-#if 0
-		if (exp & 1) res *= mult;
-		exp /= 2;
-		if(exp > 0) mult.square();
-#else
 		res *= mult;
 		exp--;
-#endif
 	}
 	return res;
 }

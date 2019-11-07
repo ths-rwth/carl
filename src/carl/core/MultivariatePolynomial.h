@@ -290,21 +290,6 @@ public:
 	 * Check if the polynomial is linear.
 	 */
 	bool isLinear() const;
-	
-	/**
-	 * Retrieves information about the definiteness of the polynomial.
-	 * @return Definiteness of this.
-	 */
-	//Definiteness definiteness( bool _fullEffort = true ) const;
-    
-    /**
-     * @param _notTrivial If this flag is true, this polynomial is not yet in form of a sos (the method than avoids checking this).
-     * @return The sum-of-squares (sos) decomposition ((q1,p1), .., (qn,pn)) with this = q1*p1^2+..+qn*pn^2, qi being positive rational numbers and pi being polynomials.
-     *          If the result is empty, no sos could be found (which does not mean, that there exists no one).
-     */
-    //auto sosDecomposition(bool not_trivial = false) const {
-	//	return carl::SoSDecomposition(*this, not_trivial);
-	//}
 
 	/**
 	 * Calculate the number of terms.
@@ -511,10 +496,7 @@ public:
 	MultivariatePolynomial remainder(const MultivariatePolynomial& divisor) const;
 	[[deprecated("Use carl::pseudo_remainder() instead.")]]
 	MultivariatePolynomial prem(const MultivariatePolynomial& divisor, Variable::Arg var) const;
-	
-	[[deprecated("Use carl::derivative() instead.")]]
-	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
-    
+
     /**
      * Calculates the square of this multivariate polynomial if it is a square.
      * @param res Used to store the result in.
@@ -608,8 +590,6 @@ public:
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q) {
 		return carl::SPolynomial(p,q);
 	}
-
-	void square();
 
 	[[deprecated("use carl::pow() instead.")]]
 	MultivariatePolynomial pow(std::size_t exp) const;
