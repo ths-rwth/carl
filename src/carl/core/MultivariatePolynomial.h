@@ -567,6 +567,7 @@ public:
 	 * @return For a polynomial p, the function value p(x_1,...,x_n).
 	 */
 	template<typename SubstitutionType = Coeff>
+	[[deprecated("use carl::evaluate() instead.")]]
 	SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
 	
 	bool divides(const MultivariatePolynomial& b) const;

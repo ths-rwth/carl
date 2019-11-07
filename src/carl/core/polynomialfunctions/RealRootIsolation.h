@@ -8,6 +8,7 @@
 #include "../polynomialfunctions/SignVariations.h"
 #include "../../io/streamingOperators.h"
 #include "EigenWrapper.h"
+#include "Evaluation.h"
 
 namespace carl::rootfinder {
 
@@ -110,7 +111,7 @@ class RealRootIsolation {
 
 	void add_trivial_root(const Number& n) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "Add trivial root " << n);
-		assert(mPolynomial.isRoot(n));
+		assert(carl::is_root_of(mPolynomial, n));
 		mRoots.emplace_back(n);
 	}
 
@@ -129,7 +130,7 @@ class RealRootIsolation {
 	/// Add a root to mRoots and simplify polynomial accordingly (essentially divide by x-n)
 	void add_root(const Number& n) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "Add root " << n);
-		assert(mPolynomial.isRoot(n));
+		assert(carl::is_root_of(mPolynomial, n));
 		reset_sturm_sequence();
 		mPolynomial.eliminateRoot(n);
 		mRoots.emplace_back(n);
@@ -144,13 +145,13 @@ class RealRootIsolation {
 	bool check_interval_bounds() {
 		bool found_root = false;
 		if (mInterval.lowerBoundType() == BoundType::WEAK) {
-			if (mPolynomial.isRoot(mInterval.lower())) {
+			if (carl::is_root_of(mPolynomial, mInterval.lower())) {
 				add_root(mInterval.lower());
 				found_root = true;
 			}
 		}
 		if (mInterval.upperBoundType() == BoundType::WEAK) {
-			if (mPolynomial.isRoot(mInterval.upper())) {
+			if (carl::is_root_of(mPolynomial, mInterval.upper())) {
 				add_root(mInterval.upper());
 				found_root = true;
 			}
@@ -195,7 +196,7 @@ class RealRootIsolation {
 			if (!isNumber(r)) continue;
 			Number n = carl::rationalize<Number>(r);
 			if (!mInterval.contains(n)) continue;
-			if (mPolynomial.isRoot(n)) {
+			if (carl::is_root_of(mPolynomial, n)) {
 				add_root(n);
 			}
 			roots.emplace_back(n);
@@ -208,7 +209,7 @@ class RealRootIsolation {
 		if (roots.size() > 0) {
 			for (std::size_t i = 0; i < roots.size() - 1; ++i) {
 				auto tmp = carl::sample(Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT));
-				if (mPolynomial.isRoot(tmp)) {
+				if (carl::is_root_of(mPolynomial, tmp)) {
 					add_root(tmp);
 				}
 				endpoints.emplace_back(tmp);

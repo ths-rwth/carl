@@ -341,7 +341,7 @@ namespace resultant_debug {
 				return carl::pow(p, q.degree());
 			}
 		}
-		if (q.isConstant()) {
+		if (is_constant(q)) {
 			//std::cout << "B is const" << std::endl;
 		   return carl::pow(q, q.degree());
 		}
@@ -452,14 +452,14 @@ namespace resultant_debug {
 		if (carl::isZero(p) || carl::isZero(q)) {
 			return UnivariatePolynomial<Coeff>(q.mainVar());
 		}
-		if (p.isConstant()) {
-			if (q.isConstant()) {
+		if (is_constant(p)) {
+			if (is_constant(q)) {
 				return UnivariatePolynomial<Coeff>(p.mainVar(), Coeff(1));
 			} else {
 				return carl::pow(p, q.degree());
 			}
 		}
-		if (q.isConstant()) {
+		if (is_constant(q)) {
 		   return carl::pow(q, p.degree());
 		}
 		if (p == q) return UnivariatePolynomial<Coeff>(p.mainVar());

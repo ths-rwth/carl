@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Degree.h"
+#include "Evaluation.h"
 #include "Power.h"
 
 #include "../Monomial.h"
@@ -346,7 +347,7 @@ template<typename Coeff>
 void substitute_inplace(UnivariatePolynomial<Coeff>& p, Variable var, const Coeff& value) {
 	if (carl::isZero(p)) return;
 	if (var == p.mainVar()) {
-		p = UnivariatePolynomial<Coeff>(p.mainVar(), p.evaluate(value));
+		p = UnivariatePolynomial<Coeff>(p.mainVar(), carl::evaluate(p, value));
 	} else if constexpr (!is_number<Coeff>::value) {
 		// Coefficients from a polynomial ring
 		if (value.has(var)) {

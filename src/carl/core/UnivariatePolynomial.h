@@ -257,10 +257,10 @@ public:
 	bool isNumber() const
 	{
 		if constexpr (carl::is_number<Coefficient>::value) {
-			return isConstant();
+			return mCoefficients.size() <= 1;
 		} else {
 			if (mCoefficients.empty()) return true;
-			return isConstant() && lcoeff().isNumber();
+			return (mCoefficients.size() <= 1) && lcoeff().isNumber();
 		}
 	}
 
@@ -561,6 +561,7 @@ public:
 	[[deprecated("Use carl::pow() instead.")]]
 	UnivariatePolynomial pow(std::size_t exp) const;
 
+	[[deprecated("Use carl::evaluate() instead.")]]
 	Coefficient evaluate(const Coefficient& value) const;
 	
 	[[deprecated("Use carl::substitute_inplace() instead.")]]
@@ -578,9 +579,11 @@ public:
 	 * @param value Point to evaluate.
 	 * @return Sign at value.
 	 */
+	[[deprecated("Use carl::sgn(carl::evaluate()) instead.")]]
 	carl::Sign sgn(const Coefficient& value) const {
 		return carl::sgn(this->evaluate(value));
 	}
+	[[deprecated("Use carl::is_root_of() instead.")]]
 	bool isRoot(const Coefficient& value) const {
 		return this->sgn(value) == Sign::ZERO;
 	}
@@ -632,14 +635,6 @@ public:
 	UnivariatePolynomial<NewCoeff> convert() const;
 	template<typename NewCoeff>
 	UnivariatePolynomial<NewCoeff> convert(const std::function<NewCoeff(const Coefficient&)>& f) const;
-
-	/**
-	 * The maximum norm of a polynomial is the maximum absolute value of the coefficients of
-	 * the corresponding integral polynomial (as calculated by coprimeCoefficients()).
-	 * @return Maximum-norm of the polynomial in case it has numeric coefficients.
-	 */
-	template<typename C=Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
-	IntNumberType maximumNorm() const;
 
 	/**
 	 * Returns the numeric content part of the i'th coefficient.

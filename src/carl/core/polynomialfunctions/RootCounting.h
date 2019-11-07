@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Evaluation.h"
 #include "SturmSequence.h"
 #include "../Sign.h"
 #include "../UnivariatePolynomial.h"
@@ -17,10 +18,10 @@ namespace carl {
 template<typename Coefficient>
 int count_real_roots(const std::vector<UnivariatePolynomial<Coefficient>>& seq, const Interval<Coefficient>& i) {
 	int l = static_cast<int>(carl::sign_variations(seq.begin(), seq.end(), 
-		[&i](const auto& p){ return p.sgn(i.lower()); }
+		[&i](const auto& p){ return carl::sgn(carl::evaluate(p, i.lower())); }
 	));
 	int r = static_cast<int>(carl::sign_variations(seq.begin(), seq.end(),
-		[&i](const auto& p){ return p.sgn(i.upper()); }
+		[&i](const auto& p){ return carl::sgn(carl::evaluate(p, i.upper())); }
 	));
 	return l - r;
 }
@@ -33,8 +34,8 @@ int count_real_roots(const std::vector<UnivariatePolynomial<Coefficient>>& seq, 
 template<typename Coefficient>
 int count_real_roots(const UnivariatePolynomial<Coefficient>& p, const Interval<Coefficient>& i) {
 	assert(!isZero(p));
-	assert(!p.isRoot(i.lower()));
-	assert(!p.isRoot(i.upper()));
+	assert(!carl::is_root_of(p, i.lower()));
+	assert(!carl::is_root_of(p, i.upper()));
 	return count_real_roots(sturm_sequence(p), i);
 }
 

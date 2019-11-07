@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../../../core/UnivariatePolynomial.h"
+#include "../../../core/polynomialfunctions/AlgebraicSubstitution.h"
+#include "../../../core/polynomialfunctions/Evaluation.h"
 #include "../../../core/polynomialfunctions/Resultant.h"
 #include "../../../core/polynomialfunctions/RootCounting.h"
 #include "../../../core/polynomialfunctions/SquareFreePart.h"
 #include "../../../core/polynomialfunctions/SturmSequence.h"
 #include "../../../core/polynomialfunctions/Representation.h"
 #include "../../../core/polynomialfunctions/RootBounds.h"
-#include "../../../core/polynomialfunctions/AlgebraicSubstitution.h"
 #include "../../../core/polynomialfunctions/to_univariate_polynomial.h"
 
 #include "../../../interval/Interval.h"
@@ -105,14 +106,14 @@ namespace ran {
 
 		bool is_consistent() const {
 			if (interval().isPointInterval()) {
-				return polynomial().isRoot(interval().lower());
+				return carl::is_root_of(polynomial(), interval().lower());
 			} else {
 				if (polynomial().normalized() != carl::squareFreePart(polynomial()).normalized()) {
 					CARL_LOG_DEBUG("carl.ran.ir", "Poly is not square free: " << polynomial());
 					return false;
 				}
-				auto lsgn = polynomial().sgn(interval().lower());
-				auto usgn = polynomial().sgn(interval().upper());
+				auto lsgn = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
+				auto usgn = carl::sgn(carl::evaluate(polynomial(), interval().upper()));
 				if (lsgn == Sign::ZERO || usgn == Sign::ZERO || lsgn == usgn) {
 					CARL_LOG_DEBUG("carl.ran.ir", "Interval does not define a zero");
 					return false;
@@ -152,7 +153,7 @@ namespace ran {
 
 		bool is_root_of(const UnivariatePolynomial<Number>& p) const {
 			if (interval().isPointInterval())
-				return p.isRoot(interval().lower());
+				return carl::is_root_of(p, interval().lower());
 			else
 				return carl::count_real_roots(p, interval()) == 1; // TODO in general incorrect: take carl::gcd(p,polynomial())
 		}
@@ -202,19 +203,19 @@ namespace ran {
 			assert(interval().contains(pivot));
 			if (newone) {
 				// assert(is_consistent());
-				auto psgn = polynomial().sgn(pivot);
+				auto psgn = carl::sgn(carl::evaluate(polynomial(), pivot));
 				if (psgn == Sign::ZERO) {
 					interval() = Interval<Number>(pivot, pivot);
 					return;
 				}
-				auto lsgn = polynomial().sgn(interval().lower());
+				auto lsgn = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
 				if (psgn == lsgn) {
 					interval().setLower(pivot);
 				} else {
 					interval().setUpper(pivot);
 				}
 			} else {
-				if (polynomial().isRoot(pivot)) {
+				if (carl::is_root_of(polynomial(), pivot)) {
 					interval() = Interval<Number>(pivot, pivot);
 					return;
 				}
@@ -238,12 +239,12 @@ namespace ran {
 			if (newone) {
 				// assert(is_consistent());
 				if (interval().contains(n)) {
-					auto psgn = carl::sgn(polynomial().evaluate(n));
+					auto psgn = carl::sgn(carl::evaluate(polynomial(), n));
 					if (psgn == Sign::ZERO) {
 						interval() = Interval<Number>(n, n);
 						return true;
 					}
-					auto lsgn = carl::sgn(polynomial().evaluate(interval().lower()));
+					auto lsgn = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
 					if (psgn == lsgn) {
 						interval().setLower(n);
 					} else {
@@ -258,7 +259,7 @@ namespace ran {
 				
 				Number newBound = carl::sample(interval());
 				
-				if (polynomial().isRoot(newBound)) {
+				if (carl::is_root_of(polynomial(), newBound)) {
 					interval() = Interval<Number>(newBound, newBound);
 					return false;
 				}
@@ -269,11 +270,11 @@ namespace ran {
 					interval().setUpper(newBound);
 				}
 				
-				while (polynomial().sgn(interval().lower()) == polynomial().sgn(interval().upper())) { // root is not in interval
+				while (carl::sgn(carl::evaluate(polynomial(), interval().lower())) == carl::sgn(carl::evaluate(polynomial(), interval().upper()))) { // root is not in interval
 					if (isLeft) {
 						Number oldBound = interval().lower();
 						newBound = carl::sample(Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT));
-						if (polynomial().isRoot(newBound)) {
+						if (carl::is_root_of(polynomial(), newBound)) {
 							interval() = Interval<Number>(newBound, newBound);
 							return false;
 						}
@@ -282,7 +283,7 @@ namespace ran {
 					} else {
 						Number oldBound = interval().upper();
 						newBound = carl::sample(Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT));
-						if (polynomial().isRoot(newBound)) {
+						if (carl::is_root_of(polynomial(), newBound)) {
 							interval() = Interval<Number>(newBound, newBound);
 							return false;
 						}
@@ -293,7 +294,7 @@ namespace ran {
 				return false;
 			} else {
 				if (interval().contains(n)) {
-					if (polynomial().isRoot(n)) {
+					if (carl::is_root_of(polynomial(), n)) {
 						interval() = Interval<Number>(n, n);
 						return true;
 					}
@@ -311,7 +312,7 @@ namespace ran {
 				
 				Number newBound = carl::sample(interval());
 				
-				if (polynomial().isRoot(newBound)) {
+				if (carl::is_root_of(polynomial(), newBound)) {
 					interval() = Interval<Number>(newBound, newBound);
 					return false;
 				}
@@ -326,7 +327,7 @@ namespace ran {
 					if (isLeft) {
 						Number oldBound = interval().lower();
 						newBound = carl::sample(Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT));
-						if (polynomial().isRoot(newBound)) {
+						if (carl::is_root_of(polynomial(), newBound)) {
 							interval() = Interval<Number>(newBound, newBound);
 							return false;
 						}
@@ -335,7 +336,7 @@ namespace ran {
 					} else {
 						Number oldBound = interval().upper();
 						newBound = carl::sample(Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT));
-						if (polynomial().isRoot(newBound)) {
+						if (carl::is_root_of(polynomial(), newBound)) {
 							interval() = Interval<Number>(newBound, newBound);
 							return false;
 						}
@@ -427,13 +428,13 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	// the interval should include at least one root.
 	assert(!carl::isZero(res));
 	assert(
-		res.sgn(interval.lower()) == Sign::ZERO ||
-		res.sgn(interval.upper()) == Sign::ZERO ||
+		carl::is_root_of(res, interval.lower()) ||
+		carl::is_root_of(res, interval.upper()) ||
 		count_real_roots(sturmSeq, interval) >= 1
 	);
 	while (
-		res.sgn(interval.lower()) == Sign::ZERO ||
-		res.sgn(interval.upper()) == Sign::ZERO ||
+		carl::is_root_of(res, interval.lower()) ||
+		carl::is_root_of(res, interval.upper()) ||
 		count_real_roots(sturmSeq, interval) != 1) 
 	{
 		// refine the result interval until it isolates exactly one real root of the result polynomial

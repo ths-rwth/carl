@@ -574,23 +574,6 @@ bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& divisor) c
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_subset_of_rationals<C>>>
-typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::maximumNorm() const {
-	typename std::vector<C>::const_iterator it = mCoefficients.begin();
-	Coeff max = carl::abs(*it);
-	IntNumberType num = carl::abs(getNum(*it));
-	IntNumberType den = carl::abs(getDenom(*it));
-	for (++it; it != mCoefficients.end(); ++it) {
-		auto tmp = carl::abs(*it);
-		if (tmp > max) max = tmp;
-		num = carl::gcd(num, getNum(tmp));
-		den = carl::lcm(den, getDenom(tmp));
-	}
-	assert(getDenom(Coeff(max*den/num)) == 1);
-	return getNum(Coeff(max*den/num));
-}
-
-template<typename Coeff>
 template<typename C, EnableIf<is_instantiation_of<GFNumber, C>>>
 UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
 {
@@ -1081,7 +1064,8 @@ bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C
 	{
 		// in different variables, polynomials can still be equal if constant.
 		if(carl::isZero(lhs) && carl::isZero(rhs)) return true;
-		if(lhs.isConstant() && rhs.isConstant() && lhs.lcoeff() == rhs.lcoeff()) return true;
+		if ((lhs.mCoefficients.size() == 1) && (rhs.mCoefficients.size() == 1) && (lhs.mCoefficients == rhs.mCoefficients)) return true;
+		// Convert to multivariate and compare that.
 		return MultivariatePolynomial<typename carl::UnderlyingNumberType<C>::type>(lhs) == MultivariatePolynomial<typename carl::UnderlyingNumberType<C>::type>(rhs);
 	}
 }
