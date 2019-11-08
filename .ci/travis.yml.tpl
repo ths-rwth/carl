@@ -11,7 +11,7 @@ cache:
 addons:
   apt:
     sources: &sources_base
-      - ubuntu-toolchain-r-test
+      - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages: &packages_base
       - texinfo
       - time
