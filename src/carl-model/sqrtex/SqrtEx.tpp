@@ -292,17 +292,17 @@ namespace carl
 	template<typename Poly>
     bool SqrtEx<Poly>::evaluate(Rational& _result, const std::map<Variable, Rational>& _evalMap, int _rounding) const
     {
-        Poly radicandEvaluated = radicand().substitute( _evalMap );
+        Poly radicandEvaluated = carl::substitute(radicand(), _evalMap );
         assert( radicandEvaluated.isConstant() );
         Rational radicandValue = radicandEvaluated.constantPart();
         assert( radicandValue >= 0 );
-        Poly factorEvaluated = factor().substitute( _evalMap );
+        Poly factorEvaluated = carl::substitute(factor(), _evalMap );
         assert( factorEvaluated.isConstant() );
         Rational factorValue = factorEvaluated.constantPart();
-        Poly constantPartEvaluated = constantPart().substitute( _evalMap );
+        Poly constantPartEvaluated = carl::substitute(constantPart(), _evalMap );
         assert( constantPartEvaluated.isConstant() );
         Rational constantPartValue = constantPartEvaluated.constantPart();
-        Poly denomEvaluated = denominator().substitute( _evalMap );
+        Poly denomEvaluated = carl::substitute(denominator(), _evalMap );
         assert( denomEvaluated.isConstant() );
         Rational denomValue = denomEvaluated.constantPart();
         assert( !carl::isZero( denomValue ) );
@@ -359,10 +359,10 @@ namespace carl
 	template<typename Poly>
     SqrtEx<Poly> SqrtEx<Poly>::substitute( const std::map<Variable, Rational>& _evalMap ) const
     {
-        Poly radicandEvaluated = radicand().substitute( _evalMap );
-        Poly factorEvaluated = factor().substitute( _evalMap );
-        Poly constantPartEvaluated = constantPart().substitute( _evalMap );
-        Poly denomEvaluated = denominator().substitute( _evalMap );
+        Poly radicandEvaluated = carl::substitute(radicand(), _evalMap );
+        Poly factorEvaluated = carl::substitute(factor(), _evalMap );
+        Poly constantPartEvaluated = carl::substitute(constantPart(), _evalMap );
+        Poly denomEvaluated = carl::substitute(denominator(), _evalMap );
         assert( !denomEvaluated.isConstant() || !carl::isZero( denomEvaluated.constantPart() ) );
         Rational sqrtExValue;
         if( radicandEvaluated.isConstant() && carl::sqrt_exact( radicandEvaluated.constantPart(), sqrtExValue ) )

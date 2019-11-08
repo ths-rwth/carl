@@ -135,7 +135,7 @@ private:
 		explicit PolynomialSubstitutor(const std::map<Variable,typename Formula::PolynomialType>& repl): replacements(repl) {}
 		Formula operator()(const Formula& formula) {
 			if (formula.getType() != FormulaType::CONSTRAINT) return formula;
-			return Formula(formula.constraint().lhs().substitute(replacements), formula.constraint().relation());
+			return Formula(carl::substitute(formula.constraint().lhs(), replacements), formula.constraint().relation());
 		}
 	};
 
