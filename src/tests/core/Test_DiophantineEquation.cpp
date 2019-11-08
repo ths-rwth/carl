@@ -115,7 +115,7 @@ TEST(DiophantineEquation, solve_linear) {
 
 	p = MultivariatePolynomial<cln::cl_I>({(cln::cl_I)-38789 * x, (cln::cl_I)3772 * y, (cln::cl_I)1999 * z, (cln::cl_I)-180003 * w, (Term<cln::cl_I>)((cln::cl_I)-10029)});
 	res = solveDiophantine(p);
-	EXPECT_EQ(res.size(), p.gatherVariables().size());
+	EXPECT_EQ(res.size(), carl::variables(p).size());
 	EXPECT_EQ(evaluatePolynomial(p, res), 0);
 
 	p = MultivariatePolynomial<cln::cl_I>({(cln::cl_I)-8 * x, (cln::cl_I)4 * y, (cln::cl_I)-12 * z, (cln::cl_I)7 * w, (Term<cln::cl_I>)((cln::cl_I)999)});

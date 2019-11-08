@@ -136,7 +136,7 @@ bool is_zero(const MultivariatePolynomial<C,O,P>& p) {
  */
 template<typename Coeff, typename Ordering, typename Policies>
 bool is_constant(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
-	return (p.nrTerms() == 0) || ((p.nrTerms() == 1) && p.lterm().isConstant());
+	return (p.nrTerms() == 0) || ((p.nrTerms() == 1) && is_constant(p.lterm()));
 }
 
 /**
@@ -146,10 +146,10 @@ template<typename Coeff, typename Ordering, typename Policies>
 bool is_linear(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
 	if (carl::isZero(p)) return true;
 	if (Ordering::degreeOrder) {
-		return p.lterm().isLinear();
+		return is_linear(p.lterm());
 	} else {
 		return std::all_of(p.begin(), p.end(),
-			[](const auto& t){ return t.isLinear(); }
+			[](const auto& t){ return is_linear(t); }
 		);
 	}
 }

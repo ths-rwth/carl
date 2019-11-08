@@ -207,77 +207,6 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable var
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
-{
-	assert(!carl::isZero(divisor));
-	if(carl::isZero(*this)) {
-		return *this;
-	}
-	if(this->degree() < divisor.degree()) return *this;
-	assert(degree() >= divisor.degree());
-	// Remainder in a field is zero by definition.
-	if (is_field<Coeff>::value && divisor.isConstant()) {
-		return UnivariatePolynomial<Coeff>(mMainVar);
-	}
-
-	Coeff factor(0); // We have to initialize it to prevent a compiler error.
-	if(prefactor != nullptr)
-	{
-		factor = carl::quotient(Coeff(*prefactor * lcoeff()), divisor.lcoeff());
-		// There should be no remainder.
-		assert(factor * divisor.lcoeff() == *prefactor * lcoeff());
-	}
-	else
-	{
-		factor = carl::quotient(lcoeff(), divisor.lcoeff());
-		// There should be no remainder.
-		assert(factor * divisor.lcoeff() == lcoeff());
-	}
-
-	UnivariatePolynomial<Coeff> result(mMainVar);
-	result.mCoefficients.reserve(mCoefficients.size()-1);
-	uint degdiff = degree() - divisor.degree();
-	if(degdiff > 0)
-	{
-		result.mCoefficients.assign(mCoefficients.begin(), mCoefficients.begin() + long(degdiff));
-	}
-	if(prefactor != nullptr)
-	{
-		for(Coeff& c : result.mCoefficients)
-		{
-			c *= *prefactor;
-		}
-	}
-	
-	// By construction, the leading coefficient will be zero.
-	if(prefactor != nullptr)
-	{
-		for(std::size_t i = 0; i < mCoefficients.size() - degdiff -1; ++i)
-		{
-			result.mCoefficients.push_back(mCoefficients[i + degdiff] * *prefactor - factor * divisor.mCoefficients[i]);
-		}
-	}
-	else
-	{
-		for(std::size_t i = 0; i < mCoefficients.size() - degdiff -1; ++i)
-		{
-			result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i]);
-		}
-	}
-	// strip zeros from the end as we might have pushed zeros.
-	result.stripLeadingZeroes();
-	
-	if(carl::isZero(result) || result.degree() < divisor.degree())
-	{
-		return result;
-	}
-	else 
-	{	
-		return result.remainder_helper(divisor, nullptr);
-	}
-}
-
-template<typename Coeff>
 bool UnivariatePolynomial<Coeff>::isNormal() const
 {
 	return unitPart() == Coeff(1);
@@ -1080,11 +1009,10 @@ bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomia
 template<typename C>
 bool operator==(const UnivariatePolynomial<C>& lhs, const C& rhs)
 {	
-	if(carl::isZero(lhs))
-	{
-		return rhs == C(0);
+	if (lhs.coefficients().size() == 0) {
+		return carl::isZero(rhs);
 	}
-	return lhs.isConstant() && lhs.lcoeff() == rhs;
+	return (lhs.coefficients().size() == 1) && lhs.lcoeff() == rhs;
 }
 
 template<typename C>

@@ -9,6 +9,13 @@
 
 namespace carl {
 
+/**
+ * Does the heavy lifting for the remainder computation of polynomial division.
+ * @param divisor
+ * @param prefactor
+ * @see @cite GCL92, page 55, Pseudo-Division Property
+ * @return 
+ */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> remainder_helper(const UnivariatePolynomial<Coeff>& dividend, const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor = nullptr) {
 	assert(!carl::isZero(divisor));

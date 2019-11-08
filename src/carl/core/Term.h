@@ -96,9 +96,9 @@ public:
 		return mMonomial;
 	}
 	/**
-		 * Gives the total degree, i.e. the sum of all exponents.
-		 * @return Total degree.
-		 */
+	 * Gives the total degree, i.e. the sum of all exponents.
+	 * @return Total degree.
+	 */
 	uint tdeg() const {
 		if (!mMonomial) return 0;
 		return mMonomial->tdeg();
@@ -108,7 +108,8 @@ public:
 		 * Checks whether the term is zero.
 		 * @return 
 		 */
-	[[deprecated("use carl::isZero(t) instead.")]] bool isZero() const {
+	[[deprecated("use carl::is_zero(t) instead.")]]
+	bool isZero() const {
 		return carl::isZero(mCoeff); //change this to mCoeff.isZero() at some point
 	}
 
@@ -116,7 +117,8 @@ public:
 		 * Checks whether the term equals one.
          * @return 
          */
-	[[deprecated("use carl::isOne(t) instead.")]] bool isOne() const {
+	[[deprecated("use carl::is_one(t) instead.")]]
+	bool isOne() const {
 		return isConstant() && carl::isOne(mCoeff); //change this to mCoeff.isOne() at some point
 	}
 	/**

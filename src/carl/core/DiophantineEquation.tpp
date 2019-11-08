@@ -38,7 +38,7 @@ std::vector<T> solveLinearDiophantine(MultivariatePolynomial<T>& equation) {
     
     // if there is no constant part return the trivial solution
     if(!equation.hasConstantTerm()){
-        res = std::vector<T>(equation.gatherVariables().size(), 0);
+        res = std::vector<T>(carl::variables(equation).size(), 0);
         return res;
     }
     

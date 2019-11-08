@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Degree.h"
 #include "Power.h"
 
 #include "../MultivariatePolynomial.h"
@@ -16,7 +17,7 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> sos_decomposition(const 
 		for (auto term = p.rbegin(); term != p.rend(); ++term) {
 			if (!carl::isNegative(term->coeff())) {
 				assert(!carl::isZero(term->coeff()));
-				if (term->isConstant()) {
+				if (is_constant(*term)) {
 					result.emplace_back(term->coeff(), MultivariatePolynomial<C,O,P>(constant_one<C>::get()));
 				} else {
 					auto resMonomial = term->monomial()->sqrt();

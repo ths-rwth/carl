@@ -717,6 +717,7 @@ public:
 	 * Reduces the polynomial such that zero is not a root anymore.
 	 * Is functionally equivalent to eliminateRoot(0), but much faster.
 	 */
+	[[deprecated("use carl::eliminate_zero_root(p) instead.")]]
 	void eliminateZeroRoots();
 	/**
 	 * Reduces the polynomial such that the given root is not a root anymore.
@@ -726,6 +727,7 @@ public:
 	 * If this is not the case, i.e. <code>evaluate(root) != 0</code>, the polynomial will contain meaningless garbage.
 	 * @param root Root to be eliminated.
 	 */
+	[[deprecated("use carl::eliminate_root(p) instead.")]]
 	void eliminateRoot(const Coefficient& root);
 	
 public:
@@ -943,15 +945,6 @@ public:
 	 * @complexity O(n^2)
 	 */
 	void shift(const Coefficient& a);	
-	
-	/**
-	 * Calculates the remainder of polynomial division.
-	 * @param divisor
-	 * @param prefactor
-	 * @see @cite GCL92, page 55, Pseudo-Division Property
-	 * @return 
-	 */
-	UnivariatePolynomial remainder_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	
 	void stripLeadingZeroes() 
 	{

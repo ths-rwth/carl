@@ -9,7 +9,7 @@ namespace carl {
 
 template<typename Coefficient>
 Coefficient evaluate(const Monomial& m, const std::map<Variable, Coefficient>& substitutions) {
-	CARL_LOG_FUNC("carl.core.monomial", *this << ", " << substitutions);
+	CARL_LOG_FUNC("carl.core.monomial", m << ", " << substitutions);
 	Coefficient res = carl::constant_one<Coefficient>::get();
 	for (const auto& ve : m) {
 		auto it = substitutions.find(ve.first);

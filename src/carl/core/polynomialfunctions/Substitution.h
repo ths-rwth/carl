@@ -78,7 +78,7 @@ void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const Mu
 			} else removedLast = true;
 		}
 		p.getTerms().swap(newTerms);
-		CARL_LOG_TRACE("carl.core", *this << " [ " << var << " -> " << value << " ] = " << *this);
+		CARL_LOG_TRACE("carl.core", p << " [ " << var << " -> " << value << " ] = " << p);
 		if (removedLast) {
 			p.reset_ordered();
 			p.template makeMinimallyOrdered<false, true>();

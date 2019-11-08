@@ -9,6 +9,7 @@
 #include "../../io/streamingOperators.h"
 #include "EigenWrapper.h"
 #include "Evaluation.h"
+#include "RootElimination.h"
 
 namespace carl::rootfinder {
 
@@ -54,7 +55,7 @@ class RealRootIsolation {
 			if (mInterval.contains(0)) {
 				mRoots.emplace_back(0);
 			}
-			mPolynomial.eliminateZeroRoots();
+			eliminate_zero_root(mPolynomial);
 		}
 	}
 
@@ -132,7 +133,7 @@ class RealRootIsolation {
 		CARL_LOG_TRACE("carl.core.rootfinder", "Add root " << n);
 		assert(carl::is_root_of(mPolynomial, n));
 		reset_sturm_sequence();
-		mPolynomial.eliminateRoot(n);
+		eliminate_root(mPolynomial, n);
 		mRoots.emplace_back(n);
 	}
 	/// Add a root to mRoots, based on an isolating interval.
