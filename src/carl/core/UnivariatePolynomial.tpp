@@ -145,68 +145,6 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 }
 
 template<typename Coeff>
-void UnivariatePolynomial<Coeff>::substituteIn(Variable var, const Coeff& value) {
-	if (carl::isZero(*this)) return;
-	if (var == mainVar()) {
-		mCoefficients[0] = evaluate(value);
-		mCoefficients.resize(1);
-	} else if constexpr (!is_number<Coeff>::value) {
-		// Coefficients from a polynomial ring
-		if (value.has(var)) {
-			// Fall back to multivariate substitution.
-			MultivariatePolynomial<NumberType> tmp(*this);
-			tmp.substituteIn(var, value);
-			*this = tmp.toUnivariatePolynomial(mainVar());
-		} else {
-			// Safely substitute into each coefficient separately
-			for (auto& c: mCoefficients) {
-				c.substituteIn(var, value);
-			}
-		}
-	}
-	stripLeadingZeroes();
-	assert(isConsistent());
-}
-
-template<typename Coeff>
-template<typename C, EnableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable var, const Coeff& value) const {
-	if (var == this->mainVar()) {
-		return UnivariatePolynomial<Coeff>(this->mainVar(), this->evaluate(value));
-	}
-	return *this;
-}
-
-template<typename Coeff>
-template<typename C, DisableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable var, const Coeff& value) const {
-	if (var == this->mainVar()) {
-		UnivariatePolynomial<Coeff> res(this->mainVar());
-		for (const auto& c: mCoefficients) {
-			res += c.substitute(var, value);
-		}
-		CARL_LOG_TRACE("carl.core.uvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << res);
-		return res;
-	} else {
-			if (value.has(var)) {
-				// Fall back to multivariate substitution.
-				MultivariatePolynomial<NumberType> tmp(*this);
-				tmp.substituteIn(var, value);
-				return tmp.toUnivariatePolynomial(this->mMainVar);
-			} else {
-		std::vector<Coeff> res(this->mCoefficients.size());
-		for (std::size_t i = 0; i < res.size(); i++) {
-			res[i] = this->mCoefficients[i].substitute(var, value);
-		}
-		UnivariatePolynomial<Coeff> resp(this->mainVar(), res);
-		resp.stripLeadingZeroes();
-		CARL_LOG_TRACE("carl.core.uvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << resp);
-		return resp;
-			}
-	}
-}
-
-template<typename Coeff>
 bool UnivariatePolynomial<Coeff>::isNormal() const
 {
 	return unitPart() == Coeff(1);
