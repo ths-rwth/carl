@@ -1,5 +1,5 @@
 language: generic
-dist: xenial
+dist: bionic
 
 cache:
   apt: true
