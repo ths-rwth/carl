@@ -10,8 +10,8 @@ cache:
 
 addons:
   apt:
-    sources: &sources_base
-      - sourceline: 'ppa:ubuntu-toolchain-r/test'
+    sources_base: &sources_base
+      sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages: &packages_base
       - texinfo
       - time
