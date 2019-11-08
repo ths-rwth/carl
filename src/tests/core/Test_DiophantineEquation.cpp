@@ -72,7 +72,7 @@ cln::cl_I evaluatePolynomial(MultivariatePolynomial<cln::cl_I>& p, std::vector<c
 	for (std::size_t i = start; i < terms.size(); i++) {
 		varMap[terms[i].getSingleVariable()] = res[i - start];
 	}
-	return p.evaluate(varMap);
+	return carl::evaluate(p, varMap);
 }
 
 TEST(DiophantineEquation, solve_linear) {

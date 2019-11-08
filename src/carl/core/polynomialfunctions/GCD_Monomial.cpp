@@ -1,8 +1,10 @@
 #include "GCD_Monomial.h"
 
+#include "../MonomialPool.h"
+
 namespace carl {
 
-Monomial::Arg Monomial::gcd(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
+Monomial::Arg gcd(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 	if(!lhs && !rhs) return nullptr;
 	if(!lhs) return rhs;
 	if(!rhs) return lhs;
@@ -11,13 +13,13 @@ Monomial::Arg Monomial::gcd(const Monomial::Arg& lhs, const Monomial::Arg& rhs) 
 	assert(lhs->isConsistent());
 	assert(rhs->isConsistent());
 
-	Content newExps;
+	Monomial::Content newExps;
 	uint expsum = 0;
 	// Linear, as we expect small monomials.
-	auto itright = rhs->mExponents.cbegin();
-	auto leftEnd = lhs->mExponents.cend();
-	auto rightEnd = rhs->mExponents.cend();
-	for(auto itleft = lhs->mExponents.cbegin(); (itleft != leftEnd && itright != rightEnd);)
+	auto itright = rhs->begin();
+	auto leftEnd = lhs->end();
+	auto rightEnd = rhs->end();
+	for(auto itleft = lhs->begin(); (itleft != leftEnd && itright != rightEnd);)
 	{
 		// Variable is present in both monomials.
 		if(itleft->first == itright->first)
