@@ -59,8 +59,8 @@ public:
 
 /**
  * Prints the given sort value on the given output stream.
- * @param _os The output stream to print on.
- * @param _sortValue The sort value to print.
+ * @param os The output stream to print on.
+ * @param sv The sort value to print.
  * @return The output stream after printing the given sort value on it.
  */
 inline std::ostream& operator<<(std::ostream& os, const SortValue& sv) {
@@ -68,8 +68,7 @@ inline std::ostream& operator<<(std::ostream& os, const SortValue& sv) {
 }
 
 /**
- * @param _sortValue The sort value to compare with.
- * @return true, if this sort value equals the given one.
+ * Compares two sort values for equality.
  */
 inline bool operator==(const SortValue& lhs, const SortValue& rhs) {
 	assert(lhs.sort() == rhs.sort());
@@ -77,8 +76,7 @@ inline bool operator==(const SortValue& lhs, const SortValue& rhs) {
 }
 
 /**
- * @param _sortValue The sort value to compare with.
- * @return true, if this sort value is less than the given one.
+ * Orders two sort values.
  */
 inline bool operator<(const SortValue& lhs, const SortValue& rhs) {
 	assert(lhs.sort() == rhs.sort());
@@ -94,7 +92,7 @@ namespace std {
 template<>
 struct hash<carl::SortValue> {
 	/**
-	 * @param _sortValue The sort value to get the hash for.
+	 * @param sv The sort value to get the hash for.
 	 * @return The hash of the given sort value.
 	 */
 	std::size_t operator()(const carl::SortValue& sv) const {

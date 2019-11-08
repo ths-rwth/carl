@@ -43,7 +43,7 @@ bool vanishes(
 		}
 		assert(varToRANMap.count(v) > 0);
 		if (varToRANMap.at(v).isNumeric()) {
-			polyCopy.substituteIn(v, Coeff(varToRANMap.at(v).value()));
+			substitute_inplace(polyCopy, v, Coeff(varToRANMap.at(v).value()));
 		} else {
 			IRmap.emplace(v, varToRANMap.at(v));
 		}

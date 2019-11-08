@@ -41,9 +41,10 @@ bool set_complement(const Interval<Number>& interval, Interval<Number>& resA, In
 /**
  * Calculates the difference of two intervals in a set-theoretic manner:
  * lhs \ rhs (can result in two distinct intervals).
- * @param rhs Righthand side.
- * @param resultA Result a.
- * @param resultB Result b.
+ * @param lhs First interval.
+ * @param rhs Second interval.
+ * @param resA Result a.
+ * @param resB Result b.
  * @return True, if the result is twofold.
  */
 template<typename Number>
@@ -149,9 +150,10 @@ bool set_is_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
 /**
  * Calculates the symmetric difference of two intervals in a
  * set-theoretic manner (can result in two distinct intervals).
- * @param rhs Righthand side.
- * @param resultA Result a.
- * @param resultB Result b.
+ * @param lhs First interval.
+ * @param rhs Second interval.
+ * @param resA Result a.
+ * @param resB Result b.
  * @return True, if the result is twofold.
  */
 template<typename Number>

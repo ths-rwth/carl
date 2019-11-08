@@ -624,37 +624,6 @@ Coeff UnivariatePolynomial<Coeff>::syntheticDivision(const Coeff& zeroOfDivisor)
 }
 
 template<typename Coeff>
-void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
-	std::size_t i = 0;
-	while ((i < this->mCoefficients.size()) && (this->mCoefficients[i] == Coeff(0))) i++;
-	if (i == 0) return;
-	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
-	for (std::size_t j = 0; j < this->mCoefficients.size()-i; j++) {
-		this->mCoefficients[j] = this->mCoefficients[j+i];
-	}
-	this->mCoefficients.resize(this->mCoefficients.size()-i);
-	assert(this->isConsistent());
-}
-
-template<typename Coeff>
-void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
-	assert(this->isRoot(root));
-	if (carl::isZero(*this)) return;
-	if (root == Coeff(0)) {
-		this->eliminateZeroRoots();
-		return;
-	}
-	do {
-		std::vector<Coeff> tmp(this->mCoefficients.size()-1);
-		for (std::size_t i = this->mCoefficients.size()-1; i > 0; i--) {
-			tmp[i-1] = this->mCoefficients[i];
-			this->mCoefficients[i-1] += this->mCoefficients[i] * root;
-		}
-		this->mCoefficients = tmp;
-	} while ((this->evaluate(root) == Coeff(0)) && (this->mCoefficients.size() > 0));
-}
-
-template<typename Coeff>
 void UnivariatePolynomial<Coeff>::reverse() {
 	std::reverse(this->mCoefficients.begin(), this->mCoefficients.end());
 }

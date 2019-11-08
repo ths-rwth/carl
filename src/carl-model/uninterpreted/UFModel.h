@@ -62,8 +62,8 @@ inline bool operator<(const UFModel& lhs, const UFModel& rhs) {
 
 /**
  * Prints the given uninterpreted function model on the given output stream.
- * @param _os The output stream to print on.
- * @param _ufm The uninterpreted function model to print.
+ * @param os The output stream to print on.
+ * @param ufm The uninterpreted function model to print.
  * @return The output stream after printing the given uninterpreted function model on it.
  */
 std::ostream& operator<<(std::ostream& os, const UFModel& ufm);

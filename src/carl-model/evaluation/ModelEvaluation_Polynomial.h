@@ -17,7 +17,7 @@ namespace model {
 	}
 	template<typename Poly, typename Rational>
 	void substituteIn(UnivariatePolynomial<Poly>& p, Variable var, const Rational& r) {
-		p.substituteIn(var, Poly(r));
+		carl::substitute_inplace(p, var, Poly(r));
 	}
 
 	/**

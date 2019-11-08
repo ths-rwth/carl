@@ -713,23 +713,7 @@ public:
 	bool zeroIsRoot() const {
 		return mCoefficients.empty() || carl::isZero(mCoefficients[0]);
 	}
-	/**
-	 * Reduces the polynomial such that zero is not a root anymore.
-	 * Is functionally equivalent to eliminateRoot(0), but much faster.
-	 */
-	[[deprecated("use carl::eliminate_zero_root(p) instead.")]]
-	void eliminateZeroRoots();
-	/**
-	 * Reduces the polynomial such that the given root is not a root anymore.
-	 * The reduction is achieved by removing the linear factor (mainVar - root) from the polynomial, possibly multiple times.
-	 *
-	 * This method assumes that the given root is an actual real root of this polynomial.
-	 * If this is not the case, i.e. <code>evaluate(root) != 0</code>, the polynomial will contain meaningless garbage.
-	 * @param root Root to be eliminated.
-	 */
-	[[deprecated("use carl::eliminate_root(p) instead.")]]
-	void eliminateRoot(const Coefficient& root);
-	
+
 public:
 	/// @name Equality comparison operators
 	/// @{
