@@ -340,11 +340,16 @@ public:
 	 * Retrieves the coefficients defining this polynomial.
 	 * @return Coefficients.
 	 */
-	const std::vector<Coefficient>& coefficients() const {
+	const std::vector<Coefficient>& coefficients() const & {
 		return mCoefficients;
 	}
-	std::vector<Coefficient>& coefficients() {
+	/// Returns the coefficients as non-const reference.
+	std::vector<Coefficient>& coefficients() & {
 		return mCoefficients;
+	}
+	/// Returns the coefficients as rvalue. The polynomial may be in an undefined state afterwards!
+	std::vector<Coefficient>&& coefficients() && {
+		return std::move(mCoefficients);
 	}
 
 	/**
