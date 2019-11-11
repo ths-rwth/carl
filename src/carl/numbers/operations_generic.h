@@ -47,16 +47,16 @@ inline bool isNegative(const T& t) {
 }
 
 /**
-	 * Implements a fast exponentiation on an arbitrary type T.
-	 * To use carl::pow() on a type T, the following must be defined:
-	 * - carl::constant_one<T>,
-	 * - T::operator=(const T&) and
-	 * - operator*(const T&, const T&).
-	 * Alternatively, carl::pow() can be specialized for T explicitly.
-	 * @param t A number.
-	 * @param exp The exponent.
-	 * @return `t` to the power of `exp`.
-	 */
+ * Implements a fast exponentiation on an arbitrary type T.
+ * To use carl::pow() on a type T, the following must be defined:
+ * - carl::constant_one<T>,
+ * - T::operator=(const T&) and
+ * - operator*(const T&, const T&).
+ * Alternatively, carl::pow() can be specialized for T explicitly.
+ * @param basis A number.
+ * @param exp The exponent.
+ * @return `basis` to the power of `exp`.
+ */
 template<typename T, DisableIf<is_interval<T>> = dummy>
 T pow(const T& basis, std::size_t exp) {
 	T res = carl::constant_one<T>().get();

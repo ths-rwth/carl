@@ -9,8 +9,9 @@
 namespace carl {
 
 /**
- * Applies the given substitutions to this monomial.
+ * Applies the given substitutions to a monomial.
  * Every variable may be substituted by some value.
+ * @param m The monomial.
  * @param substitutions Maps variables to numbers.
  * @return \f$ this[<substitutions>] \f$
  */

@@ -44,16 +44,16 @@ public:
 };
 
 /**
- * @param _ufm The uninterpreted function model to compare with.
- * @return true, if this uninterpreted function model equals the given one.
+ * Compares two UFModel objects for equality.
+ * @return true, if the two uninterpreted function models are equal.
  */
 inline bool operator==(const UFModel& lhs, const UFModel& rhs) {
 	return std::forward_as_tuple(lhs.function(), lhs.values())
 		== std::forward_as_tuple(rhs.function(), rhs.values());
 }
 /**
- * @param _ufm The uninterpreted function model to compare with.
- * @return true, if this uninterpreted function model is less than the given one.
+ * Checks whether one UFModel is smaller than another.
+ * @return true, if one uninterpreted function model is less than the other.
  */
 inline bool operator<(const UFModel& lhs, const UFModel& rhs) {
 	return std::forward_as_tuple(lhs.function(), lhs.values())
@@ -77,7 +77,7 @@ namespace std {
 template<>
 struct hash<carl::UFModel> {
 	/**
-	 * @param _ufm The uninterpreted function model to get the hash for.
+	 * @param ufm The uninterpreted function model to get the hash for.
 	 * @return The hash of the given uninterpreted function model.
 	 */
 	std::size_t operator()(const carl::UFModel& ufm) const {

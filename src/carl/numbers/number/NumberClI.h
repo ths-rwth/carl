@@ -41,7 +41,6 @@ namespace carl {
 		/**
 		 * Check if a number is integral.
 		 * As cln::cl_I are always integral, this method returns true.
-		 * @param An integer.
 		 * @return true.
 		 */
 
@@ -53,7 +52,6 @@ namespace carl {
 
 		/**
 		 * Get the bit size of the representation of a integer.
-		 * @param n An integer.
 		 * @return Bit size of n.
 		 */
 		inline std::size_t bitsize() const  {
@@ -63,7 +61,6 @@ namespace carl {
 
 		/**
 		 * Converts the given integer to a double.
-		 * @param n An integer.
 		 * @return Double.
 		 */
 		inline double toDouble() const  {
@@ -75,7 +72,6 @@ namespace carl {
 
 		/**
 		 * Get absolute value of an integer.
-		 * @param n An integer.
 		 * @return \f$|n|\f$.
 		 */
 		Number<cln::cl_I> abs() const {
@@ -84,7 +80,6 @@ namespace carl {
 
 		/*
 		 * Calculate the greatest common divisor of two integers.
-		 * @param a First argument.
 		 * @param b Second argument.
 		 * @return Gcd of a and b.
 		 */
@@ -95,7 +90,6 @@ namespace carl {
 
 		/**
 		 * Calculate the least common multiple of two integers.
-		 * @param a First argument.
 		 * @param b Second argument.
 		 * @return Lcm of a and b.
 		 */
@@ -109,7 +103,6 @@ namespace carl {
 
 		/**
 		 * Calculate the remainder of the integer division.
-		 * @param a First argument.
 		 * @param b Second argument.
 		 * @return \f$a \% b\f$.
 		 */
@@ -121,7 +114,6 @@ namespace carl {
 		/**
 		 * Divide two integers.
 		 * Asserts that the remainder is zero.
-		 * @param a First argument.
 		 * @param b Second argument.
 		 * @return \f$ a / b \f$.
 		 */
@@ -136,7 +128,6 @@ namespace carl {
 		/**
 		 * Divide two integers.
 		 * Discards the remainder of the division.
-		 * @param a First argument.
 		 * @param b Second argument.
 		 * @return \f$ a / b \f$.
 		 */
@@ -148,7 +139,6 @@ namespace carl {
 
 		/**
 		 * Calculate the remainder of the integer division.
-		 * @param a First argument.
 		 * @param b Second argument.
 		 * @return \f$a \% b\f$.
 		 */

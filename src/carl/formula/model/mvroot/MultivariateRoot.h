@@ -50,7 +50,7 @@ public:
 	 * @param poly Must mention the root-variable "_z" and
 	 * should have a at least 'rootIdx'-many roots in "_z" at each subpoint
 	 * where it is intended to be evaluated.
-	 * @param rootIdx The index of the root of the polynomial in "_z".
+	 * @param k The index of the root of the polynomial in "_z".
 	 * The first root has index 1, the second has index 2 and so on.
 	 */
 	MultivariateRoot(const Poly& poly, std::size_t k): mPoly(poly), mK(k) {

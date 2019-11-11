@@ -7,6 +7,7 @@ namespace carl {
 
 /**
  * Calculates the given power of a monomial m.
+ * @param m The monomial.
  * @param exp Exponent.
  * @return m to the power of exp.
  */
@@ -67,9 +68,10 @@ MultivariatePolynomial<C,O,P> pow_naive(const MultivariatePolynomial<C,O,P>& p, 
 }
 
 /**
- * Returns this polynomial to the given power.
+ * Returns a polynomial to the given power.
+ * @param p The polynomial.
  * @param exp Exponent.
- * @return This to the power of exp.
+ * @return The polynomial to the power of exp.
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> pow(const UnivariatePolynomial<Coeff>& p, std::size_t exp) {

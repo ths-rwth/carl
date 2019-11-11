@@ -28,6 +28,7 @@ void eliminate_zero_root(UnivariatePolynomial<Coeff>& p) {
  *
  * This method assumes that the given root is an actual real root of this polynomial.
  * If this is not the case, i.e. <code>evaluate(root) != 0</code>, the polynomial will contain meaningless garbage.
+ * @param p The polynomial.
  * @param root Root to be eliminated.
  */
 template<typename Coeff>

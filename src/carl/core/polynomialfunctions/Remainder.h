@@ -153,10 +153,7 @@ UnivariatePolynomial<Coeff> pseudo_remainder(const UnivariatePolynomial<Coeff>& 
 }
 
 /**
- * Signed pseudoremainder.
- * see 
- * @param divisor
- * @return 
+ * Compute the signed pseudo-remainder.
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> signed_pseudo_remainder(const UnivariatePolynomial<Coeff>& dividend, const UnivariatePolynomial<Coeff>& divisor) {

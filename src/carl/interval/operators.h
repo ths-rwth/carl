@@ -299,7 +299,7 @@ inline Interval<Number>& operator+=(Interval<Number>& lhs, const Number& rhs) {
 
 /**
  * Unary minus.
- * @param interval The operand.
+ * @param rhs The operand.
  * @return Resulting interval.
  */
 template<typename Number>

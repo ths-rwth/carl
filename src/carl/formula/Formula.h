@@ -1085,8 +1085,8 @@ namespace carl
 
 	/**
 	 * The output operator of a formula.
-	 * @param _out The stream to print on.
-	 * @param _formula
+	 * @param os The stream to print on.
+	 * @param f The formula to print.
 	 */
 	template<typename P>
 	inline std::ostream& operator<<(std::ostream& os, const Formula<P>& f) {

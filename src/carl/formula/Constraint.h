@@ -275,8 +275,8 @@ namespace carl
 
     /**
      * Prints the representation of the given constraints on the given stream.
-     * @param _out The stream to print on.
-     * @param _constraint The constraint to print.
+     * @param os The stream to print on.
+     * @param cc The constraint to print.
      * @return The given stream after printing.
      */
     template<typename P>
@@ -1058,8 +1058,8 @@ namespace carl
     
     /**
      * Prints the given constraint on the given stream.
-     * @param _out The stream to print the given constraint on.
-     * @param _constraint The formula to print.
+     * @param os The stream to print the given constraint on.
+     * @param c The formula to print.
      * @return The stream after printing the given constraint on it.
      */
     template<typename Poly>

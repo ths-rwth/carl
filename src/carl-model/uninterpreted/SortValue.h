@@ -33,6 +33,7 @@ private:
 
 	/**
 	 * Constructs a sort value.
+	 * @parem _sort The sort.
 	 * @param _id The id of the sort value to construct.
 	 */
 	explicit SortValue(Sort _sort, std::size_t _id)

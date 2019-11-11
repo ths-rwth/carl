@@ -230,8 +230,8 @@ public:
 
 	/**
 	 * Recursively replaces sorts within the given sort according to the mapping of sort names to sorts as declared by the given map.
-	 * @param _sort The sort to replace sorts by sorts in.
-	 * @param _parameters The map of sort names to sorts.
+	 * @param sort The sort to replace sorts by sorts in.
+	 * @param parameters The map of sort names to sorts.
 	 * @return The resulting sort.
 	 */
 	Sort replace(const Sort& sort, const std::map<std::string, Sort>& parameters);

@@ -41,8 +41,8 @@ public:
 
 	/**
 	 * Constructs an uninterpreted variable.
-	 * @param _var The variable of the uninterpreted variable to construct.
-	 * @param _domain The domain of the uninterpreted variable to construct.
+	 * @param var The variable of the uninterpreted variable to construct.
+	 * @param domain The domain of the uninterpreted variable to construct.
 	 */
 	UVariable(Variable var, Sort domain)
 		: mVar(var),

@@ -241,7 +241,7 @@ namespace carl
 
             /**
              * Create formula representing a boolean variable.
-             * @param _booleanVar The Boolean variable wrapped by this formula.
+             * @param _variable The Boolean variable wrapped by this formula.
              * @return A formula with wrapping the given Boolean variable.
              */
             const FormulaContent<Pol>* create(Variable _variable) {
@@ -606,7 +606,7 @@ namespace carl
              */
             bool formulasInverse( const Formula<Pol>& _subformulaA, const Formula<Pol>& _subformulaB );
 
-            /**
+            /* *
              * @param _type The type of the n-ary operator (n>1) of the formula to create.
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.

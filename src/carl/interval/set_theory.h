@@ -7,8 +7,9 @@ namespace carl {
 /**
  * Calculates the complement in a set-theoretic manner (can result
  * in two distinct intervals).
- * @param resultA Result a.
- * @param resultB Result b.
+ * @param interval Interval.
+ * @param resA Result a.
+ * @param resB Result b.
  * @return True, if the result is twofold.
  */
 template<typename Number>
@@ -90,6 +91,7 @@ bool set_difference(const Interval<Number>& lhs, const Interval<Number>& rhs, In
 
 /**
  * Intersects two intervals in a set-theoretic manner.
+ * @param lhs Lefthand side.
  * @param rhs Righthand side.
  * @return Result.
  */

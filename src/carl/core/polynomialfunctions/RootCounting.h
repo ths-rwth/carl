@@ -12,7 +12,7 @@ namespace carl {
 /**
  * Calculate the number of real roots of a polynomial within a given interval based on a sturm sequence of this polynomial.
  * @param seq Sturm sequence.
- * @param interval Interval.
+ * @param i Interval.
  * @return Number of real roots in the interval.
  */
 template<typename Coefficient>
@@ -28,7 +28,8 @@ int count_real_roots(const std::vector<UnivariatePolynomial<Coefficient>>& seq, 
 
 /**
  * Count the number of real roots of p within the given interval using Sturm sequences.
- * @param interval Count roots within this interval.
+ * @param p The polynomial.
+ * @param i Count roots within this interval.
  * @return Number of real roots within the interval.
  */
 template<typename Coefficient>

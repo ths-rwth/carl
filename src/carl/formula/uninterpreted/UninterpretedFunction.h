@@ -68,16 +68,16 @@ namespace carl
 	static_assert(sizeof(UninterpretedFunction) == sizeof(std::size_t), "UninterpretedFunction should be as large as its id");
 
 	/**
-	 * @param ufun The uninterpreted function to compare with.
-	 * @return true, if this and the given uninterpreted function are equal.
+	 * Check whether two uninterpreted functions are equal.
+	 * @return true, if the two given uninterpreted functions are equal.
 	 */
 	inline bool operator==(const UninterpretedFunction& lhs, const UninterpretedFunction& rhs) {
 		return lhs.id() == rhs.id();
 	}
 
 	/**
-	 * @param ufun The uninterpreted function to compare with.
-	 * @return true, if this uninterpreted function is less than the given one.
+	 * Check whether one uninterpreted function is smaller than another.
+	 * @return true, if one uninterpreted function is less than the other one.
 	 */
 	inline bool operator<(const UninterpretedFunction& lhs, const UninterpretedFunction& rhs) {
 		return lhs.id() < rhs.id();

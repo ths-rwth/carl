@@ -40,7 +40,7 @@ private:
 public:
 	/**
      * Creates a new value for the given sort.
-     * @param _sort The sort to create a new value for.
+     * @param sort The sort to create a new value for.
      * @return The resulting sort value.
      */
 	SortValue newSortValue(const Sort& sort) {
@@ -52,7 +52,7 @@ public:
 	}
 	/**
 	 * Returns the default value for the given sort.
-	 * @param _sort The sort to return the default value for.
+	 * @param sort The sort to return the default value for.
 	 * @return The resulting sort value.
 	 */
 	SortValue defaultSortValue(const Sort& sort) const {
@@ -62,7 +62,7 @@ public:
 
 /**
  * Creates a new value for the given sort.
- * @param _sort The sort to create a new value for.
+ * @param sort The sort to create a new value for.
  * @return The resulting sort value.
  */
 inline SortValue newSortValue(const Sort& sort) {
@@ -70,7 +70,7 @@ inline SortValue newSortValue(const Sort& sort) {
 }
 /**
  * Returns the default value for the given sort.
- * @param _sort The sort to return the default value for.
+ * @param sort The sort to return the default value for.
  * @return The resulting sort value.
  */
 inline SortValue defaultSortValue(const Sort& sort) {

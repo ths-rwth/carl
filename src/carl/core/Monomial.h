@@ -366,6 +366,7 @@ namespace carl
 		 * Divides the monomial by a variable v.
 		 * If the division is impossible (because v does not occur in the monomial), nullptr is returned.
 		 * @param v Variable
+		 * @param res Resulting monomial
 		 * @return This divided by v.
 		 */
 		bool divide(Variable v, Monomial::Arg& res) const;
@@ -420,6 +421,7 @@ namespace carl
 		 * The monomial pointer holds the result of the division.
 		 * If the division resulted in an empty monomial (i.e. the two monomials were equal), the pointer is nullptr.
 		 * @param m Monomial.
+		 * @param res Resulting monomial.
 		 * @return this divided by m.
 		 */
 		bool divide(const Monomial::Arg& m, Monomial::Arg& res) const;

@@ -204,7 +204,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, 
  * Output a std::unordered_set with arbitrary content.
  * The format is `{<length>: <item>, <item>, ...}`
  * @param os Output stream.
- * @param m unordered_set to be printed.
+ * @param s unordered_set to be printed.
  * @return Output stream.
  */
 template<typename T, typename H, typename K, typename A>

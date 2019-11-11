@@ -96,7 +96,7 @@ namespace std {
 template<>
 struct hash<carl::BVTerm> {
 	/**
-	 * @param _term The bit vector term to get the hash for.
+	 * @param t The bit vector term to get the hash for.
 	 * @return The hash of the given bit vector term.
 	 */
 	std::size_t operator()(const carl::BVTerm& t) const {

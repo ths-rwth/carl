@@ -33,12 +33,13 @@ namespace carl {
     };
 	
 	/**
-	 * Check whether the bits of this condition are always set if the corresponding bit
-	 * of the given condition is set.
+	 * Check whether the bits of one condition are always set if the corresponding bit
+	 * of another condition is set. Essentially checks for an implication.
 	 *
-	 * @param _condition The condition to compare with.
-	 * @return  true,   if all bits of this condition are always set if the corresponding bit
-	 *                  of the given condition is set;
+	 * @param lhs The first condition.
+	 * @param rhs The second condition.
+	 * @return  true,   if all bits of lhs are set if the corresponding bit
+	 *                  of rhs are set;
 	 *          false,  otherwise.
 	 */
 	inline bool operator<=(const Condition& lhs, const Condition& rhs) {

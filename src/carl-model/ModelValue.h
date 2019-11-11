@@ -116,9 +116,9 @@ namespace carl
 		 * @return *this.
 		 */
 		template<typename T>
-		ModelValue& operator=(const T& _t) {
+		ModelValue& operator=(const T& t) {
 			// Attention: Replace copy assignment with constructor + move assignment to avoid problems with self-assignment
-			mData = Super(_t);
+			mData = Super(t);
 			return *this;
 		}
 		template<typename ...Args>

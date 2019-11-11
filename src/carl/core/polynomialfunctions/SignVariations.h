@@ -9,6 +9,7 @@ namespace carl {
 /**
  * Counts the sign variations (i.e. an upper bound for the number of real roots) via Descarte's rule of signs.
  * This is an upper bound for countRealRoots().
+ * @param polynomial A polynomial.
  * @param interval Count roots within this interval.
  * @return Upper bound for number of real roots within the interval.
  */

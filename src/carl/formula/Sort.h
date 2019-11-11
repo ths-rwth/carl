@@ -81,8 +81,8 @@ inline bool operator!=(Sort lhs, Sort rhs) {
 }
 
 /**
-* @param _sort The sort to compare with.
-* @return true, if this sort is less than the given one.
+* Checks whether one sort is smaller than another.
+* @return true, if lhs is less than rhs.
 */
 inline bool operator<(Sort lhs, Sort rhs) {
 	return lhs.id() < rhs.id();

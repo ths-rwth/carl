@@ -10,6 +10,7 @@ namespace carl {
 /**
  * Switches the main variable using a purely syntactical restructuring.
  * The resulting polynomial will be algebraicly identical, but have the given variable as its main variable.
+ * @param p The polynomial.
  * @param newVar New main variable.
  * @return Restructured polynomial.
  */
@@ -21,7 +22,8 @@ UnivariatePolynomial<MultivariatePolynomial<typename UnderlyingNumberType<Coeff>
 }
 
 /**
- * Replaces the main variable in p.
+ * Replaces the main variable in a polynomial.
+ * @param p The polynomial.
  * @param newVar New main variable.
  * @return New polynomial.
  */
