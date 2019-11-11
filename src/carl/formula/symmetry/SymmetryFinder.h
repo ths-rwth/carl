@@ -20,6 +20,10 @@ namespace symmetry {
  */
 enum class SpecialColors { If, Then, Else, VarExp };
 
+/**
+ * Provides unique ids (colors) for all kinds of different objects in the formula:
+ * variable types, relations, formula types, numbers, special colors and indexes.
+ */
 template<typename Number>
 class ColorGenerator {
 public:

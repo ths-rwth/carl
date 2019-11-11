@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../core/Variable.h"
+
+#include <vector>
 
 namespace carl {
 namespace formula {
@@ -26,12 +29,17 @@ using Symmetries = std::vector<Symmetry>;
 namespace carl {
 namespace formula {
 
+/**
+ * Find syntactic symmetries in the given formula.
+ * Builds a graph that syntactically represents the formula and find automorphisms on its vertices.
+ */
 template<typename Poly>
 Symmetries findSymmetries(const Formula<Poly>& f) {
 	symmetry::GraphBuilder<Poly> g(f);
 	return g.symmetries();
 }
 
+/// Construct symmetry breaking formulae for the given symmetries.
 template<typename Poly>
 Formula<Poly> breakSymmetries(const Symmetries& symmetries, bool onlyFirst = true) {
 	Formulas<Poly> res;
@@ -42,6 +50,7 @@ Formula<Poly> breakSymmetries(const Symmetries& symmetries, bool onlyFirst = tru
 	return Formula<Poly>(FormulaType::AND, std::move(res));
 }
 
+/// Construct symmetry breaking formulae for symmtries from the given formula.
 template<typename Poly>
 Formula<Poly> breakSymmetries(const Formula<Poly>& f, bool onlyFirst = true) {
 	return breakSymmetries<Poly>(findSymmetries(f), onlyFirst);
