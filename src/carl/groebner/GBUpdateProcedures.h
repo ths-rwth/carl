@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "../core/polynomialfunctions/SeparablePart.h"
+
 namespace carl
 {
 
@@ -70,7 +72,7 @@ public:
 		else if(p.nrTerms() == 1)
 		{
 			assert(!p.isConstant());
-			Polynomial q(p.lmon()->separablePart());
+			Polynomial q(carl::separable_part(*p.lmon()));
 #ifdef BUCHBERGER_STATISTICS
 			if(q.lterm().tdeg() != p.lterm().tdeg()) mStats->SingleTermSFP();
 #endif
@@ -99,7 +101,7 @@ public:
 				Polynomial remainder(p);
 				while(!carl::isZero(remainder))
 				{
-					Polynomial r1(remainder.lmon()->separablePart());
+					Polynomial r1(carl::separable_part(*remainder.lmon()));
 #ifdef BUCHBERGER_STATISTICS
 					if(remainder.lterm().tdeg() != r1.lterm().tdeg()) mStats->SingleTermSFP();
 #endif

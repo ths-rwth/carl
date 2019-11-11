@@ -148,32 +148,6 @@ namespace carl
 		return createMonomial(std::move(newExps), mTotalDegree / 2);
 	}
 	
-	Monomial::Arg Monomial::separablePart() const
-	{
-		Content newExps;
-		for (auto& it: mExponents)
-		{
-			newExps.emplace_back( it.first, 1 );
-		}
-		return MonomialPool::getInstance().create( std::move(newExps), uint(mExponents.size()) );
-	}
-	
-	Monomial::Arg Monomial::pow(uint exp) const
-	{
-		if (exp == 0)
-		{
-			return nullptr;
-		}
-		Content newExps;
-		uint expsum = 0;
-		for (auto& it: mExponents)
-		{
-			newExps.emplace_back(it.first, uint(it.second * exp));
-			expsum += newExps.back().second;
-		}
-		return createMonomial(std::move(newExps), expsum);
-	}
-	
 	Monomial::Arg Monomial::lcm(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
 	{
 		if (!lhs && !rhs) return nullptr;

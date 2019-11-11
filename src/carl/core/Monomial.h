@@ -443,21 +443,6 @@ namespace carl
 		}
 		
 		/**
-		 * Calculates the separable part of this monomial.
-		 * For a monomial \f$ \\prod_i x_i^{e_i} with e_i \neq 0 \f$, this is \f$ \\prod_i x_i^1 \f$.
-		 * @return Separable part.
-		 */
-		Monomial::Arg separablePart() const;
-
-		/**
-		 * Calculates the given power of this monomial.
-		 * @param exp Exponent.
-		 * @return this to the power of exp.
-		 */
-		[[deprecated("Use carl::pow() instead.")]]
-		Monomial::Arg pow(uint exp) const;
-		
-		/**
 		 * Fill the set of variables with the variables from this monomial.
 		 * @param variables Variables.
 		 */
