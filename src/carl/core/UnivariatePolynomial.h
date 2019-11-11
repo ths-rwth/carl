@@ -8,6 +8,7 @@
 
 #include "../numbers/numbers.h"
 #include "../util/SFINAE.h"
+#include "../util/hash.h"
 #include "Polynomial.h"
 #include "Sign.h"
 #include "Variable.h"
@@ -954,12 +955,7 @@ struct hash<carl::UnivariatePolynomial<Coefficient>> {
 	 * @return Hash of p.
 	 */
 	std::size_t operator()(const carl::UnivariatePolynomial<Coefficient>& p) const {
-		std::size_t result = 0;
-		std::hash<Coefficient> h;
-		for(auto c: p.coefficients()) {
-			result ^= h(c);
-		}
-		return result;
+		return carl::hash_all(p.mainVar(), p.coefficients());
 	}
 };
 
