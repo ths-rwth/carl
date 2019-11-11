@@ -192,24 +192,6 @@ jobs:
           packages: [*packages_base, g++-9]
     - stage: build
       os: osx
-      osx_image: xcode10.2
-      script: source .ci/build.sh
-      addons:
-        homebrew:
-          packages:
-          - llvm
-          update: true
-    - stage: build
-      os: osx
-      osx_image: xcode10.3
-      script: source .ci/build.sh
-      addons:
-        homebrew:
-          packages:
-          - llvm
-          update: true
-    - stage: build
-      os: osx
       osx_image: xcode11
       script: source .ci/build.sh
     - stage: build
@@ -222,15 +204,15 @@ jobs:
       script: source .ci/build.sh
     - stage: build
       os: linux
-      compiler: g++-8
-      env: CC=gcc-8 CXX=g++-8 TASK=documentation
+      compiler: g++-9
+      env: CC=gcc-9 CXX=g++-9 TASK=documentation
       if: branch = master
       script: MAKE_PARALLEL=-j1 source .ci/build.sh
       addons:
         apt:
           sources:
           - *sources_base
-          packages: [*packages_base, g++-8, doxygen, ghostscript, lmodern, texinfo, texlive, texlive-font-utils, texlive-latex-extra, python3-pip, python3-setuptools]
+          packages: [*packages_base, g++-9, doxygen, ghostscript, lmodern, texinfo, texlive, texlive-font-utils, texlive-latex-extra, python3-pip, python3-setuptools]
     - stage: check
       os: linux
       compiler: clang++-9.0
@@ -328,15 +310,6 @@ jobs:
     - stage: dependencies
       os: linux
       env: CC=clang-7 CXX=clang++-7 TASK=sonarcloud
-    - stage: build
-      os: linux
-      env: CC=clang-9 CXX=clang++-9
-    - stage: build
-      os: osx
-      osx_image: xcode10.2
-    - stage: build
-      os: osx
-      osx_image: xcode10.3
     - stage: build
       os: osx
       osx_image: xcode11
