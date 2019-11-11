@@ -8,6 +8,7 @@
 
 namespace std {
 
+/// Hash method for boost::dynamic_bitset. Since boost 1.71 this comes with boost.
 template<typename Block, typename Allocator>
 struct hash<boost::dynamic_bitset<Block,Allocator>> {
 	std::size_t operator()(const boost::dynamic_bitset<Block,Allocator>& bs) const {
