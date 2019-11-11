@@ -68,6 +68,9 @@ inline std::size_t hash_all(Args&&... args) {
 	return seed;
 }
 
+/**
+ * Utility functor to hash a sequence of object using an output iterator.
+ */
 template<typename T>
 struct hash_inserter {
 	using difference_type = void;
