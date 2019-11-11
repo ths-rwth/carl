@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "Definiteness.h"
 #include "Monomial.h"
 #include "VariablesInformation.h"
 #include "../numbers/numbers.h"
@@ -247,8 +246,6 @@ public:
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
 	bool divisible(const Term& t) const;
 
-	Definiteness definiteness() const;
-
 	[[deprecated("Use carl::substitute() instead.")]]
 	Term substitute(const std::map<Variable, Coefficient>& substitutions) const;
 	[[deprecated("Use carl::substitute() instead.")]]
@@ -269,14 +266,6 @@ public:
 	[[deprecated("Use carl::variables() instead.")]]
 	void gatherVariables(carlVariables& variables) const {
 		if (mMonomial) mMonomial->gatherVariables(variables);
-	}
-	[[deprecated("Use carl::pow() instead.")]]
-	Term pow(uint exp) const {
-		if (mMonomial) {
-			return Term(carl::pow(coeff(), exp), mMonomial->pow(exp));
-		} else {
-			return Term(carl::pow(coeff(), exp), mMonomial);
-		}
 	}
 
 	bool isConsistent() const;
@@ -640,15 +629,15 @@ inline Term<Coeff> operator/(Variable& lhs, const Coeff& rhs) {
 namespace std {
 
 /**
-	 * Specialization of `std::hash` for a Term.
-	 */
+ * Specialization of `std::hash` for a Term.
+ */
 template<typename Coefficient>
 struct hash<carl::Term<Coefficient>> {
 	/**
-		 * Calculates the hash of a Term.
-		 * @param term Term.
-		 * @return Hash of term.
-		 */
+	 * Calculates the hash of a Term.
+	 * @param term Term.
+	 * @return Hash of term.
+	 */
 	std::size_t operator()(const carl::Term<Coefficient>& term) const {
 		if (term.isConstant()) {
 			return carl::hash_all(term.coeff());

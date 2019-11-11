@@ -126,19 +126,6 @@ bool Term<Coefficient>::divide(const Term& t, Term& res) const
 }
 
 template<typename Coefficient>
-Definiteness Term<Coefficient>::definiteness() const
-{
-	if(mMonomial)
-	{
-		if(mMonomial->isSquare())
-			return (mCoeff < CoefficientType(0) ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
-	}
-	else if(!carl::isZero(mCoeff))    //change this to mCoeff.isZero() at some point
-		return (mCoeff < CoefficientType(0) ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
-	return Definiteness::NON;
-}
-
-template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Coefficient>& substitutions) const
 {
 	if (mMonomial) {

@@ -18,6 +18,7 @@ namespace carl
 {
 	namespace constraints 
 	{
+		/// Converts Constraint<RationalFunction<Poly>> to Constraint<Poly>
 		template<typename PolType, bool AS, typename InIt, typename InsertIt>
 		void toPolynomialConstraints(InIt start, 
 									 InIt end,

@@ -13,7 +13,6 @@
 #define CONSTRAINT_WITH_FACTORIZATION
 
 #include "../config.h"
-#include "../core/Definiteness.h"
 #include "../core/Relation.h"
 #include "../core/Variables.h"
 #include "../core/VariableInformation.h"

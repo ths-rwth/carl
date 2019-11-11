@@ -9,7 +9,6 @@
 
 #include "PolynomialFactorizationPair.h"
 
-#include "Definiteness.h"
 #include "FactorizedPolynomial.h"
 #include "logging.h"
 #include "polynomialfunctions/Definiteness.h"
