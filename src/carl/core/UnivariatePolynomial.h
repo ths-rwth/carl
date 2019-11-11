@@ -902,29 +902,6 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isConsistent() const;
 	
-	/**
-	 * Reverses the order of the coefficients of this polynomial.
-	 * This method is meant to be called by signVariations only.
-	 * @complexity O(n)
-	 */
-	void reverse();
-
-	/**
-	 * Scale the variable, i.e. apply \f$ x \rightarrow factor * x \f$
-	 * This method is meant to be called by signVariations only.
-	 * @param factor Factor to scale x.
-	 * @complexity O(n)
-	 */
-	void scale(const Coefficient& factor);
-
-	/**
-	 * Shift the variable by a, i.e. apply \f$ x \rightarrow x + a \f$
-	 * This method is meant to be called by signVariations only.
-	 * @param a Offset to shift x.
-	 * @complexity O(n^2)
-	 */
-	void shift(const Coefficient& a);	
-	
 	void stripLeadingZeroes() 
 	{
 		while(mCoefficients.size() > 0 && carl::isZero(lcoeff()))

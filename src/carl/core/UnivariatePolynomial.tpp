@@ -562,36 +562,6 @@ Coeff UnivariatePolynomial<Coeff>::syntheticDivision(const Coeff& zeroOfDivisor)
 }
 
 template<typename Coeff>
-void UnivariatePolynomial<Coeff>::reverse() {
-	std::reverse(this->mCoefficients.begin(), this->mCoefficients.end());
-}
-
-template<typename Coeff>
-void UnivariatePolynomial<Coeff>::scale(const Coeff& factor) {
-	Coeff f = factor;
-	for (auto& c: mCoefficients) {
-		c *= f;
-		f *= factor;
-	}
-}
-
-template<typename Coeff>
-void UnivariatePolynomial<Coeff>::shift(const Coeff& a) {
-	std::vector<Coeff> next;
-	next.reserve(this->mCoefficients.size());
-	next.push_back(this->mCoefficients.back());
-
-	for (std::size_t i = 0; i < this->mCoefficients.size()-1; i++) {
-		next.push_back(next.back());
-		for (std::size_t j = i; j > 0; j--) {
-			next[j] = a * next[j] + next[j-1];
-		}
-		next[0] = a * next[0] + this->mCoefficients[this->mCoefficients.size()-2-i];
-	}
-	this->mCoefficients = next;
-}
-
-template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 {
 	UnivariatePolynomial result(mMainVar);

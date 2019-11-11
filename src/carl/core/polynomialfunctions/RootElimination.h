@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Degree.h"
 #include "Evaluation.h"
 #include "../UnivariatePolynomial.h"
 
