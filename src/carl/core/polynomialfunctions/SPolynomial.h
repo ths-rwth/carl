@@ -4,6 +4,9 @@
 
 namespace carl {
 
+/**
+ * Calculates the S-Polynomial of two polynomials.
+ */
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> SPolynomial(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q) {
 	assert(p.isConsistent());

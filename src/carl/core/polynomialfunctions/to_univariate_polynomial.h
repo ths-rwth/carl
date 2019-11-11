@@ -6,6 +6,13 @@
 
 namespace carl {
 
+/**
+ * Convert a univariate polynomial that is currently (mis)represented by a
+ * 'MultivariatePolynomial' into a more appropiate 'UnivariatePolynomial'
+ * representation.
+ * Note that the current polynomial must mention one and only one variable,
+ * i.e., be indeed univariate.
+ */
 template<typename C, typename O, typename P>
 UnivariatePolynomial<C> to_univariate_polynomial(const MultivariatePolynomial<C,O,P>& p) {
 	// Only correct when it is already only in one variable.
@@ -19,6 +26,11 @@ UnivariatePolynomial<C> to_univariate_polynomial(const MultivariatePolynomial<C,
 	return UnivariatePolynomial<C>(x, coeffs);
 }
 
+/**
+ * Convert a multivariate polynomial that is currently represented by a
+ * MultivariatePolynomial into a UnivariatePolynomial representation.
+ * The main variable of the resulting polynomial is given as second argument.
+ */
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> to_univariate_polynomial(const MultivariatePolynomial<C,O,P>& p, Variable v) {
 	assert(p.isConsistent());

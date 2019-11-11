@@ -7,6 +7,9 @@
 
 namespace carl {
 
+/**
+ * Calculates the quotient of a polynomial division.
+ */
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& dividend, const MultivariatePolynomial<C,O,P>& divisor) {
 	assert(!carl::isZero(divisor));

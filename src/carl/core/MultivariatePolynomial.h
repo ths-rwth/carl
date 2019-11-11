@@ -20,8 +20,6 @@
 #include "VariableInformation.h"
 #include "../numbers/numbers.h"
 #include "../util/TermAdditionManager.h"
-#include "polynomialfunctions/SPolynomial.h"
-//#include "polynomialfunctions/SoSDecomposition.h"
 
 
 namespace carl
@@ -478,14 +476,6 @@ public:
 	 * @note Division is only defined on fields
 	 */
 	DivisionResult<MultivariatePolynomial> divideBy(const MultivariatePolynomial& divisor) const;
-	/**
-	 * Calculates the quotient
-	 * @param divisor
-	 * @return 
-	 * @see MultivariatePolynomial::divideBy
-	 */
-	[[deprecated("Use carl::quotient() instead.")]]
-	MultivariatePolynomial quotient(const MultivariatePolynomial& divisor) const;
 
     /**
      * Calculates the square of this multivariate polynomial if it is a square.
@@ -534,36 +524,9 @@ public:
 	SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
 	
 	bool divides(const MultivariatePolynomial& b) const;
-	/**
-	 * Calculates the S-Polynomial.
-	 * @param p
-	 * @param q
-	 * @return 
-	 */
-	[[deprecated("use carl::SPolynomial(p,q) instead.")]]
-	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q) {
-		return carl::SPolynomial(p,q);
-	}
 
-	[[deprecated("use carl::pow() instead.")]]
-	MultivariatePolynomial pow(std::size_t exp) const;
-	[[deprecated("use carl::pow_naive() instead.")]]
-	MultivariatePolynomial naive_pow(unsigned exp) const;
-	
 	MultivariatePolynomial<typename IntegralType<Coeff>::type, Ordering, Policies> toIntegerDomain() const;
 
-	/**
-	 * Convert a univariate polynomial that is currently (mis)represented by a
-	 * 'MultivariatePolynomial' into a more appropiate 'UnivariatePolynomial'
-	 * representation.
-	 * Note that the current polynomial must mention one and only one variable,
-	 * i.e., be indeed univariate.
-	 */
-	[[deprecated("use carl::to_univariate_polynomial(p) instead.")]]
-	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
-	[[deprecated("use carl::to_univariate_polynomial(p, v) instead.")]]
-	UnivariatePolynomial<MultivariatePolynomial> toUnivariatePolynomial(Variable::Arg mainVar) const;
-	
 	const Term<Coeff>& operator[](std::size_t index) const {
 		assert(index < mTerms.size());
 		return mTerms[index];

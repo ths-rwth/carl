@@ -313,66 +313,6 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const {
 	}
 }
 
-/*template<typename Coeff, typename Ordering, typename Policies>
-Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness( bool _fullEffort ) const
-{
-	// Todo: handle constant polynomials
-	if (isLinear()) {
-		CARL_LOG_DEBUG("carl.core", "Linear and hence " << Definiteness::NON);
-		return Definiteness::NON;
-	}
-	auto term = mTerms.rbegin();
-	if (term == mTerms.rend()) return Definiteness::NON;
-	Definiteness result = term->definiteness();
-	CARL_LOG_DEBUG("carl.core", "Got " << result << " from first term " << *term);
-	++term;
-	if (term == mTerms.rend()) return result;
-	if (result > Definiteness::NON) {
-		for (; term != mTerms.rend(); ++term) {
-			Definiteness termDefin = (term)->definiteness();
-			if (termDefin > Definiteness::NON) {
-				if( termDefin > result ) result = termDefin;
-			} else {
-                result = Definiteness::NON;
-                break;
-            }
-		}
-	} else if (result < Definiteness::NON) {
-		for (; term != mTerms.rend(); ++term) {
-			Definiteness termDefin = (term)->definiteness();
-			if (termDefin < Definiteness::NON) {
-				if( termDefin < result ) result = termDefin;
-			} else {
-                result = Definiteness::NON;
-                break;
-            }
-		}
-	}
-	CARL_LOG_DEBUG("carl.core", "Eventually got " << result);
-    if( _fullEffort && result == Definiteness::NON && totalDegree() == 2 )
-    {
-        assert( !isConstant() );
-        bool lTermNegative = carl::isNegative( lterm().coeff() );
-        MultivariatePolynomial<Coeff,Ordering,Policies> tmp = *this;
-        if( hasConstantTerm() )
-        {
-            bool constPartNegative = carl::isNegative( constantPart() );
-            if( constPartNegative != lTermNegative ) return Definiteness::NON;
-            result = lTermNegative ? Definiteness::NEGATIVE : Definiteness::POSITIVE;
-            tmp -= constantPart();
-        }
-        else
-        {
-            result = lTermNegative ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI;
-        }
-        if( lTermNegative )
-            tmp = -tmp;
-        if( !tmp.sosDecomposition( true ).empty() ) return result;
-        return Definiteness::NON;
-    }
-	return result;
-}*/
-
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::tail(bool makeFullyOrdered) const
 {
@@ -614,43 +554,6 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 	return DivisionResult<MultivariatePolynomial<C,O,P>> {q,r};
 }
 
-template<typename C, typename O, typename P>
-MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const MultivariatePolynomial& divisor) const
-{
-	assert(!carl::isZero(divisor));
-	if(*this == divisor)
-	{
-		return MultivariatePolynomial<C,O,P>(1);
-	}
-	if(carl::isOne(divisor))
-	{
-		return *this;
-	}
-	//static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	MultivariatePolynomial p(*this);
-	auto id = mTermAdditionManager.getId(p.mTerms.size());
-	while(!carl::isZero(p))
-	{
-		Term<C> factor;
-		if (p.lterm().divide(divisor.lterm(), factor)) {
-			//p -= factor * divisor;
-			p.subtractProduct(factor, divisor);
-			mTermAdditionManager.template addTerm<true>(id, factor);
-		}
-		else
-		{
-			p.stripLT();
-		}
-	}
-	MultivariatePolynomial<C,O,P> result;
-	mTermAdditionManager.readTerms(id, result.mTerms);
-	result.mOrdered = false;
-	result.makeMinimallyOrdered<false, true>();
-	assert(result.isConsistent());
-	assert(this->isConsistent());
-	return result;
-}
-
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename SubstitutionType>
 SubstitutionType MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& substitutions) const
@@ -781,44 +684,6 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::sqrt(MultivariatePolynomia
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(std::size_t exp) const
-{
-	//std::cout << "pw(" << *this << " ^ " << exp << ")" << std::endl;
-	if (carl::isZero(*this)) return MultivariatePolynomial(constant_zero<Coeff>::get());
-	if (exp == 0) return MultivariatePolynomial(constant_one<Coeff>::get());
-	if (exp == 1) return MultivariatePolynomial(*this);
-	if (exp == 2) return *this * *this;
-	MultivariatePolynomial<Coeff,Ordering,Policies> res(constant_one<Coeff>::get());
-	MultivariatePolynomial<Coeff,Ordering,Policies> mult(*this);
-	while(exp > 0) {
-#if 0
-		if (exp & 1) res *= mult;
-		exp /= 2;
-		if(exp > 0) mult.square();
-#else
-		res *= mult;
-		exp--;
-#endif
-	}
-	return res;
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::naive_pow(unsigned exp) const
-{
-	if (exp == 0) {
-		return MultivariatePolynomial(constant_one<Coeff>::get());
-	}
-
-	CARL_LOG_INEFFICIENT();
-	MultivariatePolynomial<Coeff,Ordering,Policies> res(*this);
-	for (unsigned i = 1; i < exp; i++) {
-		res *= *this;
-	}
-	return res;
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables(std::set<Variable>& vars) const {
 	for (const auto& t : mTerms) {
 		t.gatherVariables(vars);
@@ -866,42 +731,6 @@ VariablesInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies
 		term.gatherVarInfo(varinfomap);
 	}
 	return varinfomap;
-}
-
-template<typename C, typename O, typename P>
-UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() const
-{
-	// Only correct when it is already only in one variable.
-	assert(gatherVariables().size() == 1);
-	Variable::Arg x = lmon()->getSingleVariable();
-	std::vector<C> coeffs(totalDegree()+1,0);
-	for (const auto& t : mTerms)
-	{
-		coeffs[t.tdeg()] = t.coeff();
-	}
-	return UnivariatePolynomial<C>(x, coeffs);
-}
-
-template<typename C, typename O, typename P>
-UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg v) const
-{
-	assert(this->isConsistent());
-	std::vector<MultivariatePolynomial<C,O,P>> coeffs(1);
-	for (const auto& term: this->mTerms) {
-		if (term.monomial() == nullptr) coeffs[0] += term;
-		else {
-			const auto& mon = term.monomial();
-			auto exponent = mon->exponentOfVariable(v);
-			if (exponent >= coeffs.size()) {
-				coeffs.resize(exponent + 1);
-			}
-			std::shared_ptr<const carl::Monomial> tmp = mon->dropVariable(v);
-			coeffs[exponent] += term.coeff() * tmp;
-		}
-	}
-	// Convert result back to MultivariatePolynomial and check that the result is equal to *this
-	assert(MultivariatePolynomial<C>(UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs)) == *this);
-	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs);
 }
 
 template<typename Coeff, typename O, typename P>
