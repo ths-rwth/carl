@@ -105,7 +105,7 @@ Coeff lagrangePositiveUpperBound(const UnivariatePolynomial<Coeff>& p) {
 /**
  * Computes a lower bound on the value of the positive real roots of the given univariate polynomial.
  * 
- * Let \f$Q(x) = x^q*P(1/x)\f$. Then \f$P(1/a) = 0 \implies Q(a) = 0\f$. Thus \f$a <= b \forall a\f$ with \f$Q(a) = 0 \implies 1/b <= a' \forall a'\f$ with \f$P(a') = 0\f$.
+ * Let \f$Q(x) = x^q*P(1/x)\f$. Then \f$P(1/a) = 0 \rightarrow Q(a) = 0\f$. Thus \f$a <= b \forall a\f$ with \f$Q(a) = 0 \rightarrow 1/b <= a' \forall a'\f$ with \f$P(a') = 0\f$.
  * Note that the coefficients of Q are the ones of P in reverse order.
  */
 template<typename Coeff>
