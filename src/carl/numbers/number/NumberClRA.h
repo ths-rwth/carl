@@ -3,6 +3,8 @@
 #include "Number.h"
 #include "NumberClI.h"
 
+#include <boost/algorithm/string.hpp>
+
 namespace carl {
 
 #ifdef USE_CLN_NUMBERS
