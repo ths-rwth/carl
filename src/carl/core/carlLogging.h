@@ -1,19 +1,17 @@
 #pragma once
 
-#include "../io/streamingOperators.h"
 #include "../util/Singleton.h"
-#include "../util/Timer.h"
 #include "../util/platform.h"
 #include "carlLoggingHelper.h"
 #include "config.h"
 
 #include <cassert>
-#include <chrono>
 #include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <sstream>
 #ifdef THREAD_SAFE
@@ -260,15 +258,13 @@ public:
 	/**
 	 * Prints the prefix of a log message, i.e. everything that goes before the message given by the user, to the output stream.
 	 * @param os Output stream.
-	 * @param timer Timer holding program execution time.
 	 * @param channel Channel name.
 	 * @param level LogLevel.
 	 * @param info Auxiliary information.
 	 */
-	virtual void prefix(std::ostream& os, const Timer& /*timer*/, const std::string& channel, LogLevel level, const RecordInfo& info) {
+	virtual void prefix(std::ostream& os, const std::string& channel, LogLevel level, const RecordInfo& info) {
 		if (!printInformation) return;
 		os.fill(' ');
-		//os << "[" << std::right << std::setw(5) << timer << "] ";
 #ifdef THREAD_SAFE
 		os << std::this_thread::get_id() << " ";
 #endif
@@ -305,8 +301,6 @@ class Logger: public carl::Singleton<Logger> {
 	std::map<std::string, std::tuple<std::shared_ptr<Sink>, Filter, std::shared_ptr<Formatter>>> mData;
 	/// Logging mutex to ensure thread-safe logging.
 	std::mutex mMutex;
-	/// Timer to track program runtime.
-	carl::Timer mTimer;
 
 public:
 	/**
@@ -408,7 +402,7 @@ public:
 		std::lock_guard<std::mutex> lock(mMutex);
 		for (auto& t: mData) {
 			if (!std::get<1>(t.second).check(channel, level)) continue;
-			std::get<2>(t.second)->prefix(std::get<0>(t.second)->log(), mTimer, channel, level, info);
+			std::get<2>(t.second)->prefix(std::get<0>(t.second)->log(), channel, level, info);
 			std::get<0>(t.second)->log() << ss.str();
 			std::get<2>(t.second)->suffix(std::get<0>(t.second)->log());
 		}

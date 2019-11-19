@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <iostream>
+#include <ostream>
 
 #include "config.h"
 
