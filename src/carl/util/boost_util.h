@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/version.hpp>
+
 #if BOOST_VERSION < 107100
 
 #include "hash.h"
