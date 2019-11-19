@@ -472,6 +472,7 @@ namespace carl
 		[[deprecated("Use carl::substitute() instead.")]]
 		Coefficient substitute(const std::map<Variable, Coefficient>& substitutions) const;
 		template<typename Coefficient>
+		[[deprecated("Use carl::evaluate() instead.")]]
 		Coefficient evaluate(const std::map<Variable, Coefficient>& substitutions) const;
 
 		///////////////////////////
