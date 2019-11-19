@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../numbers/numbers.h"
+
 namespace carl
 {
 	template<typename Coefficient>

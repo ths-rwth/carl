@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "../numbers/numbers.h"
 #include "../util/hash.h"
 #include "CompareResult.h"
 #include "Variable.h"
@@ -24,7 +23,7 @@
 namespace carl
 {
 	/// Type of an exponent.
-	using exponent = uint;
+	using exponent = std::size_t;
 	
 	/**
 	 * Compare a pair of variable and exponent with a variable.
@@ -33,7 +32,7 @@ namespace carl
 	 * @param v Variable.
 	 * @return `p.first == v`
 	 */
-	inline bool operator==(const std::pair<Variable, uint>& p, Variable v) {
+	inline bool operator==(const std::pair<Variable, std::size_t>& p, Variable v) {
 		return p.first == v;
 	}
 
@@ -63,7 +62,7 @@ namespace carl
 		 */
 		struct is_sorted {};
 		using Arg = std::shared_ptr<const Monomial>;
-		using Content = std::vector<std::pair<Variable, uint>>;
+		using Content = std::vector<std::pair<Variable, std::size_t>>;
 		~Monomial();
 
 		/**
@@ -76,7 +75,7 @@ namespace carl
 		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents.
 		Content mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
-		uint mTotalDegree = 0;
+		std::size_t mTotalDegree = 0;
 		/// Monomial id.
 		mutable std::size_t mId = 0;
 		/// Cached hash.
@@ -96,8 +95,8 @@ namespace carl
 		 */
 		void calc_total_degree() {
 			mTotalDegree = std::accumulate(
-				mExponents.begin(), mExponents.end(), uint(0),
-				[](uint d, const auto& p) { return d + p.second; }
+				mExponents.begin(), mExponents.end(), std::size_t(0),
+				[](std::size_t d, const auto& p) { return d + p.second; }
 			);
 		}
 
@@ -106,7 +105,7 @@ namespace carl
 		 * @param v The variable.
 		 * @param e The exponent.
 		 */
-		explicit Monomial(Variable v, uint e = 1) :
+		explicit Monomial(Variable v, std::size_t e = 1) :
 			mExponents(1, std::make_pair(v,e)),
 			mTotalDegree(e)
 		{
@@ -118,7 +117,7 @@ namespace carl
 		 * Generate a monomial from an initializer list of variable-exponent pairs and a total degree.
 		 * @param exponents The variables and their exponents.
 		 */
-		Monomial(const std::initializer_list<std::pair<Variable, uint>>& exponents) :
+		Monomial(const std::initializer_list<std::pair<Variable, std::size_t>>& exponents) :
 			Monomial(Content(exponents))
 		{}
 
@@ -129,7 +128,7 @@ namespace carl
 		 * @param content The variables and their exponents.
 		 * @param totalDegree The total degree of the monomial to generate, or zero.
 		 */
-		Monomial(Content&& content, uint totalDegree = 0) :
+		Monomial(Content&& content, std::size_t totalDegree = 0) :
 			mExponents(std::move(content)),
 			mTotalDegree(totalDegree)
 		{
@@ -150,7 +149,7 @@ namespace carl
 		 * @param content The variables and their exponents
 		 * @param totalDegree The total degree of the monomial to generate, or zero.
 		 */
-		Monomial(const Content& content, uint totalDegree = 0) :
+		Monomial(const Content& content, std::size_t totalDegree = 0) :
 			Monomial(Content(content), totalDegree)
 		{}
 		
@@ -162,7 +161,7 @@ namespace carl
 		 * @param totalDegree The total degree of the monomial to generate, or zero.
 		 * @param hash The hash of the content, or zero.
 		 */
-		Monomial(is_sorted, Content&& content, uint totalDegree = 0, std::size_t hash = 0) :
+		Monomial(is_sorted, Content&& content, std::size_t totalDegree = 0, std::size_t hash = 0) :
 			mExponents(std::move(content)),
 			mTotalDegree(totalDegree),
 			mHash(hash)
@@ -184,7 +183,7 @@ namespace carl
 		 * @param totalDegree The total degree of the monomial to generate, or zero.
 		 * @param hash The hash of the content, or zero.
 		 */
-		Monomial(is_sorted, const Content& content, uint totalDegree = 0, std::size_t hash = 0) :
+		Monomial(is_sorted, const Content& content, std::size_t totalDegree = 0, std::size_t hash = 0) :
 			Monomial(is_sorted{}, Content(content), totalDegree, hash)
 		{}
 
@@ -329,7 +328,7 @@ namespace carl
 		 * @param index Index.
 		 * @return VarExpPair.
 		 */
-		const std::pair<Variable, uint>& operator[](std::size_t index) const {
+		const std::pair<Variable, std::size_t>& operator[](std::size_t index) const {
 			assert(index < mExponents.size());
 			return mExponents[index];
 		}
