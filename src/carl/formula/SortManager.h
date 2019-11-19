@@ -8,17 +8,15 @@
 
 #pragma once
 
-#include "../core/logging.h"
-#include "../io/streamingOperators.h"
-#include "../util/Common.h"
+#include "../util/pointerOperations.h"
 #include "../util/Singleton.h"
 #include "Sort.h"
+#include "../core/Variable.h"
 
 #include <cassert>
 #include <iostream>
 #include <map>
 #include <memory>
-#include <set>
 #include <utility>
 #include <vector>
 

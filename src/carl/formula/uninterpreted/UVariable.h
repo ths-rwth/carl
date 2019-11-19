@@ -8,8 +8,8 @@
 #pragma once
 
 #include "../../core/VariablePool.h"
-#include "../../util/Common.h"
 #include "../Sort.h"
+#include "../../util/hash.h"
 #include "../SortManager.h"
 
 namespace carl {
