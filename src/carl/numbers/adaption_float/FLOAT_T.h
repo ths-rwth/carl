@@ -15,7 +15,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
 
-#include "../../core/logging.h"
+//#include "../../core/logging.h"
 #include "../../util/hash.h"
 #include "../../util/SFINAE.h"
 #include "roundingConversion.h"
@@ -506,7 +506,7 @@ namespace carl
 		{
 			assert(*this >= 0);
 			/// @todo implement root_assign for FLOAT_T
-			CARL_LOG_NOTIMPLEMENTED();
+			assert(false && "not implemented");
 			return *this;
 		}
 
@@ -521,8 +521,8 @@ namespace carl
 		FLOAT_T<FloatType>& root(FLOAT_T<FloatType>& /*unused*/, std::size_t /*unused*/, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			assert(*this >= 0);
-			CARL_LOG_NOTIMPLEMENTED();
 			/// @todo implement root for FLOAT_T
+			assert(false && "not implemented");
 		}
 
 		/**
