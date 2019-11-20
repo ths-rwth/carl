@@ -7,7 +7,7 @@
 
 #include <cassert>
 #include <climits>
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <type_traits>
 
