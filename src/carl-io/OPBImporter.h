@@ -5,6 +5,7 @@
 #include <carl/formula/Formula.h>
 
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <optional>
 #include <tuple>

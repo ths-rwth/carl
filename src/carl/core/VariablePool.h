@@ -166,7 +166,7 @@ public:
 	/**
 	 * Print variable names to the stream.
 	 */
-	void printVariableNamesToStream(std::ostream& os = std::cout) {
+	void printVariableNamesToStream(std::ostream& os) {
 		for (auto const& v : mVariableNames) {
 			os << v.second << " ";
 		}
@@ -214,8 +214,8 @@ inline Variable freshUninterpretedVariable(const std::string& name) {
 	return freshVariable(name, VariableType::VT_UNINTERPRETED);
 }
 
-inline void printRegisteredVariableNames() {
-	return VariablePool::getInstance().printVariableNamesToStream();
+inline void printRegisteredVariableNames(std::ostream& os) {
+	return VariablePool::getInstance().printVariableNamesToStream(os);
 }
 
 } // namespace carl

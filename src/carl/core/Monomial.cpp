@@ -6,7 +6,7 @@
 
 #include "Monomial.h"
 #include "MonomialPool.h"
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 
 namespace carl
 {

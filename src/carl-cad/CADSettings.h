@@ -9,7 +9,7 @@
 #include <algorithm>
 
 #include <carl/core/logging.h>
-#include <carl/core/carlLogging.h>
+#include <carl-logging/logging-internals.h>
 #include <carl/core/polynomialfunctions/RootFinder.h>
 
 namespace carl {

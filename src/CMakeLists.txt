@@ -1,4 +1,5 @@
 # Libraries..
+add_subdirectory(carl-logging)
 add_subdirectory(carl)
 add_subdirectory(carl-cad)
 add_subdirectory(carl-covering)

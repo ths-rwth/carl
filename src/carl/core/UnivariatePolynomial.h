@@ -36,7 +36,7 @@ using FactorMap = std::map<UnivariatePolynomial<Coefficient>, uint>;
 #include "DivisionResult.h"
 #include "MultivariatePolynomial.h"
 
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 
 namespace carl
 {

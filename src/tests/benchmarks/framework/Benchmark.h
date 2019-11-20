@@ -14,7 +14,6 @@
 
 
 #include "../config.h"
-#include "carl/core/carlLogging.h"
 #include "carl/util/Timer.h"
 #include "carl/core/MultivariatePolynomial.h"
 

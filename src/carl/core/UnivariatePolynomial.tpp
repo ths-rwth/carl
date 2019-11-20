@@ -10,7 +10,7 @@
 #include "../util/debug.h"
 #include "../util/platform.h"
 #include "../util/SFINAE.h"
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 #include "MultivariatePolynomial.h"
 #include "Sign.h"
 

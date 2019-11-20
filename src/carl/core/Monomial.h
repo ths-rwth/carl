@@ -12,7 +12,6 @@
 #include "Variable.h"
 #include "Variables.h"
 #include "VariablePool.h"
-#include "logging.h"
 
 #include <algorithm>
 #include <list>

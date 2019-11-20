@@ -7,7 +7,7 @@
 
 #include "initialize.h"
 #include "config.h"
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 
 namespace carl
 {

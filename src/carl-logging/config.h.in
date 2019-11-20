@@ -1,0 +1,8 @@
+/**
+ * Auto generated file config.h from config.h.in.
+ */ 
+#pragma once
+
+#cmakedefine LOGGING
+#cmakedefine LOGGING_DISABLE_INEFFICIENT
+#cmakedefine THREAD_SAFE

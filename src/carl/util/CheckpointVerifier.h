@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../core/logging.h"
+#include <carl-logging/carl-logging.h>
 #include "../core/VariablePool.h"
 #include "../formula/Formula.h"
 #include "debug.h"

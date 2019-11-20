@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <carl/core/carlLogging.h>
-#include <carl/core/carlLoggingHelper.h>
+
+#include <carl-logging/carl-logging.h>
+#include <carl-logging/logging-internals.h>
 
 #include "../get_output.h"
 
