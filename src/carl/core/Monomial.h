@@ -462,19 +462,6 @@ namespace carl
 			variables.add(mExponents.begin(), mExponents.end(), [](const auto& e){ return e.first; });
 		}
 
-		/**
-		 * Applies the given substitutions to this monomial.
-		 * Every variable may be substituted by some value.
-		 * @param substitutions Maps variables to numbers.
-		 * @return \f$ this[<substitutions>] \f$
-		 */
-		template<typename Coefficient>
-		[[deprecated("Use carl::substitute() instead.")]]
-		Coefficient substitute(const std::map<Variable, Coefficient>& substitutions) const;
-		template<typename Coefficient>
-		[[deprecated("Use carl::evaluate() instead.")]]
-		Coefficient evaluate(const std::map<Variable, Coefficient>& substitutions) const;
-
 		///////////////////////////
 		// Orderings
 		///////////////////////////
@@ -801,5 +788,3 @@ namespace std
 		}
 	};
 } // namespace std
-
-#include "Monomial.tpp"

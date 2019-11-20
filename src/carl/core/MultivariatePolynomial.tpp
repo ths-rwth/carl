@@ -555,21 +555,6 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-template<typename SubstitutionType>
-SubstitutionType MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& substitutions) const
-{
-	if(carl::isZero(*this)) {
-		return constant_zero<SubstitutionType>::get();
-	} else {
-		SubstitutionType result(mTerms[0].evaluate(substitutions)); 
-		for (unsigned i = 1; i < mTerms.size(); ++i) {
-			result += mTerms[i].evaluate(substitutions);
-		}
-		return result;
-	};
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
 	assert(!carl::isZero(*this));

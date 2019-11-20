@@ -126,47 +126,6 @@ bool Term<Coefficient>::divide(const Term& t, Term& res) const
 }
 
 template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Coefficient>& substitutions) const
-{
-	if (mMonomial) {
-		Monomial::Content content;
-		Coefficient coeff = mCoeff;
-		for (const auto& c: *mMonomial) {
-			auto it = substitutions.find(c.first);
-			if (it == substitutions.end()) {
-				content.push_back(c);
-			} else {
-				coeff *= carl::pow(it->second, c.second);
-			}
-		}
-		if (content.empty()) return Term<Coefficient>(coeff);
-		return Term<Coefficient>(coeff, createMonomial(std::move(content)));
-	} else {
-		return Term<Coefficient>(mCoeff);
-	}
-}
-
-template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
-{
-	if (mMonomial) {
-		return Coefficient(mCoeff) * mMonomial->substitute(substitutions);
-	} else {
-		return Term<Coefficient>(mCoeff);
-	}
-}
-
-template<typename Coefficient>
-Coefficient Term<Coefficient>::evaluate(const std::map<Variable, Coefficient>& map) const
-{
-	if (mMonomial) {
-		return mCoeff * mMonomial->evaluate(map);
-	} else {
-		return mCoeff;
-	}
-}
-
-template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) const
 {
 	assert(carl::isOne(coeff()));

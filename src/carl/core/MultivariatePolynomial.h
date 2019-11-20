@@ -515,14 +515,6 @@ public:
 	 */
 	MultivariatePolynomial normalize() const;
 	
-	/**
-	 * Like substitute, but expects substitutions for all variables.
-	 * @return For a polynomial p, the function value p(x_1,...,x_n).
-	 */
-	template<typename SubstitutionType = Coeff>
-	[[deprecated("use carl::evaluate() instead.")]]
-	SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
-	
 	bool divides(const MultivariatePolynomial& b) const;
 
 	MultivariatePolynomial<typename IntegralType<Coeff>::type, Ordering, Policies> toIntegerDomain() const;
