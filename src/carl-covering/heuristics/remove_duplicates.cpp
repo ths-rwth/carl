@@ -1,5 +1,7 @@
 #include "remove_duplicates.h"
 
+#include <carl/util/Bitset.h>
+
 #include <algorithm>
 
 namespace carl::covering::heuristic {

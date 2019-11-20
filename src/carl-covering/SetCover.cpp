@@ -1,5 +1,7 @@
 #include "SetCover.h"
 
+#include <carl/util/Bitset.h>
+
 #include <cassert>
 #include <numeric>
 

@@ -4,6 +4,7 @@
 #include "select_essential.h"
 
 #include <carl/core/logging.h>
+#include <carl/util/Bitset.h>
 
 #include <optional>
 
