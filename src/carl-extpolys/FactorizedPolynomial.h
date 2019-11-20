@@ -8,11 +8,11 @@
 #pragma once
 
 #include <iostream>
-#include "../numbers/typetraits.h"
-#include "../util/Cache.h"
-#include "DivisionResult.h"
+#include <carl/numbers/numbers.h>
+#include <carl/util/Cache.h>
+#include <carl/core/DivisionResult.h>
 #include "PolynomialFactorizationPair.h"
-#include "VariablesInformation.h"
+#include <carl/core/VariablesInformation.h>
 
 namespace carl
 {

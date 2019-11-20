@@ -21,7 +21,7 @@
 #include "../core/Term.h"
 #include "../core/MultivariatePolynomial.h"
 
-#include "../core/RationalFunction.h"
+#include <carl-extpolys/RationalFunction.h>
 
 
 namespace carl

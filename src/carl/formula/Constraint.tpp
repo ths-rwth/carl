@@ -14,6 +14,7 @@
 #include "ConstraintPool.h"
 #include "../core/polynomialfunctions/Definiteness.h"
 #include "../core/polynomialfunctions/Factorization.h"
+#include "../core/polynomialfunctions/Substitution.h"
 
 
 namespace carl

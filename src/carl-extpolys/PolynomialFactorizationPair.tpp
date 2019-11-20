@@ -10,9 +10,9 @@
 #include "PolynomialFactorizationPair.h"
 
 #include "FactorizedPolynomial.h"
-#include "logging.h"
-#include "polynomialfunctions/Definiteness.h"
-#include "polynomialfunctions/GCD.h"
+#include <carl/core/logging.h>
+#include <carl/core/polynomialfunctions/Definiteness.h>
+#include <carl/core/polynomialfunctions/GCD.h>
 
 namespace carl
 {

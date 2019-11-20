@@ -11,7 +11,6 @@
 
 #include "../core/Monomial.h"
 #include "../core/Term.h"
-#include "../core/FactorizedPolynomial.h"
 #include "../core/MultivariatePolynomial.h"
 
 
@@ -37,8 +36,6 @@ public:
 	template<typename Coeff, typename Policy, typename Ordering, typename Numeric>
 	static Interval<Numeric> evaluate(const MultivariatePolynomial<Coeff, Policy, Ordering>& p, const std::map<Variable, Interval<Numeric>>&);
     
-	template<typename P, typename Numeric>
-	static Interval<Numeric> evaluate(const FactorizedPolynomial<P>& p, const std::map<Variable, Interval<Numeric>>&);
 
 	template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>> = dummy>
 	static Interval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map);
@@ -107,29 +104,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomi
 	}
 }
 
-template<typename P, typename Numeric>
-inline Interval<Numeric> IntervalEvaluation::evaluate(const FactorizedPolynomial<P>& p, const std::map<Variable, Interval<Numeric>>& map)
-{
-    if( !existsFactorization( p ) )
-        return Interval<Numeric>( p.coefficient() );
-    if( p.factorizedTrivially() )
-    {
-        return evaluate( p.polynomial(), map ) * Interval<Numeric>( p.coefficient() );
-    }
-    else
-    {
-        Interval<Numeric> result( p.coefficient() );
-        for( const auto& factor : p.factorization() )
-        {
-            Interval<Numeric> factorEvaluated = evaluate( factor.first, map );
-            if( factorEvaluated.isZero() )
-                return factorEvaluated;
-            result *= factorEvaluated.pow( factor.second );
-        }
-        return std::move( result );
-    }
-}
-
+/*
 template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>>>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
 	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
@@ -144,7 +119,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial
 		exp = varValue.pow(i+1);
 	}
 	return res;
-}
+}*/
 
 template<typename Numeric, typename Coeff, DisableIf<std::is_same<Numeric, Coeff>>>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FactorizedPolynomial.h"
+#include <carl/interval/IntervalEvaluation.h>
 
 namespace carl {
 
@@ -26,6 +27,29 @@ Subst evaluate(const FactorizedPolynomial<Coeff>& p, const std::map<Variable, Su
 		}
 		assert(result == carl::evaluate(computePolynomial(p), substitutions));
 		return result;
+	}
+}
+
+template<typename P, typename Numeric>
+Interval<Numeric> evaluate(const FactorizedPolynomial<P>& p, const std::map<Variable, Interval<Numeric>>& map)
+{
+	if( !existsFactorization( p ) )
+		return Interval<Numeric>( p.coefficient() );
+	if( p.factorizedTrivially() )
+	{
+		return evaluate( p.polynomial(), map ) * Interval<Numeric>( p.coefficient() );
+	}
+	else
+	{
+		Interval<Numeric> result( p.coefficient() );
+		for( const auto& factor : p.factorization() )
+		{
+			Interval<Numeric> factorEvaluated = evaluate( factor.first, map );
+			if( factorEvaluated.isZero() )
+				return factorEvaluated;
+			result *= factorEvaluated.pow( factor.second );
+		}
+		return std::move( result );
 	}
 }
 

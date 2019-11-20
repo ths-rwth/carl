@@ -6,10 +6,10 @@
  */
 
 #include "FactorizedPolynomial.h"
-#include "UnivariatePolynomial.h"
 
-#include "polynomialfunctions/Division.h"
-#include "polynomialfunctions/Substitution.h"
+#include <carl/core/polynomialfunctions/Division.h>
+#include <carl/core/polynomialfunctions/Substitution.h>
+#include <carl/core/UnivariatePolynomial.h>
 
 #pragma once
 

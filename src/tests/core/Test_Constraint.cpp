@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "carl/core/ConstraintOperations.h"
+#include <carl-extpolys/ConstraintOperations.h>
 #include "carl/util/stringparser.h"
 
 #include "../Common.h"
