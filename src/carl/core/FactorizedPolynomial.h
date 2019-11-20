@@ -66,8 +66,6 @@ namespace carl
          * Co-prime coefficient of the factorization
          */
         mutable CoeffType mCoefficient;
-        
-        explicit FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, const std::shared_ptr<CACHE>& );
 
         /**
          * Updates the hash of the entry in the cache corresponding to this factorized 
@@ -136,6 +134,7 @@ namespace carl
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         FactorizedPolynomial( FactorizedPolynomial<P>&& );
         explicit FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _p);
+        explicit FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, const std::shared_ptr<CACHE>& );
         
         // Destructor.
         ~FactorizedPolynomial();
@@ -543,38 +542,6 @@ namespace carl
 		 * @todo uses multiplication -> bad idea.
          */
 		FactorizedPolynomial<P> pow(unsigned _exp) const;
-        
-        /**
-         * Like substitute, but expects substitutions for all variables.
-         * @return For a polynomial p, the function value p(x_1,...,x_n).
-         */
-        template<typename SubstitutionType = CoeffType>
-        SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
-
-		/**
-         * Replace the given variable by the given value.
-         * @return A new factorized polynomial resulting from this substitution.
-         */
-        FactorizedPolynomial<P> substitute(Variable var, const FactorizedPolynomial<P>& value) const;
-
-        /**
-         * Replace all variables by a value given in their map.
-         * @return A new factorized polynomial without the variables in map.
-         */
-        FactorizedPolynomial<P> substitute(const std::map<Variable, FactorizedPolynomial<P>>& substitutions) const;
-
-        /**
-         * Replace all variables by a value given in their map.
-         * @return A new factorized polynomial without the variables in map.
-         */
-        FactorizedPolynomial<P> substitute(const std::map<Variable, FactorizedPolynomial<P>>& substitutions, const std::map<Variable, P>& substitutionsAsP) const;
-
-        /**
-         * Replace all variables by a value given in their map.
-         * @return A new factorized polynomial without the variables in map.
-         */
-        template<typename SubstitutionType = CoeffType>
-        FactorizedPolynomial<P> substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
 
         /**
          * Calculates the square of this factorized polynomial if it is a square.

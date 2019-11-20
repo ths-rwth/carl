@@ -11,6 +11,8 @@
 #include "polynomialfunctions/Evaluation.h"
 #include "polynomialfunctions/GCD.h"
 
+#include "fp_evaluation.h"
+
 #include <boost/optional.hpp>
 
 namespace carl {
@@ -238,7 +240,7 @@ public:
 		if (isConstant()) {
 			return mNumberQuotient;
 		} else {
-			return nominatorAsPolynomial().evaluate(substitutions) / denominatorAsPolynomial().evaluate(substitutions);
+			return carl::evaluate(nominatorAsPolynomial(), substitutions) / carl::evaluate(denominatorAsPolynomial(), substitutions);
 		}
 	}
 
