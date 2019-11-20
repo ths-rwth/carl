@@ -19,7 +19,6 @@
 
 #include <algorithm>
 #include <iomanip>
-#include <boost/optional.hpp>
 
 namespace carl
 {
