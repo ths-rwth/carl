@@ -14,7 +14,7 @@
 #include "../core/Variable.h"
 
 #include <cassert>
-#include <iostream>
+#include <ostream>
 #include <map>
 #include <memory>
 #include <utility>
