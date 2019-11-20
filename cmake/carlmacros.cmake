@@ -204,7 +204,9 @@ endmacro(get_include_dir)
 
 macro(add_new_libraries name version sources dependencies)
 	add_library(${name}-objects OBJECT ${sources})
-	add_dependencies(${name}-objects ${dependencies})
+	if(dependencies)
+		add_dependencies(${name}-objects ${dependencies})
+	endif()
 
 	add_library(${name}-shared SHARED $<TARGET_OBJECTS:${name}-objects>)
 	set_target_properties(${name}-shared PROPERTIES
