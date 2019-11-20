@@ -104,7 +104,6 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomi
 	}
 }
 
-/*
 template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>>>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
 	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
@@ -119,7 +118,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial
 		exp = varValue.pow(i+1);
 	}
 	return res;
-}*/
+}
 
 template<typename Numeric, typename Coeff, DisableIf<std::is_same<Numeric, Coeff>>>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
