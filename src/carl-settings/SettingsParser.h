@@ -4,6 +4,7 @@
 
 #include <boost/program_options.hpp>
 
+#include <chrono>
 #include <vector>
 
 #if __has_include(<filesystem>)
@@ -22,8 +23,6 @@ inline void validate(boost::any& v, const std::vector<std::string>& values, std:
 }
 }
 #endif
-
-#include <chrono>
 
 namespace carl::settings {
 
