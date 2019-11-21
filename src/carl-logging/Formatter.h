@@ -5,6 +5,9 @@
 
 #include <iomanip>
 #include <iosfwd>
+#ifdef THREAD_SAFE
+#include <thread>
+#endif
 
 namespace carl::logging {
 

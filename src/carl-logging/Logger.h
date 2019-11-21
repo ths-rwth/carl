@@ -17,9 +17,6 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
-#ifdef THREAD_SAFE
-#include <thread>
-#endif
 #include <utility>
 
 
