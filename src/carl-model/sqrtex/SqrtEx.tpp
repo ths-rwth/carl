@@ -100,13 +100,13 @@ namespace carl
         {
             if( !isZero(mConstantPart) )
             {
-                mConstantPart.divideBy( gcdA, mConstantPart );
+				carl::try_divide(mConstantPart, gcdA, mConstantPart );
             }
             if( !isZero(mFactor) )
             {
-                mFactor.divideBy( gcdA, mFactor );
+                carl::try_divide(mFactor, gcdA, mFactor );
             }
-            mDenominator.divideBy( gcdA, mDenominator );
+            carl::try_divide(mDenominator, gcdA, mDenominator );
         }
         Rational numGcd = constant_zero<Rational>::get();
         Rational denomLcm = constant_one<Rational>::get();

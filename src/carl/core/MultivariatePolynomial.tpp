@@ -469,46 +469,6 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::addTerm(const Term<Coeff>&
 	}
 }
 
-template<typename Coeff, typename Ordering, typename Policies>
-template<typename C, EnableIf<is_field<C>>>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& divisor, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
-{
-	static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	if (carl::isOne(divisor)) {
-		quotient = *this;
-		return true;
-	}
-	if (carl::isZero(*this)) {
-		quotient = MultivariatePolynomial();
-		return true;
-	}
-	auto id = mTermAdditionManager.getId(0);
-	auto thisid = mTermAdditionManager.getId(mTerms.size());
-	for (const auto& t: mTerms) {
-		mTermAdditionManager.template addTerm<false,true>(thisid, t);
-	}
-	while (true) {
-		Term<C> factor = mTermAdditionManager.getMaxTerm(thisid);
-		if (carl::isZero(factor)) break;
-		if (factor.divide(divisor.lterm(), factor)) {
-			for (const auto& t: divisor) {
-				mTermAdditionManager.template addTerm<true,true>(thisid, -factor*t);
-			}
-			//res.subtractProduct(factor, divisor);
-			//p -= factor * divisor;
-			mTermAdditionManager.template addTerm<true>(id, factor);
-		} else {
-			return false;
-		}
-	}
-	mTermAdditionManager.readTerms(id, quotient.mTerms);
-	mTermAdditionManager.dropTerms(thisid);
-	quotient.mOrdered = false;
-	quotient.makeMinimallyOrdered<false, true>();
-	assert(quotient.isConsistent());
-	return true;
-}
-
 template<typename C, typename O, typename P>
 DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::divideBy(const MultivariatePolynomial& divisor) const
 {
