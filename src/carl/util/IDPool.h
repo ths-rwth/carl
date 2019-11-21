@@ -5,6 +5,7 @@
 #include "Bitset.h"
 
 #include <iostream>
+#include <mutex>
 
 namespace carl {
 
