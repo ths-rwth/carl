@@ -40,11 +40,27 @@ inline bool isZero(const mpq_class& n) {
 	return constant_zero<mpz_class>::get() == n;
 }
 
+inline bool is_zero(const mpz_class& n) {
+	return constant_zero<mpz_class>::get() == n;
+}
+
+inline bool is_zero(const mpq_class& n) {
+	return constant_zero<mpz_class>::get() == n;
+}
+
 inline bool isOne(const mpz_class& n) {
 	return constant_one<mpz_class>::get() == n;
 }
 
 inline bool isOne(const mpq_class& n) {
+	return constant_one<mpz_class>::get() == n;
+}
+
+inline bool is_one(const mpz_class& n) {
+	return constant_one<mpz_class>::get() == n;
+}
+
+inline bool is_one(const mpq_class& n) {
 	return constant_one<mpz_class>::get() == n;
 }
 

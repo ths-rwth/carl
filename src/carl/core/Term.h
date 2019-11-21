@@ -220,9 +220,11 @@ public:
 		 * @param c a non-zero coefficient.
 		 * @return 
 		 */
+	[[deprecated("Use carl::divide() instead.")]]
 	Term divide(const Coefficient& c) const;
+	[[deprecated("Use carl::divide() instead.")]]
 	bool divide(const Coefficient& c, Term& res) const;
-
+	[[deprecated("Use carl::divide() instead.")]]
 	bool divide(Variable v, Term& res) const;
 
 	bool divide(const Monomial::Arg& m, Term& res) const;

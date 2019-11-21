@@ -469,24 +469,6 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::addTerm(const Term<Coeff>&
 	}
 }
 
-
-template<typename Coeff, typename Ordering, typename Policies>
-template<typename C, EnableIf<is_field<C>>>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Coeff& divisor) const
-{
-	MultivariatePolynomial<Coeff,Ordering,Policies> res;
-	res.mTerms.reserve(mTerms.size());
-	for (unsigned i = 0; i < mTerms.size(); i++) {
-		Term<Coeff> tmp;
-		if (mTerms[i].divide(divisor, tmp)) {
-			res.mTerms.push_back(tmp);
-		}
-	}
-	res.mOrdered = this->mOrdered;
-    assert(res.isConsistent());
-	return res;
-}
-
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& divisor, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const

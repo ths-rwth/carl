@@ -395,17 +395,6 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_field<C>>>
-DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const Coeff& divisor) const 
-{
-	UnivariatePolynomial<Coeff> res(*this);
-	for (auto& c: res.mCoefficients) {
-		c = c / divisor;
-	}
-	return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial(this->mainVar()) };
-}
-
-template<typename Coeff>
 template<typename C, DisableIf<is_field<C>>, DisableIf<is_number<C>>>
 bool UnivariatePolynomial<Coeff>::divideBy(const Coeff& divisor, UnivariatePolynomial<Coeff>& quotient) const 
 {
@@ -417,19 +406,6 @@ bool UnivariatePolynomial<Coeff>::divideBy(const Coeff& divisor, UnivariatePolyn
 	assert(quo.isConsistent());
 	if (res) quotient = quo.toUnivariatePolynomial(this->mainVar());
 	return res;
-}
-
-template<typename Coeff>
-template<typename C, DisableIf<is_field<C>>, DisableIf<is_number<C>>, EnableIf<is_field<typename UnderlyingNumberType<C>::type>>>
-DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const typename UnivariatePolynomial<Coeff>::NumberType& divisor) const 
-{
-	UnivariatePolynomial<Coeff> res(*this);
-	assert(res.isConsistent());
-	for (auto& c: res.mCoefficients) {
-		c = c.divideBy(divisor);
-	}
-	assert(res.isConsistent());
-	return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial(this->mainVar())};
 }
 
 template<typename Coeff>

@@ -445,15 +445,6 @@ public:
 	void addTerm(const Term<Coeff>& term);
 
 	/**
-	 * Divides the polynomial by the given coefficient.
-	 * Applies if the coefficients are from a field.
-	 * @param divisor
-	 * @return 
-	 */
-	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
-	MultivariatePolynomial divideBy(const Coeff& divisor) const;
-    
-	/**
 	 * Divides the polynomial by another polynomial.
 	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
 	 * Otherwise, false is returned and the content of quotient remains unchanged.
@@ -475,6 +466,7 @@ public:
 	 * @see
 	 * @note Division is only defined on fields
 	 */
+	[[deprecated("Use carl::divide() instead.")]]
 	DivisionResult<MultivariatePolynomial> divideBy(const MultivariatePolynomial& divisor) const;
 
     /**

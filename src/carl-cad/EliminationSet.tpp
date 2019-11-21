@@ -7,6 +7,7 @@
 #include "CADLogging.h"
 
 #include <carl/core/polynomialfunctions/SquareFreePart.h>
+#include <carl/core/polynomialfunctions/PrimitivePart.h>
 
 namespace carl {
 namespace cad {
@@ -551,8 +552,8 @@ void EliminationSet<Coefficient>::makePrimitive() {
 			DOT_EDGE("elimination", p, p, "label=\"number\"");
 			continue; // numbers are discarded
 		}
-		DOT_EDGE("elimination", p, p->pseudoPrimpart(), "label=\"primitive\"");
-		primitiveSet.insert(p->pseudoPrimpart(), this->getParentsOf(p));
+		DOT_EDGE("elimination", p, pseudo_primitive_part(*p), "label=\"primitive\"");
+		primitiveSet.insert(pseudo_primitive_part(*p), this->getParentsOf(p));
 	}
 	std::swap(*this, primitiveSet);
 }
