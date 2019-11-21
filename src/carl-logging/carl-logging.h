@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <ostream>
+#include <iostream>
 
 #include "config.h"
 #include "logging.h"
