@@ -2,6 +2,7 @@
 
 #include "../../../core/UnivariatePolynomial.h"
 #include "../../../core/polynomialfunctions/AlgebraicSubstitution.h"
+#include "../../../core/polynomialfunctions/Division.h"
 #include "../../../core/polynomialfunctions/Evaluation.h"
 #include "../../../core/polynomialfunctions/Resultant.h"
 #include "../../../core/polynomialfunctions/RootCounting.h"
@@ -728,14 +729,14 @@ bool operator==(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
 		if (lhs.is_root_of(g)) {
 			lhs.setPolynomial(g);
 		} else {
-			assert(carl::isZero(lhs.polynomial().divideBy(g).remainder));
-			lhs.setPolynomial(lhs.polynomial().divideBy(g).quotient);
+			assert(carl::isZero(carl::divide(lhs.polynomial(), g).remainder));
+			lhs.setPolynomial(carl::divide(lhs.polynomial(), g).quotient);
 		}
 		if (rhs.is_root_of(g)) {
 			rhs.setPolynomial(g);
 		} else {
-			assert(carl::isZero(rhs.polynomial().divideBy(g).remainder));
-			rhs.setPolynomial(rhs.polynomial().divideBy(g).quotient);
+			assert(carl::isZero(carl::divide(rhs.polynomial(), g).remainder));
+			rhs.setPolynomial(carl::divide(rhs.polynomial(), g).quotient);
 		}
 	}
 	return lhs == rhs;

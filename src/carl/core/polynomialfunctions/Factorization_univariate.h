@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Derivative.h"
+#include "Division.h"
 #include "GCD_univariate.h"
 
 #include "../logging.h"
@@ -44,9 +45,9 @@ CLANG_WARNING_RESET
 		}
 		else
 		{
-			UnivariatePolynomial<Coeff> w = p.divideBy(c).quotient;
+			UnivariatePolynomial<Coeff> w = carl::divide(p, c).quotient;
 			CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: w = " << w);
-			UnivariatePolynomial<Coeff> y = b.divideBy(c).quotient;
+			UnivariatePolynomial<Coeff> y = carl::divide(b, c).quotient;
 			CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: y = " << y);
 			UnivariatePolynomial<Coeff> z = y - derivative(w);
 			CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: z = " << z);
@@ -65,9 +66,9 @@ CLANG_WARNING_RESET
 				result.emplace(i, g);
 				CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: add the factor (" << g << ")^" << i);
 				++i;
-				w = w.divideBy(g).quotient;
+				w = carl::divide(w, g).quotient;
 				CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: w = " << w);
-				y = z.divideBy(g).quotient;
+				y = carl::divide(z, g).quotient;
 				CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: y = " << y);
 				z = y - derivative(w);
 				CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: z = " << z);

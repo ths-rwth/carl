@@ -346,69 +346,6 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprimeCoefficientsSign
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_integer<C>>>
-DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const UnivariatePolynomial<Coeff>& divisor) const
-{
-	assert(!carl::isZero(divisor));
-	DivisionResult<UnivariatePolynomial<Coeff>> result {UnivariatePolynomial<Coeff>(mMainVar), *this};
-	if(carl::isZero(*this)) return result;
-	assert(*this == divisor * result.quotient + result.remainder);
-
-	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(), Coeff(0));
-
-	uint degdiff = this->degree() - divisor.degree();
-	for (std::size_t offset = 0; offset <= degdiff; offset++) {
-		Coeff factor = carl::quotient(result.remainder.mCoefficients[this->degree()-offset], divisor.lcoeff());
-		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff - offset) * divisor;
-		result.quotient.mCoefficients[degdiff-offset] += factor;
-	}
-	assert(*this == divisor * result.quotient + result.remainder);
-	return result;
-}
-
-template<typename Coeff>
-template<typename C, DisableIf<is_integer<C>>, EnableIf<is_field<C>>>
-DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const UnivariatePolynomial<Coeff>& divisor) const
-{
-	assert(!carl::isZero(divisor));
-	assert(this->mainVar() == divisor.mainVar());
-	DivisionResult<UnivariatePolynomial<Coeff>> result {UnivariatePolynomial<Coeff>(mMainVar), *this};
-	if(carl::isZero(*this)) return result;
-	assert(*this == divisor * result.quotient + result.remainder);
-	if(divisor.degree() > degree())
-	{
-		return result;
-	}
-	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(), Coeff(0));
-	
-	do
-	{
-		Coeff factor = result.remainder.lcoeff()/divisor.lcoeff();
-		uint degdiff = result.remainder.degree() - divisor.degree();
-		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff) * divisor;
-		result.quotient.mCoefficients[degdiff] += factor;
-	}
-	while(!carl::isZero(result.remainder) && divisor.degree() <= result.remainder.degree());
-	
-	assert(*this == divisor * result.quotient + result.remainder);
-	return result;
-}
-
-template<typename Coeff>
-template<typename C, DisableIf<is_field<C>>, DisableIf<is_number<C>>>
-bool UnivariatePolynomial<Coeff>::divideBy(const Coeff& divisor, UnivariatePolynomial<Coeff>& quotient) const 
-{
-	assert(this->isConsistent());
-	assert(divisor.isConsistent());
-	Coeff quo;
-	bool res = Coeff(*this).divideBy(divisor, quo);
-	CARL_LOG_TRACE("carl.core", Coeff(*this) << " / " << divisor << " = " << quo);
-	assert(quo.isConsistent());
-	if (res) quotient = quo.toUnivariatePolynomial(this->mainVar());
-	return res;
-}
-
-template<typename Coeff>
 bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& divisor) const
 {
 	///@todo Is this correct?

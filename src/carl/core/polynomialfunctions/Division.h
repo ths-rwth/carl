@@ -174,6 +174,12 @@ DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Co
 	return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial<Coeff>(p.mainVar())};
 }
 
+/**
+ * Divides the polynomial by another polynomial.
+ * @param dividend Dividend.
+ * @param divisor Divisor.
+ * @return dividend / divisor.
+ */
 template<typename Coeff>
 DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Coeff>& dividend, const UnivariatePolynomial<Coeff>& divisor) {
 	if constexpr (is_integer<Coeff>::value) {

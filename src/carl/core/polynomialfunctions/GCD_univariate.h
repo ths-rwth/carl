@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Division.h"
 #include "Remainder.h"
 
 #include "../UnivariatePolynomial.h"
@@ -60,7 +61,7 @@ UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, c
 	
 	while(!isZero(d))
 	{
-		DivisionResult<UnivariatePolynomial<Coeff>> divres = c.divideBy(d);
+		DivisionResult<UnivariatePolynomial<Coeff>> divres = carl::divide(c, d);
 		assert(divres.remainder == c - divres.quotient * d);
 		UnivariatePolynomial r1 = c1 - divres.quotient*d1;
 		UnivariatePolynomial r2 = c2 - divres.quotient*d2;

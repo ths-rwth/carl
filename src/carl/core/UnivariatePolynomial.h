@@ -490,38 +490,6 @@ public:
 	}
 	
 	/**
-	 * Divides the polynomial by another polynomial.
-	 * Applies if the polynomial both have integer coefficients.
-	 * @param divisor Divisor.
-	 * @return this / divisor.
-	 */
-	template<typename C = Coefficient, EnableIf<is_integer<C>> = dummy>
-	[[deprecated("use carl::divide()")]]
-	DivisionResult<UnivariatePolynomial> divideBy(const UnivariatePolynomial& divisor) const;
-
-	/**
-	 * Divides the polynomial by another polynomial.
-	 * Applies if the polynomial both have coefficients over a field.
-	 * @param divisor Divisor.
-	 * @return this / divisor.
-	 */
-	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy, EnableIf<is_field<C>> = dummy>
-	DivisionResult<UnivariatePolynomial> divideBy(const UnivariatePolynomial& divisor) const;
-
-	/**
-	 * Divides the polynomial by a coefficient.
-	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
-	 * Otherwise, false is returned and the content of quotient is undefined.
-	 * Applies if the polynomial has coefficients that are neither numeric nor from a field.
-	 * @param divisor Divisor.
-	 * @param quotient Resulting quotient.
-	 * @return If remainder was zero.
-	 */
-	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy, DisableIf<is_number<C>> = dummy>
-	[[deprecated("Use carl::try_divide() instead.")]]
-	bool divideBy(const Coefficient& divisor, UnivariatePolynomial& quotient) const;
-
-	/**
 	 * Checks if this polynomial is divisible by the given divisor, that is if the remainder is zero.
 	 * @param divisor Polynomial.
 	 * @return If divisor divides this polynomial.

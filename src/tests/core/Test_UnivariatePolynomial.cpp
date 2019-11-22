@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "carl/interval/Interval.h"
 #include "carl/core/polynomialfunctions/Content.h"
+#include "carl/core/polynomialfunctions/Division.h"
 #include "carl/core/polynomialfunctions/GCD.h"
 #include "carl/core/polynomialfunctions/PrimitivePart.h"
 #include "carl/core/polynomialfunctions/Resultant.h"
@@ -73,7 +74,7 @@ TEST(UnivariatePolynomial, Divide)
     Variable x = freshRealVariable("x");
     UnivariatePolynomial<Rational> p(x, {(Rational)6, (Rational)7,(Rational)1});
     UnivariatePolynomial<Rational> q(x, {(Rational)-6, (Rational)-5,(Rational)1});
-    DivisionResult<UnivariatePolynomial<Rational>> d = p.divideBy(p);
+    DivisionResult<UnivariatePolynomial<Rational>> d = carl::divide(p, p);
 //    std::cout << d.quotient << std::endl;
 //    std::cout << d.remainder << std::endl;
 }
