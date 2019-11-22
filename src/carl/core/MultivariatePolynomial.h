@@ -13,7 +13,6 @@
 #include <type_traits>
 #include <vector>
 
-#include "DivisionResult.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "Polynomial.h"
 #include "Term.h"

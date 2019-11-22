@@ -8,6 +8,16 @@
 
 namespace carl {
 
+/**
+ * A strongly typed pair encoding the result of a division, 
+ * being a quotient and a remainder.
+ */
+template<typename Type>
+struct DivisionResult {
+	Type quotient;
+	Type remainder;
+};
+
 template<typename Coeff>
 Term<Coeff> divide(const Term<Coeff>& t, const Coeff& c) {
 	assert(!is_zero(c));

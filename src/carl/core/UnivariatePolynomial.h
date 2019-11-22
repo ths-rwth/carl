@@ -33,7 +33,6 @@ template<typename Coefficient>
 using FactorMap = std::map<UnivariatePolynomial<Coefficient>, uint>;
 }
 
-#include "DivisionResult.h"
 #include "MultivariatePolynomial.h"
 
 #include <carl-logging/carl-logging.h>
