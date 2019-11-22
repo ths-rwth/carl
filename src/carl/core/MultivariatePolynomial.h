@@ -444,17 +444,6 @@ public:
 	 */
 	void addTerm(const Term<Coeff>& term);
 
-	/**
-	 * Calculating the quotient and the remainder, such that for a given polynomial p we have
-	 * p = divisor * quotient + remainder.
-	 * @param divisor Another polynomial
-	 * @return A divisionresult, holding the quotient and the remainder.
-	 * @see
-	 * @note Division is only defined on fields
-	 */
-	[[deprecated("Use carl::divide() instead.")]]
-	DivisionResult<MultivariatePolynomial> divideBy(const MultivariatePolynomial& divisor) const;
-
     /**
      * Calculates the square of this multivariate polynomial if it is a square.
      * @param res Used to store the result in.
@@ -710,7 +699,7 @@ namespace std {
 			std::size_t seed = 0;
 			carl::hash_add(seed, mpoly[0]);
 			for (std::size_t i = 1; i < mpoly.nrTerms() - 1; ++i) {
-				seed = seed | carl::hash_all(mpoly[i]);
+				seed = seed ^ carl::hash_all(mpoly[i]);
 			}
 			carl::hash_add(seed, mpoly[mpoly.nrTerms()-1]);
 			return seed;

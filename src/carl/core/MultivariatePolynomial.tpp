@@ -469,33 +469,6 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::addTerm(const Term<Coeff>&
 	}
 }
 
-template<typename C, typename O, typename P>
-DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::divideBy(const MultivariatePolynomial& divisor) const
-{
-	static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	MultivariatePolynomial<C,O,P> q;
-	MultivariatePolynomial<C,O,P> r;
-	MultivariatePolynomial p = *this;
-	while(!carl::isZero(p))
-	{
-		Term<C> factor;
-		if (p.lterm().divide(divisor.lterm(), factor)) {
-			q += factor;
-			p.subtractProduct(factor, divisor);
-			//p -= factor * divisor;
-		}
-		else
-		{
-			r += p.lterm();
-			p.stripLT();
-		}
-	}
-	assert(q.isConsistent());
-	assert(r.isConsistent());
-	assert(*this == q * divisor + r);
-	return DivisionResult<MultivariatePolynomial<C,O,P>> {q,r};
-}
-
 template<typename Coeff, typename Ordering, typename Policies>
 Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
