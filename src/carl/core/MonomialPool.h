@@ -13,55 +13,44 @@
 #include "config.h"
 
 #include <memory>
-#include <unordered_set>
+#include <boost/intrusive/unordered_set.hpp>
 
 namespace carl{
 
+	inline std::size_t hash_value(const carl::Monomial& monomial) {
+		return monomial.hash();
+	}
 
 	class MonomialPool : public Singleton<MonomialPool>
 	{
 		friend class Singleton<MonomialPool>;
 		friend std::ostream& operator<<(std::ostream& os, const MonomialPool& mp);
-		public:
-			struct PoolEntry {
-				Monomial::Content content;
-				std::size_t hash;
-				mutable std::weak_ptr<const Monomial> monomial;
-				PoolEntry(std::size_t h, Monomial::Content c, const Monomial::Arg& m): content(std::move(c)), hash(h), monomial(m) {}
-				PoolEntry(std::size_t h, Monomial::Content c): content(std::move(c)), hash(h) {
-					assert(monomial.expired());
-				}
-				explicit PoolEntry(Monomial::Content c): content(std::move(c)), hash(Monomial::hashContent(content)) {
-					assert(monomial.expired());
-				}
-			};
-			struct hash {
-				std::size_t operator()(const PoolEntry& p) const {
-					return p.hash;
-				}
-			};
-			struct equal {
-				bool operator()(const PoolEntry& p1, const PoolEntry& p2) const {
-					CARL_LOG_TRACE("carl.core.monomial", p1.content << " / " << p1.hash << " / " << p1.monomial.lock().get() << " == " << p2.content << " / " << p2.hash << " / " << p2.monomial.lock().get());
-					if (p1.hash != p2.hash) {
-						CARL_LOG_TRACE("carl.core.monomial", "No due to hash");
-						return false;
-					}
-					if (p1.monomial.lock() && p2.monomial.lock()) {
-						CARL_LOG_TRACE("carl.core.monomial", "Comparing pointers");
-						return p1.monomial.lock() == p2.monomial.lock();
-					}
-					CARL_LOG_TRACE("carl.core.monomial", "Comparing content");
-					return p1.content == p2.content;
-				}
-			};
+
+		struct content_equal {
+			bool operator()(const Monomial::Content& content, const Monomial& monomial) const { 
+				return content == monomial.mExponents;
+			}
+
+			bool operator()(const Monomial& monomial, const Monomial::Content& content) const {
+				return content == monomial.mExponents;
+			}
+		};
+
+		struct content_hash {
+			std::size_t operator()(const Monomial::Content& content) const {
+				return Monomial::hashContent(content);
+			}
+		};
+
 		private:
 			// Members:
 			/// id allocator
 			IDPool mIDs;
 			//size_t mIdAllocator;
 			/// The pool.
-			std::unordered_set<PoolEntry, MonomialPool::hash, MonomialPool::equal> mPool;
+			using underlying_set = boost::intrusive::unordered_set<Monomial>; 
+			std::unique_ptr<underlying_set::bucket_type[]> mPoolBuckets;
+			underlying_set mPool;
 			/// Mutex to avoid multiple access to the pool
 			mutable std::recursive_mutex mMutex;
 			
@@ -74,16 +63,15 @@ namespace carl{
 			#define MONOMIAL_POOL_LOCK
 			#define MONOMIAL_POOL_UNLOCK
             #endif
-
 			
 		protected:
-			
 			/**
 			 * Constructor of the pool.
 			 * @param _capacity Expected necessary capacity of the pool.
 			 */
 			explicit MonomialPool( std::size_t _capacity = 10000 ):
-				mPool(_capacity)
+				mPoolBuckets(new underlying_set::bucket_type[_capacity]),
+				mPool(underlying_set::bucket_traits(mPoolBuckets.get(), _capacity))
 			{
 				mIDs.get();
 				assert(mIDs.largestID() == 0);
@@ -95,19 +83,11 @@ namespace carl{
 				CARL_LOG_DEBUG("carl.pool", "Monomialpool destructed");
 			}
 
-			Monomial::Arg add( MonomialPool::PoolEntry&& pe, exponent totalDegree = 0 );
-		public:
-			
-			/**
-			 * Try to add the given monomial to the pool.
-			 * @param _monomial The monomial to add.
-			 * @return The corresponding monomial in the pool.
-			 */
-			Monomial::Arg add( const Monomial::Arg& _monomial );
 			Monomial::Arg add( Monomial::Content&& c, exponent totalDegree = 0 );
-			
-			Monomial::Arg create();
+
+		public:
 			Monomial::Arg create( Variable _var, exponent _exp );
+
 			template<typename Number>
 			Monomial::Arg create( Variable _var, Number&& _exp ) {
 				return create(_var, carl::toInt<exponent>(std::forward<Number>(_exp)));
@@ -124,10 +104,9 @@ namespace carl{
 				if (m == nullptr) return;
 				if (m->id() == 0) return;
 				MONOMIAL_POOL_LOCK_GUARD;
-				PoolEntry pe(m->mHash, m->mExponents);
-				auto it = mPool.find(pe);
+				auto it = mPool.find(*m);
 				if (it != mPool.end()) {
-					CARL_LOG_TRACE("carl.core.monomial", "Found " << it->content << " / " << it->hash);
+					CARL_LOG_TRACE("carl.core.monomial", "Found " << m->id());
 					mIDs.free(m->id());
 					mPool.erase(it);
 				} else {
@@ -154,7 +133,7 @@ namespace carl{
 	inline std::ostream& operator<<(std::ostream& os, const MonomialPool& mp) {
 		os << "MonomialPool of size " << mp.size() << std::endl;
 		for (const auto& entry: mp.mPool) {
-			os << "\t" << entry.content << " / " << entry.hash << std::endl;
+			os << "\t" << entry << std::endl;
 		}
 		return os;
 	}
