@@ -13,10 +13,9 @@ It covers the most important steps including obtaining the actual source code, o
 If you already use CArL and want to dig deeper or submit new code, you can read the @ref devguide.
 It contains information about supplementary features like our logging framework and some basic guidelines for our code like how we use doxygen.
 
-Note that this documentation is, and will probably still be for quite some time, work in progress.
+Note that this documentation is, and will probably always be, work in progress.
 If you feel that some topic that is important to you is missing or some explanation is unclear, please let us know!
 
 ### Contact
 - github: https://github.com/smtrat/carl
-- IRC: \#carl on chat.freenode.net
 
