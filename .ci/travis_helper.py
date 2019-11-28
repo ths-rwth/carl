@@ -82,7 +82,7 @@ properties = {
 	"task.sonarcloud-build": {"script": ["TASK=sonarcloud-build"]},
 	"task.sonarcloud-scan": {"script": ["TASK=sonarcloud-scan"]},
 	"task.clang-ubsan": {"env": ["TASK=clang-ubsan"]},
-	"task.documentation": {"if": "branch = master", "env": ["TASK=documentation"], "addons": addon_apt([],["doxygen", "ghostscript", "lmodern", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra", "python3-pip", "python3-setuptools"])},
+	"task.documentation": {"if": "branch = master", "env": ["TASK=documentation"], "addons": addon_apt([],["doxygen", "ghostscript", "lmodern", "texinfo", "texlive", "texlive-font-utils", "texlive-latex-extra", "texlive-plain-generic", "python3-pip", "python3-setuptools"])},
 	"task.pycarl": {"env": ["TASK=pycarl"], "addons": addon_apt([],["python3"])},
 	"task.addons": {"env": ["TASK=addons"]},
 	"task.tidy": {"env": ["TASK=tidy"]},

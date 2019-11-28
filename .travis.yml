@@ -212,7 +212,7 @@ jobs:
         apt:
           sources:
           - *sources_base
-          packages: [*packages_base, g++-9, doxygen, ghostscript, lmodern, texinfo, texlive, texlive-font-utils, texlive-latex-extra, python3-pip, python3-setuptools]
+          packages: [*packages_base, g++-9, doxygen, ghostscript, lmodern, texinfo, texlive, texlive-font-utils, texlive-latex-extra, texlive-plain-generic, python3-pip, python3-setuptools]
     - stage: check
       os: linux
       compiler: clang++-9.0
