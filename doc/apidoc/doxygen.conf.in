@@ -1106,7 +1106,14 @@ SERVER_BASED_SEARCH    = NO
 # If the GENERATE_LATEX tag is set to YES (the default) Doxygen will
 # generate Latex output.
 
-GENERATE_LATEX         = NO
+GENERATE_LATEX         = YES
+LATEX_OUTPUT           = apidoc
+LATEX_CMD_NAME         = pdflatex
+COMPACT_LATEX          = YES
+PAPER_TYPE             = a4
+PDF_HYPERLINKS         = YES
+USE_PDFLATEX           = YES
+
 GENERATE_RTF           = NO
 GENERATE_MAN           = NO
 GENERATE_XML           = NO

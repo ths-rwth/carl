@@ -16,10 +16,9 @@ endif(TARGET Doxygen::dot)
 
 # Paths for documentations
 set(OUTPUT_DIR ${PROJECT_BINARY_DIR}/doc)
-set(CODE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
-set(MANUAL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/doc/manual)
 
 # Collect all sources for proper dependencies
+set(CODE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 file(GLOB_RECURSE CODE_SOURCES "${CODE_SOURCE_DIR}/**/*.cpp" "${CODE_SOURCE_DIR}/**/*.h" "${CODE_SOURCE_DIR}/**/*.tpp")
 
 # Configure config for HTML documentation
@@ -36,42 +35,41 @@ add_custom_target(doc-html
 	DEPENDS ${OUTPUT_DIR}/html/index.html
 )
 
+# Configure targets
+find_package(LATEX COMPONENTS PDFLATEX BIBTEX)
+if(LATEX_FOUND)
+	file(GLOB_RECURSE MANUAL_SOURCES "${PROJECT_SOURCE_DIR}/doc/manual/**/*")
+	# Configure config for Manual
+	configure_file(manual/doxygen.conf.in ${OUTPUT_DIR}/config-manual/doxygen.conf)
+	# Build latex sources
+	add_custom_command(
+		OUTPUT ${OUTPUT_DIR}/manual/refman.tex
+		COMMAND Doxygen::doxygen ${OUTPUT_DIR}/config-manual/doxygen.conf
+		DEPENDS ${OUTPUT_DIR}/config-manual/doxygen.conf ${MANUAL_SOURCES}
+	)
+
+	# Build the manual
+	set(TEX_DIR ${OUTPUT_DIR}/manual)
+	add_custom_target(doc-pdf
+		COMMAND ${PDFLATEX_COMPILER} refman.tex
+		#COMMAND ${PDFLATEX_COMPILER} refman.tex
+		COMMAND mv ${OUTPUT_DIR}/manual/refman.pdf ${OUTPUT_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION_LIB}.pdf
+		WORKING_DIRECTORY ${OUTPUT_DIR}/manual
+		DEPENDS ${OUTPUT_DIR}/manual/refman.tex
+	)
+else(LATEX_FOUND)
+	message(STATUS "Did not find pdflatex, no pdf manual can be built.")
+	set(DOXYGEN_CREATE_PDF NO)
+endif(LATEX_FOUND)
+
 # umbrella target for the whole documentation
-add_custom_target(doc
-	DEPENDS doc-html
-)
+add_custom_target(doc)
 
-# If pdf manual is enabled, do the same for the manual again
+if(DOC_CREATE_HTML)
+	# Build html documentation by default
+	add_dependencies(doc doc-html)
+endif()
 if(DOC_CREATE_PDF)
-	find_package(LATEX COMPONENTS PDFLATEX BIBTEX)
-	if(LATEX_FOUND)
-		file(GLOB_RECURSE MANUAL_SOURCES "${MANUAL_SOURCE_DIR}/**/*")
-		# Configure config for Manual
-		configure_file(manual/doxygen.conf.in ${OUTPUT_DIR}/config-manual/doxygen.conf)
-		# Build latex sources
-		add_custom_command(
-			OUTPUT ${OUTPUT_DIR}/manual/refman.tex
-			COMMAND Doxygen::doxygen ${OUTPUT_DIR}/config-manual/doxygen.conf
-			DEPENDS ${OUTPUT_DIR}/config-manual/doxygen.conf ${MANUAL_SOURCES}
-		)
-		# Wrapper target to have proper dependencies
-		add_custom_target(doc-doxygen-manual
-			DEPENDS ${OUTPUT_DIR}/manual/refman.tex
-		)
-
-		# Build the manual
-		set(TEX_DIR ${OUTPUT_DIR}/manual)
-		add_custom_target(doc-pdf
-			BYPRODUCTS ${TEX_DIR}/refman.pdf
-			COMMAND ${PDFLATEX_COMPILER} refman.tex
-			COMMAND ${PDFLATEX_COMPILER} refman.tex
-			COMMAND mv ${TEX_DIR}/refman.pdf ${OUTPUT_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION_LIB}.pdf
-			WORKING_DIRECTORY ${TEX_DIR}
-			DEPENDS doc-doxygen-manual
-		)
-		add_dependencies(doc doc-pdf)
-	else(LATEX_FOUND)
-		message(STATUS "Did not find pdflatex, no pdf manual can be built.")
-		set(DOXYGEN_CREATE_PDF NO)
-	endif(LATEX_FOUND)
+	# Build pdf documentation by default
+	add_dependencies(doc doc-pdf)
 endif(DOC_CREATE_PDF)
