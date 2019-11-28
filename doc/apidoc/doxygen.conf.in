@@ -6,6 +6,7 @@ PROJECT_NUMBER         = @PROJECT_VERSION@
 PROJECT_BRIEF          = @PROJECT_DESCRIPTION@
 #PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = @CMAKE_BINARY_DIR@/doc/html
+CREATE_SUBDIRS         = YES
 INLINE_INHERITED_MEMB  = YES
 STRIP_FROM_PATH        = @CMAKE_SOURCE_DIR@/src
 SHORT_NAMES            = YES
@@ -72,6 +73,7 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = @CMAKE_BINARY_DIR@/doc/html
 HTML_TIMESTAMP         = NO
+GENERATE_TREEVIEW      = YES
 
 #########################
 ##### Other outputs

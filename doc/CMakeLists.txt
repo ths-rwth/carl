@@ -52,7 +52,7 @@ if(LATEX_FOUND)
 	set(TEX_DIR ${OUTPUT_DIR}/manual)
 	add_custom_target(doc-pdf
 		COMMAND ${PDFLATEX_COMPILER} refman.tex
-		#COMMAND ${PDFLATEX_COMPILER} refman.tex
+		COMMAND ${PDFLATEX_COMPILER} refman.tex
 		COMMAND mv ${OUTPUT_DIR}/manual/refman.pdf ${OUTPUT_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION_LIB}.pdf
 		WORKING_DIRECTORY ${OUTPUT_DIR}/manual
 		DEPENDS ${OUTPUT_DIR}/manual/refman.tex
