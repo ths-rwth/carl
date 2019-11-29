@@ -204,7 +204,7 @@ endmacro(get_include_dir)
 
 macro(add_new_libraries name version sources dependencies)
 	add_library(${name}-objects OBJECT ${sources})
-	if(dependencies)
+	if(NOT "${dependencies}" STREQUAL "")
 		add_dependencies(${name}-objects ${dependencies})
 	endif()
 
