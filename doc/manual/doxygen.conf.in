@@ -70,7 +70,6 @@ LATEX_HEADER           = @PROJECT_SOURCE_DIR@/doc/manual/header.tex
 LATEX_FOOTER           = @PROJECT_SOURCE_DIR@/doc/manual/footer.tex
 LATEX_EXTRA_FILES      = @PROJECT_SOURCE_DIR@/doc/manual/doxygen.sty
 PDF_HYPERLINKS         = YES
-USE_PDFLATEX           = YES
 LATEX_BATCHMODE        = NO
 LATEX_HIDE_INDICES     = NO
 LATEX_BIB_STYLE        = plain
