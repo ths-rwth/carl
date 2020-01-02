@@ -24,7 +24,7 @@ void setInitialLogLevel()
 
 	carl::logging::logger().configure("stdout", std::cout);
 	carl::logging::logger().filter("stdout")
-		("carl", carl::logging::LogLevel::LVL_DEBUG)
+		// ("carl", carl::logging::LogLevel::LVL_DEBUG)
 		("carl.cad", carl::logging::LogLevel::LVL_DEBUG)
 		("carl.cad.projection", carl::logging::LogLevel::LVL_WARN)
 		("carl.cad.sampleset", carl::logging::LogLevel::LVL_WARN)
