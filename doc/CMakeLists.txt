@@ -1,94 +1,75 @@
-option(DOC_CREATE_DOXYGEN "Create Doxygen HTML" ON)
-option(DOC_CREATE_PDF "Create PDF reference manual" OFF)
-option(DOC_CREATE_SPHINX "Create Sphinx HTML" OFF)
-option(DOC_INCLUDE_SOURCES "Include source reference in manual" ON)
+option(DOC_CREATE_HTML "Create HTML documentation" ON)
+option(DOC_CREATE_PDF "Create PDF reference manual" ON)
 
-# Cmake modules needed
-# # # # # # # # # # # #
-
+# Check if doxygen is available
 if(NOT TARGET Doxygen::doxygen)
 	message(STATUS "Doxygen not available, no documentation can be built.")
 	return()
 endif()
 
+# Check if dot is available
 if(TARGET Doxygen::dot)
-  set(DOXYGEN_HAVE_DOT YES)
+	set(DOXYGEN_HAVE_DOT YES)
 else(TARGET Doxygen::dot)
-  set(DOXYGEN_HAVE_DOT NO)
+	set(DOXYGEN_HAVE_DOT NO)
 endif(TARGET Doxygen::dot)
 
-# Look for a LaTeX compiler
-if(DOC_CREATE_PDF)
-	find_package(LATEX COMPONENTS PDFLATEX BIBTEX)
+# Paths for documentations
+set(OUTPUT_DIR ${PROJECT_BINARY_DIR}/doc)
 
-	if(LATEX_FOUND)
-		set(DOXYGEN_CREATE_PDF YES)
-	else(LATEX_FOUND)
-		message(STATUS "Did not find pdflatex, no pdf manual can be built.")
-		set(DOXYGEN_CREATE_PDF NO)
-	endif(LATEX_FOUND)
-endif()
+# Collect all sources for proper dependencies
+set(CODE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+file(GLOB_RECURSE CODE_SOURCES "${CODE_SOURCE_DIR}/**/*.cpp" "${CODE_SOURCE_DIR}/**/*.h" "${CODE_SOURCE_DIR}/**/*.tpp")
 
-set(DOC_OUTPUT_DIR ${PROJECT_BINARY_DIR}/doc)
+# Configure config for HTML documentation
+configure_file(apidoc/doxygen.conf.in ${OUTPUT_DIR}/config-apidoc/doxygen.conf)
 
-set(DOC_SOURCE_DIR ${PROJECT_SOURCE_DIR}/doc/markdown)
-
-if(DOC_INCLUDE_SOURCES)
-	set(DOC_SOURCE_DIR ${DOC_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src)
-endif(DOC_INCLUDE_SOURCES)
-STRING(REGEX REPLACE ";" " " DOXYGEN_INPUT_LIST "${DOC_SOURCE_DIR}" )
-
-file(GLOB_RECURSE DOC_SOURCES "${PROJECT_SOURCE_DIR}/src/**/*.cpp" "${PROJECT_SOURCE_DIR}/src/**/*.h" "${PROJECT_SOURCE_DIR}/src/**/*.tpp")
-
-configure_file(doxygen.conf.in ${DOC_OUTPUT_DIR}/config/doxygen.conf)
-
-# Target for running doxygen
+# Build html documentation
 add_custom_command(
-	OUTPUT ${DOC_OUTPUT_DIR}/xml/index.xml
-	COMMAND Doxygen::doxygen ${DOC_OUTPUT_DIR}/config/doxygen.conf
-	DEPENDS ${DOC_OUTPUT_DIR}/config/doxygen.conf ${DOC_SOURCES}
+	OUTPUT ${OUTPUT_DIR}/html/index.html
+	COMMAND Doxygen::doxygen ${OUTPUT_DIR}/config-apidoc/doxygen.conf
+	DEPENDS ${OUTPUT_DIR}/config-apidoc/doxygen.conf ${CODE_SOURCES}
+)
+# Wrapper target to have proper dependencies
+add_custom_target(doc-html
+	DEPENDS ${OUTPUT_DIR}/html/index.html
 )
 
-add_custom_target(doc-doxygen
-	DEPENDS ${DOC_OUTPUT_DIR}/xml/index.xml
-)
+# Configure targets
+find_package(LATEX COMPONENTS PDFLATEX BIBTEX)
+if(LATEX_FOUND)
+	file(GLOB_RECURSE MANUAL_SOURCES "${PROJECT_SOURCE_DIR}/doc/manual/**/*")
+	# Configure config for Manual
+	configure_file(manual/doxygen.conf.in ${OUTPUT_DIR}/config-manual/doxygen.conf)
+	# Build latex sources
+	add_custom_command(
+		OUTPUT ${OUTPUT_DIR}/manual/refman.tex
+		COMMAND Doxygen::doxygen ${OUTPUT_DIR}/config-manual/doxygen.conf
+		DEPENDS ${OUTPUT_DIR}/config-manual/doxygen.conf ${MANUAL_SOURCES}
+	)
+
+	# Build the manual
+	set(TEX_DIR ${OUTPUT_DIR}/manual)
+	add_custom_target(doc-pdf
+		COMMAND ${PDFLATEX_COMPILER} refman.tex
+		COMMAND ${PDFLATEX_COMPILER} refman.tex
+		COMMAND mv ${OUTPUT_DIR}/manual/refman.pdf ${OUTPUT_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION_LIB}.pdf
+		WORKING_DIRECTORY ${OUTPUT_DIR}/manual
+		DEPENDS ${OUTPUT_DIR}/manual/refman.tex
+	)
+else(LATEX_FOUND)
+	message(STATUS "Did not find pdflatex, no pdf manual can be built.")
+	set(DOXYGEN_CREATE_PDF NO)
+endif(LATEX_FOUND)
 
 # umbrella target for the whole documentation
-add_custom_target(doc
-	DEPENDS doc-doxygen
-)
+add_custom_target(doc)
 
-if(DOXYGEN_CREATE_PDF)
-	set(TEX_DIR ${DOC_OUTPUT_DIR}/latex)
-	add_custom_target(doc-pdf
-		BYPRODUCTS ${TEX_DIR}/refman.pdf
-		COMMAND ${PDFLATEX_COMPILER} refman.tex
-		COMMAND ${PDFLATEX_COMPILER} refman.tex
-		COMMAND mv ${TEX_DIR}/refman.pdf ${DOC_OUTPUT_DIR}/doc_${PROJECT_NAME}-${PROJECT_VERSION_LIB}.pdf
-		WORKING_DIRECTORY ${TEX_DIR}
-		DEPENDS doc-doxygen
-	)
+if(DOC_CREATE_HTML)
+	# Build html documentation by default
+	add_dependencies(doc doc-html)
+endif()
+if(DOC_CREATE_PDF)
+	# Build pdf documentation by default
 	add_dependencies(doc doc-pdf)
-endif(DOXYGEN_CREATE_PDF)
-
-if(DOC_CREATE_SPHINX)
-	configure_file(conf.py.in ${DOC_OUTPUT_DIR}/config/conf.py)
-	add_custom_command(
-		OUTPUT ${DOC_OUTPUT_DIR}/sphinx/index.html
-		COMMAND sphinx-build -b html -Q
-			-Dbreathe_default_project=carl -Dbreathe_projects.carl=${DOC_OUTPUT_DIR}/xml
-			-c ${DOC_OUTPUT_DIR}/config
-			${CMAKE_CURRENT_SOURCE_DIR} ${DOC_OUTPUT_DIR}/sphinx
-		WORKING_DIRECTORY ${DOC_OUTPUT_DIR}/config
-		DEPENDS
-			${DOC_OUTPUT_DIR}/xml/index.xml
-			${DOC_OUTPUT_DIR}/config/conf.py
-			${CMAKE_CURRENT_SOURCE_DIR}/index.rst
-	)
-	add_custom_target(doc-sphinx
-		DEPENDS
-			doc-doxygen
-			${DOC_OUTPUT_DIR}/sphinx/index.html
-	)
-	add_dependencies(doc doc-sphinx)
-endif(DOC_CREATE_SPHINX)
+endif(DOC_CREATE_PDF)

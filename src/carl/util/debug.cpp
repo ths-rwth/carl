@@ -1,6 +1,6 @@
 #include "debug.h"
 
-#include "../core/logging.h"
+#include <carl-logging/carl-logging.h>
 
 #include <boost/core/demangle.hpp>
 

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <chrono>
-#include <iostream>
+#include <ostream>
 
 namespace carl
 {

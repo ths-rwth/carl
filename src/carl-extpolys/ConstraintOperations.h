@@ -9,7 +9,7 @@
 
 #include <iterator>
 
-#include "../formula/Constraint.h"
+#include <carl/formula/Constraint.h>
 #include "RationalFunction.h"
 
 

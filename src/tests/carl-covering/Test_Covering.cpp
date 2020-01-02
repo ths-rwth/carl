@@ -1,5 +1,7 @@
-#include <carl-covering/carl-covering.h>
 #include <gtest/gtest.h>
+
+#include <carl/util/Bitset.h>
+#include <carl-covering/carl-covering.h>
 
 TEST(Covering, SetCover) {
 	using namespace carl::covering;

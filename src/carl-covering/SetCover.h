@@ -1,7 +1,12 @@
 #pragma once
 
-#include <carl/util/Bitset.h>
+//#include <carl/util/Bitset.h>
 
+namespace carl {
+	class Bitset;
+};
+
+#include <ostream>
 #include <vector>
 
 namespace carl::covering {

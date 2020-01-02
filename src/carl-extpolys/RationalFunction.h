@@ -5,11 +5,13 @@
  */
 
 #pragma once
-#include "../numbers/numbers.h"
-#include "../util/hash.h"
+#include <carl/numbers/numbers.h>
+#include <carl/util/hash.h>
 #include "FactorizedPolynomial.h"
-#include "polynomialfunctions/Evaluation.h"
-#include "polynomialfunctions/GCD.h"
+#include <carl/core/polynomialfunctions/Evaluation.h>
+#include <carl/core/polynomialfunctions/GCD.h>
+
+#include "evaluation.h"
 
 #include <boost/optional.hpp>
 
@@ -238,7 +240,7 @@ public:
 		if (isConstant()) {
 			return mNumberQuotient;
 		} else {
-			return nominatorAsPolynomial().evaluate(substitutions) / denominatorAsPolynomial().evaluate(substitutions);
+			return carl::evaluate(nominatorAsPolynomial(), substitutions) / carl::evaluate(denominatorAsPolynomial(), substitutions);
 		}
 	}
 

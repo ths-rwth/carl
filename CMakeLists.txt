@@ -134,6 +134,7 @@ endif()
 
 # Configure static analysis
 include(clang-tidy)
+include(clang-time-trace)
 include(coverage)
 
 # Configure documentation

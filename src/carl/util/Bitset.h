@@ -2,9 +2,9 @@
 
 #include "boost_util.h"
 
-#include <iostream>
-
 #include <boost/dynamic_bitset.hpp>
+
+#include <ostream>
 
 namespace carl {
 

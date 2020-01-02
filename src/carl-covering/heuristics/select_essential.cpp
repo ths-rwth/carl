@@ -1,5 +1,7 @@
 #include "select_essential.h"
 
+#include <carl/util/Bitset.h>
+
 namespace carl::covering::heuristic {
 
 Bitset select_essential(SetCover& sc) {

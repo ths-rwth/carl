@@ -8,6 +8,8 @@
 
 #include "../Common.h"
 
+#include <fstream>
+
 using Poly = carl::MultivariatePolynomial<Rational>;
 using FormulaT = carl::Formula<carl::MultivariatePolynomial<Rational>>;
 

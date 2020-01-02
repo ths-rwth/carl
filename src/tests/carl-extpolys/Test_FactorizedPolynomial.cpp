@@ -1,11 +1,12 @@
 #include "gtest/gtest.h"
-#include "carl/core/MultivariatePolynomial.h"
-#include "carl/core/FactorizedPolynomial.h"
-#include "carl/core/polynomialfunctions/LCM.h"
-#include "carl/core/polynomialfunctions/Quotient.h"
-#include "carl/util/stringparser.h"
-#include "carl/util/platform.h"
-#include "carl/numbers/numbers.h"
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl-extpolys/FactorizedPolynomial.h>
+#include <carl-extpolys/substitution.h>
+#include <carl/core/polynomialfunctions/LCM.h>
+#include <carl/core/polynomialfunctions/Quotient.h>
+#include <carl/util/stringparser.h>
+#include <carl/util/platform.h>
+#include <carl/numbers/numbers.h>
 
 #include "../Common.h"
 
@@ -563,11 +564,11 @@ TEST(FactorizedPolynomial, Evaluation)
     std::map<carl::Variable, Rational> substitution;
     substitution[x] = 3;
 
-    Rational result = fp1.evaluate(substitution);
+    Rational result = carl::evaluate(fp1, substitution);
     EXPECT_EQ( Rational(18), result );
-    result = fp2.evaluate(substitution);
+    result = carl::evaluate(fp2, substitution);
     EXPECT_EQ( Rational(3), result );
-    result = fp3.evaluate(substitution);
+    result = carl::evaluate(fp3, substitution);
     EXPECT_EQ( Rational(54), result );
 }
 
@@ -592,41 +593,41 @@ TEST(FactorizedPolynomial, Substitution)
     std::map<carl::Variable, Rational> substitution;
     substitution[x] = 3;
 
-    FPol result = fpc.substitute(substitution);
+    FPol result = carl::substitute(fpc, substitution);
     EXPECT_TRUE( result.isConstant() );
     EXPECT_EQ( Rational(-3), result.constantPart() );
     EXPECT_EQ( Rational(-3), result );
-    result = fp1.substitute(substitution);
+    result = carl::substitute(fp1, substitution);
     EXPECT_EQ( Rational(18), result );
-    result = fp2.substitute(substitution);
+    result = carl::substitute(fp2, substitution);
     EXPECT_EQ( Rational(3), result );
-    result = fp3.substitute(substitution);
+    result = carl::substitute(fp3, substitution);
     EXPECT_EQ( fp3, result );
-    result = fp4.substitute(substitution);
+    result = carl::substitute(fp4, substitution);
     EXPECT_EQ( Rational(54), result );
-    result = fp5.substitute(substitution);
+    result = carl::substitute(fp5, substitution);
     EXPECT_EQ( Rational(54)*fp3, result );
 
     std::map<carl::Variable, Rational> substitution2;
     substitution2[y] = 5;
-    result = fp5.substitute(substitution2);
+    result = carl::substitute(fp5, substitution2);
     EXPECT_EQ( Rational(150)*fp2*fp2, result );
 
     std::map<carl::Variable, Rational> substitution3;
     substitution3[x] = -2;
     substitution3[y] = 0;
-    result = fp1.substitute(substitution3);
+    result = carl::substitute(fp1, substitution3);
     EXPECT_EQ( Rational(-12), result );
-    result = fp2.substitute(substitution3);
+    result = carl::substitute(fp2, substitution3);
     EXPECT_EQ( Rational(-2), result );
-    result = fp3.substitute(substitution3);
+    result = carl::substitute(fp3, substitution3);
     EXPECT_EQ( Rational(0), result );
-    result = fp4.substitute(substitution3);
+    result = carl::substitute(fp4, substitution3);
     EXPECT_EQ( Rational(24), result );
-    result = fp5.substitute(substitution3);
+    result = carl::substitute(fp5, substitution3);
     EXPECT_EQ( Rational(0), result );
     substitution3[y] = 3;
-    result = fp5.substitute(substitution3);
+    result = carl::substitute(fp5, substitution3);
     EXPECT_EQ( Rational(360), result );
 }
 

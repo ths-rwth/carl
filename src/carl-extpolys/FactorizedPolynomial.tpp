@@ -6,10 +6,10 @@
  */
 
 #include "FactorizedPolynomial.h"
-#include "UnivariatePolynomial.h"
 
-#include "polynomialfunctions/Division.h"
-#include "polynomialfunctions/Substitution.h"
+#include <carl/core/polynomialfunctions/Division.h>
+#include <carl/core/polynomialfunctions/Substitution.h>
+#include <carl/core/UnivariatePolynomial.h>
 
 #pragma once
 
@@ -574,134 +574,6 @@ namespace carl
         }
         return res;
 	}
-
-    template<typename P>
-    template<typename SubstitutionType>
-    SubstitutionType FactorizedPolynomial<P>::evaluate(const std::map<Variable,SubstitutionType>& substitutions) const
-    {
-        if (!existsFactorization(*this)) {
-            return mCoefficient;
-        }
-        if (factorizedTrivially()) {
-            return SubstitutionType(mCoefficient) * carl::evaluate(polynomial(), substitutions);
-        } else {
-            SubstitutionType result = mCoefficient;
-            for (const auto& factor : content().factorization()) {
-                SubstitutionType subResult = factor.first.evaluate(substitutions);
-                if (carl::isZero(subResult)) {
-                    return constant_zero<SubstitutionType>::get();
-                }
-                result *= carl::pow(subResult, factor.second);
-            }
-            assert(result == carl::evaluate(computePolynomial(*this), substitutions));
-            return result;
-        }
-    }
-
-    template<typename P>
-    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute(Variable var, const FactorizedPolynomial<P>& value) const
-    {
-        std::map<Variable, FactorizedPolynomial<P>> varFPolMap;
-        varFPolMap.insert(std::make_pair(var, value));
-        std::map<Variable, P> varPolMap;
-        varPolMap.insert(std::make_pair(var, value.polynomial()));
-        return substitute(varFPolMap, varPolMap);
-    }
-
-    template<typename P>
-    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute(const std::map<Variable, FactorizedPolynomial<P>>& substitutions) const
-    {
-        std::map<Variable, P> varPolMap;
-        for (const auto& varFPolPair : substitutions) {
-            varPolMap.insert(varPolMap.end(), std::make_pair(varFPolPair.first, varFPolPair.second.polynomial()));
-        }
-        return substitute(substitutions, varPolMap);
-    }
-
-    template<typename P>
-    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute(const std::map<Variable, FactorizedPolynomial<P>>& substitutions, const std::map<Variable, P>& substitutionsAsP) const
-    {
-        if (!existsFactorization(*this)) {
-            // Contains no variables but only coefficients
-            return *this;
-        }
-        if (factorizedTrivially()) {
-            // Only has one factor
-            // Substitute in copy
-            P subResult = polynomial().substitute(substitutionsAsP);
-            if (subResult.isConstant()) {
-                FactorizedPolynomial<P> result(subResult.constantPart() * mCoefficient);
-                assert(computePolynomial(result) == computePolynomial(*this).substitute(substitutionsAsP));
-                return std::move(result);
-            } else {
-                FactorizedPolynomial<P> result(std::move(subResult), mpCache);
-                result *= mCoefficient;
-                assert(computePolynomial(result) == computePolynomial(*this).substitute(substitutionsAsP));
-                return std::move(result);
-            }
-        } else {
-            CoeffType resultCoeff = mCoefficient;
-            Factorization<P> resultFactorization;
-            // Substitute in all factors
-            for (const auto& factor : content().factorization()) {
-                FactorizedPolynomial<P> subResult = factor.first.substitute(substitutions);
-                if (subResult.isZero()) {
-                    return FactorizedPolynomial<P>(constant_zero<CoeffType>::get());
-                }
-                if (subResult.isConstant()) {
-                    resultCoeff *= carl::pow(subResult.constantPart(), factor.second);
-                } else {
-                    // Add substituted polynomial into factorization
-                    resultFactorization.insert(std::pair<FactorizedPolynomial<P>, carl::exponent>(subResult, factor.second));
-                }
-            }
-            FactorizedPolynomial<P> result(std::move(resultFactorization), resultCoeff, mpCache);
-            assert(computePolynomial(result) == computePolynomial(*this).substitute(substitutionsAsP));
-            return std::move(result);
-        }
-    }
-
-    template<typename P>
-    template<typename SubstitutionType>
-    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
-    {
-        if (!existsFactorization(*this)) {
-            // Contains no variables but only coefficients
-            return *this;
-        }
-        if (factorizedTrivially()) {
-            // Only has one factor
-            P subResult = carl::substitute(polynomial(), substitutions);
-            if (subResult.isConstant()) {
-                FactorizedPolynomial<P> result(subResult.constantPart() * mCoefficient);
-                assert(computePolynomial(result) == carl::substitute(computePolynomial(*this), substitutions));
-                return std::move(result);
-            } else {
-                FactorizedPolynomial<P> result(std::move(subResult), mpCache);
-                result *= mCoefficient;
-                assert(computePolynomial(result) == carl::substitute(computePolynomial(*this), substitutions));
-                return std::move(result);
-            }
-        } else {
-            CoeffType resultCoeff = mCoefficient;
-            Factorization<P> resultFactorization;
-            // Substitute in all factors
-            for (const auto& factor : content().factorization()) {
-                FactorizedPolynomial<P> subResult = factor.first.substitute(substitutions);
-                if (subResult.isZero())
-                    return FactorizedPolynomial<P>(constant_zero<CoeffType>::get());
-                if (subResult.isConstant()) {
-                    resultCoeff *= carl::pow(subResult.constantPart(), factor.second);
-                } else {
-                    // Add substituted polynomial into factorization
-                    resultFactorization.insert(std::pair<FactorizedPolynomial<P>, carl::exponent>(subResult, factor.second));
-                }
-            }
-            FactorizedPolynomial<P> result(std::move(resultFactorization), resultCoeff, mpCache);
-            assert(computePolynomial(result) == carl::substitute(computePolynomial(*this), substitutions));
-            return std::move(result);
-        }
-    }
 
     template<typename P>
     bool FactorizedPolynomial<P>::sqrt( FactorizedPolynomial<P>& _result ) const

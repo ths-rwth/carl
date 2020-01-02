@@ -220,9 +220,11 @@ public:
 		 * @param c a non-zero coefficient.
 		 * @return 
 		 */
+	[[deprecated("Use carl::divide() instead.")]]
 	Term divide(const Coefficient& c) const;
+	[[deprecated("Use carl::divide() instead.")]]
 	bool divide(const Coefficient& c, Term& res) const;
-
+	[[deprecated("Use carl::divide() instead.")]]
 	bool divide(Variable v, Term& res) const;
 
 	bool divide(const Monomial::Arg& m, Term& res) const;
@@ -245,13 +247,6 @@ public:
 	bool divisible(const Term& t) const;
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
 	bool divisible(const Term& t) const;
-
-	[[deprecated("Use carl::substitute() instead.")]]
-	Term substitute(const std::map<Variable, Coefficient>& substitutions) const;
-	[[deprecated("Use carl::substitute() instead.")]]
-	Term substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
-	[[deprecated("Use carl::evaluate() instead.")]]
-	Coefficient evaluate(const std::map<Variable, Coefficient>& map) const;
 
 	template<bool gatherCoeff, typename CoeffType>
 	void gatherVarInfo(Variable var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;

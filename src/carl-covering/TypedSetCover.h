@@ -2,6 +2,7 @@
 
 #include "SetCover.h"
 
+#include <cassert>
 #include <map>
 #include <vector>
 

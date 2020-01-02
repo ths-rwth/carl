@@ -13,7 +13,6 @@
 #include <type_traits>
 #include <vector>
 
-#include "DivisionResult.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "Polynomial.h"
 #include "Term.h"
@@ -444,39 +443,6 @@ public:
 	 */
 	void addTerm(const Term<Coeff>& term);
 
-	/**
-	 * Divides the polynomial by the given coefficient.
-	 * Applies if the coefficients are from a field.
-	 * @param divisor
-	 * @return 
-	 */
-	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
-	MultivariatePolynomial divideBy(const Coeff& divisor) const;
-    
-	/**
-	 * Divides the polynomial by another polynomial.
-	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
-	 * Otherwise, false is returned and the content of quotient remains unchanged.
-	 * Applies if the coefficients are from a field.
-	 * Note that the quotient must not be *this.
-	 * @param divisor
-	 * @param quotient
-	 * @return 
-	 */
-	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
-	[[deprecated("Use carl::try_divide() instead.")]]
-	bool divideBy(const MultivariatePolynomial& divisor, MultivariatePolynomial& quotient) const;
-	
-	/**
-	 * Calculating the quotient and the remainder, such that for a given polynomial p we have
-	 * p = divisor * quotient + remainder.
-	 * @param divisor Another polynomial
-	 * @return A divisionresult, holding the quotient and the remainder.
-	 * @see
-	 * @note Division is only defined on fields
-	 */
-	DivisionResult<MultivariatePolynomial> divideBy(const MultivariatePolynomial& divisor) const;
-
     /**
      * Calculates the square of this multivariate polynomial if it is a square.
      * @param res Used to store the result in.
@@ -514,14 +480,6 @@ public:
 	 * @return 
 	 */
 	MultivariatePolynomial normalize() const;
-	
-	/**
-	 * Like substitute, but expects substitutions for all variables.
-	 * @return For a polynomial p, the function value p(x_1,...,x_n).
-	 */
-	template<typename SubstitutionType = Coeff>
-	[[deprecated("use carl::evaluate() instead.")]]
-	SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
 	
 	bool divides(const MultivariatePolynomial& b) const;
 
@@ -740,7 +698,7 @@ namespace std {
 			std::size_t seed = 0;
 			carl::hash_add(seed, mpoly[0]);
 			for (std::size_t i = 1; i < mpoly.nrTerms() - 1; ++i) {
-				seed = seed | carl::hash_all(mpoly[i]);
+				seed = seed ^ carl::hash_all(mpoly[i]);
 			}
 			carl::hash_add(seed, mpoly[mpoly.nrTerms()-1]);
 			return seed;

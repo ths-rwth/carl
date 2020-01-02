@@ -15,8 +15,8 @@
 #include "../../formula/Formula.h"
 #include "../../core/MonomialPool.h"
 #include "../../core/MultivariatePolynomial.h"
-#include "../../core/FactorizedPolynomial.h"
-#include "../../core/RationalFunction.h"
+#include <carl-extpolys/FactorizedPolynomial.h>
+#include <carl-extpolys/RationalFunction.h>
 #include "../../core/Variable.h"
 #include "../../core/VariablePool.h"
 #include "../../io/streamingOperators.h"

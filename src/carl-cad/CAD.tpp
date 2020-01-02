@@ -503,7 +503,7 @@ cad::Answer CAD<Number>::check(
 			std::list<const UPolynomial*> tmp;
 			if (b.second.lowerBoundType() != BoundType::INFTY) {
 				UPolynomial p(mVariables[b.first], {MPolynomial(Term<Number>(-b.second.lower())), MPolynomial(Term<Number>(1))});
-				tmp.push_back(this->polynomials.take(new UPolynomial(p.pseudoPrimpart())));
+				tmp.push_back(this->polynomials.take(new UPolynomial(pseudo_primitive_part(p))));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
 				assert(b.first < boundPolynomials.size());
@@ -511,7 +511,7 @@ cad::Answer CAD<Number>::check(
 			}
 			if (b.second.upperBoundType() != BoundType::INFTY) {
 				UPolynomial p(mVariables[b.first], {MPolynomial(Term<Number>(-b.second.upper())), MPolynomial(Term<Number>(1))});
-				tmp.push_back(this->polynomials.take(new UPolynomial(p.pseudoPrimpart())));
+				tmp.push_back(this->polynomials.take(new UPolynomial(pseudo_primitive_part(p))));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
 				boundPolynomials[b.first].first = tmp.back();

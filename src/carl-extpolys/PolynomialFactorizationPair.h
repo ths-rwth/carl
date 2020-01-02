@@ -10,7 +10,7 @@
 #include <map>
 #include <mutex>
 
-#include "Monomial.h"
+#include <carl/core/Monomial.h>
 
 namespace carl
 {

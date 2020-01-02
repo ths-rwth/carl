@@ -21,7 +21,6 @@ namespace carl
         mTseitinVars(),
         mTseitinVarToFormula()
     {
-		logging::logger();
 		VariablePool::getInstance();
         ConstraintPool<Pol>::getInstance();
         mpTrue->mNegation = mpFalse;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Derivative.h"
+#include "Division.h"
 #include "GCD.h"
 #include "to_univariate_polynomial.h"
 
@@ -39,7 +40,7 @@ UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p)
 	if (isZero(p)) return p;
 	if (p.isLinearInMainVar()) return p;
 	UnivariatePolynomial<Coeff> normalized = p.coprimeCoefficients().template convert<Coeff>();
-	return normalized.divideBy(carl::gcd(normalized, derivative(normalized))).quotient;
+	return carl::divide(normalized, carl::gcd(normalized, derivative(normalized))).quotient;
 }
 
 template<typename Coeff, DisableIf<is_subset_of_rationals<Coeff>> = dummy>

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <bitset>
 #include <cstdint>
 #include <sstream>
@@ -32,7 +31,10 @@ std::string binary(const T& a, const bool& spacing = true)
  * Return the basename of a given filename.
  */
 inline std::string basename(const std::string& filename) {
-	return filename.substr(std::max(filename.rfind('/') + 1, filename.rfind('\\') + 1));
+	auto slash1 = filename.rfind('/') + 1;
+	auto slash2 = filename.rfind('\\') + 1;
+	if (slash2 > slash1) slash1 = slash2;
+	return filename.substr(slash1);
 }
 
 }

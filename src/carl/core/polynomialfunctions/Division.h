@@ -8,6 +8,68 @@
 
 namespace carl {
 
+/**
+ * A strongly typed pair encoding the result of a division, 
+ * being a quotient and a remainder.
+ */
+template<typename Type>
+struct DivisionResult {
+	Type quotient;
+	Type remainder;
+};
+
+template<typename Coeff>
+Term<Coeff> divide(const Term<Coeff>& t, const Coeff& c) {
+	assert(!is_zero(c));
+	return Term<Coeff>(t.coeff() / c, t.monomial());
+}
+
+template<typename Coeff>
+bool try_divide(const Term<Coeff>& t, const Coeff& c, Term<Coeff>& res) {
+	if (is_zero(c)) return false;
+	res.coeff() = t.coeff() / c;
+	res.monomial() = t.monomial();
+	return true;
+}
+
+template<typename Coeff>
+bool try_divide(const Term<Coeff>& t, Variable v, Term<Coeff>& res) {
+	if (!t.monomial()) return false;
+	if (t.monomial()->divide(v, res.monomial())) {
+		res.coeff() = t.coeff();
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Divides the polynomial by the given coefficient.
+ * Applies if the coefficients are from a field.
+ * @param divisor
+ * @return 
+ */
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> divide(const MultivariatePolynomial<Coeff,Ordering,Policies>& p, const Coeff& divisor) {
+	static_assert(is_field<Coeff>::value);
+	std::vector<Term<Coeff>> new_coeffs;
+	for (const auto& t: p) {
+		new_coeffs.emplace_back(divide(t, divisor));
+	}
+	MultivariatePolynomial<Coeff,Ordering,Policies> res(std::move(new_coeffs), false, p.isOrdered());
+	assert(res.isConsistent());
+	return res;
+}
+
+/**
+ * Divides the polynomial by another polynomial.
+ * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
+ * Otherwise, false is returned and the content of quotient remains unchanged.
+ * Applies if the coefficients are from a field.
+ * Note that the quotient must not be *this.
+ * @param divisor
+ * @param quotient
+ * @return 
+ */
 template<typename Coeff, typename Ordering, typename Policies>
 bool try_divide(const MultivariatePolynomial<Coeff,Ordering,Policies>& dividend, const MultivariatePolynomial<Coeff,Ordering,Policies>& divisor, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) {
 	static_assert(is_field<Coeff>::value, "Division only defined for field coefficients");
@@ -47,6 +109,37 @@ bool try_divide(const MultivariatePolynomial<Coeff,Ordering,Policies>& dividend,
 	return true;
 }
 
+/**
+ * Calculating the quotient and the remainder, such that for a given polynomial p we have
+ * p = divisor * quotient + remainder.
+ * @param divisor Another polynomial
+ * @return A divisionresult, holding the quotient and the remainder.
+ * @see
+ * @note Division is only defined on fields
+ */
+template<typename Coeff, typename Ordering, typename Policies>
+DivisionResult<MultivariatePolynomial<Coeff,Ordering,Policies>> divide(const MultivariatePolynomial<Coeff,Ordering,Policies>& dividend, const MultivariatePolynomial<Coeff,Ordering,Policies>& divisor) {
+	static_assert(is_field<Coeff>::value, "Division only defined for field coefficients");
+	MultivariatePolynomial<Coeff,Ordering,Policies> q;
+	MultivariatePolynomial<Coeff,Ordering,Policies> r;
+	MultivariatePolynomial<Coeff,Ordering,Policies> p = dividend;
+	while(!is_zero(p)) {
+		Term<Coeff> factor;
+		if (try_divide(p.lterm(), divisor.lterm(), factor)) {
+			q += factor;
+			p.subtractProduct(factor, divisor);
+			//p -= factor * divisor;
+		} else {
+			r += p.lterm();
+			p.stripLT();
+		}
+	}
+	assert(q.isConsistent());
+	assert(r.isConsistent());
+	assert(dividend == q * divisor + r);
+	return DivisionResult<MultivariatePolynomial<Coeff,Ordering,Policies>> {q,r};
+}
+
 template<typename Coeff>
 bool try_divide(const UnivariatePolynomial<Coeff>& dividend, const Coeff& divisor, UnivariatePolynomial<Coeff>& quotient) {
 	static_assert(!is_field<Coeff>::value);
@@ -61,6 +154,42 @@ bool try_divide(const UnivariatePolynomial<Coeff>& dividend, const Coeff& diviso
 	return res;
 }
 
+template<typename Coeff>
+DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Coeff>& p, const Coeff& divisor) {
+	assert(p.isConsistent());
+	assert(divisor.isConsistent());
+	if constexpr(is_field<Coeff>::value) {
+		UnivariatePolynomial<Coeff> res(p);
+		for (auto& c: res.coefficients()) {
+			c = c / divisor;
+		}
+		return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial(p.mainVar()) };
+	} else {
+		CARL_LOG_ERROR("carl.core", "Called divide() with non-field number divisor " << divisor);
+		return p;
+	}
+}
+
+template<typename Coeff>
+DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Coeff>& p, const typename UnderlyingNumberType<Coeff>::type& divisor) {
+	assert(p.isConsistent());
+	static_assert(is_field<typename UnderlyingNumberType<Coeff>::type>::value);
+
+	UnivariatePolynomial<Coeff> res(p);
+	assert(res.isConsistent());
+	for (auto& c: res.coefficients()) {
+		c = divide(c, divisor);
+	}
+	assert(res.isConsistent());
+	return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial<Coeff>(p.mainVar())};
+}
+
+/**
+ * Divides the polynomial by another polynomial.
+ * @param dividend Dividend.
+ * @param divisor Divisor.
+ * @return dividend / divisor.
+ */
 template<typename Coeff>
 DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Coeff>& dividend, const UnivariatePolynomial<Coeff>& divisor) {
 	if constexpr (is_integer<Coeff>::value) {

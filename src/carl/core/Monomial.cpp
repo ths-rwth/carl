@@ -6,7 +6,7 @@
 
 #include "Monomial.h"
 #include "MonomialPool.h"
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 
 namespace carl
 {
@@ -27,7 +27,7 @@ namespace carl
 		}
 		if (mExponents.size() == 1) return nullptr;
 
-		uint tDeg = mTotalDegree - it->second;
+		std::size_t tDeg = mTotalDegree - it->second;
 		Content newExps(mExponents.begin(), it);
 		it++;
 		newExps.insert(newExps.end(), it, mExponents.end());
@@ -102,7 +102,7 @@ namespace carl
 					CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " fails");
 					return false;
 				}
-				uint newExp = itleft->second - itright->second;
+				std::size_t newExp = itleft->second - itright->second;
 				if(newExp > 0)
 				{
 					newExps.emplace_back(itleft->first, newExp);
@@ -133,7 +133,7 @@ namespace carl
 			res = nullptr;
 			return true;
 		}
-		res = MonomialPool::getInstance().create( std::move(newExps), uint(mTotalDegree - m->mTotalDegree) );
+		res = MonomialPool::getInstance().create( std::move(newExps), std::size_t(mTotalDegree - m->mTotalDegree) );
 		CARL_LOG_TRACE("carl.core.monomial", *this << " / " << m << " = " << res);
 		return true;
 	}
@@ -158,7 +158,7 @@ namespace carl
 		assert(rhs->isConsistent());
 
 		Content newExps;
-		uint expsum = lhs->tdeg() + rhs->tdeg();
+		std::size_t expsum = lhs->tdeg() + rhs->tdeg();
 		// Linear, as we expect small monomials.
 		auto itright = rhs->mExponents.cbegin();
 		auto leftEnd = lhs->mExponents.cend();
@@ -177,7 +177,7 @@ namespace carl
 			// Variable is present in both monomials.
 			if(itleft->first == itright->first)
 			{
-				uint newExp = std::max(itleft->second, itright->second);
+				std::size_t newExp = std::max(itleft->second, itright->second);
 				newExps.emplace_back(itleft->first, newExp);
 				expsum -= std::min(itleft->second, itright->second);
 				++itright;
@@ -208,7 +208,7 @@ namespace carl
 	{
 		CARL_LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree << ", " << mHash);
 		if (mTotalDegree < 1) return false;
-		uint tdegree = 0;
+		std::size_t tdegree = 0;
 		for(const auto& ve : mExponents)
 		{
 			if (ve.second <= 0) {

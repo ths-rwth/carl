@@ -12,7 +12,7 @@
 
 #include "MonomialPool.h"
 #include "config.h"
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 
 #ifdef USE_COCOA
 #include <CoCoA/GlobalManager.H>

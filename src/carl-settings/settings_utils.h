@@ -1,13 +1,15 @@
 #pragma once
 
-#include <boost/any.hpp>
-
 #include <array>
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
+
+namespace boost {
+	class any;
+}
 
 namespace carl::settings {
 

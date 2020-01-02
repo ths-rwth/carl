@@ -12,6 +12,8 @@
 #include "framework/Benchmark.h"
 #include "framework/BenchmarkOutput.h"
 
+#include <fstream>
+
 namespace carl 
 {
 class BenchmarkTest : public ::testing::Test {

@@ -1,5 +1,7 @@
 #include "greedy.h"
 
+#include <carl/util/Bitset.h>
+
 namespace carl::covering::heuristic {
 
 Bitset greedy(SetCover& sc) {

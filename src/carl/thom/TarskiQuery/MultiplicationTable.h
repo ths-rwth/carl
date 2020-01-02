@@ -9,6 +9,8 @@
 
 #include "GroebnerBase.h"
 
+#include <carl/core/polynomialfunctions/Division.h>
+
 namespace carl {
 	
 	
@@ -220,7 +222,7 @@ private:
 				auto it = vars.begin();
 				Variable var = *it;
 				Monomial x_beta;
-				while(!m.divide(var, x_beta) || (std::find(Bor.begin(), Bor.end(), x_beta) == Bor.end())) {				    
+				while(!try_divide(m, var, x_beta) || (std::find(Bor.begin(), Bor.end(), x_beta) == Bor.end())) {				    
 					it++;
 					CARL_LOG_ASSERT("carl.thom.tarski.table", it != vars.end(), "");
 					var = *it;

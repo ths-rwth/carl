@@ -14,7 +14,7 @@ Monomial::Arg gcd(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 	assert(rhs->isConsistent());
 
 	Monomial::Content newExps;
-	uint expsum = 0;
+	std::size_t expsum = 0;
 	// Linear, as we expect small monomials.
 	auto itright = rhs->begin();
 	auto leftEnd = lhs->end();
@@ -24,7 +24,7 @@ Monomial::Arg gcd(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 		// Variable is present in both monomials.
 		if(itleft->first == itright->first)
 		{
-			uint newExp = std::min(itleft->second, itright->second);
+			std::size_t newExp = std::min(itleft->second, itright->second);
 			newExps.emplace_back(itleft->first, newExp);
 			expsum += newExp;
 			++itright;

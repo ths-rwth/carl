@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 #include "../numbers/numbers.h"
 
 #include <functional>

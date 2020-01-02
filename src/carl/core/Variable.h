@@ -7,13 +7,13 @@
 
 #include <cassert>
 #include <climits>
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <type_traits>
 
 #include "../util/enum_util.h"
 #include "config.h"
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 
 namespace carl {
 

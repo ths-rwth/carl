@@ -18,6 +18,7 @@
 #include "../core/VariableInformation.h"
 #include "../core/VariablesInformation.h"
 #include "../core/polynomialfunctions/Complexity.h"
+#include "../core/polynomialfunctions/Definiteness.h"
 #include "../interval/Interval.h"
 #include "../interval/IntervalEvaluation.h"
 #include "../util/Common.h"

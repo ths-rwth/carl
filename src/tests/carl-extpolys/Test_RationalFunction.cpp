@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
-#include "carl/core/RationalFunction.h"
-#include "carl/core/VariablePool.h"
-#include "carl/util/stringparser.h"
-#include "carl/core/FactorizedPolynomial.h"
-#include "carl/util/platform.h"
+#include <carl-extpolys/RationalFunction.h>
+#include <carl/core/VariablePool.h>
+#include <carl/util/stringparser.h>
+#include <carl-extpolys/FactorizedPolynomial.h>
+#include <carl/util/platform.h>
 
 #include "../Common.h"
 

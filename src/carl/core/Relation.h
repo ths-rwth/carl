@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 #include "Sign.h"
 
 #include <cassert>
