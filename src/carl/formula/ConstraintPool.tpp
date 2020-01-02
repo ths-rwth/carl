@@ -16,7 +16,6 @@ namespace carl
     template<typename Pol>
     ConstraintPool<Pol>::ConstraintPool( unsigned _capacity ):
         Singleton<ConstraintPool<Pol>>(),
-        mLastConstructedConstraintWasKnown( false ),
         mIdAllocator( 1 ),
         mConsistentConstraint( new ConstraintContent<Pol>( Pol( typename Pol::NumberType( 0 ) ), Relation::EQ, 1 ) ),
         mInconsistentConstraint( new ConstraintContent<Pol>( Pol( typename Pol::NumberType( 0 ) ), Relation::LESS, 2 ) ),
@@ -72,11 +71,9 @@ namespace carl
             constraint->initEager();
             constraint->mID = mIdAllocator;
             ++mIdAllocator;
-            mLastConstructedConstraintWasKnown = false;
         }
         else
         {
-            mLastConstructedConstraintWasKnown = true;
             delete constraint;
         }
         return *iterBoolPair.first;
@@ -242,7 +239,6 @@ namespace carl
     const ConstraintContent<Pol>* ConstraintPool<Pol>::addConstraintToPool( ConstraintContent<Pol>* _constraint )
     {
 		CARL_LOG_DEBUG("carl.formula.constraint", "Adding " << *_constraint);
-        mLastConstructedConstraintWasKnown = false;
         unsigned constraintConsistent = _constraint->isConsistent();
 		CARL_LOG_DEBUG("carl.formula.constraint", "Consistent? " << constraintConsistent);
 //        std::cout << *_constraint << " is consistent: " << constraintConsistent << std::endl;
@@ -252,7 +248,6 @@ namespace carl
             auto iterBoolPair = mConstraints.insert( _constraint );
             if( !iterBoolPair.second ) // Constraint has already been generated.
             {
-                mLastConstructedConstraintWasKnown = true;
                 delete _constraint;
             }
             else
@@ -265,7 +260,6 @@ namespace carl
                     auto iterBoolPairB = mConstraints.insert( constraint );
                     if( !iterBoolPairB.second ) // Simplified version already exists
                     {
-                        mLastConstructedConstraintWasKnown = true;
                         delete constraint;
                     }
                     else // Simplified version has not been generated before.
@@ -290,7 +284,6 @@ namespace carl
         }
         else // Constraint contains no variables.
         {
-            mLastConstructedConstraintWasKnown = true;
             delete _constraint;
             const ConstraintContent<Pol>* result = (constraintConsistent ? mConsistentConstraint : mInconsistentConstraint );
             return result;
