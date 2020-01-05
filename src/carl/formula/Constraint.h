@@ -72,121 +72,72 @@ namespace carl
     {
         return _poly;
     }
-    
+        
     /**
      * Represent a polynomial (in)equality against zero.
      */
     template<typename Pol>
-    class ConstraintContent
+    class ConstraintContent : public boost::intrusive::unordered_set_base_hook<>
     {
             friend class Constraint<Pol>;
             friend class ConstraintPool<Pol>;
         
         private:
             /// A unique id.
-            std::size_t mID = 0;
-            /// A unique id.
-            mutable std::size_t mUsages = 0;
+            const std::size_t mID;
             /// The relation symbol comparing the polynomial considered by this constraint to zero.
-            Relation mRelation = Relation::EQ;
+            const Relation mRelation;
             /// The polynomial which is compared by this constraint to zero.
-            Pol mLhs;
+            const Pol mLhs;
 			/// The hash value.
-			std::size_t mHash;
-            /// The factorization of the polynomial considered by this constraint.
-            mutable Factors<Pol> mFactorization;
-            /// A container which includes all variables occurring in the polynomial considered by this constraint.
-            carlVariables mVariables;
-            /// A map which stores information about properties of the variables in this constraint.
-            mutable VarInfoMap<Pol> mVarInfoMap;
+            const carlVariables mVariables;
             /// Definiteness of the polynomial in this constraint.
-            mutable Definiteness mLhsDefinitess = Definiteness::NON;
+            const Definiteness mLhsDefiniteness;
+            /// Consistency
+            const unsigned mConsistency;
+            /// The factorization of the polynomial considered by this constraint.
+            const std::size_t mHash;
+            /// Weak pointer to itself
+            std::weak_ptr<ConstraintContent<Pol>> mWeakPtr;
+            /// A container which includes all variables occurring in the polynomial considered by this constraint.
+            Factors<Pol> mFactorization;
+            /// A map which stores information about properties of the variables in this constraint.
+            VarInfoMap<Pol> mVarInfoMap;
             /// Mutex for access to variable information map.
-            mutable std::mutex mVarInfoMapMutex;
+            std::mutex mVarInfoMapMutex;
             /// Mutex for access to the factorization.
-            mutable std::mutex mFactorizationMutex;
+            std::mutex mFactorizationMutex;
 
-            /**
-             * Default constructor. (0=0)
-             */
-            ConstraintContent();
-            
-            /**
-             * Constructs the constraint content:   _lhs _rel 0
-             * @param _var The left-hand side of the constraint to construct being a polynomial.
-             * @param _rel The relation symbol.
-             * @param _id The unique id for this constraint. It should be maintained by a central instance
-             *             as the offered ConstraintPool class, therefore the constructors are private and
-             *             can only be invoked using the constraint pool or more precisely using the 
-             *             method newConstraint( _lhs, _rel )  or
-             *             newBound( x, _rel, b ) if _lhs = x - b and x is a variable
-             *             and b is a rational.
-             */
-            ConstraintContent( carl::Variable::Arg _var, Relation _rel, std::size_t _id = 0 ):
-                ConstraintContent<Pol>::ConstraintContent( std::move( makePolynomial<Pol>(_var) ), _rel, _id )
-            {}
-            
-            /**
-             * Constructs the constraint content:   _lhs _rel 0
-             * @param _lhs The left-hand side of the constraint to construct being a polynomial.
-             * @param _rel The relation symbol.
-             * @param _id The unique id for this constraint. It should be maintained by a central instance
-             *             as the offered ConstraintPool class, therefore the constructors are private and
-             *             can only be invoked using the constraint pool or more precisely using the 
-             *             method newConstraint( _lhs, _rel )  or
-             *             newBound( x, _rel, b ) if _lhs = x - b and x is a variable
-             *             and b is a rational.
-             */
-            ConstraintContent( const Pol& _lhs, Relation _rel, std::size_t _id = 0 ):
-                ConstraintContent<Pol>::ConstraintContent( std::move( Pol( _lhs ) ), _rel, _id)
-            {}
+            ConstraintContent() = delete;
+            ConstraintContent(const ConstraintContent<Pol>&) = delete;
             
             template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
-            ConstraintContent( const typename Pol::PolyType& _lhs, Relation _rel, std::size_t _id = 0 ):
-                ConstraintContent<Pol>::ConstraintContent( std::move( makePolynomial<Pol>( _lhs ) ), _rel, _id )
+            ConstraintContent( std::size_t _id, typename Pol::PolyType&& _lhs, Relation _rel,  carl::carlVariables&& _vars, carl::Definiteness _definiteness, unsigned _consistent):
+                ConstraintContent<Pol>::ConstraintContent( _id, std::move( makePolynomial<Pol>( std::move( _lhs ) ) ), _rel, std::move(_vars), _definiteness, _consistent )
             {}
             
-            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
-            ConstraintContent( typename Pol::PolyType&& _lhs, Relation _rel, std::size_t _id = 0 ):
-                ConstraintContent<Pol>::ConstraintContent( std::move( makePolynomial<Pol>( std::move( _lhs ) ) ), _rel, _id )
-            {}
-            
-            ConstraintContent( Pol&& _lhs, Relation _rel, std::size_t _id = 0 );
-            
-            /**
-             * Initializes some basic information of the constraint, such as the definiteness of the left-hand 
-             * side and specific information to each variable.
-             */
-            void initLazy();
-            void initEager();
-            
+            ConstraintContent( std::size_t _id, Pol&& _lhs, Relation _rel, carl::carlVariables&& _vars, carl::Definiteness _definiteness, unsigned _consistent );
+                        
             /**
              * Initializes the stored factorization.
              */
-            void initFactorization() const;
+            void initFactorization();
             
-            void initVariableInformations()
-            {
+            void initVariableInformations() {
                 VariablesInformation<false,Pol> varinfos = mLhs.template getVarInfo<false>();
 				for (const auto& vi: varinfos) {
 					mVarInfoMap.emplace_hint(mVarInfoMap.end(), vi.first, vi.second);
 				}
             }
-               
-            /**
-             * Applies some cheap simplifications to the constraints.
-             *
-             * @return The simplified constraints, if simplifications could be applied;
-             *         The constraint itself, otherwise.
-             */
-            ConstraintContent* simplify() const;
-            
+                           
         public:
 
             /**
              * Destructor.
              */
-            ~ConstraintContent() noexcept = default;
+            ~ConstraintContent() noexcept {
+                ConstraintPool<Pol>::getInstance().free(this);
+            }
 
             /**
              * @return A hash value for this constraint.
@@ -204,13 +155,16 @@ namespace carl
 			const auto& lhs() const {
 				return mLhs;
 			}
+
+            unsigned isConsistent() const {
+                return mConsistency;
+            }
             
             /**
              * @param _variable The variable for which to determine the maximal degree.
              * @return The maximal degree of the given variable in this constraint content. (Monomial-wise)
              */
-            uint maxDegree( const Variable& _variable ) const
-            {
+            uint maxDegree( const Variable& _variable ) const {
                 auto varInfo = mVarInfoMap.find(_variable);
                 if (varInfo == mVarInfoMap.end()) return 0;
                 return varInfo->second.maxDegree();
@@ -219,8 +173,7 @@ namespace carl
             /**
              * @return The maximal degree of all variables in this constraint. (Monomial-wise)
              */
-            uint maxDegree() const
-            {
+            uint maxDegree() const {
                 uint result = 0;
                 for (const auto& var: mVariables.underlyingVariables()) {
                     uint deg = maxDegree(var);
@@ -228,36 +181,7 @@ namespace carl
                 }
                 return result;
             }
-            
-            /**
-             * Checks if this constraints contains an integer valued variable.
-             * @return true, if it does;
-             *          false, otherwise.
-             */
-            bool hasIntegerValuedVariable() const
-            {
-				return !mVariables.integer().empty();
-            }
-            
-            /**
-             * Checks if this constraints contains an real valued variable.
-             * @return true, if it does;
-             *          false, otherwise.
-             */
-            bool hasRealValuedVariable() const
-            {
-				return !mVariables.real().empty();
-            }
-            
-            /**
-             * Checks, whether the constraint  represented by this constraint content is consistent.
-             * It differs between, containing variables, consistent, and inconsistent.
-             * @return 0, if the constraint is not consistent.
-             *          1, if the constraint is consistent.
-             *          2, if the constraint still contains variables.
-             */
-            unsigned isConsistent() const;
-            
+                  
     };
 	
 	/**
@@ -267,9 +191,6 @@ namespace carl
 	 */
 	template<typename Pol>
 	bool operator==(const ConstraintContent<Pol>& lhs, const ConstraintContent<Pol>& rhs) {
-		if (lhs.id() == 0 || rhs.id() == 0) {
-            return lhs.relation() == rhs.relation() && lhs.lhs() == rhs.lhs();
-        }
         return lhs.id() == rhs.id();
 	}
 
@@ -300,9 +221,9 @@ namespace carl
             // Members.
 
             /// The real (in)equality is stored here.
-            const ConstraintContent<Pol>* mpContent;
+            std::shared_ptr<ConstraintContent<Pol>> mpContent;
             
-            explicit Constraint( const ConstraintContent<Pol>* _content );
+            explicit Constraint( std::shared_ptr<ConstraintContent<Pol>> _content );
             
             #ifdef THREAD_SAFE
             #define VARINFOMAP_LOCK_GUARD std::lock_guard<std::mutex> lock1( mpContent->mVarInfoMapMutex );
@@ -330,9 +251,7 @@ namespace carl
             Constraint( const Constraint& _constraint );
             
             Constraint( Constraint&& _constraint ) noexcept;
-            
-            ~Constraint();
-            
+                        
             Constraint& operator=( const Constraint& _constraint );
             
             Constraint& operator=( Constraint&& _constraint ) noexcept;
@@ -520,7 +439,7 @@ namespace carl
              */
             bool hasIntegerValuedVariable() const
             {
-                return mpContent->hasIntegerValuedVariable();
+                return !mpContent->mVariables.integer().empty();
             }
             
             /**
@@ -530,7 +449,7 @@ namespace carl
              */
             bool hasRealValuedVariable() const
             {
-                return mpContent->hasRealValuedVariable();
+                return !mpContent->mVariables.real().empty();
             }
             
             /**

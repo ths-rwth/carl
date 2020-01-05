@@ -72,6 +72,10 @@ public:
 		compact(true);
 		return mVariables.size();
 	}
+	void clear() {
+		mVariables.clear();
+		mAddedSinceCompact = 0;
+	}
 	bool has(Variable var) const {
 		return std::any_of(begin(), end(),
 			[&var](const auto& v) {

@@ -15,14 +15,14 @@ namespace carl
     FormulaPool<Pol>::FormulaPool( unsigned _capacity ):
         Singleton<FormulaPool<Pol>>(),
         mIdAllocator( 3 ),
-        mpTrue( new FormulaContent<Pol>( TRUE, 1 ) ),
-        mpFalse( new FormulaContent<Pol>( FALSE, 2 ) ),
         mPool(),
         mTseitinVars(),
         mTseitinVarToFormula()
     {
 		VariablePool::getInstance();
         ConstraintPool<Pol>::getInstance();
+        mpTrue = new FormulaContent<Pol>( TRUE, 1 );
+        mpFalse = new FormulaContent<Pol>( FALSE, 2 );
         mpTrue->mNegation = mpFalse;
      	mpFalse->mNegation = mpTrue;
         mPool.reserve( _capacity );

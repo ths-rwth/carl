@@ -32,222 +32,29 @@ namespace carl
     }
     
     template<typename Pol>
-    ConstraintContent<Pol>::ConstraintContent():
-        mHash( CONSTRAINT_HASH( mLhs, mRelation, Pol ) )
-    {}
-
-    template<typename Pol>
-    ConstraintContent<Pol>::ConstraintContent( Pol&& _lhs, Relation _rel, std::size_t _id ):
+    ConstraintContent<Pol>::ConstraintContent( std::size_t _id, Pol&& _lhs, Relation _rel, carl::carlVariables&& _vars, carl::Definiteness _definiteness, unsigned _consistent ):
         mID( _id ),
         mRelation( _rel ),
         mLhs( std::move(_lhs) ),
-		mHash( CONSTRAINT_HASH( mLhs, mRelation, Pol ) )
+        mVariables (std::move(_vars)),
+        mLhsDefiniteness(_definiteness),
+        mConsistency(_consistent),
+        mHash( CONSTRAINT_HASH( mLhs, mRelation, Pol ) )
     {
-        if (mRelation == Relation::GREATER) {
-            mLhs *= -1;
-            mRelation = Relation::LESS;
-        } else if (mRelation == Relation::GEQ) {
-            mLhs *= -1;
-            mRelation = Relation::LEQ;
-        }
 		CARL_LOG_DEBUG("carl.formula.constraint", "Created " << *this);
-        initLazy(); // TODO: this must unfortunately be done here and basically collects the variables. The reason is that without the variables, we cannot do the integer normalization.
-        if( hasIntegerValuedVariable() && !hasRealValuedVariable() )
-        {
-            if( mRelation == Relation::LESS )
-            {
-                mLhs += carl::constant_one<typename Pol::CoeffType>::get();
-                mRelation = Relation::LEQ;
-                mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
-            }
-            if( mRelation == Relation::GREATER )
-            {
-                mLhs -= carl::constant_one<typename Pol::CoeffType>::get();
-                mRelation = Relation::GEQ;
-                mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
-            }
-        }
-        mLhsDefinitess = carl::definiteness(mLhs, FULL_EFFORT_FOR_DEFINITENESS_CHECK );
-		CARL_LOG_DEBUG("carl.formula.constraint", "definiteness: " << mLhsDefinitess);
-    }
-
-    template<typename Pol>
-    unsigned ConstraintContent<Pol>::isConsistent() const
-    {
-        if( mLhs.isConstant() )
-            return carl::evaluate( mLhs.constantPart(), mRelation ) ? 1 : 0;
-        else
-        {
-			CARL_LOG_DEBUG("carl.formula.constraint", "Checking " << mRelation << " against " << mLhsDefinitess);
-            switch( mRelation )
-            {
-                case Relation::EQ:
-                {
-                    if( mLhsDefinitess == Definiteness::POSITIVE || mLhsDefinitess == Definiteness::NEGATIVE ) return 0;
-                    break;
-                }
-                case Relation::NEQ:
-                {
-                    if( mLhsDefinitess == Definiteness::POSITIVE || mLhsDefinitess == Definiteness::NEGATIVE ) return 1;
-                    break;
-                }
-                case Relation::LESS:
-                {
-                    if( mLhsDefinitess == Definiteness::NEGATIVE ) return 1;
-                    if( mLhsDefinitess >= Definiteness::POSITIVE_SEMI ) return 0;
-                    break;
-                }
-                case Relation::GREATER:
-                {
-                    if( mLhsDefinitess == Definiteness::POSITIVE ) return 1;
-                    if( mLhsDefinitess <= Definiteness::NEGATIVE_SEMI ) return 0;
-                    break;
-                }
-                case Relation::LEQ:
-                {
-                    if( mLhsDefinitess <= Definiteness::NEGATIVE_SEMI ) return 1;
-                    if( mLhsDefinitess == Definiteness::POSITIVE ) return 0;
-                    break;
-                }
-                case Relation::GEQ:
-                {
-                    if( mLhsDefinitess >= Definiteness::POSITIVE_SEMI ) return 1;
-                    if( mLhsDefinitess == Definiteness::NEGATIVE ) return 0;
-                    break;
-                }
-                default:
-                {
-                    std::cout << "Error in isConsistent: unexpected relation symbol." << std::endl;
-                    return false;
-                }
-            }
-            return 2;
-        }
-    }
-    
-    template<typename Pol>
-    ConstraintContent<Pol>* ConstraintContent<Pol>::simplify() const
-    {
-        using PolyT = typename Pol::PolyType;
-        Relation rel = mRelation;
-        if( (mLhsDefinitess == Definiteness::POSITIVE_SEMI && rel == Relation::LEQ) || (mLhsDefinitess == Definiteness::NEGATIVE_SEMI && rel == Relation::GEQ) )
-            rel = Relation::EQ;
-        // Left-hand side is a non-linear univariate monomial
-        if( mVariables.size() == 1 && !mLhs.isLinear() && mLhs.nrTerms() == 1 )
-        {
-			Variable var = mVariables.underlyingVariables()[0];
-            switch( rel )
-            {
-                case Relation::EQ:
-                    return new ConstraintContent( var, rel );
-                case Relation::NEQ:
-                    return new ConstraintContent( var, rel );
-                case Relation::LEQ:
-                    if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-                        return new ConstraintContent( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( var ) * PolyT( var ), rel );
-                    else
-                        return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( var ), rel );
-                case Relation::GEQ:
-                    if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-                        return new ConstraintContent( PolyT( var ) * PolyT( var ), rel );
-                    else
-                        return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( var ), rel );
-                case Relation::LESS:
-                    if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-                        return new ConstraintContent( var, Relation::NEQ );
-                    else
-                    {
-                        if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-                            return new ConstraintContent( PolyT( var ) * PolyT( var ), rel );
-                        else
-                            return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( var ), rel );
-                    }
-                case Relation::GREATER:
-                    if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-                        return new ConstraintContent( var, Relation::NEQ );
-                    else
-                    {
-                        if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-                            return new ConstraintContent( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( var ) * PolyT( var ), rel ); 
-                        else
-                            return new ConstraintContent( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( var ), rel ); 
-                    }
-                default:
-                    assert( false );
-            }
-        }
-        else if( hasIntegerValuedVariable() && !hasRealValuedVariable() && !mLhs.isConstant() )
-        {
-            typename Pol::NumberType constPart = mLhs.constantPart();
-            if( constPart != typename Pol::NumberType( 0 ) )
-            {
-                // Find the gcd of the coefficients of the non-constant terms.
-                typename Pol::NumberType g = carl::abs( mLhs.coprimeFactorWithoutConstant() );
-                assert( g != typename Pol::NumberType( 0 ) );
-                if( carl::mod( carl::getNum( constPart ), carl::getDenom( g ) ) != 0 )
-                {
-                    switch( mRelation )
-                    {
-                        case Relation::EQ:
-                            return new ConstraintContent( Pol( typename Pol::NumberType( 0 ) ), Relation::LESS );
-                        case Relation::NEQ:
-                            return new ConstraintContent( Pol( typename Pol::NumberType( 0 ) ), Relation::EQ );
-                        case Relation::LEQ:
-                        {
-                            Pol newLhs = ((mLhs - constPart) * g);
-                            newLhs += carl::floor( (constPart * g) ) + typename Pol::NumberType( 1 );
-                            return new ConstraintContent( newLhs, Relation::LEQ );
-                        }
-                        case Relation::GEQ:
-                        {
-                            Pol newLhs = ((mLhs - constPart) * g);
-                            newLhs += carl::floor( (constPart * g) );
-                            return new ConstraintContent( newLhs, Relation::GEQ );
-                        }
-                        case Relation::LESS:
-                        {
-                            Pol newLhs = ((mLhs - constPart) * g);
-                            newLhs += carl::floor( (constPart * g) ) + typename Pol::NumberType( 1 );
-                            return new ConstraintContent( newLhs, Relation::LEQ );
-                        }
-                        case Relation::GREATER:
-                        {
-                            Pol newLhs = ((mLhs - constPart) * g);
-                            newLhs += carl::floor( (constPart * g) );
-                            return new ConstraintContent( newLhs, Relation::GEQ );
-                        }
-                        default:
-                            assert( false );
-                    }
-                }
-            }
-        }
-        return nullptr;
-    }
-
-    template<typename Pol>
-    void ConstraintContent<Pol>::initLazy()
-    {
-		carl::variables(mLhs, mVariables);
-    }
-
-    template<typename Pol>
-    void ConstraintContent<Pol>::initEager()
-    {
         initVariableInformations();
     }
     
     template<typename Pol>
-    void ConstraintContent<Pol>::initFactorization() const 
+    void ConstraintContent<Pol>::initFactorization() 
     {
 		mFactorization = carl::factorization(mLhs);
     }
     
     template<typename Pol>
-    Constraint<Pol>::Constraint( const ConstraintContent<Pol>* _content ):
+    Constraint<Pol>::Constraint( std::shared_ptr<ConstraintContent<Pol>> _content ):
         mpContent( _content )
     {
-        ConstraintPool<Pol>::getInstance().reg( mpContent );
     }
     
     template<typename Pol>
@@ -277,31 +84,18 @@ namespace carl
     Constraint<Pol>::Constraint( const Constraint<Pol>& _constraint ):
         mpContent( _constraint.mpContent )
     {
-        ConstraintPool<Pol>::getInstance().reg( mpContent );
     }
     
     template<typename Pol>
     Constraint<Pol>::Constraint( Constraint<Pol>&& _constraint ) noexcept:
         mpContent( _constraint.mpContent )
     {
-        _constraint.mpContent = nullptr;
+        _constraint.mpContent.reset();
     }
-            
-    template<typename Pol>
-    Constraint<Pol>::~Constraint()
-    {
-        if( mpContent != nullptr )
-        {
-            ConstraintPool<Pol>::getInstance().free( mpContent );
-        }
-    }
-    
+
     template<typename Pol>
     Constraint<Pol>& Constraint<Pol>::operator=( const Constraint<Pol>& _constraint )
     {
-        ConstraintPool<Pol>::getInstance().reg( _constraint.mpContent );
-        if( mpContent != nullptr ) 
-            ConstraintPool<Pol>::getInstance().free( mpContent );
         mpContent = _constraint.mpContent;
         return *this;
     }
@@ -309,10 +103,8 @@ namespace carl
     template<typename Pol>
     Constraint<Pol>& Constraint<Pol>::operator=( Constraint<Pol>&& _constraint ) noexcept
     {
-        if( mpContent != nullptr ) 
-            ConstraintPool<Pol>::getInstance().free( mpContent );
         mpContent = _constraint.mpContent;
-        _constraint.mpContent = nullptr;
+        _constraint.mpContent.reset();
         return *this;
     }
     
@@ -712,7 +504,7 @@ namespace carl
     {
         _out << "Properties:" << std::endl;
         _out << "   Definitess:              ";
-        switch( mpContent->mLhsDefinitess )
+        switch( mpContent->mLhsDefiniteness )
         {
             case Definiteness::NON:
                 _out << "NON" << std::endl;
