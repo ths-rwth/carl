@@ -79,7 +79,8 @@ namespace carl{
 			}
 			
 			~MonomialPool() {
-				CARL_LOG_DEBUG("carl.pool", "Monomialpool destructed");
+				// for (const auto& m : mPool) m.mId = 0; // hacky fix for singletons not be destroyed in proper order
+				// CARL_LOG_DEBUG("carl.pool", "Monomialpool destructed");
 			}
 
 			Monomial::Arg add( Monomial::Content&& c, exponent totalDegree = 0 );
@@ -99,9 +100,9 @@ namespace carl{
 			Monomial::Arg create( std::vector<std::pair<Variable, exponent>>&& _exponents );
 
 			void free(const Monomial* m) {
-				CARL_LOG_TRACE("carl.core.monomial", "Freeing " << m);
 				if (m == nullptr) return;
 				if (m->id() == 0) return;
+				CARL_LOG_TRACE("carl.core.monomial", "Freeing " << m);
 				MONOMIAL_POOL_LOCK_GUARD;
 				auto it = mPool.find(*m);
 				if (it != mPool.end()) {

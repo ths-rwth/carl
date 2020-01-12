@@ -81,7 +81,7 @@ namespace carl
 		using exponents_it = Content::iterator ;
 		using exponents_cIt = Content::const_iterator;
 
-		mutable std::weak_ptr<const Monomial> mWeakPtr; // TODO better solution?
+		mutable std::weak_ptr<const Monomial> mWeakPtr;
 
 		/**
 		 * Calculates the hash and stores it to mHash.
