@@ -8,62 +8,29 @@
 #include "../io/streamingOperators.h"
 
 namespace carl
-{
-	Monomial::Arg MonomialPool::add( MonomialPool::PoolEntry&& pe, exponent totalDegree) {
-		CARL_LOG_TRACE("carl.core.monomial", pe.content << " / " << pe.hash << ", " << totalDegree);
-		for (const auto& pe: mPool) {
-			CARL_LOG_TRACE("carl.core.monomial", "\t" << pe.content << " / " << pe.hash << " / " << pe.monomial.lock().get());
-		}
-		MONOMIAL_POOL_LOCK_GUARD
-		auto iter = mPool.insert(std::move(pe));
-		Monomial::Arg res;
-		if (iter.second) {
-			CARL_LOG_TRACE("carl.core.monomial", "Was newly added");
-			if (iter.first->monomial.expired()) {
-				CARL_LOG_TRACE("carl.core.monomial", "Weakptr is expired");
-				res = Monomial::Arg(new Monomial(Monomial::is_sorted{}, iter.first->content, totalDegree, iter.first->hash));
-				iter.first->monomial = res;
-			} else {
-				res = iter.first->monomial.lock();
-				CARL_LOG_TRACE("carl.core.monomial", "Got existing weakptr as " << res);
-			}
-			res->mId = mIDs.get();
-			CARL_LOG_TRACE("carl.core.monomial", "ID = " << res->mId);
-		} else {
-			res = iter.first->monomial.lock();
-			CARL_LOG_TRACE("carl.core.monomial", "Was already there as " << res);
-		}
-		return res;
-	}
-
-	Monomial::Arg MonomialPool::add( const Monomial::Arg& _monomial ) {
-		assert(_monomial->id() == 0);
-		PoolEntry pe(_monomial->hash(), _monomial->exponents(), _monomial);
-		MONOMIAL_POOL_LOCK_GUARD
-		auto iter = mPool.insert(pe);
-		if (iter.second) {
-			_monomial->mId = mIDs.get();
-			return _monomial;
-		} else {
-			assert(_monomial == iter.first->monomial.lock());
-			return iter.first->monomial.lock();
-		}
-	}
-	
+{	
 	Monomial::Arg MonomialPool::add( Monomial::Content&& c, exponent totalDegree) {
 		CARL_LOG_TRACE("carl.core.monomial", c << ", " << totalDegree);
-		return MonomialPool::add(PoolEntry(std::move(c)), totalDegree);
+		
+		MONOMIAL_POOL_LOCK_GUARD
+		
+		underlying_set::insert_commit_data insert_data;
+		auto res = mPool.insert_check(c, content_hash(), content_equal(), insert_data);
+		if (!res.second) {
+			return res.first->mWeakPtr.lock();
+		} else {
+			auto shared = std::shared_ptr<Monomial>(new Monomial(c, totalDegree));
+			shared.get()->mId = mIDs.get();
+			shared.get()->mWeakPtr = shared;
+			mPool.insert_commit(*shared.get(), insert_data);
+			return shared;
+		}
 	}
 	
-	Monomial::Arg MonomialPool::create()
-	{
-		return add(Monomial::Arg());
-	}
-
 	Monomial::Arg MonomialPool::create( Variable _var, exponent _exp )
 	{
 		CARL_LOG_TRACE("carl.core.monomial", _var << ", " << _exp);
-		return add(Monomial::Arg(new Monomial(_var, _exp)));
+		return add(Monomial::Content(1, std::make_pair(_var, _exp)), _exp);
 	}
 
 	Monomial::Arg MonomialPool::create( std::vector<std::pair<Variable, exponent>>&& _exponents, exponent _totalDegree )
@@ -75,12 +42,12 @@ namespace carl
 	Monomial::Arg MonomialPool::create( const std::initializer_list<std::pair<Variable, exponent>>& _exponents )
 	{
 		//CARL_LOG_TRACE("carl.core.monomial", _exponents);
-		return add(Monomial::Arg(new Monomial(_exponents)));
+		return add(Monomial::Content(_exponents));
 	}
 
 	Monomial::Arg MonomialPool::create( std::vector<std::pair<Variable, exponent>>&& _exponents )
 	{
 		CARL_LOG_TRACE("carl.core.monomial", _exponents);
-		return add(std::move(_exponents));
+		return add(std::move(_exponents), 0);
 	}
 } // end namespace carl

@@ -19,6 +19,9 @@
 #include <set>
 #include <sstream>
 
+#include <boost/intrusive/unordered_set.hpp>
+
+
 namespace carl
 {
 	/// Type of an exponent.
@@ -51,15 +54,10 @@ namespace carl
 	 * 
 	 * @ingroup multirp
 	 */
-	class Monomial final
+	class Monomial final : public boost::intrusive::unordered_set_base_hook<>
 	{
 		friend class MonomialPool;
 	public:
-		/**
-		 * Tag type to indicate that the Content provided to a constructor is already properly sorted.
-		 * This should only be used internally.
-		 */
-		struct is_sorted {};
 		using Arg = std::shared_ptr<const Monomial>;
 		using Content = std::vector<std::pair<Variable, std::size_t>>;
 		~Monomial();
@@ -83,6 +81,8 @@ namespace carl
 		using exponents_it = Content::iterator ;
 		using exponents_cIt = Content::const_iterator;
 
+		mutable std::weak_ptr<const Monomial> mWeakPtr;
+
 		/**
 		 * Calculates the hash and stores it to mHash.
 		 */
@@ -98,27 +98,6 @@ namespace carl
 				[](std::size_t d, const auto& p) { return d + p.second; }
 			);
 		}
-
-		/**
-		 * Generate a monomial from a variable and an exponent.
-		 * @param v The variable.
-		 * @param e The exponent.
-		 */
-		explicit Monomial(Variable v, std::size_t e = 1) :
-			mExponents(1, std::make_pair(v,e)),
-			mTotalDegree(e)
-		{
-			calc_hash();
-			assert(isConsistent());
-		}
-		
-		/**
-		 * Generate a monomial from an initializer list of variable-exponent pairs and a total degree.
-		 * @param exponents The variables and their exponents.
-		 */
-		Monomial(const std::initializer_list<std::pair<Variable, std::size_t>>& exponents) :
-			Monomial(Content(exponents))
-		{}
 
 		/**
 		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
@@ -150,40 +129,6 @@ namespace carl
 		 */
 		Monomial(const Content& content, std::size_t totalDegree = 0) :
 			Monomial(Content(content), totalDegree)
-		{}
-		
-		/**
-		 * Generate a monomial from a vector of variable-exponent pairs, a total degree and its hash.
-		 * This overload expects the content to be sorted, as is indicated by the tag parameter is_sorted.
-		 * If the totalDegree or the hash is zero, it is recalculated.
-		 * @param content The variables and their exponents.
-		 * @param totalDegree The total degree of the monomial to generate, or zero.
-		 * @param hash The hash of the content, or zero.
-		 */
-		Monomial(is_sorted, Content&& content, std::size_t totalDegree = 0, std::size_t hash = 0) :
-			mExponents(std::move(content)),
-			mTotalDegree(totalDegree),
-			mHash(hash)
-		{
-			if (mTotalDegree == 0) {
-				calc_total_degree();
-			}
-			if (mHash == 0) {
-				calc_hash();
-			}
-			assert(isConsistent());
-		}
-
-		/**
-		 * Generate a monomial from a vector of variable-exponent pairs, a total degree and its hash.
-		 * This overload expects the content to be sorted, as is indicated by the tag parameter is_sorted.
-		 * If the totalDegree or the hash is zero, it is recalculated.
-		 * @param content The variables and their exponents.
-		 * @param totalDegree The total degree of the monomial to generate, or zero.
-		 * @param hash The hash of the content, or zero.
-		 */
-		Monomial(is_sorted, const Content& content, std::size_t totalDegree = 0, std::size_t hash = 0) :
-			Monomial(is_sorted{}, Content(content), totalDegree, hash)
 		{}
 
 	public:
@@ -567,6 +512,16 @@ namespace carl
 	
 	/// @name Comparison operators
 	/// @{
+
+
+	inline bool operator==(const Monomial& lhs, const Monomial& rhs) {
+		if (&lhs == &rhs) return true;
+		if ((lhs.id() != 0) && (rhs.id() != 0)) return lhs.id() == rhs.id();
+		if (lhs.hash() != rhs.hash()) return false;
+		if (lhs.tdeg() != rhs.tdeg()) return false;
+		return lhs.exponents() == rhs.exponents();
+	}
+
 	/**
 	 * Compares two arguments where one is a Monomial and the other is either a monomial or a variable.
 	 * @param lhs First argument.

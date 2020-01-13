@@ -24,8 +24,6 @@ namespace carl
         private:
             // Members:
 
-            /// A flag indicating whether the last constraint which has been tried to add to the pool, was already an element of it.
-            bool mLastConstructedConstraintWasKnown;
             /// id allocator
             unsigned mIdAllocator;
             /// The constraint (0=0) representing a valid constraint.
@@ -98,6 +96,11 @@ namespace carl
                 return mInconsistentConstraint;
             }
 
+            const std::shared_ptr<typename Pol::CACHE>& pPolynomialCache() const
+            {
+                return mpPolynomialCache;
+            }
+
         protected:
             
             /**
@@ -114,28 +117,6 @@ namespace carl
             ~ConstraintPool();
 
             /**
-             * @return An iterator to the first constraint in this pool.
-             */
-            typename FastPointerSet<ConstraintContent<Pol>>::const_iterator begin() const
-            {
-                // TODO: Will begin() be valid if we insert elements?
-                CONSTRAINT_POOL_LOCK_GUARD
-                auto result = mConstraints.begin();
-                return result;
-            }
-
-            /**
-             * @return An iterator to the end of the container of the constraints in this pool.
-             */
-            typename FastPointerSet<ConstraintContent<Pol>>::const_iterator end() const
-            {
-                // TODO: Will end() be changed if we insert elements?
-                CONSTRAINT_POOL_LOCK_GUARD
-                auto result = mConstraints.end();
-                return result;
-            }
-
-            /**
              * @return The number of constraint in this pool.
              */
             size_t size() const
@@ -144,21 +125,7 @@ namespace carl
                 size_t result = mConstraints.size();
                 return result;
             }
-            
-            /**
-             * @return true, the last constraint which has been tried to add to the pool, was already an element of it;
-             *         false, otherwise.
-             */
-            bool lastConstructedConstraintWasKnown() const
-            {
-                return mLastConstructedConstraintWasKnown;
-            }
-            
-            const std::shared_ptr<typename Pol::CACHE>& pPolynomialCache() const
-            {
-                return mpPolynomialCache;
-            }
-
+                        
             /**
              * Note: This method makes the other accesses to the constraint pool waiting.
              * @return The highest degree occurring in all constraints
