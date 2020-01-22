@@ -61,6 +61,7 @@ properties = {
 	"xcode11": {"os": "osx", "osx_image": "xcode11", "env": []},
 	"xcode11.1": {"os": "osx", "osx_image": "xcode11.1", "env": []},
 	"xcode11.2": {"os": "osx", "osx_image": "xcode11.2", "env": []},
+	"xcode11.3": {"os": "osx", "osx_image": "xcode11.3", "env": []},
 	"linux": {"os": "linux"},
 
 	"clang-3.8": {"env": ["CC=clang-3.8 CXX=clang++-3.8"], "compiler": "clang++-3.8", "addons": addon_apt(["llvm-toolchain-xenial-3.8"], ["clang-3.8", "libstdc++-6-dev"])},
