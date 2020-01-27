@@ -5,7 +5,7 @@ ExternalProject_Add(
 	GIT_REPOSITORY "https://github.com/doxygen/doxygen.git"
 	GIT_TAG Release_${DOXYGEN_TAG}
 	UPDATE_COMMAND ""
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -Duse_libclang=ON
+	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -Duse_libclang=OFF
 )
 
 ExternalProject_Get_Property(Doxygen-EP INSTALL_DIR)
