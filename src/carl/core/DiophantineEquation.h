@@ -1,5 +1,5 @@
 /**
- * @file DiophantineEquations.h
+ * @file DiophantineEquation.h
  * @author Tobias Winkler <tobias.winkler1@rwth-aachen.de>
  */
 

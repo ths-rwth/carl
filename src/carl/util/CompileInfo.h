@@ -1,5 +1,5 @@
 /**
- * @file CMakeOptions.h
+ * @file CompileInfo.h
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 

@@ -2,7 +2,7 @@
  * File:   TarskiQuery.h
  * Author: tobias
  *
- * Created on 24. April 2016, 20:16
+ * Created on 24. ApriU 2016, 20:16
  */
 
 #pragma once
