@@ -52,15 +52,15 @@ private:
 	/// Mutex to avoid multiple access to the pool
 	mutable std::recursive_mutex mMutex;
 
-#ifdef THREAD_SAFE
-#define MONOMIAL_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock(mMutex);
-#define MONOMIAL_POOL_LOCK mMutex.lock();
-#define MONOMIAL_POOL_UNLOCK mMutex.unlock();
-#else
-#define MONOMIAL_POOL_LOCK_GUARD
-#define MONOMIAL_POOL_LOCK
-#define MONOMIAL_POOL_UNLOCK
-#endif
+	#ifdef THREAD_SAFE
+	#define MONOMIAL_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock(mMutex);
+	#define MONOMIAL_POOL_LOCK mMutex.lock();
+	#define MONOMIAL_POOL_UNLOCK mMutex.unlock();
+	#else
+	#define MONOMIAL_POOL_LOCK_GUARD
+	#define MONOMIAL_POOL_LOCK
+	#define MONOMIAL_POOL_UNLOCK
+	#endif
 
 protected:
 	/**
