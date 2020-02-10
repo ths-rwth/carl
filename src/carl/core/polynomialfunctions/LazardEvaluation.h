@@ -17,7 +17,7 @@ private:
 public:
 	LazardEvaluation(const Poly& p): mLiftingPoly(p) {}
 	
-	void substitute(Variable v, const RealAlgebraicNumber<Rational>& r, bool divideZeroFactors = true) {
+	auto substitute(Variable v, const RealAlgebraicNumber<Rational>& r, bool divideZeroFactors = true) {
 		auto red = mFieldExtensions.extend(v, r);
 		Poly newPoly;
 		if (red.first) {
@@ -39,6 +39,7 @@ public:
 		}
 		mLiftingPoly = newPoly;
 		CARL_LOG_DEBUG("carl.lazard", "Remaining poly: " << mLiftingPoly);
+		return red;
 	}
 	
 	const auto& getLiftingPoly() const {

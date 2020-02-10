@@ -1,5 +1,5 @@
 /** 
- * @file   DivisionResult.h
+ * @file   DivisionLookupResult.h
  * @ingroup gb
  * @author Sebastian Junges
  *

@@ -73,7 +73,6 @@ inline cln::cl_I getDenom(const cln::cl_RA& n) {
 /**
  * Check if a number is integral.
  * As cln::cl_I are always integral, this method returns true.
- * @param An integer.
  * @return true.
  */
 inline bool isInteger(const cln::cl_I& /*unused*/) {
@@ -383,8 +382,8 @@ inline cln::cl_RA lcm(const cln::cl_RA& a, const cln::cl_RA& b) {
 
 /**
  * Calculate the power of some fraction to some positive integer.
- * @param n Basis.
- * @param e Exponent.
+ * @param basis Basis.
+ * @param exp Exponent.
  * @return \f$n^e\f$
  */
 template<>
