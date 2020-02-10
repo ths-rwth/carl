@@ -374,6 +374,8 @@ public:
 	RationalFunction& operator*=(carl::sint rhs);
 	/// @}
 
+	/// @name In-place division operators
+	/// @{
 	/**
 	 * Divide this rational function by something and return the changed rational function.
 	 * @param rhs Right hand side.

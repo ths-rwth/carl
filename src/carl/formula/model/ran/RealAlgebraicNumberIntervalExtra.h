@@ -78,23 +78,39 @@ bool vanishes(
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> substitute_rans_into_polynomial(
 		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m
+		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
+		bool use_lazard = true
 ) {
 	std::vector<MultivariatePolynomial<Number>> polys;
 	std::vector<Variable> varOrder;
 
-	FieldExtensions<Number, MultivariatePolynomial<Number>> fe;
-	for (const auto& vic: m) {
-		varOrder.emplace_back(vic.first);
-		auto res = fe.extend(vic.first, vic.second);
-		if (res.first) {
-			polys.emplace_back(vic.first - res.second);
-		} else {
-			polys.emplace_back(res.second);
+	if (use_lazard) {
+		auto le = LazardEvaluation<Number, MultivariatePolynomial<Number>>(MultivariatePolynomial<Number>(p));
+		for (const auto& vic: m) {
+			varOrder.emplace_back(vic.first);
+			auto res = le.substitute(vic.first, vic.second, true);
+			if (res.first) {
+				polys.emplace_back(vic.first - res.second);
+			} else {
+				polys.emplace_back(res.second);
+			}
 		}
+		polys.emplace_back(le.getLiftingPoly());
+		varOrder.emplace_back(p.mainVar());
+	} else {
+		FieldExtensions<Number, MultivariatePolynomial<Number>> fe;
+		for (const auto& vic: m) {
+			varOrder.emplace_back(vic.first);
+			auto res = fe.extend(vic.first, vic.second);
+			if (res.first) {
+				polys.emplace_back(vic.first - res.second);
+			} else {
+				polys.emplace_back(res.second);
+			}
+		}
+		polys.emplace_back(p);
+		varOrder.emplace_back(p.mainVar());
 	}
-	polys.emplace_back(p);
-	varOrder.emplace_back(p.mainVar());
 
 	return algebraic_substitution(polys, varOrder);
 }

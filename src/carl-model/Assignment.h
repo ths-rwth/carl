@@ -47,7 +47,7 @@ namespace carl
     /**
      * @param _model The assignment for which to check whether the given formula is satisfied by it.
      * @param _assignment The map to store the rational assignments in.
-	 * @parem bvAssigns The map to store the bitvector assignments in.
+	 * @param bvAssigns The map to store the bitvector assignments in.
      * @param _formula The formula to be satisfied.
      * @return 0, if this formula is violated by the given assignment;
      *         1, if this formula is satisfied by the given assignment;

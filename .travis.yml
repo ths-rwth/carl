@@ -203,6 +203,10 @@ jobs:
       osx_image: xcode11.2
       script: source .ci/build.sh
     - stage: build
+      os: osx
+      osx_image: xcode11.3
+      script: source .ci/build.sh
+    - stage: build
       os: linux
       compiler: g++-9
       env: CC=gcc-9 CXX=g++-9 TASK=documentation
@@ -319,6 +323,9 @@ jobs:
     - stage: build
       os: osx
       osx_image: xcode11.2
+    - stage: build
+      os: osx
+      osx_image: xcode11.3
     - stage: check
       os: linux
       env: CC=clang-9 CXX=clang++-9 TASK=tidy
