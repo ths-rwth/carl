@@ -41,8 +41,10 @@ namespace carl
 
 	Monomial::Arg MonomialPool::create( const std::initializer_list<std::pair<Variable, exponent>>& _exponents )
 	{
-		//CARL_LOG_TRACE("carl.core.monomial", _exponents);
-		return add(Monomial::Content(_exponents));
+		auto exp = Monomial::Content(_exponents);
+		CARL_LOG_TRACE("carl.core.monomial", _exponents);
+		std::sort(exp.begin(), exp.end(), [](const auto& p1, const auto& p2){ return p1.first < p2.first; });
+		return add(std::move(exp));
 	}
 
 	Monomial::Arg MonomialPool::create( std::vector<std::pair<Variable, exponent>>&& _exponents )

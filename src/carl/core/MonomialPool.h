@@ -86,17 +86,43 @@ namespace carl{
 			Monomial::Arg add( Monomial::Content&& c, exponent totalDegree = 0 );
 
 		public:
+			/**
+			 * Creates a monomial from a variable and an exponent.
+			 */
 			Monomial::Arg create( Variable _var, exponent _exp );
 
+			/**
+			 * Creates a monomial from a variable and an exponent.
+			 */
 			template<typename Number>
 			Monomial::Arg create( Variable _var, Number&& _exp ) {
 				return create(_var, static_cast<exponent>(std::forward<Number>(_exp)));
 			}
 			
+			/**
+			 * Creates a monomial from a list of variables and their exponents.
+			 * 
+			 * Note that the input is required to be sorted.
+			 * 
+			 * @param _exponents Sorted list of variables and exponents.
+			 * @param _totalDegree Total degree.
+			 */
 			Monomial::Arg create( std::vector<std::pair<Variable, exponent>>&& _exponents, exponent _totalDegree );
 			
+			/**
+			 * Creates a Monomial.
+			 * 
+			 * @param _exponents Possibly unsorted list of variables and epxonents.
+			 */
 			Monomial::Arg create( const std::initializer_list<std::pair<Variable, exponent>>& _exponents );
 			
+			/**
+			 * Creates a monomial from a list of variables and their exponents.
+			 * 
+			 * Note that the input is required to be sorted.
+			 * 
+			 * @param Sorted list of variables and exponents.
+			 */
 			Monomial::Arg create( std::vector<std::pair<Variable, exponent>>&& _exponents );
 
 			void free(const Monomial* m) {
@@ -112,14 +138,6 @@ namespace carl{
 				} else {
 					CARL_LOG_TRACE("carl.core.monomial", "Not found in pool.");
 				}
-			}
-
-			/**
-			 * Clears everything already created in this pool.
-			 */
-			void clear() {
-				mPool.clear();
-				mIDs.clear();
 			}
 
 			std::size_t size() const {
