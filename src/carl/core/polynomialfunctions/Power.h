@@ -23,7 +23,7 @@ inline Monomial::Arg pow(const Monomial& m, uint exp) {
 	}
 	return createMonomial(std::move(newExps), expsum);
 }
-inline Monomial::Arg pow(const Monomial::Arg& m, std::size_t exp) {
+inline Monomial::Arg pow(const Monomial::Arg& m, uint exp) {
 	if (m == nullptr) return nullptr;
 	return pow(*m, exp);
 }
