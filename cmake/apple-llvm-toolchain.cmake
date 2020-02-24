@@ -1,7 +1,6 @@
 # Detect clang version, switch to homebrew llvm automatically
 if(APPLE)
 	set(USE_LLVM_FROM_BREW NO)
-	set(LIB_FILESYSTEM "c++fs")
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0)
 		message(STATUS "clang ${CMAKE_CXX_COMPILER_VERSION} does not support C++17.")
 		set(USE_LLVM_FROM_BREW YES)
