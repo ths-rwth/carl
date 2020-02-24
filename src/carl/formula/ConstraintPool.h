@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../util/Common.h"
+#include "../util/Pool.h"
 #include "../util/Singleton.h"
 #include "Constraint.h"
 #include "ConstraintRaw.h"
@@ -57,6 +58,7 @@ private:
     /// Mutex to avoid multiple access to the pool
     mutable std::recursive_mutex mMutexPool;
 
+    pool::RehashPolicy mRehashPolicy;
     using underlying_set = boost::intrusive::unordered_set<ConstraintContent<Pol>>;
     std::unique_ptr<typename underlying_set::bucket_type[]> mPoolBuckets;
     /// The constraint pool.
@@ -78,6 +80,15 @@ private:
     std::shared_ptr<ConstraintContent<Pol>> add(RawConstraint<Pol>&& _constraint);
 
     std::shared_ptr<ConstraintContent<Pol>> addToPool(RawConstraint<Pol>&& _constraint);
+
+    void check_rehash() {
+		auto rehash = mRehashPolicy.needRehash(mPool.bucket_count(), mPool.size());
+		if (rehash.first) {
+			auto new_buckets = new typename underlying_set::bucket_type[rehash.second];
+			mPool.rehash(typename underlying_set::bucket_traits(new_buckets, rehash.second));
+			mPoolBuckets.reset(new_buckets);
+		}
+	}
 
     /**
      * @return A pointer to the constraint which represents any constraint for which it is easy to 
@@ -104,7 +115,7 @@ protected:
      * Constructor of the constraint pool.
      * @param _capacity Expected necessary capacity of the pool.
      */
-    explicit ConstraintPool(unsigned _capacity = 10000);
+    explicit ConstraintPool(unsigned _capacity = 1000);
 
 public:
     /**

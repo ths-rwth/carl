@@ -16,8 +16,8 @@ template<typename Pol>
 ConstraintPool<Pol>::ConstraintPool(unsigned _capacity)
 	: Singleton<ConstraintPool<Pol>>(),
 	  mIdAllocator(1),
-	  mPoolBuckets(new typename underlying_set::bucket_type[_capacity]),
-	  mPool(typename underlying_set::bucket_traits(mPoolBuckets.get(), _capacity)),
+	  mPoolBuckets(new typename underlying_set::bucket_type[mRehashPolicy.numBucketsFor(_capacity)]),
+	  mPool(typename underlying_set::bucket_traits(mPoolBuckets.get(), mRehashPolicy.numBucketsFor(_capacity))),
 	  mpPolynomialCache(nullptr) {
 	VariablePool::getInstance();
 	MonomialPool::getInstance();
@@ -85,6 +85,7 @@ std::shared_ptr<ConstraintContent<Pol>> ConstraintPool<Pol>::addToPool(RawConstr
 		++mIdAllocator;
 		shared.get()->mWeakPtr = shared;
 		mPool.insert_commit(*shared.get(), insert_data);
+		check_rehash();
 		return shared;
 	}
 }

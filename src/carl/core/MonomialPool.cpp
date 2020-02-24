@@ -23,6 +23,7 @@ Monomial::Arg MonomialPool::add(Monomial::Content&& c, exponent totalDegree) {
 		shared.get()->mId = mIDs.get();
 		shared.get()->mWeakPtr = shared;
 		mPool.insert_commit(*shared.get(), insert_data);
+		check_rehash();
 		return shared;
 	}
 }

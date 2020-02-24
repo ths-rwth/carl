@@ -7,6 +7,7 @@
 
 #include "../config.h"
 #include "../util/IDPool.h"
+#include "../util/Pool.h"
 #include "../util/Singleton.h"
 #include "Monomial.h"
 #include "config.h"
@@ -45,9 +46,10 @@ private:
 	/// id allocator
 	IDPool mIDs;
 	//size_t mIdAllocator;
-	/// The pool.
+	pool::RehashPolicy mRehashPolicy;
 	using underlying_set = boost::intrusive::unordered_set<Monomial>;
 	std::unique_ptr<underlying_set::bucket_type[]> mPoolBuckets;
+	/// The pool.
 	underlying_set mPool;
 	/// Mutex to avoid multiple access to the pool
 	mutable std::recursive_mutex mMutex;
@@ -67,9 +69,9 @@ protected:
 	 * Constructor of the pool.
 	 * @param _capacity Expected necessary capacity of the pool.
 	 */
-	explicit MonomialPool(std::size_t _capacity = 10000)
-		: mPoolBuckets(new underlying_set::bucket_type[_capacity]),
-		  mPool(underlying_set::bucket_traits(mPoolBuckets.get(), _capacity)) {
+	explicit MonomialPool(std::size_t _capacity = 1000)
+		: mPoolBuckets(new underlying_set::bucket_type[mRehashPolicy.numBucketsFor(_capacity)]),
+		  mPool(underlying_set::bucket_traits(mPoolBuckets.get(), mRehashPolicy.numBucketsFor(_capacity))) {
 		mIDs.get();
 		assert(mIDs.largestID() == 0);
 		VariablePool::getInstance();
@@ -77,11 +79,20 @@ protected:
 	}
 
 	~MonomialPool() {
-		// for (const auto& m : mPool) m.mId = 0; // hacky fix for singletons not be destroyed in proper order
+		// for (const auto& m : mPool) m.mId = 0; // hacky fix for singletons not being destroyed in proper order
 		// CARL_LOG_DEBUG("carl.pool", "Monomialpool destructed");
 	}
 
 	Monomial::Arg add(Monomial::Content&& c, exponent totalDegree = 0);
+
+	void check_rehash() {
+		auto rehash = mRehashPolicy.needRehash(mPool.bucket_count(), mPool.size());
+		if (rehash.first) {
+			auto new_buckets = new underlying_set::bucket_type[rehash.second];
+			mPool.rehash(underlying_set::bucket_traits(new_buckets, rehash.second));
+			mPoolBuckets.reset(new_buckets);
+		}
+	}
 
 public:
 	/**
@@ -153,9 +164,6 @@ inline std::ostream& operator<<(std::ostream& os, const MonomialPool& mp) {
 	}
 	return os;
 }
-} // end namespace carl
-
-namespace carl {
 
 template<typename... T>
 inline Monomial::Arg createMonomial(T&&... t) {
