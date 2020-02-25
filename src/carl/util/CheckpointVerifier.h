@@ -29,8 +29,7 @@ namespace checkpointverifier {
 		}
 	public:
 		CheckpointVector() {
-			// TODO can we get rid of this here?
-			//VariablePool::getInstance();
+			VariablePool::getInstance();
 		}
 		const std::string& description() const {
 			return std::get<0>(cur());
@@ -70,10 +69,9 @@ namespace checkpointverifier {
 	class CheckpointVerifier {
 		struct ChannelWrapper: std::map<std::string, checkpointverifier::CheckpointVector> {
 			ChannelWrapper() {
-				// TODO can we get rid of this here?
-				//carl::VariablePool::getInstance();
-				//carl::ConstraintPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
-				//carl::FormulaPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
+				carl::VariablePool::getInstance();
+				carl::ConstraintPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
+				carl::FormulaPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
 			}
 		};
 		template<typename... Args>
