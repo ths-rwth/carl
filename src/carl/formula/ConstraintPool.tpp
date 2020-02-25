@@ -39,7 +39,7 @@ ConstraintPool<Pol>::ConstraintPool(unsigned _capacity)
 
 template<typename Pol>
 ConstraintPool<Pol>::~ConstraintPool() {
-	for (auto& m : mPool) m.mID = 0;
+	for (auto& m : mPool) m.mID = 0; // workaround for undeterministic destruction order of singletons
 	mPool.clear();
 }
 
