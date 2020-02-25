@@ -16,12 +16,12 @@ class RehashPolicy {
 	static const int numPrimes = sizeof(unsigned long) != 8 ? 256 : 256 + 48;
 	static const unsigned long primes[256 + 48 + 1];
 
-	float mMaxLoadFactor;
-	float mGrowthFactor;
+	float mMaxLoadFactor; // stdlib uses 1
+	float mGrowthFactor; // stdlib uses 2
 	mutable std::size_t mNextResize;
 
 public:
-	RehashPolicy(float maxLoadFactor = 0.7f, float growthFactor = 2.f)
+	RehashPolicy(float maxLoadFactor = 0.95f, float growthFactor = 2.f)
 		: mMaxLoadFactor(maxLoadFactor), mGrowthFactor(growthFactor), mNextResize(0) {}
 
 	std::size_t numBucketsFor(std::size_t numElements) const;
