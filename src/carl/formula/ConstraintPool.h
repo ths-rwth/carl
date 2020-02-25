@@ -205,10 +205,12 @@ public:
     }
 
     void free(const ConstraintContent<Pol>* _cc) noexcept {
-        CONSTRAINT_POOL_LOCK_GUARD
-        auto it = mPool.find(*_cc);
-        assert(it != mPool.end());
-        mPool.erase(it);
+        if (_cc->id() != 0) {
+            CONSTRAINT_POOL_LOCK_GUARD
+            auto it = mPool.find(*_cc);
+            assert(it != mPool.end());
+            mPool.erase(it);
+        }
     }
 
     /**

@@ -84,7 +84,7 @@ namespace carl
         
         private:
             /// A unique id.
-            const std::size_t mID;
+            /* const */ std::size_t mID;
             /// The relation symbol comparing the polynomial considered by this constraint to zero.
             const Relation mRelation;
             /// The polynomial which is compared by this constraint to zero.
