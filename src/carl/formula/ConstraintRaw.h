@@ -49,7 +49,7 @@ private:
 	
 	void set_trivial(bool _valid);
 	void set_bound(Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound);
-	void set_constraint(const Pol& _lhs, const Relation _rel);
+	void set_constraint(const Pol& _lhs, Relation _rel);
 
 	void initialize() {
 		assert(mRelation != Relation::GREATER && mRelation != Relation::GEQ);
