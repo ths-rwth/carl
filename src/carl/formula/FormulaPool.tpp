@@ -37,7 +37,7 @@ namespace carl
     template<typename Pol>
     FormulaPool<Pol>::~FormulaPool()
     {
-        assert( mPool.size() == 2 );
+        // assert( mPool.size() == 2 );
         mPool.clear();
         delete mpTrue;
         delete mpFalse;
