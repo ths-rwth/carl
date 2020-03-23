@@ -94,7 +94,7 @@ elif [[ ${TASK} == "documentation" ]]; then
 	git checkout --orphan master
 	
 	# Update cloned copy
-	cp -r ../doc/doc-apidoc-html/* carl/ || return 1
+	cp -r ../doc/apidoc-html/* carl/ || return 1
 	cp ../doc/doc_carl-*.pdf . || return 1
 	cp ../doc/doc_carl-*.pdf doc_carl-latest.pdf || return 1
 	cp ../doc/manual_carl-*.pdf . || return 1
