@@ -77,7 +77,8 @@ elif [[ ${TASK} == "clang-ubsan" ]]; then
 
 elif [[ ${TASK} == "documentation" ]]; then
 	
-	fold "reconfigure" cmake -D DOC_CREATE_PDF=ON -D DOC_CREATE_SPHINX=OFF -D BUILD_DOXYGEN=ON ../
+	# To allow convert for doc/pictures/
+	sudo rm -f /etc/ImageMagick-6/policy.xml
 	
 	start_keep_waiting
 	fold "build-doc" make doc || return 1
@@ -93,8 +94,11 @@ elif [[ ${TASK} == "documentation" ]]; then
 	git checkout --orphan master
 	
 	# Update cloned copy
-	cp -r ../doc/html/* carl/ || return 1
-	cp ../doc/*.pdf . || return 1
+	cp -r ../doc/doc-apidoc-html/* carl/ || return 1
+	cp ../doc/doc_carl-*.pdf . || return 1
+	cp ../doc/doc_carl-*.pdf doc_carl-latest.pdf || return 1
+	cp ../doc/manual_carl-*.pdf . || return 1
+	cp ../doc/manual_carl-*.pdf manual_carl-latest.pdf || return 1
 	
 	git add . || return 1
 	
