@@ -44,7 +44,7 @@ CITE_BIB_FILES         = @CMAKE_SOURCE_DIR@/doc/literature.bib
 #########################
 ##### Input
 
-INPUT                  = @PROJECT_SOURCE_DIR@/doc/manual @PROJECT_SOURCE_DIR@/src
+INPUT                  = @PROJECT_SOURCE_DIR@/doc/markdown @PROJECT_SOURCE_DIR@/src
 FILE_PATTERNS          = *.cpp *.h *.tpp *.dox *.py *.md
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = */tests/*
