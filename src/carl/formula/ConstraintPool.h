@@ -124,44 +124,6 @@ public:
     ~ConstraintPool();
 
     /**
-     * @return The number of constraint in this pool.
-     */
-    size_t size() const {
-        CONSTRAINT_POOL_LOCK_GUARD
-        size_t result = mPool.size();
-        return result;
-    }
-
-    /**
-     * Note: This method makes the other accesses to the constraint pool waiting.
-     * @return The highest degree occurring in all constraints
-     */
-    std::size_t maxDegree() const {
-        std::size_t result = 0;
-        CONSTRAINT_POOL_LOCK_GUARD
-        for (auto constraint = mPool.begin(); constraint != mPool.end(); ++constraint) {
-            std::size_t maxdeg = isZero(constraint->mLhs) ? 0 : constraint->mLhs.totalDegree();
-            if (maxdeg > result)
-                result = maxdeg;
-        }
-        return result;
-    }
-
-    /**
-     * Note: This method makes the other accesses to the constraint pool waiting.
-     * @return The number of non-linear constraints in the pool.
-     */
-    unsigned nrNonLinearConstraints() const {
-        unsigned nonlinear = 0;
-        CONSTRAINT_POOL_LOCK_GUARD
-        for (auto constraint = mPool.begin(); constraint != mPool.end(); ++constraint) {
-            if (!constraint->mLhs.isLinear())
-                ++nonlinear;
-        }
-        return nonlinear;
-    }
-
-    /**
      * Constructs a new constraint and adds it to the pool, if it is not yet a member. If it is a
      * member, this will be returned instead of a new constraint.
      * Note, that the left-hand side of the constraint is simplified and normalized, hence it is
