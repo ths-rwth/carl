@@ -192,18 +192,6 @@ jobs:
           packages: [*packages_base, g++-9]
     - stage: build
       os: osx
-      osx_image: xcode11
-      script: source .ci/build.sh
-    - stage: build
-      os: osx
-      osx_image: xcode11.1
-      script: source .ci/build.sh
-    - stage: build
-      os: osx
-      osx_image: xcode11.2
-      script: source .ci/build.sh
-    - stage: build
-      os: osx
       osx_image: xcode11.3
       script: source .ci/build.sh
     - stage: build
@@ -314,15 +302,6 @@ jobs:
     - stage: dependencies
       os: linux
       env: CC=clang-9 CXX=clang++-9 TASK=sonarcloud
-    - stage: build
-      os: osx
-      osx_image: xcode11
-    - stage: build
-      os: osx
-      osx_image: xcode11.1
-    - stage: build
-      os: osx
-      osx_image: xcode11.2
     - stage: build
       os: osx
       osx_image: xcode11.3
