@@ -39,8 +39,6 @@
 #include "../../../interval/Interval.h"
 #include "../../../interval/sampling.h"
 
-#include "RealAlgebraicNumberSettings.h"
-
 #include "RealAlgebraicNumber_Number.h"
 #include "RealAlgebraicNumber_Interval.h"
 #ifdef RAN_USE_THOM

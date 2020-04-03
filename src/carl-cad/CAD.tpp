@@ -14,7 +14,6 @@
 
 #include <carl/core/logging.h>
 #include <carl/interval/IntervalEvaluation.h>
-#include <carl/formula/model/ran/RealAlgebraicNumberSettings.h>
 #include <carl/core/polynomialfunctions/Representation.h>
 #include <carl/core/polynomialfunctions/RootFinder.h>
 #include <carl/thom/ThomRootFinder.h>
