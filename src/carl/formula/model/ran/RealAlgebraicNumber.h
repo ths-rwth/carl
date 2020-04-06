@@ -157,7 +157,7 @@ public:
 	{
 	}
 	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, bool isRoot = true):
-		mContent(std::in_place_type<IntervalContent>, p, i, seq),
+		mContent(std::in_place_type<IntervalContent>, p, i),
 		mIsRoot(isRoot)
 	{}
 	static RealAlgebraicNumber createSafeIR(const Polynomial& p, const Interval<Number>& i, bool isRoot = true) {
