@@ -49,7 +49,7 @@ TEST(Constraint, satisfiedBySqrt)
 	carl::Interval<Rational> i(Rational(11)/16, carl::BoundType::STRICT, Rational(3)/4, carl::BoundType::STRICT);
 
 	{
-		RAP r({ RAN(px, i), RAN(py, i) });
+		RAP r({ RAN::createSafeIR(px, i), RAN::createSafeIR(py, i) });
 		///@todo Change to MultivariatePolynomial
 		//EXPECT_TRUE(Constraint(p1, carl::Sign::ZERO, {x,y}, false).satisfiedBy(r));
 	}

@@ -35,19 +35,19 @@ class RealRootIsolation {
 	/// The bounding interval.
 	Interval<Number> mInterval;
 	/// The sturm sequence for mPolynomial.
-	std::optional<std::vector<UnivariatePolynomial<Number>>> mSturmSequence;
+	// std::optional<std::vector<UnivariatePolynomial<Number>>> mSturmSequence;
 
 	/// Return the sturm sequence for mPolynomial, create it if necessary.
-	const auto& sturm_sequence() {
-		if (!mSturmSequence) {
-			mSturmSequence = carl::sturm_sequence(mPolynomial);
-		}
-		return *mSturmSequence;
-	}
+	// const auto& sturm_sequence() {
+	// 	if (!mSturmSequence) {
+	// 		mSturmSequence = carl::sturm_sequence(mPolynomial);
+	// 	}
+	// 	return *mSturmSequence;
+	// }
 	/// Reset the sturm sequence, used if the polynomial was modified.
-	void reset_sturm_sequence() {
-		mSturmSequence.reset();
-	}
+	// void reset_sturm_sequence() {
+	// 	mSturmSequence.reset();
+	// }
 
 	/// Handle zero roots (p(0) == 0)
 	void eliminate_zero_roots() {
@@ -118,7 +118,7 @@ class RealRootIsolation {
 
 	void add_trivial_root(const Interval<Number>& i) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "Add trivial root " << i);
-		mRoots.emplace_back(mPolynomial, i, sturm_sequence());
+		mRoots.emplace_back(mPolynomial, i);
 	}
 
 	/// Use root bounds to shrink mInterval.
@@ -132,14 +132,14 @@ class RealRootIsolation {
 	void add_root(const Number& n) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "Add root " << n);
 		assert(carl::is_root_of(mPolynomial, n));
-		reset_sturm_sequence();
+		// reset_sturm_sequence();
 		eliminate_root(mPolynomial, n);
 		mRoots.emplace_back(n);
 	}
 	/// Add a root to mRoots, based on an isolating interval.
 	void add_root(const Interval<Number>& i) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "Add root " << i);
-		mRoots.emplace_back(mPolynomial, i, sturm_sequence());
+		mRoots.emplace_back(mPolynomial, i);
 	}
 
 	/// Check whether the interval bounds are roots.
@@ -305,7 +305,7 @@ public:
 				CARL_LOG_DEBUG("carl.core.rootfinder", "Coputing root of factor " << factor);
 				mPolynomial = factor.first;
 				mInterval = interval;
-				reset_sturm_sequence();
+				// reset_sturm_sequence();
 				compute_roots();
 			}
 		} else {

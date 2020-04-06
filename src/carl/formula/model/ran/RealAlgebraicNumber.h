@@ -157,14 +157,12 @@ public:
 	{
 	}
 	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, bool isRoot = true):
-		mContent(std::in_place_type<IntervalContent>, p, i),
-		mIsRoot(isRoot)
-	{}
-	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, const std::vector<UnivariatePolynomial<Number>>& seq, bool isRoot = true):
 		mContent(std::in_place_type<IntervalContent>, p, i, seq),
 		mIsRoot(isRoot)
 	{}
-
+	static RealAlgebraicNumber createSafeIR(const Polynomial& p, const Interval<Number>& i, bool isRoot = true) {
+		return RealAlgebraicNumber(carl::squareFreePart(p), i, isRoot);
+	}
 	explicit RealAlgebraicNumber(const NumberContent& ran, bool isRoot = true):
 		mContent(ran), mIsRoot(isRoot)
 	{}
@@ -320,10 +318,6 @@ public:
 		return call_on_content(
 			[](const auto& c) { return ran::get_polynomial(c); }
 		);
-	}
-	const auto& getIRSturmSequence() const {
-		assert(isInterval());
-		return std::get<IntervalContent>(mContent).sturm_sequence();
 	}
 
 	Sign sgn() const {
