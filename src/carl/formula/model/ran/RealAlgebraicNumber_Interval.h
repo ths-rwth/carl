@@ -34,14 +34,10 @@ namespace ran {
 
 			Content(Polynomial&& p, const Interval<Number>& i):
 				polynomial(std::move(p)), interval(i)
-			{
-				// assert(polynomial == carl::squareFreePart(polynomial));
-			}
+			{}
 			Content(const Polynomial& p, const Interval<Number>& i):
 				polynomial(p), interval(i)
-			{
-				// assert(polynomial == carl::squareFreePart(polynomial));
-			}
+			{}
 		};
 
 		mutable std::shared_ptr<Content> mContent;
@@ -62,28 +58,6 @@ namespace ran {
 			const Interval<Number> i
 		):
 			mContent(std::make_shared<Content>(replaceVariable(p), i))
-		{
-			CARL_LOG_DEBUG("carl.ran.ir", "Creating " << *this);
-			assert(!carl::isZero(polynomial()) && polynomial().degree() > 0);
-			assert(interval().isOpenInterval() || interval().isPointInterval());
-			// assert(interval().isPointInterval() || count_real_roots(sturm_sequence(), interval()) == 1);
-			assert(is_consistent());
-			if (polynomial().degree() == 1) {
-				Number a = polynomial().coefficients()[1];
-				Number b = polynomial().coefficients()[0];
-				interval() = Interval<Number>(Number(-b / a));
-			} else {
-				if (interval().contains(0)) refineAvoiding(0);
-				refineToIntegrality();
-			}
-		}
-
-		IntervalContent(
-			const Polynomial& p,
-			const Interval<Number> i,
-			const std::vector<UnivariatePolynomial<Number>>& seq
-		):
-			mContent(std::make_shared<Content>(replaceVariable(p), i, seq))
 		{
 			CARL_LOG_DEBUG("carl.ran.ir", "Creating " << *this);
 			assert(!carl::isZero(polynomial()) && polynomial().degree() > 0);
@@ -401,6 +375,7 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 		algebraic_information.emplace_back(replace_main_variable(cur.second.polynomial(), cur.first).template convert<MultivariatePolynomial<Number>>());
 	}
 	UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
+	res = carl::squareFreePart(res);
 	// Note that res cannot be zero as v is a fresh variable in v-p.
 	// compute the initial result interval
 	std::map<Variable, Interval<Number>> varToInterval;
