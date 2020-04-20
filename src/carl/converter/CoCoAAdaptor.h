@@ -169,22 +169,30 @@ public:
 		return mSymbolBack;
 	}
 
+	auto construct_symbol_back(std::vector<Variable> vars, bool lex_order = false) const {
+		if (!lex_order) {
+			std::sort(vars.begin(), vars.end());
+		}
+		return vars;
+	}
+
+	auto construct_ring(const std::vector<Variable>& vars, bool lex_order = false) const {
+		std::vector<CoCoA::symbol> indets;
+		for (auto s: vars) {
+			indets.emplace_back(s.safe_name());
+		}
+		if (lex_order) {
+			return CoCoA::NewPolyRing(mQ, indets, CoCoA::lex);
+		} else {
+			return CoCoA::NewPolyRing(mQ, indets);
+		}
+	}
+
 public:
 	explicit CoCoAAdaptor(const std::vector<Variable>& vars, bool lex_order = false):
-		mSymbolBack(vars), mRing(CoCoA::NewPolyRing(mQ, 1))
+		mSymbolBack(construct_symbol_back(vars)), mRing(construct_ring(mSymbolBack, lex_order))
 	{
-		if (lex_order) {
-			std::vector<CoCoA::symbol> indets;
-			for (auto s: mSymbolBack) {
-				indets.emplace_back(s.safe_name());
-			}
-			mRing = CoCoA::NewPolyRing(mQ, indets, CoCoA::lex);
-		} else {
-			std::sort(mSymbolBack.begin(), mSymbolBack.end());
-			mRing = CoCoA::NewPolyRing(mQ, long(mSymbolBack.size()));
-		}
 		auto indets = CoCoA::indets(mRing);
-
 		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
 			mSymbolThere.emplace(mSymbolBack[i], indets[i]);
 		}
