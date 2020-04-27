@@ -1,0 +1,4 @@
+311c311
+<     if (log_modulus > 2*log_lc + factor_bound + 0.7) max_tuple_size = THIS->nfactors/2;
+---
+>     if (log_modulus > 2*log_lc + factor_bound + 0.7 && 0) max_tuple_size = THIS->nfactors/2;
