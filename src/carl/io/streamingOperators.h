@@ -24,9 +24,10 @@
 
 namespace carl {
 
-
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l);
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, const std::initializer_list<T>& l);
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::list<T>& l);
 template<typename Key, typename Value, typename Comparator>
@@ -51,7 +52,6 @@ template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& v);
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::deque<T>& v);
-
 
 /**
  * Allows to easily output some container with all elements separated by some string.
@@ -85,6 +85,18 @@ inline auto stream_joined(const std::string& glue, const T& v, F&& f);
  */
 template<typename T>
 inline std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l) {
+	return os << "[" << stream_joined(", ", l) << "]";
+}
+
+/**
+ * Output a std::initializer_list with arbitrary content.
+ * The format is `[<item>, <item>, ...]`
+ * @param os Output stream.
+ * @param l list to be printed.
+ * @return Output stream.
+ */
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, const std::initializer_list<T>& l) {
 	return os << "[" << stream_joined(", ", l) << "]";
 }
 
