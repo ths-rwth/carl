@@ -11,7 +11,7 @@
 #include "../core/MultivariatePolynomial.h"
 #include "../numbers/conversion/cln_gmp.h"
 #include "../util/Common.h"
-#include "../util/TimingCollector.h"
+#include "CoCoAAdaptorStatistics.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -219,7 +219,7 @@ public:
 	Poly gcd(const Poly& p1, const Poly& p2) const {
 		auto start = CARL_TIME_START();
 		auto res = convert(cocoawrapper::gcd(convert(p1), convert(p2)));
-		CARL_TIME_FINISH("cocoa.gcd", start);
+		CARL_TIME_FINISH(cocoa::statistics().gcd, start);
 		return res;
 	}
 
@@ -252,7 +252,7 @@ public:
 		for (std::size_t i = 0; i < finfo.myFactors().size(); ++i) {
 			res.emplace(convert(finfo.myFactors()[i]), finfo.myMultiplicities()[i]);
 		}
-		CARL_TIME_FINISH("cocoa.factorize", start);
+		CARL_TIME_FINISH(cocoa::statistics().factorize, start);
 		return res;
 	}
 
@@ -310,7 +310,7 @@ public:
 	auto GBasis(const std::vector<Poly>& p) const {
 		auto start = CARL_TIME_START();
 		auto res = convert(cocoawrapper::ReducedGBasis(convert(p)));
-		CARL_TIME_FINISH("cocoa.gbasis", start);
+		CARL_TIME_FINISH(cocoa::statistics().gbasis, start);
 		return res;
 	}
 };

@@ -1,0 +1,6 @@
+/**
+ * Auto generated file config.h from config.h.in.
+ */ 
+#pragma once
+
+#cmakedefine CARL_DEVOPTION_Statistics

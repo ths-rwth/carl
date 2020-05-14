@@ -7,6 +7,7 @@ add_subdirectory(carl-extpolys)
 add_subdirectory(carl-io)
 add_subdirectory(carl-model)
 add_subdirectory(carl-settings)
+add_subdirectory(carl-statistics)
 
 # For unit tests.
 # We decided to always compile them, if gtest is present,
