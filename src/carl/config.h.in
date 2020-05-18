@@ -6,7 +6,6 @@
 #define CARL_BUILD_${CMAKE_BUILD_TYPE}
 #cmakedefine LOGGING
 #cmakedefine LOGGING_DISABLE_INEFFICIENT
-#cmakedefine TIMING
 #cmakedefine THREAD_SAFE
 #cmakedefine USE_BLISS
 #cmakedefine USE_CLN_NUMBERS

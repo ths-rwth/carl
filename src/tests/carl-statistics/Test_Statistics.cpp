@@ -1,5 +1,3 @@
-#define TIMING
-
 #include "../get_output.h"
 
 #include <carl-statistics/Statistics.h>
