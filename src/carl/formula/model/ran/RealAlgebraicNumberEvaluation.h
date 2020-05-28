@@ -147,15 +147,16 @@ bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
 			IRmap.emplace(r.first, r.second);
 		}
 	}
-	if (pol.isNumber()) {
-		return evaluate(pol.constantPart(), c.relation());
+	// if (pol.isNumber()) {
+	// 	return evaluate(pol.constantPart(), c.relation());
+	// }
+	Constraint<Poly> constr(pol, c.relation());
+	if (constr.lhs().isNumber()) {
+		return evaluate(constr.lhs().constantPart(), constr.relation());
 	}
 
 	// need to evaluate polynomial on non-trivial RANs
-
-	Constraint<Poly> constr(pol, c.relation());
 	CARL_LOG_TRACE("carl.ran", "Remaining " << constr << " on " << IRmap);
-
 	return overload_on_map<bool>(
 		[&constr](auto& map){ return bool(ran::evaluate(constr, map)); },
 		IRmap
