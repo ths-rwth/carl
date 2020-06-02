@@ -10,7 +10,7 @@ We use C++17 and thus need at least `g++` 7 or `clang` 5.
 
 Optional dependencies
 - `ccmake` to set cmake flags.
-- `doxygen` to build the documentation.
+- `doxygen` to build the documentation. If the documentation is built without a `doxygen` installation available, `doxygen` is built requiring `flex` and `bison` packages.
 - `gtest` to build the test cases.
 
 Additionally, CArL requires a few external libraries:
