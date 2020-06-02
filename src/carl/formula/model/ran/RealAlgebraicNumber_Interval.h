@@ -164,7 +164,7 @@ namespace ran {
 			return i.contains(interval());
 		}
 		
-		void refine(bool newone = true) const {
+		void refine() const {
 			Number pivot = carl::sample(interval());
 			assert(interval().contains(pivot));
 			// assert(is_consistent());
