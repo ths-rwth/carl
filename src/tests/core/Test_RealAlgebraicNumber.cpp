@@ -50,20 +50,3 @@ TEST(RealAlgebraicNumber, Evaluation)
 	 * }
 	 */
 }
-
-TEST(RealAlgebraicNumber, Evaluation2)
-{
-    Variable t = freshRealVariable("t");
-
-	UnivariatePolynomial<MultivariatePolynomial<Rational>> mp(t, {
-		MultivariatePolynomial<Rational>(-3),
-		MultivariatePolynomial<Rational>(0),
-		MultivariatePolynomial<Rational>(1)
-	});
-	UnivariatePolynomial<Rational> p(t, std::initializer_list<Rational>{-3, 0, 1});
-	std::vector<Variable> vars({t});
-	Interval<Rational> i(Rational(13)/8, BoundType::STRICT, Rational(7)/4, BoundType::STRICT);
-	RealAlgebraicPoint<Rational> point({RealAlgebraicNumber<Rational>(p, i)});
-	auto res = RealAlgebraicNumberEvaluation::evaluate(MultivariatePolynomial<Rational>(mp), point, vars);
-	std::cerr << res << std::endl;
-}

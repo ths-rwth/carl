@@ -1,7 +1,6 @@
 # Libraries..
 add_subdirectory(carl-logging)
 add_subdirectory(carl)
-add_subdirectory(carl-cad)
 add_subdirectory(carl-covering)
 add_subdirectory(carl-extpolys)
 add_subdirectory(carl-io)

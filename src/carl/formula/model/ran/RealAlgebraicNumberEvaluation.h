@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "RealAlgebraicNumber.h"
-#include "RealAlgebraicPoint.h"
 
 #include "../../../core/polynomialfunctions/Substitution.h"
 
@@ -46,15 +45,7 @@ auto overload_on_map(F&& f, const RANMap<Number>& map) {
 	);
 }
 
-/**
- * Evaluate the given polynomial 'p' at the given 'point' based on the variable order given by 'variables'.
- * If a variable is assigned a numeric representation, the corresponding value is directly plugged in.
- * All assignments of interval representations are passed on to <code>evaluate(MultivariatePolynomial, RANIRMap)</code>.
- * Note that the number of variables must match the dimension of the 'point', all
- * variables of 'p' must appear in 'variables' and that 'variables' must not mention any additional variables.
- */
-template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, const RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
+
 
 /**
  * Evaluate the given polynomial 'p' at the point represented by the variable-to-nummber-mapping 'm'.
@@ -62,38 +53,6 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
  * All assignments of interval representations are passed on to <code>evaluate(MultivariatePolynomial, RANIRMap)</code>.
  * Note that variables of 'p' must be assigned in 'm' and that 'm' must not assign any additional variables.
  */
-template<typename Number>
-RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m);
-
-
-////////////////////////////////////////
-////////////////////////////////////////
-// Implementation
-
-// This is called by carl::CAD implementation (from Constraint)
-template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, const RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
-        assert(point.dim() == variables.size());
-	RANMap<Number> RANs;
-	MultivariatePolynomial<Coeff> pol(p);
-	for (std::size_t i = 0; i < point.dim(); i++) {
-		if (!pol.has(variables[i])) continue;
-		assert(pol.has(variables[i]));
-		if (point[i].isNumeric()) {
-			// Plug in numeric representations
-			carl::substitute_inplace(pol, variables[i], MultivariatePolynomial<Coeff>(point[i].value()));
-		} else {
-			// Defer interval representations
-			RANs.emplace(variables[i], point[i]);
-		}
-	}
-	if (pol.isNumber()) {
-		return RealAlgebraicNumber<Number>(pol.constantPart());
-	}
-	return evaluate(pol, RANs);
-}
-
-// This is called by smtrat::CAD implementation (from CAD.h)
 template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m) {
 	CARL_LOG_TRACE("carl.ran", "Evaluating " << p << " on " << m);

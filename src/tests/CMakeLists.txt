@@ -13,7 +13,6 @@ add_dependencies(TestCommon resources GTESTCORE_STATIC GTESTMAIN_STATIC)
 # Unit Tests
 ################################
 add_subdirectory(util)
-add_subdirectory(carl-cad)
 add_subdirectory(carl-covering)
 add_subdirectory(carl-extpolys)
 add_subdirectory(carl-io)

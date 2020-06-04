@@ -116,10 +116,6 @@ private:
 
 	mutable Content mContent = NumberContent();
 
-	// A flag/tag that a user of this class can set.
-	// It indicates that this number stems from an outside root computation.
-	bool mIsRoot = true;
-
 	/// Convert to a plain number if possible.
 	void checkForSimplification() const {
 		if (std::holds_alternative<NumberContent>(mContent)) return;
@@ -147,47 +143,42 @@ private:
 
 public:
 	RealAlgebraicNumber() = default;
-	explicit RealAlgebraicNumber(const Number& n, bool isRoot = true):
-		mContent(std::in_place_type<NumberContent>, n),
-		mIsRoot(isRoot)
+	explicit RealAlgebraicNumber(const Number& n):
+		mContent(std::in_place_type<NumberContent>, n)
 	{}
-	explicit RealAlgebraicNumber(Variable var, bool isRoot = true):
-		mContent(std::in_place_type<IntervalContent>, Polynomial(var), Interval<Number>::zeroInterval()),
-		mIsRoot(isRoot)
-	{
+	explicit RealAlgebraicNumber(Variable var):
+		mContent(std::in_place_type<IntervalContent>, Polynomial(var), Interval<Number>::zeroInterval())
+	{}
+	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i):
+		mContent(std::in_place_type<IntervalContent>, p, i)
+	{}
+	static RealAlgebraicNumber createSafeIR(const Polynomial& p, const Interval<Number>& i) {
+		return RealAlgebraicNumber(carl::squareFreePart(p), i);
 	}
-	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, bool isRoot = true):
-		mContent(std::in_place_type<IntervalContent>, p, i),
-		mIsRoot(isRoot)
+	explicit RealAlgebraicNumber(const NumberContent& ran):
+		mContent(ran)
 	{}
-	static RealAlgebraicNumber createSafeIR(const Polynomial& p, const Interval<Number>& i, bool isRoot = true) {
-		return RealAlgebraicNumber(carl::squareFreePart(p), i, isRoot);
-	}
-	explicit RealAlgebraicNumber(const NumberContent& ran, bool isRoot = true):
-		mContent(ran), mIsRoot(isRoot)
-	{}
-	explicit RealAlgebraicNumber(const IntervalContent& ran, bool isRoot = true):
-		mContent(ran), mIsRoot(isRoot)
+	explicit RealAlgebraicNumber(const IntervalContent& ran):
+		mContent(ran)
 	{}
 #ifdef RAN_USE_THOM
-	explicit RealAlgebraicNumber(const ThomEncoding<Number>& te, bool isRoot = true):
-		mContent(std::in_place_type<ThomContent>, te),
-		mIsRoot(isRoot)
+	explicit RealAlgebraicNumber(const ThomEncoding<Number>& te):
+		mContent(std::in_place_type<ThomContent>, te)
 	{}
-	explicit RealAlgebraicNumber(const ThomContent& ran, bool isRoot = true):
-		mContent(ran), mIsRoot(isRoot)
+	explicit RealAlgebraicNumber(const ThomContent& ran):
+		mContent(ran)
 	{}
 #endif
 
 #ifdef RAN_USE_Z3
-	explicit RealAlgebraicNumber(const Z3Content& ran, bool isRoot = true):
-		mContent(ran), mIsRoot(isRoot)
+	explicit RealAlgebraicNumber(const Z3Content& ran):
+		mContent(ran)
 	{}
-	explicit RealAlgebraicNumber(const Z3Ran<Number>& zr, bool isRoot = true)
-		: mContent(std::in_place_type<Z3Content>, zr), mIsRoot(isRoot)
+	explicit RealAlgebraicNumber(const Z3Ran<Number>& zr)
+		: mContent(std::in_place_type<Z3Content>, zr)
 	{}
-	explicit RealAlgebraicNumber(Z3Ran<Number>&& zr, bool isRoot = true)
-		: mContent(std::in_place_type<Z3Content>, std::move(zr)), mIsRoot(isRoot)
+	explicit RealAlgebraicNumber(Z3Ran<Number>&& zr)
+		: mContent(std::in_place_type<Z3Content>, std::move(zr))
 	{}
 #endif
 
@@ -208,20 +199,6 @@ public:
 		return call_on_content(
 			[](const auto& c) { return c.size(); }
 		);
-	}
-
-	/**
-	 * Check if this number stems from an outside root computation.
-	 */
-	bool isRoot() const {
-		return mIsRoot;
-	}
-
-	/**
-	 * Set the flag marking whether the number stems from an outside root computation.
-	 */
-	void setIsRoot(bool isRoot) noexcept {
-		mIsRoot = isRoot;
 	}
 
 	bool isZero() const {
@@ -295,10 +272,6 @@ public:
 		return std::get<NumberContent>(mContent).value();
 	}
 
-	std::size_t getRefinementCount() const {
-		assert(isInterval());
-		return std::get<IntervalContent>(mContent).refinementCount();
-	}
 	Interval<Number> getInterval() const {
 		return call_on_content(
 			[](const auto& c) { return ran::get_interval(c); }
@@ -350,12 +323,6 @@ public:
 		);
 	}
 
-	bool refineAvoiding(const Number& n) const {
-		assert(isInterval());
-		bool res = std::get<IntervalContent>(mContent).refineAvoiding(n);
-		checkForSimplification();
-		return res;
-	}
 	/// Refines until the number is either numeric or the interval does not contain any integer.
 	void refineToIntegrality() const {
 		return call_on_content(
@@ -363,16 +330,10 @@ public:
 			[](const auto& c) {}
 		);
 	}
-	void refine() const {
-		return call_on_content(
-			[](IntervalContent& c) { c.refine(); },
-			[](const auto& c) {}
-		);
-	}
 
 	RealAlgebraicNumber<Number> abs() const {
 		return call_on_content(
-			[this](const auto& c) { return RealAlgebraicNumber<Number>(ran::abs(c), mIsRoot); }
+			[this](const auto& c) { return RealAlgebraicNumber<Number>(ran::abs(c)); }
 		);
 	}
 };
@@ -380,7 +341,7 @@ public:
 template<typename Num>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
 	return std::visit(overloaded {
-		[&os,&ran](const auto& c) -> auto& { return os << "(" << c << (ran.isRoot() ? " R" : "") << ")"; }
+		[&os,&ran](const auto& c) -> auto& { return os << "(" << c << ")"; }
 	}, ran.mContent);
 }
 
@@ -391,7 +352,7 @@ namespace std {
 	template<typename Number>
 	struct hash<carl::RealAlgebraicNumber<Number>> {
 		std::size_t operator()(const carl::RealAlgebraicNumber<Number>& n) const {
-			return carl::hash_all(n.isRoot(), n.integerBelow());
+			return carl::hash_all(n.integerBelow());
 		}
 	};
 

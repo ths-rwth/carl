@@ -48,21 +48,21 @@ namespace carl {
 	template<typename Number>
 	RealAlgebraicNumber<Number> sampleBelow(const RealAlgebraicNumber<Number>& n) {
 		return std::visit(
-			[](const auto& c){ return RealAlgebraicNumber<Number>(ran::sample_below(c), false); }
+			[](const auto& c){ return RealAlgebraicNumber<Number>(ran::sample_below(c)); }
 			, n.content()
 		);
 	}
 	template<typename Number>
 	RealAlgebraicNumber<Number> sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper, RANSampleHeuristic heuristic = RANSampleHeuristic::Default) {
 		return std::visit(
-			[](auto& l, auto& u){ return RealAlgebraicNumber<Number>(ran::sample_between(l, u), false); }
+			[](auto& l, auto& u){ return RealAlgebraicNumber<Number>(ran::sample_between(l, u)); }
 			, lower.mContent, upper.mContent
 		);
 	}
 	template<typename Number>
 	RealAlgebraicNumber<Number> sampleAbove(const RealAlgebraicNumber<Number>& n) {
 		return std::visit(
-			[](const auto& c){ return RealAlgebraicNumber<Number>(ran::sample_above(c), false); }
+			[](const auto& c){ return RealAlgebraicNumber<Number>(ran::sample_above(c)); }
 			, n.content()
 		);
 	}

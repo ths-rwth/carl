@@ -397,7 +397,7 @@ TEST(Formula, Uniqueness)
 	
 	Interval<Rational> ir(Rational(-594743)/343, BoundType::STRICT, Rational(-1189485)/686, BoundType::STRICT);
 	UnivariatePolynomial<Rational> up(r, {Rational(-1031250000)/343, Rational(0), Rational(1)});
-	RealAlgebraicNumber<Rational> ran = RealAlgebraicNumber<Rational>::createSafeIR(up, ir, true);
+	RealAlgebraicNumber<Rational> ran = RealAlgebraicNumber<Rational>::createSafeIR(up, ir);
 	VariableComparison<Pol> vc(X, ran, Relation::GREATER, true);
 	
 	FormulaT f1 = FormulaT(vc);

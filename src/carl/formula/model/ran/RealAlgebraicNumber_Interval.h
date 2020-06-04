@@ -31,7 +31,6 @@ namespace ran {
 		struct Content {
 			Polynomial polynomial;
 			Interval<Number> interval;
-			std::size_t refinementCount = 0;
 			// TODO cache sgn at endpoints in RAN
 
 			Content(Polynomial&& p, const Interval<Number>& i):
@@ -100,9 +99,6 @@ namespace ran {
 		auto& interval() const {
 			return mContent->interval;
 		}
-		auto& refinementCount() const {
-			return mContent->refinementCount;
-		}
 
 		bool is_zero() const {
 			return carl::isZero(interval());
@@ -118,13 +114,6 @@ namespace ran {
 
 		std::size_t size() const {
 			return carl::bitsize(interval().lower()) + carl::bitsize(interval().upper()) + polynomial().degree();
-		}
-
-		bool is_root_of(const UnivariatePolynomial<Number>& p) const { // TODO remove
-			if (interval().isPointInterval())
-				return carl::is_root_of(p, interval().lower());
-			else
-				return carl::count_real_roots(p, interval()) == 1; // TODO in general incorrect: take carl::gcd(p,polynomial())
 		}
 
 		bool isIntegral() {
@@ -198,7 +187,6 @@ namespace ran {
 				interval() = Interval<Number>(pivot, pivot);
 				return Sign::ZERO;
 			}
-			refinementCount()++;
 			auto lsgn = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
 			if (psgn == lsgn) {
 				interval().setLower(pivot);
@@ -210,146 +198,10 @@ namespace ran {
 				return Sign::NEGATIVE;
 			}
 		}
-			
-		/** Refine the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
-		 * @param n
-		 * @rcomplexity constant
-		 * @scomplexity constant
-		 * @return true, if n is the exact numeric representation of this root, otherwise false
-		 */
-		bool refineAvoiding(const Number& n) const { // TODO remove?
-			// assert(is_consistent());
-			if (interval().contains(n)) {
-				auto psgn = carl::sgn(carl::evaluate(polynomial(), n));
-				if (psgn == Sign::ZERO) {
-					interval() = Interval<Number>(n, n);
-					return true;
-				}
-				auto lsgn = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
-				if (psgn == lsgn) {
-					interval().setLower(n);
-				} else {
-					interval().setUpper(n);
-				}
-				refinementCount()++;
-			} else if (interval().lower() != n && interval().upper() != n) {
-				return false;
-			}
-			
-			bool isLeft = interval().lower() == n;
-			
-			Number newBound = carl::sample(interval());
-			
-			if (carl::is_root_of(polynomial(), newBound)) {
-				interval() = Interval<Number>(newBound, newBound);
-				return false;
-			}
-			
-			if (isLeft) {
-				interval().setLower(newBound);
-			} else {
-				interval().setUpper(newBound);
-			}
-			
-			while (carl::sgn(carl::evaluate(polynomial(), interval().lower())) == carl::sgn(carl::evaluate(polynomial(), interval().upper()))) { // root is not in interval
-				if (isLeft) {
-					Number oldBound = interval().lower();
-					newBound = carl::sample(Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT));
-					if (carl::is_root_of(polynomial(), newBound)) {
-						interval() = Interval<Number>(newBound, newBound);
-						return false;
-					}
-					interval().setUpper(oldBound);
-					interval().setLower(newBound);
-				} else {
-					Number oldBound = interval().upper();
-					newBound = carl::sample(Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT));
-					if (carl::is_root_of(polynomial(), newBound)) {
-						interval() = Interval<Number>(newBound, newBound);
-						return false;
-					}
-					interval().setLower(oldBound);
-					interval().setUpper(newBound);
-				}
-			}
-			return false;
-			
-			/* this method based using Sturm sequences was used before (and is significantly slower):
-			if (interval().contains(n)) {
-				if (carl::is_root_of(polynomial(), n)) {
-					interval() = Interval<Number>(n, n);
-					return true;
-				}
-				if (carl::count_real_roots(sturm_sequence(), Interval<Number>(interval().lower(), BoundType::STRICT, n, BoundType::STRICT)) > 0) {
-					interval().setUpper(n);
-				} else {
-					interval().setLower(n);
-				}
-				refinementCount()++;
-			} else if (interval().lower() != n && interval().upper() != n) {
-				return false;
-			}
-			
-			bool isLeft = interval().lower() == n;
-			
-			Number newBound = carl::sample(interval());
-			
-			if (carl::is_root_of(polynomial(), newBound)) {
-				interval() = Interval<Number>(newBound, newBound);
-				return false;
-			}
-			
-			if (isLeft) {
-				interval().setLower(newBound);
-			} else {
-				interval().setUpper(newBound);
-			}
-			
-			while (carl::count_real_roots(sturm_sequence(), interval()) == 0) {
-				if (isLeft) {
-					Number oldBound = interval().lower();
-					newBound = carl::sample(Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT));
-					if (carl::is_root_of(polynomial(), newBound)) {
-						interval() = Interval<Number>(newBound, newBound);
-						return false;
-					}
-					interval().setUpper(oldBound);
-					interval().setLower(newBound);
-				} else {
-					Number oldBound = interval().upper();
-					newBound = carl::sample(Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT));
-					if (carl::is_root_of(polynomial(), newBound)) {
-						interval() = Interval<Number>(newBound, newBound);
-						return false;
-					}
-					interval().setLower(oldBound);
-					interval().setUpper(newBound);
-				}
-			}
-			return false;
-			*/
-		}
-		
+					
 		void refineToIntegrality() const {
 			while (!interval().isPointInterval() && interval().containsInteger()) {
 				refine();
-			}
-		}
-
-		void simplifyByPolynomial(Variable var, const MultivariatePolynomial<Number>& poly) const { // TODO remove
-			UnivariatePolynomial<Number> irp(var, polynomial().template convert<Number>().coefficients());
-			CARL_LOG_DEBUG("carl.ran", "gcd(" << irp << ", " << poly << ")");
-			auto gmv = carl::gcd(MultivariatePolynomial<Number>(irp), poly);
-			CARL_LOG_DEBUG("carl.ran", "Simplyfing, gcd = " << gmv);
-			if (carl::isOne(gmv)) return;
-			auto g = carl::to_univariate_polynomial(gmv);
-			if (is_root_of(g)) {
-				CARL_LOG_DEBUG("carl.ran", "Is a root of " << g);
-				setPolynomial(g);
-			} else {
-				CARL_LOG_DEBUG("carl.ran", "Is not a root of " << g);
-				CARL_LOG_DEBUG("carl.ran", "Dividing " << polynomial() << " by " << g);
-				setPolynomial(polynomial().divideBy(g.replaceVariable(auxVariable)).quotient);
 			}
 		}
 	};
