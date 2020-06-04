@@ -138,7 +138,7 @@ namespace ran {
 
 		Sign sgn() const {
 			if (interval().isPointInterval()) return carl::sgn(interval().lower());
-			assert(!interval().contains(0));
+			assert(!interval().contains(constant_zero<Number>::get()));
 			if (interval().isSemiPositive()) return Sign::POSITIVE;
 			else {
 				assert(interval().isSemiNegative());
@@ -356,9 +356,9 @@ namespace ran {
 
 template<typename Number>
 IntervalContent<Number> abs(const IntervalContent<Number>& n) {
-	n.refine_using(constant_zero<Number>::get());
+	assert(!interval().contains(constant_zero<Number>::get()) || interval().isPointInterval());
 	if (n.interval().isSemiPositive()) return n;
-	return IntervalContent<Number>(n.polynomial().negateVariable(), n.interval().abs());
+	else return IntervalContent<Number>(n.polynomial().negateVariable(), n.interval().abs());
 }
 
 template<typename Number>
