@@ -137,7 +137,13 @@ namespace ran {
 		}
 
 		Sign sgn() const {
-			return interval().sgn();
+			if (interval().isPointInterval()) return carl::sgn(interval().lower());
+			assert(!interval().contains(0));
+			if (interval().isSemiPositive()) return Sign::POSITIVE;
+			else {
+				assert(interval().isSemiNegative());
+				return Sign::NEGATIVE;
+			}
 		}
 		
 		Sign sgn(const Polynomial& p) const {
