@@ -13,6 +13,7 @@
 
 #include "../../../interval/Interval.h"
 #include "../../../interval/IntervalEvaluation.h"
+#include "../../../interval/set_theory.h"
 
 #include <list>
 
@@ -24,13 +25,14 @@ namespace ran {
 		static const Variable auxVariable;
 
 		template<typename Num>
-		friend bool operator==(IntervalContent<Num>& lhs, IntervalContent<Num>& rhs);
+		friend bool compare(IntervalContent<Num>& lhs, IntervalContent<Num>& rhs, const Relation);
 
 	private:
 		struct Content {
 			Polynomial polynomial;
 			Interval<Number> interval;
 			std::size_t refinementCount = 0;
+			// TODO cache sgn at endpoints in RAN
 
 			Content(Polynomial&& p, const Interval<Number>& i):
 				polynomial(std::move(p)), interval(i)
@@ -69,7 +71,7 @@ namespace ran {
 				Number b = polynomial().coefficients()[0];
 				interval() = Interval<Number>(Number(-b / a));
 			} else {
-				if (interval().contains(0)) refineAvoiding(0);
+				if (interval().contains(0)) refine_using(0);
 				refineToIntegrality();
 			}
 		}
@@ -118,7 +120,7 @@ namespace ran {
 			return carl::bitsize(interval().lower()) + carl::bitsize(interval().upper()) + polynomial().degree();
 		}
 
-		bool is_root_of(const UnivariatePolynomial<Number>& p) const {
+		bool is_root_of(const UnivariatePolynomial<Number>& p) const { // TODO remove
 			if (interval().isPointInterval())
 				return carl::is_root_of(p, interval().lower());
 			else
@@ -156,42 +158,51 @@ namespace ran {
 
 		bool contained_in(const Interval<Number>& i) {
 			if (interval().contains(i.lower())) {
-				refineAvoiding(i.lower());
+				refine_internal(i.lower());
 			}
 			if (interval().contains(i.upper())) {
-				refineAvoiding(i.upper());
+				refine_internal(i.upper());
 			}
 			return i.contains(interval());
 		}
 		
 		void refine() const {
 			Number pivot = carl::sample(interval());
-			assert(interval().contains(pivot));
+			refine_internal(pivot);
+		}
+
+		std::optional<Sign> refine_using(const Number& pivot) const {
+			if (interval().contains(pivot)) {
+				return refine_internal(pivot);
+			}
+			return std::nullopt;
+		}
+
+		/**
+		 * Returns the sign of "interval() - pivot":
+		 * Returns ZERO if pivot is equal to RAN.
+		 * Returns POSITIVE if pivot is less than RAN resp. the new lower bound.
+		 * Returns NEGATIVE if pivot is greater than RAN resp. the new upper bound.
+		 */
+		Sign refine_internal(const Number& pivot) const {
 			// assert(is_consistent());
+			assert(interval().contains(pivot));
 			auto psgn = carl::sgn(carl::evaluate(polynomial(), pivot));
 			if (psgn == Sign::ZERO) {
 				interval() = Interval<Number>(pivot, pivot);
-				return;
+				return Sign::ZERO;
 			}
+			refinementCount()++;
 			auto lsgn = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
 			if (psgn == lsgn) {
 				interval().setLower(pivot);
+				assert(interval().isConsistent());
+				return Sign::POSITIVE;
 			} else {
 				interval().setUpper(pivot);
+				assert(interval().isConsistent());
+				return Sign::NEGATIVE;
 			}
-			/* this method based using Sturm sequences was used before (and is significantly slower):
-			if (carl::is_root_of(polynomial(), pivot)) {
-				interval() = Interval<Number>(pivot, pivot);
-				return;
-			}
-			if (carl::count_real_roots(sturm_sequence(), Interval<Number>(interval().lower(), BoundType::STRICT, pivot, BoundType::STRICT)) > 0) {
-				interval().setUpper(pivot);
-			} else {
-				interval().setLower(pivot);
-			}
-			*/
-			refinementCount()++;
-			assert(interval().isConsistent());
 		}
 			
 		/** Refine the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
@@ -200,7 +211,7 @@ namespace ran {
 		 * @scomplexity constant
 		 * @return true, if n is the exact numeric representation of this root, otherwise false
 		 */
-		bool refineAvoiding(const Number& n) const {
+		bool refineAvoiding(const Number& n) const { // TODO remove?
 			// assert(is_consistent());
 			if (interval().contains(n)) {
 				auto psgn = carl::sgn(carl::evaluate(polynomial(), n));
@@ -319,7 +330,7 @@ namespace ran {
 			}
 		}
 
-		void simplifyByPolynomial(Variable var, const MultivariatePolynomial<Number>& poly) const {
+		void simplifyByPolynomial(Variable var, const MultivariatePolynomial<Number>& poly) const { // TODO remove
 			UnivariatePolynomial<Number> irp(var, polynomial().template convert<Number>().coefficients());
 			CARL_LOG_DEBUG("carl.ran", "gcd(" << irp << ", " << poly << ")");
 			auto gmv = carl::gcd(MultivariatePolynomial<Number>(irp), poly);
@@ -339,8 +350,8 @@ namespace ran {
 
 template<typename Number>
 IntervalContent<Number> abs(const IntervalContent<Number>& n) {
-	n.refineAvoiding(constant_zero<Number>::get());
-	if (n.interval().isPositive()) return n;
+	n.refine_using(constant_zero<Number>::get());
+	if (n.interval().isSemiPositive()) return n;
 	return IntervalContent<Number>(n.polynomial().negateVariable(), n.interval().abs());
 }
 
@@ -638,109 +649,169 @@ Number sample_below(const IntervalContent<Number>& n) {
 }
 template<typename Number>
 Number sample_between(IntervalContent<Number>& lower, IntervalContent<Number>& upper) {
-	lower.refineAvoiding(upper.interval().lower());
-	upper.refineAvoiding(lower.interval().upper());
-	while (lower.interval().upper() >= upper.interval().lower()) {
-		lower.refine();
-		upper.refine();
-	}
+	lower.refine_using(upper.interval().lower());
+	upper.refine_using(lower.interval().upper());
+	assert(lower.interval().upper() <= upper.interval().lower());
 	return sample_between(NumberContent<Number>(lower.interval().upper()), NumberContent<Number>(upper.interval().lower()));
 }
 template<typename Number>
 Number sample_between(IntervalContent<Number>& lower, const NumberContent<Number>& upper) {
-	lower.refineAvoiding(upper.value());
-	while (lower.interval().upper() >= upper.value()) {
-		lower.refine();
-	}
+	lower.refine_using(upper.value());
+	assert(lower.interval().upper() <= upper.value());
 	return sample_between(NumberContent<Number>(lower.interval().upper()), upper);
 }
 template<typename Number>
 Number sample_between(const NumberContent<Number>& lower, IntervalContent<Number>& upper) {
-	upper.refineAvoiding(lower.value());
-	while (lower.value() >= upper.interval().lower()) {
-		upper.refine();
-	}
+	upper.refine_using(lower.value());
+	assert(lower.value() <= upper.interval().lower());
 	return sample_between(lower, NumberContent<Number>(upper.interval().lower()));
 }
 
 template<typename Number>
-bool operator==(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
-	if (lhs.mContent.get() == rhs.mContent.get()) return true;
-	if (lhs.interval().upper() < rhs.interval().lower()) return false;
-	if (lhs.interval().lower() > rhs.interval().upper()) return false;
-	if (lhs.interval().isPointInterval() && lhs.interval() == rhs.interval()) return true;
-	if (lhs.polynomial() == rhs.polynomial()) {
-		if (lhs.interval().lower() <= rhs.interval().lower()) {
-			if (rhs.interval().upper() <= lhs.interval().upper()) {
-				rhs = lhs;
-				return true;
-			}
-			lhs.refineAvoiding(rhs.interval().lower());
-			rhs.refineAvoiding(lhs.interval().upper());
-		} else {
-			assert(rhs.interval().lower() <= lhs.interval().lower());
-			if (lhs.interval().upper() <= rhs.interval().upper()) {
-				rhs = lhs;
-				return true;
-			}
-			lhs.refineAvoiding(rhs.interval().upper());
-			rhs.refineAvoiding(lhs.interval().lower());
-		}
-	} else {
-		assert(lhs.polynomial() != rhs.polynomial());
-		assert(lhs.polynomial().mainVar() == rhs.polynomial().mainVar());
-		auto g = carl::gcd(lhs.polynomial(), rhs.polynomial());
-		if (carl::isOne(g)) return false;
-		if (lhs.is_root_of(g)) {
-			lhs.setPolynomial(g);
-		} else {
-			assert(carl::isZero(carl::divide(lhs.polynomial(), g).remainder));
-			lhs.setPolynomial(carl::divide(lhs.polynomial(), g).quotient);
-		}
-		if (rhs.is_root_of(g)) {
-			rhs.setPolynomial(g);
-		} else {
-			assert(carl::isZero(carl::divide(rhs.polynomial(), g).remainder));
-			rhs.setPolynomial(carl::divide(rhs.polynomial(), g).quotient);
+bool compare(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs, const Relation relation) {
+	if (lhs.mContent.get() == rhs.mContent.get()) {
+		return evaluate(Sign::ZERO, relation);
+	}
+
+	if (lhs.interval().isPointInterval() && lhs.interval() == rhs.interval()) {
+		return evaluate(Sign::ZERO, relation);
+	}
+
+	if (carl::set_have_intersection(lhs.interval(), rhs.interval())) {
+		auto intersection = carl::set_intersection(lhs.interval(), rhs.interval());
+		assert(!intersection.isEmpty());
+		lhs.refine_using(intersection.lower());
+		rhs.refine_using(intersection.lower());
+		if (intersection.isPointInterval()) {
+			lhs.refine_using(intersection.upper());
+			rhs.refine_using(intersection.upper());
 		}
 	}
-	return lhs == rhs;
+	// now: intervals are either equal or disjoint
+
+	if (lhs.interval() == rhs.interval()) {
+		if (lhs.polynomial() == rhs.polynomial()) {
+			return evaluate(Sign::ZERO, relation);
+		}
+		auto g = carl::gcd(lhs.polynomial(), rhs.polynomial());
+		auto lsgn = carl::sgn(carl::evaluate(g, lhs.interval().lower()));
+		auto usgn = carl::sgn(carl::evaluate(g, lhs.interval().upper()));
+		if (lsgn != usgn) {
+			lhs.setPolynomial(g);
+			rhs.setPolynomial(g);
+			return evaluate(Sign::ZERO, relation);
+		} else {
+			if (relation == Relation::EQ) return false;
+			if (relation == Relation::NEQ) return true;
+			while (lhs.interval() == rhs.interval()) {
+				lhs.refine();
+				rhs.refine();
+			}
+		}
+	}
+	// now: intervals are disjoint
+	if (lhs.interval().upper() < rhs.interval().lower()) {
+		return relation == Relation::LESS || relation == Relation::LEQ;
+	}
+	if (lhs.interval().lower() > rhs.interval().upper()) {
+		return relation == Relation::GREATER || relation == Relation::GEQ;
+	}
+	
+	assert(false);
+	return false;
+}
+
+template<typename Number>
+bool operator==(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::EQ);
+}
+
+template<typename Number>
+bool operator!=(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::NEQ);
+}
+template<typename Number>
+bool operator<=(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::LEQ);
+}
+template<typename Number>
+bool operator>=(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::GEQ);
+}
+template<typename Number>
+bool operator<(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::LESS);
+}
+template<typename Number>
+bool operator>(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::GREATER);
+}
+
+template<typename Number>
+bool compare(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs, const Relation relation) {
+	auto res = lhs.refine_using(rhs.value());
+	if (res) {
+		return evaluate(*res, relation);
+	} else {
+		if (relation == Relation::EQ) return false;
+		else if (relation == Relation::NEQ) return true;
+		else if (relation == Relation::LESS || relation == Relation::LEQ) return lhs.interval().upper() <= rhs.value();
+		else if (relation == Relation::GREATER || relation == Relation::GEQ) return lhs.interval().lower() >= rhs.value();
+	}
+	assert(false);
+	return false;
 }
 
 template<typename Number>
 bool operator==(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs) {
-	return lhs.refineAvoiding(rhs.value());
+	return compare(lhs, rhs, Relation::EQ);
+}
+template<typename Number>
+bool operator!=(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::NEQ);
+}
+template<typename Number>
+bool operator<=(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::LEQ);
+}
+template<typename Number>
+bool operator>=(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::GEQ);
+}
+template<typename Number>
+bool operator<(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::LESS);
+}
+template<typename Number>
+bool operator>(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs) {
+	return compare(lhs, rhs, Relation::GREATER);
 }
 
 template<typename Number>
 bool operator==(const NumberContent<Number>& lhs, IntervalContent<Number>& rhs) {
 	return rhs == lhs;
 }
-
 template<typename Number>
-bool operator<(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs) {
-	if (lhs == rhs) return false;
-	while (true) {
-		if (lhs.interval().upper() < rhs.interval().lower()) return true;
-		if (lhs.interval().lower() > rhs.interval().upper()) return false;
-		lhs.refineAvoiding(rhs.interval().lower());
-		lhs.refineAvoiding(rhs.interval().upper());
-		rhs.refineAvoiding(lhs.interval().lower());
-		rhs.refineAvoiding(lhs.interval().upper());
-	}
+bool operator!=(const NumberContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return rhs != lhs;
 }
-
 template<typename Number>
-bool operator<(IntervalContent<Number>& lhs, const NumberContent<Number>& rhs) {
-	if (lhs.refineAvoiding(rhs.value())) return false;
-		return lhs.interval().upper() < rhs.value();
+bool operator<=(const NumberContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return rhs >= lhs;
 }
-
+template<typename Number>
+bool operator>=(const NumberContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return rhs <= lhs;
+}
 template<typename Number>
 bool operator<(const NumberContent<Number>& lhs, IntervalContent<Number>& rhs) {
-	if (rhs.refineAvoiding(lhs.value())) return false;
-	return lhs.value() < rhs.interval().lower();
+	return rhs > lhs;
 }
+template<typename Number>
+bool operator>(const NumberContent<Number>& lhs, IntervalContent<Number>& rhs) {
+	return rhs < lhs;
+}
+
 
 template<typename Num>
 std::ostream& operator<<(std::ostream& os, const IntervalContent<Num>& ran) {
