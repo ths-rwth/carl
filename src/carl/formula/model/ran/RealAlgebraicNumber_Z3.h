@@ -160,6 +160,15 @@ Z3Content<Number> sample_between(IntervalContent<Number>& lower, const Z3Content
 }
 
 template<typename Number>
+Number floor(const Z3Content<Number>& n) {
+	return carl::floor(n.interval().lower());
+}
+template<typename Number>
+Number ceil(const Z3Content<Number>& n) {
+	return carl::ceil(n.interval().upper());
+}
+
+template<typename Number>
 Sign sgn(const Z3Content<Number>& n) {
 	return n.z3_ran().sgn();
 }

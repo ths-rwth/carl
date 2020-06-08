@@ -103,6 +103,15 @@ Number sample_between(const NumberContent<Number>& lower, const NumberContent<Nu
 }
 
 template<typename Number>
+Number floor(const NumberContent<Number>& n) {
+	return carl::floor(n.value());
+}
+template<typename Number>
+Number ceil(const NumberContent<Number>& n) {
+	return carl::ceil(n.value());
+}
+
+template<typename Number>
 inline bool operator==(const NumberContent<Number>& lhs, const NumberContent<Number>& rhs) {
 	return lhs.value() == rhs.value();
 }

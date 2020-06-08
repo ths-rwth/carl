@@ -322,14 +322,6 @@ public:
 		);
 	}
 
-	/// Refines until the number is either numeric or the interval does not contain any integer.
-	void refineToIntegrality() const {
-		return call_on_content(
-			[](IntervalContent& c) { c.refineToIntegrality(); },
-			[](const auto& c) {}
-		);
-	}
-
 	RealAlgebraicNumber<Number> abs() const {
 		return call_on_content(
 			[this](const auto& c) { return RealAlgebraicNumber<Number>(ran::abs(c)); }

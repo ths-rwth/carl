@@ -23,28 +23,20 @@ namespace carl {
 
 	template<typename Number>
 	inline typename IntegralType<Number>::type floor(const RealAlgebraicNumber<Number>& n) {
-		n.refineToIntegrality();
-		return floor_fast(n);
-	}
-
-	template<typename Number>
-	inline typename IntegralType<Number>::type floor_fast(const RealAlgebraicNumber<Number>& n) {
-		if (n.isNumeric()) return carl::floor(n.value());
-		else return carl::floor(n.lower());
+		return std::visit(
+			[](const auto& c){ return RealAlgebraicNumber<Number>(ran::floor(c)); }
+			, n.content()
+		);
 	}
 	
 	template<typename Number>
 	inline typename IntegralType<Number>::type ceil(const RealAlgebraicNumber<Number>& n) {
-		n.refineToIntegrality();
-		return ceil_fast(n);
+		return std::visit(
+			[](const auto& c){ return RealAlgebraicNumber<Number>(ran::ceil(c)); }
+			, n.content()
+		);
 	}
 	
-	template<typename Number>
-	inline typename IntegralType<Number>::type ceil_fast(const RealAlgebraicNumber<Number>& n) {
-		if (n.isNumeric()) return carl::ceil(n.value());
-		else return carl::ceil(n.upper());
-	}
-
 	template<typename Number>
 	RealAlgebraicNumber<Number> sampleBelow(const RealAlgebraicNumber<Number>& n) {
 		return std::visit(

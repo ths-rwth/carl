@@ -52,7 +52,10 @@ namespace ran {
 			if (interval().isPointInterval()) {
 				return carl::is_root_of(polynomial(), interval().lower());
 			} else {
-				if (interval().contains(0)) return false;
+				if (interval().contains(0)) {
+					CARL_LOG_DEBUG("carl.ran.ir", "Interval contains 0");
+					return false;
+				}
 				if (polynomial().normalized() != carl::squareFreePart(polynomial()).normalized()) {
 					CARL_LOG_DEBUG("carl.ran.ir", "Poly is not square free: " << polynomial());
 					return false;
@@ -64,6 +67,7 @@ namespace ran {
 					return false;
 				}
 				if (mContent->lower_sign != lsgn) {
+					CARL_LOG_DEBUG("carl.ran.ir", "Lower sign does not match");
 					return false;
 				}
 				return true;
@@ -121,12 +125,11 @@ namespace ran {
 				Number a = polynomial().coefficients()[1];
 				Number b = polynomial().coefficients()[0];
 				interval() = Interval<Number>(Number(-b / a));
+				mContent->lower_sign = Sign::ZERO;
 			} else {
-				if (interval().contains(0)) refine_using(0);
-				refineToIntegrality();
-			}
-			if (interval().isOpenInterval()) {
 				mContent->lower_sign = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
+				if (interval().contains(0)) refine_using(0);
+				refine_to_integrality();
 			}
 			assert(is_consistent());
 		}
@@ -142,11 +145,11 @@ namespace ran {
 			return carl::isZero(interval());
 		}
 		bool is_integral() const {
-			refineToIntegrality();
+			refine_to_integrality();
 			return interval().isPointInterval() && carl::isInteger(interval().lower());
 		}
 		Number integer_below() const {
-			refineToIntegrality();
+			refine_to_integrality();
 			return carl::floor(interval().lower());
 		}
 
@@ -206,7 +209,8 @@ namespace ran {
 			return std::nullopt;
 		}
 	
-		void refineToIntegrality() const {
+		/// Refines until the number is either numeric or the interval does not contain any integer.
+		void refine_to_integrality() const {
 			while (!interval().isPointInterval() && interval().containsInteger()) {
 				refine();
 			}
@@ -530,6 +534,16 @@ Number sample_between(const NumberContent<Number>& lower, IntervalContent<Number
 	upper.refine_using(lower.value());
 	assert(lower.value() <= upper.interval().lower());
 	return sample_between(lower, NumberContent<Number>(upper.interval().lower()));
+}
+template<typename Number>
+Number floor(const IntervalContent<Number>& n) {
+	n.refine_to_integrality();
+	return carl::floor(n.interval().lower());
+}
+template<typename Number>
+Number ceil(const IntervalContent<Number>& n) {
+	n.refine_to_integrality();
+	return carl::ceil(n.interval().upper());
 }
 
 template<typename Number>

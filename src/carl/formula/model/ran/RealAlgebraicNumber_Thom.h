@@ -184,6 +184,15 @@ Number sample_between(const NumberContent<Number>& lower, const ThomContent<Numb
 }
 
 template<typename Number>
+Number floor(const ThomContent<Number>& n) {
+	return carl::floor(get_interval(n).lower());
+}
+template<typename Number>
+Number ceil(const ThomContent<Number>& n) {
+	return carl::ceil(get_interval(n).upper());
+}
+
+template<typename Number>
 bool operator==(const ThomContent<Number>& lhs, const ThomContent<Number>& rhs) {
 	if (lhs.mContent.get() == rhs.mContent.get()) return true;
 	return lhs.thom_encoding() == rhs.thom_encoding();
