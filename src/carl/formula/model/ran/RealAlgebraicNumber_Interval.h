@@ -31,7 +31,8 @@ namespace ran {
 		struct Content {
 			Polynomial polynomial;
 			Interval<Number> interval;
-			// TODO cache sgn at endpoints in RAN
+			/// Sign of polynomial at interval.lower
+			Sign lower_sign;
 
 			Content(Polynomial&& p, const Interval<Number>& i):
 				polynomial(std::move(p)), interval(i)
@@ -46,13 +47,65 @@ namespace ran {
 		static Polynomial replaceVariable(const Polynomial& p) {
 			return carl::replace_main_variable(p, auxVariable);
 		}
+
+		bool is_consistent() const {
+			if (interval().isPointInterval()) {
+				return carl::is_root_of(polynomial(), interval().lower());
+			} else {
+				if (interval().contains(0)) return false;
+				if (polynomial().normalized() != carl::squareFreePart(polynomial()).normalized()) {
+					CARL_LOG_DEBUG("carl.ran.ir", "Poly is not square free: " << polynomial());
+					return false;
+				}
+				auto lsgn = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
+				auto usgn = carl::sgn(carl::evaluate(polynomial(), interval().upper()));
+				if (lsgn == Sign::ZERO || usgn == Sign::ZERO || lsgn == usgn) {
+					CARL_LOG_DEBUG("carl.ran.ir", "Interval does not define a zero");
+					return false;
+				}
+				if (mContent->lower_sign != lsgn) {
+					return false;
+				}
+				return true;
+			}
+		}
+
+		void setPolynomial(const Polynomial& p, Sign lower_sign) const {
+			polynomial() = replaceVariable(p);
+			mContent->lower_sign = lower_sign;
+			assert(is_consistent());
+		}
+
+		/**
+		 * Returns the sign of "interval() - pivot":
+		 * Returns ZERO if pivot is equal to RAN.
+		 * Returns POSITIVE if pivot is less than RAN resp. the new lower bound.
+		 * Returns NEGATIVE if pivot is greater than RAN resp. the new upper bound.
+		 */
+		Sign refine_internal(const Number& pivot) const {
+			// assert(is_consistent());
+			assert(interval().contains(pivot));
+			auto psgn = carl::sgn(carl::evaluate(polynomial(), pivot));
+			if (psgn == Sign::ZERO) {
+				interval() = Interval<Number>(pivot, pivot);
+				return Sign::ZERO;
+			}
+			if (psgn == mContent->lower_sign) {
+				interval().setLower(pivot);
+				assert(interval().isConsistent());
+				return Sign::POSITIVE;
+			} else {
+				interval().setUpper(pivot);
+				assert(interval().isConsistent());
+				return Sign::NEGATIVE;
+			}
+		}
+
 	public:
 
 		IntervalContent():
 			IntervalContent(Polynomial(auxVariable, {0, 1}), Interval<Number>(0))
-		{
-			assert(is_consistent());
-		}
+		{}
 		
 		IntervalContent(
 			const Polynomial& p,
@@ -64,7 +117,6 @@ namespace ran {
 			assert(!carl::isZero(polynomial()) && polynomial().degree() > 0);
 			assert(interval().isOpenInterval() || interval().isPointInterval());
 			// assert(interval().isPointInterval() || count_real_roots(sturm_sequence(), interval()) == 1);
-			assert(is_consistent());
 			if (polynomial().degree() == 1) {
 				Number a = polynomial().coefficients()[1];
 				Number b = polynomial().coefficients()[0];
@@ -73,24 +125,10 @@ namespace ran {
 				if (interval().contains(0)) refine_using(0);
 				refineToIntegrality();
 			}
-		}
-
-		bool is_consistent() const {
-			if (interval().isPointInterval()) {
-				return carl::is_root_of(polynomial(), interval().lower());
-			} else {
-				if (polynomial().normalized() != carl::squareFreePart(polynomial()).normalized()) {
-					CARL_LOG_DEBUG("carl.ran.ir", "Poly is not square free: " << polynomial());
-					return false;
-				}
-				auto lsgn = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
-				auto usgn = carl::sgn(carl::evaluate(polynomial(), interval().upper()));
-				if (lsgn == Sign::ZERO || usgn == Sign::ZERO || lsgn == usgn) {
-					CARL_LOG_DEBUG("carl.ran.ir", "Interval does not define a zero");
-					return false;
-				}
-				return true;
+			if (interval().isOpenInterval()) {
+				mContent->lower_sign = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
 			}
+			assert(is_consistent());
 		}
 
 		auto& polynomial() const {
@@ -120,11 +158,6 @@ namespace ran {
 			return interval().isPointInterval() && carl::isInteger(interval().lower());
 		}
 		
-		void setPolynomial(const Polynomial& p) const {
-			polynomial() = replaceVariable(p);
-			assert(is_consistent());
-		}
-
 		Sign sgn() const {
 			if (interval().isPointInterval()) return carl::sgn(interval().lower());
 			assert(!interval().contains(constant_zero<Number>::get()));
@@ -172,33 +205,7 @@ namespace ran {
 			}
 			return std::nullopt;
 		}
-
-		/**
-		 * Returns the sign of "interval() - pivot":
-		 * Returns ZERO if pivot is equal to RAN.
-		 * Returns POSITIVE if pivot is less than RAN resp. the new lower bound.
-		 * Returns NEGATIVE if pivot is greater than RAN resp. the new upper bound.
-		 */
-		Sign refine_internal(const Number& pivot) const {
-			// assert(is_consistent());
-			assert(interval().contains(pivot));
-			auto psgn = carl::sgn(carl::evaluate(polynomial(), pivot));
-			if (psgn == Sign::ZERO) {
-				interval() = Interval<Number>(pivot, pivot);
-				return Sign::ZERO;
-			}
-			auto lsgn = carl::sgn(carl::evaluate(polynomial(), interval().lower()));
-			if (psgn == lsgn) {
-				interval().setLower(pivot);
-				assert(interval().isConsistent());
-				return Sign::POSITIVE;
-			} else {
-				interval().setUpper(pivot);
-				assert(interval().isConsistent());
-				return Sign::NEGATIVE;
-			}
-		}
-					
+	
 		void refineToIntegrality() const {
 			while (!interval().isPointInterval() && interval().containsInteger()) {
 				refine();
@@ -208,7 +215,7 @@ namespace ran {
 
 template<typename Number>
 IntervalContent<Number> abs(const IntervalContent<Number>& n) {
-	assert(!interval().contains(constant_zero<Number>::get()) || interval().isPointInterval());
+	assert(!n.interval().contains(constant_zero<Number>::get()) || n.interval().isPointInterval());
 	if (n.interval().isSemiPositive()) return n;
 	else return IntervalContent<Number>(n.polynomial().negateVariable(), n.interval().abs());
 }
@@ -555,8 +562,8 @@ bool compare(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs, const R
 		auto lsgn = carl::sgn(carl::evaluate(g, lhs.interval().lower()));
 		auto usgn = carl::sgn(carl::evaluate(g, lhs.interval().upper()));
 		if (lsgn != usgn) {
-			lhs.setPolynomial(g);
-			rhs.setPolynomial(g);
+			lhs.setPolynomial(g, lsgn);
+			rhs.setPolynomial(g, lsgn);
 			return evaluate(Sign::ZERO, relation);
 		} else {
 			if (relation == Relation::EQ) return false;
