@@ -279,9 +279,9 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 		count_real_roots(sturmSeq, interval) >= 1
 	);
 	while (
+		count_real_roots(sturmSeq, interval) != 1 ||
 		carl::is_root_of(res, interval.lower()) ||
-		carl::is_root_of(res, interval.upper()) ||
-		count_real_roots(sturmSeq, interval) != 1) 
+		carl::is_root_of(res, interval.upper())) 
 	{
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (auto it = m.begin(); it != m.end(); it++) {
