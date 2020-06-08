@@ -308,7 +308,6 @@ public:
 	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
 		return call_on_content(
 			[&p](const NumberContent& c) { return p.sgn(c.value()) == carl::Sign::ZERO; },
-			[&p](const IntervalContent& c) { return c.is_root_of(p); },
 			[&p](const auto& c) { return c.sgn(p) == Sign::ZERO; }
 		);
 	}
