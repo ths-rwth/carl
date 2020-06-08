@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../formula/model/ran/RealAlgebraicNumber.h"
+#include "../RealAlgebraicNumber.h"
 
 namespace carl {
 

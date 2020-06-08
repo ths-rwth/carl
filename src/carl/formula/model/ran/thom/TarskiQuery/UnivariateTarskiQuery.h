@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../../core/Sign.h"
-#include "../../core/UnivariatePolynomial.h"
+#include <carl/core/Sign.h>
+#include <carl/core/UnivariatePolynomial.h>
 
 namespace carl {
 

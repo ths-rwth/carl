@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../core/MultivariatePolynomial.h"
-#include "../core/polynomialfunctions/Derivative.h"
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/core/polynomialfunctions/Derivative.h>
 
 namespace carl {
 

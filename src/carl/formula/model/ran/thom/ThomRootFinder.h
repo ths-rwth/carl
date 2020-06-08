@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "../interval/Interval.h"
+#include <carl/interval/Interval.h>
 #include "ThomEncoding.h"
 #include "ThomUtil.h"
-#include "../formula/model/ran/RealAlgebraicNumber.h"
+#include "../RealAlgebraicNumber.h"
 
 namespace carl {
         

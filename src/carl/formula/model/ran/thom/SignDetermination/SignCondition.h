@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../../core/Sign.h"
+#include <carl/core/Sign.h>
 #include <list>
 
 namespace carl {

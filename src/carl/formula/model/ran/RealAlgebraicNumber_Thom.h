@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../thom/ThomEncoding.h"
+#include "./thom/ThomEncoding.h"
 
 #include <memory>
 

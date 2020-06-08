@@ -9,7 +9,7 @@
 
 #include "SignDetermination/SignDetermination.h"
 #include "ThomRootFinder.h"
-#include "../core/polynomialfunctions/Substitution.h"
+#include <carl/core/polynomialfunctions/Substitution.h>
 
 // some settings
 #define INITIAL_OFFSET (Number(1)/10)

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../../groebner/groebner.h"
+#include <carl/groebner/groebner.h>
 
 namespace carl {
         
