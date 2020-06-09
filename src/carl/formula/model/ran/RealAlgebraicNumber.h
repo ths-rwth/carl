@@ -51,11 +51,6 @@
 
 namespace carl {
 
-namespace ran {
-	template<typename Number> struct equal;
-	template<typename Number> struct less;
-}
-
 enum class RANSampleHeuristic { Center, CenterInt, LeftInt, RightInt, ZeroInt, InftyInt, Default = RightInt };
 inline std::ostream& operator<<(std::ostream& os, RANSampleHeuristic sh) {
 	switch (sh) {
@@ -81,13 +76,17 @@ private:
 	template<typename Num>
 	friend bool operator==(const RealAlgebraicNumber<Num>& lhs, const RealAlgebraicNumber<Num>& rhs);
 	template<typename Num>
+	friend bool operator!=(const RealAlgebraicNumber<Num>& lhs, const RealAlgebraicNumber<Num>& rhs);
+	template<typename Num>
 	friend bool operator<(const RealAlgebraicNumber<Num>& lhs, const RealAlgebraicNumber<Num>& rhs);
 	template<typename Num>
+	friend bool operator<=(const RealAlgebraicNumber<Num>& lhs, const RealAlgebraicNumber<Num>& rhs);
+	template<typename Num>
+	friend bool operator>(const RealAlgebraicNumber<Num>& lhs, const RealAlgebraicNumber<Num>& rhs);
+	template<typename Num>
+	friend bool operator>=(const RealAlgebraicNumber<Num>& lhs, const RealAlgebraicNumber<Num>& rhs);
+	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran);
-	template<typename Num>
-	friend struct ran::equal;
-	template<typename Num>
-	friend struct ran::less;
 public:
 	using NumberContent = ran::NumberContent<Number>;
 	using IntervalContent = ran::IntervalContent<Number>;
@@ -117,18 +116,18 @@ private:
 	mutable Content mContent = NumberContent();
 
 	/// Convert to a plain number if possible.
-	void checkForSimplification() const {
+	void check_for_simplification() const {
 		if (std::holds_alternative<NumberContent>(mContent)) return;
 		if (call_on_content(
 			[](const auto& c) { return ran::is_number(c); }
 		)) {
-			switchToNR(call_on_content(
+			switch_to_nr(call_on_content(
 				[](const auto& c) { return ran::get_number(c); }
 			));
 		}
 	}
 	// Switch to numeric representation.
-	void switchToNR(Number n) const {
+	void switch_to_nr(Number n) const {
 		mContent = NumberContent{ n };
 	}
 
@@ -211,7 +210,7 @@ public:
 	 * Check if the underlying representation is an explicit number.
 	 */
 	bool isNumeric() const {
-		checkForSimplification();
+		check_for_simplification();
 		return std::holds_alternative<NumberContent>(mContent);
 	}
 	/**
@@ -219,7 +218,7 @@ public:
 	 * (encoded by a polynomial and an interval).
 	 */
 	bool isInterval() const {
-		checkForSimplification();
+		check_for_simplification();
 		return std::holds_alternative<IntervalContent>(mContent);
 	}
 
@@ -229,7 +228,7 @@ public:
 	 * that uses the Thom encoding.
 	 */
 	bool isThom() const noexcept {
-		checkForSimplification();
+		check_for_simplification();
 		return std::holds_alternative<ThomContent>(mContent);
 	}
 	const ThomEncoding<Number>& getThomEncoding() const {
@@ -240,7 +239,7 @@ public:
 
 #ifdef RAN_USE_Z3
 	bool isZ3Ran() const {
-		checkForSimplification();
+		check_for_simplification();
 		return std::holds_alternative<Z3Content>(mContent);
 	}
 	const Z3Ran<Number>& getZ3Ran() const {
@@ -255,7 +254,7 @@ public:
 		);
 	}
 
-	Number integerBelow() const {
+	Number integer_below() const {
 		return call_on_content(
 			[](const auto& c) { return c.integer_below(); }
 		);
@@ -305,7 +304,7 @@ public:
 		);
 	}
 
-	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
+	bool is_root_of(const UnivariatePolynomial<Number>& p) const {
 		return call_on_content(
 			[&p](const NumberContent& c) { return p.sgn(c.value()) == carl::Sign::ZERO; },
 			[&p](const auto& c) { return c.sgn(p) == Sign::ZERO; }
@@ -316,7 +315,7 @@ public:
 	 * Check if this (possibly implicitly represented) number lies within
 	 * the bounds of interval 'i'.
 	 */
-	bool containedIn(const Interval<Number>& i) const {
+	bool contained_in(const Interval<Number>& i) const {
 		return call_on_content(
 			[&i](auto& c) { return c.contained_in(i); }
 		);
@@ -343,7 +342,7 @@ namespace std {
 	template<typename Number>
 	struct hash<carl::RealAlgebraicNumber<Number>> {
 		std::size_t operator()(const carl::RealAlgebraicNumber<Number>& n) const {
-			return carl::hash_all(n.integerBelow());
+			return carl::hash_all(n.integer_below());
 		}
 	};
 

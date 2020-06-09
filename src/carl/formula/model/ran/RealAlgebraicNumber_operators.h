@@ -1,40 +1,36 @@
 #pragma once
 
 namespace carl {
-
+	
 template<typename Number>
 inline bool operator==(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
 	if (&lhs == &rhs) return true;
-	return std::visit(
-		[](auto& l, auto& r) { return l == r; },
-		lhs.mContent,
-		rhs.mContent
-	);
+	return std::visit([](auto& l, auto& r) { return l == r; }, lhs.mContent, rhs.mContent);
 }
 template<typename Number>
 inline bool operator!=(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
-	return !(lhs == rhs);
+	if (&lhs == &rhs) return false;
+	return std::visit([](auto& l, auto& r) { return l != r; }, lhs.mContent, rhs.mContent);
 }
 template<typename Number>
 inline bool operator<(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
 	if (&lhs == &rhs) return false;
-	return std::visit(
-		[](auto& l, auto& r) { return l < r; },
-		lhs.mContent,
-		rhs.mContent
-	);
+	return std::visit([](auto& l, auto& r) { return l < r; }, lhs.mContent, rhs.mContent);
 }
 template<typename Number>
 inline bool operator<=(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
-	return !(rhs < lhs);
+	if (&lhs == &rhs) return true;
+	return std::visit([](auto& l, auto& r) { return l <= r; }, lhs.mContent, rhs.mContent);
 }
 template<typename Number>
 inline bool operator>(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
-	return rhs < lhs;
+	if (&lhs == &rhs) return false;
+	return std::visit([](auto& l, auto& r) { return l > r; }, lhs.mContent, rhs.mContent);
 }
 template<typename Number>
 inline bool operator>=(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
-	return rhs <= lhs;
+	if (&lhs == &rhs) return true;
+	return std::visit([](auto& l, auto& r) { return l >= r; }, lhs.mContent, rhs.mContent);
 }
 
 namespace ran {
@@ -57,11 +53,26 @@ inline bool operator==(const T1& lhs, const T2& rhs) {
 	unsupported_operation("==", lhs, rhs);
 	return false;
 }
-
+template<typename T1, typename T2>
+inline bool operator!=(const T1& lhs, const T2& rhs) {
+	return !(lhs == rhs);
+}
 template<typename T1, typename T2>
 inline bool operator<(const T1& lhs, const T2& rhs) {
-	unsupported_operation("==", lhs, rhs);
+	unsupported_operation("<", lhs, rhs);
 	return false;
+}
+template<typename T1, typename T2>
+inline bool operator<=(const T1& lhs, const T2& rhs) {
+	return !(rhs < lhs);
+}
+template<typename T1, typename T2>
+inline bool operator>(const T1& lhs, const T2& rhs) {
+	return rhs < lhs;
+}
+template<typename T1, typename T2>
+inline bool operator>=(const T1& lhs, const T2& rhs) {
+	return rhs <= lhs;
 }
 
 template<typename Number, typename Content>
