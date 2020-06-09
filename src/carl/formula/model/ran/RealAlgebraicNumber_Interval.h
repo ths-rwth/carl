@@ -521,19 +521,37 @@ Number sample_between(IntervalContent<Number>& lower, IntervalContent<Number>& u
 	lower.refine_using(upper.interval().lower());
 	upper.refine_using(lower.interval().upper());
 	assert(lower.interval().upper() <= upper.interval().lower());
-	return sample(Interval<Number>(lower.interval().upper(), upper.interval().lower()), true);
+	if (is_number(lower)) {
+		return sample_between(NumberContent<Number>(get_number(lower)), upper);
+	} else if (is_number(upper)) {
+		return sample_between(lower, NumberContent<Number>(get_number(upper)));
+	} else {
+		return sample(Interval<Number>(lower.interval().upper(), upper.interval().lower()), true);
+	}
 }
 template<typename Number>
 Number sample_between(IntervalContent<Number>& lower, const NumberContent<Number>& upper) {
 	lower.refine_using(upper.value());
 	assert(lower.interval().upper() <= upper.value());
-	return sample_between(NumberContent<Number>(lower.interval().upper()), upper);
+	assert(lower < upper);
+	while(lower.interval().upper() == upper.value()) lower.refine();
+	if (is_number(lower)) {
+		return sample_between(NumberContent<Number>(get_number(lower)), upper);
+	} else {
+		return sample(Interval<Number>(lower.interval().upper(), BoundType::WEAK, upper.value(), BoundType::STRICT), false);
+	}
 }
 template<typename Number>
 Number sample_between(const NumberContent<Number>& lower, IntervalContent<Number>& upper) {
 	upper.refine_using(lower.value());
 	assert(lower.value() <= upper.interval().lower());
-	return sample_between(lower, NumberContent<Number>(upper.interval().lower()));
+	assert(lower < upper);
+	while(lower.value() == upper.interval().lower()) upper.refine();
+	if (is_number(upper)) {
+		return sample_between(lower, NumberContent<Number>(get_number(upper)));
+	} else {
+		return sample(Interval<Number>(lower.value(), BoundType::STRICT, upper.interval().lower(), BoundType::WEAK), false);
+	}
 }
 template<typename Number>
 Number floor(const IntervalContent<Number>& n) {
