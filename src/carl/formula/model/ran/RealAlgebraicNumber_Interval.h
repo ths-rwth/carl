@@ -521,7 +521,7 @@ Number sample_between(IntervalContent<Number>& lower, IntervalContent<Number>& u
 	lower.refine_using(upper.interval().lower());
 	upper.refine_using(lower.interval().upper());
 	assert(lower.interval().upper() <= upper.interval().lower());
-	return sample_between(NumberContent<Number>(lower.interval().upper()), NumberContent<Number>(upper.interval().lower()));
+	return sample(Interval<Number>(lower.interval().upper(), upper.interval().lower()), true);
 }
 template<typename Number>
 Number sample_between(IntervalContent<Number>& lower, const NumberContent<Number>& upper) {
@@ -548,40 +548,50 @@ Number ceil(const IntervalContent<Number>& n) {
 
 template<typename Number>
 bool compare(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs, const Relation relation) {
+	CARL_LOG_DEBUG("carl.ran", "Compare " << lhs << " " << relation << " " << rhs);
+
 	if (lhs.mContent.get() == rhs.mContent.get()) {
+		CARL_LOG_TRACE("carl.ran", "Contents are equal");
 		return evaluate(Sign::ZERO, relation);
 	}
 
-	if (lhs.interval().isPointInterval() && lhs.interval() == rhs.interval()) {
-		return evaluate(Sign::ZERO, relation);
+	if (lhs.interval().isPointInterval() && rhs.interval().isPointInterval()) {
+		CARL_LOG_TRACE("carl.ran", "Point interval comparison");
+		return evaluate(lhs.interval().lower(), relation, rhs.interval().lower());
 	}
 
 	if (carl::set_have_intersection(lhs.interval(), rhs.interval())) {
+		CARL_LOG_TRACE("carl.ran", "Intervals " << lhs.interval() << " and " << rhs.interval() << " do intersect");
 		auto intersection = carl::set_intersection(lhs.interval(), rhs.interval());
 		assert(!intersection.isEmpty());
 		lhs.refine_using(intersection.lower());
 		rhs.refine_using(intersection.lower());
-		if (intersection.isPointInterval()) {
+		if (!intersection.isPointInterval()) {
 			lhs.refine_using(intersection.upper());
 			rhs.refine_using(intersection.upper());
 		}
 	}
 	// now: intervals are either equal or disjoint
-
+	assert(!carl::set_have_intersection(lhs.interval(), rhs.interval()) || lhs.interval() == rhs.interval());
 	if (lhs.interval() == rhs.interval()) {
+		CARL_LOG_TRACE("carl.ran", "Intervals " << lhs.interval() << " and " << rhs.interval() << " are equal");
 		if (lhs.polynomial() == rhs.polynomial()) {
+			CARL_LOG_TRACE("carl.ran", "Polynomials " << lhs.polynomial() << " and " << rhs.polynomial() << " are equal");
 			return evaluate(Sign::ZERO, relation);
 		}
 		auto g = carl::gcd(lhs.polynomial(), rhs.polynomial());
 		auto lsgn = carl::sgn(carl::evaluate(g, lhs.interval().lower()));
 		auto usgn = carl::sgn(carl::evaluate(g, lhs.interval().upper()));
 		if (lsgn != usgn) {
+			CARL_LOG_TRACE("carl.ran", "gcd(lhs,rhs) has a zero in the common interval");
 			lhs.setPolynomial(g, lsgn);
 			rhs.setPolynomial(g, lsgn);
 			return evaluate(Sign::ZERO, relation);
 		} else {
+			CARL_LOG_TRACE("carl.ran", "gcd(lhs,rhs) has no zero in the common interval");
 			if (relation == Relation::EQ) return false;
 			if (relation == Relation::NEQ) return true;
+			CARL_LOG_TRACE("carl.ran", "Refine until intervals become disjoint");
 			while (lhs.interval() == rhs.interval()) {
 				lhs.refine();
 				rhs.refine();
@@ -589,10 +599,12 @@ bool compare(IntervalContent<Number>& lhs, IntervalContent<Number>& rhs, const R
 		}
 	}
 	// now: intervals are disjoint
-	if (lhs.interval().upper() < rhs.interval().lower()) {
+	CARL_LOG_TRACE("carl.ran", "Intervals " << lhs.interval() << " and " << rhs.interval() << " are disjoint");
+	assert(!carl::set_have_intersection(lhs.interval(), rhs.interval()));
+	if (lhs.interval().upper() <= rhs.interval().lower()) {
 		return relation == Relation::LESS || relation == Relation::LEQ;
 	}
-	if (lhs.interval().lower() > rhs.interval().upper()) {
+	if (lhs.interval().lower() >= rhs.interval().upper()) {
 		return relation == Relation::GREATER || relation == Relation::GEQ;
 	}
 	
