@@ -45,8 +45,6 @@ auto overload_on_map(F&& f, const RANMap<Number>& map) {
 	);
 }
 
-
-
 /**
  * Evaluate the given polynomial 'p' at the point represented by the variable-to-nummber-mapping 'm'.
  * If a variable is assigned a numeric representation, the corresponding value is directly plugged in.
@@ -60,20 +58,15 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, co
 	RANMap<Number> IRmap;
 	
 	for (const auto& r: m) {
-		//assert(pol.has(it->first));
 		if (r.second.isNumeric()) {
-			// Plug in numeric representations
 			carl::substitute_inplace(pol, r.first, MultivariatePolynomial<Number>(r.second.value()));
 		} else {
-			// Defer interval representations
 			IRmap.emplace(r.first, r.second);
 		}
 	}
 	if (pol.isNumber()) {
 		return RealAlgebraicNumber<Number>(pol.constantPart());
 	}
-
-	// need to evaluate polynomial on non-trivial RANs
 
 	return overload_on_map<RealAlgebraicNumber<Number>>(
 		[&pol](auto& map){ return RealAlgebraicNumber<Number>(ran::evaluate(pol, map)); },
@@ -96,25 +89,18 @@ bool evaluate(const Constraint<Poly>& c, const RANMap<Number>& m) {
 	
 	for (const auto& r: m) {
 		if (!pol.has(r.first)) continue;
-		//assert(pol.has(it->first));
 		if (r.second.isNumeric()) {
-			// Plug in numeric representations
 			carl::substitute_inplace(pol, r.first, MultivariatePolynomial<Number>(r.second.value()));
 			CARL_LOG_TRACE("carl.ran", "Substituting " << r.first << " = " << r.second.value());
 		} else {
-			// Defer interval representations
 			IRmap.emplace(r.first, r.second);
 		}
 	}
-	// if (pol.isNumber()) {
-	// 	return evaluate(pol.constantPart(), c.relation());
-	// }
 	Constraint<Poly> constr(pol, c.relation());
 	if (constr.lhs().isNumber()) {
 		return evaluate(constr.lhs().constantPart(), constr.relation());
 	}
 
-	// need to evaluate polynomial on non-trivial RANs
 	CARL_LOG_TRACE("carl.ran", "Remaining " << constr << " on " << IRmap);
 	return overload_on_map<bool>(
 		[&constr](auto& map){ return bool(ran::evaluate(constr, map)); },
