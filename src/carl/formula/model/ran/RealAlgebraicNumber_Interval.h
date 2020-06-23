@@ -110,6 +110,10 @@ namespace ran {
 		IntervalContent():
 			IntervalContent(Polynomial(auxVariable, {0, 1}), Interval<Number>(0))
 		{}
+
+		IntervalContent(const Number n):
+			IntervalContent(Polynomial(auxVariable, {-n, 1}), Interval<Number>(n))
+		{}
 		
 		IntervalContent(
 			const Polynomial& p,
@@ -238,7 +242,7 @@ Number branching_point(const IntervalContent<Number>& n) {
  * @return Evaluation result
  */
 template<typename Number>
-IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable, IntervalContent<Number>>& m) {
+IntervalContent<Number> evaluate(MultivariatePolynomial<Number> p, const std::map<Variable, IntervalContent<Number>>& m, bool refine_model = true) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
 	assert(m.size() > 0);
 	if (m.size() == 1) {
@@ -248,8 +252,33 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 			return IntervalContent<Number>();
 		}
 	}
-	Variable v = freshRealVariable();
+
+	// compute the initial result interval
+	std::map<Variable, Interval<Number>> var_to_interval;
+	for (const auto& [var, ran] : m) {
+		if (!p.has(var)) continue;
+		if (refine_model) {
+			static Number min_width = Number(1)/(Number(1048576)); // 1/2^20, taken from libpoly
+			while (ran.interval().diameter() > min_width) {
+				ran.refine();
+			}
+		}
+		if (is_number(ran)) {
+			substitute_inplace(p, var, MultivariatePolynomial<Number>(ran.interval().lower()));
+		} else {
+			var_to_interval.emplace(var, ran.interval());
+		}
+	}
+	assert(!var_to_interval.empty());
+	Interval<Number> interval = IntervalEvaluation::evaluate(p, var_to_interval);
+
+	if (interval.isPointInterval()) {
+		CARL_LOG_DEBUG("carl.ran", "Interval is point interval " << interval);
+		return IntervalContent<Number>(interval.lower());
+	}
+	
 	// compute the result polynomial
+	Variable v = freshRealVariable();
 	std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
 	for (const auto& cur: m) {
 		algebraic_information.emplace_back(replace_main_variable(cur.second.polynomial(), cur.first).template convert<MultivariatePolynomial<Number>>());
@@ -257,46 +286,36 @@ IntervalContent<Number> evaluate(const MultivariatePolynomial<Number>& p, const 
 	UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 	res = carl::squareFreePart(res);
 	// Note that res cannot be zero as v is a fresh variable in v-p.
-	// compute the initial result interval
-	std::map<Variable, Interval<Number>> varToInterval;
-	for (const auto& [var, ran] : m) {
-		if (!p.has(var)) continue;
-		varToInterval.emplace(var,ran.interval());
-	}
-	assert(!varToInterval.empty());
-	CARL_LOG_DEBUG("carl.ran", "res = " << res);
-	CARL_LOG_DEBUG("carl.ran", "varToInterval = " << varToInterval);
-	CARL_LOG_DEBUG("carl.ran", "p = " << p);
-	Interval<Number> interval = IntervalEvaluation::evaluate(p, varToInterval);
-	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
 
+	CARL_LOG_DEBUG("carl.ran", "res = " << res);
+	CARL_LOG_DEBUG("carl.ran", "var_to_interval = " << var_to_interval);
+	CARL_LOG_DEBUG("carl.ran", "p = " << p);
+	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
+	
 	auto sturmSeq = sturm_sequence(res);
 	// the interval should include at least one root.
 	assert(!carl::isZero(res));
-	assert(
-		carl::is_root_of(res, interval.lower()) ||
-		carl::is_root_of(res, interval.upper()) ||
-		count_real_roots(sturmSeq, interval) >= 1
-	);
-	while (
-		count_real_roots(sturmSeq, interval) != 1 ||
-		carl::is_root_of(res, interval.lower()) ||
-		carl::is_root_of(res, interval.upper())) 
-	{
+	assert(carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturmSeq, interval) >= 1);
+	while (!interval.isPointInterval() && (carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturmSeq, interval) != 1)) {
 		// refine the result interval until it isolates exactly one real root of the result polynomial
-		for (auto it = m.begin(); it != m.end(); it++) {
-			if (varToInterval.find(it->first) == varToInterval.end()) continue;
-			it->second.refine();
-			if (is_number(it->second)) {
-				return evaluate(p, m);
+		for (const auto& [var, ran] : m) {
+			if (var_to_interval.find(var) == var_to_interval.end()) continue;
+			ran.refine();
+			if (is_number(ran)) {
+				substitute_inplace(p, var, MultivariatePolynomial<Number>(ran.interval().lower()));
+				var_to_interval.erase(var);
 			} else {
-				varToInterval[it->first] = it->second.interval();
+				var_to_interval[var] = ran.interval();
 			}
 		}
-		interval = IntervalEvaluation::evaluate(p, varToInterval);
+		interval = IntervalEvaluation::evaluate(p, var_to_interval);
 	}
-	CARL_LOG_DEBUG("carl.ran", "Result is " << IntervalContent<Number>(res, interval));
-	return IntervalContent<Number>(res, interval);
+	CARL_LOG_DEBUG("carl.ran", "Result is " << res << " " << interval);
+	if (interval.isPointInterval()) {
+		return IntervalContent<Number>(interval.lower());
+	} else {
+		return IntervalContent<Number>(res, interval);
+	}
 }
 
 template<typename Number, typename Poly>
@@ -306,16 +325,16 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 
 	if (use_intervals) { // TODO needs some profound considerations ...
 		CARL_LOG_DEBUG("carl.ran", "Evaluate constraint using interval arithmetic");
-		static Number min_width = Number(1)/(Number(65536)); // (1/2)^16, taken from Z3
+		static Number min_width = Number(1)/(Number(1048576)); // (1/2)^20, taken from libpoly
 		while(true) {
 			// evaluate
-			std::map<Variable, Interval<Number>> varToInterval;
+			std::map<Variable, Interval<Number>> var_to_interval;
 			for (const auto& var : carl::variables(p).underlyingVariables()) {
-				varToInterval[var] = m.at(var).interval();
+				var_to_interval[var] = m.at(var).interval();
 			}
 			
-			CARL_LOG_DEBUG("carl.ran",  "Evaluate " << p << " on " << varToInterval);
-			auto res = IntervalEvaluation::evaluate(p, varToInterval);
+			CARL_LOG_DEBUG("carl.ran",  "Evaluate " << p << " on " << var_to_interval);
+			auto res = IntervalEvaluation::evaluate(p, var_to_interval);
 			CARL_LOG_DEBUG("carl.ran",  "Interval evaluation obtained " << res);
 
 			if (res.isPositive()) {
@@ -347,7 +366,7 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		
 			// refine RANs
 			bool refined = false;
-			for (const auto& a : varToInterval) {
+			for (const auto& a : var_to_interval) {
 				if (a.second.diameter() > min_width) {
 					if (p.has(a.first)) { // is var still in p?
 						CARL_LOG_DEBUG("carl.ran", "Refine " <<  m.at(a.first) << " (" << a.first << ")");
@@ -398,16 +417,16 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 		UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 		// Note that res cannot be zero as v is a fresh variable in v-p.
 		// compute the initial result interval
-		std::map<Variable, Interval<Number>> varToInterval;
+		std::map<Variable, Interval<Number>> var_to_interval;
 		for (const auto& [var, ran] : m) {
 			assert(p.has(var));
-			varToInterval.emplace(var,ran.interval());
+			var_to_interval.emplace(var,ran.interval());
 		}
-		assert(!varToInterval.empty());
+		assert(!var_to_interval.empty());
 		CARL_LOG_DEBUG("carl.ran", "res = " << res);
-		CARL_LOG_DEBUG("carl.ran", "varToInterval = " << varToInterval);
+		CARL_LOG_DEBUG("carl.ran", "var_to_interval = " << var_to_interval);
 		CARL_LOG_DEBUG("carl.ran", "p = " << p);
-		Interval<Number> interval = IntervalEvaluation::evaluate(p, varToInterval);
+		Interval<Number> interval = IntervalEvaluation::evaluate(p, var_to_interval);
 		CARL_LOG_DEBUG("carl.ran", "-> " << interval);
 
 		// Let pos_lb a lower bound on the positive real roots and neg_ub an upper bound on the negative real roots
@@ -455,10 +474,10 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, IntervalConten
 				if (is_number(it->second)) {
 					return evaluate(c, m);
 				} else {
-					varToInterval[it->first] = it->second.interval();
+					var_to_interval[it->first] = it->second.interval();
 				}
 			}
-			interval = IntervalEvaluation::evaluate(p, varToInterval);
+			interval = IntervalEvaluation::evaluate(p, var_to_interval);
 			if (interval.isNegative()) {
 				CARL_LOG_DEBUG("carl.ran", "p < 0");
 				return evaluate(Sign::NEGATIVE, c.relation());
