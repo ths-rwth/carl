@@ -115,5 +115,125 @@ UnivariatePolynomial<Number> substitute_rans_into_polynomial(
 	return algebraic_substitution(polys, varOrder);
 }
 
+template<typename Number>
+class ran_evaluator {
+private:
+	Variable m_var;
+	MultivariatePolynomial<Number> m_original_poly;
+	UnivariatePolynomial<MultivariatePolynomial<Number>> m_poly;
+	std::map<Variable, const RealAlgebraicNumber<Number>&> m_ir_assignments;
+
+public:
+
+	ran_evaluator(const MultivariatePolynomial<Number>& p) : m_original_poly(p) {
+		Variable m_var = freshRealVariable();
+		m_poly = UnivariatePolynomial<MultivariatePolynomial<Number>>(m_var, {MultivariatePolynomial<Number>(-m_original_poly), MultivariatePolynomial<Number>(1)});
+	}
+
+	bool assign(const std::map<Variable, RealAlgebraicNumber<Number>>& m, bool refine_model = true) {
+		bool evaluated = false;
+
+		for (const auto& [var, ran] : m) {
+			if (refine_model) {
+				static Number min_width = Number(1)/(Number(1048576)); // 1/2^20, taken from libpoly
+				while (ran.interval().diameter() > min_width) {
+					ran.refine();
+				}
+			}
+
+			if (is_number(ran)) {
+				evaluated |= assign(var, ran, false);
+				if (evaluated) return true;
+			}
+		}
+
+		for (const auto& [var, ran] : m) {
+			if (!is_number(ran)) {
+				evaluated |= assign(var, ran, false);
+				if (evaluated) return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool assign(Variable var, const RealAlgebraicNumber<Number>& value, bool refine_model = true) {
+		assert(m_ir_assignments.find(var) == m_ir_assignments.end());
+		if (!m_poly.has(var)) return false;
+
+		if (refine_model) {
+			static Number min_width = Number(1)/(Number(1048576)); // 1/2^20, taken from libpoly
+			while (value.interval().diameter() > min_width) {
+				value.refine();
+			}
+		}
+
+		if (is_number(value)) {
+			carl::substitute_inplace(m_poly, var, Poly(get_number(value)));
+			carl::substitute_inplace(m_original_poly, var, Poly(get_number(value)));
+			return m_poly.gatherVariables() == carlVariables({ m_var });
+		} else {
+			m_ir_assignments.emplace(var, value);
+
+			if (m_original_poly.isUnivariate()) {
+				auto p = carl::to_univariate_polynomial(m_original_poly, var).toNumberCoefficients();
+				if (value.sgn(p) == Sign::ZERO) {
+					return RealAlgebraicNumber<Number>();
+				}
+			}
+
+			const auto poly = replace_main_variable(value.getIRPolynomial(), var).template convert<MultivariatePolynomial<Number>>();
+			m_poly = pseudo_remainder(switch_main_variable(m_poly, var), poly);
+			m_poly = carl::resultant(m_poly, poly);
+
+			return m_poly.gatherVariables() == carlVariables({ m_var });
+		}
+	}
+
+	auto value() {
+		assert(m_poly.gatherVariables() == carlVariables({ m_var }));
+
+		UnivariatePolynomial<Number> res = switch_main_variable(m_poly, m_var).toNumberCoefficients();
+		res = carl::squareFreePart(res);
+		// Note that res cannot be zero as v is a fresh variable in v-p
+
+		std::map<Variable, Interval<Number>> var_to_interval;
+		for (const auto& [var, ran] : m_ir_assignments) {
+			if (!m_original_poly.has(var)) continue;
+			var_to_interval.emplace(var, ran.interval());
+		}
+		assert(!var_to_interval.empty());
+		Interval<Number> interval = IntervalEvaluation::evaluate(m_original_poly, var_to_interval);
+
+		if (interval.isPointInterval()) {
+			return RealAlgebraicNumber<Number>(interval.lower());
+		}
+
+		auto sturm_seq = sturm_sequence(res);
+		// the interval should include at least one root.
+		assert(!carl::isZero(res));
+		assert(carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) >= 1);
+		while (!interval.isPointInterval() && (carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
+			// refine the result interval until it isolates exactly one real root of the result polynomial
+			for (const auto& [var, ran] : m_ir_assignments) {
+				if (var_to_interval.find(var) == var_to_interval.end()) continue;
+				ran.refine();
+				if (is_number(ran)) {
+					substitute_inplace(m_original_poly, var, MultivariatePolynomial<Number>(ran.interval().lower()));
+					var_to_interval.erase(var);
+				} else {
+					var_to_interval[var] = ran.interval();
+				}
+			}
+			interval = IntervalEvaluation::evaluate(m_original_poly, var_to_interval);
+		}
+		if (interval.isPointInterval()) {
+			return RealAlgebraicNumber<Number>(interval.lower());
+		} else {
+			return RealAlgebraicNumber<Number>(res, interval);
+		}
+	}
+};
+
 }
 }
