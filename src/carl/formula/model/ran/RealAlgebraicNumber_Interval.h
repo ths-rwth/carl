@@ -292,11 +292,11 @@ IntervalContent<Number> evaluate(MultivariatePolynomial<Number> p, const std::ma
 	CARL_LOG_DEBUG("carl.ran", "p = " << p);
 	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
 	
-	auto sturmSeq = sturm_sequence(res);
+	auto sturm_seq = sturm_sequence(res);
 	// the interval should include at least one root.
 	assert(!carl::isZero(res));
-	assert(carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturmSeq, interval) >= 1);
-	while (!interval.isPointInterval() && (carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturmSeq, interval) != 1)) {
+	assert(carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) >= 1);
+	while (!interval.isPointInterval() && (carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (const auto& [var, ran] : m) {
 			if (var_to_interval.find(var) == var_to_interval.end()) continue;
