@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../formula/model/ran/RealAlgebraicNumber.h"
-#include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
-#include "../../interval/Interval.h"
-#include "../logging.h"
-#include "../Sign.h"
-#include "../UnivariatePolynomial.h"
+#include "../RealAlgebraicNumber.h"
+#include "../RealAlgebraicNumberEvaluation.h"
+#include <carl/interval/Interval.h>
+#include <carl/core/logging.h>
+#include <carl/core/Sign.h>
+#include <carl/core/UnivariatePolynomial.h>
 
 #include "RealRootIsolation.h"
 
@@ -15,7 +15,7 @@
 #include <map>
 
 #ifdef RAN_USE_Z3
-#include "../../formula/model/ran/z3/Z3RanRootFinder.h"
+#include "../z3/Z3RanRootFinder.h"
 #endif
 
 namespace carl {

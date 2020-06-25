@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include <carl/core/polynomialfunctions/RootFinder.h>
+#include <carl/formula/model/ran/RootFinder.h>
 #include <carl/formula/model/ran/RealAlgebraicNumber.h>
 
 using Poly = carl::UnivariatePolynomial<mpq_class>;

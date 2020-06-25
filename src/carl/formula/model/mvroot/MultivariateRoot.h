@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../core/logging.h"
-#include "../../../core/polynomialfunctions/RootFinder.h"
+#include "../ran/interval/RootFinder.h"
 #include "../../../core/polynomialfunctions/Substitution.h"
 #include "../../../core/Variable.h"
 #include "../../../numbers/numbers.h"

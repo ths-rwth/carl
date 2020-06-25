@@ -1,15 +1,16 @@
 #pragma once
 
-#include "../UnivariatePolynomial.h"
-#include "../../formula/model/ran/RealAlgebraicNumber.h"
-#include "../../interval/set_theory.h"
-#include "../../interval/sampling.h"
-#include "../polynomialfunctions/Factorization_univariate.h"
-#include "../polynomialfunctions/SignVariations.h"
-#include "../../io/streamingOperators.h"
-#include "EigenWrapper.h"
-#include "Evaluation.h"
-#include "RootElimination.h"
+#include <carl/core/UnivariatePolynomial.h>
+#include "../RealAlgebraicNumber.h"
+
+#include <carl/interval/set_theory.h>
+#include <carl/interval/sampling.h>
+#include <carl/core/polynomialfunctions/Factorization_univariate.h>
+#include <carl/core/polynomialfunctions/SignVariations.h>
+#include <carl/io/streamingOperators.h>
+#include <carl/core/polynomialfunctions/EigenWrapper.h>
+#include <carl/core/polynomialfunctions/Evaluation.h>
+#include <carl/core/polynomialfunctions/RootElimination.h>
 
 namespace carl::rootfinder {
 

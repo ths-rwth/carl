@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Model.h"
-#include <carl/core/polynomialfunctions/RootFinder.h>
+#include <carl/formula/model/ran/RootFinder.h>
 #include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/UnivariatePolynomial.h>

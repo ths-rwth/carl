@@ -1,7 +1,7 @@
 
 #include <gtest/gtest.h>
 
-#include <carl/core/polynomialfunctions/RootFinder.h>
+#include <carl/formula/model/ran/RootFinder.h>
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/polynomialfunctions/Chebyshev.h>
 #include "carl/core/polynomialfunctions/LazardEvaluation.h"

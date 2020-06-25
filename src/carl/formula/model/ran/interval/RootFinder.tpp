@@ -11,10 +11,10 @@
 #pragma once
 
 #include "RootFinder.h"
-#include "Substitution.h"
+#include <carl/core/polynomialfunctions/Substitution.h>
 
-#include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
-#include "../../formula/model/ran/RealAlgebraicNumberIntervalExtra.h"
+#include "../RealAlgebraicNumberEvaluation.h"
+#include "../RealAlgebraicNumberIntervalExtra.h"
 
 namespace carl {
 namespace rootfinder {
