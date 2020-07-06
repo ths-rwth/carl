@@ -393,6 +393,10 @@ bool compare(const real_algebraic_number_interval<Number>& lhs, const real_algeb
 	assert(!carl::set_have_intersection(lhs.interval_int(), rhs.interval_int()) || lhs.interval_int() == rhs.interval_int());
 	if (lhs.interval_int() == rhs.interval_int()) {
 		CARL_LOG_TRACE("carl.ran", "Intervals " << lhs.interval_int() << " and " << rhs.interval_int() << " are equal");
+		if (lhs.is_numeric()) {
+			CARL_LOG_TRACE("carl.ran", "Interval " << lhs.interval_int() << " is a point interval");
+			return evaluate(Sign::ZERO, relation);
+		}
 		if (lhs.polynomial_int() == rhs.polynomial_int()) {
 			CARL_LOG_TRACE("carl.ran", "Polynomials " << lhs.polynomial_int() << " and " << rhs.polynomial_int() << " are equal");
 			return evaluate(Sign::ZERO, relation);
