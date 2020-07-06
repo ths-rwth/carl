@@ -16,7 +16,7 @@ namespace carl {
  * meaning.
  */
 template<typename Number>
-class RealAlgebraicPoint {
+class [[deprecated]] RealAlgebraicPoint {
 private:
 	/**
 	 * Numbers of this RealAlgebraicPoint.
