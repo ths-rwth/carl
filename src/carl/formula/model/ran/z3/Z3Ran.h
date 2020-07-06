@@ -46,14 +46,6 @@ namespace carl {
 			Number value() const;
 
             bool is_integral() const;
-
-			Number integer_below() const {
-                if (is_numeric()) {
-                    return carl::floor(value());
-                } else {
-                    return carl::floor(lower());
-                }
-			}
            
             const Number& lower() const;
 

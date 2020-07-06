@@ -25,19 +25,19 @@ private:
 		{}
 	};
 	
+	mutable std::shared_ptr<Content> mContent;
+
+	void set_content(const real_algebraic_number_z3<Number>& other) const {
+		mContent = other.mContent;
+	}
 
 public: // should be private, but would be nasty
-	mutable std::shared_ptr<Content> mContent;
 
 	auto& z3_ran() {
 		return mContent->ran;
 	}
 	const auto& z3_ran() const {
 		return mContent->ran;
-	}
-
-	void set_content(const real_algebraic_number_z3<Number>& other) const {
-		mContent = other.mContent;
 	}
 
 public:
@@ -80,7 +80,11 @@ public:
 	}
 
 	Number integer_below() const {
-		return z3_ran().integer_below();
+		if (is_numeric()) {
+			return carl::floor(value());
+		} else {
+			return carl::floor(z3_ran().lower());
+		}
 	}
 	Sign sgn() const {
 		return z3_ran().sgn();
@@ -90,6 +94,22 @@ public:
 	}
 	real_algebraic_number_z3<Number> abs() const {
 		return z3_ran().abs();
+	}
+
+	bool equal(const real_algebraic_number_z3<Number>& rhs) const {
+		if (mContent.get() == rhs.mContent.get()) {
+			return true;
+		} else if (z3_ran().equal(rhs.z3_ran())) {
+			set_content(rhs);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	bool less(const real_algebraic_number_z3<Number>& rhs) const {
+		if (mContent.get() == rhs.mContent.get()) return false;
+		return z3_ran().less(rhs.z3_ran());
 	}
 };
 
@@ -127,46 +147,21 @@ Number ceil(const real_algebraic_number_z3<Number>& n) {
 	return carl::ceil(n.interval().upper());
 }
 
-namespace ran::z3 {
-
-template<typename Number>
-bool equal(const real_algebraic_number_z3<Number>& lhs, const real_algebraic_number_z3<Number>& rhs) {
-	if (lhs.mContent.get() == rhs.mContent.get()) {
-		return true;
-	} else if (lhs.z3_ran().equal(rhs.z3_ran())) {
-		lhs.set_content(rhs);
-		return true;
-	} else {
-		return false;
-	}
-}
-
-template<typename Number>
-bool less(const real_algebraic_number_z3<Number>& lhs, const real_algebraic_number_z3<Number>& rhs) {
-	if (lhs.mContent.get() == rhs.mContent.get()) return false;
-	return lhs.z3_ran().less(rhs.z3_ran());
-}
-
-}
-
 template<typename Number>
 bool compare(const real_algebraic_number_z3<Number>& lhs, const real_algebraic_number_z3<Number>& rhs, Relation rel) {
-	if (lhs.mContent.get() == rhs.mContent.get()) {
-		return evaluate(Sign::ZERO, rel);
-	}
 	switch (rel) {
 		case Relation::EQ:
-			return ran::z3::equal(lhs, rhs);
+			return lhs.equal(rhs);
 		case Relation::NEQ:
-			return !ran::z3::equal(lhs, rhs);
+			return !lhs.equal(rhs);
 		case Relation::LEQ:
-			return ran::z3::equal(lhs, rhs) || ran::z3::less(lhs,rhs);
+			return lhs.equal(rhs) || lhs.less(rhs);
 		case Relation::GEQ:
-			return ran::z3::equal(lhs, rhs) || ran::z3::less(rhs,lhs);
+			return lhs.equal(rhs) || rhs.less(lhs);
 		case Relation::LESS:
-			return ran::z3::less(lhs,rhs);
+			return lhs.less(rhs);
 		case Relation::GREATER:
-			return ran::z3::less(rhs,lhs);		
+			return rhs.less(lhs);		
 		default:
 			assert(false);
 			return false;
