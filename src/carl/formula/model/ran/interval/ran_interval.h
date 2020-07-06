@@ -148,13 +148,15 @@ private:
 	}
 
 	void refine() const {
+		if (is_numeric()) return;
 		Number pivot = carl::sample(interval_int());
 		refine_internal(pivot);
 	}
 
 	std::optional<Sign> refine_using(const Number& pivot) const {
 		if (interval_int().contains(pivot)) {
-			return refine_internal(pivot);
+			if (is_numeric()) return Sign::ZERO;
+			else return refine_internal(pivot);
 		}
 		return std::nullopt;
 	}
@@ -291,10 +293,10 @@ public:
 	}
 
 	bool contained_in(const Interval<Number>& i) const {
-		if (interval_int().contains(i.lower())) {
+		if (!is_numeric() && interval_int().contains(i.lower())) {
 			refine_internal(i.lower());
 		}
-		if (interval_int().contains(i.upper())) {
+		if (!is_numeric() && interval_int().contains(i.upper())) {
 			refine_internal(i.upper());
 		}
 		return i.contains(interval_int());
