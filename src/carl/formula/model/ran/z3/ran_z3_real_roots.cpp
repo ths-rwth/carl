@@ -19,9 +19,9 @@ namespace carl::ran::z3 {
 
         std::vector<real_algebraic_number_z3<Number>> res;
         for (unsigned i = 0; i < roots.size(); i++) {
-            Z3Ran<Number> zr(std::move(roots[i]));
-            if (zr.containedIn(interval)) {
-                res.push_back(real_algebraic_number_z3<Number>(zr)); // std::move(zr)));
+            real_algebraic_number_z3<Number> zr(std::move(roots[i]));
+            if (zr.contained_in(interval)) {
+                res.push_back(zr); // std::move(zr)));
             }
         }
 
@@ -44,7 +44,7 @@ namespace carl::ran::z3 {
 		nlsat::assignment map(carl::z3().anumMan());
         for(auto const &pair : m) {
 			polynomial::var var = carl::z3().toZ3(pair.first);
-            const algebraic_numbers::anum& val = pair.second.z3_ran().content();
+            const algebraic_numbers::anum& val = pair.second.content();
             map.set(var, val);
         }
 
@@ -53,9 +53,9 @@ namespace carl::ran::z3 {
 
         std::vector<real_algebraic_number_z3<Number>> res;
         for (unsigned i = 0; i < roots.size(); i++) {
-            Z3Ran<Number> zr(std::move(roots[i]));
-            if (zr.containedIn(interval)) {
-                res.push_back(real_algebraic_number_z3<Number>(zr)); // std::move(zr)));
+            real_algebraic_number_z3<Number> zr(std::move(roots[i]));
+            if (zr.contained_in(interval)) {
+                res.push_back(zr); // std::move(zr)));
             }
         }
 

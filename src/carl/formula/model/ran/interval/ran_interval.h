@@ -309,11 +309,6 @@ Number branching_point(const real_algebraic_number_interval<Number>& n) {
 }
 
 template<typename Number>
-Number is_root_of(const UnivariatePolynomial<Number>& p, const real_algebraic_number_interval<Number>& value) {
-	return value.sgn(p) == Sign::ZERO;
-}
-
-template<typename Number>
 Number sample_above(const real_algebraic_number_interval<Number>& n) {
 	return carl::floor(n.interval_int().upper()) + 1;
 }

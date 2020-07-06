@@ -4,8 +4,6 @@
 
 #ifdef RAN_USE_Z3
 
-#include "Z3Ran.h"
-
 #include "../ran_operations.h"
 #include "../ran_operations_number.h"
 
@@ -13,110 +11,64 @@
 
 namespace carl {
 
+class Z3RanContent;
+
 template<typename Number>
 class real_algebraic_number_z3 {
 
 private:
-	struct Content {
-		Z3Ran<Number> ran;
-
-		Content(const Z3Ran<Number>& z):
-			ran(z)
-		{}
-	};
-	
-	mutable std::shared_ptr<Content> mContent;
-
-	void set_content(const real_algebraic_number_z3<Number>& other) const {
-		mContent = other.mContent;
-	}
+	mutable std::shared_ptr<Z3RanContent> mContent;
 
 public: // should be private, but would be nasty
-
-	auto& z3_ran() {
-		return mContent->ran;
-	}
-	const auto& z3_ran() const {
-		return mContent->ran;
+	Z3RanContent& content() const {
+		return *mContent;
 	}
 
 public:
-	real_algebraic_number_z3(const Z3Ran<Number>& ran):
-		mContent(std::make_shared<Content>(ran))
-	{}
+	explicit real_algebraic_number_z3();
+	explicit real_algebraic_number_z3(const Z3RanContent& content);
+	explicit real_algebraic_number_z3(Z3RanContent&& content);
+	explicit real_algebraic_number_z3(const Number& r);
 
-	real_algebraic_number_z3(const Number& number):
-		mContent(std::make_shared<Content>(Z3Ran<Number>(number)))
-	{}
-
-	real_algebraic_number_z3(): real_algebraic_number_z3(0)
-	{}
-
-	const auto& polynomial() const {
-		return z3_ran().getPolynomial();
-	}
-
-	const auto& interval() const {
-		return z3_ran().getInterval();
-	}
-
+	const UnivariatePolynomial<Number> polynomial() const;
+	const Interval<Number> interval() const;
 	std::size_t size() const {
 		return 0;
 	}
-	bool is_integral() const {
-		return z3_ran().is_integral();
-	}
-	bool is_zero() const {
-		return z3_ran().is_zero();
-	}
-	bool is_numeric() const {
-		return z3_ran().is_numeric();
-	}
-	Number value() const {
-		return z3_ran().value();
-	}
-	bool contained_in(const Interval<Number>& i) const {
-		return z3_ran().containedIn(i);
-	}
-
+	bool is_integral() const;
+	bool is_zero() const;
+	bool is_numeric() const;
+	Number value() const;
+	bool contained_in(const Interval<Number>& i) const;
 	Number integer_below() const {
 		if (is_numeric()) {
 			return carl::floor(value());
 		} else {
-			return carl::floor(z3_ran().lower());
+			return carl::floor(lower());
 		}
 	}
-	Sign sgn() const {
-		return z3_ran().sgn();
-	}
-	Sign sgn(const UnivariatePolynomial<Number>& p) const {
-		return z3_ran().sgn(p);
-	}
-	real_algebraic_number_z3<Number> abs() const {
-		return z3_ran().abs();
-	}
+	Sign sgn() const;
+	Sign sgn(const UnivariatePolynomial<Number>& p) const;
+	real_algebraic_number_z3<Number> abs() const;
 
-	bool equal(const real_algebraic_number_z3<Number>& rhs) const {
-		if (mContent.get() == rhs.mContent.get()) {
-			return true;
-		} else if (z3_ran().equal(rhs.z3_ran())) {
-			set_content(rhs);
-			return true;
-		} else {
-			return false;
-		}
-	}
+	template<typename Num>
+	friend Num branching_point(const real_algebraic_number_z3<Num>& n);
+	template<typename Num>
+	friend bool compare(const real_algebraic_number_z3<Num>& lhs, const real_algebraic_number_z3<Num>& rhs, Relation rel);
+	template<typename Num>
+	friend bool compare(const real_algebraic_number_z3<Num>& lhs, const Num& rhs, Relation rel);
 
-	bool less(const real_algebraic_number_z3<Number>& rhs) const {
-		if (mContent.get() == rhs.mContent.get()) return false;
-		return z3_ran().less(rhs.z3_ran());
-	}
+private:
+	bool equal(const real_algebraic_number_z3<Number>& rhs) const;
+	bool less(const real_algebraic_number_z3<Number>& rhs) const;
+	bool equal(const Number& n) const;
+    bool less(const Number& n) const;
+	bool greater(const Number& n) const;
+
+	const Number lower() const;
+    const Number upper() const;
 };
 
-template<typename Number>
-Number branching_point(const real_algebraic_number_z3<Number>& n) {
-	return n.z3_ran().branchingPoint();
-}
 
 template<typename Number>
 real_algebraic_number_z3<Number> sample_above(const real_algebraic_number_z3<Number>& n);
@@ -126,25 +78,28 @@ template<typename Number>
 real_algebraic_number_z3<Number> sample_between(const real_algebraic_number_z3<Number>& lower, const real_algebraic_number_z3<Number>& upper);
 template<typename Number>
 real_algebraic_number_z3<Number> sample_between(const real_algebraic_number_z3<Number>& lower, const Number& upper) {
-	return sample_between(lower.z3_ran(), real_algebraic_number_z3<Number>(upper));
+	return sample_between(lower, real_algebraic_number_z3<Number>(upper));
 }
 template<typename Number>
 real_algebraic_number_z3<Number> sample_between(const Number& lower, const real_algebraic_number_z3<Number>& upper) {
-	return sample_between(real_algebraic_number_z3<Number>(lower), upper.z3_ran());
-}
-
-template<typename Number>
-Number is_root_of(const UnivariatePolynomial<Number>& p, const real_algebraic_number_z3<Number>& value) {
-	return value.sgn(p) == Sign::ZERO;
+	return sample_between(real_algebraic_number_z3<Number>(lower), upper);
 }
 
 template<typename Number>
 Number floor(const real_algebraic_number_z3<Number>& n) {
-	return carl::floor(n.interval().lower());
+	if (n.is_numeric()) {
+		return carl::floor(n.interval().value());
+	} else {
+		return carl::floor(n.interval().lower());
+	}
 }
 template<typename Number>
 Number ceil(const real_algebraic_number_z3<Number>& n) {
-	return carl::ceil(n.interval().upper());
+	if (n.is_numeric()) {
+		return carl::ceil(n.interval().value());
+	} else {
+		return carl::ceil(n.interval().upper());
+	}
 }
 
 template<typename Number>
@@ -172,17 +127,17 @@ template<typename Number>
 bool compare(const real_algebraic_number_z3<Number>& lhs, const Number& rhs, Relation rel) {
 	switch (rel) {
 		case Relation::EQ:
-			return lhs.z3_ran().equal(rhs);
+			return lhs.equal(rhs);
 		case Relation::NEQ:
-			return !lhs.z3_ran().equal(rhs);
+			return !lhs.equal(rhs);
 		case Relation::LEQ:
-			return lhs.z3_ran().equal(rhs) || lhs.z3_ran().less(rhs);
+			return lhs.equal(rhs) || lhs.less(rhs);
 		case Relation::GEQ:
-			return lhs.z3_ran().equal(rhs) || lhs.z3_ran().greater(rhs);
+			return lhs.equal(rhs) || lhs.greater(rhs);
 		case Relation::LESS:
-			return lhs.z3_ran().less(rhs);
+			return lhs.less(rhs);
 		case Relation::GREATER:
-			return lhs.z3_ran().greater(rhs);		
+			return lhs.greater(rhs);		
 		default:
 			assert(false);
 			return false;
@@ -190,9 +145,7 @@ bool compare(const real_algebraic_number_z3<Number>& lhs, const Number& rhs, Rel
 }
 
 template<typename Num>
-std::ostream& operator<<(std::ostream& os, const real_algebraic_number_z3<Num>& rhs) {
-	return os << "(" << rhs.z3_ran() << ")"; 
-}
+std::ostream& operator<<(std::ostream& os, const real_algebraic_number_z3<Num>& rhs);
 
 template<typename Number>
 struct is_ran<real_algebraic_number_z3<Number>> : std::true_type {};

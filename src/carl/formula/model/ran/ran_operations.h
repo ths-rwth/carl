@@ -27,6 +27,11 @@ inline RAN abs(const RAN& n) {
 	return n.abs();
 }
 
+template<typename Number, typename RAN, typename = std::enable_if_t<is_ran<RAN>::value>>
+Number is_root_of(const UnivariatePolynomial<Number>& p, const RAN& value) {
+	return value.sgn(p) == Sign::ZERO;
+}
+
 
 /* comparison operators */
 

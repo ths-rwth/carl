@@ -146,26 +146,6 @@ real_algebraic_number_thom<Number> abs(const real_algebraic_number_thom<Number>&
 }
 
 template<typename Number>
-Number is_root_of(const UnivariatePolynomial<Number>& p, const real_algebraic_number_thom<Number>& value) {
-	return value.sgn(p) == Sign::ZERO;
-}
-
-template<typename Number>
-Interval<Number> get_interval(const real_algebraic_number_thom<Number>& n) {
-	return Interval<Number>(n.thom_encoding().get_number());
-}
-
-template<typename Number>
-const Number& get_number(const real_algebraic_number_thom<Number>& n) {
-	return n.thom_encoding().get_number();
-}
-
-template<typename Number>
-UnivariatePolynomial<Number> get_polynomial(const real_algebraic_number_thom<Number>& n) {
-	return UnivariatePolynomial<Number>(Variable::NO_VARIABLE);
-}
-
-template<typename Number>
 real_algebraic_number_thom<Number> sample_above(const real_algebraic_number_thom<Number>& n) {
 	return n.thom_encoding() + Number(1);
 }

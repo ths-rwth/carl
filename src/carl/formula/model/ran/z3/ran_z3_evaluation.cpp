@@ -7,25 +7,6 @@
 #include "Z3RanContent.h"
 
 namespace carl {
-/*
-    template<typename Number>
-    RealAlgebraicNumber<Number> evaluateZ3(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, RealAlgebraicNumber<Number>>& evalMap) {
-        polynomial::polynomial_ref poly = z3().toZ3IntCoeff(polynomial);
-        algebraic_numbers::anum res;
-        nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
-        for(auto const &pair : evalMap) {
-            assert(pair.second.isZ3Ran()); // all trivial assignments should have already been plugged in ...
-            polynomial::var var = z3().toZ3(pair.first);
-            const algebraic_numbers::anum& val = pair.second.getZ3Ran().content();
-            map.set(var, val);
-        }
-        z3().polyMan().eval(poly.get(), map, res);
-        return RealAlgebraicNumber<Number>(Z3Ran<Number>(std::move(res)));
-    }
-
-    template RealAlgebraicNumber<mpq_class> evaluateZ3(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, RealAlgebraicNumber<mpq_class>>& evalMap);
-*/
-
     template<typename Number>
     real_algebraic_number_z3<Number> evaluate(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap) {
         polynomial::polynomial_ref poly = z3().toZ3IntCoeff(polynomial);
@@ -33,11 +14,11 @@ namespace carl {
         nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
         for(auto const &pair : evalMap) {
             polynomial::var var = z3().toZ3(pair.first);
-            const algebraic_numbers::anum& val = pair.second.z3_ran().content();
+            const algebraic_numbers::anum& val = pair.second.content();
             map.set(var, val);
         }
         z3().polyMan().eval(poly.get(), map, res);
-        return real_algebraic_number_z3<Number>(Z3Ran<Number>(std::move(res)));
+        return real_algebraic_number_z3<Number>(std::move(res));
     }
 
     template real_algebraic_number_z3<mpq_class> evaluate(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, real_algebraic_number_z3<mpq_class>>& evalMap);
@@ -49,7 +30,7 @@ namespace carl {
         nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
         for(auto const &pair : evalMap) {
             polynomial::var var = z3().toZ3(pair.first);
-            const algebraic_numbers::anum& val = pair.second.z3_ran().content();
+            const algebraic_numbers::anum& val = pair.second.content();
             map.set(var, val);
         }
         int rs = z3().anumMan().eval_sign_at(poly, map);
