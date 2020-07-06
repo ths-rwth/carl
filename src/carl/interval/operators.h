@@ -18,6 +18,9 @@ inline bool operator<(const LowerBound<Number>& lhs, const LowerBound<Number>& r
 		case BoundType::WEAK:
 			if (lhs.number < rhs.number) return true;
 			return rhs.bound_type == BoundType::STRICT && lhs.number == rhs.number;
+		default:
+			assert(false);
+			return false;
 	}
 }
 
@@ -52,6 +55,9 @@ inline bool operator<(const UpperBound<Number>& lhs, const UpperBound<Number>& r
 		case BoundType::WEAK:
 			if (lhs.number < rhs.number) return true;
 			if (lhs.bound_type == BoundType::STRICT) return lhs.number == rhs.number;
+			return false;
+		default:
+			assert(false);
 			return false;
 	}
 }
@@ -152,6 +158,9 @@ inline bool operator<(const Interval<Number>& lhs, const Number& rhs) {
 			return lhs.upper() < rhs;
 		case BoundType::INFTY:
 			return false;
+		default:
+			assert(false);
+			return false;
 	}
 }
 template<typename Number>
@@ -162,6 +171,9 @@ inline bool operator<(const Number& lhs, const Interval<Number>& rhs) {
 		case BoundType::WEAK:
 			return lhs < rhs.lower();
 		case BoundType::INFTY:
+			return false;
+		default:
+			assert(false);
 			return false;
 	}
 }

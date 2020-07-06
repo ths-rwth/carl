@@ -24,6 +24,7 @@ inline std::ostream& operator<<(std::ostream& os, BoundType b) {
 		case BoundType::STRICT: return os << "STRICT";
 		case BoundType::WEAK: return os << "WEAK";
 		case BoundType::INFTY: return os << "INFTY";
+		default: assert(false); return os;
 	}
 }
 
