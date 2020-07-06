@@ -73,7 +73,7 @@ TYPED_TEST(MultivariateRootTest, Evaluate2)
 	ModelT m;
 	IntervalT rani(TypeParam(-5793)/4096, BoundType::STRICT, TypeParam(-181)/128, BoundType::STRICT);
 	UnivariatePolynomial<TypeParam> ranp(x, {TypeParam(-2), TypeParam(0), TypeParam(1)});
-	m.assign(x, RANT::createSafeIR(ranp, rani));
+	m.assign(x, RANT::create_safe(ranp, rani));
 	m.assign(y, RANT(-1));
 	
 	auto res = model::evaluate(f, m);

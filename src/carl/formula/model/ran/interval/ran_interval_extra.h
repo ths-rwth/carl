@@ -4,21 +4,21 @@
 #include <map>
 #include <vector>
 
-#include "RealAlgebraicNumber.h"
-#include "../../../core/polynomialfunctions/LazardEvaluation.h"
-#include "../../../core/polynomialfunctions/AlgebraicSubstitution.h"
+#include "ran_interval.h"
+#include "LazardEvaluation.h"
+#include "AlgebraicSubstitution.h"
 
-#include "../../../util/SFINAE.h"
+#include <carl/util/SFINAE.h>
 
 namespace carl {
-
-namespace RealAlgebraicNumberEvaluation {
+namespace ran {
+namespace interval {
 
 // TODO move somewhere else, integrate into evaluation
 template<typename Coeff, typename Number>
 bool vanishes(
 		const UnivariatePolynomial<Coeff>& poly,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& varToRANMap
+		const std::map<Variable, real_algebraic_number_interval<Number>>& varToRANMap
 ) {
 	CARL_LOG_FUNC("carl.ran", "Check if " << poly << " vanishes under " << varToRANMap);
 	assert(varToRANMap.find(poly.mainVar()) == varToRANMap.end());
@@ -33,7 +33,7 @@ bool vanishes(
 	}
 
 	UnivariatePolynomial<Coeff> polyCopy(poly);
-	std::map<Variable, RealAlgebraicNumber<Number>> IRmap;
+	std::map<Variable, real_algebraic_number_interval<Number>> IRmap;
 
 	for (Variable v: polyCopy.gatherVariables()) {
 		if (v == poly.mainVar()) continue;
@@ -42,7 +42,7 @@ bool vanishes(
 			return false;
 		}
 		assert(varToRANMap.count(v) > 0);
-		if (varToRANMap.at(v).isNumeric()) {
+		if (varToRANMap.at(v).is_numeric()) {
 			substitute_inplace(polyCopy, v, Coeff(varToRANMap.at(v).value()));
 		} else {
 			IRmap.emplace(v, varToRANMap.at(v));
@@ -78,7 +78,7 @@ bool vanishes(
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> substitute_rans_into_polynomial(
 		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
+		const std::map<Variable, real_algebraic_number_interval<Number>>& m,
 		bool use_lazard = true
 ) {
 	std::vector<MultivariatePolynomial<Number>> polys;
@@ -121,7 +121,7 @@ private:
 	Variable m_var;
 	MultivariatePolynomial<Number> m_original_poly;
 	UnivariatePolynomial<MultivariatePolynomial<Number>> m_poly;
-	std::map<Variable, const RealAlgebraicNumber<Number>&> m_ir_assignments;
+	std::map<Variable, const real_algebraic_number_interval<Number>&> m_ir_assignments;
 
 public:
 
@@ -130,25 +130,25 @@ public:
 		m_poly = UnivariatePolynomial<MultivariatePolynomial<Number>>(m_var, {MultivariatePolynomial<Number>(-m_original_poly), MultivariatePolynomial<Number>(1)});
 	}
 
-	bool assign(const std::map<Variable, RealAlgebraicNumber<Number>>& m, bool refine_model = true) {
+	bool assign(const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true) {
 		bool evaluated = false;
 
 		for (const auto& [var, ran] : m) {
 			if (refine_model) {
 				static Number min_width = Number(1)/(Number(1048576)); // 1/2^20, taken from libpoly
-				while (ran.interval().diameter() > min_width) {
+				while (!ran.is_numeric() && ran.interval().diameter() > min_width) {
 					ran.refine();
 				}
 			}
 
-			if (is_number(ran)) {
+			if (ran.is_numeric()) {
 				evaluated |= assign(var, ran, false);
 				if (evaluated) return true;
 			}
 		}
 
 		for (const auto& [var, ran] : m) {
-			if (!is_number(ran)) {
+			if (!ran.is_numeric()) {
 				evaluated |= assign(var, ran, false);
 				if (evaluated) return true;
 			}
@@ -157,20 +157,20 @@ public:
 		return false;
 	}
 
-	bool assign(Variable var, const RealAlgebraicNumber<Number>& value, bool refine_model = true) {
+	bool assign(Variable var, const real_algebraic_number_interval<Number>& value, bool refine_model = true) {
 		assert(m_ir_assignments.find(var) == m_ir_assignments.end());
 		if (!m_poly.has(var)) return false;
 
 		if (refine_model) {
 			static Number min_width = Number(1)/(Number(1048576)); // 1/2^20, taken from libpoly
-			while (value.interval().diameter() > min_width) {
+			while (!value.is_numeric() && value.interval().diameter() > min_width) {
 				value.refine();
 			}
 		}
 
-		if (is_number(value)) {
-			carl::substitute_inplace(m_poly, var, Poly(get_number(value)));
-			carl::substitute_inplace(m_original_poly, var, Poly(get_number(value)));
+		if (value.is_numeric()) {
+			carl::substitute_inplace(m_poly, var, Poly(value.value()));
+			carl::substitute_inplace(m_original_poly, var, Poly(value.value()));
 			return m_poly.gatherVariables() == carlVariables({ m_var });
 		} else {
 			m_ir_assignments.emplace(var, value);
@@ -178,11 +178,11 @@ public:
 			if (m_original_poly.isUnivariate()) {
 				auto p = carl::to_univariate_polynomial(m_original_poly, var).toNumberCoefficients();
 				if (value.sgn(p) == Sign::ZERO) {
-					return RealAlgebraicNumber<Number>();
+					return real_algebraic_number_interval<Number>();
 				}
 			}
 
-			const auto poly = replace_main_variable(value.getIRPolynomial(), var).template convert<MultivariatePolynomial<Number>>();
+			const auto poly = replace_main_variable(value.polynomial(), var).template convert<MultivariatePolynomial<Number>>();
 			m_poly = pseudo_remainder(switch_main_variable(m_poly, var), poly);
 			m_poly = carl::resultant(m_poly, poly);
 
@@ -206,7 +206,7 @@ public:
 		Interval<Number> interval = IntervalEvaluation::evaluate(m_original_poly, var_to_interval);
 
 		if (interval.isPointInterval()) {
-			return RealAlgebraicNumber<Number>(interval.lower());
+			return real_algebraic_number_interval<Number>(interval.lower());
 		}
 
 		auto sturm_seq = sturm_sequence(res);
@@ -218,8 +218,8 @@ public:
 			for (const auto& [var, ran] : m_ir_assignments) {
 				if (var_to_interval.find(var) == var_to_interval.end()) continue;
 				ran.refine();
-				if (is_number(ran)) {
-					substitute_inplace(m_original_poly, var, MultivariatePolynomial<Number>(ran.interval().lower()));
+				if (ran.is_numeric()) {
+					substitute_inplace(m_original_poly, var, MultivariatePolynomial<Number>(ran.value()));
 					var_to_interval.erase(var);
 				} else {
 					var_to_interval[var] = ran.interval();
@@ -228,12 +228,13 @@ public:
 			interval = IntervalEvaluation::evaluate(m_original_poly, var_to_interval);
 		}
 		if (interval.isPointInterval()) {
-			return RealAlgebraicNumber<Number>(interval.lower());
+			return real_algebraic_number_interval<Number>(interval.lower());
 		} else {
-			return RealAlgebraicNumber<Number>(res, interval);
+			return real_algebraic_number_interval<Number>(res, interval);
 		}
 	}
 };
 
+}
 }
 }

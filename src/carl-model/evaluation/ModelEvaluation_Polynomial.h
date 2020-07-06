@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Model.h"
-#include <carl/formula/model/ran/RootFinder.h>
+#include <carl/formula/model/ran/real_roots.h>
 #include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/UnivariatePolynomial.h>
@@ -26,11 +26,11 @@ namespace model {
 	 */
 	template<typename Rational>
 	void substituteIn(MultivariatePolynomial<Rational>& p, Variable var, const RealAlgebraicNumber<Rational>& r) {
-		if (r.isNumeric()) substituteIn(p, var, r.value());
+		if (r.is_numeric()) substituteIn(p, var, r.value());
 	}
 	template<typename Poly, typename Rational>
 	void substituteIn(UnivariatePolynomial<Poly>& p, Variable var, const RealAlgebraicNumber<Rational>& r) {
-		if (r.isNumeric()) substituteIn(p, var, r.value());
+		if (r.is_numeric()) substituteIn(p, var, r.value());
 	}
 
 	/**
@@ -79,7 +79,7 @@ namespace model {
 		
 		auto map = collectRANIR(carl::variables(p).underlyingVariableSet(), m);
 		if (map.size() == carl::variables(p).size()) {
-            res = RealAlgebraicNumberEvaluation::evaluate(p, map);
+            res = evaluate(p, map);
 			return;
 		}
 		res = createSubstitution<Rational,Poly,ModelPolynomialSubstitution<Rational,Poly>>(p);
@@ -89,13 +89,13 @@ namespace model {
 	auto realRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
 		auto map = collectRANIR(carl::variables(tmp).underlyingVariableSet(), m);
-		return carl::rootfinder::realRoots(carl::to_univariate_polynomial(tmp, v), map);
+		return carl::realRoots(carl::to_univariate_polynomial(tmp, v), map);
 	}
 	template<typename Rational, typename Poly>
 	auto realRoots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
 		UnivariatePolynomial<Poly> tmp = substitute(p, m);
 		auto map = collectRANIR(carl::variables(tmp).underlyingVariableSet(), m);
-		return carl::rootfinder::realRoots(tmp, map);
+		return carl::realRoots(tmp, map);
 	}
 	
 	template<typename Rational, typename Poly>
@@ -108,7 +108,7 @@ namespace model {
 			CARL_LOG_DEBUG("carl.formula.model", "Sizes of " << map << " and " << carl::variables(tmp) << " do not match. This will not work...");
 			return boost::none;
 		}
-		return carl::rootfinder::realRoots(carl::to_univariate_polynomial(tmp, v), map);
+		return carl::realRoots(carl::to_univariate_polynomial(tmp, v), map);
 	}
 }
 }

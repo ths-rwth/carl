@@ -1,18 +1,21 @@
 #pragma once
 
-#include "./thom/ThomEncoding.h"
+#include "ThomEncoding.h"
+#include "../ran_operations.h"
+
 
 #include <memory>
 
 namespace carl {
-namespace ran {
+
+// TODO adapt to new interface
 
 template<typename Number>
-struct ThomContent {
+struct real_algebraic_number_thom {
 	template<typename Num>
-	friend bool operator==(const ThomContent<Num>& lhs, const ThomContent<Num>& rhs);
+	friend bool operator==(const real_algebraic_number_thom<Num>& lhs, const real_algebraic_number_thom<Num>& rhs);
 	template<typename Num>
-	friend bool operator<(const ThomContent<Num>& lhs, const ThomContent<Num>& rhs);
+	friend bool operator<(const real_algebraic_number_thom<Num>& lhs, const real_algebraic_number_thom<Num>& rhs);
 private:
 	struct Content {
 		ThomEncoding<Number> te;
@@ -23,7 +26,7 @@ private:
 	};
 	std::shared_ptr<Content> mContent;
 public:
-	ThomContent(const ThomEncoding<Number>& te):
+	real_algebraic_number_thom(const ThomEncoding<Number>& te):
 		mContent(std::make_shared<Content>(te))
 	{}
 
@@ -77,12 +80,12 @@ public:
 };
 
 template<typename Number>
-Number branching_point(const ThomContent<Number>& n) {
+Number branching_point(const real_algebraic_number_thom<Number>& n) {
 	return n.thom_encoding().get_number();
 }
 
 template<typename Number>
-Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, ThomContent<Number>>& m) {
+Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, real_algebraic_number_thom<Number>>& m) {
 	//using Polynomial = MultivariatePolynomial<Number>;
 	
 	CARL_LOG_INFO("carl.ran.thom",
@@ -97,7 +100,7 @@ Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, Thom
 	}
 	assert(m.size() > 0);
 	
-	std::map<Variable, ThomContent<Number>>& m_prime(m);
+	std::map<Variable, real_algebraic_number_thom<Number>>& m_prime(m);
 	auto it = m_prime.begin();
 	while(it != m_prime.end()) {
 			if(!p.has(it->first)) {
@@ -131,107 +134,112 @@ Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, Thom
 }
 
 template<typename Number, typename Poly>
-bool evaluate(const Constraint<Poly>& c, std::map<Variable, ThomContent<Number>>& m) {
+bool evaluate(const Constraint<Poly>& c, std::map<Variable, real_algebraic_number_thom<Number>>& m) {
 	auto res = evaluate(c.lhs(), m);
 	return evaluate(res, c.relation());
 }
 
 template<typename Number>
-ThomContent<Number> abs(const ThomContent<Number>& n) {
+real_algebraic_number_thom<Number> abs(const real_algebraic_number_thom<Number>& n) {
 	assert(false);
 	return n;
 }
 
 template<typename Number>
-Interval<Number> get_interval(const ThomContent<Number>& n) {
+Number is_root_of(const UnivariatePolynomial<Number>& p, const real_algebraic_number_thom<Number>& value) {
+	return value.sgn(p) == Sign::ZERO;
+}
+
+template<typename Number>
+Interval<Number> get_interval(const real_algebraic_number_thom<Number>& n) {
 	return Interval<Number>(n.thom_encoding().get_number());
 }
 
 template<typename Number>
-const Number& get_number(const ThomContent<Number>& n) {
+const Number& get_number(const real_algebraic_number_thom<Number>& n) {
 	return n.thom_encoding().get_number();
 }
 
 template<typename Number>
-UnivariatePolynomial<Number> get_polynomial(const ThomContent<Number>& n) {
+UnivariatePolynomial<Number> get_polynomial(const real_algebraic_number_thom<Number>& n) {
 	return UnivariatePolynomial<Number>(Variable::NO_VARIABLE);
 }
 
 template<typename Number>
-bool is_number(const ThomContent<Number>& n) {
-	return n.thom_encoding().is_number();
-}
-
-template<typename Number>
-ThomContent<Number> sample_above(const ThomContent<Number>& n) {
+real_algebraic_number_thom<Number> sample_above(const real_algebraic_number_thom<Number>& n) {
 	return n.thom_encoding() + Number(1);
 }
 template<typename Number>
-ThomContent<Number> sample_below(const ThomContent<Number>& n) {
+real_algebraic_number_thom<Number> sample_below(const real_algebraic_number_thom<Number>& n) {
 	return n.thom_encoding() + Number(-1);
 }
 template<typename Number>
-ThomContent<Number> sample_between(const ThomContent<Number>& lower, const ThomContent<Number>& upper) {
+real_algebraic_number_thom<Number> sample_between(const real_algebraic_number_thom<Number>& lower, const real_algebraic_number_thom<Number>& upper) {
 	return ThomEncoding<Number>::intermediatePoint(lower.thom_encoding(), upper.thom_encoding());
 }
 template<typename Number>
-Number sample_between(const ThomContent<Number>& lower, const NumberContent<Number>& upper) {
-	return ThomEncoding<Number>::intermediatePoint(lower.thom_encoding(), upper.value());
+Number sample_between(const real_algebraic_number_thom<Number>& lower, const Number& upper) {
+	return ThomEncoding<Number>::intermediatePoint(lower.thom_encoding(), upper);
 }
 template<typename Number>
-Number sample_between(const NumberContent<Number>& lower, const ThomContent<Number>& upper) {
-	return ThomEncoding<Number>::intermediatePoint(lower.value(), upper.thom_encoding());
+Number sample_between(const Number& lower, const real_algebraic_number_thom<Number>& upper) {
+	return ThomEncoding<Number>::intermediatePoint(lower, upper.thom_encoding());
 }
 
 template<typename Number>
-Number floor(const ThomContent<Number>& n) {
+Number floor(const real_algebraic_number_thom<Number>& n) {
 	return carl::floor(get_interval(n).lower());
 }
 template<typename Number>
-Number ceil(const ThomContent<Number>& n) {
+Number ceil(const real_algebraic_number_thom<Number>& n) {
 	return carl::ceil(get_interval(n).upper());
 }
 
 template<typename Number>
-bool operator==(const ThomContent<Number>& lhs, const ThomContent<Number>& rhs) {
+bool operator==(const real_algebraic_number_thom<Number>& lhs, const real_algebraic_number_thom<Number>& rhs) {
 	if (lhs.mContent.get() == rhs.mContent.get()) return true;
 	return lhs.thom_encoding() == rhs.thom_encoding();
 }
 
 template<typename Number>
-bool operator==(const ThomContent<Number>& lhs, const NumberContent<Number>& rhs) {
-	return lhs.thom_encoding() == rhs.value();
+bool operator==(const real_algebraic_number_thom<Number>& lhs, const Number& rhs) {
+	return lhs.thom_encoding() == rhs;
 }
 
 template<typename Number>
-bool operator==(const NumberContent<Number>& lhs, const ThomContent<Number>& rhs) {
-	return lhs.value() == rhs.thom_encoding();
+bool operator==(const Number& lhs, const real_algebraic_number_thom<Number>& rhs) {
+	return lhs == rhs.thom_encoding();
 }
 
 template<typename Number>
-bool operator<(const ThomContent<Number>& lhs, const ThomContent<Number>& rhs) {
+bool operator<(const real_algebraic_number_thom<Number>& lhs, const real_algebraic_number_thom<Number>& rhs) {
 	if (lhs.mContent.get() == rhs.mContent.get()) return false;
 	return lhs.thom_encoding() < rhs.thom_encoding();
 }
 
 template<typename Number>
-bool operator<(const ThomContent<Number>& lhs, const NumberContent<Number>& rhs) {
-	return lhs.thom_encoding() == rhs.value();
+bool operator<(const real_algebraic_number_thom<Number>& lhs, const Number& rhs) {
+	return lhs.thom_encoding() == rhs;
 }
 
 template<typename Number>
-bool operator<(const NumberContent<Number>& lhs, const ThomContent<Number>& rhs) {
-	return lhs.value() == rhs.thom_encoding();
+bool operator<(const Number& lhs, const real_algebraic_number_thom<Number>& rhs) {
+	return lhs == rhs.thom_encoding();
 }
 
 template<typename Num>
-std::ostream& operator<<(std::ostream& os, const ThomContent<Num>& rhs) {
-	os << "TE " << rhs.polynomial() << " in " << rhs.mainVar() << ", " << rhs.sign_condition();
+std::ostream& operator<<(std::ostream& os, const real_algebraic_number_thom<Num>& rhs) {
+	os << "(TE " << rhs.polynomial() << " in " << rhs.mainVar() << ", " << rhs.sign_condition();
 	if (rhs.dimension() > 1) {
 		os << " OVER " << rhs.point();
 	}
+	os << ")";
 	return os;
 }
 
-}
+template<typename Number>
+struct is_ran<real_algebraic_number_thom<Number>> { 
+  static const bool value = true;
+};
+
 }

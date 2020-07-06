@@ -5,6 +5,8 @@
  * @version 2013-10-07
  */
 
+#include <carl/core/polynomialfunctions/GCD.h>
+
 namespace carl
 {
 

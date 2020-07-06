@@ -19,7 +19,7 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void substituteIn(MultivariateRoot<Poly>& mvr, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
-		if (r.isNumeric()) substituteIn(mvr, var, r.value());
+		if (r.is_numeric()) substituteIn(mvr, var, r.value());
 	}
 
 	/**

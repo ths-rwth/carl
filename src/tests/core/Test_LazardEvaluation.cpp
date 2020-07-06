@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 
-#include "carl/core/polynomialfunctions/LazardEvaluation.h"
+#include "carl/formula/model/ran/interval/LazardEvaluation.h"
 #include "carl/core/UnivariatePolynomial.h"
 
 #include "../Common.h"
@@ -21,7 +21,7 @@ TEST(LazardEvaluation, Test)
 	{
 		carl::UnivariatePolynomial<Rational> p(x, std::initializer_list<Rational>{-2, 0, 1});
 		carl::Interval<Rational> i(Rational(1), carl::BoundType::STRICT, Rational(2), carl::BoundType::STRICT);
-		carl::RealAlgebraicNumber<Rational> ran = carl::RealAlgebraicNumber<Rational>::createSafeIR(p, i);
+		carl::real_algebraic_number_interval<Rational> ran = carl::real_algebraic_number_interval<Rational>::create_safe(p, i);
 		
 		le.substitute(x, ran);
 	}
@@ -29,7 +29,7 @@ TEST(LazardEvaluation, Test)
 	{
 		carl::UnivariatePolynomial<Rational> p(y, std::initializer_list<Rational>{-2, 0, 1});
 		carl::Interval<Rational> i(Rational(1), carl::BoundType::STRICT, Rational(2), carl::BoundType::STRICT);
-		carl::RealAlgebraicNumber<Rational> ran = carl::RealAlgebraicNumber<Rational>::createSafeIR(p, i);
+		carl::real_algebraic_number_interval<Rational> ran = carl::real_algebraic_number_interval<Rational>::create_safe(p, i);
 		
 		le.substitute(y, ran);
 	}
@@ -51,7 +51,7 @@ TEST(LazardEvaluation, Test2)
 	{
 		carl::UnivariatePolynomial<Rational> p(x, std::initializer_list<Rational>{-2, 0, 1});
 		carl::Interval<Rational> i(Rational(1), carl::BoundType::STRICT, Rational(2), carl::BoundType::STRICT);
-		carl::RealAlgebraicNumber<Rational> ran = carl::RealAlgebraicNumber<Rational>::createSafeIR(p, i);
+		carl::real_algebraic_number_interval<Rational> ran = carl::real_algebraic_number_interval<Rational>::create_safe(p, i);
 		
 		le.substitute(x, ran);
 	}
@@ -59,7 +59,7 @@ TEST(LazardEvaluation, Test2)
 	{
 		carl::UnivariatePolynomial<Rational> p(y, std::initializer_list<Rational>{-2, 0, 0, 0, 1});
 		carl::Interval<Rational> i(Rational(1), carl::BoundType::STRICT, Rational(2), carl::BoundType::STRICT);
-		carl::RealAlgebraicNumber<Rational> ran = carl::RealAlgebraicNumber<Rational>::createSafeIR(p, i);
+		carl::real_algebraic_number_interval<Rational> ran = carl::real_algebraic_number_interval<Rational>::create_safe(p, i);
 		
 		le.substitute(y, ran);
 	}
@@ -86,7 +86,7 @@ protected:
 	auto getRAN(std::initializer_list<Rational> coeffs, Rational lower, Rational upper) {
 		carl::UnivariatePolynomial<Rational> p(y, coeffs);
 		carl::Interval<Rational> i(lower, carl::BoundType::STRICT, upper, carl::BoundType::STRICT);
-		return carl::RealAlgebraicNumber<Rational>::createSafeIR(p, i);
+		return carl::real_algebraic_number_interval<Rational>::create_safe(p, i);
 	}
 };
 

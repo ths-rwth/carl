@@ -3,7 +3,6 @@
 
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/formula/model/ran/RealAlgebraicNumber.h"
-#include "carl/formula/model/ran/RealAlgebraicNumberEvaluation.h"
 #include "carl/formula/model/ran/RealAlgebraicPoint.h"
 
 #include "../Common.h"
@@ -42,7 +41,7 @@ TEST(RealAlgebraicNumber, Evaluation)
 	std::vector<Variable> vars({y, x});
 	RealAlgebraicPoint<Rational> point({RealAlgebraicNumber<Rational>(py, iy), RealAlgebraicNumber<Rational>(px, ix)});
 
-	//RealAlgebraicNumberEvaluation::evaluate(MultivariatePolynomial<Rational>(p), point, vars);
+	//evaluate(MultivariatePolynomial<Rational>(p), point, vars);
 
 	/* m = {
 	 * skoY : (IR ]-147580509/24822226, -73113831/12411113[, (1)*skoY^14 + (-144)*skoY^12 + (11232)*skoY^10 + (-556416)*skoY^8 + (18156096)*skoY^6 + (-387555840)*skoY^4 + (4572288000)*skoY^2 + -18289152000),

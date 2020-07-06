@@ -7,6 +7,7 @@
 #include "../core/Variable.h"
 #include "../numbers/numbers.h"
 #include "../util/hash.h"
+#include <carl/core/polynomialfunctions/Representation.h>
 
 #include <optional>
 #include <tuple>
@@ -77,7 +78,7 @@ namespace carl {
 				auto ccoeff = mr.poly().coeff(mr.var(), 0);
 				return Constraint<Poly>(Poly(mVar) + ccoeff / lcoeff, rel);
 			}
-			if (!std::get<RAN>(mValue).isNumeric()) return std::nullopt;
+			if (!std::get<RAN>(mValue).is_numeric()) return std::nullopt;
 			return Constraint<Poly>(Poly(mVar) - Poly(std::get<RAN>(mValue).value()), rel);
 		}
 
@@ -90,8 +91,8 @@ namespace carl {
 		Poly definingPolynomial() const {
 			if (std::holds_alternative<RAN>(mValue)) {
 				const auto& ran = std::get<RAN>(mValue);
-				if (ran.isNumeric()) return Poly(mVar) - ran.value();
-				return Poly(carl::replace_main_variable(ran.getIRPolynomial(), mVar));
+				if (ran.is_numeric()) return Poly(mVar) - ran.value();
+				return Poly(carl::replace_main_variable(ran.polynomial(), mVar));
 			} else {
 				const auto& mr = std::get<MR>(mValue);
 				return mr.poly(mVar);

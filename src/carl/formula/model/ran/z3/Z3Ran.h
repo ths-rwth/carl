@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../config.h"
+#include <carl/config.h>
 
 #ifdef RAN_USE_Z3
 
@@ -42,20 +42,18 @@ namespace carl {
 
             bool is_zero() const;
 
-			bool is_number() const;
-			Number get_number() const;
+			bool is_numeric() const;
+			Number value() const;
 
             bool is_integral() const;
 
 			Number integer_below() const {
-				return carl::floor(lower());
+                if (is_numeric()) {
+                    return carl::floor(value());
+                } else {
+                    return carl::floor(lower());
+                }
 			}
-
-            // Note: this already tries to simplify to a polynomial!
-            // TODO can this result be cached ?!?
-            bool isNumeric() const;
-
-            Number getNumber() const;
            
             const Number& lower() const;
 

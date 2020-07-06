@@ -3,7 +3,7 @@
 #include <vector>
 
 namespace carl {
-namespace rootfinder {
+namespace roots {
 namespace eigen {
 
 /**

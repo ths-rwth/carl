@@ -36,7 +36,7 @@ namespace carl
             }
             else if (ass->second.isRAN())
             {
-                if (ass->second.asRAN().isNumeric())
+                if (ass->second.asRAN().is_numeric())
                 {
                     assert( ass->first.isVariable() );
                     _rationalAssigns.insert( _rationalAssigns.end(), std::make_pair(ass->first.asVariable(), ass->second.asRAN().value()) );

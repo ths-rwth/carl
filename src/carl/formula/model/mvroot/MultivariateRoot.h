@@ -1,12 +1,11 @@
 #pragma once
 
 #include "../../../core/logging.h"
-#include "../ran/interval/RootFinder.h"
+#include "../ran/real_roots.h"
 #include "../../../core/polynomialfunctions/Substitution.h"
 #include "../../../core/Variable.h"
 #include "../../../numbers/numbers.h"
 #include "../ran/RealAlgebraicNumber.h"
-#include "../ran/RealAlgebraicNumberEvaluation.h"
 
 #include <boost/optional.hpp>
 
@@ -35,7 +34,7 @@ class MultivariateRoot {
 public:
 	using Number = typename UnderlyingNumberType<Poly>::type;
 	using RAN = RealAlgebraicNumber<Number>;
-	using EvalMap = RealAlgebraicNumberEvaluation::RANMap<Number>;
+	using EvalMap = ran::RANMap<Number>;
 private:
   /**
    * Distinguished, globally unique root-variable
@@ -126,7 +125,7 @@ public:
 	boost::optional<RAN> evaluate(const EvalMap& m) const {
 		CARL_LOG_DEBUG("carl.rootexpression", "Evaluate: " << *this << " against: " << m);
 		auto poly = carl::to_univariate_polynomial(mPoly, sVar);
-		auto roots = rootfinder::realRoots(poly, m);
+		auto roots = carl::realRoots(poly, m);
 		CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << roots);
 		if (roots.size() < mK) {
 			CARL_LOG_TRACE("carl.rootexpression", mK << "th root does not exist.");

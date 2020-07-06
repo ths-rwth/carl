@@ -1,8 +1,8 @@
 #pragma once
 
 #include "FieldExtensions.h"
-#include "Quotient.h"
-#include "Substitution.h"
+#include <carl/core/polynomialfunctions/Quotient.h>
+#include <carl/core/polynomialfunctions/Substitution.h>
 
 #ifdef USE_COCOA
 
@@ -17,7 +17,7 @@ private:
 public:
 	LazardEvaluation(const Poly& p): mLiftingPoly(p) {}
 	
-	auto substitute(Variable v, const RealAlgebraicNumber<Rational>& r, bool divideZeroFactors = true) {
+	auto substitute(Variable v, const real_algebraic_number_interval<Rational>& r, bool divideZeroFactors = true) {
 		auto red = mFieldExtensions.extend(v, r);
 		Poly newPoly;
 		if (red.first) {

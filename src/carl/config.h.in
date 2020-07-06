@@ -12,7 +12,6 @@
 #cmakedefine USE_COCOA
 #cmakedefine USE_GINAC
 
+#cmakedefine RAN_USE_INTERVAL
 #cmakedefine RAN_USE_THOM
 #cmakedefine RAN_USE_Z3
-
-#cmakedefine ROOTFINDER_LE

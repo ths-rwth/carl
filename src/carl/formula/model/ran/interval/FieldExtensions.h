@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../formula/model/ran/RealAlgebraicNumberEvaluation.h"
+#include "ran_interval_evaluation.h"
 
-#include "Representation.h"
+#include <carl/core/polynomialfunctions/Representation.h>
 
 #ifdef USE_COCOA
 
@@ -97,7 +97,7 @@ template<typename Rational, typename Poly>
 class FieldExtensions {
 private:
 	CoCoA::ring mQ = CoCoA::RingQQ();
-	std::map<Variable,RealAlgebraicNumber<Rational>> mModel;
+	std::map<Variable,real_algebraic_number_interval<Rational>> mModel;
 	
 	detail_field_extensions::CoCoAConverter cc;
 	std::map<Variable, CoCoA::RingElem> mSymbolsThere;
@@ -114,7 +114,7 @@ private:
 	
 	bool evaluatesToZero(const CoCoA::RingElem& p, const detail_field_extensions::CoCoAConverter::ConversionInfo& ci) const {
 		auto mp = cc.convertMV<Poly>(p, ci);
-		auto res = carl::RealAlgebraicNumberEvaluation::evaluate(Constraint<Poly>(mp, Relation::EQ), mModel);
+		auto res = carl::evaluate(Constraint<Poly>(mp, Relation::EQ), mModel);
 		CARL_LOG_DEBUG("carl.lazard", "Evaluated " << p << " -> " << mp << " == 0 -> " << res);
 		return res;
 	}
@@ -136,14 +136,14 @@ public:
 	 * In the first case, we return true and the term to substitute with.
 	 * In the second case, we return false and the new minimal polynomial.
 	 */
-	std::pair<bool,Poly> extend(Variable v, const RealAlgebraicNumber<Rational>& r) {
+	std::pair<bool,Poly> extend(Variable v, const real_algebraic_number_interval<Rational>& r) {
 		mModel.emplace(v, r);
-		if (r.isNumeric()) {
+		if (r.is_numeric()) {
 			CARL_LOG_DEBUG("carl.lazard", "Is numeric: " << v << " -> " << r);
 			return std::make_pair(true, Poly(r.value()));
 		}
 		detail_field_extensions::CoCoAConverter::ConversionInfo ci = buildPolyRing(v);
-		CoCoA::RingElem p = cc.convertUV(replace_main_variable(r.getIRPolynomial(), v), ci);
+		CoCoA::RingElem p = cc.convertUV(replace_main_variable(r.polynomial(), v), ci);
 		CARL_LOG_DEBUG("carl.lazard", "Factorization of " << p << " on " << ci.mRing);
 		auto factorization = CoCoA::factor(p);
 		CARL_LOG_DEBUG("carl.lazard", "-> " << factorization);

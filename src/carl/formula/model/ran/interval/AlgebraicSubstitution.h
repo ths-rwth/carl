@@ -16,13 +16,13 @@
  * Thus the first defining polynomials may contain all variables, the last must be univariate.
  */
 
-#include "../MultivariatePolynomial.h"
-#include "../UnivariatePolynomial.h"
-#include "../../converter/CoCoAAdaptor.h"
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/core/UnivariatePolynomial.h>
+#include <carl/converter/CoCoAAdaptor.h>
 
-#include "Remainder.h"
-#include "Resultant.h"
-#include "to_univariate_polynomial.h"
+#include <carl/core/polynomialfunctions/Remainder.h>
+#include <carl/core/polynomialfunctions/Resultant.h>
+#include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
 
 namespace carl {
 

@@ -12,18 +12,18 @@ public:
 };
 
 BENCHMARK_F(RAN_Fixture, RAN_Create)(benchmark::State& state) {
-	auto rans = carl::rootfinder::realRoots(p);
-	auto p = rans[0].getIRPolynomial();
-	auto i = rans[0].getInterval();
+	auto rans = carl::realRoots(p);
+	auto p = rans[0].polynomial();
+	auto i = rans[0].interval();
 	for (auto _ : state) {
 		auto ran = carl::RealAlgebraicNumber<mpq_class>(p, i);
 	}
 }
 
 BENCHMARK_F(RAN_Fixture, RAN_CreateRefineOld)(benchmark::State& state) {
-	auto rans = carl::rootfinder::realRoots(p);
-	auto p = rans[0].getIRPolynomial();
-	auto i = rans[0].getInterval();
+	auto rans = carl::realRoots(p);
+	auto p = rans[0].polynomial();
+	auto i = rans[0].interval();
 	for (auto _ : state) {
 		auto ran = carl::RealAlgebraicNumber<mpq_class>(p, i);
 		ran.refine(false);
@@ -31,9 +31,9 @@ BENCHMARK_F(RAN_Fixture, RAN_CreateRefineOld)(benchmark::State& state) {
 }
 
 BENCHMARK_F(RAN_Fixture, RAN_CreateRefineNew)(benchmark::State& state) {
-	auto rans = carl::rootfinder::realRoots(p);
-	auto p = rans[0].getIRPolynomial();
-	auto i = rans[0].getInterval();
+	auto rans = carl::realRoots(p);
+	auto p = rans[0].polynomial();
+	auto i = rans[0].interval();
 	for (auto _ : state) {
 		auto ran = carl::RealAlgebraicNumber<mpq_class>(p, i);
 		ran.refine(true);

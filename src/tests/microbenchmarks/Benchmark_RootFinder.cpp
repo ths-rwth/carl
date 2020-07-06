@@ -14,7 +14,7 @@ BENCHMARK_F(RF_Fixture, Real_Roots_1)(benchmark::State& state) {
 	// (384)*x^3 + (-96)*x^2 + (12)*x^1 + -1
 
 	for (auto _ : state) {
-		auto rans = carl::rootfinder::realRoots(p, carl::Interval<mpq_class>::unboundedInterval());
+		auto rans = carl::realRoots(p, carl::Interval<mpq_class>::unboundedInterval());
 	}
 }
 
@@ -40,7 +40,7 @@ BENCHMARK_F(RF_Fixture, Real_Roots_2)(benchmark::State& state) {
 	// -66864570625487788604261524190527488000000000000000000000000000000000000000000000000
 
 	for (auto _ : state) {
-		auto rans = carl::rootfinder::realRoots(p, carl::Interval<mpq_class>::unboundedInterval());
+		auto rans = carl::realRoots(p, carl::Interval<mpq_class>::unboundedInterval());
 	}
 }
 

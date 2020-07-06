@@ -51,7 +51,7 @@ ModelValue<Rational,Poly> evaluate(const T& t, const Model<Rational,Poly>& m) {
 	T tmp = t;
 	ModelValue<Rational,Poly> res;
 	evaluate(res, tmp, m);
-	if (res.isRAN() && res.asRAN().isNumeric()) {
+	if (res.isRAN() && res.asRAN().is_numeric()) {
 		res = res.asRAN().value();
 	}
 	return res;

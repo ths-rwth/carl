@@ -12,7 +12,7 @@
 #include <carl/core/polynomialfunctions/Evaluation.h>
 #include <carl/core/polynomialfunctions/RootElimination.h>
 
-namespace carl::rootfinder {
+namespace carl::ran::interval {
 
 using carl::operator<<;
 
@@ -184,7 +184,7 @@ class RealRootIsolation {
 		CARL_LOG_DEBUG("carl.core.rootfinder", "Double coeffs: " << coeffs);
 		
 		// Get approximations of the roots
-		std::vector<double> approx = eigen::root_approximation(coeffs);
+		std::vector<double> approx = carl::roots::eigen::root_approximation(coeffs);
 		// Sort and make them unique
 		for (double& a: approx) {
 			a = std::round(a*1000) / 1000;

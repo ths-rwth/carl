@@ -1,10 +1,10 @@
 
 #include <gtest/gtest.h>
 
-#include <carl/formula/model/ran/RootFinder.h>
+#include <carl/formula/model/ran/real_roots.h>
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/polynomialfunctions/Chebyshev.h>
-#include "carl/core/polynomialfunctions/LazardEvaluation.h"
+#include <carl/formula/model/ran/interval/LazardEvaluation.h>
 
 #include <carl/formula/Formula.h>
 #include <carl-model/Model.h>
@@ -22,10 +22,10 @@ using namespace carl;
 
 template<typename Number>
 bool represents(const carl::RealAlgebraicNumber<Number> root, const Number& exact) {
-	if (root.isNumeric()) {
+	if (root.is_numeric()) {
 		return root.value() == exact;
 	} else {
-		return root.getInterval().contains(exact);
+		return root.interval().contains(exact);
 	}
 }
 
@@ -36,26 +36,26 @@ TEST(RootFinder, realRoots)
 
 	{
 		UPolynomial p(x, {(Rational)-1, (Rational)0, (Rational)0, (Rational)1});
-		auto roots = carl::rootfinder::realRoots(p);
+		auto roots = carl::realRoots(p);
 		EXPECT_TRUE(roots.size() == 1);
 		EXPECT_TRUE(represents(roots.front(), (Rational)1));
 	}
 	{
 		UPolynomial p(x, {(Rational)0, (Rational)-1, (Rational)0, (Rational)0, (Rational)1});
-		auto roots = carl::rootfinder::realRoots(p);
+		auto roots = carl::realRoots(p);
 		EXPECT_TRUE(roots.size() == 2);
 	}
 
 	{
 		UMPolynomial p(x, {MPolynomial(-1), MPolynomial(0), MPolynomial(0), MPolynomial(1)});
-		auto roots = carl::rootfinder::realRoots(p);
+		auto roots = carl::realRoots(p);
 		EXPECT_TRUE(roots.size() == 1);
 		EXPECT_TRUE(represents(roots.front(), (Rational)1));
 	}
 
 	{
 		UMPolynomial p(x, {MPolynomial(-1), MPolynomial(0), MPolynomial(1)});
-		auto roots = carl::rootfinder::realRoots(p);
+		auto roots = carl::realRoots(p);
 		EXPECT_TRUE(roots.size() == 2);
 		EXPECT_TRUE(represents(roots.front(), (Rational)-1));
 		EXPECT_TRUE(represents(roots.back(), (Rational)1));
@@ -66,7 +66,7 @@ TEST(RootFinder, realRoots)
 		std::map<carl::Variable, carl::RealAlgebraicNumber<Rational>> m;
 		m.emplace(y, carl::RealAlgebraicNumber<Rational>(Rational(-1)));
 		std::cout << "Map = " << m << std::endl;
-		auto roots = carl::rootfinder::realRoots(p, m);
+		auto roots = carl::realRoots(p, m);
 		EXPECT_TRUE(roots.size() == 2);
 		EXPECT_TRUE(represents(roots.front(), (Rational)-1));
 		EXPECT_TRUE(represents(roots.back(), (Rational)1));
@@ -77,7 +77,7 @@ TEST(RootFinder, realRoots)
 		UMPolynomial p(x, {c2,c1});
 		std::map<carl::Variable, carl::RealAlgebraicNumber<Rational>> m;
 		m.emplace(y, carl::RealAlgebraicNumber<Rational>(Rational(-1)));
-		auto roots = carl::rootfinder::realRoots(p, m);
+		auto roots = carl::realRoots(p, m);
 		EXPECT_TRUE(roots.empty());
 	}
 }
@@ -94,7 +94,7 @@ TEST(RootFinder, evalRoots)
 	UMPolynomial p = UMPolynomial(y, {MPolynomial(x), MPolynomial(-1)});
 	std::map<carl::Variable, carl::RealAlgebraicNumber<Rational>> m;
 	m.emplace(x, xval);
-	auto roots = carl::rootfinder::realRoots(p, m);
+	auto roots = carl::realRoots(p, m);
 	EXPECT_TRUE(roots.size() == 1);
 	EXPECT_TRUE(roots.front() == xval);
 }
@@ -139,7 +139,7 @@ TEST(RootFinder, tryRealRoots)
 	std::cout << "y = z? " << (yval == zval) << std::endl;
 	std::cout << p << std::endl;
 	std::cout << m << std::endl;
-	auto roots = carl::rootfinder::realRoots(p, m);
+	auto roots = carl::realRoots(p, m);
 	std::cout << "-> " << roots << std::endl;
 
 	#ifdef USE_COCOA
@@ -148,7 +148,7 @@ TEST(RootFinder, tryRealRoots)
 	le.substitute(z, zval);
 	std::cout << "Lazard: " << le.getLiftingPoly() << std::endl;
 	{
-		auto roots = carl::rootfinder::realRoots(carl::to_univariate_polynomial(le.getLiftingPoly(), x), m);
+		auto roots = carl::realRoots(carl::to_univariate_polynomial(le.getLiftingPoly(), x), m);
 		std::cout << "-> " << roots << std::endl;
 	}
 	#endif
@@ -158,7 +158,7 @@ TEST(RootFinder, Chebyshev)
 {
 	carl::Chebyshev<Rational> chebyshev(freshRealVariable("x"));
 	std::size_t n = 50;
-	auto roots = rootfinder::realRoots(chebyshev(n));
+	auto roots = realRoots(chebyshev(n));
 	EXPECT_TRUE(roots.size() == n);
 	carl::RealAlgebraicNumber<Rational> mone(Rational(-1));
 	carl::RealAlgebraicNumber<Rational> pone(Rational(1));
@@ -181,7 +181,7 @@ TEST(RootFinder, Comparison)
 	662971140168469203991742914981670449102848000000000_mpq, -221093370976852468477758191983112847898368000000_mpq,
 	35982863100180637437263547995778211974592000_mpq, -222040198421806427031529186994264976123_mpq});
 
-	auto ran1 = carl::rootfinder::realRoots(p, carl::Interval<mpq_class>::unboundedInterval());
+	auto ran1 = carl::realRoots(p, carl::Interval<mpq_class>::unboundedInterval());
 
 	std::cout << ran1 << std::endl;
 }
@@ -194,7 +194,7 @@ TEST(RootFinder, FactorizationBug)
 	// 2 + -7*x + 7*x^2 + -2*x^3 < 0
 	std::cout << p << std::endl;
 
-	auto ran1 = carl::rootfinder::realRoots(p);
+	auto ran1 = carl::realRoots(p);
 	std::cout << ran1 << std::endl;
 	// should be: 1/2, 1, 2
 

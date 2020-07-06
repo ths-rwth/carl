@@ -31,12 +31,12 @@ namespace carl {
     }
 
 	template<typename Number>
-	bool Z3Ran<Number>::is_number() const {
+	bool Z3Ran<Number>::is_numeric() const {
 		return z3().anumMan().is_rational(content());
 	}
 	template<typename Number>
-	Number Z3Ran<Number>::get_number() const {
-		assert(isNumeric());
+	Number Z3Ran<Number>::value() const {
+		assert(is_numeric());
         mpq res;
         z3().anumMan().to_rational(content(), res);
         Number num = z3().toNumber<Number>(res);
@@ -54,24 +54,10 @@ namespace carl {
         return z3().anumMan().is_int(content());
     }
 
-    template<typename Number>
-    bool Z3Ran<Number>::isNumeric() const {
-        return z3().anumMan().is_rational(content());
-    }
-
-    template<typename Number>
-    Number Z3Ran<Number>::getNumber() const {
-        assert(isNumeric());
-        mpq res;
-        z3().anumMan().to_rational(content(), res);
-        Number num = z3().toNumber<Number>(res);
-        z3().free(res);
-        return num;
-    }
 
     template<typename Number>
     const Number& Z3Ran<Number>::lower() const {
-        assert(!isNumeric());
+        assert(!is_numeric());
         mpq res;
         z3().anumMan().get_lower(content(), res);
         mLower = z3().toNumber<Number>(res);
@@ -81,7 +67,7 @@ namespace carl {
 
     template<typename Number>
     const Number& Z3Ran<Number>::upper() const {
-        assert(!isNumeric());
+        assert(!is_numeric());
         mpq res;
         z3().anumMan().get_upper(content(), res);
         mUpper = z3().toNumber<Number>(res);
@@ -91,7 +77,7 @@ namespace carl {
 
     template<typename Number>
     const Interval<Number>& Z3Ran<Number>::getInterval() const {
-        assert(!isNumeric());
+        assert(!is_numeric());
         const Number& lo = lower();
         const Number& up = upper();
         mInterval = Interval<Number>(lo, BoundType::STRICT, up, BoundType::STRICT);
@@ -101,17 +87,21 @@ namespace carl {
     template<typename Number>
     Number Z3Ran<Number>::branchingPoint() const
     {
-        const Number& low = lower();
-        const Number& up = upper();
-        const Number& mid = (up-low)/2;
-        
-        const Number& midf = carl::floor(mid);
-        if (low <= midf)
-            return midf;
-        const Number& midc = carl::ceil(mid);
-        if (up >= midc)
-            return midc;
-        return mid;
+        if (is_numeric()) {
+            return value();
+        } else {
+            const Number& low = lower();
+            const Number& up = upper();
+            const Number& mid = (up-low)/2;
+            
+            const Number& midf = carl::floor(mid);
+            if (low <= midf)
+                return midf;
+            const Number& midc = carl::ceil(mid);
+            if (up >= midc)
+                return midc;
+            return mid;
+        }
     }
 
     template<typename Number>

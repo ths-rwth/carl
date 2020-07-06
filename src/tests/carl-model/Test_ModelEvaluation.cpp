@@ -13,7 +13,7 @@ typedef Constraint<Pol> ConstraintT;
 typedef MultivariateRoot<Pol> MVRootT;
 typedef Formula<Pol> FormulaT;
 typedef Interval<Rational> IntervalT;
-typedef RealAlgebraicNumber<Rational> RANT;
+typedef real_algebraic_number_interval<Rational> RANT;
 typedef Model<Rational,Pol> ModelT;
 
 TEST(ModelEvaluation, Formula)
@@ -64,7 +64,7 @@ TEST(ModelEvaluation, EvaluateRANIR)
 	ModelT m;
 	IntervalT i(Rational(-3)/2, BoundType::STRICT, Rational(-1), BoundType::STRICT);
 	UnivariatePolynomial<Rational> p(x, {Rational(-2), Rational(0), Rational(1)});
-	m.assign(x, RANT::createSafeIR(p, i));
+	m.assign(x, RANT::create_safe(p, i));
 	FormulaT f = FormulaT(ConstraintT(Pol(p), Relation::EQ));
 	auto res = model::evaluate(f, m);
 	EXPECT_TRUE(res.isBool());
@@ -77,7 +77,7 @@ TEST(ModelEvaluation, EvaluateRANIRConstraint)
 	ModelT m;
 	IntervalT i(Rational(27)/32, BoundType::STRICT, Rational(7)/8, BoundType::STRICT);
 	UnivariatePolynomial<Rational> p(x, {Rational(-3), Rational(0), Rational(4)}); // 4*r^2 -3
-	m.assign(x, RANT::createSafeIR(p, i)); // x = (IR ]27/32, 7/8[, (4)*__r^2 + -3 R)
+	m.assign(x, RANT::create_safe(p, i)); // x = (IR ]27/32, 7/8[, (4)*__r^2 + -3 R)
 	FormulaT f = FormulaT(ConstraintT(Pol(x), Relation::LEQ));
 	auto res = model::evaluate(f, m);
 	EXPECT_TRUE(res.isBool());
@@ -97,8 +97,8 @@ TEST(ModelEvaluation, EvaluateWithMVR)
 	using UPol = UnivariatePolynomial<Rational>;
 
 	UPol upol(x, {Rational(-7), 0, 1});
-	RealAlgebraicNumber<Rational> r1 = RealAlgebraicNumber<Rational>::createSafeIR(upol, Interval<Rational>(-3,BoundType::STRICT,-1,BoundType::STRICT));
-	RealAlgebraicNumber<Rational> r2 = RealAlgebraicNumber<Rational>::createSafeIR(upol, Interval<Rational>(1,BoundType::STRICT,3,BoundType::STRICT));
+	RANT r1 = RANT::create_safe(upol, Interval<Rational>(-3,BoundType::STRICT,-1,BoundType::STRICT));
+	RANT r2 = RANT::create_safe(upol, Interval<Rational>(1,BoundType::STRICT,3,BoundType::STRICT));
 
 	EXPECT_EQ(res, std::decay<decltype(res)>::type({r1, r2}));
 }
