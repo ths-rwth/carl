@@ -149,6 +149,7 @@ UnivariatePolynomial<Number> algebraic_substitution(
 		case AlgebraicSubstitutionStrategy::GROEBNER:
 			return algebraic_substitution_groebner(p, polynomials);
 		case AlgebraicSubstitutionStrategy::RESULTANT:
+		default:
 			return algebraic_substitution_resultant(p, polynomials);
 	}
 }
@@ -168,6 +169,7 @@ UnivariatePolynomial<Number> algebraic_substitution(
 		case AlgebraicSubstitutionStrategy::GROEBNER:
 			return algebraic_substitution_groebner(polynomials, variables);
 		case AlgebraicSubstitutionStrategy::RESULTANT:
+		default:
 			return algebraic_substitution_resultant(polynomials, variables);
 	}
 }

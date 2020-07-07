@@ -3,7 +3,6 @@
 
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/formula/model/ran/RealAlgebraicNumber.h"
-#include "carl/formula/model/ran/RealAlgebraicPoint.h"
 
 #include "../Common.h"
 
@@ -37,11 +36,6 @@ TEST(RealAlgebraicNumber, Evaluation)
 	Interval<Rational> ix(Rational("2927288666429")/Rational("1099511627776"), BoundType::STRICT, Rational("1463644333215")/Rational("549755813888"), BoundType::STRICT);
 	UnivariatePolynomial<Rational> py(y, std::initializer_list<Rational>{Rational("-18289152000"), 0, Rational("4572288000"), 0, Rational("-387555840"), 0, 18156096, 0, -556416, 0, 11232, 0, -144, 0, 1});
 	Interval<Rational> iy(Rational(-147580509)/24822226, BoundType::STRICT, Rational(-73113831)/12411113, BoundType::STRICT);
-
-	std::vector<Variable> vars({y, x});
-	RealAlgebraicPoint<Rational> point({RealAlgebraicNumber<Rational>(py, iy), RealAlgebraicNumber<Rational>(px, ix)});
-
-	//evaluate(MultivariatePolynomial<Rational>(p), point, vars);
 
 	/* m = {
 	 * skoY : (IR ]-147580509/24822226, -73113831/12411113[, (1)*skoY^14 + (-144)*skoY^12 + (11232)*skoY^10 + (-556416)*skoY^8 + (18156096)*skoY^6 + (-387555840)*skoY^4 + (4572288000)*skoY^2 + -18289152000),

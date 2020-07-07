@@ -278,7 +278,7 @@ public:
 		std::set<Sort> sorts;
 		for (const auto& v: vars) {
 			std::visit(overloaded {
-				[](Variable v){},
+				[](Variable){},
 				[&sorts](BVVariable v){ sorts.insert(v.sort()); },
 				[&sorts](UVariable v){ sorts.insert(v.domain()); },
 			}, v);
