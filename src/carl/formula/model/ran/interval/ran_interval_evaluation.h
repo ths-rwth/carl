@@ -23,7 +23,6 @@ template<typename Number>
 real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
 	
-	std::map<Variable, Interval<Number>> var_to_interval;
 	for (const auto& [var, ran] : m) {
 		if (!p.has(var)) continue;
 		if (refine_model) {
@@ -34,13 +33,19 @@ real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p
 		}
 		if (ran.is_numeric()) {
 			substitute_inplace(p, var, MultivariatePolynomial<Number>(ran.value()));
-		} else {
-			var_to_interval.emplace(var, ran.interval());
-		}
+		} 
 	}
     if (p.isNumber()) {
         return real_algebraic_number_interval<Number>(p.constantPart());
     }
+
+	std::map<Variable, Interval<Number>> var_to_interval;
+	for (const auto& [var, ran] : m) {
+		if (p.has(var)) {
+			assert(!ran.is_numeric());
+			var_to_interval.emplace(var, ran.interval());
+		}
+	}
 
     assert(!var_to_interval.empty());
 	if (var_to_interval.size() == 1) {
@@ -84,7 +89,9 @@ real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p
 			ran.refine();
 			if (ran.is_numeric()) {
 				substitute_inplace(p, var, MultivariatePolynomial<Number>(ran.value()));
-				var_to_interval.erase(var);
+				for (const auto& entry : m) {
+					if (!p.has(entry.first)) var_to_interval.erase(entry.first);
+				}
 			} else {
 				var_to_interval[var] = ran.interval();
 			}
@@ -110,8 +117,6 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 	} else {
 		Poly p = c.lhs();
 
-		// collect intervals and substitute rationals
-		std::map<Variable, Interval<Number>> var_to_interval;
 		for (const auto& [var, ran] : m) {
 			if (!p.has(var)) continue;
 			if (refine_model) {
@@ -122,12 +127,9 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 			}
 			if (ran.is_numeric()) {
 				substitute_inplace(p, var, MultivariatePolynomial<Number>(ran.value()));
-			} else {
-				var_to_interval.emplace(var, ran.interval());
 			}
 		}
-
-		// check for simplification
+		
 		if (p.isNumber()) {
 			CARL_LOG_DEBUG("carl.ran", "Left hand side is constant");
 			return carl::evaluate(p.constantPart(), c.relation());
@@ -138,6 +140,15 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 			return constr.isConsistent();
 		}
 		p = constr.lhs(); // Constraint simplifies polynomial
+
+		std::map<Variable, Interval<Number>> var_to_interval;
+		for (const auto& [var, ran] : m) {
+			if (p.has(var)) {
+				assert(!ran.is_numeric());
+				var_to_interval.emplace(var, ran.interval());
+			}
+		}
+
 		Interval<Number> interval = IntervalEvaluation::evaluate(p, var_to_interval);
 		{
 			auto int_res = carl::evaluate(interval, c.relation());
@@ -160,8 +171,10 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 		// compute the result polynomial	
 		Variable v = freshRealVariable();
 		std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
-		for (const auto& cur : m) {
-			algebraic_information.emplace_back(replace_main_variable(cur.second.polynomial_int(), cur.first).template convert<MultivariatePolynomial<Number>>());
+		for (const auto& [var, ran] : m) {
+			if (var_to_interval.find(var) == var_to_interval.end()) continue;
+			assert(!ran.is_numeric());
+			algebraic_information.emplace_back(replace_main_variable(ran.polynomial_int(), var).template convert<MultivariatePolynomial<Number>>());
 		}
 		UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 		// Note that res cannot be zero as v is a fresh variable in v-p.
@@ -210,10 +223,13 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 		CARL_LOG_DEBUG("carl.ran", "Refine until interval is in (" << neg_ub << "," << pos_lb << ") or interval is positive or negative");
 		while (!((neg_ub < interval.lower() || neg_ub == 0) && (interval.upper() < pos_lb || pos_lb == 0))) {
 			for (const auto& [var, ran] : m) {
+				if (var_to_interval.find(var) == var_to_interval.end()) continue;
 				ran.refine();
 				if (ran.is_numeric()) {
 					substitute_inplace(p, var, MultivariatePolynomial<Number>(ran.value()));
-					var_to_interval.erase(var);
+					for (const auto& entry : m) {
+						if (!p.has(entry.first)) var_to_interval.erase(entry.first);
+					}
 				} else {
 					var_to_interval[var] = ran.interval();
 				}
