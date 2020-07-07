@@ -175,13 +175,6 @@ public:
 		} else {
 			m_ir_assignments.emplace(var, value);
 
-			if (m_original_poly.isUnivariate()) {
-				auto p = carl::to_univariate_polynomial(m_original_poly, var).toNumberCoefficients();
-				if (value.sgn(p) == Sign::ZERO) {
-					return real_algebraic_number_interval<Number>();
-				}
-			}
-
 			const auto poly = replace_main_variable(value.polynomial(), var).template convert<MultivariatePolynomial<Number>>();
 			m_poly = pseudo_remainder(switch_main_variable(m_poly, var), poly);
 			m_poly = carl::resultant(m_poly, poly);
@@ -191,7 +184,7 @@ public:
 	}
 
 	auto value() {
-		assert(m_poly.gatherVariables() == carlVariables({ m_var }));
+		assert(m_poly.gatherVariables() == carlVariables({ m_var }) || m_original_poly.isUnivariate());
 
 		UnivariatePolynomial<Number> res = switch_main_variable(m_poly, m_var).toNumberCoefficients();
 		res = carl::squareFreePart(res);
@@ -220,7 +213,9 @@ public:
 				ran.refine();
 				if (ran.is_numeric()) {
 					substitute_inplace(m_original_poly, var, MultivariatePolynomial<Number>(ran.value()));
-					var_to_interval.erase(var);
+					for (const auto& entry : m) {
+						if (!m_original_poly.has(entry.first)) var_to_interval.erase(entry.first);
+					}
 				} else {
 					var_to_interval[var] = ran.interval();
 				}
