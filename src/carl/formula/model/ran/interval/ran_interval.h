@@ -147,12 +147,14 @@ private:
 		}
 	}
 
+public: // TODO should be private
 	void refine() const {
 		if (is_numeric()) return;
 		Number pivot = carl::sample(interval_int());
 		refine_internal(pivot);
 	}
 
+private:
 	std::optional<Sign> refine_using(const Number& pivot) const {
 		if (interval_int().contains(pivot)) {
 			if (is_numeric()) return Sign::ZERO;
