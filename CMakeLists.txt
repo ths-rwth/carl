@@ -66,6 +66,8 @@ export_option(BUILD_DOXYGEN)
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
+option( EXCLUDE_TESTS_FROM_ALL "If set, tests will not be compiled by default" OFF )
+export_option(EXCLUDE_TESTS_FROM_ALL)
 
 set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
 set_property(CACHE CLANG_SANITIZER PROPERTY STRINGS none address memory thread)
