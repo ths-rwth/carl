@@ -43,3 +43,33 @@ TEST(RealAlgebraicNumber, Evaluation)
 	 * }
 	 */
 }
+
+
+
+TEST(RealAlgebraicNumber, EvalBug)
+{
+	// Evaluating skoY^2 + skoX^2 <= 0 on {skoY : (IR ]-212079/131072, -1696631/1048576[, __r^2 + __r^1 + -1), skoD : (NR 1), skoX : (NR 0)} -> 1
+
+    Variable y = freshRealVariable("skoY");
+    Variable x = freshRealVariable("skoX");
+	MultivariatePolynomial<Rational> mpx(x);
+	MultivariatePolynomial<Rational> mpy(y);
+	MultivariatePolynomial<Rational> poly(carl::pow(mpx, 2) + carl::pow(mpy, 2));
+	Constraint<MultivariatePolynomial<Rational>> constr(poly,carl::Relation::LEQ);
+
+	Variable h = freshRealVariable("h"); 
+	UnivariatePolynomial<Rational> py(h, std::initializer_list<Rational>{-1, 1, 1});
+	Interval<Rational> iy(Rational("-212079")/Rational("131072"), BoundType::STRICT, -Rational("1696631")/Rational("1048576"), BoundType::STRICT);
+	RealAlgebraicNumber<Rational> ry = RealAlgebraicNumber<Rational>::create_safe(py, iy);
+
+	carl::ran::RANMap<Rational> eval;
+	eval.emplace(y,ry);
+	eval.emplace(x,Rational(0));
+
+	bool res = carl::evaluate(constr, eval);
+	EXPECT_FALSE(res);
+}
+
+
+
+
