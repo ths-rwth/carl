@@ -159,6 +159,7 @@ public:
 
 	bool assign(Variable var, const real_algebraic_number_interval<Number>& ran, bool refine_model = true) {
 		assert(m_ir_assignments.find(var) == m_ir_assignments.end());
+		if (m_original_poly.isConstant()) return true;
 		if (!m_poly.has(var)) return false;
 
 		CARL_LOG_TRACE("carl.ran", "Assign " << var << " -> " << ran);
@@ -176,7 +177,7 @@ public:
 			carl::substitute_inplace(m_original_poly, var, MultivariatePolynomial<Number>(ran.value()));
 			CARL_LOG_TRACE("carl.ran", "Remainung poly: " << m_poly << "; original: " << m_original_poly);
 			assert(carl::variables(m_poly).size() > 1 || carl::variables(m_poly) == carlVariables({ m_var }));
-			return carl::variables(m_poly).size() == 1;
+			return carl::variables(m_poly).size() == 1 || m_original_poly.isConstant();
 		} else {
 			CARL_LOG_TRACE("carl.ran", "Still an interval: " << ran);
 			m_ir_assignments.emplace(var, ran);
@@ -186,24 +187,32 @@ public:
 			m_poly = switch_main_variable(m_poly, m_var);
 			CARL_LOG_TRACE("carl.ran", "Remainung poly: " << m_poly << "; original: " << m_original_poly);
 			assert(carl::variables(m_poly).size() > 1 || carl::variables(m_poly) == carlVariables({ m_var }));
-			return carl::variables(m_poly).size() == 1;
+			return carl::variables(m_poly).size() == 1 || m_original_poly.isConstant();
 		}
 	}
 
 	bool has_value() const {
-		return carl::variables(m_poly).size() == 1;
+		return carl::variables(m_poly).size() == 1 || m_original_poly.isConstant();
 	}
 
 	auto value() {
+		if (m_original_poly.isConstant()) {
+			CARL_LOG_TRACE("carl.ran", "Poly is constant: " << m_original_poly);
+			return real_algebraic_number_interval<Number>(m_original_poly.constantPart());
+		}
+
 		assert(carl::variables(m_poly).size() == 1 && m_poly.has(m_var));
 
 		UnivariatePolynomial<Number> res = carl::squareFreePart(m_poly.toNumberCoefficients());
-		
+
+		CARL_LOG_TRACE("carl.ran", "Computing value of " << m_original_poly << " at " << m_ir_assignments << " using " << res);
+
 		std::map<Variable, Interval<Number>> var_to_interval;
 		for (const auto& [var, ran] : m_ir_assignments) {
 			if (!m_original_poly.has(var)) continue;
 			var_to_interval.emplace(var, ran.interval());
 		}
+		CARL_LOG_TRACE("carl.ran", "Got intervals " << var_to_interval);
 		assert(!var_to_interval.empty());
 		Interval<Number> interval = IntervalEvaluation::evaluate(m_original_poly, var_to_interval);
 
