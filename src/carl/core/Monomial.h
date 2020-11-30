@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../util/hash.h"
+#include "../numbers/numbers.h"
 #include "CompareResult.h"
 #include "Variable.h"
 #include "Variables.h"
