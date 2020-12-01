@@ -152,4 +152,14 @@ struct is_ran<real_algebraic_number_z3<Number>> : std::true_type {};
 
 }
 
+
+namespace std {
+template<typename Number>
+struct hash<carl::real_algebraic_number_z3<Number>> {
+    std::size_t operator()(const carl::real_algebraic_number_z3<Number>& n) const {
+		return carl::hash_all(n.integer_below());
+	}
+};
+}
+
 #endif

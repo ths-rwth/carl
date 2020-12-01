@@ -71,10 +71,6 @@ std::vector<real_algebraic_number_interval<Number>> realRoots(
 		const std::map<Variable, real_algebraic_number_interval<Number>>& varToRANMap,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
-	#ifdef RAN_USE_Z3
-	return realRootsZ3(poly, varToRANMap, interval);
-	#endif
-
 	CARL_LOG_FUNC("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 	assert(varToRANMap.count(poly.mainVar()) == 0);
 

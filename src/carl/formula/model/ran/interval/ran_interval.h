@@ -474,3 +474,11 @@ struct is_ran<real_algebraic_number_interval<Number>>: std::true_type {};
 
 } // namespace carl
 
+namespace std {
+template<typename Number>
+struct hash<carl::real_algebraic_number_interval<Number>> {
+    std::size_t operator()(const carl::real_algebraic_number_interval<Number>& n) const {
+		return carl::hash_all(n.integer_below());
+	}
+};
+}

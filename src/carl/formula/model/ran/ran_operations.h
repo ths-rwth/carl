@@ -5,6 +5,8 @@
 #include <carl/core/polynomialfunctions/Substitution.h>
 #include <carl/core/Relation.h>
 
+#include <functional>
+
 namespace carl {
 
 template<typename T>
@@ -112,8 +114,10 @@ bool operator>(const RAN& lhs, const RAN& rhs) {
 
 }
 
+/*
 namespace std {
 
+this does not work with clang:
 
 template <typename First, typename... Others>
 using first = First;
@@ -125,4 +129,18 @@ struct hash<first<RAN, std::enable_if_t<carl::is_ran<RAN>::value>>> {
 	}
 };
 
+neither this:
+
+template <typename RAN>
+struct hash {
+    typename std::enable_if_t<carl::is_ran<RAN>::value, std::size_t>
+    operator()(const RAN& n) const {
+		return carl::hash_all(n.integer_below());
+	}
+};
+
+
+solution: hash is defined for each algebraic number type indivdually
+
 }
+*/
