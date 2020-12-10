@@ -1,13 +1,16 @@
 #include "gtest/gtest.h"
 #include <map>
 
-#include "carl/core/UnivariatePolynomial.h"
-#include "carl/formula/model/ran/RealAlgebraicNumber.h"
-#include "carl/formula/model/ran/interval/ran_interval_evaluation.h"
+#include <carl/core/UnivariatePolynomial.h>
+#include <carl/formula/model/ran/RealAlgebraicNumber.h>
+#include <carl/formula/model/ran/real_roots.h>
+//#include "carl/formula/model/ran/interval/ran_interval_evaluation.h"
 
 #include "../Common.h"
 
 using namespace carl;
+using RAN = RealAlgebraicNumber<Rational>;
+using ConstraintT = Constraint<MultivariatePolynomial<Rational>>;
 
 TEST(IsolationAndEvaluation, Comparison) {
 	Variable a = freshRealVariable("a");
@@ -29,7 +32,7 @@ TEST(IsolationAndEvaluation, Comparison) {
 
 	Rational d_value = Rational(-1);
 
-	std::vector<variable> variableOrder{d, c, b, a};
+	std::vector<Variable> variableOrder{d, c, b, a};
 	std::map<carl::Variable, RAN> varToRANMap;
 	varToRANMap[variableOrder[0]] = d_value;
 	varToRANMap[variableOrder[1]] = c_value;
@@ -38,12 +41,13 @@ TEST(IsolationAndEvaluation, Comparison) {
 
 	bool b1 = carl::evaluate(ConstraintT(poly, carl::Relation::EQ), varToRANMap);
 
-	auto isolatedRoots = carl::realRoots(carl::to_univariate_polynomial(poly, variableOrder[3]), prefixPointToStdMap(3));
+	varToRANMap.erase(variableOrder[3]);
+	auto isolatedRoots = carl::realRoots(carl::to_univariate_polynomial(poly, variableOrder[3]), varToRANMap);
 	std::size_t rootIdx = 0;
 	bool b2 = false;
 	for (const auto& root : isolatedRoots) {
 		rootIdx++;
-		if (root == pointComp) {
+		if (root == a_value) {
 			b2 = true;
 		}
 	}
