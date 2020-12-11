@@ -57,7 +57,7 @@ bool vanishes(
 		CARL_LOG_TRACE("carl.ran", "poly is still univariate");
 		return false;
 	} else {
-		CARL_LOG_TRACE("carl.ran", poly << " in " << poly.mainVar() << ", " << varToRANMap);
+		CARL_LOG_TRACE("carl.ran", polyCopy << " in " << polyCopy.mainVar() << ", " << IRmap);
 		assert(IRmap.find(polyCopy.mainVar()) == IRmap.end());
 
 		LazardEvaluation<Number,MultivariatePolynomial<Number>> le((MultivariatePolynomial<Number>(polyCopy)));
@@ -79,12 +79,13 @@ template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> substitute_rans_into_polynomial(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, real_algebraic_number_interval<Number>>& m,
-		bool use_lazard = true
+		bool use_lazard = false // TODO revert
 ) {
 	std::vector<MultivariatePolynomial<Number>> polys;
 	std::vector<Variable> varOrder;
 
 	if (use_lazard) {
+		CARL_LOG_TRACE("carl.ran", "Substituting using Lazard evaluation");
 		auto le = LazardEvaluation<Number, MultivariatePolynomial<Number>>(MultivariatePolynomial<Number>(p));
 		for (const auto& vic: m) {
 			varOrder.emplace_back(vic.first);
@@ -94,10 +95,13 @@ UnivariatePolynomial<Number> substitute_rans_into_polynomial(
 			} else {
 				polys.emplace_back(res.second);
 			}
+			CARL_LOG_TRACE("carl.ran", vic.first << " -> " << vic.second << " is now " << polys.back());
 		}
 		polys.emplace_back(le.getLiftingPoly());
 		varOrder.emplace_back(p.mainVar());
+		CARL_LOG_TRACE("carl.ran", "main poly " << p << " in " << p.mainVar() << " is now " << polys.back());
 	} else {
+		CARL_LOG_TRACE("carl.ran", "Substituting using field extensions only");
 		FieldExtensions<Number, MultivariatePolynomial<Number>> fe;
 		for (const auto& vic: m) {
 			varOrder.emplace_back(vic.first);
@@ -107,11 +111,14 @@ UnivariatePolynomial<Number> substitute_rans_into_polynomial(
 			} else {
 				polys.emplace_back(res.second);
 			}
+			CARL_LOG_TRACE("carl.ran", vic.first << " -> " << vic.second << " is now " << polys.back());
 		}
 		polys.emplace_back(p);
 		varOrder.emplace_back(p.mainVar());
+		CARL_LOG_TRACE("carl.ran", "main poly " << p << " in " << p.mainVar() << " is now " << polys.back());
 	}
 
+	CARL_LOG_TRACE("carl.ran", "Perform algebraic substitution on " << polys << " wrt " << varOrder);
 	return algebraic_substitution(polys, varOrder);
 }
 

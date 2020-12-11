@@ -21,7 +21,7 @@ namespace carl {
  */
 template<typename Number>
 real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true) {
-	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
+	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << p << " on " << m);
 	
 	for (const auto& [var, ran] : m) {
 		if (!p.has(var)) continue;
@@ -51,7 +51,7 @@ real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p
 	if (var_to_interval.size() == 1) {
 		auto poly = carl::to_univariate_polynomial(p, m.begin()->first);
 		if (m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
-			CARL_LOG_DEBUG("carl.ran", "Returning " << real_algebraic_number_interval<Number>());
+			CARL_LOG_DEBUG("carl.ran.evaluation", "Returning " << real_algebraic_number_interval<Number>());
 			return real_algebraic_number_interval<Number>();
 		}
 	}
@@ -59,7 +59,7 @@ real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p
 	Interval<Number> interval = IntervalEvaluation::evaluate(p, var_to_interval);
 
 	if (interval.isPointInterval()) {
-		CARL_LOG_DEBUG("carl.ran", "Interval is point interval " << interval);
+		CARL_LOG_DEBUG("carl.ran.evaluation", "Interval is point interval " << interval);
 		return real_algebraic_number_interval<Number>(interval.lower());
 	}
 
@@ -73,10 +73,10 @@ real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p
 	res = carl::squareFreePart(res);
 	// Note that res cannot be zero as v is a fresh variable in v-p.
 
-	CARL_LOG_DEBUG("carl.ran", "res = " << res);
-	CARL_LOG_DEBUG("carl.ran", "var_to_interval = " << var_to_interval);
-	CARL_LOG_DEBUG("carl.ran", "p = " << p);
-	CARL_LOG_DEBUG("carl.ran", "-> " << interval);
+	CARL_LOG_DEBUG("carl.ran.evaluation", "res = " << res);
+	CARL_LOG_DEBUG("carl.ran.evaluation", "var_to_interval = " << var_to_interval);
+	CARL_LOG_DEBUG("carl.ran.evaluation", "p = " << p);
+	CARL_LOG_DEBUG("carl.ran.evaluation", "-> " << interval);
 
 	auto sturm_seq = sturm_sequence(res);
 	// the interval should include at least one root.
@@ -98,7 +98,7 @@ real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p
 		}
 		interval = IntervalEvaluation::evaluate(p, var_to_interval);
 	}
-	CARL_LOG_DEBUG("carl.ran", "Result is " << res << " " << interval);
+	CARL_LOG_DEBUG("carl.ran.evaluation", "Result is " << res << " " << interval);
 	if (interval.isPointInterval()) {
 		return real_algebraic_number_interval<Number>(interval.lower());
 	} else {
@@ -108,16 +108,16 @@ real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p
 
 template<typename Number, typename Poly>
 bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
-	CARL_LOG_DEBUG("carl.ran", "Evaluating " << c << " on " << m);
+	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << c << " on " << m);
 	
 	if (!use_root_bounds) {
-		CARL_LOG_DEBUG("carl.ran", "Evaluate constraint by evaluating poly");
+		CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluate constraint by evaluating poly");
 		real_algebraic_number_interval<Number> res = evaluate(c.lhs(), m);
 		return evaluate(res.sgn(), c.relation());
 	} else {
 		Poly p = c.lhs();
 
-		CARL_LOG_TRACE("carl.ran", "p = " << p);
+		CARL_LOG_TRACE("carl.ran.evaluation", "p = " << p);
 
 		for (const auto& [var, ran] : m) {
 			if (!p.has(var)) continue;
@@ -129,21 +129,21 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 			}
 			if (ran.is_numeric()) {
 				substitute_inplace(p, var, MultivariatePolynomial<Number>(ran.value()));
-				CARL_LOG_TRACE("carl.ran", "Substituting numeric value p["<<ran.value()<<"/"<<var<<"] = " << p);
+				CARL_LOG_TRACE("carl.ran.evaluation", "Substituting numeric value p["<<ran.value()<<"/"<<var<<"] = " << p);
 			}
 		}
 		
 		if (p.isNumber()) {
-			CARL_LOG_DEBUG("carl.ran", "Left hand side is constant");
+			CARL_LOG_DEBUG("carl.ran.evaluation", "Left hand side is constant");
 			return carl::evaluate(p.constantPart(), c.relation());
 		}
 		Constraint<Poly> constr(p, c.relation());
 		if (constr.isConsistent() != 2) {
-			CARL_LOG_DEBUG("carl.ran", "Constraint already evaluates to value");
+			CARL_LOG_DEBUG("carl.ran.evaluation", "Constraint already evaluates to value");
 			return constr.isConsistent();
 		}
 		p = constr.lhs(); // Constraint simplifies polynomial
-		CARL_LOG_TRACE("carl.ran", "p = " << p << " (after simplification)");
+		CARL_LOG_TRACE("carl.ran.evaluation", "p = " << p << " (after simplification)");
 
 		std::map<Variable, Interval<Number>> var_to_interval;
 		for (const auto& [var, ran] : m) {
@@ -155,21 +155,21 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 
 		Interval<Number> interval = IntervalEvaluation::evaluate(p, var_to_interval);
 		{
-			CARL_LOG_TRACE("carl.ran", "Interval evaluation of " << p << " under " << var_to_interval << " results in " << interval);
+			CARL_LOG_TRACE("carl.ran.evaluation", "Interval evaluation of " << p << " under " << var_to_interval << " results in " << interval);
 			auto int_res = carl::evaluate(interval, constr.relation());
-			CARL_LOG_TRACE("carl.ran", "Obtained " << interval << " " << constr.relation() << " 0 -> " << (indeterminate(int_res) ? -1 : (bool)int_res));
+			CARL_LOG_TRACE("carl.ran.evaluation", "Obtained " << interval << " " << constr.relation() << " 0 -> " << (indeterminate(int_res) ? -1 : (bool)int_res));
 			if (!indeterminate(int_res)) {
-				CARL_LOG_DEBUG("carl.ran", "Result obtained by interval evaluation");
+				CARL_LOG_DEBUG("carl.ran.evaluation", "Result obtained by interval evaluation");
 				return (bool)int_res;
 			}
 		}
 
-		CARL_LOG_DEBUG("carl.ran", "Evaluate constraint using resultants and root bounds");
+		CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluate constraint using resultants and root bounds");
 		assert(var_to_interval.size() > 0);
 		if (var_to_interval.size() == 1) {
 			auto poly = carl::to_univariate_polynomial(p, var_to_interval.begin()->first);
 			if (m.at(var_to_interval.begin()->first).sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
-				CARL_LOG_DEBUG("carl.ran", "Got " << real_algebraic_number_interval<Number>());
+				CARL_LOG_DEBUG("carl.ran.evaluation", "Got " << real_algebraic_number_interval<Number>());
 				return evaluate(Sign::ZERO, constr.relation());
 			}
 		}
@@ -185,20 +185,20 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 		UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 		// Note that res cannot be zero as v is a fresh variable in v-p.
 
-		CARL_LOG_DEBUG("carl.ran", "res = " << res);
-		CARL_LOG_DEBUG("carl.ran", "var_to_interval = " << var_to_interval);
-		CARL_LOG_DEBUG("carl.ran", "p = " << p);
-		CARL_LOG_DEBUG("carl.ran", "-> " << interval);
+		CARL_LOG_DEBUG("carl.ran.evaluation", "res = " << res);
+		CARL_LOG_DEBUG("carl.ran.evaluation", "var_to_interval = " << var_to_interval);
+		CARL_LOG_DEBUG("carl.ran.evaluation", "p = " << p);
+		CARL_LOG_DEBUG("carl.ran.evaluation", "-> " << interval);
 
 		// Let pos_lb a lower bound on the positive real roots and neg_ub an upper bound on the negative real roots
 		// Then if the zero of res is in the interval (neg_ub,pos_lb), then it must be zero.
 
 		// compute root bounds
 		auto pos_lb = lagrangePositiveLowerBound(res);
-		CARL_LOG_TRACE("carl.ran", "positive root lower bound: " << pos_lb);
+		CARL_LOG_TRACE("carl.ran.evaluation", "positive root lower bound: " << pos_lb);
 		if (pos_lb == 0) {
 			// no positive root exists
-			CARL_LOG_DEBUG("carl.ran", "p <= 0");
+			CARL_LOG_DEBUG("carl.ran.evaluation", "p <= 0");
 			if (constr.relation() == Relation::GREATER) {
 				return false;
 			} else if (constr.relation() == Relation::LEQ) {
@@ -206,10 +206,10 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 			}
 		}
 		auto neg_ub = lagrangeNegativeUpperBound(res);
-		CARL_LOG_TRACE("carl.ran", "negative root upper bound: " << neg_ub);
+		CARL_LOG_TRACE("carl.ran.evaluation", "negative root upper bound: " << neg_ub);
 		if (neg_ub == 0) {
 			// no negative root exists
-			CARL_LOG_DEBUG("carl.ran", "p >= 0");
+			CARL_LOG_DEBUG("carl.ran.evaluation", "p >= 0");
 			if (constr.relation() == Relation::LESS) {
 				return false;
 			} else if (constr.relation() == Relation::GEQ) {
@@ -219,14 +219,14 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 
 		if (pos_lb == 0 && neg_ub == 0) {
 			// no positive or negative zero exists
-			CARL_LOG_DEBUG("carl.ran", "p = 0");
+			CARL_LOG_DEBUG("carl.ran.evaluation", "p = 0");
 			return evaluate(Sign::ZERO, constr.relation());
 		}
 
 		assert(!carl::isZero(res));
 
 		// refine the interval until it is either positive or negative or is contained in (neg_ub,pos_lb)
-		CARL_LOG_DEBUG("carl.ran", "Refine until interval is in (" << neg_ub << "," << pos_lb << ") or interval is positive or negative");
+		CARL_LOG_DEBUG("carl.ran.evaluation", "Refine until interval is in (" << neg_ub << "," << pos_lb << ") or interval is positive or negative");
 		while (!((neg_ub < interval.lower() || neg_ub == 0) && (interval.upper() < pos_lb || pos_lb == 0))) {
 			for (const auto& [var, ran] : m) {
 				if (var_to_interval.find(var) == var_to_interval.end()) continue;
@@ -243,12 +243,12 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 			interval = IntervalEvaluation::evaluate(p, var_to_interval);
 			auto int_res = carl::evaluate(interval, constr.relation());
 			if (!indeterminate(int_res)) {
-				CARL_LOG_DEBUG("carl.ran", "Got result");
+				CARL_LOG_DEBUG("carl.ran.evaluation", "Got result");
 				return (bool)int_res;
 			}
 		}
 
-		CARL_LOG_DEBUG("carl.ran", "p = 0");
+		CARL_LOG_DEBUG("carl.ran.evaluation", "p = 0");
 		return evaluate(Sign::ZERO, constr.relation());
 	}
 }

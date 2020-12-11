@@ -26,10 +26,10 @@ std::vector<real_algebraic_number_interval<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
-	CARL_LOG_DEBUG("carl.core.rootfinder", polynomial << " within " << interval);
+	CARL_LOG_DEBUG("carl.ran.realroots", polynomial << " within " << interval);
 	carl::ran::interval::RealRootIsolation rri(polynomial, interval);
 	auto r = rri.get_roots();
-	CARL_LOG_DEBUG("carl.core.rootfinder", "-> " << r);
+	CARL_LOG_DEBUG("carl.ran.realroots", "-> " << r);
 	return r;
 }
 
@@ -71,15 +71,15 @@ std::vector<real_algebraic_number_interval<Number>> realRoots(
 		const std::map<Variable, real_algebraic_number_interval<Number>>& varToRANMap,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
-	CARL_LOG_FUNC("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
+	CARL_LOG_FUNC("carl.ran.realroots", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 	assert(varToRANMap.count(poly.mainVar()) == 0);
 
 	if (carl::isZero(poly)) {
-		CARL_LOG_TRACE("carl.core.rootfinder", "poly is 0 -> everything is a root");
+		CARL_LOG_TRACE("carl.ran.realroots", "poly is 0 -> everything is a root");
 		return {};
 	}
 	if (poly.isNumber()) {
-		CARL_LOG_TRACE("carl.core.rootfinder", "poly is constant but not zero -> no root");
+		CARL_LOG_TRACE("carl.ran.realroots", "poly is constant but not zero -> no root");
 		return std::vector<real_algebraic_number_interval<Number>>({});
 	}
 
@@ -90,7 +90,7 @@ std::vector<real_algebraic_number_interval<Number>> realRoots(
 	for (Variable v: carl::variables(polyCopy).underlyingVariables()) {
 		if (v == poly.mainVar()) continue;
 		if (varToRANMap.count(v) == 0) {
-			CARL_LOG_TRACE("carl.core.rootfinder", "poly still contains unassigned variable " << v);
+			CARL_LOG_TRACE("carl.ran.realroots", "poly still contains unassigned variable " << v);
 			return {};
 		}
 		assert(varToRANMap.count(v) > 0);
@@ -101,14 +101,14 @@ std::vector<real_algebraic_number_interval<Number>> realRoots(
 		}
 	}
 	if (carl::isZero(polyCopy)) {
-		CARL_LOG_TRACE("carl.core.rootfinder", "poly is 0 after substituting rational assignments -> everything is a root");
+		CARL_LOG_TRACE("carl.ran.realroots", "poly is 0 after substituting rational assignments -> everything is a root");
 		return {};
 	}
 	if (IRmap.empty()) {
 		assert(polyCopy.isUnivariate());
 		return realRoots(polyCopy, interval);
 	} else {
-		CARL_LOG_TRACE("carl.core.rootfinder", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
+		CARL_LOG_TRACE("carl.ran.realroots", polyCopy << " in " << polyCopy.mainVar() << ", " << varToRANMap << ", " << interval);
 		assert(IRmap.find(polyCopy.mainVar()) == IRmap.end());
 
 		std::optional<UnivariatePolynomial<Number>> evaledpoly;
@@ -116,19 +116,19 @@ std::vector<real_algebraic_number_interval<Number>> realRoots(
 		evaledpoly = substitute_rans_into_polynomial(polyCopy, IRmap);
 
 		if (!evaledpoly) return {};
-		CARL_LOG_DEBUG("carl.core.rootfinder", "Calling on " << *evaledpoly);
+		CARL_LOG_DEBUG("carl.ran.realroots", "Calling on " << *evaledpoly);
 		
 		Constraint<MultivariatePolynomial<Number>> cons(MultivariatePolynomial<Number>(polyCopy), Relation::EQ);
 		std::vector<real_algebraic_number_interval<Number>> roots;
 		auto res = realRoots(*evaledpoly, interval);
 		for (const auto& r: res) { // TODO can be made more efficient!
-			CARL_LOG_DEBUG("carl.core.rootfinder", "Checking " << polyCopy.mainVar() << " = " << r);
+			CARL_LOG_DEBUG("carl.ran.realroots", "Checking " << polyCopy.mainVar() << " = " << r);
 			IRmap[polyCopy.mainVar()] = r;
-			CARL_LOG_DEBUG("carl.core.rootfinder", "Evaluating " << cons << " on " << IRmap);
+			CARL_LOG_DEBUG("carl.ran.realroots", "Evaluating " << cons << " on " << IRmap);
 			if (evaluate(cons, IRmap)) {
 				roots.emplace_back(r);
 			} else {
-				CARL_LOG_DEBUG("carl.core.rootfinder", "Purging spurious root " << r);
+				CARL_LOG_DEBUG("carl.ran.realroots", "Purging spurious root " << r);
 			}
 		}
 		return roots;

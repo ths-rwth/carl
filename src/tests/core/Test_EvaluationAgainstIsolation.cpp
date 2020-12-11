@@ -1,11 +1,13 @@
 #include "gtest/gtest.h"
 #include <map>
 
+#include "../Common.h"
+
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/formula/model/ran/RealAlgebraicNumber.h>
 #include <carl/formula/model/ran/real_roots.h>
+#include <carl/formula/model/ran/interval/ran_interval_extra.h>
 
-#include "../Common.h"
 
 using namespace carl;
 using RAN = RealAlgebraicNumber<Rational>;
@@ -39,9 +41,25 @@ TEST(IsolationAndEvaluation, Comparison) {
 	varToRANMap[variableOrder[2]] = b_value;
 	varToRANMap[variableOrder[3]] = a_value;
 
+/*
 	bool b1 = carl::evaluate(ConstraintT(poly, carl::Relation::EQ), varToRANMap);
+	bool b3 = carl::evaluate(poly, varToRANMap).is_zero();
+	EXPECT_EQ(b1, b3);
+*/
+
+/*
+	std::cout << "test if poly is not nullified" << std::endl;
+	varToRANMap[variableOrder[3]] = Rational(123);
+	bool b4= carl::evaluate(ConstraintT(poly, carl::Relation::EQ), varToRANMap);
+	EXPECT_FALSE(b4);
+*/
 
 	varToRANMap.erase(variableOrder[3]);
+
+	bool is_nullified = carl::ran::interval::vanishes(carl::to_univariate_polynomial(poly, variableOrder[3]), varToRANMap);
+	EXPECT_TRUE(is_nullified);
+
+	/*
 	auto isolatedRoots = carl::realRoots(carl::to_univariate_polynomial(poly, variableOrder[3]), varToRANMap);
 	std::size_t rootIdx = 0;
 	bool b2 = false;
@@ -54,5 +72,7 @@ TEST(IsolationAndEvaluation, Comparison) {
 
 	//EXPECT_TRUE(b1);
 	//EXPECT_TRUE(b2);
+	
 	EXPECT_EQ(b1, b2);
+	*/
 }

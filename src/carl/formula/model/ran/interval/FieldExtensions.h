@@ -34,7 +34,7 @@ namespace detail_field_extensions {
 			}
 			#endif
 			else {
-				CARL_LOG_ERROR("carl.lazard", "Unsupported number type.");
+				CARL_LOG_ERROR("carl.fieldext", "Unsupported number type.");
 			}
 		}
 		#ifdef USE_CLN_NUMBERS
@@ -115,7 +115,7 @@ private:
 	bool evaluatesToZero(const CoCoA::RingElem& p, const detail_field_extensions::CoCoAConverter::ConversionInfo& ci) const {
 		auto mp = cc.convertMV<Poly>(p, ci);
 		auto res = carl::evaluate(Constraint<Poly>(mp, Relation::EQ), mModel);
-		CARL_LOG_DEBUG("carl.lazard", "Evaluated " << p << " -> " << mp << " == 0 -> " << res);
+		CARL_LOG_DEBUG("carl.fieldext", "Evaluated " << p << " -> " << mp << " == 0 -> " << res);
 		return res;
 	}
 	
@@ -139,17 +139,17 @@ public:
 	std::pair<bool,Poly> extend(Variable v, const real_algebraic_number_interval<Rational>& r) {
 		mModel.emplace(v, r);
 		if (r.is_numeric()) {
-			CARL_LOG_DEBUG("carl.lazard", "Is numeric: " << v << " -> " << r);
+			CARL_LOG_DEBUG("carl.fieldext", "Is numeric: " << v << " -> " << r);
 			return std::make_pair(true, Poly(r.value()));
 		}
 		detail_field_extensions::CoCoAConverter::ConversionInfo ci = buildPolyRing(v);
 		CoCoA::RingElem p = cc.convertUV(replace_main_variable(r.polynomial(), v), ci);
-		CARL_LOG_DEBUG("carl.lazard", "Factorization of " << p << " on " << ci.mRing);
+		CARL_LOG_DEBUG("carl.fieldext", "Factorization of " << p << " on " << ci.mRing);
 		auto factorization = CoCoA::factor(p);
-		CARL_LOG_DEBUG("carl.lazard", "-> " << factorization);
+		CARL_LOG_DEBUG("carl.fieldext", "-> " << factorization);
 		for (const auto& f: factorization.myFactors()) {
 			if (evaluatesToZero(f, ci)) {
-				CARL_LOG_DEBUG("carl.lazard", "Factor " << f << " is zero in assignment.");
+				CARL_LOG_DEBUG("carl.fieldext", "Factor " << f << " is zero in assignment.");
 				if (CoCoA::deg(f) == 1) {
 					auto cf =-(f -CoCoA::LF(f)) / CoCoA::CoeffEmbeddingHom(CoCoA::owner(f))(CoCoA::LC(f));
 					return std::make_pair(true, cc.convertMV<Poly>(cf, ci));
@@ -159,7 +159,7 @@ public:
 				}
 			}
 		}
-		CARL_LOG_ERROR("carl.lazard", "No factor is zero in assignment.");
+		CARL_LOG_ERROR("carl.fieldext", "No factor is zero in assignment.");
 		assert(false);
 		return std::make_pair(false, Poly());
 	}
