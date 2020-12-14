@@ -74,6 +74,19 @@ namespace detail_field_extensions {
 			}
 			return res;
 		}
+
+		template<typename Poly>
+		CoCoA::RingElem convertMV(const Poly& p, const ConversionInfo& ci) const {
+			CoCoA::RingElem res(ci.mRing);
+			CoCoA::RingElem exp(ci.mRing, 1);
+			// TODO:
+			CoCoA::RingElem var = ci.mSymbolThere.at(p.mainVar());
+			for (std::size_t deg = 0; deg <= p.degree(); ++deg) {
+				res += convert(p.coefficients()[deg]) * exp;
+				exp *= var;
+			}
+			return res;
+		}
 		
 		template<typename Poly>
 		CoCoA::RingElem convertUV(const Poly& p, const ConversionInfo& ci) const {
@@ -109,6 +122,12 @@ private:
 		mSymbolsBack.emplace(std::make_pair(CoCoA::RingID(ring), 0), v);
 		return detail_field_extensions::CoCoAConverter::ConversionInfo({
 			ring, mSymbolsThere, mSymbolsBack
+		});
+	}
+
+	auto getPolyRing() {
+		return detail_field_extensions::CoCoAConverter::ConversionInfo({
+			mQ, mSymbolsThere, mSymbolsBack
 		});
 	}
 	
@@ -162,6 +181,12 @@ public:
 		CARL_LOG_ERROR("carl.fieldext", "No factor is zero in assignment.");
 		assert(false);
 		return std::make_pair(false, Poly());
+	}
+
+	Poly embed(const Poly& poly) {
+		detail_field_extensions::CoCoAConverter::ConversionInfo ci = getPolyRing();
+		auto f =  cc.convertMV(poly, ci);
+		return cc.convertMV<Poly>(f, ci);
 	}
 };
 

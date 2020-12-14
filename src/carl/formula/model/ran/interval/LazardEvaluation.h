@@ -27,6 +27,8 @@ public:
 			CARL_LOG_DEBUG("carl.lazard", "Obtained reductor " << red.second);
 			newPoly = carl::remainder(mLiftingPoly, red.second);
 		}
+		newPoly = mFieldExtensions.embed(newPoly);
+		// TODO körperturm rückwäärts gehen bzw einmal durch fieldextensions packen
 		while (carl::isZero(newPoly) && divideZeroFactors) {
 			if (red.first) {
 				mLiftingPoly = carl::quotient(mLiftingPoly, v - red.second);
@@ -35,6 +37,8 @@ public:
 				mLiftingPoly = carl::quotient(mLiftingPoly, red.second);
 				newPoly = carl::remainder(mLiftingPoly, red.second);
 			}
+			// TODO körperturm rückwäärts gehen bzw einmal durch fieldextensions packen
+			newPoly = mFieldExtensions.embed(newPoly);
 			CARL_LOG_DEBUG("carl.lazard", "Reducing to " << mLiftingPoly);
 		}
 		mLiftingPoly = newPoly;
