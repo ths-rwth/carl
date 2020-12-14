@@ -78,12 +78,23 @@ namespace detail_field_extensions {
 		template<typename Poly>
 		CoCoA::RingElem convertMV(const Poly& p, const ConversionInfo& ci) const {
 			CoCoA::RingElem res(ci.mRing);
-			CoCoA::RingElem exp(ci.mRing, 1);
-			// TODO:
-			CoCoA::RingElem var = ci.mSymbolThere.at(p.mainVar());
-			for (std::size_t deg = 0; deg <= p.degree(); ++deg) {
-				res += convert(p.coefficients()[deg]) * exp;
-				exp *= var;
+			for (const auto& t: p) {
+				if (!t.monomial()) {
+					res += convert(t.coeff());
+					continue;
+				}
+				std::vector<long> exponents(ci.mSymbolBack.size());
+				for (const auto& p: *t.monomial()) {
+					auto it = ci.mSymbolThere.find(p.first);
+					assert(it != ci.mSymbolThere.end());
+					long indetIndex;
+					if (CoCoA::IsIndet(indetIndex, it->second)) {
+						exponents[std::size_t(indetIndex)] = long(p.second);
+					} else {
+						assert(false && "The symbol is not an inderminant.");
+					}
+				}
+				res += CoCoA::monomial(ci.mRing, convert(t.coeff()), exponents);
 			}
 			return res;
 		}
