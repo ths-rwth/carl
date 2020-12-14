@@ -36,10 +36,10 @@ TEST(IsolationAndEvaluation, Comparison) {
 
 	std::vector<Variable> variableOrder{d, c, b, a};
 	std::map<carl::Variable, RAN> varToRANMap;
-	varToRANMap[variableOrder[0]] = d_value;
-	varToRANMap[variableOrder[1]] = c_value;
-	varToRANMap[variableOrder[2]] = b_value;
-	varToRANMap[variableOrder[3]] = a_value;
+	varToRANMap[d] = d_value;
+	varToRANMap[c] = c_value;
+	varToRANMap[b] = b_value;
+	varToRANMap[a] = a_value;
 
 /*
 	bool b1 = carl::evaluate(ConstraintT(poly, carl::Relation::EQ), varToRANMap);
@@ -54,9 +54,9 @@ TEST(IsolationAndEvaluation, Comparison) {
 	EXPECT_FALSE(b4);
 */
 
-	varToRANMap.erase(variableOrder[3]);
+	varToRANMap.erase(a);
 
-	bool is_nullified = carl::ran::interval::vanishes(carl::to_univariate_polynomial(poly, variableOrder[3]), varToRANMap);
+	bool is_nullified = carl::ran::interval::vanishes(carl::to_univariate_polynomial(poly, a), varToRANMap);
 	EXPECT_TRUE(is_nullified);
 
 	/*
