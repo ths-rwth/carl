@@ -6,7 +6,7 @@
 
 #ifdef USE_COCOA
 
-namespace carl {
+namespace carl::ran::interval {
 
 template<typename Rational, typename Poly>
 class LazardEvaluation {
@@ -27,8 +27,7 @@ public:
 			CARL_LOG_DEBUG("carl.lazard", "Obtained reductor " << red.second);
 			newPoly = carl::remainder(mLiftingPoly, red.second);
 		}
-		newPoly = mFieldExtensions.embed(newPoly);
-		// TODO körperturm rückwäärts gehen bzw einmal durch fieldextensions packen
+		// TODO newPoly = mFieldExtensions.embed(newPoly);
 		while (carl::isZero(newPoly) && divideZeroFactors) {
 			if (red.first) {
 				mLiftingPoly = carl::quotient(mLiftingPoly, v - red.second);
@@ -37,8 +36,7 @@ public:
 				mLiftingPoly = carl::quotient(mLiftingPoly, red.second);
 				newPoly = carl::remainder(mLiftingPoly, red.second);
 			}
-			// TODO körperturm rückwäärts gehen bzw einmal durch fieldextensions packen
-			newPoly = mFieldExtensions.embed(newPoly);
+			// TODO newPoly = mFieldExtensions.embed(newPoly);
 			CARL_LOG_DEBUG("carl.lazard", "Reducing to " << mLiftingPoly);
 		}
 		mLiftingPoly = newPoly;

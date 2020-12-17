@@ -10,7 +10,7 @@
 #include <carl/interval/Interval.h>
 #include "ThomEncoding.h"
 #include "ThomUtil.h"
-#include "../RealAlgebraicNumber.h"
+#include "ran_thom.h"
 
 namespace carl {
         

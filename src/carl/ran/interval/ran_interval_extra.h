@@ -5,14 +5,12 @@
 #include <vector>
 
 #include "ran_interval.h"
+#include "ran_interval_real_roots.h"
 #include "LazardEvaluation.h"
-#include "AlgebraicSubstitution.h"
 
 #include <carl/util/SFINAE.h>
 
-namespace carl {
-namespace ran {
-namespace interval {
+namespace carl::ran::interval {
 
 // TODO move somewhere else, integrate into evaluation
 template<typename Coeff, typename Number>
@@ -31,6 +29,10 @@ bool vanishes(
 		CARL_LOG_TRACE("carl.ran", "poly is constant but not zero");
 		return false;
 	}
+
+	return real_roots(poly, varToRANMap).is_nullified();
+	
+	// TODO fix the following check:
 
 	UnivariatePolynomial<Coeff> polyCopy(poly);
 	std::map<Variable, real_algebraic_number_interval<Number>> IRmap;
@@ -75,52 +77,7 @@ bool vanishes(
 	}
 }
 
-template<typename Number, typename Coeff>
-UnivariatePolynomial<Number> substitute_rans_into_polynomial(
-		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, real_algebraic_number_interval<Number>>& m,
-		bool use_lazard = false // TODO revert
-) {
-	std::vector<MultivariatePolynomial<Number>> polys;
-	std::vector<Variable> varOrder;
 
-	if (use_lazard) {
-		CARL_LOG_TRACE("carl.ran", "Substituting using Lazard evaluation");
-		auto le = LazardEvaluation<Number, MultivariatePolynomial<Number>>(MultivariatePolynomial<Number>(p));
-		for (const auto& vic: m) {
-			varOrder.emplace_back(vic.first);
-			auto res = le.substitute(vic.first, vic.second, true);
-			if (res.first) {
-				polys.emplace_back(vic.first - res.second);
-			} else {
-				polys.emplace_back(res.second);
-			}
-			CARL_LOG_TRACE("carl.ran", vic.first << " -> " << vic.second << " is now " << polys.back());
-		}
-		polys.emplace_back(le.getLiftingPoly());
-		varOrder.emplace_back(p.mainVar());
-		CARL_LOG_TRACE("carl.ran", "main poly " << p << " in " << p.mainVar() << " is now " << polys.back());
-	} else {
-		CARL_LOG_TRACE("carl.ran", "Substituting using field extensions only");
-		FieldExtensions<Number, MultivariatePolynomial<Number>> fe;
-		for (const auto& vic: m) {
-			varOrder.emplace_back(vic.first);
-			auto res = fe.extend(vic.first, vic.second);
-			if (res.first) {
-				polys.emplace_back(vic.first - res.second);
-			} else {
-				polys.emplace_back(res.second);
-			}
-			CARL_LOG_TRACE("carl.ran", vic.first << " -> " << vic.second << " is now " << polys.back());
-		}
-		polys.emplace_back(p);
-		varOrder.emplace_back(p.mainVar());
-		CARL_LOG_TRACE("carl.ran", "main poly " << p << " in " << p.mainVar() << " is now " << polys.back());
-	}
-
-	CARL_LOG_TRACE("carl.ran", "Perform algebraic substitution on " << polys << " wrt " << varOrder);
-	return algebraic_substitution(polys, varOrder);
-}
 
 template<typename Number>
 class ran_evaluator {
@@ -255,6 +212,4 @@ public:
 	}
 };
 
-}
-}
 }

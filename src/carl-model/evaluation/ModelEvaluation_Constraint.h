@@ -28,7 +28,7 @@ namespace model {
 		
 		auto map = collectRANIR(carl::variables(c.lhs()).underlyingVariableSet(), m);
 		if (map.size() == carl::variables(c.lhs()).size()) {
-			res = evaluate(c, map);
+			res = *evaluate(c, map);
 			return;
 		}
 

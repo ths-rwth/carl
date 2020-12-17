@@ -1,13 +1,13 @@
 #pragma once
 
 #include "../../../core/logging.h"
-#include "../ran/real_roots.h"
 #include "../../../core/polynomialfunctions/Substitution.h"
 #include "../../../core/Variable.h"
 #include "../../../numbers/numbers.h"
-#include "../ran/RealAlgebraicNumber.h"
+#include "../../../ran/ran.h"
+#include "../../../ran/real_roots.h"
 
-#include <boost/optional.hpp>
+#include <optional>
 
 #include <algorithm>
 #include <iostream>
@@ -119,23 +119,26 @@ public:
 	 * Return the emerging algebraic real after pluggin in a subpoint to replace
 	 * all variables with algebraic reals that are not the root-variable "_z".
 	 * @param m must contain algebraic real assignments for all variables that are not "_z".
-	 * @return boost::none if the underlying polynomial has no root with index 'rootIdx' at
+	 * @return std::nullopt if the underlying polynomial has no root with index 'rootIdx' at
 	 * the given subpoint.
 	 */
-	boost::optional<RAN> evaluate(const EvalMap& m) const {
+	std::optional<RAN> evaluate(const EvalMap& m) const {
 		CARL_LOG_DEBUG("carl.rootexpression", "Evaluate: " << *this << " against: " << m);
 		auto poly = carl::to_univariate_polynomial(mPoly, sVar);
-		auto roots = carl::realRoots(poly, m);
-		CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << roots);
-		if (roots.size() < mK) {
-			CARL_LOG_TRACE("carl.rootexpression", mK << "th root does not exist.");
-			return boost::none;
+		auto result = carl::real_roots(poly, m);
+		if (!result.is_univariate()) {
+			return std::nullopt;
 		}
-		CARL_LOG_TRACE("carl.rootexpression", "Take " << mK << "th of isolated roots " << roots);
-		assert(roots.size() >= mK);
+		CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << result.roots());
+		if (result.roots().size() < mK) {
+			CARL_LOG_TRACE("carl.rootexpression", mK << "th root does not exist.");
+			return std::nullopt;
+		}
+		CARL_LOG_TRACE("carl.rootexpression", "Take " << mK << "th of isolated roots " << result.roots());
+		assert(result.roots().size() >= mK);
 		assert(mK > 0);
-		CARL_LOG_DEBUG("carl.rootexpression", "Result is " << roots[mK-1]);
-		return roots[mK-1];
+		CARL_LOG_DEBUG("carl.rootexpression", "Result is " << result.roots()[mK-1]);
+		return result.roots()[mK-1];
 	}
 };
 

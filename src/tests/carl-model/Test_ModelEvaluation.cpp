@@ -92,7 +92,7 @@ TEST(ModelEvaluation, EvaluateWithMVR)
 	Pol p = Pol(x*x) - y*y - Rational(4);
 	Pol mvrpol = Pol(MVRootT::var() * MVRootT::var()) - Rational(3);
 	m.assign(y, createSubstitution<Rational>(MVRootT(mvrpol, 1)));
-	auto res = carl::model::realRoots(p, x, m);
+	auto res = carl::model::real_roots(p, x, m).roots();
 
 	using UPol = UnivariatePolynomial<Rational>;
 

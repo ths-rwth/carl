@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 
-#include "carl/formula/model/ran/interval/LazardEvaluation.h"
+#include "carl/ran/interval/LazardEvaluation.h"
 #include "carl/core/UnivariatePolynomial.h"
 
 #include "../Common.h"
@@ -16,7 +16,7 @@ TEST(LazardEvaluation, Test)
 	
 	Poly p = (Poly(x)-Poly(y))*z;
 	
-	carl::LazardEvaluation<Rational,Poly> le(p);
+	carl::ran::interval::LazardEvaluation<Rational,Poly> le(p);
 	
 	{
 		carl::UnivariatePolynomial<Rational> p(x, std::initializer_list<Rational>{-2, 0, 1});
@@ -46,7 +46,7 @@ TEST(LazardEvaluation, Test2)
 	
 	Poly p = (Poly(y)*Poly(y)-Poly(x))*z;
 	
-	carl::LazardEvaluation<Rational,Poly> le(p);
+	carl::ran::interval::LazardEvaluation<Rational,Poly> le(p);
 	
 	{
 		carl::UnivariatePolynomial<Rational> p(x, std::initializer_list<Rational>{-2, 0, 1});
@@ -95,7 +95,7 @@ TEST_F(LazardTest, Proper1) {
 	auto ay = getRAN({-2, 0, 1}, 1, 2);
 	auto q = (Poly(x)-y)*z;
 	
-	carl::LazardEvaluation<Rational,Poly> le(q);
+	carl::ran::interval::LazardEvaluation<Rational,Poly> le(q);
 	le.substitute(x, ax);
 	le.substitute(y, ay);
 	EXPECT_EQ(-Poly(z), le.getLiftingPoly());
@@ -106,7 +106,7 @@ TEST_F(LazardTest, Proper2) {
 	auto ay = getRAN({6, 0, -6, 0, 1}, 2, 3);
 	auto q = (Poly(2)*x-y)*z;
 	
-	carl::LazardEvaluation<Rational,Poly> le(q);
+	carl::ran::interval::LazardEvaluation<Rational,Poly> le(q);
 	le.substitute(x, ax);
 	le.substitute(y, ay);
 	EXPECT_EQ(-Poly(z), le.getLiftingPoly());
@@ -117,7 +117,7 @@ TEST_F(LazardTest, Proper3) {
 	auto ay = getRAN({-2, 0, 0, 0, 1}, 1, 2);
 	auto q = (Poly(x)-Poly(y)*y)*z;
 	
-	carl::LazardEvaluation<Rational,Poly> le(q);
+	carl::ran::interval::LazardEvaluation<Rational,Poly> le(q);
 	le.substitute(x, ax);
 	le.substitute(y, ay);
 	EXPECT_EQ(-Poly(z), le.getLiftingPoly());

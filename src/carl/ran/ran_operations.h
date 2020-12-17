@@ -87,27 +87,27 @@ bool operator>(const Number& lhs, const RAN& rhs) {
 	return rhs < lhs;
 }
 
-template<typename RAN, EnableIf<carl::is_ran<RAN>> = dummy>
+template<typename RAN, EnableIf<is_ran<RAN>> = dummy>
 bool operator==(const RAN& lhs, const RAN& rhs) {
 	return compare(lhs, rhs, Relation::EQ);
 }
-template<typename RAN, EnableIf<carl::is_ran<RAN>> = dummy>
+template<typename RAN, EnableIf<is_ran<RAN>> = dummy>
 bool operator!=(const RAN& lhs, const RAN& rhs) {
 	return compare(lhs, rhs, Relation::NEQ);
 }
-template<typename RAN, EnableIf<carl::is_ran<RAN>> = dummy>
+template<typename RAN, EnableIf<is_ran<RAN>> = dummy>
 bool operator<=(const RAN& lhs, const RAN& rhs) {
 	return compare(lhs, rhs, Relation::LEQ);
 }
-template<typename RAN, EnableIf<carl::is_ran<RAN>> = dummy>
+template<typename RAN, EnableIf<is_ran<RAN>> = dummy>
 bool operator>=(const RAN& lhs, const RAN& rhs) {
 	return compare(lhs, rhs, Relation::GEQ);
 }
-template<typename RAN, EnableIf<carl::is_ran<RAN>> = dummy>
+template<typename RAN, EnableIf<is_ran<RAN>> = dummy>
 bool operator<(const RAN& lhs, const RAN& rhs) {
 	return compare(lhs, rhs, Relation::LESS);
 }
-template<typename RAN, EnableIf<carl::is_ran<RAN>> = dummy>
+template<typename RAN, EnableIf<is_ran<RAN>> = dummy>
 bool operator>(const RAN& lhs, const RAN& rhs) {
 	return compare(lhs, rhs, Relation::GREATER);
 }

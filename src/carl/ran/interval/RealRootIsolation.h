@@ -1,7 +1,7 @@
 #pragma once
 
 #include <carl/core/UnivariatePolynomial.h>
-#include "../RealAlgebraicNumber.h"
+#include "ran_interval.h"
 
 #include <carl/interval/set_theory.h>
 #include <carl/interval/sampling.h>
@@ -32,7 +32,7 @@ class RealRootIsolation {
 	/// The polynomial.
 	UnivariatePolynomial<Number> mPolynomial;
 	/// The list of roots.
-	std::vector<RealAlgebraicNumber<Number>> mRoots;
+	std::vector<real_algebraic_number_interval<Number>> mRoots;
 	/// The bounding interval.
 	Interval<Number> mInterval;
 	/// The sturm sequence for mPolynomial.
@@ -267,12 +267,13 @@ class RealRootIsolation {
 
 	/// Do actual root isolation.
 	void compute_roots() {
-		// Check for p(0) == 0
-		eliminate_zero_roots();
 		// Handle zero polynomial
 		if (carl::isZero(mPolynomial)) {
 			return;
 		}
+		// Check for p(0) == 0
+		eliminate_zero_roots();
+		assert(!carl::isZero(mPolynomial));
 		// Handle other easy cases
 		while (true) {
 			// Degree of at most 2 -> use p-q-formula

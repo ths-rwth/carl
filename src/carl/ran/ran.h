@@ -46,21 +46,24 @@
 namespace carl {
 	#ifdef RAN_USE_INTERVAL
 	template<typename Number>
-	using RealAlgebraicNumber = real_algebraic_number_interval<Number>;
+	using real_algebraic_number = real_algebraic_number_interval<Number>;
 	#endif
 
 	#ifdef RAN_USE_THOM
 	template<typename Number>
-	using RealAlgebraicNumber = real_algebraic_number_thom<Number>;
+	using real_algebraic_number = real_algebraic_number_thom<Number>;
 	#endif
 
 	#ifdef RAN_USE_Z3
 	template<typename Number>
-	using RealAlgebraicNumber = real_algebraic_number_z3<Number>;
+	using real_algebraic_number = real_algebraic_number_z3<Number>;
 	#endif
+
+	template<typename Number>
+	using RealAlgebraicNumber = real_algebraic_number<Number>;
 
 	namespace ran {
 		template<typename Number>
-		using RANMap = std::map<Variable, RealAlgebraicNumber<Number>>;
+		using RANMap = std::map<Variable, real_algebraic_number<Number>>;
 	}
 }

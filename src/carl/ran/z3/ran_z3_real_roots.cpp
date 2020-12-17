@@ -2,13 +2,13 @@
 
 #ifdef RAN_USE_Z3
 
-#include "../../../../converter/Z3Converter.h"
+#include "../../converter/Z3Converter.h"
 
 #include "Z3RanContent.h"
 
 namespace carl::ran::z3 {
     template<typename Coeff, typename Number>
-    std::vector<real_algebraic_number_z3<Number>> realRoots(
+    real_roots_result<real_algebraic_number_z3<Number>> real_roots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval
     ) {
@@ -30,11 +30,11 @@ namespace carl::ran::z3 {
             z3().free(roots[i]);
         }*/
         
-        return res;
+        return real_roots_result<real_algebraic_number_z3<Number>>::roots_response(std::move(res));
     }
 
     template<typename Coeff, typename Number>
-    std::vector<real_algebraic_number_z3<Number>> realRoots(
+    real_roots_result<real_algebraic_number_z3<Number>> real_roots(
         const UnivariatePolynomial<Coeff>& p,
         const std::map<Variable, real_algebraic_number_z3<Number>>& m,
         const Interval<Number>& interval
@@ -64,24 +64,24 @@ namespace carl::ran::z3 {
             z3().free(roots[i]);
         }*/
         
-        return res;
+        return real_roots_result<real_algebraic_number_z3<Number>>::roots_response(std::move(res));
     }
 
 
-    template std::vector<real_algebraic_number_z3<mpq_class>> realRoots(
+    template real_roots_result<real_algebraic_number_z3<mpq_class>> real_roots(
 		const UnivariatePolynomial<mpq_class>& polynomial,
 		const Interval<mpq_class>& interval = Interval<mpq_class>::unboundedInterval()
     );
 
     /*
-    template std::vector<real_algebraic_number_z3<mpq_class>> realRoots(
+    template std::vector<real_algebraic_number_z3<mpq_class>> real_roots(
         const UnivariatePolynomial<mpq_class>& p,
         const std::map<Variable, real_algebraic_number_z3<mpq_class>>& m,
         const Interval<mpq_class>& interval = Interval<mpq_class>::unboundedInterval()
     );
     */
 
-    template std::vector<real_algebraic_number_z3<mpq_class>> realRoots(
+    template real_roots_result<real_algebraic_number_z3<mpq_class>> real_roots(
         const UnivariatePolynomial<MultivariatePolynomial<mpq_class>>& p,
         const std::map<Variable, real_algebraic_number_z3<mpq_class>>& m,
         const Interval<mpq_class>& interval = Interval<mpq_class>::unboundedInterval()

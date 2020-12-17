@@ -1,7 +1,7 @@
 #pragma once
 
 #include "model/mvroot/MultivariateRoot.h"
-#include "model/ran/RealAlgebraicNumber.h"
+#include "../ran/ran.h"
 #include "../core/MultivariatePolynomial.h"
 #include "../core/Relation.h"
 #include "../core/Variable.h"
@@ -26,7 +26,7 @@ namespace carl {
 	public:
 		using Number = typename UnderlyingNumberType<Poly>::type;
 		using MR = MultivariateRoot<Poly>;
-		using RAN = RealAlgebraicNumber<Number>;
+		using RAN = real_algebraic_number<Number>;
 	private:
 		Variable mVar;
 		std::variant<MR, RAN> mValue;

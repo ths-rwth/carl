@@ -8,7 +8,6 @@
 #include "ran_interval.h"
 #include "AlgebraicSubstitution.h"
 
-
 namespace carl {
 
 /**
@@ -20,7 +19,7 @@ namespace carl {
  * @return Evaluation result
  */
 template<typename Number>
-real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true) {
+std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolynomial<Number> p, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true) {
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << p << " on " << m);
 	
 	for (const auto& [var, ran] : m) {
@@ -69,7 +68,11 @@ real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p
 	for (const auto& cur : m) {
 		algebraic_information.emplace_back(replace_main_variable(cur.second.polynomial_int(), cur.first).template convert<MultivariatePolynomial<Number>>());
 	}
-	UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
+	auto result = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
+	if (!result) {
+		return std::nullopt;
+	}
+	UnivariatePolynomial<Number> res = *result;
 	res = carl::squareFreePart(res);
 	// Note that res cannot be zero as v is a fresh variable in v-p.
 
@@ -107,13 +110,14 @@ real_algebraic_number_interval<Number> evaluate(MultivariatePolynomial<Number> p
 }
 
 template<typename Number, typename Poly>
-bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
+std::optional<bool> evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << c << " on " << m);
 	
 	if (!use_root_bounds) {
 		CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluate constraint by evaluating poly");
-		real_algebraic_number_interval<Number> res = evaluate(c.lhs(), m);
-		return evaluate(res.sgn(), c.relation());
+		auto res = evaluate(c.lhs(), m);
+		if (!res) return std::nullopt;
+		else return evaluate(res->sgn(), c.relation());
 	} else {
 		Poly p = c.lhs();
 
@@ -182,8 +186,13 @@ bool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic
 			assert(!ran.is_numeric());
 			algebraic_information.emplace_back(replace_main_variable(ran.polynomial_int(), var).template convert<MultivariatePolynomial<Number>>());
 		}
-		UnivariatePolynomial<Number> res = carl::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
+		auto result = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 		// Note that res cannot be zero as v is a fresh variable in v-p.
+
+		if (!result) {
+			return std::nullopt;
+		}
+		UnivariatePolynomial<Number> res = *result;
 
 		CARL_LOG_DEBUG("carl.ran.evaluation", "res = " << res);
 		CARL_LOG_DEBUG("carl.ran.evaluation", "var_to_interval = " << var_to_interval);

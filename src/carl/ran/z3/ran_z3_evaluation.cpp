@@ -2,13 +2,13 @@
 
 #ifdef RAN_USE_Z3
 
-#include "../../../../converter/Z3Converter.h"
+#include "../../converter/Z3Converter.h"
 
 #include "Z3RanContent.h"
 
 namespace carl {
     template<typename Number>
-    real_algebraic_number_z3<Number> evaluate(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap) {
+    std::optional<real_algebraic_number_z3<Number>> evaluate(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap) {
         polynomial::polynomial_ref poly = z3().toZ3IntCoeff(polynomial);
         algebraic_numbers::anum res;
         nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
@@ -21,10 +21,10 @@ namespace carl {
         return real_algebraic_number_z3<Number>(std::move(res));
     }
 
-    template real_algebraic_number_z3<mpq_class> evaluate(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, real_algebraic_number_z3<mpq_class>>& evalMap);
+    template std::optional<real_algebraic_number_z3<mpq_class>> evaluate(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, real_algebraic_number_z3<mpq_class>>& evalMap);
 
     template<typename Number, typename Poly>
-    bool evaluate(const Constraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap) {
+    std::optional<bool> evaluate(const Constraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap) {
         polynomial::polynomial_ref poly = z3().toZ3IntCoeff(constraint.lhs());
         algebraic_numbers::anum res;
         nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
@@ -37,7 +37,7 @@ namespace carl {
         return evaluate(rs, constraint.relation());
     }
 
-    template bool evaluate(const Constraint<MultivariatePolynomial<mpq_class>>& constraint, const std::map<Variable, real_algebraic_number_z3<mpq_class>>& evalMap);
+    template std::optional<bool> evaluate(const Constraint<MultivariatePolynomial<mpq_class>>& constraint, const std::map<Variable, real_algebraic_number_z3<mpq_class>>& evalMap);
 
 }
 

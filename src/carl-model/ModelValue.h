@@ -4,7 +4,7 @@
 #include <carl/util/variant_util.h>
 #include <carl/formula/bitvector/BVValue.h>
 #include <carl/formula/model/mvroot/MultivariateRoot.h>
-#include <carl/formula/model/ran/RealAlgebraicNumber.h>
+#include <carl/ran/ran.h>
 #include "sqrtex/SqrtEx.h"
 #include "uninterpreted/SortValue.h"
 #include "uninterpreted/UFModel.h"

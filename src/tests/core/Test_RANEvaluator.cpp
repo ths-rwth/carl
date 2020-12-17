@@ -2,8 +2,8 @@
 #include <map>
 
 #include "carl/core/UnivariatePolynomial.h"
-#include "carl/formula/model/ran/RealAlgebraicNumber.h"
-#include "carl/formula/model/ran/interval/ran_interval_extra.h"
+#include "carl/ran/ran.h"
+#include "carl/ran/interval/ran_interval_extra.h"
 
 
 #include "../Common.h"

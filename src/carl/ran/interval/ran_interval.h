@@ -32,10 +32,10 @@ class real_algebraic_number_interval {
 	friend bool compare(const real_algebraic_number_interval<Num>&, const Num&, const Relation);
 
 	template<typename Num, typename Poly>
-	friend bool evaluate(const Constraint<Poly>&, const std::map<Variable, real_algebraic_number_interval<Num>>&, bool, bool);
+	friend std::optional<bool> evaluate(const Constraint<Poly>&, const std::map<Variable, real_algebraic_number_interval<Num>>&, bool, bool);
 
 	template<typename Num>
-	friend real_algebraic_number_interval<Num> evaluate(MultivariatePolynomial<Num>, const std::map<Variable, real_algebraic_number_interval<Num>>&, bool);
+	friend std::optional<real_algebraic_number_interval<Num>> evaluate(MultivariatePolynomial<Num>, const std::map<Variable, real_algebraic_number_interval<Num>>&, bool);
 
 	template<typename Num>
 	friend Num branching_point(const real_algebraic_number_interval<Num>& n);
@@ -471,8 +471,7 @@ const Variable real_algebraic_number_interval<Number>::auxVariable = freshRealVa
 
 template<typename Number>
 struct is_ran<real_algebraic_number_interval<Number>>: std::true_type {};
-
-} // namespace carl
+}
 
 namespace std {
 template<typename Number>

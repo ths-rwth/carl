@@ -574,7 +574,10 @@ public:
 	UnivariatePolynomial<GFNumber<typename IntegralType<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralType<Coefficient>::type>* galoisField) const;
 
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial<NumberType> toNumberCoefficients(bool check = true) const;
+	UnivariatePolynomial<NumberType> toNumberCoefficients() const;
+
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	bool hasConstantCoefficients() const;
 
 	template<typename NewCoeff>
 	UnivariatePolynomial<NewCoeff> convert() const;
@@ -657,7 +660,8 @@ public:
 	 * @return True if zero is a root.
 	 */
 	bool zeroIsRoot() const {
-		return mCoefficients.empty() || carl::isZero(mCoefficients[0]);
+		assert(!mCoefficients.empty());
+		return carl::isZero(mCoefficients[0]);
 	}
 
 public:

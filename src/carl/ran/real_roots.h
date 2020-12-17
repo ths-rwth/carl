@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RealAlgebraicNumber.h"
+#include "ran.h"
 
 #ifdef RAN_USE_INTERVAL
 #include "interval/ran_interval_real_roots.h"
@@ -14,16 +14,20 @@
 #include "z3/ran_z3_real_roots.h"
 #endif
 
-namespace carl {
+namespace carl::ran {
     #ifdef RAN_USE_INTERVAL
-    using carl::ran::interval::realRoots;
+    using carl::ran::interval::real_roots;
     #endif
 
     #ifdef RAN_USE_THOM
-    using carl::ran::thom::realRoots;
+    using carl::ran::thom::real_roots;
     #endif
 
     #ifdef RAN_USE_Z3
-    using carl::ran::z3::realRoots;
+    using carl::ran::z3::real_roots;
     #endif
+}
+
+namespace carl {
+    using carl::ran::real_roots;
 }

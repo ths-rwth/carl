@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Model.h"
-#include <carl/formula/model/ran/real_roots.h>
+#include <carl/ran/real_roots.h>
 #include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/UnivariatePolynomial.h>
@@ -79,36 +79,42 @@ namespace model {
 		
 		auto map = collectRANIR(carl::variables(p).underlyingVariableSet(), m);
 		if (map.size() == carl::variables(p).size()) {
-            res = evaluate(p, map);
+            res = *evaluate(p, map);
 			return;
 		}
 		res = createSubstitution<Rational,Poly,ModelPolynomialSubstitution<Rational,Poly>>(p);
 	}
 	
+	// TODO :
 	template<typename Rational, typename Poly>
-	auto realRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
+	auto real_roots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
 		auto map = collectRANIR(carl::variables(tmp).underlyingVariableSet(), m);
-		return carl::realRoots(carl::to_univariate_polynomial(tmp, v), map);
+		return carl::real_roots(carl::to_univariate_polynomial(tmp, v), map);
 	}
 	template<typename Rational, typename Poly>
-	auto realRoots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
+	auto real_roots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
 		UnivariatePolynomial<Poly> tmp = substitute(p, m);
 		auto map = collectRANIR(carl::variables(tmp).underlyingVariableSet(), m);
-		return carl::realRoots(tmp, map);
+		return carl::real_roots(tmp, map);
 	}
 	
 	template<typename Rational, typename Poly>
-	boost::optional<std::vector<RealAlgebraicNumber<Rational>>> tryRealRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
+	std::optional<std::vector<RealAlgebraicNumber<Rational>>> tryRealRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
 		CARL_LOG_DEBUG("carl.formula.model", p << " over " << m << " = " << tmp);
 		auto map = collectRANIR(carl::variables(tmp).underlyingVariableSet(), m);
 		CARL_LOG_DEBUG("carl.formula.model", "Remaining: " << map);
 		if (map.size() + 1 != carl::variables(tmp).size()) {
 			CARL_LOG_DEBUG("carl.formula.model", "Sizes of " << map << " and " << carl::variables(tmp) << " do not match. This will not work...");
-			return boost::none;
+			return std::nullopt;
 		}
-		return carl::realRoots(carl::to_univariate_polynomial(tmp, v), map);
+		auto res = carl::real_roots(carl::to_univariate_polynomial(tmp, v), map);
+		if (res.is_univariate()) {
+			return res.roots();
+		} else {
+			return std::nullopt;
+		}
 	}
 }
 }

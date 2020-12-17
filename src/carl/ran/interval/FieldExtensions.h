@@ -8,15 +8,20 @@
 
 #include <CoCoA/library.H>
 
-namespace carl {
+namespace carl::ran::interval {
 namespace detail_field_extensions {
 	
 	struct CoCoAConverter {
-		struct ConversionInfo {
-			CoCoA::SparsePolyRing mRing;
-			const std::map<Variable, CoCoA::RingElem>& mSymbolThere;
-			const std::map<std::pair<long,std::size_t>, Variable>& mSymbolBack;
-		};
+
+		std::map<Variable, CoCoA::RingElem> mSymbolThere;
+		std::map<std::pair<long,std::size_t>, Variable> mSymbolBack;
+
+		auto buildPolyRing(CoCoA::ring coeff_ring, Variable v) {
+			CoCoA::SparsePolyRing ring = CoCoA::NewPolyRing(coeff_ring, {CoCoA::NewSymbol()});
+			mSymbolThere.emplace(v, CoCoA::indets(ring)[0]);
+			mSymbolBack.emplace(std::make_pair(CoCoA::RingID(ring), 0), v);
+			return ring;
+		}
 		
 		CoCoA::BigRat convert(const mpq_class& n) const {
 			return CoCoA::BigRatFromMPQ(n.get_mpq_t());
@@ -46,7 +51,7 @@ namespace detail_field_extensions {
 		#endif
 
 		template<typename Poly>
-		Poly convertMV(const CoCoA::RingElem& p, const ConversionInfo& ci) const {
+		Poly convertMV(const CoCoA::RingElem& p) const {
 			Poly res;
 			for (CoCoA::SparsePolyIter i = CoCoA::BeginIter(p); !CoCoA::IsEnded(i); ++i) {
 				Poly coeff;
@@ -54,7 +59,7 @@ namespace detail_field_extensions {
 				if (CoCoA::IsRational(numcoeff, CoCoA::coeff(i))) {
 					coeff = Poly(convert<typename Poly::CoeffType>(numcoeff));
 				} else {
-					coeff = convertMV<Poly>(CoCoA::CanonicalRepr(CoCoA::coeff(i)), ci);
+					coeff = convertMV<Poly>(CoCoA::CanonicalRepr(CoCoA::coeff(i)));
 				}
 				if (CoCoA::IsOne(CoCoA::PP(i))) {
 					res += coeff;
@@ -66,7 +71,7 @@ namespace detail_field_extensions {
 					for (std::size_t i = 0; i < exponents.size(); ++i) {
 						if (exponents[i] == 0) continue;
 						const auto& ring = CoCoA::owner(p);
-						monContent.emplace_back(ci.mSymbolBack.at(std::make_pair(CoCoA::RingID(ring),i)), exponents[i]);
+						monContent.emplace_back(mSymbolBack.at(std::make_pair(CoCoA::RingID(ring),i)), exponents[i]);
 						tdeg += std::size_t(exponents[i]);
 					}
 					res += coeff * createMonomial(std::move(monContent), tdeg);
@@ -76,17 +81,17 @@ namespace detail_field_extensions {
 		}
 
 		template<typename Poly>
-		CoCoA::RingElem convertMV(const Poly& p, const ConversionInfo& ci) const {
-			CoCoA::RingElem res(ci.mRing);
+		CoCoA::RingElem convertMV(const Poly& p, const CoCoA::ring& ring) const {
+			CoCoA::RingElem res(ring);
 			for (const auto& t: p) {
 				if (!t.monomial()) {
 					res += convert(t.coeff());
 					continue;
 				}
-				std::vector<long> exponents(ci.mSymbolBack.size());
+				std::vector<long> exponents(mSymbolBack.size());
 				for (const auto& p: *t.monomial()) {
-					auto it = ci.mSymbolThere.find(p.first);
-					assert(it != ci.mSymbolThere.end());
+					auto it = mSymbolThere.find(p.first);
+					assert(it != mSymbolThere.end());
 					long indetIndex;
 					if (CoCoA::IsIndet(indetIndex, it->second)) {
 						exponents[std::size_t(indetIndex)] = long(p.second);
@@ -94,16 +99,16 @@ namespace detail_field_extensions {
 						assert(false && "The symbol is not an inderminant.");
 					}
 				}
-				res += CoCoA::monomial(ci.mRing, convert(t.coeff()), exponents);
+				res += CoCoA::monomial(ring, convert(t.coeff()), exponents);
 			}
 			return res;
 		}
 		
 		template<typename Poly>
-		CoCoA::RingElem convertUV(const Poly& p, const ConversionInfo& ci) const {
-			CoCoA::RingElem res(ci.mRing);
-			CoCoA::RingElem exp(ci.mRing, 1);
-			CoCoA::RingElem var = ci.mSymbolThere.at(p.mainVar());
+		CoCoA::RingElem convertUV(const Poly& p, const CoCoA::SparsePolyRing& ring) const {
+			CoCoA::RingElem res(ring);
+			CoCoA::RingElem exp(ring, 1);
+			CoCoA::RingElem var = mSymbolThere.at(p.mainVar());
 			for (std::size_t deg = 0; deg <= p.degree(); ++deg) {
 				res += convert(p.coefficients()[deg]) * exp;
 				exp *= var;
@@ -124,29 +129,16 @@ private:
 	std::map<Variable,real_algebraic_number_interval<Rational>> mModel;
 	
 	detail_field_extensions::CoCoAConverter cc;
-	std::map<Variable, CoCoA::RingElem> mSymbolsThere;
-	std::map<std::pair<long,std::size_t>, Variable> mSymbolsBack;
 	
 	auto buildPolyRing(Variable v) {
-		CoCoA::SparsePolyRing ring = CoCoA::NewPolyRing(mQ, {CoCoA::NewSymbol()});
-		mSymbolsThere.emplace(v, CoCoA::indets(ring)[0]);
-		mSymbolsBack.emplace(std::make_pair(CoCoA::RingID(ring), 0), v);
-		return detail_field_extensions::CoCoAConverter::ConversionInfo({
-			ring, mSymbolsThere, mSymbolsBack
-		});
-	}
-
-	auto getPolyRing() {
-		return detail_field_extensions::CoCoAConverter::ConversionInfo({
-			mQ, mSymbolsThere, mSymbolsBack
-		});
+		return cc.buildPolyRing(mQ, v);
 	}
 	
-	bool evaluatesToZero(const CoCoA::RingElem& p, const detail_field_extensions::CoCoAConverter::ConversionInfo& ci) const {
-		auto mp = cc.convertMV<Poly>(p, ci);
+	bool evaluatesToZero(const CoCoA::RingElem& p) const {
+		auto mp = cc.convertMV<Poly>(p);
 		auto res = carl::evaluate(Constraint<Poly>(mp, Relation::EQ), mModel);
 		CARL_LOG_DEBUG("carl.fieldext", "Evaluated " << p << " -> " << mp << " == 0 -> " << res);
-		return res;
+		return *res;
 	}
 	
 	void extendRing(const CoCoA::ring& ring, const CoCoA::RingElem& p) {
@@ -172,20 +164,20 @@ public:
 			CARL_LOG_DEBUG("carl.fieldext", "Is numeric: " << v << " -> " << r);
 			return std::make_pair(true, Poly(r.value()));
 		}
-		detail_field_extensions::CoCoAConverter::ConversionInfo ci = buildPolyRing(v);
+		auto ci = buildPolyRing(v);
 		CoCoA::RingElem p = cc.convertUV(replace_main_variable(r.polynomial(), v), ci);
-		CARL_LOG_DEBUG("carl.fieldext", "Factorization of " << p << " on " << ci.mRing);
+		CARL_LOG_DEBUG("carl.fieldext", "Factorization of " << p << " on " << ci);
 		auto factorization = CoCoA::factor(p);
 		CARL_LOG_DEBUG("carl.fieldext", "-> " << factorization);
 		for (const auto& f: factorization.myFactors()) {
-			if (evaluatesToZero(f, ci)) {
+			if (evaluatesToZero(f)) {
 				CARL_LOG_DEBUG("carl.fieldext", "Factor " << f << " is zero in assignment.");
 				if (CoCoA::deg(f) == 1) {
 					auto cf =-(f -CoCoA::LF(f)) / CoCoA::CoeffEmbeddingHom(CoCoA::owner(f))(CoCoA::LC(f));
-					return std::make_pair(true, cc.convertMV<Poly>(cf, ci));
+					return std::make_pair(true, cc.convertMV<Poly>(cf));
 				} else {
-					extendRing(ci.mRing, f);
-					return std::make_pair(false, cc.convertMV<Poly>(f, ci));
+					extendRing(ci, f);
+					return std::make_pair(false, cc.convertMV<Poly>(f));
 				}
 			}
 		}
@@ -194,10 +186,11 @@ public:
 		return std::make_pair(false, Poly());
 	}
 
-	Poly embed(const Poly& poly) {
-		detail_field_extensions::CoCoAConverter::ConversionInfo ci = getPolyRing();
-		auto f =  cc.convertMV(poly, ci);
-		return cc.convertMV<Poly>(f, ci);
+	Poly embed(const Poly& poly) { // TODO not functional yet
+		CARL_LOG_DEBUG("carl.fieldext", "Embed " << poly << " into " << mQ);
+		auto f = cc.convertMV(poly, mQ);
+		CARL_LOG_DEBUG("carl.fieldext", "Embedding is " << f);
+		return cc.convertMV<Poly>(f);
 	}
 };
 

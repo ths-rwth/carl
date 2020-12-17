@@ -6,7 +6,7 @@ namespace carl {
 template<typename Number> class RealAlgebraicPoint;
 }
 
-#include "RealAlgebraicNumber.h"
+#include "ran.h"
 
 namespace carl {
 

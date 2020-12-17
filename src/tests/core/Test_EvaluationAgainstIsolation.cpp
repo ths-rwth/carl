@@ -4,9 +4,9 @@
 #include "../Common.h"
 
 #include <carl/core/UnivariatePolynomial.h>
-#include <carl/formula/model/ran/RealAlgebraicNumber.h>
-#include <carl/formula/model/ran/real_roots.h>
-#include <carl/formula/model/ran/interval/ran_interval_extra.h>
+#include <carl/ran/ran.h>
+#include <carl/ran/real_roots.h>
+#include <carl/ran/interval/ran_interval_extra.h>
 
 
 using namespace carl;
@@ -60,7 +60,7 @@ TEST(IsolationAndEvaluation, Comparison) {
 	EXPECT_TRUE(is_nullified);
 
 	/*
-	auto isolatedRoots = carl::realRoots(carl::to_univariate_polynomial(poly, variableOrder[3]), varToRANMap);
+	auto isolatedRoots = carl::real_roots(carl::to_univariate_polynomial(poly, variableOrder[3]), varToRANMap);
 	std::size_t rootIdx = 0;
 	bool b2 = false;
 	for (const auto& root : isolatedRoots) {

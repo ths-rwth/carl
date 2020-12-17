@@ -189,14 +189,23 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::pow(std::size_t exp) co
 
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
-UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> UnivariatePolynomial<Coeff>::toNumberCoefficients(bool check) const {
+UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> UnivariatePolynomial<Coeff>::toNumberCoefficients() const {
 	std::vector<NumberType> coeffs;
 	coeffs.reserve(this->mCoefficients.size());
 	for (auto c: this->mCoefficients) {
-		if (check) assert(c.isConstant());
+		assert(c.isConstant());
 		coeffs.push_back(c.constantPart());
 	}
 	return UnivariatePolynomial<NumberType>(this->mMainVar, coeffs);
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_number<C>>>
+bool UnivariatePolynomial<Coeff>::hasConstantCoefficients() const {
+	for (auto c: this->mCoefficients) {
+		if (!c.isConstant()) return false;
+	}
+	return true;
 }
 
 template<typename Coeff>

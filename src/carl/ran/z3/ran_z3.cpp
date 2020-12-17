@@ -2,7 +2,7 @@
 
 #ifdef RAN_USE_Z3
 
-#include "../../../../converter/Z3Converter.h"
+#include "../../converter/Z3Converter.h"
 
 #include "Z3RanContent.h"
 

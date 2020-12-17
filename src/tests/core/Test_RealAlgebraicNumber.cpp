@@ -2,7 +2,7 @@
 #include <map>
 
 #include "carl/core/UnivariatePolynomial.h"
-#include "carl/formula/model/ran/RealAlgebraicNumber.h"
+#include "carl/ran/ran.h"
 
 #include "../Common.h"
 
@@ -66,8 +66,8 @@ TEST(RealAlgebraicNumber, EvalBug)
 	eval.emplace(y,ry);
 	eval.emplace(x,Rational(0));
 
-	bool res = carl::evaluate(constr, eval);
-	EXPECT_FALSE(res);
+	auto res = carl::evaluate(constr, eval);
+	EXPECT_FALSE(*res);
 }
 
 

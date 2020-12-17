@@ -24,7 +24,7 @@
 #include <carl/core/polynomialfunctions/Resultant.h>
 #include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
 
-namespace carl {
+namespace carl::ran::interval {
 
 /**
  * Implements algebraic substitution by Gröbner basis computation.
@@ -32,7 +32,7 @@ namespace carl {
  * The result is then the polynomial in the last variable only.
  */
 template<typename Number>
-UnivariatePolynomial<Number> algebraic_substitution_groebner(
+std::optional<UnivariatePolynomial<Number>> algebraic_substitution_groebner(
 	const std::vector<MultivariatePolynomial<Number>>& polynomials,
 	const std::vector<Variable>& variables
 ) {
@@ -51,7 +51,8 @@ UnivariatePolynomial<Number> algebraic_substitution_groebner(
 	} catch (const CoCoA::ErrorInfo& e) {
 		CARL_LOG_ERROR("carl.algsubs", "Computation of GBasis failed: " << e << " -> " << CoCoA::context(e));
 	}
-	return UnivariatePolynomial<Number>(target);
+	return std::nullopt;
+	// return UnivariatePolynomial<Number>(target);
 }
 
 /**
@@ -60,7 +61,7 @@ UnivariatePolynomial<Number> algebraic_substitution_groebner(
  * The result is then the polynomial in the last variable only.
  */
 template<typename Number>
-UnivariatePolynomial<Number> algebraic_substitution_groebner(
+std::optional<UnivariatePolynomial<Number>> algebraic_substitution_groebner(
 	const UnivariatePolynomial<MultivariatePolynomial<Number>>& p,
 	const std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>>& polynomials
 ) {
@@ -85,7 +86,7 @@ UnivariatePolynomial<Number> algebraic_substitution_groebner(
  * Note that we assume that the polynomials are in a triangular form where any polynomial may contain variables that are ``defined'' by the previous polynomials.
  */
 template<typename Number>
-UnivariatePolynomial<Number> algebraic_substitution_resultant(
+std::optional<UnivariatePolynomial<Number>> algebraic_substitution_resultant(
 	const UnivariatePolynomial<MultivariatePolynomial<Number>>& p,
 	const std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>>& polynomials
 ) {
@@ -101,7 +102,11 @@ UnivariatePolynomial<Number> algebraic_substitution_resultant(
 		cur = carl::resultant(cur, poly);
 		CARL_LOG_DEBUG("carl.algsubs", "-> " << cur);
 	}
-	UnivariatePolynomial<Number> result = switch_main_variable(cur, v).toNumberCoefficients();
+	auto swpoly = switch_main_variable(cur, v);
+	if (!swpoly.hasConstantCoefficients()) {
+		return std::nullopt;
+	}
+	UnivariatePolynomial<Number> result = swpoly.toNumberCoefficients();
 	CARL_LOG_DEBUG("carl.algsubs", "Result: " << result);
 	return result;
 }
@@ -114,7 +119,7 @@ UnivariatePolynomial<Number> algebraic_substitution_resultant(
  * Note that we assume that the polynomials are in a triangular form where any polynomial may contain variables that are ``defined'' by the previous polynomials.
  */
 template<typename Number>
-UnivariatePolynomial<Number> algebraic_substitution_resultant(
+std::optional<UnivariatePolynomial<Number>> algebraic_substitution_resultant(
 	const std::vector<MultivariatePolynomial<Number>>& polynomials,
 	const std::vector<Variable>& variables
 ) {
@@ -139,7 +144,7 @@ enum class AlgebraicSubstitutionStrategy {
  * The result is a univariate polynomial in the main variable of p.
  */
 template<typename Number>
-UnivariatePolynomial<Number> algebraic_substitution(
+std::optional<UnivariatePolynomial<Number>> algebraic_substitution(
 	const UnivariatePolynomial<MultivariatePolynomial<Number>>& p,
 	const std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>>& polynomials,
 	AlgebraicSubstitutionStrategy strategy = AlgebraicSubstitutionStrategy::RESULTANT
@@ -159,7 +164,7 @@ UnivariatePolynomial<Number> algebraic_substitution(
  * The result is a univariate polynomial in the main variable of p.
  */
 template<typename Number>
-UnivariatePolynomial<Number> algebraic_substitution(
+std::optional<UnivariatePolynomial<Number>> algebraic_substitution(
 	const std::vector<MultivariatePolynomial<Number>>& polynomials,
 	const std::vector<Variable>& variables,
 	AlgebraicSubstitutionStrategy strategy = AlgebraicSubstitutionStrategy::RESULTANT

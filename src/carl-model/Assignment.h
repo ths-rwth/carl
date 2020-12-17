@@ -12,7 +12,7 @@
 #include "Model.h"
 
 #include <carl/formula/Formula.h>
-#include <carl/formula/model/ran/RealAlgebraicNumber.h>
+#include <carl/ran/ran.h>
 #include "sqrtex/SqrtEx.h"
 #include <carl-model/uninterpreted/SortValue.h>
 #include <carl-model/uninterpreted/UFModel.h>
