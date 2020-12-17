@@ -60,7 +60,8 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
  *   <li>all variables from the coefficients of 'p' must be in 'm'</li>
  * </ul>
  * The roots are sorted in ascending order.
- * Returns std::nullopt iff the polynomial is nullified/vanishes identically.
+ * Returns a real_roots_result indicating whether the roots could be isolated or the polynomial
+ * was not univariate or is nullified.  
  */
 template<typename Coeff, typename Number>
 real_roots_result<real_algebraic_number_interval<Number>> real_roots(

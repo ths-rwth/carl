@@ -13,6 +13,8 @@ namespace carl {
 /**
  * Evaluate the given polynomial with the given values for the variables.
  * Asserts that all variables of p have an assignment in m and that m has no additional assignments.
+ * 
+ * Returns std::nullopt if some unassigned variables are still contained in p after plugging in m.
  *
  * @param p Polynomial to be evaluated
  * @param m Variable assignment
