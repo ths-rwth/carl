@@ -72,7 +72,7 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 	}
 	// substitute RANs with low degrees first
 	std::sort(algebraic_information.begin(), algebraic_information.end(), [](const auto& a, const auto& b){ 
-		return a.degree() <= b.degree();
+		return a.degree() > b.degree();
 	});
 	auto result = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 	if (!result) {
@@ -194,7 +194,7 @@ std::optional<bool> evaluate(const Constraint<Poly>& c, const ran::ran_assignmen
 		}
 		// substitute RANs with low degrees first
 		std::sort(algebraic_information.begin(), algebraic_information.end(), [](const auto& a, const auto& b){ 
-			return a.degree() <= b.degree();
+			return a.degree() > b.degree();
 		});
 		auto result = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 		// Note that res cannot be zero as v is a fresh variable in v-p.

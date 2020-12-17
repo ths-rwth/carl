@@ -114,7 +114,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		ran::ordered_ran_assignment_t<real_algebraic_number_interval<Number>> ord_ass;
 		for (const auto& ass : ir_map) ord_ass.emplace_back(ass);
 		std::sort(ord_ass.begin(), ord_ass.end(), [](const auto& a, const auto& b){ 
-			return a.second.polynomial().degree() <= b.second.polynomial().degree();
+			return a.second.polynomial().degree() > b.second.polynomial().degree();
 		});
 
 		std::optional<UnivariatePolynomial<Number>> evaledpoly = substitute_rans_into_polynomial(polyCopy, ord_ass);
