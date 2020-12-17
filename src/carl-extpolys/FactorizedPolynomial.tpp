@@ -1046,7 +1046,7 @@ namespace carl
     }
     
     template<typename P>
-    std::string FactorizedPolynomial<P>::toString( bool _infix, bool _friendlyVarNames ) const
+    std::string FactorizedPolynomial<P>::toString( bool _infix, bool /* _friendlyVarNames */ ) const
     {
         if( existsFactorization( *this ) )
         {

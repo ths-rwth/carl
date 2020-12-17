@@ -200,15 +200,6 @@ UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> Univariat
 }
 
 template<typename Coeff>
-template<typename C, DisableIf<is_number<C>>>
-bool UnivariatePolynomial<Coeff>::hasConstantCoefficients() const {
-	for (auto c: this->mCoefficients) {
-		if (!c.isConstant()) return false;
-	}
-	return true;
-}
-
-template<typename Coeff>
 template<typename NewCoeff>
 UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert() const {
 	std::vector<NewCoeff> coeffs;
@@ -570,14 +561,14 @@ UnivariatePolynomial<C> operator+(const C& lhs, const UnivariatePolynomial<C>& r
 template<typename Coefficient>
 UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator-=(const Coefficient& rhs)
 {
-	CARL_LOG_INEFFICIENT();
+//	CARL_LOG_INEFFICIENT();
 	return *this += -rhs;
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const UnivariatePolynomial& rhs)
 {
-	CARL_LOG_INEFFICIENT();
+//	CARL_LOG_INEFFICIENT();
 	return *this += -rhs;
 }
 

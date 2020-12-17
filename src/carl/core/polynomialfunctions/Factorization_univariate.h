@@ -9,6 +9,8 @@
 
 namespace carl {
 
+// TODO replace with cocoa implementation
+
 template<typename Coeff>
 std::map<uint, UnivariatePolynomial<Coeff>> squareFreeFactorization(const UnivariatePolynomial<Coeff>& p) {
 	CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: " << p);

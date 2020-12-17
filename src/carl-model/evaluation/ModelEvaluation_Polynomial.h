@@ -85,7 +85,6 @@ namespace model {
 		res = createSubstitution<Rational,Poly,ModelPolynomialSubstitution<Rational,Poly>>(p);
 	}
 	
-	// TODO :
 	template<typename Rational, typename Poly>
 	auto real_roots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
