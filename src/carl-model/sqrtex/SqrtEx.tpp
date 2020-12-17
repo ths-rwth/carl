@@ -234,7 +234,7 @@ namespace carl
     }
     
 	template<typename Poly>
-    std::string SqrtEx<Poly>::toString( bool _infix, bool _friendlyNames ) const
+    std::string SqrtEx<Poly>::toString( bool _infix, bool /*_friendlyNames*/ ) const
     {
         if( _infix )
         {
