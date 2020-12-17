@@ -561,14 +561,14 @@ UnivariatePolynomial<C> operator+(const C& lhs, const UnivariatePolynomial<C>& r
 template<typename Coefficient>
 UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator-=(const Coefficient& rhs)
 {
-	CARL_LOG_INEFFICIENT();
+//	CARL_LOG_INEFFICIENT();
 	return *this += -rhs;
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const UnivariatePolynomial& rhs)
 {
-	CARL_LOG_INEFFICIENT();
+//	CARL_LOG_INEFFICIENT();
 	return *this += -rhs;
 }
 
