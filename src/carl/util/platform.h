@@ -51,3 +51,5 @@
 #endif
 
 #define __BITS (sizeof(void*))
+
+#define UNUSED(x) (void)(x)
