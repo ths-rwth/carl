@@ -104,7 +104,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 	}
 	if (IRmap.empty()) {
 		assert(polyCopy.isUnivariate());
-		CARL_LOG_TRACE("carl.ran.realroots", "poly " << polyCopy << " is univariate substituting rational assignments");
+		CARL_LOG_TRACE("carl.ran.realroots", "poly " << polyCopy << " is univariate after substituting rational assignments");
 		return real_roots(polyCopy, interval);
 	} else {
 		CARL_LOG_TRACE("carl.ran.realroots", polyCopy << " in " << polyCopy.mainVar() << ", " << varToRANMap << ", " << interval);

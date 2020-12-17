@@ -573,11 +573,11 @@ public:
 	
 	UnivariatePolynomial<GFNumber<typename IntegralType<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralType<Coefficient>::type>* galoisField) const;
 
+	/**
+	 * Asserts that isUnivariate() is true.
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial<NumberType> toNumberCoefficients() const;
-
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	bool hasConstantCoefficients() const;
 
 	template<typename NewCoeff>
 	UnivariatePolynomial<NewCoeff> convert() const;

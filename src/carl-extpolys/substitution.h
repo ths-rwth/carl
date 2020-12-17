@@ -92,12 +92,12 @@ FactorizedPolynomial<P> substitute(const FactorizedPolynomial<P>& p, const std::
 		if (subResult.isConstant()) {
 			FactorizedPolynomial<P> result(subResult.constantPart() * p.coefficient());
 			assert(computePolynomial(result) == carl::substitute(computePolynomial(p), substitutions));
-			return std::move(result);
+			return result;
 		} else {
 			FactorizedPolynomial<P> result(std::move(subResult), p.pCache());
 			result *= p.coefficient();
 			assert(computePolynomial(result) == carl::substitute(computePolynomial(p), substitutions));
-			return std::move(result);
+			return result;
 		}
 	} else {
 		auto resultCoeff = p.coefficient();
@@ -116,7 +116,7 @@ FactorizedPolynomial<P> substitute(const FactorizedPolynomial<P>& p, const std::
 		}
 		FactorizedPolynomial<P> result(std::move(resultFactorization), resultCoeff, p.pCache());
 		assert(computePolynomial(result) == carl::substitute(computePolynomial(p), substitutions));
-		return std::move(result);
+		return result;
 	}
 }
 

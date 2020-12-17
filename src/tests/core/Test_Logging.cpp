@@ -42,6 +42,7 @@ TEST(Logging, Formatter)
 TEST(Logging, Logger)
 {
 	auto& logger = carl::logging::logger();
+	UNUSED(logger);
 }
 
 TEST(LoggingHelper, binary)

@@ -200,15 +200,6 @@ UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> Univariat
 }
 
 template<typename Coeff>
-template<typename C, DisableIf<is_number<C>>>
-bool UnivariatePolynomial<Coeff>::hasConstantCoefficients() const {
-	for (auto c: this->mCoefficients) {
-		if (!c.isConstant()) return false;
-	}
-	return true;
-}
-
-template<typename Coeff>
 template<typename NewCoeff>
 UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert() const {
 	std::vector<NewCoeff> coeffs;
