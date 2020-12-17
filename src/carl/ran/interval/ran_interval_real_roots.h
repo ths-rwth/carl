@@ -66,7 +66,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 template<typename Coeff, typename Number>
 real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		const UnivariatePolynomial<Coeff>& poly,
-		const std::map<Variable, real_algebraic_number_interval<Number>>& varToRANMap,
+		const ran::ran_assignment_t<real_algebraic_number_interval<Number>>& varToRANMap,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
 	CARL_LOG_FUNC("carl.ran.realroots", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
@@ -83,7 +83,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 
   	// We want to simplify 'poly', but it's const, so make a copy.
 	UnivariatePolynomial<Coeff> polyCopy(poly);
-	std::map<Variable, real_algebraic_number_interval<Number>> IRmap;
+	ran::ran_assignment_t<real_algebraic_number_interval<Number>> ir_map;
 
 	for (Variable v: carl::variables(polyCopy).underlyingVariables()) {
 		if (v == poly.mainVar()) continue;
@@ -95,24 +95,29 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		if (varToRANMap.at(v).is_numeric()) {
 			substitute_inplace(polyCopy, v, Coeff(varToRANMap.at(v).value()));
 		} else {
-			IRmap.emplace(v, varToRANMap.at(v));
+			ir_map.emplace(v, varToRANMap.at(v));
 		}
 	}
 	if (carl::isZero(polyCopy)) {
 		CARL_LOG_TRACE("carl.ran.realroots", "poly is 0 after substituting rational assignments -> nullified");
 		return real_roots_result<real_algebraic_number_interval<Number>>::nullified_response();
 	}
-	if (IRmap.empty()) {
+	if (ir_map.empty()) {
 		assert(polyCopy.isUnivariate());
 		CARL_LOG_TRACE("carl.ran.realroots", "poly " << polyCopy << " is univariate substituting rational assignments");
 		return real_roots(polyCopy, interval);
 	} else {
 		CARL_LOG_TRACE("carl.ran.realroots", polyCopy << " in " << polyCopy.mainVar() << ", " << varToRANMap << ", " << interval);
-		assert(IRmap.find(polyCopy.mainVar()) == IRmap.end());
+		assert(ir_map.find(polyCopy.mainVar()) == ir_map.end());
 
-		// TODO substitute low degrees first
+		// substitute RANs with low degrees first
+		ran::ordered_ran_assignment_t<real_algebraic_number_interval<Number>> ord_ass;
+		for (const auto& ass : ir_map) ord_ass.emplace_back(ass);
+		std::sort(ord_ass.begin(), ord_ass.end(), [](const auto& a, const auto& b){ 
+			return a.second.polynomial().degree() <= b.second.polynomial().degree();
+		});
 
-		std::optional<UnivariatePolynomial<Number>> evaledpoly = substitute_rans_into_polynomial(polyCopy, IRmap);
+		std::optional<UnivariatePolynomial<Number>> evaledpoly = substitute_rans_into_polynomial(polyCopy, ord_ass);
 		if (!evaledpoly) {
 			CARL_LOG_TRACE("carl.ran.realroots", "poly still contains unassigned variable -> non-univariate");
 			return real_roots_result<real_algebraic_number_interval<Number>>::non_univariate_response();
@@ -128,9 +133,9 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		auto res = real_roots(*evaledpoly, interval);
 		for (const auto& r: res.roots()) { // TODO can be made more efficient!
 			CARL_LOG_TRACE("carl.ran.realroots", "Checking " << polyCopy.mainVar() << " = " << r);
-			IRmap[polyCopy.mainVar()] = r;
-			CARL_LOG_TRACE("carl.ran.realroots", "Evaluating " << cons << " on " << IRmap);
-			if (evaluate(cons, IRmap)) {
+			ir_map[polyCopy.mainVar()] = r;
+			CARL_LOG_TRACE("carl.ran.realroots", "Evaluating " << cons << " on " << ir_map);
+			if (evaluate(cons, ir_map)) {
 				roots.emplace_back(r);
 			} else {
 				CARL_LOG_TRACE("carl.ran.realroots", "Purging spurious root " << r);

@@ -60,6 +60,13 @@ namespace carl {
 	#endif
 
 	template<typename Number>
+	using ran_assignment = ran::ran_assignment_t<real_algebraic_number<Number>>;
+
+	template<typename Number>
+	using ordered_ran_assignment = ran::ordered_ran_assignment_t<real_algebraic_number<Number>>;
+
+
+	template<typename Number>
 	using RealAlgebraicNumber = real_algebraic_number<Number>;
 
 	namespace ran {

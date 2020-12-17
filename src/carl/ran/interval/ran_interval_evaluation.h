@@ -21,7 +21,7 @@ namespace carl {
  * @return Evaluation result
  */
 template<typename Number>
-std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolynomial<Number> p, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true) {
+std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolynomial<Number> p, const ran::ran_assignment_t<real_algebraic_number_interval<Number>>& m, bool refine_model = true) {
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << p << " on " << m);
 	
 	for (const auto& [var, ran] : m) {
@@ -70,6 +70,10 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 	for (const auto& cur : m) {
 		algebraic_information.emplace_back(replace_main_variable(cur.second.polynomial_int(), cur.first).template convert<MultivariatePolynomial<Number>>());
 	}
+	// substitute RANs with low degrees first
+	std::sort(algebraic_information.begin(), algebraic_information.end(), [](const auto& a, const auto& b){ 
+		return a.degree() <= b.degree();
+	});
 	auto result = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 	if (!result) {
 		return std::nullopt;
@@ -112,7 +116,7 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 }
 
 template<typename Number, typename Poly>
-std::optional<bool> evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
+std::optional<bool> evaluate(const Constraint<Poly>& c, const ran::ran_assignment_t<real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << c << " on " << m);
 	
 	if (!use_root_bounds) {
@@ -188,6 +192,10 @@ std::optional<bool> evaluate(const Constraint<Poly>& c, const std::map<Variable,
 			assert(!ran.is_numeric());
 			algebraic_information.emplace_back(replace_main_variable(ran.polynomial_int(), var).template convert<MultivariatePolynomial<Number>>());
 		}
+		// substitute RANs with low degrees first
+		std::sort(algebraic_information.begin(), algebraic_information.end(), [](const auto& a, const auto& b){ 
+			return a.degree() <= b.degree();
+		});
 		auto result = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 		// Note that res cannot be zero as v is a fresh variable in v-p.
 

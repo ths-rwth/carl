@@ -4,11 +4,10 @@
 #include "AlgebraicSubstitution.h"
 
 namespace carl::ran::interval {
-    // TODO ordering as parameter:
     template<typename Number, typename Coeff>
     std::optional<UnivariatePolynomial<Number>> substitute_rans_into_polynomial(
             const UnivariatePolynomial<Coeff>& p,
-            const std::map<Variable, real_algebraic_number_interval<Number>>& m,
+            const ordered_ran_assignment_t<real_algebraic_number_interval<Number>>& m,
             bool use_lazard = false // TODO revert
     ) {
         std::vector<MultivariatePolynomial<Number>> polys;
