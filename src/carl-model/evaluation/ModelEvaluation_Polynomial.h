@@ -97,23 +97,5 @@ namespace model {
 		auto map = collectRANIR(carl::variables(tmp).underlyingVariableSet(), m);
 		return carl::real_roots(tmp, map);
 	}
-	
-	template<typename Rational, typename Poly>
-	std::optional<std::vector<RealAlgebraicNumber<Rational>>> tryRealRoots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
-		Poly tmp = substitute(p, m);
-		CARL_LOG_DEBUG("carl.formula.model", p << " over " << m << " = " << tmp);
-		auto map = collectRANIR(carl::variables(tmp).underlyingVariableSet(), m);
-		CARL_LOG_DEBUG("carl.formula.model", "Remaining: " << map);
-		if (map.size() + 1 != carl::variables(tmp).size()) {
-			CARL_LOG_DEBUG("carl.formula.model", "Sizes of " << map << " and " << carl::variables(tmp) << " do not match. This will not work...");
-			return std::nullopt;
-		}
-		auto res = carl::real_roots(carl::to_univariate_polynomial(tmp, v), map);
-		if (res.is_univariate()) {
-			return res.roots();
-		} else {
-			return std::nullopt;
-		}
-	}
 }
 }
