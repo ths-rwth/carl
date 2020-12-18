@@ -8,6 +8,8 @@
 #include "ran_interval.h"
 #include "AlgebraicSubstitution.h"
 
+#include <boost/logic/tribool_io.hpp>
+
 namespace carl {
 
 /**
@@ -70,24 +72,23 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 	for (const auto& cur : m) {
 		algebraic_information.emplace_back(replace_main_variable(cur.second.polynomial_int(), cur.first).template convert<MultivariatePolynomial<Number>>());
 	}
-	auto result = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
-	if (!result) {
+	auto res = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
+	if (!res) {
 		return std::nullopt;
 	}
-	UnivariatePolynomial<Number> res = *result;
-	res = carl::squareFreePart(res);
+	res = carl::squareFreePart(*res);
 	// Note that res cannot be zero as v is a fresh variable in v-p.
 
-	CARL_LOG_DEBUG("carl.ran.evaluation", "res = " << res);
+	CARL_LOG_DEBUG("carl.ran.evaluation", "res = " << *res);
 	CARL_LOG_DEBUG("carl.ran.evaluation", "var_to_interval = " << var_to_interval);
 	CARL_LOG_DEBUG("carl.ran.evaluation", "p = " << p);
 	CARL_LOG_DEBUG("carl.ran.evaluation", "-> " << interval);
 
-	auto sturm_seq = sturm_sequence(res);
+	auto sturm_seq = sturm_sequence(*res);
 	// the interval should include at least one root.
-	assert(!carl::isZero(res));
-	assert(carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) >= 1);
-	while (!interval.isPointInterval() && (carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
+	assert(!carl::isZero(*res));
+	assert(carl::is_root_of(*res, interval.lower()) || carl::is_root_of(*res, interval.upper()) || count_real_roots(sturm_seq, interval) >= 1);
+	while (!interval.isPointInterval() && (carl::is_root_of(*res, interval.lower()) || carl::is_root_of(*res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (const auto& [var, ran] : m) {
 			if (var_to_interval.find(var) == var_to_interval.end()) continue;
@@ -103,22 +104,22 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 		}
 		interval = IntervalEvaluation::evaluate(p, var_to_interval);
 	}
-	CARL_LOG_DEBUG("carl.ran.evaluation", "Result is " << res << " " << interval);
+	CARL_LOG_DEBUG("carl.ran.evaluation", "Result is " << *res << " " << interval);
 	if (interval.isPointInterval()) {
 		return real_algebraic_number_interval<Number>(interval.lower());
 	} else {
-		return real_algebraic_number_interval<Number>(res, interval);
+		return real_algebraic_number_interval<Number>(*res, interval);
 	}
 }
 
 template<typename Number, typename Poly>
-std::optional<bool> evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
+boost::tribool evaluate(const Constraint<Poly>& c, const std::map<Variable, real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << c << " on " << m);
 	
 	if (!use_root_bounds) {
 		CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluate constraint by evaluating poly");
 		auto res = evaluate(c.lhs(), m);
-		if (!res) return std::nullopt;
+		if (!res) return boost::indeterminate;
 		else return evaluate(res->sgn(), c.relation());
 	} else {
 		Poly p = c.lhs();
@@ -188,15 +189,14 @@ std::optional<bool> evaluate(const Constraint<Poly>& c, const std::map<Variable,
 			assert(!ran.is_numeric());
 			algebraic_information.emplace_back(replace_main_variable(ran.polynomial_int(), var).template convert<MultivariatePolynomial<Number>>());
 		}
-		auto result = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
+		auto res = ran::interval::algebraic_substitution(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), algebraic_information);
 		// Note that res cannot be zero as v is a fresh variable in v-p.
 
-		if (!result) {
-			return std::nullopt;
+		if (!res) {
+			return boost::indeterminate;
 		}
-		UnivariatePolynomial<Number> res = *result;
 
-		CARL_LOG_DEBUG("carl.ran.evaluation", "res = " << res);
+		CARL_LOG_DEBUG("carl.ran.evaluation", "res = " << *res);
 		CARL_LOG_DEBUG("carl.ran.evaluation", "var_to_interval = " << var_to_interval);
 		CARL_LOG_DEBUG("carl.ran.evaluation", "p = " << p);
 		CARL_LOG_DEBUG("carl.ran.evaluation", "-> " << interval);
@@ -205,7 +205,7 @@ std::optional<bool> evaluate(const Constraint<Poly>& c, const std::map<Variable,
 		// Then if the zero of res is in the interval (neg_ub,pos_lb), then it must be zero.
 
 		// compute root bounds
-		auto pos_lb = lagrangePositiveLowerBound(res);
+		auto pos_lb = lagrangePositiveLowerBound(*res);
 		CARL_LOG_TRACE("carl.ran.evaluation", "positive root lower bound: " << pos_lb);
 		if (pos_lb == 0) {
 			// no positive root exists
@@ -216,7 +216,7 @@ std::optional<bool> evaluate(const Constraint<Poly>& c, const std::map<Variable,
 				return true;
 			}
 		}
-		auto neg_ub = lagrangeNegativeUpperBound(res);
+		auto neg_ub = lagrangeNegativeUpperBound(*res);
 		CARL_LOG_TRACE("carl.ran.evaluation", "negative root upper bound: " << neg_ub);
 		if (neg_ub == 0) {
 			// no negative root exists
@@ -234,7 +234,7 @@ std::optional<bool> evaluate(const Constraint<Poly>& c, const std::map<Variable,
 			return evaluate(Sign::ZERO, constr.relation());
 		}
 
-		assert(!carl::isZero(res));
+		assert(!carl::isZero(*res));
 
 		// refine the interval until it is either positive or negative or is contained in (neg_ub,pos_lb)
 		CARL_LOG_DEBUG("carl.ran.evaluation", "Refine until interval is in (" << neg_ub << "," << pos_lb << ") or interval is positive or negative");

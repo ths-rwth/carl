@@ -24,7 +24,7 @@ namespace carl {
     template std::optional<real_algebraic_number_z3<mpq_class>> evaluate(const MultivariatePolynomial<mpq_class>& polynomial, const std::map<Variable, real_algebraic_number_z3<mpq_class>>& evalMap);
 
     template<typename Number, typename Poly>
-    std::optional<bool> evaluate(const Constraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap) {
+    boost::tribool evaluate(const Constraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap) {
         polynomial::polynomial_ref poly = z3().toZ3IntCoeff(constraint.lhs());
         algebraic_numbers::anum res;
         nlsat::assignment map(z3().anumMan()); // map frees its elements automatically
@@ -37,7 +37,7 @@ namespace carl {
         return evaluate(rs, constraint.relation());
     }
 
-    template std::optional<bool> evaluate(const Constraint<MultivariatePolynomial<mpq_class>>& constraint, const std::map<Variable, real_algebraic_number_z3<mpq_class>>& evalMap);
+    template boost::tribool evaluate(const Constraint<MultivariatePolynomial<mpq_class>>& constraint, const std::map<Variable, real_algebraic_number_z3<mpq_class>>& evalMap);
 
 }
 

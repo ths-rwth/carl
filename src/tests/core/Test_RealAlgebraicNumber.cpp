@@ -67,7 +67,7 @@ TEST(RealAlgebraicNumber, EvalBug)
 	eval.emplace(x,Rational(0));
 
 	auto res = carl::evaluate(constr, eval);
-	EXPECT_FALSE(*res);
+	EXPECT_FALSE((bool)res);
 }
 
 

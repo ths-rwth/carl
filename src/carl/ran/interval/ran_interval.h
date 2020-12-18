@@ -17,6 +17,7 @@
 #include "../ran_operations_number.h"
 
 #include <list>
+#include <boost/logic/tribool.hpp>
 
 namespace carl {
 
@@ -32,7 +33,7 @@ class real_algebraic_number_interval {
 	friend bool compare(const real_algebraic_number_interval<Num>&, const Num&, const Relation);
 
 	template<typename Num, typename Poly>
-	friend std::optional<bool> evaluate(const Constraint<Poly>&, const std::map<Variable, real_algebraic_number_interval<Num>>&, bool, bool);
+	friend boost::tribool evaluate(const Constraint<Poly>&, const std::map<Variable, real_algebraic_number_interval<Num>>&, bool, bool);
 
 	template<typename Num>
 	friend std::optional<real_algebraic_number_interval<Num>> evaluate(MultivariatePolynomial<Num>, const std::map<Variable, real_algebraic_number_interval<Num>>&, bool);

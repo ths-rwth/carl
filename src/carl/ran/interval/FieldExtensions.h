@@ -138,7 +138,8 @@ private:
 		auto mp = cc.convertMV<Poly>(p);
 		auto res = carl::evaluate(Constraint<Poly>(mp, Relation::EQ), mModel);
 		CARL_LOG_DEBUG("carl.fieldext", "Evaluated " << p << " -> " << mp << " == 0 -> " << res);
-		return *res;
+		assert(!indeterminate(res));
+		return (bool)res;
 	}
 	
 	void extendRing(const CoCoA::ring& ring, const CoCoA::RingElem& p) {
