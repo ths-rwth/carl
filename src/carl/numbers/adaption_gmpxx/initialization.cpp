@@ -1,6 +1,6 @@
 #include "initialization.h"
 
-#include "config.h"
+#include "../config.h"
 
 #ifdef USE_MIMALLOC
 
