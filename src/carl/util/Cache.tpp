@@ -96,7 +96,7 @@ namespace carl
                 assert( !hasDuplicates( newElement->second.refStoragePositions ) );
                 mUnusedPositionsInCacheRefs.pop();
             }
-            assert( mNumOfUnusedEntries < std::numeric_limits<ContentType>::max() );
+            assert( mNumOfUnusedEntries < std::numeric_limits<sint>::max() );
             ++mNumOfUnusedEntries;
         }
         assert( (*ret.first)->second.refStoragePositions.size() > 0);
@@ -116,7 +116,7 @@ namespace carl
             assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
         }
-        assert( cacheRef->second.usageCount < std::numeric_limits<ContentType>::max() );
+        assert( cacheRef->second.usageCount < std::numeric_limits<sint>::max() );
         ++cacheRef->second.usageCount;
     }
     
@@ -131,7 +131,7 @@ namespace carl
         --cacheRef->second.usageCount;
         if( cacheRef->second.usageCount == 0 ) // no more usage
         {
-            assert( mNumOfUnusedEntries < std::numeric_limits<ContentType>::max() );
+            assert( mNumOfUnusedEntries < std::numeric_limits<sint>::max() );
             ++mNumOfUnusedEntries;
             // If the cache contains more used elements than the maximum desired cache size, remove this entry directly.
             if( mCache.size() - mNumOfUnusedEntries >= mMaxCacheSize )

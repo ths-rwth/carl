@@ -34,20 +34,12 @@ namespace carl {
 #include "adaption_gmpxx/typetraits.h"
 #include "adaption_gmpxx/initialization.h"
 
-//#include "Number.h"
-
-
-//#include "NumberMpq.h"
-//#include "NumberMpz.h"
-
 
 #ifdef USE_CLN_NUMBERS
 #include "adaption_cln/include.h"
 #include "adaption_cln/hash.h"
 #include "adaption_cln/operations.h"
 #include "adaption_cln/typetraits.h"
-//#include "NumberClRA.h"
-//#include "NumberClI.h"
 #endif
 
 #ifdef USE_MPFR_FLOAT
@@ -63,6 +55,5 @@ namespace carl {
 
 #include "GaloisField.h"
 #include "GFNumber.h"
-#include "Numeric.h"
 
 #include "conversion/conversion.h"
