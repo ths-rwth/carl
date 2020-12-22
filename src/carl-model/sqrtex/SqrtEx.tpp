@@ -36,8 +36,6 @@ namespace carl
         mRadicand( isZero(mFactor) ? mFactor : std::move( _radicand ) )
     {
         assert( !isZero(mDenominator) );
-//        if( !( !mRadicand.isConstant() || isZero(mRadicand) || smtrat::ZERO_RATIONAL <= mRadicand.trailingTerm().coeff() ) )
-//            exit(1569);
         assert( !mRadicand.isConstant() || isZero(mRadicand) || constant_zero<Rational>::get() <= mRadicand.trailingTerm().coeff() );
         normalize();
     }
