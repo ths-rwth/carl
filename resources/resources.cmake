@@ -188,12 +188,3 @@ if(NOT DOXYGEN_FOUND)
 	add_custom_target(doxygen-build DEPENDS Doxygen::doxygen Doxygen-EP)
 endif()
 print_resource_info("Doxygen" Doxygen::doxygen "${DOXYGEN_VERSION}")
-
-##### MIMALLOC
-if(USE_MIMALLOC)
-	set(MIMALLOC_VERSION "1.6.7")
-	include(resources/mimalloc.cmake)
-	print_resource_info("mimalloc" MIMALLOC_OBJECT ${MIMALLOC_VERSION})
-	print_resource_info("mimalloc" MIMALLOC_SHARED ${MIMALLOC_VERSION})
-	print_resource_info("mimalloc" MIMALLOC_STATIC ${MIMALLOC_VERSION})
-endif()

@@ -32,7 +32,6 @@ namespace carl {
 #include "adaption_gmpxx/hash.h"
 #include "adaption_gmpxx/operations.h"
 #include "adaption_gmpxx/typetraits.h"
-#include "adaption_gmpxx/initialization.h"
 
 
 #ifdef USE_CLN_NUMBERS
