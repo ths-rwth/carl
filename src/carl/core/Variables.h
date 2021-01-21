@@ -154,7 +154,7 @@ public:
 			return std::holds_alternative<carl::Variable>(v) && std::get<carl::Variable>(v).type() == vt;
 		});
 	}
-
+	// TODO use ranges
 	auto boolean() const {
 		return filter_type(VariableType::VT_BOOL);
 	}
@@ -163,6 +163,11 @@ public:
 	}
 	auto real() const {
 		return filter_type(VariableType::VT_REAL);
+	}
+	auto arithmetic() const {
+		return filter([](const auto& v) {
+			return std::holds_alternative<carl::Variable>(v) && (std::get<carl::Variable>(v).type() == VariableType::VT_REAL || std::get<carl::Variable>(v).type() == VariableType::VT_INT);
+		});
 	}
 	auto bitvector() const {
 		return filter_type<BVVariable>();

@@ -315,7 +315,7 @@ namespace carl
                 return mpContent->mProperties;
             }
 
-            const Variables& variables() const
+            const Variables& variables() const // TODO use carlVariables
             {
                 COLLECT_VARIABLES_LOCK_GUARD
                 if( mpContent->mpVariables != nullptr )
@@ -745,7 +745,7 @@ namespace carl
              * Collects all constraint occurring in this formula.
              * @param _constraints The container to insert the constraint into.
              */
-            void getConstraints( std::vector<Formula>& _constraints ) const
+            void getConstraints( std::vector<Formula>& _constraints ) const // TODO rename to gatherConstraints
             {
                 if( mpContent->mType == FormulaType::CONSTRAINT )
                     _constraints.push_back( *this );
