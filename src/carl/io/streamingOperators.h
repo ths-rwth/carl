@@ -21,6 +21,7 @@
 #include <variant>
 #include <vector>
 #include <deque>
+#include "boost/container/flat_set.hpp"
 
 namespace carl {
 
@@ -170,6 +171,18 @@ inline std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p) {
  */
 template<typename T, typename C>
 inline std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s) {
+	return os << "{" << s.size() << ": " << stream_joined(", ", s) << "}";
+}
+
+/**
+ * Output a boost::container::flat_set with arbitrary content.
+ * The format is `{<length>: <item>, <item>, ...}`
+ * @param os Output stream.
+ * @param s set to be printed.
+ * @return Output stream.
+ */
+template<typename T, typename C>
+inline std::ostream& operator<<(std::ostream& os, const boost::container::flat_set<T, C>& s) {
 	return os << "{" << s.size() << ": " << stream_joined(", ", s) << "}";
 }
 
