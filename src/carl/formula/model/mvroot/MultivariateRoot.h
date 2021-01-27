@@ -127,6 +127,7 @@ public:
 		auto poly = carl::to_univariate_polynomial(mPoly, sVar);
 		auto result = carl::real_roots(poly, m);
 		if (!result.is_univariate()) {
+			CARL_LOG_TRACE("carl.rootexpression", poly << " is not univariate (nullified: " << result.is_nullified() << "; non-univariate: " << result.is_non_univariate() << ").");
 			return std::nullopt;
 		}
 		CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << result.roots());
