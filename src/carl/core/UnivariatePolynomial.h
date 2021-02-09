@@ -367,9 +367,11 @@ public:
 	[[deprecated("Use carl::variables() instead.")]]
 	std::set<Variable> gatherVariables() const {
 		if constexpr (carl::is_number<Coefficient>::value) {
-			return std::set<Variable>({mainVar()});
+			if (!isConstant()) return std::set<Variable>({mainVar()});
+			else return std::set<Variable>();
 		} else {
-			std::set<Variable> res({this->mainVar()});
+			std::set<Variable> res;
+			if (!isConstant()) res.insert({this->mainVar()});
 			for (const auto& c: this->mCoefficients) {
 				auto tmp = c.gatherVariables();
 				res.insert(tmp.begin(), tmp.end());
