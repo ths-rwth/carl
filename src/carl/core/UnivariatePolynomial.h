@@ -386,7 +386,7 @@ public:
 	 */
 	[[deprecated("Use carl::variables() instead.")]]
 	void gatherVariables(std::set<Variable>& vars) const {
-		vars = {mainVar()};
+		if (!isConstant()) vars = {mainVar()};
 		if constexpr (!carl::is_number<Coefficient>::value) {
 			for (const auto& c: mCoefficients) {
 				auto tmp = c.gatherVariables();
