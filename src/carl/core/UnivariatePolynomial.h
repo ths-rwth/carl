@@ -889,7 +889,7 @@ bool isOne(const UnivariatePolynomial<Coefficient>& p) {
 /// Add the variables of the given polynomial to the variables.
 template<typename Coeff>
 void variables(const UnivariatePolynomial<Coeff>& p, carlVariables& vars) {
-	vars.add(p.mainVar());
+	if (!p.isConstant()) vars.add(p.mainVar());
 	if constexpr (!carl::is_number<Coeff>::value) {
 		for (const auto& c : p.coefficients()) {
 			variables(c, vars);
