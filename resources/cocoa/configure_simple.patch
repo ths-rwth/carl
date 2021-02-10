@@ -1,5 +1,0 @@
-347c347,348
-< CXXFLAGS_FOR_GMP=`$SCRIPT_DIR/gmp-cxx-flags.sh`
----
-> #CXXFLAGS_FOR_GMP=`$SCRIPT_DIR/gmp-cxx-flags.sh`
-> CXXFLAGS_FOR_GMP=`echo `
