@@ -48,9 +48,6 @@ BVTermType BVTerm::type() const {
 	return mpContent->type();
 }
 
-void BVTerm::collectVariables(std::set<BVVariable>& vars) const {
-	mpContent->collectVariables(vars);
-}
 void BVTerm::gatherVariables(carlVariables& vars) const {
 	mpContent->gatherVariables(vars);
 }

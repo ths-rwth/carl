@@ -57,8 +57,6 @@ public:
 	 */
 	size_t complexity() const;
 
-	void collectVariables(std::set<BVVariable>& vars) const;
-
 	void gatherVariables(carlVariables& vars) const;
 
 	bool isInvalid() const;

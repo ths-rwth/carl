@@ -104,14 +104,6 @@ namespace carl {
 		VariableComparison invertRelation() const {
 			return VariableComparison(mVar, mValue, carl::inverse(mRelation), mNegated);
 		}
-		void collectVariables(Variables& vars) const {
-			vars.insert(mVar);
-			auto newVars = std::visit(overloaded {
-					[](const MR& mr) { return mr.gatherVariables(); },
-					[](const RAN&) { return Variables(); }
-				}, mValue);
-			vars.insert(newVars.begin(), newVars.end());
-		}
 		void gatherVariables(carlVariables& vars) const {
 			vars.add(mVar);
 			std::visit(overloaded {

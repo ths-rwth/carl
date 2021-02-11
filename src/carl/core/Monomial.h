@@ -385,27 +385,6 @@ namespace carl
 				varinfo.variableInTerm(ve, coeffFromTerm, *this);
 			}
 		}
-		
-		/**
-		 * Fill the set of variables with the variables from this monomial.
-		 * @param variables Variables.
-		 */
-		[[deprecated("Use carl::variables() instead.")]]
-		void gatherVariables(std::set<Variable>& variables) const
-		{
-			for (const auto& it: mExponents) {
-				variables.insert(it.first);
-			}
-		}
-
-		/**
-		 * Fill the variables with the variables from this monomial.
-		 * @param variables Variables.
-		 */
-		[[deprecated("Use carl::variables() instead.")]]
-		void gatherVariables(carlVariables& variables) const {
-			variables.add(mExponents.begin(), mExponents.end(), [](const auto& e){ return e.first; });
-		}
 
 		///////////////////////////
 		// Orderings

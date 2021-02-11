@@ -584,28 +584,6 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::sqrt(MultivariatePolynomia
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-void MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables(std::set<Variable>& vars) const {
-	for (const auto& t : mTerms) {
-		t.gatherVariables(vars);
-	}
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-void MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables(carlVariables& vars) const {
-	for (const auto& t : mTerms) {
-		t.gatherVariables(vars);
-	}
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-std::set<Variable> MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables() const
-{
-	std::set<Variable> vars;
-	gatherVariables(vars);
-	return vars;
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 template<bool gatherCoeff>
 VariableInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::getVarInfo(Variable::Arg v) const
 {

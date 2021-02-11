@@ -263,6 +263,15 @@ namespace carl
              */
             static SqrtEx subBySqrtEx( const Poly& _substituteIn, const carl::Variable& _varToSubstitute, const SqrtEx& _substituteBy );
     };
+
+    template<typename Poly>
+    void variables(const SqrtEx<Poly>& ex, carlVariables& vars) {
+        variables(ex.constantPart(), vars);
+        variables(ex.factor(), vars);
+        variables(ex.denominator(), vars);
+        variables(ex.radicand(), vars);
+	}
+
 }    // end namspace vs
 
 namespace std

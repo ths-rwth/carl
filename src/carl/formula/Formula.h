@@ -79,11 +79,11 @@ namespace carl
             #ifdef THREAD_SAFE
             #define ACTIVITY_LOCK_GUARD std::lock_guard<std::mutex> lock1( mpContent->mActivityMutex );
             #define DIFFICULTY_LOCK_GUARD std::lock_guard<std::mutex> lock2( mpContent->mDifficultyMutex );
-            #define COLLECT_VARIABLES_LOCK_GUARD std::lock_guard<std::mutex> lock3( mpContent->mCollectVariablesMutex );
+            #define VARIABLES_LOCK_GUARD std::lock_guard<std::mutex> lock3( mpContent->mVariablesMutex );
             #else
             #define ACTIVITY_LOCK_GUARD
             #define DIFFICULTY_LOCK_GUARD
-            #define COLLECT_VARIABLES_LOCK_GUARD
+            #define VARIABLES_LOCK_GUARD
             #endif
 
         public:
@@ -315,9 +315,9 @@ namespace carl
                 return mpContent->mProperties;
             }
 
-            const Variables& variables() const // TODO use carlVariables
+            const Variables& variables() const
             {
-                COLLECT_VARIABLES_LOCK_GUARD
+                VARIABLES_LOCK_GUARD
                 if( mpContent->mpVariables != nullptr )
                 {
                     return *(mpContent->mpVariables);
@@ -327,60 +327,6 @@ namespace carl
                 auto varvector = vars.underlyingVariables();
                 mpContent->mpVariables = new Variables(varvector.begin(), varvector.end());
                 return *(mpContent->mpVariables);
-            }
-
-            /**
-             * Collects all real valued variables occurring in this formula.
-             * @param _realVars The container to collect the real valued variables in.
-             */
-			[[deprecated("use gatherVariables() instead.")]]
-            void realValuedVars( Variables& _realVars ) const
-            {
-                if( propertyHolds( PROP_CONTAINS_REAL_VALUED_VARS ) )
-                    collectVariables( _realVars, false, true, false, false, false );
-            }
-
-            /**
-             * Collects all integer valued variables occurring in this formula.
-             * @param _intVars The container to collect the integer valued variables in.
-             */
-			[[deprecated("use gatherVariables() instead.")]]
-            void integerValuedVars( Variables& _intVars ) const
-            {
-                if( propertyHolds( PROP_CONTAINS_INTEGER_VALUED_VARS ) )
-                    collectVariables( _intVars, false, false, true, false, false );
-            }
-
-            /**
-             * Collects all arithmetic variables occurring in this formula.
-             * @param _arithmeticVars The container to collect the arithmetic variables in.
-             */
-			[[deprecated("use gatherVariables() instead.")]]
-            void arithmeticVars( Variables& _arithmeticVars ) const
-            {
-                if( propertyHolds( PROP_CONTAINS_REAL_VALUED_VARS ) || propertyHolds( PROP_CONTAINS_INTEGER_VALUED_VARS ) )
-                    collectVariables( _arithmeticVars, false, true, true, false, false );
-            }
-
-            /**
-             * Collects all boolean variables occurring in this formula.
-             * @param _booleanVars The container to collect the boolean variables in.
-             */
-			[[deprecated("use gatherVariables() instead.")]]
-            void booleanVars( Variables& _booleanVars ) const
-            {
-                if( propertyHolds( PROP_CONTAINS_BOOLEAN ) )
-                    collectVariables( _booleanVars, true, false, false, false, false );
-            }
-
-            /**
-             * Collects all variables occurring in this formula.
-             * @param _vars The container to collect the variables in.
-             */
-			[[deprecated("use gatherVariables() instead.")]]
-            void allVars( Variables& _vars ) const
-            {
-                collectVariables( _vars, true, true, true, true, true );
             }
 
             Formula negated() const
@@ -757,17 +703,6 @@ namespace carl
 						subAst->getConstraints(_constraints);
 				}
             }
-
-            /**
-             * Collects all Boolean variables occurring in this formula.
-             * @param _vars The container to collect the Boolean variables in.
-			 * @param _type
-			 * @param _ofThisType
-             */
-			[[deprecated("use gatherVariables() instead.")]]
-            void collectVariables( Variables& _vars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
-			[[deprecated("use gatherVariables() instead.")]]
-            void collectVariables_( Variables& _vars, std::set<BVVariable>* _bvVars, std::set<UVariable>* _ueVars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
 
 			void gatherVariables(carlVariables& vars) const;
 

@@ -36,9 +36,8 @@ namespace carl
 	//static_assert(!(strategy::variableSelectionHeurisics == variableSelectionHeurisics::GREEDY_II)&&!(strategy::variableSelectionHeurisics == variableSelectionHeurisics::GREEDY_IIs), "Strategy requires Interval map");
 
 	if (strategy::selectionType == variableSelectionHeurisics::GREEDY_II || strategy::selectionType == variableSelectionHeurisics::GREEDY_IIs){
-		std::set<Variable> allVariablesinPolynome;
+		std::set<Variable> allVariablesinPolynome = carl::variables(inPut).underlyingVariableSet(); // TODO VARREFACTOR
 		std::set<Variable>::iterator variableIt;
-		inPut.gatherVariables(allVariablesinPolynome);
 
 		for (variableIt = allVariablesinPolynome.begin(); variableIt != allVariablesinPolynome.end(); variableIt++)
 		{
@@ -109,8 +108,7 @@ namespace carl
 
 		std::set<Variable>::iterator variableIt;
 		std::set<Variable>::iterator selectedVariable;
-		std::set<Variable> allVariablesinPolynome;
-		inPut.gatherVariables(allVariablesinPolynome);
+		std::set<Variable> allVariablesinPolynome = carl::variables(inPut).underlyingVariableSet(); // TODO VARREFACTOR
 
 		Interval<double> currentInterval(0);
 		CoeffType delta = constant_zero<CoeffType>::get();

@@ -365,7 +365,7 @@ public:
 	MultivariatePolynomial& stripLT();
     
 	bool hasSingleVariable() const {
-		return gatherVariables().size() == 1;
+		return lterm().isSingleVariable() && nrTerms() == 1;
 	}
     
     /**
@@ -406,17 +406,6 @@ public:
 			[](const auto& t){ return t.isSquare(); }
 		);
 	}
-	
-	/**
-	 * Iterates through all terms to find variables occuring in this polynomial.
-	 * @param vars Holds the variables occuring in the polynomial at return.
-	 */
-	[[deprecated("Use carl::variables() instead.")]]
-	void gatherVariables(std::set<Variable>& vars) const;
-	[[deprecated("Use carl::variables() instead.")]]
-	void gatherVariables(carlVariables& vars) const;
-	[[deprecated("Use carl::variables() instead.")]]
-	std::set<Variable> gatherVariables() const;
 	
 	/**
 	 * @param v The variable to check for its occurrence.

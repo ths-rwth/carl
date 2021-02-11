@@ -91,23 +91,6 @@ public:
 	}
 
 	/**
-	 * @return The variables mentioned in underlying polynomial, excluding
-	 * the root-variable "_z". For example, with an underlying poly p(x,y,_z)
-	 * we return {x,y}.
-	 */
-	[[deprecated("Use carl::variables() instead.")]]
-	std::set<Variable> gatherVariables() const {
-		Variables var = mPoly.gatherVariables();
-		var.erase(sVar);
-		return var;
-	}
-	[[deprecated("Use carl::variables() instead.")]]
-	void gatherVariables(carlVariables& vars) const {
-		carl::variables(mPoly, vars);
-		vars.erase(sVar);
-	}
-
-	/**
 	 * Create a copy of the underlying polynomial with the given variable
 	 * replaced by the given polynomial.
 	 */

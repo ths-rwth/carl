@@ -361,41 +361,6 @@ public:
 	}
 
 	/**
-	 * Gathers all variables that occur in the polynomial.
-	 * @return Set of variables.
-	 */
-	[[deprecated("Use carl::variables() instead.")]]
-	std::set<Variable> gatherVariables() const {
-		if constexpr (carl::is_number<Coefficient>::value) {
-			if (!isConstant()) return std::set<Variable>({mainVar()});
-			else return std::set<Variable>();
-		} else {
-			std::set<Variable> res;
-			if (!isConstant()) res.insert({this->mainVar()});
-			for (const auto& c: this->mCoefficients) {
-				auto tmp = c.gatherVariables();
-				res.insert(tmp.begin(), tmp.end());
-			}
-			return res;
-		}
-	}
-	
-	/**
-	 * Gathers all variables that occur in the polynomial.
-	 * @return Set of variables.
-	 */
-	[[deprecated("Use carl::variables() instead.")]]
-	void gatherVariables(std::set<Variable>& vars) const {
-		if (!isConstant()) vars = {mainVar()};
-		if constexpr (!carl::is_number<Coefficient>::value) {
-			for (const auto& c: mCoefficients) {
-				auto tmp = c.gatherVariables();
-				vars.insert(tmp.begin(), tmp.end());
-			}
-		}
-	}
-
-	/**
 	 * Checks if the given variable occurs in the polynomial.
 	 * @param v Variable.
 	 * @return If v occurs in the polynomial.
@@ -889,7 +854,7 @@ bool isOne(const UnivariatePolynomial<Coefficient>& p) {
 /// Add the variables of the given polynomial to the variables.
 template<typename Coeff>
 void variables(const UnivariatePolynomial<Coeff>& p, carlVariables& vars) {
-	if (!p.isConstant()) vars.add(p.mainVar());
+	if (!is_constant(p)) vars.add(p.mainVar());
 	if constexpr (!carl::is_number<Coeff>::value) {
 		for (const auto& c : p.coefficients()) {
 			variables(c, vars);

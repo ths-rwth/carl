@@ -254,15 +254,6 @@ public:
 	template<bool gatherCoeff, typename CoeffType>
 	void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const;
 
-	[[deprecated("Use carl::variables() instead.")]]
-	void gatherVariables(std::set<Variable>& variables) const {
-		if (mMonomial) mMonomial->gatherVariables(variables);
-	}
-	[[deprecated("Use carl::variables() instead.")]]
-	void gatherVariables(carlVariables& variables) const {
-		if (mMonomial) mMonomial->gatherVariables(variables);
-	}
-
 	bool isConsistent() const;
 
 	/// @name Division operators

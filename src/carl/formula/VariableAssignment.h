@@ -38,9 +38,6 @@ namespace carl {
 		operator const VariableComparison<Poly>&() const {
 			return mComparison;
 		}
-		void collectVariables(Variables& vars) const {
-			mComparison.collectVariables(vars);
-		}
 		void gatherVariables(carlVariables& vars) const {
 			mComparison.gatherVariables(vars);
 		}

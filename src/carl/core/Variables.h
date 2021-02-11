@@ -9,10 +9,11 @@
 #include <algorithm>
 #include <variant>
 #include <vector>
+//#include <range/v3/algorithm/copy_if.hpp>
 
 namespace carl {
 
-using VariableVariant = std::variant<Variable,BVVariable,UVariable>;
+using VariableVariant = std::variant<Variable,BVVariable,UVariable>; // TODO do not employ variants, add separate methods for gathering BV und UV; here, collect them as Variable
 inline Variable underlying_variable(const VariableVariant& var) {
 	return std::visit(overloaded {
 		[](Variable v){ return v; },
@@ -134,11 +135,7 @@ public:
 		compact(true);
 		std::set<Variable> res;
 		std::for_each(begin(), end(), [&res](const auto& var) {
-			std::visit(overloaded {
-				[&res](Variable v){ res.insert(v); },
-				[&res](BVVariable v){ res.insert(v.variable()); },
-				[&res](UVariable v){ res.insert(v.variable()); },
-			}, var);
+			res.emplace(underlying_variable(var));
 		});
 		return res;
 	}
@@ -173,7 +170,7 @@ public:
 		return filter_type<BVVariable>();
 	}
 	auto uninterpreted() const {
-		return filter_type<BVVariable>();
+		return filter_type<UVariable>();
 	}
 };
 

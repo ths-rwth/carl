@@ -171,22 +171,6 @@ struct BVTermContent {
 	bool isInvalid() const {
 		return (mType == BVTermType::CONSTANT && mWidth == 0);
 	}
-	void collectVariables(std::set<BVVariable>& vars) const {
-		if (mType == BVTermType::CONSTANT) {
-		} else if (mType == BVTermType::VARIABLE) {
-			vars.insert(as<BVVariable>());
-		} else if (mType == BVTermType::EXTRACT) {
-			as<BVExtractContent>().mOperand.collectVariables(vars);
-		} else if (typeIsUnary(mType)) {
-			as<BVUnaryContent>().mOperand.collectVariables(vars);
-		} else if (typeIsBinary(mType)) {
-			as<BVBinaryContent>().mFirst.collectVariables(vars);
-			as<BVBinaryContent>().mSecond.collectVariables(vars);
-		} else {
-			std::cerr << "Type is " << mType << std::endl;
-			assert(false);
-		}
-	}
 
 	void gatherVariables(carlVariables& vars) const {
 		std::visit(overloaded {
