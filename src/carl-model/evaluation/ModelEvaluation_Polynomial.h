@@ -51,7 +51,7 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly, typename ModelPoly>
 	void substituteIn(Poly& p, const Model<Rational,ModelPoly>& m) {
-		for (auto var: carl::variables(p).underlyingVariables()) {
+		for (auto var: carl::variables(p)) {
 			auto it = m.find(var);
 			if (it == m.end()) continue;
 			const ModelValue<Rational,ModelPoly>& value = m.evaluated(var);
@@ -77,7 +77,7 @@ namespace model {
 	void evaluate(ModelValue<Rational,Poly>& res, Poly& p, const Model<Rational,Poly>& m) {
 		substituteIn(p, m);
 		
-		auto map = collectRANIR(carl::variables(p).underlyingVariableSet(), m);
+		auto map = collectRANIR(carl::variables(p).as_set(), m);
 		if (map.size() == carl::variables(p).size()) {
             res = *evaluate(p, map);
 			return;
@@ -88,13 +88,13 @@ namespace model {
 	template<typename Rational, typename Poly>
 	auto real_roots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
 		Poly tmp = substitute(p, m);
-		auto map = collectRANIR(carl::variables(tmp).underlyingVariableSet(), m);
+		auto map = collectRANIR(carl::variables(tmp).as_set(), m);
 		return carl::real_roots(carl::to_univariate_polynomial(tmp, v), map);
 	}
 	template<typename Rational, typename Poly>
 	auto real_roots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
 		UnivariatePolynomial<Poly> tmp = substitute(p, m);
-		auto map = collectRANIR(carl::variables(tmp).underlyingVariableSet(), m);
+		auto map = collectRANIR(carl::variables(tmp).as_set(), m);
 		return carl::real_roots(tmp, map);
 	}
 }

@@ -22,7 +22,7 @@ private:
 	mutable std::size_t mAddedSinceCompact = 0;
 
 	void compact(bool force = false) const {
-		if (force || (mAddedSinceCompact > mVariables.size() / 2)) {
+		if ((force && mAddedSinceCompact > 0) || (mAddedSinceCompact > mVariables.size() / 2)) {
 			std::sort(mVariables.begin(), mVariables.end());
 			mVariables.erase(std::unique(mVariables.begin(), mVariables.end()), mVariables.end());
 			mAddedSinceCompact = 0;
@@ -105,22 +105,14 @@ public:
 		std::copy_if(begin(), end(), std::back_inserter(res.mVariables), std::forward<F>(f));
 		return res;
 	}
-	std::vector<Variable> underlyingVariables() const {
+	const std::vector<Variable>& as_vector() const {
 		compact(true);
-		std::vector<Variable> res;
-		std::for_each(begin(), end(), [&res](const auto& var) {
-			res.emplace_back(var);
-		});
-		return res;
+		return mVariables;
 	}
 
-	std::set<Variable> underlyingVariableSet() const {
+	std::set<Variable> as_set() const {
 		compact(true);
-		std::set<Variable> res;
-		std::for_each(begin(), end(), [&res](const auto& var) {
-			res.emplace(var);
-		});
-		return res;
+		return std::set<Variable>(mVariables.begin(), mVariables.end());
 	}
 
 	auto filter_type(VariableType vt) const {

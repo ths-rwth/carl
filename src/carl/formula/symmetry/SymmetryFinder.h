@@ -86,7 +86,7 @@ class GraphBuilder {
 		assert(mColor.next() == 0);
 		carlVariables vars;
 		f.gatherVariables(vars);
-		for (const auto& v: vars.underlyingVariables()) {
+		for (const auto& v: vars) {
 			auto res = mVariableIDs.emplace(v, mGraph.add_vertex(mColor(v.type())));
 			assert(res.first->second == mVariables.size());
 			mVariables.emplace_back(v);

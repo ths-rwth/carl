@@ -175,7 +175,7 @@ namespace carl
              */
             uint maxDegree() const {
                 uint result = 0;
-                for (const auto& var: mVariables.underlyingVariables()) {
+                for (const auto& var: mVariables) {
                     uint deg = maxDegree(var);
                     if (deg > result) result = deg;
                 }
@@ -457,7 +457,7 @@ namespace carl
              */
             bool isBound(bool negated = false) const
             {
-				if (mpContent->mVariables.size() != 1 || maxDegree(mpContent->mVariables.underlyingVariables()[0]) != 1) return false;
+				if (mpContent->mVariables.size() != 1 || maxDegree(mpContent->mVariables.as_vector()[0]) != 1) return false;
 				if (negated) {
 					return mpContent->mRelation != Relation::EQ;
 				} else {

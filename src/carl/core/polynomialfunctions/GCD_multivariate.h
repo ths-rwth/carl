@@ -13,8 +13,8 @@ namespace carl {
 namespace gcd_detail {
 	template<typename Polynomial>
 	Variable select_variable(const Polynomial& p1, const Polynomial& p2) {
-		std::set<Variable> v1 = carl::variables(p1).underlyingVariableSet(); // TODO VARREFACTOR
-		std::set<Variable> v2 = carl::variables(p2).underlyingVariableSet(); // TODO VARREFACTOR
+		std::set<Variable> v1 = carl::variables(p1).as_set(); // TODO VARREFACTOR
+		std::set<Variable> v2 = carl::variables(p2).as_set(); // TODO VARREFACTOR
 		std::set<Variable> common;
 		
 		std::set_intersection(v1.begin(),v1.end(),v2.begin(),v2.end(), std::inserter(common,common.begin()));

@@ -28,7 +28,7 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void substituteIn(MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
-		for (auto var: carl::variables(mvr).underlyingVariables()) {
+		for (auto var: carl::variables(mvr)) {
 			auto it = m.find(var);
 			if (it == m.end()) continue;
 			const ModelValue<Rational,Poly>& value = m.evaluated(var);
@@ -49,7 +49,7 @@ namespace model {
 		CARL_LOG_DEBUG("carl.model.evaluation", "Substituting " << m << " into " << mvr);
 		substituteIn(mvr, m);
 		
-		auto map = collectRANIR(carl::variables(mvr).underlyingVariableSet(), m);
+		auto map = collectRANIR(carl::variables(mvr).as_set(), m);
 		if (map.size() == carl::variables(mvr).size()) {
 			CARL_LOG_DEBUG("carl.model.evaluation", "Fully evaluating " << mvr << " over " << map);
 			auto r = mvr.evaluate(map);

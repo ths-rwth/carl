@@ -324,8 +324,7 @@ namespace carl
                 }
                 carlVariables vars;
                 gatherVariables(vars);
-                auto varvector = vars.underlyingVariables();
-                mpContent->mpVariables = new Variables(varvector.begin(), varvector.end());
+                mpContent->mpVariables = new Variables(vars.begin(), vars.end());
                 return *(mpContent->mpVariables);
             }
 

@@ -85,7 +85,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 	UnivariatePolynomial<Coeff> polyCopy(poly);
 	ran::ran_assignment_t<real_algebraic_number_interval<Number>> ir_map;
 
-	for (Variable v: carl::variables(polyCopy).underlyingVariables()) {
+	for (Variable v: carl::variables(polyCopy)) {
 		if (v == poly.mainVar()) continue;
 		if (varToRANMap.count(v) == 0) {
 			CARL_LOG_TRACE("carl.ran.realroots", "poly still contains unassigned variable " << v << " -> non-univariate");

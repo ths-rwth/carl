@@ -465,7 +465,7 @@ TEST(MultivariatePolynomial, GatherVariables)
     Variable x = freshRealVariable("x");
     Variable y = freshRealVariable("y");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
-    std::set<Variable> vars = carl::variables(f1).underlyingVariableSet();
+    std::set<Variable> vars = carl::variables(f1).as_set();
     EXPECT_EQ(x, *vars.begin());
     EXPECT_EQ((unsigned)2, vars.size());
 

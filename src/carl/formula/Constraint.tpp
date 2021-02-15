@@ -133,7 +133,7 @@ namespace carl
             return carl::evaluate( constantPart(), relation() ) ? 1 : 0;
         else
         {
-			auto vars = variables().underlyingVariables();
+			auto& vars = variables().as_vector();
             auto varIter = vars.begin();
             auto varIntervalIter = _solutionInterval.begin();
             while( varIter != vars.end() && varIntervalIter != _solutionInterval.end() )
@@ -243,7 +243,7 @@ namespace carl
             return carl::evaluate( constantPart(), relation() ) ? 1 : 0;
         else
         {
-			auto vars = variables().underlyingVariables();
+			auto& vars = variables().as_vector();
             auto varIter = vars.begin();
             auto varIntervalIter = _solutionInterval.begin();
             while( varIter != vars.end() && varIntervalIter != _solutionInterval.end() )

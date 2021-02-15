@@ -105,7 +105,7 @@ public:
 		carlVariables vars;
 		carl::variables(mNumerator, vars);
 		carl::variables(mDenominator, vars);
-		mDependees = vars.underlyingVariables();
+		mDependees = vars.as_vector();
 	}
 
 	auto var() const {

@@ -287,7 +287,7 @@ inline bool RawConstraint<Pol>::simplify_nonlinear_univariate_monomial() {
 	Relation rel = mRelation;
 	if ((mLhsDefiniteness == Definiteness::POSITIVE_SEMI && rel == Relation::LEQ) || (mLhsDefiniteness == Definiteness::NEGATIVE_SEMI && rel == Relation::GEQ))
 		rel = Relation::EQ;
-	Variable var = mVariables.underlyingVariables()[0];
+	Variable var = mVariables.as_vector()[0];
 
 	switch (rel) {
 	case Relation::EQ:

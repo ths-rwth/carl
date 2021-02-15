@@ -57,7 +57,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
         for(const auto& entry : m) {
                 CARL_LOG_ASSERT("carl.thom.rootfinder", entry.first == entry.second.mainVar(), "invalid map Variable -> Thom encoding");
         }
-        for(const auto& v : carl::variables(p).underlyingVariables()) {
+        for(const auto& v : carl::variables(p)) {
                 if(v != mainVar) {
                         CARL_LOG_ASSERT("carl.thom.rootfinder", m.find(v) != m.end(), "there is a variable which is in p but not in m");
                 }

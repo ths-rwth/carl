@@ -109,7 +109,7 @@ namespace carl
         void gatherVariables(const Poly& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap)
         {
             std::lock_guard<std::recursive_mutex> lock( mMutex );
-			for (auto var: carl::variables(poly).underlyingVariables()) {
+			for (auto var: carl::variables(poly)) {
                 GiNaC::symbol vg(var.name());
                 if( carlToGinacVarMap.emplace(var, vg).second )
                 {

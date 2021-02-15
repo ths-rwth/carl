@@ -193,7 +193,7 @@ public:
 		}
 	}
 	CoCoAAdaptor(const std::vector<Poly>& polys):
-		CoCoAAdaptor(variables(polys).underlyingVariables())
+		CoCoAAdaptor(variables(polys).as_vector())
 	{}
 	CoCoAAdaptor(const std::initializer_list<Poly>& polys):
 		CoCoAAdaptor(std::vector<Poly>(polys))

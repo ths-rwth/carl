@@ -37,7 +37,7 @@ bool vanishes(
 	UnivariatePolynomial<Coeff> polyCopy(poly);
 	std::map<Variable, real_algebraic_number_interval<Number>> IRmap;
 
-	for (Variable v: carl::variables(polyCopy).underlyingVariables()) {
+	for (Variable v: carl::variables(polyCopy)) {
 		if (v == poly.mainVar()) continue;
 		if (varToRANMap.count(v) == 0) {
 			CARL_LOG_TRACE("carl.ran", "poly still contains unassigned variable " << v);

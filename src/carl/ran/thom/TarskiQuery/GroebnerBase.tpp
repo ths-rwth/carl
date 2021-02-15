@@ -144,7 +144,7 @@ std::set<Variable> GroebnerBase<Number>::gatherVariables() const {
         for(const auto& p : this->get()) {
                 carl::variables(p, vars);
         }
-        return vars.underlyingVariableSet();
+        return vars.as_set();
 }
 
         

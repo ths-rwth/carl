@@ -26,7 +26,7 @@ namespace model {
 	void evaluate(ModelValue<Rational,Poly>& res, Constraint<Poly>& c, const Model<Rational,Poly>& m) {
 		substituteIn(c, m);
 		
-		auto map = collectRANIR(carl::variables(c.lhs()).underlyingVariableSet(), m);
+		auto map = collectRANIR(carl::variables(c.lhs()).as_set(), m);
 		if (map.size() == carl::variables(c.lhs()).size()) {
 			auto eval_res = evaluate(c, map);
 			assert(!indeterminate(eval_res));
