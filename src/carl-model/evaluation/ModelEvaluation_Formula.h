@@ -177,7 +177,7 @@ namespace model {
 			}
 			case FormulaType::UEQ: {
 				std::set<UVariable> vars;
-				f.uequality().collectUVariables(vars);
+				f.uequality().gatherUVariables(vars);
 				if (m.contains(vars)) {
 					auto val = evaluate(f.uequality(), m);
 					assert(val.isBool());

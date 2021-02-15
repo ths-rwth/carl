@@ -88,9 +88,17 @@ public:
 		return 1 + mLhs.complexity() + mRhs.complexity();
 	}
 
+	void gatherBVVariables(std::set<BVVariable>& vars) const {
+		mLhs.gatherBVVariables(vars);
+		mRhs.gatherBVVariables(vars);
+	}
+
 	void gatherVariables(carlVariables& vars) const {
-		mLhs.gatherVariables(vars);
-		mRhs.gatherVariables(vars);
+		std::set<BVVariable> bvvars;
+		gatherBVVariables(bvvars);
+		for (const auto& bvv : bvvars) {
+			vars.add(bvv.variable());
+		}
 	}
 
 	/**

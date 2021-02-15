@@ -19,7 +19,7 @@ void collectUFVars(std::set<UVariable>& uvars, UFInstance ufi) {
 	}
 }
 
-void UEquality::collectUVariables(std::set<UVariable>& uvars) const {
+void UEquality::gatherUVariables(std::set<UVariable>& uvars) const {
 	if (mLhs.isUVariable()) {
 		uvars.insert(mLhs.asUVariable());
 	} else {

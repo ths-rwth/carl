@@ -61,6 +61,30 @@ namespace carl
     }
 
     template<typename Pol>
+    void Formula<Pol>::gatherUVariables(std::set<UVariable>& uvs) const {
+		FormulaVisitor<Formula<Pol>> visitor;
+		visitor.visit(*this,
+			[&uvs](const Formula<Pol>& f) {
+				if (f.getType() == FormulaType::UEQ) {
+					f.uequality().gatherUVariables(uvs);
+				}
+			}
+		);
+    }
+
+    template<typename Pol>
+    void Formula<Pol>::gatherBVVariables(std::set<BVVariable>& bvvs) const {
+		FormulaVisitor<Formula<Pol>> visitor;
+		visitor.visit(*this,
+			[&bvvs](const Formula<Pol>& f) {
+				if (f.getType() == FormulaType::BITVECTOR) {
+					f.bvConstraint().gatherBVVariables(bvvs);
+				}
+			}
+		);
+    }
+
+    template<typename Pol>
     size_t Formula<Pol>::complexity() const
     {
         size_t result = 0;

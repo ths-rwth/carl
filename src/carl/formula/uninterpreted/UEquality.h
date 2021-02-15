@@ -94,7 +94,6 @@ namespace carl
 				return UEquality(lhs(), rhs(), !negated());
 			}
 
-            void collectUVariables(std::set<UVariable>& uvars) const;
 			void gatherVariables(carlVariables& vars) const {
 				mLhs.gatherVariables(vars);
 				mRhs.gatherVariables(vars);
@@ -103,6 +102,7 @@ namespace carl
 				mLhs.gatherUFs(ufs);
 				mRhs.gatherUFs(ufs);
 			}
+			void gatherUVariables(std::set<UVariable>& uvars) const;
 
     };
 

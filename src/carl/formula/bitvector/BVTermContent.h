@@ -172,14 +172,14 @@ struct BVTermContent {
 		return (mType == BVTermType::CONSTANT && mWidth == 0);
 	}
 
-	void gatherVariables(carlVariables& vars) const {
+	void gatherBVVariables(std::set<BVVariable>& vars) const {
 		std::visit(overloaded {
-			[&vars](const BVVariable& v){ vars.add(v.variable()); },
-			[&vars](const BVExtractContent& c){ c.mOperand.gatherVariables(vars); },
-			[&vars](const BVUnaryContent& c){ c.mOperand.gatherVariables(vars); },
+			[&vars](const BVVariable& v){ vars.insert(v); },
+			[&vars](const BVExtractContent& c){ c.mOperand.gatherBVVariables(vars); },
+			[&vars](const BVUnaryContent& c){ c.mOperand.gatherBVVariables(vars); },
 			[&vars](const BVBinaryContent& c){
-				c.mFirst.gatherVariables(vars);
-				c.mSecond.gatherVariables(vars);
+				c.mFirst.gatherBVVariables(vars);
+				c.mSecond.gatherBVVariables(vars);
 			},
 			[](const auto&){}
 		}, mContent);

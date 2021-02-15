@@ -252,42 +252,57 @@ public:
 	void declare(Variable v) {
 		*this << "(declare-fun " << v << " () " << v.type() << ")" << std::endl;
 	}
+	/// Declare a bitvector variable via `declare-fun`.
+	void declare(BVVariable v) {
+		*this << "(declare-fun " << v.variable() << " () " << v.variable().type() << ")" << std::endl;
+	}
 	/// Declare an uninterpreted variable via `declare-fun`.
 	void declare(UVariable v) {
 		*this << "(declare-fun " << v << " () " << v.domain() << ")" << std::endl;
 	}
 	/// Declare a set of functions.
 	void declare(const std::set<UninterpretedFunction>& ufs) {
-		for (auto uf: ufs) {
+		for (const auto& uf: ufs) {
 			declare(uf);
 		}
 	}
 	/// Declare a set of variables.
 	void declare(const carlVariables& vars) {
 		for (const auto& v: vars) {
-			std::visit(overloaded {
-				[this](Variable v){ declare(v); },
-				[this](BVVariable v){ declare(v.variable()); },
-				[this](UVariable v){ declare(v); },
-			}, v);
+			declare(v);
+		}
+	}
+	/// Declare a set of bitvector variables.
+	void declare(const std::set<BVVariable>& bvvs) {
+		for (const auto& bv: bvvs) {
+			declare(bv);
+		}
+	}
+	/// Declare a set of uninterpreted variables.
+	void declare(const std::set<UVariable>& uvs) {
+		for (const auto& uv: uvs) {
+			declare(uv);
 		}
 	}
 	/// Generic initializer including the logic, a set of variables and a set of functions.
-	void initialize(Logic l, const carlVariables& vars, const std::set<UninterpretedFunction>& ufs = {}) {
+	void initialize(Logic l, const carlVariables& vars, const std::set<UninterpretedFunction>& ufs = {}, const std::set<BVVariable>& bvvs = {}, const std::set<UVariable>& uvs = {}) {
 		declare(l);
 		std::set<Sort> sorts;
-		for (const auto& v: vars) {
-			std::visit(overloaded {
-				[](Variable){},
-				[&sorts](BVVariable v){ sorts.insert(v.sort()); },
-				[&sorts](UVariable v){ sorts.insert(v.domain()); },
-			}, v);
+		for (const auto& v: bvvs) {
+			sorts.insert(v.sort());
+		}
+		for (const auto& v: uvs) {
+			sorts.insert(v.domain());
 		}
 		for (const auto& s: sorts) {
 			declare(s);
 		}
 		declare(ufs);
-		declare(vars);
+		declare(vars.filter([](const auto& v) {
+			return v.type() != VariableType::VT_BITVECTOR && v.type() != VariableType::VT_UNINTERPRETED;
+		}));
+		declare(bvvs);
+		declare(uvs);
 	}
 	
 	/// Generic initializer including the logic and variables and functions from a set of formulas.
@@ -295,11 +310,15 @@ public:
 	void initialize(Logic l, std::initializer_list<Formula<Pol>> formulas) {
 		carlVariables vars;
 		std::set<UninterpretedFunction> ufs;
+		std::set<BVVariable> bvvs;
+		std::set<UVariable> uvs;
 		for (const auto& f: formulas) {
 			f.gatherVariables(vars);
 			f.gatherUFs(ufs);
+			f.gatherBVVariables(bvvs);
+			f.gatherUVariables(uvs);
 		}
-		initialize(l, vars, ufs);
+		initialize(l, vars, ufs, bvvs, uvs);
 	}
 
 	/// Set information via `set-info`.

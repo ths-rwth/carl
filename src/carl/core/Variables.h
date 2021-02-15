@@ -10,24 +10,15 @@
 #include <variant>
 #include <vector>
 //#include <range/v3/algorithm/copy_if.hpp>
+// TODO refactor
 
 namespace carl {
-
-using VariableVariant = std::variant<Variable,BVVariable,UVariable>; // TODO do not employ variants, add separate methods for gathering BV und UV; here, collect them as Variable
-inline Variable underlying_variable(const VariableVariant& var) {
-	return std::visit(overloaded {
-		[](Variable v){ return v; },
-		[](BVVariable v){ return v.variable(); },
-		[](UVariable v){ return v.variable(); },
-	}, var);
-}
-
 class carlVariables {
 public:
 	friend bool operator==(const carlVariables& lhs, const carlVariables& rhs);
 	friend std::ostream& operator<<(std::ostream& os, const carlVariables& vars);
 private:
-	mutable std::vector<VariableVariant> mVariables;
+	mutable std::vector<Variable> mVariables;
 	mutable std::size_t mAddedSinceCompact = 0;
 
 	void compact(bool force = false) const {
@@ -39,7 +30,7 @@ private:
 	}
 public:
 	carlVariables() = default;
-	explicit carlVariables(std::initializer_list<VariableVariant> i):
+	explicit carlVariables(std::initializer_list<Variable> i):
 		mVariables(i)
 	{}
 	template<typename Iterator>
@@ -78,23 +69,15 @@ public:
 		mAddedSinceCompact = 0;
 	}
 	bool has(Variable var) const {
-		return std::any_of(begin(), end(),
-			[&var](const auto& v) {
-				return std::visit(overloaded {
-					[&var](Variable v){ return v == var; },
-					[&var](BVVariable v){ return v.variable() == var; },
-					[&var](UVariable v){ return v.variable() == var; },
-				}, v);
-			}
-		);
+		return std::find(mVariables.begin(), mVariables.end(), var) != mVariables.end();
 	}
 
-	void add(VariableVariant v) {
+	void add(Variable v) {
 		mVariables.emplace_back(v);
 		++mAddedSinceCompact;
 		compact();
 	}
-	void add(std::initializer_list<VariableVariant> i) {
+	void add(std::initializer_list<Variable> i) {
 		mVariables.insert(end(), i.begin(), i.end());
 		mAddedSinceCompact += i.size();
 		compact();
@@ -112,7 +95,7 @@ public:
 		);
 	}
 
-	void erase(VariableVariant v) {
+	void erase(Variable v) {
 		mVariables.erase(std::remove(mVariables.begin(), mVariables.end(), v), mVariables.end());
 	}
 
@@ -126,7 +109,7 @@ public:
 		compact(true);
 		std::vector<Variable> res;
 		std::for_each(begin(), end(), [&res](const auto& var) {
-			res.emplace_back(underlying_variable(var));
+			res.emplace_back(var);
 		});
 		return res;
 	}
@@ -135,23 +118,16 @@ public:
 		compact(true);
 		std::set<Variable> res;
 		std::for_each(begin(), end(), [&res](const auto& var) {
-			res.emplace(underlying_variable(var));
+			res.emplace(var);
 		});
 		return res;
 	}
 
-	template<typename T>
-	auto filter_type() const {
-		return filter([](const auto& v) {
-			return std::holds_alternative<T>(v);
-		});
-	}
 	auto filter_type(VariableType vt) const {
 		return filter([vt](const auto& v) {
-			return std::holds_alternative<carl::Variable>(v) && std::get<carl::Variable>(v).type() == vt;
+			return v.type() == vt;
 		});
 	}
-	// TODO use ranges
 	auto boolean() const {
 		return filter_type(VariableType::VT_BOOL);
 	}
@@ -163,18 +139,18 @@ public:
 	}
 	auto arithmetic() const {
 		return filter([](const auto& v) {
-			return std::holds_alternative<carl::Variable>(v) && (std::get<carl::Variable>(v).type() == VariableType::VT_REAL || std::get<carl::Variable>(v).type() == VariableType::VT_INT);
+			return v.type() == VariableType::VT_REAL || v.type() == VariableType::VT_INT;
 		});
 	}
 	auto bitvector() const {
-		return filter_type<BVVariable>();
+		return filter_type(VariableType::VT_BITVECTOR);
 	}
 	auto uninterpreted() const {
-		return filter_type<UVariable>();
+		return filter_type(VariableType::VT_UNINTERPRETED);
 	}
 };
 
-inline void swap(VariableVariant& lhs, VariableVariant& rhs) {
+inline void swap(Variable& lhs, Variable& rhs) {
 	auto tmp = lhs;
 	lhs = rhs;
 	rhs = tmp;

@@ -705,8 +705,9 @@ namespace carl
             }
 
 			void gatherVariables(carlVariables& vars) const;
-
             void gatherUFs(std::set<UninterpretedFunction>& ufs) const;
+            void gatherUVariables(std::set<UVariable>& uvs) const;
+            void gatherBVVariables(std::set<BVVariable>& bvvs) const;
 
             /**
              * @return The formula's complexity, which is mainly the number of operations within this formula.

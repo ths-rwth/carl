@@ -181,11 +181,7 @@ public:
 
 	void initialize(const carlVariables& vars) {
 		for (const auto& v: vars) {
-			std::visit(overloaded {
-				[this](Variable v){ declare(v); },
-				[this](BVVariable v){ declare(v.variable()); },
-				[this](UVariable v){ declare(v.variable()); },
-			}, v);
+			declare(v);
 		}
 	}
 	
