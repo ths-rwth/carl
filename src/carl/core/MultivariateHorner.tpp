@@ -36,7 +36,7 @@ namespace carl
 	//static_assert(!(strategy::variableSelectionHeurisics == variableSelectionHeurisics::GREEDY_II)&&!(strategy::variableSelectionHeurisics == variableSelectionHeurisics::GREEDY_IIs), "Strategy requires Interval map");
 
 	if (strategy::selectionType == variableSelectionHeurisics::GREEDY_II || strategy::selectionType == variableSelectionHeurisics::GREEDY_IIs){
-		auto allVariablesinPolynome = carl::variables(inPut).as_set();
+		auto allVariablesinPolynome = carl::variables(inPut).as_set(); // TODO VARREFACTOR
 		std::set<Variable>::iterator variableIt;
 
 		for (variableIt = allVariablesinPolynome.begin(); variableIt != allVariablesinPolynome.end(); variableIt++)
