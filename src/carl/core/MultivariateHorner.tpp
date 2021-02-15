@@ -36,8 +36,8 @@ namespace carl
 	//static_assert(!(strategy::variableSelectionHeurisics == variableSelectionHeurisics::GREEDY_II)&&!(strategy::variableSelectionHeurisics == variableSelectionHeurisics::GREEDY_IIs), "Strategy requires Interval map");
 
 	if (strategy::selectionType == variableSelectionHeurisics::GREEDY_II || strategy::selectionType == variableSelectionHeurisics::GREEDY_IIs){
-		auto allVariablesinPolynome = carl::variables(inPut).as_set(); // TODO VARREFACTOR
-		std::set<Variable>::iterator variableIt;
+		auto allVariablesinPolynome = carl::variables(inPut);
+		carl::carlVariables::iterator variableIt;
 
 		for (variableIt = allVariablesinPolynome.begin(); variableIt != allVariablesinPolynome.end(); variableIt++)
 		{
@@ -106,9 +106,9 @@ namespace carl
 	{
 	int s = strategy::selectionType;
 
-		std::set<Variable>::iterator variableIt;
-		std::set<Variable>::iterator selectedVariable;
-		std::set<Variable> allVariablesinPolynome = carl::variables(inPut).as_set(); // TODO VARREFACTOR
+		carl::carlVariables::iterator variableIt;
+		carl::carlVariables::iterator selectedVariable;
+		auto allVariablesinPolynome = carl::variables(inPut);
 
 		Interval<double> currentInterval(0);
 		CoeffType delta = constant_zero<CoeffType>::get();
@@ -116,7 +116,7 @@ namespace carl
 
 		unsigned int monomials_containingChoosenVar = 0;
 
-		if (allVariablesinPolynome.size() != 0)
+		if (!allVariablesinPolynome.empty())
 		{
 			//Detecting amounts of Variables in Monomials
 			for (variableIt = allVariablesinPolynome.begin(); variableIt != allVariablesinPolynome.end(); variableIt++)

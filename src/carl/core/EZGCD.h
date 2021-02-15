@@ -187,9 +187,9 @@ class EZGCD
 	Variable getMainVar(const Polynomial p1, const Polynomial p2) const
 	{
 		// TODO find good heuristic.
-		std::set<Variable> common;
-		std::set<Variable> v1 = carl::variables(p1).as_set(); // TODO VARREFACTOR
-		std::set<Variable> v2 = carl::variables(p2).as_set(); // TODO VARREFACTOR
+		std::vector<Variable> common;
+		auto v1 = carl::variables(p1).as_vector();
+		auto v2 = carl::variables(p2).as_vector();
 		
 		std::set_intersection(v1.begin(),v1.end(),v2.begin(),v2.end(),
                   std::inserter(common,common.begin()));

@@ -17,6 +17,8 @@ class carlVariables {
 public:
 	friend bool operator==(const carlVariables& lhs, const carlVariables& rhs);
 	friend std::ostream& operator<<(std::ostream& os, const carlVariables& vars);
+	using iterator = std::vector<Variable>::iterator;
+	using const_iterator = std::vector<Variable>::const_iterator;
 private:
 	mutable std::vector<Variable> mVariables;
 	mutable std::size_t mAddedSinceCompact = 0;
