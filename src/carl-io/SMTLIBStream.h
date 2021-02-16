@@ -298,9 +298,7 @@ public:
 			declare(s);
 		}
 		declare(ufs);
-		declare(vars.filter([](const auto& v) {
-			return v.type() != VariableType::VT_BITVECTOR && v.type() != VariableType::VT_UNINTERPRETED;
-		}));
+		declare(vars.filter(carl::variable_type_filter::excluding({VariableType::VT_BITVECTOR, VariableType::VT_UNINTERPRETED})));
 		declare(bvvs);
 		declare(uvs);
 	}

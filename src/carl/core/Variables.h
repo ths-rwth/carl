@@ -9,10 +9,61 @@
 #include <algorithm>
 #include <variant>
 #include <vector>
-//#include <range/v3/algorithm/copy_if.hpp>
-// TODO refactor
 
 namespace carl {
+
+class variable_type_filter {
+	bool filter_bool = true;
+	bool filter_real = true;
+	bool filter_int = true;
+	bool filter_uninterpreted = true;
+	bool filter_bitvector = true;
+
+public:
+	static variable_type_filter all() {
+		return variable_type_filter();
+	}	
+	static variable_type_filter excluding(std::initializer_list<VariableType> i) {
+		auto res = variable_type_filter();
+		for (const auto t : i) {
+			if (t == VariableType::VT_BOOL) res.filter_bool = false;
+			else if (t == VariableType::VT_REAL) res.filter_real = false;
+			else if (t == VariableType::VT_INT) res.filter_int = false;
+			else if (t == VariableType::VT_UNINTERPRETED) res.filter_uninterpreted = false;
+			else if (t == VariableType::VT_BITVECTOR) res.filter_bitvector = false;
+		}
+		return res;
+	}
+	static variable_type_filter only(std::initializer_list<VariableType> i) {
+		auto res = variable_type_filter();
+		res.filter_bool = false;
+		res.filter_real = false;
+		res.filter_int = false;
+		res.filter_uninterpreted = false;
+		res.filter_bitvector = false;
+		for (const auto t : i) {
+			if (t == VariableType::VT_BOOL) res.filter_bool = true;
+			else if (t == VariableType::VT_REAL) res.filter_real = true;
+			else if (t == VariableType::VT_INT) res.filter_int = true;
+			else if (t == VariableType::VT_UNINTERPRETED) res.filter_uninterpreted = true;
+			else if (t == VariableType::VT_BITVECTOR) res.filter_bitvector = true;
+		}
+		return res;
+	}
+
+	bool apply(VariableType v) const {
+		return (
+			(filter_bool && v == VariableType::VT_BOOL) ||
+			(filter_real && v == VariableType::VT_REAL) ||
+			(filter_int && v == VariableType::VT_INT) ||
+			(filter_uninterpreted && v == VariableType::VT_UNINTERPRETED) ||
+			(filter_bitvector && v == VariableType::VT_BITVECTOR)
+		);
+	}
+	bool apply(Variable v) const {
+		return apply(v.type());
+	}
+};
 class carlVariables {
 public:
 	friend bool operator==(const carlVariables& lhs, const carlVariables& rhs);
@@ -22,6 +73,7 @@ public:
 private:
 	mutable std::vector<Variable> mVariables;
 	mutable std::size_t mAddedSinceCompact = 0;
+	variable_type_filter mFilter;
 
 	void compact(bool force = false) const {
 		if ((force && mAddedSinceCompact > 0) || (mAddedSinceCompact > mVariables.size() / 2)) {
@@ -31,17 +83,13 @@ private:
 		}
 	}
 public:
-	carlVariables() = default;
-	explicit carlVariables(std::initializer_list<Variable> i):
-		mVariables(i)
-	{}
-	template<typename Iterator>
-	explicit carlVariables(const Iterator& b, const Iterator& e) {
-		add(b, e);
+	carlVariables(variable_type_filter filter = variable_type_filter::all()) : mFilter(filter) {};
+	explicit carlVariables(std::initializer_list<Variable> i, variable_type_filter filter = variable_type_filter::all()) : mFilter(filter) {
+		add(i);
 	}
-	template<typename Iterator, typename F>
-	carlVariables(const Iterator& b, const Iterator& e, F&& f) {
-		add(b, e, std::forward<F>(f));
+	template<typename Iterator>
+	explicit carlVariables(const Iterator& b, const Iterator& e, variable_type_filter filter = variable_type_filter::all()) : mFilter(filter) {
+		add(b, e);
 	}
 
 	auto begin() const {
@@ -75,38 +123,32 @@ public:
 	}
 
 	void add(Variable v) {
-		mVariables.emplace_back(v);
-		++mAddedSinceCompact;
-		compact();
-	}
-	void add(std::initializer_list<Variable> i) {
-		mVariables.insert(end(), i.begin(), i.end());
-		mAddedSinceCompact += i.size();
-		compact();
+		if (mFilter.apply(v)) {
+			mVariables.emplace_back(v);
+			++mAddedSinceCompact;
+			compact();
+		}
 	}
 	template<typename Iterator>
 	void add(const Iterator& b, const Iterator& e) {
-		mVariables.insert(end(), b, e);
-		mAddedSinceCompact += static_cast<std::size_t>(std::distance(b, e));
+		std::for_each(b, e,
+			[this](const auto& v){ 
+				if (mFilter.apply(v)) {
+					mVariables.emplace_back(v);
+					++mAddedSinceCompact;
+				}
+			 }
+		);
 		compact();
 	}
-	template<typename Iterator, typename F>
-	void add(const Iterator& b, const Iterator& e, F&& f) {
-		std::for_each(b, e,
-			[this, &f](const auto& elem){ this->add(f(elem)); }
-		);
+	void add(std::initializer_list<Variable> i) {
+		add(i.begin(), i.end());
 	}
 
 	void erase(Variable v) {
 		mVariables.erase(std::remove(mVariables.begin(), mVariables.end(), v), mVariables.end());
 	}
 
-	template<typename F>
-	carlVariables filter(F&& f) const {
-		carlVariables res;
-		std::copy_if(begin(), end(), std::back_inserter(res.mVariables), std::forward<F>(f));
-		return res;
-	}
 	const std::vector<Variable>& as_vector() const {
 		compact(true);
 		return mVariables;
@@ -117,30 +159,27 @@ public:
 		return std::set<Variable>(mVariables.begin(), mVariables.end());
 	}
 
-	auto filter_type(VariableType vt) const {
-		return filter([vt](const auto& v) {
-			return v.type() == vt;
-		});
+	carlVariables filter(variable_type_filter&& f) const {
+		return carlVariables(begin(), end(), f);
 	}
+
 	auto boolean() const {
-		return filter_type(VariableType::VT_BOOL);
+		return filter(variable_type_filter::only({VariableType::VT_BOOL}));
 	}
 	auto integer() const {
-		return filter_type(VariableType::VT_INT);
+		return filter(variable_type_filter::only({VariableType::VT_INT}));
 	}
 	auto real() const {
-		return filter_type(VariableType::VT_REAL);
+		return filter(variable_type_filter::only({VariableType::VT_REAL}));
 	}
 	auto arithmetic() const {
-		return filter([](const auto& v) {
-			return v.type() == VariableType::VT_REAL || v.type() == VariableType::VT_INT;
-		});
+		return filter(variable_type_filter::only({VariableType::VT_REAL, VariableType::VT_INT}));
 	}
 	auto bitvector() const {
-		return filter_type(VariableType::VT_BITVECTOR);
+		return filter(variable_type_filter::only({VariableType::VT_BITVECTOR}));
 	}
 	auto uninterpreted() const {
-		return filter_type(VariableType::VT_UNINTERPRETED);
+		return filter(variable_type_filter::only({VariableType::VT_UNINTERPRETED}));
 	}
 };
 
@@ -163,6 +202,48 @@ inline std::ostream& operator<<(std::ostream& os, const carlVariables& vars) {
 template<typename T>
 inline carlVariables variables(const T& t) {
 	carlVariables vars;
+	variables(t, vars);
+	return vars;
+}
+
+template<typename T>
+inline carlVariables boolean_variables(const T& t) {
+	carlVariables vars(variable_type_filter::only({VariableType::VT_BOOL}));
+	variables(t, vars);
+	return vars;
+}
+
+template<typename T>
+inline carlVariables integer_variables(const T& t) {
+	carlVariables vars(variable_type_filter::only({VariableType::VT_INT}));
+	variables(t, vars);
+	return vars;
+}
+
+template<typename T>
+inline carlVariables real_variables(const T& t) {
+	carlVariables vars(variable_type_filter::only({VariableType::VT_REAL}));
+	variables(t, vars);
+	return vars;
+}
+
+template<typename T>
+inline carlVariables arithmetic_variables(const T& t) {
+	carlVariables vars(variable_type_filter::only({VariableType::VT_INT, VariableType::VT_REAL}));
+	variables(t, vars);
+	return vars;
+}
+
+template<typename T>
+inline carlVariables bitvector_variables(const T& t) {
+	carlVariables vars(variable_type_filter::only({VariableType::VT_BITVECTOR}));
+	variables(t, vars);
+	return vars;
+}
+
+template<typename T>
+inline carlVariables uninterpreted_variables(const T& t) {
+	carlVariables vars(variable_type_filter::only({VariableType::VT_UNINTERPRETED}));
 	variables(t, vars);
 	return vars;
 }

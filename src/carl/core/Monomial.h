@@ -652,7 +652,9 @@ namespace carl
 
 	/// Add the variables of the given monomial to the variables.
 	inline void variables(const Monomial& m, carlVariables& vars) {
-		vars.add(m.begin(), m.end(), [](const auto& e){ return e.first; });
+		for (const auto& e : m) {
+			vars.add(e.first);
+		}
 	}
 
 	struct hashLess {
