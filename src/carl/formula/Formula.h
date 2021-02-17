@@ -673,7 +673,7 @@ namespace carl
              * Collects all constraint occurring in this formula.
              * @param _constraints The container to insert the constraint into.
              */
-            void getConstraints( std::vector<Constraint<Pol>>& _constraints ) const
+            void getConstraints( std::vector<Constraint<Pol>>& _constraints ) const // TODO rename to gatherConstraints
             {
                 if (mpContent->mType == FormulaType::CONSTRAINT)
                     _constraints.push_back(std::get<Constraint<Pol>>(mpContent->mContent));
@@ -889,6 +889,11 @@ namespace carl
              */
             static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoAsts, bool _inConjunction );
     };
+
+    template<typename Pol>
+    inline void variables(const Formula<Pol>& f, carlVariables& vars) {
+		f.gatherVariables(vars);
+	}
 
 	/**
 	 * The output operator of a formula.

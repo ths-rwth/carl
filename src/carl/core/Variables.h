@@ -50,6 +50,24 @@ public:
 		}
 		return res;
 	}
+	static auto boolean() {
+		return only({VariableType::VT_BOOL});
+	}
+	static auto integer() {
+		return only({VariableType::VT_INT});
+	}
+	static auto real() {
+		return only({VariableType::VT_REAL});
+	}
+	static auto arithmetic() {
+		return only({VariableType::VT_REAL, VariableType::VT_INT});
+	}
+	static auto bitvector() {
+		return only({VariableType::VT_BITVECTOR});
+	}
+	static auto uninterpreted() {
+		return only({VariableType::VT_UNINTERPRETED});
+	}
 
 	bool apply(VariableType v) const {
 		return (
@@ -164,22 +182,22 @@ public:
 	}
 
 	auto boolean() const {
-		return filter(variable_type_filter::only({VariableType::VT_BOOL}));
+		return filter(variable_type_filter::boolean());
 	}
 	auto integer() const {
-		return filter(variable_type_filter::only({VariableType::VT_INT}));
+		return filter(variable_type_filter::integer());
 	}
 	auto real() const {
-		return filter(variable_type_filter::only({VariableType::VT_REAL}));
+		return filter(variable_type_filter::real());
 	}
 	auto arithmetic() const {
-		return filter(variable_type_filter::only({VariableType::VT_REAL, VariableType::VT_INT}));
+		return filter(variable_type_filter::arithmetic());
 	}
 	auto bitvector() const {
-		return filter(variable_type_filter::only({VariableType::VT_BITVECTOR}));
+		return filter(variable_type_filter::bitvector());
 	}
 	auto uninterpreted() const {
-		return filter(variable_type_filter::only({VariableType::VT_UNINTERPRETED}));
+		return filter(variable_type_filter::uninterpreted());
 	}
 };
 
@@ -208,42 +226,42 @@ inline carlVariables variables(const T& t) {
 
 template<typename T>
 inline carlVariables boolean_variables(const T& t) {
-	carlVariables vars(variable_type_filter::only({VariableType::VT_BOOL}));
+	carlVariables vars(variable_type_filter::boolean());
 	variables(t, vars);
 	return vars;
 }
 
 template<typename T>
 inline carlVariables integer_variables(const T& t) {
-	carlVariables vars(variable_type_filter::only({VariableType::VT_INT}));
+	carlVariables vars(variable_type_filter::integer());
 	variables(t, vars);
 	return vars;
 }
 
 template<typename T>
 inline carlVariables real_variables(const T& t) {
-	carlVariables vars(variable_type_filter::only({VariableType::VT_REAL}));
+	carlVariables vars(variable_type_filter::real());
 	variables(t, vars);
 	return vars;
 }
 
 template<typename T>
 inline carlVariables arithmetic_variables(const T& t) {
-	carlVariables vars(variable_type_filter::only({VariableType::VT_INT, VariableType::VT_REAL}));
+	carlVariables vars(variable_type_filter::arithmetic());
 	variables(t, vars);
 	return vars;
 }
 
 template<typename T>
 inline carlVariables bitvector_variables(const T& t) {
-	carlVariables vars(variable_type_filter::only({VariableType::VT_BITVECTOR}));
+	carlVariables vars(variable_type_filter::bitvector());
 	variables(t, vars);
 	return vars;
 }
 
 template<typename T>
 inline carlVariables uninterpreted_variables(const T& t) {
-	carlVariables vars(variable_type_filter::only({VariableType::VT_UNINTERPRETED}));
+	carlVariables vars(variable_type_filter::uninterpreted());
 	variables(t, vars);
 	return vars;
 }
