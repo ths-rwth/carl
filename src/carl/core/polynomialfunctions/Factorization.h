@@ -53,7 +53,13 @@ namespace helper {
  */
 template<typename C, typename O, typename P>
 Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomial<C,O,P>& p, bool includeConstants = true) {
-	if (p.totalDegree() <= 1) {
+	if (p.totalDegree() == 0) {
+		if (includeConstants) {
+			return helper::trivialFactorization(p);
+		} else {
+			return {};
+		}
+	} else if (p.totalDegree() == 1) {
 		return helper::trivialFactorization(p);
 	}
 
@@ -83,7 +89,13 @@ Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomia
  */
 template<typename C, typename O, typename P>
 std::vector<MultivariatePolynomial<C,O,P>> irreducibleFactors(const MultivariatePolynomial<C,O,P>& p, bool includeConstants = true) {
-	if (p.totalDegree() <= 1) {
+	if (p.totalDegree() == 0) {
+		if (includeConstants) {
+			return {p};
+		} else {
+			return {};
+		}
+	} else if (p.totalDegree() == 1) {
 		return {p};
 	}
 
