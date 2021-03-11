@@ -113,6 +113,11 @@ namespace carl {
 		}
 	};
 
+	template<typename Pol>
+    inline void variables(const VariableComparison<Pol>& f, carlVariables& vars) {
+		f.gatherVariables(vars);
+	}
+
 	template<typename Poly>
 	bool operator==(const VariableComparison<Poly>& lhs, const VariableComparison<Poly>& rhs) {
 		return lhs.relation() == rhs.relation() && lhs.var() == rhs.var() && lhs.negated() == rhs.negated() && lhs.value() == rhs.value();

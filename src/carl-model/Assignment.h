@@ -13,7 +13,7 @@
 
 #include <carl/formula/Formula.h>
 #include <carl/ran/ran.h>
-#include "sqrtex/SqrtEx.h"
+#include <carl/vs/SqrtEx.h>
 #include <carl-model/uninterpreted/SortValue.h>
 #include <carl-model/uninterpreted/UFModel.h>
 

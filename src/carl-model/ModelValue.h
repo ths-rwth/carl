@@ -5,7 +5,7 @@
 #include <carl/formula/bitvector/BVValue.h>
 #include <carl/formula/model/mvroot/MultivariateRoot.h>
 #include <carl/ran/ran.h>
-#include "sqrtex/SqrtEx.h"
+#include <carl/vs/SqrtEx.h>
 #include "uninterpreted/SortValue.h"
 #include "uninterpreted/UFModel.h"
 

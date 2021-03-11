@@ -71,6 +71,6 @@ namespace carl {
 
 	namespace ran {
 		template<typename Number>
-		using RANMap = std::map<Variable, real_algebraic_number<Number>>;
+		using RANMap = ran_assignment<Number>;
 	}
 }
