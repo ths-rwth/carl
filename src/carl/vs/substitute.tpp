@@ -8,7 +8,7 @@
 const unsigned MAX_NUM_OF_TERMS = 512;
 
 
-namespace  carl::vs::detail 
+namespace carl::vs::detail 
 {
     template <class combineType> 
     bool combine( const std::vector< std::vector< std::vector< combineType > > >& _toCombine, std::vector< std::vector< combineType > >& _combination )
@@ -63,7 +63,7 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    void simplify( case_distinction<Poly>& _toSimplify )
+    void simplify( CaseDistinction<Poly>& _toSimplify )
     {
         bool containsEmptyDisjunction = false;
         auto conj = _toSimplify.begin();
@@ -98,7 +98,7 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    void simplify( case_distinction<Poly>& _toSimplify, Variables& _conflictingVars, const detail::EvalDoubleIntervalMap& _solutionSpace )
+    void simplify( CaseDistinction<Poly>& _toSimplify, Variables& _conflictingVars, const detail::EvalDoubleIntervalMap& _solutionSpace )
     {
         bool containsEmptyDisjunction = false;
         auto conj = _toSimplify.begin();
@@ -153,7 +153,7 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    bool splitProducts( case_distinction<Poly>& _toSimplify, bool _onlyNeq )
+    bool splitProducts( CaseDistinction<Poly>& _toSimplify, bool _onlyNeq )
     {
         bool result = true;
         size_t toSimpSize = _toSimplify.size();
@@ -161,7 +161,7 @@ namespace  carl::vs::detail
         {
             if( !_toSimplify.begin()->empty() )
             {
-                case_distinction<Poly> temp;
+                CaseDistinction<Poly> temp;
                 if( !splitProducts( _toSimplify[pos], temp, _onlyNeq ) )
                     result = false;
                 _toSimplify.erase( _toSimplify.begin() );
@@ -175,9 +175,9 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    bool splitProducts( const constraint_conjunction<Poly>& _toSimplify, case_distinction<Poly>& _result, bool _onlyNeq )
+    bool splitProducts( const ConstraintConjunction<Poly>& _toSimplify, CaseDistinction<Poly>& _result, bool _onlyNeq )
     {
-        std::vector<case_distinction<Poly>> toCombine;
+        std::vector<CaseDistinction<Poly>> toCombine;
         for( auto constraint = _toSimplify.begin(); constraint != _toSimplify.end(); ++constraint )
         {
             if( constraint->hasFactorization() )
@@ -246,9 +246,9 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    case_distinction<Poly> splitProducts( const Constraint<Poly>& _constraint, bool _onlyNeq )
+    CaseDistinction<Poly> splitProducts( const Constraint<Poly>& _constraint, bool _onlyNeq )
     {
-        case_distinction<Poly> result;
+        CaseDistinction<Poly> result;
         if( _constraint.hasFactorization() )
         {
             switch( _constraint.relation() )
@@ -306,7 +306,7 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    void splitSosDecompositions( case_distinction<Poly>& _toSimplify )
+    void splitSosDecompositions( CaseDistinction<Poly>& _toSimplify )
     {
         // TODO this needs to be reviewed and fixed
         // It seems that is is assumed that lcoeffNeg * constraint.lhs() is positive if
@@ -442,9 +442,9 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    case_distinction<Poly> getSignCombinations( const Constraint<Poly>& _constraint )
+    CaseDistinction<Poly> getSignCombinations( const Constraint<Poly>& _constraint )
     {
-        case_distinction<Poly> combinations;
+        CaseDistinction<Poly> combinations;
         if( _constraint.hasFactorization() && _constraint.factorization().size() <= MAX_PRODUCT_SPLIT_NUMBER )
         {
             assert( _constraint.relation() == Relation::GREATER || _constraint.relation() == Relation::LESS
@@ -457,10 +457,10 @@ namespace  carl::vs::detail
                 relNeg = Relation::LEQ;
             }
             bool positive = (_constraint.relation() == Relation::GEQ || _constraint.relation() == Relation::GREATER);
-            constraint_conjunction<Poly> positives;
-            constraint_conjunction<Poly> alwayspositives;
-            constraint_conjunction<Poly> negatives;
-            constraint_conjunction<Poly> alwaysnegatives;
+            ConstraintConjunction<Poly> positives;
+            ConstraintConjunction<Poly> alwayspositives;
+            ConstraintConjunction<Poly> negatives;
+            ConstraintConjunction<Poly> alwaysnegatives;
             unsigned numOfAlwaysNegatives = 0;
             const smtrat::Factorization& product = _constraint.factorization();
             for( auto factor = product.begin(); factor != product.end(); ++factor )
@@ -576,7 +576,7 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    void print( case_distinction<Poly>& _substitutionResults )
+    void print( CaseDistinction<Poly>& _substitutionResults )
     {
         auto conj = _substitutionResults.begin();
         while( conj != _substitutionResults.end() )
@@ -601,8 +601,8 @@ namespace  carl::vs::detail
     
     template<typename Poly>
     bool substitute( const Constraint<Poly>& _cons,
-                     const substitution<Poly>& _subs,
-                     case_distinction<Poly>& _result,
+                     const Substitution<Poly>& _subs,
+                     CaseDistinction<Poly>& _result,
                      bool _accordingPaper,
                      Variables& _conflictingVariables,
                      const detail::EvalDoubleIntervalMap& _solutionSpace )
@@ -614,22 +614,22 @@ namespace  carl::vs::detail
         // Apply the substitution according to its type.
         switch( _subs.term().type() )
         {
-            case substitution_type::NORMAL:
+            case TermType::NORMAL:
             {
                 result = substituteNormal( _cons, _subs, _result, _accordingPaper, _conflictingVariables, _solutionSpace );
                 break;
             }
-            case substitution_type::PLUS_EPSILON:
+            case TermType::PLUS_EPSILON:
             {
                 result = substitutePlusEps( _cons, _subs, _result, _accordingPaper, _conflictingVariables, _solutionSpace );
                 break;
             }
-            case substitution_type::MINUS_INFINITY:
+            case TermType::MINUS_INFINITY:
             {
                 substituteInf( _cons, _subs, _result, _conflictingVariables, _solutionSpace );
                 break;
             }
-            case substitution_type::PLUS_INFINITY:
+            case TermType::PLUS_INFINITY:
             {
                 substituteInf( _cons, _subs, _result, _conflictingVariables, _solutionSpace );
                 break;
@@ -658,8 +658,8 @@ namespace  carl::vs::detail
 
     template<typename Poly>
     bool substituteNormal( const Constraint<Poly>& _cons,
-                           const substitution<Poly>& _subs,
-                           case_distinction<Poly>& _result,
+                           const Substitution<Poly>& _subs,
+                           CaseDistinction<Poly>& _result,
                            bool _accordingPaper,
                            Variables& _conflictingVariables,
                            const detail::EvalDoubleIntervalMap& _solutionSpace )
@@ -784,7 +784,7 @@ namespace  carl::vs::detail
     bool substituteNormalSqrtEq( const Poly& _radicand,
                                  const Poly& _q,
                                  const Poly& _r,
-                                 case_distinction<Poly>& _result,
+                                 CaseDistinction<Poly>& _result,
                                  bool _accordingPaper )
     {
         if( _q.size() > MAX_NUM_OF_TERMS || _r.size() > MAX_NUM_OF_TERMS || _radicand.size() > MAX_NUM_OF_TERMS )
@@ -826,7 +826,7 @@ namespace  carl::vs::detail
     bool substituteNormalSqrtNeq( const Poly& _radicand,
                                   const Poly& _q,
                                   const Poly& _r,
-                                  case_distinction<Poly>& _result,
+                                  CaseDistinction<Poly>& _result,
                                   bool _accordingPaper )
     {
         if( _q.size() > MAX_NUM_OF_TERMS || _r.size() > MAX_NUM_OF_TERMS || _radicand.size() > MAX_NUM_OF_TERMS )
@@ -862,7 +862,7 @@ namespace  carl::vs::detail
                                    const Poly& _q,
                                    const Poly& _r,
                                    const Poly& _s,
-                                   case_distinction<Poly>& _result,
+                                   CaseDistinction<Poly>& _result,
                                    bool _accordingPaper )
     {
         if( _q.size() > MAX_NUM_OF_TERMS || _r.size() > MAX_NUM_OF_TERMS || _radicand.size() > MAX_NUM_OF_TERMS )
@@ -926,7 +926,7 @@ namespace  carl::vs::detail
                                   const Poly& _q,
                                   const Poly& _r,
                                   const Poly& _s,
-                                  case_distinction<Poly>& _result,
+                                  CaseDistinction<Poly>& _result,
                                   bool _accordingPaper )
     {
         if( _q.size() > MAX_NUM_OF_TERMS || _r.size() > MAX_NUM_OF_TERMS || _radicand.size() > MAX_NUM_OF_TERMS )
@@ -981,8 +981,8 @@ namespace  carl::vs::detail
 
     template<typename Poly>
     bool substitutePlusEps( const Constraint<Poly>& _cons,
-                            const substitution<Poly>& _subs,
-                            case_distinction<Poly>& _result,
+                            const Substitution<Poly>& _subs,
+                            CaseDistinction<Poly>& _result,
                             bool _accordingPaper,
                             Variables& _conflictingVariables,
                             const detail::EvalDoubleIntervalMap& _solutionSpace )
@@ -1047,22 +1047,22 @@ namespace  carl::vs::detail
 
     template<typename Poly>
     bool substituteEpsGradients( const Constraint<Poly>& _cons,
-                                 const substitution<Poly>& _subs,
+                                 const Substitution<Poly>& _subs,
                                  const Relation _relation,
-                                 case_distinction<Poly>& _result,
+                                 CaseDistinction<Poly>& _result,
                                  bool _accordingPaper,
                                  Variables& _conflictingVariables,
                                  const detail::EvalDoubleIntervalMap& _solutionSpace )
     {
         assert( _cons.hasVariable( _subs.variable() ) );
         // Create a substitution formed by the given one without an addition of epsilon.
-        substitution<Poly> subs = substitution<Poly>( _subs.variable(), substitution_term<Poly>::normal(_subs.term().sqrt_ex()));
+        auto term = Term<Poly>::normal(_subs.term().sqrt_ex());
         // Call the method substituteNormal with the constraint f(x)~0 and the substitution [x -> t],  where the parameter relation is ~.
         Constraint<Poly> firstCaseInequality = Constraint<Poly>( _cons.lhs(), _relation );
-        if( !substituteNormal( firstCaseInequality, subs, _result, _accordingPaper, _conflictingVariables, _solutionSpace ) )
+        if( !substituteNormal( firstCaseInequality, {_subs.variable(), term}, _result, _accordingPaper, _conflictingVariables, _solutionSpace ) )
             return false;
         // Create a vector to store the results of each single substitution.
-        std::vector<case_distinction<Poly>> substitutionResultsVector;
+        std::vector<CaseDistinction<Poly>> substitutionResultsVector;
         /*
          * Let k be the maximum degree of x in f, then call for every 1<=i<=k substituteNormal with:
          *
@@ -1082,10 +1082,10 @@ namespace  carl::vs::detail
             Constraint<Poly> inequality = Constraint<Poly>( deriv, _relation );
             // Apply the substitution (without epsilon) to the new constraints.
             substitutionResultsVector.emplace_back();
-            if( !substituteNormal( equation, subs, substitutionResultsVector.back(), _accordingPaper, _conflictingVariables, _solutionSpace ) )
+            if( !substituteNormal( equation, {_subs.variable(), term}, substitutionResultsVector.back(), _accordingPaper, _conflictingVariables, _solutionSpace ) )
                 return false;
             substitutionResultsVector.emplace_back();
-            if( !substituteNormal( inequality, subs, substitutionResultsVector.back(), _accordingPaper, _conflictingVariables, _solutionSpace ) )
+            if( !substituteNormal( inequality, {_subs.variable(), term}, substitutionResultsVector.back(), _accordingPaper, _conflictingVariables, _solutionSpace ) )
                 return false;
             if( !combine( substitutionResultsVector, _result ) )
                 return false;
@@ -1097,7 +1097,7 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    void substituteInf( const Constraint<Poly>& _cons, const substitution<Poly>& _subs, case_distinction<Poly>& _result, Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace )
+    void substituteInf( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result, Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace )
     {
         if( !_cons.variables().empty() )
         {
@@ -1123,7 +1123,7 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    void substituteInfLessGreater( const Constraint<Poly>& _cons, const substitution<Poly>& _subs, case_distinction<Poly>& _result )
+    void substituteInfLessGreater( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result )
     {
         assert( _cons.relation() != Relation::EQ );
         assert( _cons.relation() != Relation::NEQ );
@@ -1169,7 +1169,7 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    void substituteTrivialCase( const Constraint<Poly>& _cons, const substitution<Poly>& _subs, case_distinction<Poly>& _result )
+    void substituteTrivialCase( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result )
     {
         assert( _cons.relation() == Relation::EQ || _cons.relation() == Relation::LEQ || _cons.relation() == Relation::GEQ );
         carl::uint varDegree = _cons.maxDegree( _subs.variable() );
@@ -1180,7 +1180,7 @@ namespace  carl::vs::detail
     }
 
     template<typename Poly>
-    void substituteNotTrivialCase( const Constraint<Poly>& _cons, const substitution<Poly>& _subs, case_distinction<Poly>& _result )
+    void substituteNotTrivialCase( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result )
     {
         assert( _cons.relation() == Relation::NEQ );
         carl::uint varDegree = _cons.maxDegree( _subs.variable() );
