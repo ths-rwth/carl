@@ -78,7 +78,12 @@ elif [[ ${TASK} == "clang-ubsan" ]]; then
 elif [[ ${TASK} == "documentation" ]]; then
 	
 	# To allow convert for doc/pictures/
-	sudo rm -f /etc/ImageMagick-6/policy.xml
+	if ! command -v sudo &> /dev/null
+	then
+		rm -f /etc/ImageMagick-6/policy.xml
+	else
+		sudo rm -f /etc/ImageMagick-6/policy.xml
+	fi
 	
 	start_keep_waiting
 	fold "build-doc" make doc || return 1
@@ -137,9 +142,16 @@ elif [[ ${TASK} == "addons" ]]; then
 	fold "build" /usr/bin/time make ${MAKE_PARALLEL} || return 1
 	fold "tests" /usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
 	
+elif [[ ${TASK} == "parallel" ]]; then
+
+	fold "build" /usr/bin/time make ${MAKE_PARALLEL} || return 1
+	fold "tests" /usr/bin/time make ${MAKE_PARALLEL} CTEST_OUTPUT_ON_FAILURE=1 test || return 1
+
 else
+
 	fold "build" /usr/bin/time make ${MAKE_PARALLEL} || return 1
 	fold "tests" /usr/bin/time make -j1 CTEST_OUTPUT_ON_FAILURE=1 test || return 1
+
 fi
 
 cd ../
