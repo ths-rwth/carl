@@ -107,7 +107,7 @@ pycarl-gcc-9:
     - development
   except:
 
-build-gcc-9:
+addons-gcc-9:
   extends: build-gcc-9
   script:
   - MAKE_PARALLEL=-j4 TASK=addons source .ci/build.sh
