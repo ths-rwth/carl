@@ -100,7 +100,7 @@ build-clang-11:
 
 
 pycarl-gcc-9:
-  extends: .build-gcc-9
+  extends: build-gcc-9
   script:
   - MAKE_PARALLEL=-j4 TASK=pycarl source .ci/build.sh
   only:
@@ -108,7 +108,7 @@ pycarl-gcc-9:
   except:
 
 build-gcc-9:
-  extends: .build-gcc-9
+  extends: build-gcc-9
   script:
   - MAKE_PARALLEL=-j4 TASK=addons source .ci/build.sh
   only:
