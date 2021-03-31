@@ -96,7 +96,7 @@ TEST(RealAlgebraicNumber, EvalBug2)
 	eval.emplace(x2, ry);
 
 	auto res = carl::evaluate(poly, eval);
-
+	EXPECT_TRUE((bool) res);
 }
 
 
