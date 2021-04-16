@@ -17,7 +17,7 @@ cache: &global_cache
 
 
 stages:
-  - tidy
+ # - tidy
   - build-gcc
   - build-clang 
 
