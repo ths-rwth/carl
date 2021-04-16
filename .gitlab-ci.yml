@@ -21,12 +21,12 @@ stages:
   - build-gcc
   - build-clang 
 
-make_tidy:
-  stage: tidy
-  script:
-    - MAKE_PARALLEL=-j24 TASK=tidy source .ci/build.sh
-  only:
-    - ci-kroll
+#make_tidy:
+#  stage: tidy
+#  script:
+#    - MAKE_PARALLEL=-j24 TASK=tidy source .ci/build.sh
+#  only:
+#    - ci-kroll
 
 build-gcc10:
   stage: build-gcc
