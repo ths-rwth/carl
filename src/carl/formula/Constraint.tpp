@@ -18,19 +18,7 @@
 
 
 namespace carl
-{
-    template<typename Pol, EnableIf<needs_cache<Pol>>>
-    Pol makePolynomial( typename Pol::PolyType&& _poly )
-    {
-        return Pol( std::move(_poly), constraintPool<Pol>().pPolynomialCache() );
-    }
-
-    template<typename Pol, EnableIf<needs_cache<Pol>>>
-    Pol makePolynomial( carl::Variable::Arg _var )
-    {
-        return Pol( std::move(typename Pol::PolyType(_var)), constraintPool<Pol>().pPolynomialCache() );
-    }
-    
+{    
     template<typename Pol>
     ConstraintContent<Pol>::ConstraintContent( std::size_t _id, Pol&& _lhs, Relation _rel, carl::carlVariables&& _vars, carl::Definiteness _definiteness, unsigned _consistent ):
         mID( _id ),
@@ -73,12 +61,6 @@ namespace carl
     {
 		CARL_LOG_DEBUG("carl.formula.constraint", _lhs << " " << _rel << " 0  ->  " << *this);
 	}
-
-    template<typename Pol>
-    template<typename P, EnableIf<needs_cache<P>>>
-    Constraint<Pol>::Constraint( const typename P::PolyType& _lhs, Relation _rel ):
-        Constraint( ConstraintPool<Pol>::getInstance().create( _lhs, _rel ) )
-    {}
     
     template<typename Pol>
     Constraint<Pol>::Constraint( const Constraint<Pol>& _constraint ):
@@ -467,7 +449,7 @@ namespace carl
                 if( d->second.isConstant() && (varInfoPair->first.type() != carl::VariableType::VT_INT || carl::isOne(carl::abs( d->second.constantPart() ))) )
                 {
                     _substitutionVariable = varInfoPair->first;
-                    _substitutionTerm = makePolynomial<Pol>( _substitutionVariable ) * d->second - lhs();
+                    _substitutionTerm = Pol( _substitutionVariable ) * d->second - lhs();
                     _substitutionTerm /= d->second.constantPart();
                     return true;
                 }
@@ -498,42 +480,4 @@ namespace carl
 	bool Constraint<Pol>::isPseudoBoolean() const {
 		return !variables().boolean().empty();
 	}
-
-    template<typename Pol>
-    void Constraint<Pol>::printProperties( std::ostream& _out ) const
-    {
-        _out << "Properties:" << std::endl;
-        _out << "   Definitess:              ";
-        switch( mpContent->mLhsDefiniteness )
-        {
-            case Definiteness::NON:
-                _out << "NON" << std::endl;
-                break;
-            case Definiteness::POSITIVE:
-                _out << "POSITIVE" << std::endl;
-                break;
-            case Definiteness::POSITIVE_SEMI:
-                _out << "POSITIVE_SEMI" << std::endl;
-                break;
-            case Definiteness::NEGATIVE:
-                _out << "NEGATIVE" << std::endl;
-                break;
-            case Definiteness::NEGATIVE_SEMI:
-                _out << "NEGATIVE_SEMI" << std::endl;
-                break;
-            default:
-                _out << "UNDEFINED" << std::endl;
-                break;
-        }
-        _out << "   The number of monomials: " << lhs().nrTerms() << std::endl;
-        _out << "   The maximal degree:      " << (carl::isZero(lhs()) ? 0 : lhs().totalDegree()) << std::endl;
-        _out << "   The constant part:       " << constantPart() << std::endl;
-        _out << "   Variables:" << std::endl;
-        for( auto vi = mpContent->mVarInfoMap.begin(); vi != mpContent->mVarInfoMap.end(); ++vi )
-        {
-            _out << "        " << vi->first << " has " << vi->second.occurence() << " occurences." << std::endl;
-            _out << "        " << vi->first << " has the maximal degree of " << vi->second.maxDegree() << "." << std::endl;
-            _out << "        " << vi->first << " has the minimal degree of " << vi->second.minDegree() << "." << std::endl;
-        }
-    }
 }    // namespace carl

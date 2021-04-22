@@ -87,7 +87,7 @@ inline void RawConstraint<Pol>::set_trivial(bool _valid) {
 template<typename Pol>
 inline void RawConstraint<Pol>::set_bound(Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound) {
 	CARL_LOG_DEBUG("carl.formula.constraint", "Normalizing bound " << _var << " " << _rel << " " << _bound);
-	mLhs = makePolynomial<Pol>(_var);
+	mLhs = Pol(_var);
 	mRelation = _rel;
 	switch (_rel) {
 	case Relation::GREATER:

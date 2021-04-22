@@ -7,7 +7,6 @@
  * @version 2014-10-30
  */
 
-#include "../converter/OldGinacConverter.h"
 #include "ConstraintPool.h"
 
 namespace carl {
@@ -17,16 +16,9 @@ ConstraintPool<Pol>::ConstraintPool(unsigned _capacity)
 	: Singleton<ConstraintPool<Pol>>(),
 	  mIdAllocator(1),
 	  mPoolBuckets(new typename underlying_set::bucket_type[mRehashPolicy.numBucketsFor(_capacity)]),
-	  mPool(typename underlying_set::bucket_traits(mPoolBuckets.get(), mRehashPolicy.numBucketsFor(_capacity))),
-	  mpPolynomialCache(nullptr) {
+	  mPool(typename underlying_set::bucket_traits(mPoolBuckets.get(), mRehashPolicy.numBucketsFor(_capacity))) {
 	VariablePool::getInstance();
 	MonomialPool::getInstance();
-	if (needs_cache<Pol>::value) {
-		mpPolynomialCache = std::shared_ptr<typename Pol::CACHE>(new typename Pol::CACHE());
-        #ifdef USE_GINAC
-		setGinacConverterPolynomialCache<Pol>(mpPolynomialCache);
-        #endif
-	}
 	/* Make sure that the MonomialPool is created before the ConstraintPool.
     * Thereby, the MonomialPool gets destroyed after the ConstraintPool.
     * Thereby, destroying the constraints (and the Monomials contained) works correctly.

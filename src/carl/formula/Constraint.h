@@ -9,9 +9,6 @@
 
 #pragma once
 
-//#define NDEBUG
-#define CONSTRAINT_WITH_FACTORIZATION
-
 #include "../config.h"
 #include "../core/Relation.h"
 #include "../core/Variables.h"
@@ -48,31 +45,7 @@ namespace carl
     
     template<typename Pol>
     using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
-    
-    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
-    Pol makePolynomial( typename Pol::PolyType&& _poly );
-
-    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
-    Pol makePolynomial( carl::Variable::Arg _var );
-    
-    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
-    Pol makePolynomial( const typename Pol::PolyType& _poly )
-    {
-        return makePolynomial<Pol>(typename Pol::PolyType(_poly));
-    }
-
-    template<typename Pol, DisableIf<needs_cache<Pol>> = dummy>
-    Pol makePolynomial( carl::Variable::Arg _var )
-    {
-        return Pol( _var );
-    }
-
-    template<typename Pol, DisableIf<needs_cache<Pol>> = dummy>
-    Pol makePolynomial( const typename Pol::PolyType& _poly )
-    {
-        return _poly;
-    }
-        
+            
     /**
      * Represent a polynomial (in)equality against zero.
      */
@@ -110,12 +83,7 @@ namespace carl
 
             ConstraintContent() = delete;
             ConstraintContent(const ConstraintContent<Pol>&) = delete;
-            
-            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
-            ConstraintContent( std::size_t _id, typename Pol::PolyType&& _lhs, Relation _rel,  carl::carlVariables&& _vars, carl::Definiteness _definiteness, unsigned _consistent):
-                ConstraintContent<Pol>::ConstraintContent( _id, std::move( makePolynomial<Pol>( std::move( _lhs ) ) ), _rel, std::move(_vars), _definiteness, _consistent )
-            {}
-            
+                        
             ConstraintContent( std::size_t _id, Pol&& _lhs, Relation _rel, carl::carlVariables&& _vars, carl::Definiteness _definiteness, unsigned _consistent );
                         
             /**
@@ -244,9 +212,6 @@ namespace carl
             explicit Constraint( carl::Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound = constant_zero<typename Pol::NumberType>::get() );
             
             explicit Constraint( const Pol& _lhs, Relation _rel );
-            
-            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
-            explicit Constraint( const typename P::PolyType& _lhs, Relation _rel );
             
             Constraint( const Constraint& _constraint );
             
@@ -611,12 +576,6 @@ namespace carl
              * @return True if this constraint is pseudo-boolean. False otherwise.
              */
             bool isPseudoBoolean() const;
-
-            /**
-             * Prints the properties of this constraints on the given stream.
-             * @param _out The stream to print on.
-             */
-            void printProperties( std::ostream& _out = std::cout ) const;
 		
 		template<typename P>
 		friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs);

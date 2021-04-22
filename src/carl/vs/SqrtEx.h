@@ -47,11 +47,7 @@ namespace carl
             {}
             
             explicit SqrtEx( Variable::Arg _var ) : 
-                SqrtEx( makePolynomial<Poly>( _var ) )
-            {}
-            
-            template<typename P = Poly, typename = typename std::enable_if<needs_cache<P>::value>::type>
-            explicit SqrtEx( typename P::PolyType&& _poly ) : SqrtEx( std::move( makePolynomial<P>( std::move(_poly) ) ) )
+                SqrtEx( Poly( _var ) )
             {}
             
             /**

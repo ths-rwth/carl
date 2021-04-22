@@ -64,9 +64,6 @@ private:
     /// The constraint pool.
     underlying_set mPool;
     
-    /// Pointer to the polynomial cache, if cache is needed of the polynomial type, otherwise, it is nullptr.
-    std::shared_ptr<typename Pol::CACHE> mpPolynomialCache;
-
     #ifdef THREAD_SAFE
     #define CONSTRAINT_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock1(mMutexPool);
     #define CONSTRAINT_POOL_LOCK mMutexPool.lock();
@@ -104,10 +101,6 @@ private:
     */
     std::shared_ptr<ConstraintContent<Pol>> inconsistentConstraint() const {
         return mInconsistentConstraint;
-    }
-
-    const std::shared_ptr<typename Pol::CACHE>& pPolynomialCache() const {
-        return mpPolynomialCache;
     }
 
 protected:
@@ -158,12 +151,7 @@ public:
     }
 
     std::shared_ptr<ConstraintContent<Pol>> create(carl::Variable::Arg _var, Relation _rel) {
-        return create(makePolynomial<Pol>(_var), _rel);
-    }
-
-    template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
-    std::shared_ptr<ConstraintContent<Pol>> create(const typename Pol::PolyType& _lhs, Relation _rel) {
-        return create(makePolynomial<Pol>(_lhs), _rel);
+        return create(Pol(_var), _rel);
     }
 
     void free(const ConstraintContent<Pol>* _cc) noexcept {
