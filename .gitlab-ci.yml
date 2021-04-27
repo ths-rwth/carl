@@ -38,6 +38,7 @@ build-gcc10:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths: 
       - build/
+      - cmake/
   only:
     - ci-kroll
 
@@ -51,6 +52,7 @@ build-gcc9:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths: 
       - build/
+      - cmake/
   only:
     - ci-kroll
   
@@ -64,6 +66,7 @@ build-gcc8:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths: 
       - build/
+      - cmake/
   only:
     - ci-kroll
 
@@ -77,6 +80,7 @@ build-clang11:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths: 
       - build/
+      - cmake/
   only:
     - ci-kroll
 
@@ -90,6 +94,7 @@ build-clang10:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths: 
       - build/
+      - cmake/
   only:
     - ci-kroll
 
@@ -103,5 +108,6 @@ build-clang9:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths: 
       - build/
+      - cmake/
   only:
     - ci-kroll
