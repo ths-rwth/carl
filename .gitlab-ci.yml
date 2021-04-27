@@ -39,6 +39,7 @@ build-gcc10:
     paths: 
       - build/
       - cmake/
+      - src/
   only:
     - ci-kroll
 
@@ -53,6 +54,7 @@ build-gcc9:
     paths: 
       - build/
       - cmake/
+      - src/
   only:
     - ci-kroll
   
@@ -67,6 +69,7 @@ build-gcc8:
     paths: 
       - build/
       - cmake/
+      - src/
   only:
     - ci-kroll
 
@@ -81,6 +84,7 @@ build-clang11:
     paths: 
       - build/
       - cmake/
+      - src/
   only:
     - ci-kroll
 
@@ -95,6 +99,7 @@ build-clang10:
     paths: 
       - build/
       - cmake/
+      - src/
   only:
     - ci-kroll
 
@@ -109,5 +114,6 @@ build-clang9:
     paths: 
       - build/
       - cmake/
+      - src/
   only:
     - ci-kroll
