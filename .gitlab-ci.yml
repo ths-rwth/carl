@@ -2,7 +2,7 @@ image: registry.git.rwth-aachen.de/ths/smt/carl/ci:latest
 
 #Gleicher Cache für alle Branches, Verschiedene für jeden Job
 #Für alle Jobs der gleiche Cache klappt leider nicht, da diese bei verschiedenen Compilern neu compiliert werden müssen
-cache: &global_cache
+cache:
   key: ${CI_JOB_NAME}
   paths:
     - build/resources/
@@ -15,11 +15,15 @@ cache: &global_cache
 #    - build/*.a*
 #  policy: pull-push
 
+include: 
+  - template: Code-Quality.gitlab-ci.yml
+
 
 stages:
  # - tidy
   - build-gcc
   - build-clang 
+  - test
 
 #make_tidy:
 #  stage: tidy
@@ -117,3 +121,7 @@ build-clang9:
       - src/
   only:
     - ci-kroll
+
+  code_quality:
+  artifacts:
+    paths: [gl-code-quality-report.json]
