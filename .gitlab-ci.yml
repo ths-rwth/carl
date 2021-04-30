@@ -122,6 +122,6 @@ build-clang9:
   only:
     - ci-kroll
 
-  code_quality:
+code_quality:
   artifacts:
     paths: [gl-code-quality-report.json]
