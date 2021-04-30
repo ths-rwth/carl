@@ -123,13 +123,13 @@ code_quality:
   image: docker:stable
   allow_failure: true
   services:
-    - docker:stable-dind
+    - docker:18-dind
   script:
     - docker run
         --env SOURCE_CODE="$PWD"
-        --volume "$PWD":/code
+        --volume "$PWD":/src
         --volume /var/run/docker.sock:/var/run/docker.sock
-        "registry.gitlab.com/gitlab-org/security-products/codequality:11-8-stable" /code
+        "registry.gitlab.com/gitlab-org/security-products/codequality:11-8-stable" /src
   artifacts:
     paths: [gl-code-quality-report.json]
     expire_in: 1 week
