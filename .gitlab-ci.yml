@@ -15,10 +15,6 @@ cache:
 #    - build/*.a*
 #  policy: pull-push
 
-include: 
-  - template: Code-Quality.gitlab-ci.yml
-
-
 stages:
  # - tidy
   - build-gcc
@@ -123,5 +119,19 @@ build-clang9:
     - ci-kroll
 
 code_quality:
+  stage: test
+  image: docker:stable
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "registry.gitlab.com/gitlab-org/security-products/codequality:11-8-stable" /code
   artifacts:
     paths: [gl-code-quality-report.json]
+    expire_in: 1 week
+  only:
+    - ci-kroll
