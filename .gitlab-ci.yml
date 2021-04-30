@@ -16,10 +16,9 @@ cache:
 #  policy: pull-push
 
 stages:
- # - tidy
+  - quality
   - build-gcc
   - build-clang 
-  - test
 
 #make_tidy:
 #  stage: tidy
@@ -119,7 +118,8 @@ build-clang9:
     - ci-kroll
 
 code_quality:
-  stage: test
+  dependencies: []
+  stage: quality
   image: docker:stable
   allow_failure: true
   services:
