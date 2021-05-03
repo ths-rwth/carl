@@ -20,9 +20,10 @@ variables:
 
 
 stages:
-  - quality
   - build-gcc
   - build-clang 
+  - test
+  - quality
 
 #make_tidy:
 #  stage: tidy
@@ -120,6 +121,18 @@ build-clang9:
       - src/
   only:
     - ci-kroll
+
+test-clang: 
+  dependencies: [build-clang11]
+  stage: test
+  script: 
+    - cd build && make test #kein xml-output möglich?
+
+test-gcc: 
+  dependencies: [build-gcc10]
+  stage: test
+  script: 
+    - cd build && make test #kein xml-output möglich?
 
 code_quality:
   dependencies: []
