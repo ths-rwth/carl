@@ -117,6 +117,7 @@ test-gcc:
 code_quality:
   dependencies: []
   stage: quality
+  cache: {}
   image: docker:stable
   allow_failure: true
   services:
@@ -134,6 +135,7 @@ code_quality:
 
 docs:
   stage: documentation
+  cache: {}
   script:
     - MAKE_PARALLEL=-j4 TASK=documentation source .ci/build.sh
   only:
