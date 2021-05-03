@@ -7,16 +7,14 @@ cache:
   paths:
     - build/resources/
   policy: pull-push
-#Für jeden Branch und jeden Job seperat -> Multiple Caches sind aus bzw. braucht gitlab 13.12
-#Siehe https://gitlab.com/gitlab-org/gitlab/-/issues/32814#note_ca588f809e9dc92dbb3a55e2f3693be098b88a9d
-#  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
-#  paths: 
-#    - build/*.so*
-#    - build/*.a*
-#  policy: pull-push
+  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG" 
+  paths: 
+    - build/*.so*
+    - build/*.a*
+  policy: pull-push
 
 variables:
-  DOCKER_TLS_CERTDIR: "" #test
+  DOCKER_TLS_CERTDIR: "" #do not change, needed for docker in docker (quality)
 
 
 stages:
