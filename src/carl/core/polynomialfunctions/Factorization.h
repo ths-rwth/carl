@@ -83,6 +83,12 @@ Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomia
 	return factors;
 }
 
+template<typename C, typename O, typename P>
+bool is_trivial(const Factors<MultivariatePolynomial<C,O,P>>& f) {
+	return f.size() <= 1;
+}
+ 
+
 /**
  * Try to factorize a multivariate polynomial and return the irreducible factors (without multiplicities).
  * Uses CoCoALib and GiNaC, if available, depending on the coefficient type of the polynomial.

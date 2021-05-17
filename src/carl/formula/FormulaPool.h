@@ -10,7 +10,6 @@
 #include "../util/Singleton.h"
 #include "../core/VariablePool.h"
 #include "Formula.h"
-#include "ConstraintPool.h"
 #include <mutex>
 #include <limits>
 #include <boost/variant.hpp>

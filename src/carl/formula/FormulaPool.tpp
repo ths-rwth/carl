@@ -20,7 +20,6 @@ namespace carl
         mTseitinVarToFormula()
     {
 		VariablePool::getInstance();
-        ConstraintPool<Pol>::getInstance();
         mpTrue = new FormulaContent<Pol>( TRUE, 1 );
         mpFalse = new FormulaContent<Pol>( FALSE, 2 );
         mpTrue->mNegation = mpFalse;

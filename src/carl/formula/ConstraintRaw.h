@@ -3,7 +3,7 @@
 namespace carl {
 
 /**
- * "Raw" constraint used by the ConstraintPool internally to normalize and simplify constraints. 
+ * "Raw" constraint used internally to normalize and simplify constraints. 
  */
 template<typename Pol>
 struct RawConstraint {
@@ -31,12 +31,16 @@ struct RawConstraint {
 	RawConstraint(Variable::Arg _var, const Relation _rel, const typename Pol::NumberType& _bound) {
 		set_bound(_var, _rel, _bound);
 		initialize();
+		simplify();
 	}
 
 	RawConstraint(const Pol& _lhs, const Relation _rel) {
 		set_constraint(_lhs, _rel);
 		initialize();
 		normalize_consistency();
+		if (is_consistent() == 2) {
+			simplify();
+		}
 	}
 
 	void simplify() {

@@ -70,7 +70,6 @@ namespace checkpointverifier {
 		struct ChannelWrapper: std::map<std::string, checkpointverifier::CheckpointVector> {
 			ChannelWrapper() {
 				carl::VariablePool::getInstance();
-				carl::ConstraintPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
 				carl::FormulaPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
 			}
 		};

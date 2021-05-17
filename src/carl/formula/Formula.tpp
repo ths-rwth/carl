@@ -10,7 +10,6 @@
 
 #include "Formula.h"
 #include "FormulaPool.h"
-#include "ConstraintPool.h"
 
 namespace carl
 {

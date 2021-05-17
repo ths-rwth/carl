@@ -180,7 +180,8 @@ namespace carl::vs::detail
         std::vector<CaseDistinction<Poly>> toCombine;
         for( auto constraint = _toSimplify.begin(); constraint != _toSimplify.end(); ++constraint )
         {
-            if( constraint->hasFactorization() )
+            auto factorization = carl::factorization(constraint->lhs());
+            if( !carl::is_trivial(factorization) )
             {
                 switch( constraint->relation() )
                 {
@@ -189,7 +190,6 @@ namespace carl::vs::detail
                         if( !_onlyNeq )
                         {
                             toCombine.emplace_back();
-                            const smtrat::Factorization& factorization = constraint->factorization();
                             for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
                             {
                                 toCombine.back().emplace_back();
@@ -209,7 +209,7 @@ namespace carl::vs::detail
                     {
                         toCombine.emplace_back();
                         toCombine.back().emplace_back();
-                        const smtrat::Factorization& factorization = constraint->factorization();
+                        const smtrat::Factorization factorization = carl::factorization(constraint->lhs());
                         for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
                             toCombine.back().back().push_back( Constraint<Poly>( factor->first, Relation::NEQ ) );
                         simplify( toCombine.back() );
@@ -249,7 +249,8 @@ namespace carl::vs::detail
     CaseDistinction<Poly> splitProducts( const Constraint<Poly>& _constraint, bool _onlyNeq )
     {
         CaseDistinction<Poly> result;
-        if( _constraint.hasFactorization() )
+        auto factorization = carl::factorization(_constraint.lhs());
+        if( !carl::is_trivial(factorization) )
         {
             switch( _constraint.relation() )
             {
@@ -257,7 +258,6 @@ namespace carl::vs::detail
                 {
                     if( !_onlyNeq )
                     {
-                        const smtrat::Factorization& factorization = _constraint.factorization();
                         for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
                         {
                             result.emplace_back();
@@ -275,7 +275,6 @@ namespace carl::vs::detail
                 case Relation::NEQ:
                 {
                     result.emplace_back();
-                    const smtrat::Factorization& factorization = _constraint.factorization();
                     for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
                         result.back().push_back( Constraint<Poly>( factor->first, Relation::NEQ ) );
                     simplify( result );
@@ -445,7 +444,8 @@ namespace carl::vs::detail
     CaseDistinction<Poly> getSignCombinations( const Constraint<Poly>& _constraint )
     {
         CaseDistinction<Poly> combinations;
-        if( _constraint.hasFactorization() && _constraint.factorization().size() <= MAX_PRODUCT_SPLIT_NUMBER )
+        auto factorization = carl::factorization(_constraint.lhs());
+        if( !carl::is_trivial(factorization) && factorization.size() <= MAX_PRODUCT_SPLIT_NUMBER )
         {
             assert( _constraint.relation() == Relation::GREATER || _constraint.relation() == Relation::LESS
                     || _constraint.relation() == Relation::GEQ || _constraint.relation() == Relation::LEQ );
@@ -462,8 +462,7 @@ namespace carl::vs::detail
             ConstraintConjunction<Poly> negatives;
             ConstraintConjunction<Poly> alwaysnegatives;
             unsigned numOfAlwaysNegatives = 0;
-            const smtrat::Factorization& product = _constraint.factorization();
-            for( auto factor = product.begin(); factor != product.end(); ++factor )
+            for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
             {
                 Constraint<Poly> consPos = Constraint<Poly>( factor->first, relPos );
                 unsigned posConsistent = consPos.isConsistent();
