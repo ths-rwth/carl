@@ -47,7 +47,9 @@ build-gcc9:
       - build/
       - cmake/
       - src/
-  
+  only:
+     - development
+
 build-gcc8:
   dependencies: []
   stage: build-gcc
@@ -60,6 +62,8 @@ build-gcc8:
       - build/
       - cmake/
       - src/
+  only:
+     - development
 
 build-clang11:
   dependencies: []
@@ -86,7 +90,8 @@ build-clang10:
       - build/
       - cmake/
       - src/
-
+  only:
+     - development
 
 build-clang9:
   dependencies: []
@@ -100,7 +105,8 @@ build-clang9:
       - build/
       - cmake/
       - src/
-
+  only:
+     - development
 
 test-clang: 
   dependencies: [build-clang11]
