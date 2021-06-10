@@ -70,6 +70,35 @@ TEST(RealAlgebraicNumber, EvalBug)
 	EXPECT_FALSE((bool)res);
 }
 
+TEST(RealAlgebraicNumber, EvalBug2)
+{
+	// Poly : 2*x1 + 3*x2  
+	// Assignment : {x1 : (NR -4), x2 : (IR ]-3, -2[, (2)*__r^3 + (6)*__r^2 + (4)*__r^1 + 11), x0 : (NR -8)} 
+	Variable x0 = freshRealVariable("x0");
+	Variable x1 = freshRealVariable("x1");
+	Variable x2 = freshRealVariable("x2");
+	MultivariatePolynomial<Rational> mpx1(x1) ;
+	MultivariatePolynomial<Rational> mpx2(x2) ;
+
+	//build poly
+	MultivariatePolynomial<Rational> poly(Rational("2")*mpx1 + Rational("3")*mpx2) ;
+
+	//build ran
+	Variable h = freshRealVariable("h"); 
+	UnivariatePolynomial<Rational> py(h, std::initializer_list<Rational>{11, 4, 6, 2});
+	Interval<Rational> iy(Rational("-3"), BoundType::STRICT, Rational("-2"), BoundType::STRICT);
+	RealAlgebraicNumber<Rational> ry = RealAlgebraicNumber<Rational>::create_safe(py, iy);
+
+	//build assignment
+	carl::ran::RANMap<Rational> eval;
+	eval.emplace(x0, Rational("-8"));
+	eval.emplace(x1, Rational("-4"));
+	eval.emplace(x2, ry);
+
+	auto res = carl::evaluate(poly, eval);
+	EXPECT_TRUE((bool) res);
+}
+
 
 
 

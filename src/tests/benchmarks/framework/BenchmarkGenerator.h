@@ -39,6 +39,11 @@ public:
 		rand(4), /* chosen by fair dice roll. guaranteed to be random. */
 		bi(bi)
 	{}
+
+	ObjectGenerator(const BenchmarkInformation& bi, unsigned long seed):
+		rand(seed), /* chosen by fair dice roll. guaranteed to be random. */
+		bi(bi)
+	{	}
 	
 	/// integers: [0, ...]
 	template<typename T>

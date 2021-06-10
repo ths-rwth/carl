@@ -1,116 +1,167 @@
+image: registry.git.rwth-aachen.de/ths/smt/carl/ci:latest
+
 cache:
-  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+  key: ${CI_JOB_NAME} #Gleicher Cache für alle Branches, Verschiedene für jeden Job
   paths:
-    - build/resources
+    - build/resources/
+  policy: pull-push
+  #key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG" #Verschieden für alle Branches und alle Jobs
+  #paths: 
+  #  - build/*.so*
+  #  - build/*.a*
+  #policy: pull-push
 
-.setup:
-  before_script: &setup-before_script
-    - apt-get update 
-    - apt-get -y install make texinfo time uuid-dev cmake flex bison
-    - git config --global user.email "runner@ths.rwth-aachen.de"
+variables:
+  DOCKER_TLS_CERTDIR: "" #do not change, needed for docker in docker (quality)
 
-dependencies-gcc-9:
-  extends: .setup
-  image: gcc:9
-  cache: {}
+
+stages:
+  - build-gcc
+  - build-clang 
+  - test
+  - quality
+  - documentation
+
+build-gcc10:
+  dependencies: []
+  stage: build-gcc
   script:
-    - MAKE_PARALLEL=-j4 TASK=dependencies source .ci/build.sh
-  only:
-    - development
+    - export CC=/usr/bin/gcc-10 && export CXX=/usr/bin/g++-10
+    - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
+  artifacts: 
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths: 
+      - build/
+      - cmake/
+      - src/
 
-docs-gcc-9:
-  extends: .setup
-  image: gcc:9
-  before_script:
-    - *setup-before_script
-    - apt-get -y install ghostscript graphviz libclang-7-dev lmodern texinfo texlive texlive-font-utils texlive-latex-extra texlive-plain-generic python3-pip python3-setuptools
+build-gcc9:
+  dependencies: []
+  stage: build-gcc
+  script:
+    - export CC=/usr/bin/gcc-9 && export CXX=/usr/bin/g++-9
+    - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
+  artifacts: 
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths: 
+      - build/
+      - cmake/
+      - src/
+  only:
+     - development
+
+build-gcc8:
+  dependencies: []
+  stage: build-gcc
+  script:
+    - export CC=/usr/bin/gcc-8 && export CXX=/usr/bin/g++-8
+    - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
+  artifacts: 
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths: 
+      - build/
+      - cmake/
+      - src/
+  only:
+     - development
+
+build-clang11:
+  dependencies: []
+  stage: build-clang
+  script:
+     - export CC=/usr/bin/clang-11 && export CXX=/usr/bin/clang++-11
+     - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
+  artifacts: 
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths: 
+      - build/
+      - cmake/
+      - src/
+
+build-clang10:
+  dependencies: []
+  stage: build-clang
+  script:
+     - export CC=/usr/bin/clang-10 && export CXX=/usr/bin/clang++-10
+     - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
+  artifacts: 
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths: 
+      - build/
+      - cmake/
+      - src/
+  only:
+     - development
+
+build-clang9:
+  dependencies: []
+  stage: build-clang
+  script:
+     - export CC=/usr/bin/clang-9 && export CXX=/usr/bin/clang++-9
+     - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
+  artifacts: 
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths: 
+      - build/
+      - cmake/
+      - src/
+  only:
+     - development
+
+test-clang: 
+  dependencies: [build-clang11]
+  stage: test
+  script: 
+    - cd build && make test #kein xml-output möglich?
+
+test-gcc: 
+  dependencies: [build-gcc10]
+  stage: test
+  script: 
+    - cd build && make test #kein xml-output möglich?
+
+code_quality:
+  dependencies: []
+  stage: quality
+  cache: {}
+  image: docker:stable
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "registry.gitlab.com/gitlab-org/security-products/codequality" /code
+  artifacts:
+    reports: 
+      codequality: gl-code-quality-report.json
+
+
+docs:
+  stage: documentation
+  cache: {}
   script:
     - MAKE_PARALLEL=-j4 TASK=documentation source .ci/build.sh
   only:
     - master
 
-tidy-clang-9:
-  extends: .setup
-  image: silkeh/clang:9
-  script:
-    - MAKE_PARALLEL=-j4 TASK=tidy source .ci/build.sh
-  except:
-    - master
 
-ubsan-clang-9:
-  extends: .setup
-  image: silkeh/clang:9
-  script:
-    - MAKE_PARALLEL=-j4 TASK=clang-ubsan source .ci/build.sh
-  except:
-    - master
-
-.build:
-  extends: .setup
-  before_script:
-    - *setup-before_script
-#    - apt-get -y install libboost-all-dev
-  script:
-    - MAKE_PARALLEL=-j4 TASK=parallel source .ci/build.sh
-
-.build-clang:
-  extends: .setup
-  before_script:
-    - *setup-before_script
-    - apt-get -y install libboost-all-dev
-    - apt-get -y install python3
-  script:
-    - CC=clang CXX=clang++ MAKE_PARALLEL=-j4 TASK=parallel source .ci/build.sh
-
-build-gcc-8:
-  extends: .build
-  image: gcc:8
-  only:
-    - development
-
-build-gcc-9:
-  extends: .build
-  image: gcc:9
-  except:
-    - master
-
-build-gcc-10:
-  extends: .build
-  image: gcc:10
-  only:
-    - development
-
-build-clang-5:
-  extends: .build-clang
-  image: silkeh/clang:5
-  only:
-    - development
-
-build-clang-9:
-  extends: .build-clang
-  image: silkeh/clang:9
-  except:
-    - master
-
-build-clang-11:
-  extends: .build-clang
-  image: silkeh/clang:11
-  only:
-    - development
-
-
-pycarl-gcc-9:
-  extends: build-gcc-9
-  script:
-  - MAKE_PARALLEL=-j4 TASK=pycarl source .ci/build.sh
-  only:
-    - development
-  except:
-
-addons-gcc-9:
-  extends: build-gcc-9
-  script:
-  - MAKE_PARALLEL=-j4 TASK=addons source .ci/build.sh
-  only:
-    - development
-  except:
+#### UNUSED ## 
+#pycarl:
+#  script:
+#  - MAKE_PARALLEL=-j8 TASK=pycarl source .ci/build.sh
+#  only:
+#    - development
+#
+#addons:
+#  script:
+#  - MAKE_PARALLEL=-j8 TASK=addons source .ci/build.sh
+#  only:
+#    - development
+#
+#make_tidy:
+#  stage: tidy
+#  script:
+#    - MAKE_PARALLEL=-j8 TASK=tidy source .ci/build.sh
