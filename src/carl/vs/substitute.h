@@ -55,7 +55,7 @@ namespace carl::vs::detail {
      *          true, otherwise.
      */
     template <class combineType> 
-    bool combine( const std::vector< std::vector< std::vector< combineType > > >& _toCombine, std::vector< std::vector< combineType > >& _combination );
+    inline bool combine( const std::vector< std::vector< std::vector< combineType > > >& _toCombine, std::vector< std::vector< combineType > >& _combination );
     
     /**
      * Simplifies a disjunction of conjunctions of constraints by deleting consistent
@@ -65,7 +65,7 @@ namespace carl::vs::detail {
      * @param _toSimplify The disjunction of conjunctions to simplify.
      */
     template<typename Poly>
-    void simplify( CaseDistinction<Poly>& );
+    inline void simplify( CaseDistinction<Poly>& );
         
     /**
      * Simplifies a disjunction of conjunctions of constraints by deleting consistent
@@ -77,7 +77,7 @@ namespace carl::vs::detail {
      * @param _solutionSpace
      */
     template<typename Poly>
-    void simplify( CaseDistinction<Poly>&, carl::Variables&, const detail::EvalDoubleIntervalMap& );
+    inline void simplify( CaseDistinction<Poly>&, carl::Variables&, const detail::EvalDoubleIntervalMap& );
     
     /**
      * Splits all constraints in the given disjunction of conjunctions of constraints having a non-trivial 
@@ -89,7 +89,7 @@ namespace carl::vs::detail {
      *          true, otherwise.
      */
     template<typename Poly>
-    bool splitProducts( CaseDistinction<Poly>&, bool = false );
+    inline bool splitProducts( CaseDistinction<Poly>&, bool = false );
     
     /**
      * Splits all constraints in the given conjunction of constraints having a non-trivial 
@@ -102,7 +102,7 @@ namespace carl::vs::detail {
      *          true, otherwise.
      */
     template<typename Poly>
-    bool splitProducts( const ConstraintConjunction<Poly>&, CaseDistinction<Poly>&, bool = false );
+    inline bool splitProducts( const ConstraintConjunction<Poly>&, CaseDistinction<Poly>&, bool = false );
     
     /**
      * Splits the given constraint into a set of constraints which compare the factors of the
@@ -113,10 +113,10 @@ namespace carl::vs::detail {
      *          the given constraint.
      */
     template<typename Poly>
-    CaseDistinction<Poly> splitProducts( const Constraint<Poly>&, bool = false );
+    inline CaseDistinction<Poly> splitProducts( const Constraint<Poly>&, bool = false );
     
     template<typename Poly>
-    void splitSosDecompositions( CaseDistinction<Poly>& );
+    inline void splitSosDecompositions( CaseDistinction<Poly>& );
     
     /**
      * For a given constraint f_1*...*f_n ~ 0 this method computes all combinations of constraints
@@ -128,26 +128,26 @@ namespace carl::vs::detail {
      * @return The resulting combinations.
      */
     template<typename Poly>
-    CaseDistinction<Poly> getSignCombinations( const Constraint<Poly>& );
+    inline CaseDistinction<Poly> getSignCombinations( const Constraint<Poly>& );
     
     /**
      * @param _length The maximal length of the bit strings with odd parity to compute.
      * @param _strings All bit strings of length less or equal the given length with odd parity.
      */
-    void getOddBitStrings( size_t _length, std::vector< std::bitset<MAX_PRODUCT_SPLIT_NUMBER> >& _strings );
+    inline void getOddBitStrings( size_t _length, std::vector< std::bitset<MAX_PRODUCT_SPLIT_NUMBER> >& _strings );
         
     /**
      * @param _length The maximal length of the bit strings with even parity to compute.
      * @param _strings All bit strings of length less or equal the given length with even parity.
      */
-    void getEvenBitStrings( size_t _length, std::vector< std::bitset<MAX_PRODUCT_SPLIT_NUMBER> >& _strings );
+    inline void getEvenBitStrings( size_t _length, std::vector< std::bitset<MAX_PRODUCT_SPLIT_NUMBER> >& _strings );
     
     /**
      * Prints the given disjunction of conjunction of constraints.
      * @param _substitutionResults The disjunction of conjunction of constraints to print.
      */
     template<typename Poly>
-    void print( CaseDistinction<Poly>& _substitutionResults );
+    inline void print( CaseDistinction<Poly>& _substitutionResults );
     
     /**
      * Applies a substitution to a constraint and stores the results in the given vector.
@@ -159,7 +159,7 @@ namespace carl::vs::detail {
      *          true, otherwise.
      */
     template<typename Poly>
-    bool substitute( const Constraint<Poly>&, const Substitution<Poly>&, CaseDistinction<Poly>&, bool _accordingPaper, carl::Variables&, const detail::EvalDoubleIntervalMap& );
+    inline bool substitute( const Constraint<Poly>&, const Substitution<Poly>&, CaseDistinction<Poly>&, bool _accordingPaper, carl::Variables&, const detail::EvalDoubleIntervalMap& );
     
     /**
      * Applies a substitution of a variable to a term, which is not minus infinity nor a to an square root expression plus an infinitesimal.
@@ -174,7 +174,7 @@ namespace carl::vs::detail {
      * @param _solutionSpace The solution space in form of double intervals of the variables occurring in the given constraint.
      */
     template<typename Poly>
-    bool substituteNormal( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result, bool _accordingPaper, carl::Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace );
+    inline bool substituteNormal( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result, bool _accordingPaper, carl::Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace );
     
     /**
      * Sub-method of substituteNormalSqrt, where applying the substitution led to a term
@@ -193,7 +193,7 @@ namespace carl::vs::detail {
      *                        degree in the result by splitting the result in more cases (false).
      */
     template<typename Poly>
-    bool substituteNormalSqrtEq( const Poly& _radicand, const Poly& _q, const Poly& _r, CaseDistinction<Poly>& _result, bool _accordingPaper );
+    inline bool substituteNormalSqrtEq( const Poly& _radicand, const Poly& _q, const Poly& _r, CaseDistinction<Poly>& _result, bool _accordingPaper );
     
     /**
      * Sub-method of substituteNormalSqrt, where applying the substitution led to a term
@@ -212,7 +212,7 @@ namespace carl::vs::detail {
      *                        degree in the result by splitting the result in more cases (false).
      */
     template<typename Poly>
-    bool substituteNormalSqrtNeq( const Poly& _radicand, const Poly& _q, const Poly& _r, CaseDistinction<Poly>& _result, bool _accordingPaper );
+    inline bool substituteNormalSqrtNeq( const Poly& _radicand, const Poly& _q, const Poly& _r, CaseDistinction<Poly>& _result, bool _accordingPaper );
     
     /**
      * Sub-method of substituteNormalSqrt, where applying the substitution led to a term
@@ -232,7 +232,7 @@ namespace carl::vs::detail {
      *                        degree in the result by splitting the result in more cases (false).
      */
     template<typename Poly>
-    bool substituteNormalSqrtLess( const Poly& _radicand, const Poly& _q, const Poly& _r, const Poly& _s, CaseDistinction<Poly>& _result, bool _accordingPaper );
+    inline bool substituteNormalSqrtLess( const Poly& _radicand, const Poly& _q, const Poly& _r, const Poly& _s, CaseDistinction<Poly>& _result, bool _accordingPaper );
     
     /**
      * Sub-method of substituteNormalSqrt, where applying the substitution led to a term
@@ -252,7 +252,7 @@ namespace carl::vs::detail {
      *                        degree in the result by splitting the result in more cases (false).
      */
     template<typename Poly>
-    bool substituteNormalSqrtLeq( const Poly& _radicand, const Poly& _q, const Poly& _r, const Poly& _s, CaseDistinction<Poly>& _result, bool _accordingPaper );
+    inline bool substituteNormalSqrtLeq( const Poly& _radicand, const Poly& _q, const Poly& _r, const Poly& _s, CaseDistinction<Poly>& _result, bool _accordingPaper );
     
     /**
      * Applies the given substitution to the given constraint, where the substitution
@@ -271,7 +271,7 @@ namespace carl::vs::detail {
      * @param _solutionSpace The solution space in form of double intervals of the variables occurring in the given constraint.
      */
     template<typename Poly>
-    bool substitutePlusEps( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result, bool _accordingPaper, carl::Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace );
+    inline bool substitutePlusEps( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result, bool _accordingPaper, carl::Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace );
     
     /**
      * Sub-method of substituteEps, where one of the gradients in the
@@ -289,7 +289,7 @@ namespace carl::vs::detail {
      * @param _solutionSpace The solution space in form of double intervals of the variables occurring in the given constraint.
      */
     template<typename Poly>
-    bool substituteEpsGradients( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, const carl::Relation _relation, CaseDistinction<Poly>&, bool _accordingPaper, carl::Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace );
+    inline bool substituteEpsGradients( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, const carl::Relation _relation, CaseDistinction<Poly>&, bool _accordingPaper, carl::Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace );
     
     /**
      * Applies the given substitution to the given constraint, where the substitution
@@ -304,7 +304,7 @@ namespace carl::vs::detail {
      * @param _solutionSpace The solution space in form of double intervals of the variables occurring in the given constraint.
      */
     template<typename Poly>
-    void substituteInf( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result, carl::Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace );
+    inline void substituteInf( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result, carl::Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace );
     
     /**
      * Applies the given substitution to the given constraint, where the substitution
@@ -316,7 +316,7 @@ namespace carl::vs::detail {
      * @param _result The vector, in which to store the results of this substitution. It is semantically a disjunction of conjunctions of constraints.
      */
     template<typename Poly>
-    void substituteInfLessGreater( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result );
+    inline void substituteInfLessGreater( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result );
     
     /**
      * Deals with the case, that the left hand side of the constraint to substitute is
@@ -327,7 +327,7 @@ namespace carl::vs::detail {
      * @param _result The vector, in which to store the results of this substitution. It is semantically a disjunction of conjunctions of constraints.
      */
     template<typename Poly>
-    void substituteTrivialCase( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result );
+    inline void substituteTrivialCase( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result );
     
     /**
      * Deals with the case, that the left hand side of the constraint to substitute is
@@ -338,7 +338,7 @@ namespace carl::vs::detail {
      * @param _result The vector, in which to store the results of this substitution. It is semantically a disjunction of conjunctions of constraints.
      */
     template<typename Poly>
-    void substituteNotTrivialCase( const Constraint<Poly>&, const Substitution<Poly>&, CaseDistinction<Poly>& );
+    inline void substituteNotTrivialCase( const Constraint<Poly>&, const Substitution<Poly>&, CaseDistinction<Poly>& );
     
 }
 
@@ -352,7 +352,7 @@ namespace carl::vs {
      *          Thr substitution result, otherwise.
      */
     template<typename Poly>
-    std::optional<CaseDistinction<Poly>> substitute(const Constraint<Poly>& cons, const Variable var, const Term<Poly>& term) {
+    inline std::optional<CaseDistinction<Poly>> substitute(const Constraint<Poly>& cons, const Variable var, const Term<Poly>& term) {
         CaseDistinction<Poly> subres;
         carl::Variables dummy_vars; // we do not make use of this feature here
         detail::EvalDoubleIntervalMap dummy_map; // we do not make use of this feature here
@@ -373,7 +373,7 @@ namespace carl::vs {
      *          Thr substitution result, otherwise.
      */
     template<typename Poly>
-    std::optional<std::variant<CaseDistinction<Poly>, VariableComparison<Poly>>> substitute(const VariableComparison<Poly>& varcomp, const Variable var, const Term<Poly>& term) {
+    static std::optional<std::variant<CaseDistinction<Poly>, VariableComparison<Poly>>> substitute(const VariableComparison<Poly>& varcomp, const Variable var, const Term<Poly>& term) {
         if (std::holds_alternative<MultivariateRoot<Poly>>(varcomp.value()) && std::get<MultivariateRoot<Poly>>(varcomp.value()).poly().has(var)) {
             // Substitution variable occurs in MVRoot's polynomial
             return std::nullopt;
