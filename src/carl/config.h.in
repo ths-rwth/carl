@@ -11,7 +11,9 @@
 #cmakedefine USE_CLN_NUMBERS
 #cmakedefine USE_COCOA
 #cmakedefine USE_GINAC
+#cmakedefine USE_LIBPOLY
 
 #cmakedefine RAN_USE_INTERVAL
 #cmakedefine RAN_USE_THOM
 #cmakedefine RAN_USE_Z3
+#cmakedefine RAN_USE_LIBPOLY

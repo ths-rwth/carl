@@ -14,6 +14,8 @@ using Poly = MultivariatePolynomial<Rational>;
 using UPoly = UnivariatePolynomial<Rational>;
 using RAN = RealAlgebraicNumber<Rational>;
 
+#ifdef RAN_USE_INTERVAL
+
 TEST(RealAlgebraicNumber, RANEvaluator)
 {
 	Variable x = freshRealVariable("x");
@@ -46,3 +48,5 @@ TEST(RealAlgebraicNumber, RANEvaluator)
 
 
 }
+
+#endif

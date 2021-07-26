@@ -176,6 +176,15 @@ if(COMPARE_WITH_Z3 OR USE_Z3_NUMBERS OR RAN_USE_Z3)
 	print_resource_info("Z3" Z3_STATIC ${Z3_VERSION})
 endif()
 
+##### LIBPOLY
+if(USE_LIBPOLY OR RAN_USE_LIBPOLY)
+	if(NOT LIBPOLY_FOUND)
+	set(LIBPOLY_FIND_VERSION "0.1.9")
+	include(resources/libpoly.cmake)
+	endif()
+	print_resource_info("LIBPOLY" LIBPOLYXX_STATIC ${LIBPOLY_FIND_VERSION})
+endif()
+
 ##### Doxygen
 find_package(Doxygen 1.8.14 QUIET)
 if(DOXYGEN_FOUND AND ${CMAKE_VERSION} VERSION_LESS "3.9.0")
