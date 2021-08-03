@@ -304,13 +304,36 @@ TYPED_TEST(IntervalRationalTest, abs) {
 	EXPECT_EQ(i5.abs().upperBoundType(), BoundType::STRICT);
 }
 
-TYPED_TEST(IntervalRationalTest, mul_assign)
-{
+TYPED_TEST(IntervalRationalTest, mul_assign) {
 	Interval<TypeParam> i(TypeParam(-1));
 	Interval<TypeParam> j(TypeParam(0), BoundType::INFTY, TypeParam(0), BoundType::STRICT);
 	Interval<TypeParam> res(TypeParam(0), BoundType::STRICT, TypeParam(0), BoundType::INFTY);
 	i *= j;
 	EXPECT_EQ(i, res);
+
+	Interval<TypeParam> k{1, BoundType::STRICT, 2, BoundType::STRICT};
+	Interval<TypeParam> res_k = TypeParam(0) * i;
+	Interval<TypeParam> l{1, BoundType::WEAK, 2, BoundType::STRICT};
+	Interval<TypeParam> res_l = TypeParam(0) * i;
+	Interval<TypeParam> m{1, BoundType::STRICT, 2, BoundType::WEAK};
+	Interval<TypeParam> res_m = TypeParam(0) * i;
+	Interval<TypeParam> n{1, BoundType::WEAK, 2, BoundType::WEAK};
+	Interval<TypeParam> res_n = TypeParam(0) * i;
+	Interval<TypeParam> o{0, BoundType::INFTY, 2, BoundType::STRICT};
+	Interval<TypeParam> res_o = TypeParam(0) * i;
+	Interval<TypeParam> p{1, BoundType::STRICT, 1, BoundType::INFTY};
+	Interval<TypeParam> res_p = TypeParam(0) * i;
+	Interval<TypeParam> q{0, BoundType::INFTY, 0, BoundType::INFTY};
+	Interval<TypeParam> res_q = TypeParam(0) * i;
+
+	Interval<TypeParam> zero{0};
+	EXPECT_EQ(res_k, zero);
+	EXPECT_EQ(res_l, zero);
+	EXPECT_EQ(res_m, zero);
+	EXPECT_EQ(res_n, zero);
+	EXPECT_EQ(res_o, zero);
+	EXPECT_EQ(res_p, zero);
+	EXPECT_EQ(res_q, zero);
 }
 
 TYPED_TEST(IntervalRationalTest, set_is_subset) {
