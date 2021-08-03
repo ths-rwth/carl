@@ -395,10 +395,12 @@ inline Interval<Number> operator*(const Interval<Number>& lhs, const Interval<Nu
  */
 template<typename Number>
 inline Interval<Number> operator*(const Interval<Number>& lhs, const Number& rhs) {
-	if (rhs >= 0) {
+	if (rhs > 0 || lhs.isEmpty()) {
 		return Interval<Number>(lhs.rContent() * rhs, lhs.lowerBoundType(), lhs.upperBoundType());
-	} else {
+	} else if (rhs < 0) {
 		return Interval<Number>(lhs.rContent() * rhs, lhs.upperBoundType(), lhs.lowerBoundType());
+	} else {
+		return Interval<Number>{0};
 	}
 }
 
@@ -433,6 +435,9 @@ inline Interval<Number>& operator*=(Interval<Number>& lhs, const Interval<Number
  */
 template<typename Number>
 inline Interval<Number>& operator*=(Interval<Number>& lhs, const Number& rhs) {
+	if (carl::isZero(rhs) && !lhs.isEmpty()) {
+		return Interval<Number>{0};
+	}
 	lhs.rContent() *= rhs;
 	return lhs;
 }

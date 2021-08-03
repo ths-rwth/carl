@@ -239,21 +239,29 @@ template<typename Number>
 	}
 
     template<typename Number>
-    void Interval<Number>::bloat_by(const Number& width)
-    {
-	if(!isInfinite()){
-	    BoundType lowerTmp = mLowerBoundType;
-	    BoundType upperTmp = mUpperBoundType;
-	    this->set(boost::numeric::widen(mContent, width));
-	    mLowerBoundType = lowerTmp;
-	    mUpperBoundType = upperTmp;
-	} else if (mLowerBoundType != BoundType::INFTY) {
-	    this->set(boost::numeric::widen(mContent, width));
-	    mUpperBoundType = BoundType::INFTY;
-	} else if (mUpperBoundType != BoundType::INFTY) {
-	    this->set(boost::numeric::widen(mContent, width));
+    void Interval<Number>::bloat_by(const Number& width) {
+		if(this->isEmpty()) {
+			return;
+		}
+		if (width == carl::constant_zero<Number>().get()) {
+			mLowerBoundType = BoundType::WEAK;
+			mUpperBoundType = BoundType::WEAK;
+			mContent.assign(0, 0);
+			return;
+		}
+		if (!isInfinite()) {
+			BoundType lowerTmp = mLowerBoundType;
+			BoundType upperTmp = mUpperBoundType;
+			this->set(boost::numeric::widen(mContent, width));
+			mLowerBoundType = lowerTmp;
+			mUpperBoundType = upperTmp;
+		} else if (mLowerBoundType != BoundType::INFTY) {
+			this->set(boost::numeric::widen(mContent, width));
+			mUpperBoundType = BoundType::INFTY;
+		} else if (mUpperBoundType != BoundType::INFTY) {
+			this->set(boost::numeric::widen(mContent, width));
 	    mLowerBoundType = BoundType::INFTY;
-	}
+		}
     }
 
     template<typename Number>
