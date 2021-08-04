@@ -43,6 +43,11 @@
 #include "z3/ran_z3_evaluation.h"
 #endif
 
+#ifdef RAN_USE_LIBPOLY
+#include "libpoly/ran_libpoly.h"
+#include "libpoly/ran_libpoly_evaluation.h"
+#endif
+
 namespace carl {
 	#ifdef RAN_USE_INTERVAL
 	template<typename Number>
@@ -57,6 +62,11 @@ namespace carl {
 	#ifdef RAN_USE_Z3
 	template<typename Number>
 	using real_algebraic_number = real_algebraic_number_z3<Number>;
+	#endif
+
+	#ifdef RAN_USE_LIBPOLY
+	template<typename Number>
+	using real_algebraic_number = real_algebraic_number_libpoly<Number>;
 	#endif
 
 	template<typename Number>

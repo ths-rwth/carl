@@ -16,7 +16,6 @@
 #include "carl/util/debug.h"
 #include "carl/util/platform.h"
 
-
 #include <random>
 #include <cmath>
 

@@ -1,8 +1,9 @@
 ExternalProject_Add(
 	BLISS-EP
-	URL "http://www.tcs.hut.fi/Software/bliss/bliss-${BLISS_VERSION}.zip"
+	URL "https://users.aalto.fi/~tjunttil/bliss/downloads/bliss-${BLISS_VERSION}.zip"
 	DOWNLOAD_NO_PROGRESS 1
 	PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/resources/bliss/CMakeLists.txt <SOURCE_DIR>
+	COMMAND bash ${CMAKE_SOURCE_DIR}/resources/bliss/patch.sh <SOURCE_DIR>
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 	BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/resources/lib/libbliss{STATIC_EXT} ${CMAKE_BINARY_DIR}/resources/lib/libbliss${DYNAMIC_EXT}
 )
