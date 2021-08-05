@@ -24,7 +24,7 @@ std::ostream& operator<<(std::ostream& out, const zero<Poly>& z) {
  * Gathers zeros with side conditions from the given constraint in the given variable.
  */
 template<typename Poly>
-bool gather_zeros(const Constraint<Poly>& constraint, const Variable& eliminationVar, std::vector<zero<Poly>>& results) {
+static bool gather_zeros(const Constraint<Poly>& constraint, const Variable& eliminationVar, std::vector<zero<Poly>>& results) {
 	using Rational = typename Poly::NumberType;
     
     if (!constraint.hasVariable(eliminationVar)) {
@@ -136,7 +136,7 @@ bool gather_zeros(const Constraint<Poly>& constraint, const Variable& eliminatio
 }
 
 template<typename Poly>
-bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable& eliminationVar, std::vector<zero<Poly>>& results) {
+static bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable& eliminationVar, std::vector<zero<Poly>>& results) {
 	using Rational = typename Poly::NumberType;
 
 	if (varcomp.var() != eliminationVar && !carl::variables(varcomp).has(eliminationVar) ) {

@@ -7,3 +7,4 @@
 #cmakedefine USE_CLN_NUMBER
 #cmakedefine USE_GINAC
 #cmakedefine COMPARE_WITH_Z3
+#cmakedefine USE_LIBPOLY

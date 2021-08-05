@@ -190,7 +190,7 @@ UnivariatePolynomial<Coeff> exclude_linear_factors(const UnivariatePolynomial<Co
 							++retVal.first->second;
 						}
 						// Check whether result is a linear factor now.
-						if(result.isLinearInMainVar() <= 1)
+						if(result.isLinearInMainVar())
 						{
 							goto LinearFactorRemains;
 						}

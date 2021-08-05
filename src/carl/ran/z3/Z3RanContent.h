@@ -1,4 +1,4 @@
-#pragma once
+#pragma onceAlgebraicNumber
 
 #include "../../config.h"
 

@@ -14,6 +14,10 @@
 #include "z3/ran_z3_real_roots.h"
 #endif
 
+#ifdef RAN_USE_LIBPOLY
+#include "libpoly/ran_libpoly_real_roots.h"
+#endif
+
 namespace carl::ran {
     #ifdef RAN_USE_INTERVAL
     using carl::ran::interval::real_roots;
@@ -25,6 +29,10 @@ namespace carl::ran {
 
     #ifdef RAN_USE_Z3
     using carl::ran::z3::real_roots;
+    #endif
+
+    #ifdef RAN_USE_LIBPOLY
+    using carl::ran::libpoly::real_roots;
     #endif
 }
 
