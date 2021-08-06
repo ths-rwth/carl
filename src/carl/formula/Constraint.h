@@ -85,16 +85,6 @@ public:
 		return mRelation;
 	}
 
-
-	// TODO what to do with ids?
-	/**
-     * @return The unique id of this constraint.
-     */
-//	size_t id() const {
-//		return mpContent->id();
-//	}
-
-
 	/**
      * @return A hash value for this constraint.
      */

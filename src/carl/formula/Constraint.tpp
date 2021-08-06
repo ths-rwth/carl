@@ -341,8 +341,9 @@ bool Constraint<Pol>::hasFinitelyManySolutionsIn(const Variable& _var) const {
 
 template<typename Pol>
 Pol Constraint<Pol>::coefficient(const Variable& _var, uint _degree) const {
-	auto d = varInfo<true>(_var).coeffs().find(_degree);
-	return d != varInfo<true>(_var).coeffs().end() ? d->second : Pol(typename Pol::NumberType(0));
+	auto vi = varInfo<true>(_var);
+	auto d = vi.coeffs().find(_degree);
+	return d != vi.coeffs().end() ? d->second : Pol(typename Pol::NumberType(0));
 }
 
 template<typename Pol>
