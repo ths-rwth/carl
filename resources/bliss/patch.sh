@@ -1,0 +1,1 @@
+sed -i -e 's/assert(neighbour_cell->nof_nonzeros == 0);//g' $1/graph.cc

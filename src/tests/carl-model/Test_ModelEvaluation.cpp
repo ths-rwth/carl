@@ -13,7 +13,7 @@ typedef Constraint<Pol> ConstraintT;
 typedef MultivariateRoot<Pol> MVRootT;
 typedef Formula<Pol> FormulaT;
 typedef Interval<Rational> IntervalT;
-typedef real_algebraic_number_interval<Rational> RANT;
+typedef real_algebraic_number<Rational> RANT;
 typedef Model<Rational,Pol> ModelT;
 
 TEST(ModelEvaluation, Formula)

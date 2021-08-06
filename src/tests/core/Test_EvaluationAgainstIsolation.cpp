@@ -23,7 +23,7 @@ TEST(IsolationAndEvaluation, Comparison) {
 
 	Rational d_value = Rational(0);
 
-	Interval<Rational> i1(Rational("-4248605910149717961169920635929051829594223322247294470949631829") / Rational("1102359498361667329021785995346037545330231253734995885016743936"), BoundType::STRICT, -Rational("-3717530171381003216023680556437920350894945406966382662080927793") / Rational("964564561066458912894062745927782852163952347018121399389650944"), BoundType::STRICT);
+	Interval<Rational> i1(Rational("-4") / Rational("1"), BoundType::STRICT, -Rational("-2") / Rational("1"), BoundType::STRICT);
 	UnivariatePolynomial<Rational> p1(freshRealVariable("__r1"), std::initializer_list<Rational>{-11, 1, 1});
 	RealAlgebraicNumber<Rational> c_value = RealAlgebraicNumber<Rational>::create_safe(p1, i1);
 
