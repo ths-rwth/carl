@@ -14,7 +14,6 @@
 #include "../core/VariableInformation.h"
 #include "../core/Variables.h"
 #include "../core/VariablesInformation.h"
-#include "../core/polynomialfunctions/Complexity.h"
 #include "../core/polynomialfunctions/Definiteness.h"
 #include "../interval/Interval.h"
 #include "../interval/IntervalEvaluation.h"
@@ -133,13 +132,6 @@ public:
 		return mLhs.template getVarInfo<gatherCoeff>(_variable);
 	}
 
-	bool relationIsStrict() const {
-		return isStrict(mRelation);
-	}
-	bool relationIsWeak() const {
-		return isWeak(mRelation);
-	}
-
 	/**
      * Checks if the given variable occurs in the constraint.
      * @param _var  The variable to check for.
@@ -229,23 +221,6 @@ public:
 	}
 
 	/**
-     * @return An approximation of the complexity of this constraint.
-     */
-	size_t complexity() const {
-		return 1 + carl::complexity(mLhs);
-	}
-
-	/**
-     * Checks whether the given assignment satisfies this constraint.
-     * @param _assignment The assignment.
-     * @return 1, if the given assignment satisfies this constraint.
-     *          0, if the given assignment contradicts this constraint.
-     *          2, otherwise (possibly not defined for all variables in the constraint,
-     *                       even then it could be possible to obtain the first two results.)
-     */
-	unsigned satisfiedBy(const EvaluationMap<typename Pol::NumberType>& _assignment) const;
-
-	/**
      * Checks, whether the constraint is consistent.
      * It differs between, containing variables, consistent, and inconsistent.
      * @return 0, if the constraint is not consistent.
@@ -279,20 +254,6 @@ public:
      *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
      */
 	unsigned consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation) const;
-
-	/**
-     * Checks whether the given interval assignment may fulfill the constraint.
-     * Note that the assignment must be complete.
-     * There are three possible outcomes:
-     * - True (4), i.e. all actual assignments satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow True$
-     * - Maybe (3), i.e. some actual assignments satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow ?$
-     * - Not null (2), i.e. all assignments that make the constraint evaluate not to zero satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow p \neq 0$
-     * - Null (1), i.e. only assignments that make the constraint evaluate to zero satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow p_\alpha = 0$
-     * - False (0), i.e. no actual assignment satisfies the constraint: $p ~_\alpha 0 \Leftrightarrow False$
-     * @param _assignment Variable assignment.
-     * @return 0, 1 or 2.
-     */
-	unsigned evaluate(const EvaluationMap<Interval<typename carl::UnderlyingNumberType<Pol>::type>>& _assignment) const;
 
 	/**
      * @param _var The variable to check the size of its solution set for.
@@ -396,253 +357,18 @@ const signed A_XOR_B = -4;
  *           0, otherwise.
  */
 template<typename Pol>
-signed compare(const Constraint<Pol>& _constraintA, const Constraint<Pol>& _constraintB) {
-	/*
-    * Check whether it holds that 
-    * 
-    *                      _constraintA  =  a_1*m_1+...+a_k*m_k + c ~ 0
-    * and 
-    *                      _constraintB  =  b_1*m_1+...+b_k*m_k + d ~ 0, 
-    * 
-    * where a_1,..., a_k, b_1,..., b_k, c, d are rational coefficients, 
-    *       m_1,..., m_k are non-constant monomials and 
-    *       exists a rational g such that 
-    * 
-    *                   a_i = g * b_i for all 1<=i<=k 
-    *              or   b_i = g * a_i for all 1<=i<=k 
-    */
-	typename Pol::NumberType one_divided_by_a = _constraintA.lhs().coprimeFactorWithoutConstant();
-	typename Pol::NumberType one_divided_by_b = _constraintB.lhs().coprimeFactorWithoutConstant();
-	typename Pol::NumberType c = _constraintA.lhs().constantPart();
-	typename Pol::NumberType d = _constraintB.lhs().constantPart();
-	assert(carl::isOne(carl::getNum(carl::abs(one_divided_by_b))));
-	Pol tmpA = (_constraintA.lhs() - c) * one_divided_by_a;
-	Pol tmpB = (_constraintB.lhs() - d) * one_divided_by_b;
-	//        std::cout << "tmpA = " << tmpA << std::endl;
-	//        std::cout << "tmpB = " << tmpB << std::endl;
-	if (tmpA != tmpB) return 0;
-	bool termACoeffGreater = false;
-	bool signsDiffer = (one_divided_by_a < carl::constant_zero<typename Pol::NumberType>::get()) != (one_divided_by_b < carl::constant_zero<typename Pol::NumberType>::get());
-	typename Pol::NumberType g;
-	if (carl::getDenom(one_divided_by_a) > carl::getDenom(one_divided_by_b)) {
-		g = typename Pol::NumberType(carl::getDenom(one_divided_by_a)) / carl::getDenom(one_divided_by_b);
-		if (signsDiffer)
-			g = -g;
-		termACoeffGreater = true;
-		d *= g;
-	} else {
-		g = typename Pol::NumberType(carl::getDenom(one_divided_by_b)) / carl::getDenom(one_divided_by_a);
-		if (signsDiffer)
-			g = -g;
-		c *= g;
-	}
-	// Apply the multiplication by a negative g to the according relation symbol, which
-	// has to be turned around then.
-	Relation relA = _constraintA.relation();
-	Relation relB = _constraintB.relation();
-	if (g < 0) {
-		if (termACoeffGreater) {
-			switch (relB) {
-			case Relation::LEQ:
-				relB = Relation::GEQ;
-				break;
-			case Relation::GEQ:
-				relB = Relation::LEQ;
-				break;
-			case Relation::LESS:
-				relB = Relation::GREATER;
-				break;
-			case Relation::GREATER:
-				relB = Relation::LESS;
-				break;
-			default:
-				break;
-			}
-		} else {
-			switch (relA) {
-			case Relation::LEQ:
-				relA = Relation::GEQ;
-				break;
-			case Relation::GEQ:
-				relA = Relation::LEQ;
-				break;
-			case Relation::LESS:
-				relA = Relation::GREATER;
-				break;
-			case Relation::GREATER:
-				relA = Relation::LESS;
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	//        std::cout << "c = " << c << std::endl;
-	//        std::cout << "d = " << d << std::endl;
-	//        std::cout << "g = " << g << std::endl;
-	//        std::cout << "relA = " << relA << std::endl;
-	//        std::cout << "relB = " << relB << std::endl;
-	// Compare the adapted constant parts.
-	switch (relB) {
-	case Relation::EQ:
-		switch (relA) {
-		case Relation::EQ: // p+c=0  and  p+d=0
-			if (c == d) return A_IFF_B;
-			return NOT__A_AND_B;
-		case Relation::NEQ: // p+c!=0  and  p+d=0
-			if (c == d) return A_XOR_B;
-			return B_IMPLIES_A;
-		case Relation::LESS: // p+c<0  and  p+d=0
-			if (c < d) return B_IMPLIES_A;
-			return NOT__A_AND_B;
-		case Relation::GREATER: // p+c>0  and  p+d=0
-			if (c > d) return B_IMPLIES_A;
-			return NOT__A_AND_B;
-		case Relation::LEQ: // p+c<=0  and  p+d=0
-			if (c <= d) return B_IMPLIES_A;
-			return NOT__A_AND_B;
-		case Relation::GEQ: // p+c>=0  and  p+d=0
-			if (c >= d) return B_IMPLIES_A;
-			return NOT__A_AND_B;
-		default:
-			return false;
-		}
-	case Relation::NEQ:
-		switch (relA) {
-		case Relation::EQ: // p+c=0  and  p+d!=0
-			if (c == d) return A_XOR_B;
-			return A_IMPLIES_B;
-		case Relation::NEQ: // p+c!=0  and  p+d!=0
-			if (c == d) return A_IFF_B;
-			return 0;
-		case Relation::LESS: // p+c<0  and  p+d!=0
-			if (c >= d) return A_IMPLIES_B;
-			return 0;
-		case Relation::GREATER: // p+c>0  and  p+d!=0
-			if (c <= d) return A_IMPLIES_B;
-			return 0;
-		case Relation::LEQ: // p+c<=0  and  p+d!=0
-			if (c > d) return A_IMPLIES_B;
-			if (c == d) return A_AND_B__IFF_C;
-			return 0;
-		case Relation::GEQ: // p+c>=0  and  p+d!=0
-			if (c < d) return A_IMPLIES_B;
-			if (c == d) return A_AND_B__IFF_C;
-			return 0;
-		default:
-			return 0;
-		}
-	case Relation::LESS:
-		switch (relA) {
-		case Relation::EQ: // p+c=0  and  p+d<0
-			if (c > d) return A_IMPLIES_B;
-			return NOT__A_AND_B;
-		case Relation::NEQ: // p+c!=0  and  p+d<0
-			if (c <= d) return B_IMPLIES_A;
-			return 0;
-		case Relation::LESS: // p+c<0  and  p+d<0
-			if (c == d) return A_IFF_B;
-			if (c < d) return B_IMPLIES_A;
-			return A_IMPLIES_B;
-		case Relation::GREATER: // p+c>0  and  p+d<0
-			if (c <= d) return NOT__A_AND_B;
-			return 0;
-		case Relation::LEQ: // p+c<=0  and  p+d<0
-			if (c > d) return A_IMPLIES_B;
-			return B_IMPLIES_A;
-		case Relation::GEQ: // p+c>=0  and  p+d<0
-			if (c < d) return NOT__A_AND_B;
-			if (c == d) return A_XOR_B;
-			return 0;
-		default:
-			return 0;
-		}
-	case Relation::GREATER: {
-		switch (relA) {
-		case Relation::EQ: // p+c=0  and  p+d>0
-			if (c < d) return A_IMPLIES_B;
-			return NOT__A_AND_B;
-		case Relation::NEQ: // p+c!=0  and  p+d>0
-			if (c >= d) return B_IMPLIES_A;
-			return 0;
-		case Relation::LESS: // p+c<0  and  p+d>0
-			if (c >= d) return NOT__A_AND_B;
-			return 0;
-		case Relation::GREATER: // p+c>0  and  p+d>0
-			if (c == d) return A_IFF_B;
-			if (c > d) return B_IMPLIES_A;
-			return A_IMPLIES_B;
-		case Relation::LEQ: // p+c<=0  and  p+d>0
-			if (c > d) return NOT__A_AND_B;
-			if (c == d) return A_XOR_B;
-			return 0;
-		case Relation::GEQ: // p+c>=0  and  p+d>0
-			if (c > d) return B_IMPLIES_A;
-			return A_IMPLIES_B;
-		default:
-			return 0;
-		}
-	}
-	case Relation::LEQ: {
-		switch (relA) {
-		case Relation::EQ: // p+c=0  and  p+d<=0
-			if (c >= d) return A_IMPLIES_B;
-			return NOT__A_AND_B;
-		case Relation::NEQ: // p+c!=0  and  p+d<=0
-			if (c < d) return B_IMPLIES_A;
-			if (c == d) return A_AND_B__IFF_C;
-			return 0;
-		case Relation::LESS: // p+c<0  and  p+d<=0
-			if (c < d) return B_IMPLIES_A;
-			return A_IMPLIES_B;
-		case Relation::GREATER: // p+c>0  and  p+d<=0
-			if (c < d) return NOT__A_AND_B;
-			if (c == d) return A_XOR_B;
-			return 0;
-		case Relation::LEQ: // p+c<=0  and  p+d<=0
-			if (c == d) return A_IFF_B;
-			if (c < d) return B_IMPLIES_A;
-			return A_IMPLIES_B;
-		case Relation::GEQ: // p+c>=0  and  p+d<=0
-			if (c < d) return NOT__A_AND_B;
-			if (c == d) return A_AND_B__IFF_C;
-			return 0;
-		default:
-			return 0;
-		}
-	}
-	case Relation::GEQ: {
-		switch (relA) {
-		case Relation::EQ: // p+c=0  and  p+d>=0
-			if (c <= d) return A_IMPLIES_B;
-			return NOT__A_AND_B;
-		case Relation::NEQ: // p+c!=0  and  p+d>=0
-			if (c > d) return B_IMPLIES_A;
-			if (c == d) return A_AND_B__IFF_C;
-			return 0;
-		case Relation::LESS: // p+c<0  and  p+d>=0
-			if (c > d) return NOT__A_AND_B;
-			if (c == d) return A_XOR_B;
-			return 0;
-		case Relation::GREATER: // p+c>0  and  p+d>=0
-			if (c < d) return B_IMPLIES_A;
-			return A_IMPLIES_B;
-		case Relation::LEQ: // p+c<=0  and  p+d>=0
-			if (c > d) return NOT__A_AND_B;
-			if (c == d) return A_AND_B__IFF_C;
-			return 0;
-		case Relation::GEQ: // p+c>=0  and  p+d>=0
-			if (c == d) return A_IFF_B;
-			if (c < d) return A_IMPLIES_B;
-			return B_IMPLIES_A;
-		default:
-			return 0;
-		}
-	}
-	default:
-		return 0;
-	}
-}
+signed compare(const Constraint<Pol>& _constraintA, const Constraint<Pol>& _constraintB);
+
+/**
+ * Checks whether the given assignment satisfies this constraint.
+ * @param _assignment The assignment.
+ * @return 1, if the given assignment satisfies this constraint.
+ *          0, if the given assignment contradicts this constraint.
+ *          2, otherwise (possibly not defined for all variables in the constraint,
+ *                       even then it could be possible to obtain the first two results.)
+ */
+template<typename Pol>
+unsigned satisfiedBy(const Constraint<Pol>&, const EvaluationMap<typename Pol::NumberType>& _assignment);
 
 } // namespace carl
 

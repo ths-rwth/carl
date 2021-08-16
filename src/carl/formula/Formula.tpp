@@ -10,6 +10,7 @@
 
 #include "Formula.h"
 #include "FormulaPool.h"
+#include "../core/polynomialfunctions/Complexity.h"
 
 namespace carl
 {
@@ -97,7 +98,7 @@ namespace carl
                     case FormulaType::FALSE:
                         break;
                     case FormulaType::CONSTRAINT:
-                        result += _f.constraint().complexity(); break;
+                        result += complexity(_f.constraint()); break;
                     case FormulaType::BITVECTOR:
                         result += _f.bvConstraint().complexity(); break;
                     case FormulaType::UEQ:
