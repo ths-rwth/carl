@@ -128,7 +128,7 @@ public:
      * the given flag gatherCoeff is set to true.
      */
 	template<bool gatherCoeff = false>
-	const auto varInfo(const Variable& _variable) const {
+	const auto varInfo(const Variable _variable) const {
 		return mLhs.template getVarInfo<gatherCoeff>(_variable);
 	}
 
@@ -138,7 +138,7 @@ public:
      * @return true, if the given variable occurs in the constraint;
      *          false, otherwise.
      */
-	bool hasVariable(const Variable& _var) const {
+	bool hasVariable(const Variable _var) const {
 		return mLhs.has(_var);
 	}
 
@@ -276,18 +276,6 @@ public:
 		CARL_LOG_DEBUG("carl.formula.constraint", "negation of " << *this << " is " << Constraint(lhs(), carl::inverse(relation())));
 		return Constraint(lhs(), carl::inverse(relation()));
 	}
-
-	/**
-     * If this constraint represents a substitution (equation, where at least one variable occurs only linearly),
-     * this method detects a (there could be various possibilities) corresponding substitution variable and term.
-     * @param _substitutionVariable Is set to the substitution variable, if this constraint represents a substitution.
-     * @param _substitutionTerm Is set to the substitution term, if this constraint represents a substitution.
-     * @return true, if this constraints represents a substitution;
-     *         false, otherwise.
-     */
-	bool getSubstitution(Variable& _substitutionVariable, Pol& _substitutionTerm, bool _negated = false, const Variable& _exclude = carl::Variable::NO_VARIABLE) const;
-
-	bool getAssignment(Variable& _substitutionVariable, typename Pol::NumberType& _substitutionValue) const;
 
 	/**
      * Determines whether the constraint is pseudo-boolean.

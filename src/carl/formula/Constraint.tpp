@@ -279,45 +279,6 @@ Pol Constraint<Pol>::coefficient(const Variable& _var, uint _degree) const {
 }
 
 template<typename Pol>
-bool Constraint<Pol>::getSubstitution(Variable& _substitutionVariable, Pol& _substitutionTerm, bool _negated, const Variable& _exclude) const {
-	if ((!_negated && relation() != Relation::EQ) || (_negated && relation() != Relation::NEQ))
-		return false;
-	for (const auto& var : variables()) {
-		if (var == _exclude) continue;
-		auto vi = varInfo<true>(var);
-		if (vi.maxDegree() == 1) {
-			auto d = vi.coeffs().find(1);
-			assert(d != vi.coeffs().end());
-			if (d->second.isConstant() && (var.type() != carl::VariableType::VT_INT || carl::isOne(carl::abs(d->second.constantPart())))) {
-				_substitutionVariable = var;
-				_substitutionTerm = Pol(_substitutionVariable) * d->second - lhs();
-				_substitutionTerm /= d->second.constantPart();
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-template<typename Pol>
-bool Constraint<Pol>::getAssignment(Variable& _substitutionVariable, typename Pol::NumberType& _substitutionValue) const {
-	if (relation() != Relation::EQ) return false;
-	if (lhs().nrTerms() > 2) return false;
-	if (lhs().nrTerms() == 0) return false;
-	if (!lhs().lterm().isSingleVariable()) return false;
-	if (lhs().nrTerms() == 1) {
-		_substitutionVariable = lhs().lterm().getSingleVariable();
-		_substitutionValue = 0;
-		return true;
-	}
-	assert(lhs().nrTerms() == 2);
-	if (!lhs().trailingTerm().isConstant()) return false;
-	_substitutionVariable = lhs().lterm().getSingleVariable();
-	_substitutionValue = -lhs().trailingTerm().coeff() / lhs().lterm().coeff();
-	return true;
-}
-
-template<typename Pol>
 bool Constraint<Pol>::isPseudoBoolean() const {
 	return !variables().boolean().empty();
 }
