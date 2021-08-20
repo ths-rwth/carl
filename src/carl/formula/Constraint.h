@@ -287,17 +287,18 @@ public:
 
 template<typename P>
 bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs) {
-	return lhs.lhs() == rhs.lhs() && lhs.relation() == rhs.relation();
+	return lhs.relation() == rhs.relation() && lhs.hash() == rhs.hash() && lhs.lhs() == rhs.lhs();
 }
 
 template<typename P>
 bool operator!=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
-	return lhs.lhs() != rhs.lhs() || lhs.relation() != rhs.relation();
+	return lhs.relation() != rhs.relation() || lhs.hash() != rhs.hash() || lhs.lhs() != rhs.lhs();
 }
 
 template<typename P>
 bool operator<(const Constraint<P>& lhs, const Constraint<P>& rhs) {
-	return lhs.lhs() < rhs.lhs() || (lhs.lhs() == rhs.lhs() && lhs.relation() < rhs.relation());
+	return lhs.relation() < rhs.relation() || (lhs.relation() == rhs.relation() && (lhs.hash() < rhs.hash() || (lhs.hash() == rhs.hash() && lhs.lhs() < rhs.lhs()))); 
+	// return lhs.lhs() < rhs.lhs() || (lhs.lhs() == rhs.lhs() && lhs.relation() < rhs.relation());
 }
 
 template<typename P>
