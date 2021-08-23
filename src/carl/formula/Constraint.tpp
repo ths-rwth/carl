@@ -16,31 +16,32 @@ namespace carl {
 
 template<typename Pol>
 Constraint<Pol>::Constraint(bool _valid)
-	: mLhs(RawConstraint<Pol>(_valid).mLhs), mRelation(RawConstraint<Pol>(_valid).mRelation) {
+	: mLhs(RawConstraint<Pol>(_valid).mLhs), mRelation(RawConstraint<Pol>(_valid).mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {
 }
 
 template<typename Pol>
 Constraint<Pol>::Constraint(carl::Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound)
-	: mLhs(RawConstraint<Pol>(_var, _rel, _bound).mLhs), mRelation(RawConstraint<Pol>(_var, _rel, _bound).mRelation) {
+	: mLhs(RawConstraint<Pol>(_var, _rel, _bound).mLhs), mRelation(RawConstraint<Pol>(_var, _rel, _bound).mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {
 }
 
 template<typename Pol>
 Constraint<Pol>::Constraint(const Pol& _lhs, Relation _rel)
-	: mLhs(RawConstraint<Pol>(_lhs, _rel).mLhs), mRelation(RawConstraint<Pol>(_lhs, _rel).mRelation) {
+	: mLhs(RawConstraint<Pol>(_lhs, _rel).mLhs), mRelation(RawConstraint<Pol>(_lhs, _rel).mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {
 }
 
 template<typename Pol>
 Constraint<Pol>::Constraint(const Constraint<Pol>& _constraint)
-	: mLhs(_constraint.mLhs), mRelation(_constraint.mRelation) {}
+	: mLhs(_constraint.mLhs), mRelation(_constraint.mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {}
 
 template<typename Pol>
 Constraint<Pol>::Constraint(Constraint<Pol>&& _constraint) noexcept
-	: mLhs(std::move(_constraint.mLhs)), mRelation(_constraint.mRelation) {}
+	: mLhs(std::move(_constraint.mLhs)), mRelation(_constraint.mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {}
 
 template<typename Pol>
 Constraint<Pol>& Constraint<Pol>::operator=(const Constraint<Pol>& _constraint) {
 	mLhs = _constraint.mLhs;
 	mRelation = _constraint.mRelation;
+	mHash = _constraint.mHash;
 	return *this;
 }
 
@@ -48,6 +49,7 @@ template<typename Pol>
 Constraint<Pol>& Constraint<Pol>::operator=(Constraint<Pol>&& _constraint) noexcept {
 	mLhs = std::move(_constraint.mLhs);
 	mRelation = _constraint.mRelation;
+	mHash = _constraint.mHash;
 	return *this;
 }
 

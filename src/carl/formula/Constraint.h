@@ -48,6 +48,8 @@ private:
 	Pol mLhs;
 	/// The relation symbol comparing the polynomial considered by this constraint to zero.
 	Relation mRelation;
+	/// Cahce for the hash.
+	std::size_t mHash;
 
 public:
 	explicit Constraint(bool _valid = true);
@@ -88,7 +90,7 @@ public:
      * @return A hash value for this constraint.
      */
 	size_t hash() const {
-		return CONSTRAINT_HASH(mLhs, mRelation, Pol);
+		return mHash;
 	}
 
 	/**
