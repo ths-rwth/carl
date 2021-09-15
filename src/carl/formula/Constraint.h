@@ -361,6 +361,11 @@ signed compare(const Constraint<Pol>& _constraintA, const Constraint<Pol>& _cons
 template<typename Pol>
 unsigned satisfiedBy(const Constraint<Pol>&, const EvaluationMap<typename Pol::NumberType>& _assignment);
 
+template<typename Pol>
+void variables(const Constraint<Pol>& c, carlVariables& vars) {
+	variables(c.lhs(), vars);
+}
+
 } // namespace carl
 
 namespace std {

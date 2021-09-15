@@ -71,10 +71,10 @@ unsigned satisfiedBy(const Constraint<Pol>& c, const EvaluationMap<typename Pol:
 
 template<typename Pol>
 unsigned Constraint<Pol>::consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval) const {
-	if (variables().empty())
+	auto vars = variables();
+	if (vars.empty())
 		return carl::evaluate(constantPart(), relation()) ? 1 : 0;
 	else {
-		auto& vars = variables().as_vector();
 		auto varIter = vars.begin();
 		auto varIntervalIter = _solutionInterval.begin();
 		while (varIter != vars.end() && varIntervalIter != _solutionInterval.end()) {
@@ -161,10 +161,10 @@ unsigned Constraint<Pol>::consistentWith(const EvaluationMap<Interval<double>>& 
 template<typename Pol>
 unsigned Constraint<Pol>::consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation) const {
 	_stricterRelation = relation();
-	if (variables().empty())
+	auto vars = variables();
+	if (vars.empty())
 		return carl::evaluate(constantPart(), relation()) ? 1 : 0;
 	else {
-		auto& vars = variables().as_vector();
 		auto varIter = vars.begin();
 		auto varIntervalIter = _solutionInterval.begin();
 		while (varIter != vars.end() && varIntervalIter != _solutionInterval.end()) {
@@ -269,7 +269,7 @@ unsigned Constraint<Pol>::consistentWith(const EvaluationMap<Interval<double>>& 
 
 template<typename Pol>
 bool Constraint<Pol>::hasFinitelyManySolutionsIn(const Variable& _var) const {
-	if (variables().has(_var))
+	if (hasVariable(_var))
 		return true;
 	if (relation() == Relation::EQ) {
 		if (variables().size() == 1)

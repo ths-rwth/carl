@@ -18,7 +18,7 @@ template<typename Pol>
 std::optional<std::pair<Variable, Pol>> get_substitution(const Constraint<Pol>& c, bool _negated = false, Variable _exclude = carl::Variable::NO_VARIABLE) {
 	if ((!_negated && c.relation() != Relation::EQ) || (_negated && c.relation() != Relation::NEQ))
 		return std::nullopt;
-	for (const auto& var : c.variables()) {
+	for (const auto& var : variables(c)) {
 		if (var == _exclude) continue;
 		auto vi = c.template varInfo<true>(var);
 		if (vi.maxDegree() == 1) {

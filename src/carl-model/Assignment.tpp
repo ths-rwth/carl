@@ -354,7 +354,7 @@ namespace carl
 	template<typename Rational, typename Poly>
     void getDefaultModel( Model<Rational,Poly>& _defaultModel, const Constraint<Poly>& _constraint, bool /*_overwrite*/, size_t /*_seed*/ )
     {
-        for( carl::Variable var : _constraint.variables() )
+        for( carl::Variable var : variables(_constraint) )
         {
             auto ass = _defaultModel.find( var );
             if( ass == _defaultModel.end() )

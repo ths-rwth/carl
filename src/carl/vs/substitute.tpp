@@ -128,7 +128,8 @@ namespace carl::vs::detail
                     
                     if( conflictingWithSolutionSpace == 0 )
                     {
-                        _conflictingVars.insert( cons->variables().begin(), cons->variables().end() );
+                        auto vars = variables(*cons);
+                        _conflictingVars.insert( vars.begin(), vars.end() );
                         conjInconsistent = true;
                         break;
                     }
@@ -987,9 +988,10 @@ namespace carl::vs::detail
                             const detail::EvalDoubleIntervalMap& _solutionSpace )
     {
         bool result = true;
-        if( !_cons.variables().empty() )
+        auto vars = variables(_cons);
+        if( !vars.empty() )
         {
-            if( _cons.variables().has( _subs.variable() ) )
+            if( vars.has( _subs.variable() ) )
             {
                 switch( _cons.relation() )
                 {
@@ -1098,9 +1100,10 @@ namespace carl::vs::detail
     template<typename Poly>
     void substituteInf( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result, Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace )
     {
-        if( !_cons.variables().empty() )
+        auto vars = variables(_cons);
+        if( !vars.empty() )
         {
-            if( _cons.variables().has( _subs.variable() ) )
+            if( vars.has( _subs.variable() ) )
             {
                 if( _cons.relation() == Relation::EQ )
                     substituteTrivialCase( _cons, _subs, _result );
