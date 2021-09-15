@@ -15,6 +15,7 @@
 #include "../core/Variables.h"
 #include "../core/VariablesInformation.h"
 #include "../core/polynomialfunctions/Definiteness.h"
+#include "../core/polynomialfunctions/Factorization.h"
 #include "../interval/Interval.h"
 #include "../interval/IntervalEvaluation.h"
 #include "../util/Common.h"
@@ -48,8 +49,10 @@ private:
 	Pol mLhs;
 	/// The relation symbol comparing the polynomial considered by this constraint to zero.
 	Relation mRelation;
-	/// Cahce for the hash.
+	/// Cache for the hash.
 	std::size_t mHash;
+	/// Cache for the factorization
+	mutable Factors<Pol> mFactorization;
 
 public:
 	explicit Constraint(bool _valid = true);
@@ -285,7 +288,18 @@ public:
      * @return True if this constraint is pseudo-boolean. False otherwise.
      */
 	bool isPseudoBoolean() const;
+
+	template<typename P>
+	friend const Factors<P>& factorization(const Constraint<P>& c);
 };
+
+template <typename Pol>
+const Factors<Pol>& factorization(const Constraint<Pol>& c) {
+	if (c.mFactorization.empty()) {
+		c.mFactorization = carl::factorization(c.lhs());
+	}
+	return c.mFactorization;
+}
 
 template<typename P>
 bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs) {

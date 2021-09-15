@@ -34,7 +34,7 @@ static bool gather_zeros(const Constraint<Poly>& constraint, const Variable& eli
 	std::vector<Poly> factors;
 	Constraints<Poly> sideConditions;
 
-	auto factorization = carl::factorization(constraint.lhs());
+	auto& factorization = carl::factorization(constraint);
 	if (!carl::is_trivial(factorization)) {
 		for (const auto& iter : factorization) {
 			if (carl::variables(iter.first).has(eliminationVar)) {
