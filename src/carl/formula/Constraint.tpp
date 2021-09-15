@@ -31,11 +31,11 @@ Constraint<Pol>::Constraint(const Pol& _lhs, Relation _rel)
 
 template<typename Pol>
 Constraint<Pol>::Constraint(const Constraint<Pol>& _constraint)
-	: mLhs(_constraint.mLhs), mRelation(_constraint.mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {}
+	: mLhs(_constraint.mLhs), mRelation(_constraint.mRelation), mHash(_constraint.mHash) {}
 
 template<typename Pol>
 Constraint<Pol>::Constraint(Constraint<Pol>&& _constraint) noexcept
-	: mLhs(std::move(_constraint.mLhs)), mRelation(_constraint.mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {}
+	: mLhs(std::move(_constraint.mLhs)), mRelation(_constraint.mRelation), mHash(_constraint.mHash) {}
 
 template<typename Pol>
 Constraint<Pol>& Constraint<Pol>::operator=(const Constraint<Pol>& _constraint) {
