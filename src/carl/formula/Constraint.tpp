@@ -20,13 +20,19 @@ Constraint<Pol>::Constraint(bool _valid)
 }
 
 template<typename Pol>
-Constraint<Pol>::Constraint(carl::Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound)
-	: mLhs(RawConstraint<Pol>(_var, _rel, _bound).mLhs), mRelation(RawConstraint<Pol>(_var, _rel, _bound).mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {
+Constraint<Pol>::Constraint(carl::Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound) {
+	RawConstraint<Pol> raw(_var, _rel, _bound);
+	mLhs = raw.mLhs;
+	mRelation = raw.mRelation;
+	mHash = CONSTRAINT_HASH(mLhs, mRelation, Pol);
 }
 
 template<typename Pol>
-Constraint<Pol>::Constraint(const Pol& _lhs, Relation _rel)
-	: mLhs(RawConstraint<Pol>(_lhs, _rel).mLhs), mRelation(RawConstraint<Pol>(_lhs, _rel).mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {
+Constraint<Pol>::Constraint(const Pol& _lhs, Relation _rel) {
+	RawConstraint<Pol> raw(_lhs, _rel);
+	mLhs = raw.mLhs;
+	mRelation = raw.mRelation;
+	mHash = CONSTRAINT_HASH(mLhs, mRelation, Pol);
 }
 
 template<typename Pol>
