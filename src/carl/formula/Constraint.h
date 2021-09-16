@@ -53,6 +53,7 @@ private:
 	std::size_t mHash;
 	/// Cache for the factorization
 	mutable Factors<Pol> mFactorization;
+	// TODO caching factorizations should be optional
 
 public:
 	explicit Constraint(bool _valid = true);
