@@ -292,6 +292,9 @@ public:
 
 	template<typename P>
 	friend const Factors<P>& factorization(const Constraint<P>& c);
+
+	template<typename P>
+	friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs);
 };
 
 template <typename Pol>
@@ -305,11 +308,22 @@ const Factors<Pol>& factorization(const Constraint<Pol>& c) {
 template<typename P>
 bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs) {
 	return lhs.hash() == rhs.hash() && lhs.relation() == rhs.relation() && lhs.lhs() == rhs.lhs();
+	// if (lhs.hash() == rhs.hash() && lhs.relation() == rhs.relation() && lhs.lhs() == rhs.lhs()) {
+	// 	if (lhs.mFactorization.empty()) {
+	// 		lhs.mFactorization = rhs.mFactorization;
+	// 	} else {
+	// 		rhs.mFactorization = lhs.mFactorization;
+	// 	}
+	// 	return true;
+	// }
+	//  else {
+	// 	return false;
+	// }
 }
 
 template<typename P>
 bool operator!=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
-	return lhs.hash() != rhs.hash() || lhs.relation() != rhs.relation() || lhs.lhs() != rhs.lhs();
+	return !(lhs == rhs);
 }
 
 template<typename P>

@@ -156,6 +156,7 @@ namespace carl::vs::detail
     template<typename Poly>
     bool splitProducts( CaseDistinction<Poly>& _toSimplify, bool _onlyNeq )
     {
+        std::map<const Constraint<Poly>, CaseDistinction<Poly>> result_cache;
         bool result = true;
         size_t toSimpSize = _toSimplify.size();
         for( size_t pos = 0; pos < toSimpSize; )
@@ -163,7 +164,7 @@ namespace carl::vs::detail
             if( !_toSimplify.begin()->empty() )
             {
                 CaseDistinction<Poly> temp;
-                if( !splitProducts( _toSimplify[pos], temp, _onlyNeq ) )
+                if( !splitProducts( _toSimplify[pos], temp, result_cache, _onlyNeq ) )
                     result = false;
                 _toSimplify.erase( _toSimplify.begin() );
                 _toSimplify.insert( _toSimplify.end(), temp.begin(), temp.end() );
@@ -176,67 +177,17 @@ namespace carl::vs::detail
     }
 
     template<typename Poly>
-    bool splitProducts( const ConstraintConjunction<Poly>& _toSimplify, CaseDistinction<Poly>& _result, bool _onlyNeq )
+    bool splitProducts( const ConstraintConjunction<Poly>& _toSimplify, CaseDistinction<Poly>& _result, std::map<const Constraint<Poly>, CaseDistinction<Poly>>& result_cache, bool _onlyNeq )
     {
         std::vector<CaseDistinction<Poly>> toCombine;
         for( auto constraint = _toSimplify.begin(); constraint != _toSimplify.end(); ++constraint )
         {
-            auto& factorization = carl::factorization(*constraint);
-            if( !carl::is_trivial(factorization) )
-            {
-                switch( constraint->relation() )
-                {
-                    case Relation::EQ:
-                    {
-                        if( !_onlyNeq )
-                        {
-                            toCombine.emplace_back();
-                            for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
-                            {
-                                toCombine.back().emplace_back();
-                                toCombine.back().back().push_back( Constraint<Poly>( factor->first, Relation::EQ ) );
-                            }
-                            simplify( toCombine.back() );
-                        }
-                        else
-                        {
-                            toCombine.emplace_back();
-                            toCombine.back().emplace_back();
-                            toCombine.back().back().push_back( *constraint );
-                        }
-                        break;
-                    }
-                    case Relation::NEQ:
-                    {
-                        toCombine.emplace_back();
-                        toCombine.back().emplace_back();
-                        for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
-                            toCombine.back().back().push_back( Constraint<Poly>( factor->first, Relation::NEQ ) );
-                        simplify( toCombine.back() );
-                        break;
-                    }
-                    default:
-                    {
-                        if( !_onlyNeq )
-                        {
-                            toCombine.push_back( getSignCombinations( *constraint ) );
-                            simplify( toCombine.back() );
-                        }
-                        else
-                        {
-                            toCombine.emplace_back();
-                            toCombine.back().emplace_back();
-                            toCombine.back().back().push_back( *constraint );
-                        }
-                    }
-                }
+            auto i = result_cache.find(*constraint);
+            if (i == result_cache.end()) {
+                auto res = splitProducts(*constraint, _onlyNeq);
+                i = result_cache.emplace(*constraint, res).first;
             }
-            else
-            {
-                toCombine.emplace_back();
-                toCombine.back().emplace_back();
-                toCombine.back().back().push_back( *constraint );
-            }
+            toCombine.push_back(i->second);
         }
         bool result = true;
         if( !combine( toCombine, _result ) )
@@ -444,7 +395,7 @@ namespace carl::vs::detail
     CaseDistinction<Poly> getSignCombinations( const Constraint<Poly>& _constraint )
     {
         CaseDistinction<Poly> combinations;
-        auto factorization = carl::factorization(_constraint);
+        auto& factorization = carl::factorization(_constraint);
         if( !carl::is_trivial(factorization) && factorization.size() <= MAX_PRODUCT_SPLIT_NUMBER )
         {
             assert( _constraint.relation() == Relation::GREATER || _constraint.relation() == Relation::LESS

@@ -102,7 +102,7 @@ namespace carl::vs::detail {
      *          true, otherwise.
      */
     template<typename Poly>
-    inline bool splitProducts( const ConstraintConjunction<Poly>&, CaseDistinction<Poly>&, bool = false );
+    inline bool splitProducts( const ConstraintConjunction<Poly>&, CaseDistinction<Poly>&, std::map<const Constraint<Poly>, CaseDistinction<Poly>>&, bool = false );
     
     /**
      * Splits the given constraint into a set of constraints which compare the factors of the
@@ -399,14 +399,19 @@ namespace carl::vs {
             auto subRes1 = substitute(Constraint<Poly>(Poly(subVar1) - subVar2, varcompRelation), subVar1, term);
             assert(subRes1);
             CaseDistinction<Poly> result;
+            std::map<std::reference_wrapper<const Constraint<Poly>>, CaseDistinction<Poly>, std::less<Constraint<Poly>>> result_cache;
             for (const auto& vcase : *subRes1) {
                 std::vector<CaseDistinction<Poly>> subresults;
                 size_t num_cases = 1;
                 for (const auto& constr : vcase) {
-                    auto subRes2 = substitute(constr, subVar2, Term<Poly>::normal(zeros[0].sqrt_ex));
-                    assert(subRes2);
-                    subresults.push_back(*subRes2);
-                    num_cases = num_cases * subRes2->size();
+                    if (result_cache.find(std::cref(constr)) == result_cache.end()) {
+                        auto subRes2 = substitute(constr, subVar2, Term<Poly>::normal(zeros[0].sqrt_ex));
+                        assert(subRes2);
+                        result_cache.emplace(std::cref(constr), *subRes2);
+                    }
+                    auto subRes2 = result_cache.at(std::cref(constr));
+                    subresults.push_back(subRes2);
+                    num_cases = num_cases * subRes2.size();
                 }
 
                 // distributive law                

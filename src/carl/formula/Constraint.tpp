@@ -45,19 +45,31 @@ Constraint<Pol>::Constraint(Constraint<Pol>&& _constraint) noexcept
 
 template<typename Pol>
 Constraint<Pol>& Constraint<Pol>::operator=(const Constraint<Pol>& _constraint) {
-	mLhs = _constraint.mLhs;
-	mRelation = _constraint.mRelation;
-	mHash = _constraint.mHash;
-	mFactorization = _constraint.mFactorization;
+	if (*this == _constraint) {
+		if (mFactorization.empty()) {
+			mFactorization = _constraint.mFactorization;
+		}
+	} else {
+		mLhs = _constraint.mLhs;
+		mRelation = _constraint.mRelation;
+		mHash = _constraint.mHash;
+		mFactorization = _constraint.mFactorization;
+	}
 	return *this;
 }
 
 template<typename Pol>
 Constraint<Pol>& Constraint<Pol>::operator=(Constraint<Pol>&& _constraint) noexcept {
-	mLhs = std::move(_constraint.mLhs);
-	mRelation = _constraint.mRelation;
-	mHash = _constraint.mHash;
-	mFactorization = std::move(_constraint.mFactorization);
+	if (*this == _constraint) {
+		if (mFactorization.empty()) {
+			mFactorization = std::move(_constraint.mFactorization);
+		}
+	} else {
+		mLhs = std::move(_constraint.mLhs);
+		mRelation = _constraint.mRelation;
+		mHash = _constraint.mHash;
+		mFactorization = std::move(_constraint.mFactorization);
+	}
 	return *this;
 }
 
