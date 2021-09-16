@@ -181,7 +181,7 @@ namespace carl::vs::detail
         std::vector<CaseDistinction<Poly>> toCombine;
         for( auto constraint = _toSimplify.begin(); constraint != _toSimplify.end(); ++constraint )
         {
-            auto factorization = carl::factorization(constraint->lhs());
+            auto factorization = carl::factorization(constraint);
             if( !carl::is_trivial(factorization) )
             {
                 switch( constraint->relation() )
@@ -210,7 +210,7 @@ namespace carl::vs::detail
                     {
                         toCombine.emplace_back();
                         toCombine.back().emplace_back();
-                        const smtrat::Factorization factorization = carl::factorization(constraint->lhs());
+                        const smtrat::Factorization factorization = carl::factorization(constraint);
                         for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
                             toCombine.back().back().push_back( Constraint<Poly>( factor->first, Relation::NEQ ) );
                         simplify( toCombine.back() );
