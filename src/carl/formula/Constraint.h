@@ -299,10 +299,11 @@ public:
 
 template <typename Pol>
 const Factors<Pol>& factorization(const Constraint<Pol>& c) {
-	if (c.mFactorization.empty()) {
-		c.mFactorization = carl::factorization(c.lhs());
-	}
-	return c.mFactorization;
+	return carl::factorization(c.lhs());
+	// if (c.mFactorization.empty()) {
+	// 	c.mFactorization = carl::factorization(c.lhs());
+	// }
+	// return c.mFactorization;
 }
 
 template<typename P>
