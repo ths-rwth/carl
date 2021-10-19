@@ -323,6 +323,11 @@ public:
 	void setInfo(const std::string& name, const std::string& value) {
 		*this << "(set-info :" << name << " " << value << ")" << std::endl;
 	}
+
+	/// Set option via `set-option`.
+	void setOption(const std::string& name, const std::string& value) {
+		*this << "(set-option :" << name << " " << value << ")" << std::endl;
+	}
 	
 	/// Assert a formula via `assert`.
 	template<typename Pol>
