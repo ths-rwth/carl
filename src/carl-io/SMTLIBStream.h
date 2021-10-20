@@ -53,7 +53,12 @@ private:
 			case FormulaType::XOR:
 			case FormulaType::IMPLIES:
 			case FormulaType::ITE:
-				*this << "(" << f.getType() << " " << stream_joined(" ", f.subformulas()) << ")";
+				// 	*this << "(" << f.getType() << " " << stream_joined(" ", f.subformulas()) << ")";
+				*this << "(" << f.getType();
+				for (const auto& f : f.subformulas()) {
+					*this << " " << f;
+				}
+				*this << ")";
 				break;
 			case FormulaType::NOT:
 				*this << "(" << f.getType() << " " << f.subformula() << ")";
@@ -141,7 +146,12 @@ private:
 		if (m.exponents().empty()) *this << "1";
 		else if (m.exponents().size() == 1) *this << m.exponents().front();
 		else {
-			*this << "(* " << stream_joined(" ", m.exponents()) << ")";
+			// *this << "(* " << stream_joined(" ", m.exponents()) << ")";
+			*this << "(* "; 
+			for (const auto& e : m.exponents()) {
+				*this << " " << e; 
+			}
+			*this << ")";
 		}
 	}
 	
@@ -190,7 +200,12 @@ private:
 	}
 
 	void write(const UFInstance& ufi) {
-		*this << "(" << ufi.uninterpretedFunction().name() << " " << stream_joined(" ", ufi.args()) << ")";
+		// *this << "(" << ufi.uninterpretedFunction().name() << " " << stream_joined(" ", ufi.args()) << ")";
+		*this << "(" << ufi.uninterpretedFunction().name();
+		for (const auto& a : ufi.args()) {
+			*this << " " << a;
+		}
+		*this << ")";
 	}
 	
 	template<typename Coeff>
@@ -235,6 +250,10 @@ private:
 	}
 	
 public:
+	/// Writes a comment
+	void comment(const std::string& c) {
+		*this << "; " << c << std::endl;
+	}
 	/// Declare a logic via `set-logic`.
 	void declare(Logic l) {
 		*this << "(set-logic " << l << ")" << std::endl;
@@ -245,7 +264,12 @@ public:
 	}
 	/// Declare a fresh function via `declare-fun`.
 	void declare(UninterpretedFunction uf) {
-		*this << "(declare-fun " << uf.name() << " (" << stream_joined(" ", uf.domain()) << ") ";
+		// *this << "(declare-fun " << uf.name() << " (" << stream_joined(" ", uf.domain()) << ") ";
+		*this << "(declare-fun " << uf.name() << " (";
+		for (const auto& d : uf.domain()) {
+			*this << " " << uf.domain();
+		}
+		*this  << ") ";
 		*this << uf.codomain() << ")" << std::endl;
 	}
 	/// Declare a fresh variable via `declare-fun`.
@@ -354,6 +378,16 @@ public:
 	/// Print model via `get-model`.
 	void getModel() {
 		*this << "(get-model)" << std::endl;
+	}
+
+	/// Reset via `reset`.
+	void reset() {
+		*this << "(reset)" << std::endl;
+	}
+
+	/// Exit via `exit`.
+	void exit() {
+		*this << "(exit)" << std::endl;
 	}
 	
 	/// Write some data to this stream.
