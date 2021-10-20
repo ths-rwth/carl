@@ -380,6 +380,11 @@ public:
 		*this << "(get-model)" << std::endl;
 	}
 
+	/// Echo via `echo`.
+	void echo(const std::string& str) {
+		*this << "(echo \"" << str << "\")" << std::endl;
+	}
+
 	/// Reset via `reset`.
 	void reset() {
 		*this << "(reset)" << std::endl;
