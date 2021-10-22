@@ -22,6 +22,7 @@
 #include "bitvector/BVConstraint.h"
 #include "VariableAssignment.h"
 #include "VariableComparison.h"
+#include "Logic.h"
 
 #include "FormulaContent.h"
 
@@ -649,6 +650,60 @@ namespace carl
                     && !(carl::PROP_CONTAINS_INTEGER_VALUED_VARS <= properties())
                     && !(carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties())
                     && !(carl::PROP_CONTAINS_PSEUDOBOOLEAN <= properties());
+            }
+
+            Logic logic() const {
+                if (carl::PROP_CONTAINS_BITVECTOR <= properties()
+                && !(carl::PROP_CONTAINS_UNINTERPRETED_EQUATIONS <= properties())
+                && !(carl::PROP_CONTAINS_INTEGER_VALUED_VARS <= properties())
+                && !(carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties())
+                && !(carl::PROP_CONTAINS_PSEUDOBOOLEAN <= properties())) {
+                    return Logic::QF_BV;
+                } else if (!(carl::PROP_CONTAINS_BITVECTOR <= properties())
+                && (carl::PROP_CONTAINS_UNINTERPRETED_EQUATIONS <= properties())
+                && !(carl::PROP_CONTAINS_INTEGER_VALUED_VARS <= properties())
+                && !(carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties())
+                && !(carl::PROP_CONTAINS_PSEUDOBOOLEAN <= properties())) {
+                    return Logic::QF_UF;
+                } else if (!(carl::PROP_CONTAINS_BITVECTOR <= properties())
+                && !(carl::PROP_CONTAINS_UNINTERPRETED_EQUATIONS <= properties())
+                && !(carl::PROP_CONTAINS_INTEGER_VALUED_VARS <= properties())
+                && !(carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties())
+                && (carl::PROP_CONTAINS_PSEUDOBOOLEAN <= properties())) {
+                    return Logic::QF_PB;
+                } else if (!(carl::PROP_CONTAINS_BITVECTOR <= properties())
+                && !(carl::PROP_CONTAINS_UNINTERPRETED_EQUATIONS <= properties())
+                && (carl::PROP_CONTAINS_INTEGER_VALUED_VARS <= properties())
+                && !(carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties())
+                && !(carl::PROP_CONTAINS_PSEUDOBOOLEAN <= properties())) {
+                    if (carl::PROP_CONTAINS_NONLINEAR_POLYNOMIAL <= properties()) {
+                        return Logic::QF_NIA;
+                    } else {
+                        return Logic::QF_LIA;
+                    }
+                } else if (!(carl::PROP_CONTAINS_BITVECTOR <= properties())
+                && !(carl::PROP_CONTAINS_UNINTERPRETED_EQUATIONS <= properties())
+                && !(carl::PROP_CONTAINS_INTEGER_VALUED_VARS <= properties())
+                && (carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties())
+                && !(carl::PROP_CONTAINS_PSEUDOBOOLEAN <= properties())) {
+                    if (carl::PROP_CONTAINS_NONLINEAR_POLYNOMIAL <= properties()) {
+                        return Logic::QF_NRA;
+                    } else {
+                        return Logic::QF_LRA;
+                    }
+                } else if (!(carl::PROP_CONTAINS_BITVECTOR <= properties())
+                && !(carl::PROP_CONTAINS_UNINTERPRETED_EQUATIONS <= properties())
+                && (carl::PROP_CONTAINS_INTEGER_VALUED_VARS <= properties())
+                && (carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties())
+                && !(carl::PROP_CONTAINS_PSEUDOBOOLEAN <= properties())) {
+                    if (carl::PROP_CONTAINS_NONLINEAR_POLYNOMIAL <= properties()) {
+                        return Logic::QF_NIRA;
+                    } else {
+                        return Logic::QF_LIRA;
+                    }
+                } else {
+                    return Logic::UNDEFINED;
+                }
             }
 
             /**
