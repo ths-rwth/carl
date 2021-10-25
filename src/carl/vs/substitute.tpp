@@ -605,7 +605,8 @@ namespace carl::vs::detail
                      CaseDistinction<Poly>& _result,
                      bool _accordingPaper,
                      Variables& _conflictingVariables,
-                     const detail::EvalDoubleIntervalMap& _solutionSpace )
+                     const detail::EvalDoubleIntervalMap& _solutionSpace,
+                     bool factorization )
     {
         #ifdef VS_DEBUG_SUBSTITUTION
         std::cout << "substitute: ( " << _cons << " )" << _subs << std::endl;
@@ -642,10 +643,8 @@ namespace carl::vs::detail
         #ifdef VS_DEBUG_SUBSTITUTION
         print( _result );
         #endif
-        #ifdef SMTRAT_STRAT_Factorization
-        if( !splitProducts( _result, true ) ) 
+        if( factorization && !splitProducts( _result, true ) ) 
             result = false;
-        #endif
         if( result )
         {
             splitSosDecompositions( _result );
