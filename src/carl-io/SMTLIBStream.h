@@ -7,6 +7,7 @@
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/Variable.h>
 #include <carl/formula/Constraint.h>
+#include <carl/formula/VariableComparison.h>
 #include <carl/formula/Formula.h>
 #include <carl/formula/Logic.h>
 #include <carl-model/Model.h>
@@ -44,6 +45,18 @@ private:
 		}
 	}
 	
+	template<typename Pol>
+	void write(const VariableComparison<Pol>& c) {
+		auto constraint = c.asConstraint();
+		if (constraint) {
+			*this << *constraint;
+		} else {
+			std::stringstream ss;
+			ss << c;
+			*this << ss.str();
+		}
+	}
+
 	template<typename Pol>
 	void write(const Formula<Pol>& f) {
 		switch (f.getType()) {
