@@ -4,4 +4,3 @@
 #pragma once
 #include "../config.h"
 #cmakedefine VARIABLE_PASS_BY_VALUE
-#cmakedefine PRUNE_MONOMIAL_POOL

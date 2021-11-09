@@ -50,7 +50,6 @@ export_option(USE_MPFR_FLOAT)
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
-option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 
 set(RAN_IMPLEMENTATION "INTERVAL" CACHE STRING "The implementation for real algebraic numbers to be used")
 set_property(CACHE RAN_IMPLEMENTATION PROPERTY STRINGS "INTERVAL" "THOM" "Z3" "LIBPOLY")
