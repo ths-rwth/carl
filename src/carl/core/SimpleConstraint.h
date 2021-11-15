@@ -1,5 +1,5 @@
 /** 
- * @file core/SimpeConstraint.h
+ * @file SimpleConstraint.h
  * @author Sebastian Junges
  * @ingroup constraints
  * @since April 4, 2014
