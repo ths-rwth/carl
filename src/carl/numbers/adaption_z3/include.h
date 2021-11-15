@@ -1,5 +1,5 @@
 /**
- * @file z3_include.h
+ * @file include.h
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 #pragma once

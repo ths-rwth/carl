@@ -1,5 +1,5 @@
 /** 
- * @file   core/ConstraintOperations.h
+ * @file   ConstraintOperations.h
  * @author Sebastian Junges
  * @ingroup constraints
  *
