@@ -121,9 +121,12 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 	}
 	CARL_LOG_DEBUG("carl.ran.libpoly", "After rational substitution: " << polyCopy);
 	//mainVar does not occur in poly anymore --> Nullified
-	if (!carl::variables(polyCopy).has(mainVar)) {
-		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is constant (does not contain mainVar) after substituting rational assignments -> nullified");
+	if (carl::isZero(polyCopy)) {
+		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 -> nullified");
 		return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
+	} else if (!carl::variables(polyCopy).has(mainVar)) {
+		CARL_LOG_DEBUG("carl.ran.libpoly", "poly does not contain mainVar after substituting rationals -> no roots");
+		return real_roots_result<real_algebraic_number_libpoly<Number>>::no_roots_response();
 	} else if (found_unassigned_var) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "poly still contains unassigned variable -> non-univariate");
 		return real_roots_result<real_algebraic_number_libpoly<Number>>::non_univariate_response();

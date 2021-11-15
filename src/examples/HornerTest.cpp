@@ -27,8 +27,7 @@ int main (int argc, char** argv)
   //Pol p1 = sp.parseMultivariatePolynomial<Rational>("2184*x^17+15708*z+(-126672)*x^2+643384*z^3+(-2306444)*z^4+4162512*x^13+(-10186920)*z^12+18820800*x^11+(-27118448)*x^10+31123477*x^9+6199788*x^5+(-12956461)*x^6+21524503*x^7+(-28784511)*x^8+(-1226048)*x^14+245224*y^15+(-31192)*y^16+(-924)");
 
 
-	std::set<Variable> allVarInPolynome;
-	p1.gatherVariables(allVarInPolynome);
+	std::set<Variable> allVarInPolynome = carl::variables(p1).as_set();
 	std::map<Variable, Interval<double>> map;
 
 	for(auto i : allVarInPolynome) {

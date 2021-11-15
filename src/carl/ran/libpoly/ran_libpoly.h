@@ -567,7 +567,7 @@ bool compare(const real_algebraic_number_libpoly<Number>& lhs, const Number& rhs
 
 	//refine unitl rhs in not in interval of lhs
 	//Technically not necessary because libpoly does that in compare, but whatever
-	refine_using(lhs, rat);
+	refine_using(lhs, rhs);
 
 	int cmp = lp_algebraic_number_cmp_rational(lhs.get_internal(), rat.get_internal());
 
