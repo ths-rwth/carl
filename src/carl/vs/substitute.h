@@ -159,7 +159,7 @@ namespace carl::vs::detail {
      *          true, otherwise.
      */
     template<typename Poly>
-    inline bool substitute( const Constraint<Poly>&, const Substitution<Poly>&, CaseDistinction<Poly>&, bool _accordingPaper, carl::Variables&, const detail::EvalDoubleIntervalMap& );
+    inline bool substitute( const Constraint<Poly>&, const Substitution<Poly>&, CaseDistinction<Poly>&, bool _accordingPaper, carl::Variables&, const detail::EvalDoubleIntervalMap&, bool factorization = true );
     
     /**
      * Applies a substitution of a variable to a term, which is not minus infinity nor a to an square root expression plus an infinitesimal.
@@ -356,7 +356,7 @@ namespace carl::vs {
         CaseDistinction<Poly> subres;
         carl::Variables dummy_vars; // we do not make use of this feature here
         detail::EvalDoubleIntervalMap dummy_map; // we do not make use of this feature here
-        if (!detail::substitute(cons, detail::Substitution<Poly>(var, term), subres, false, dummy_vars, dummy_map)) {
+        if (!detail::substitute(cons, detail::Substitution<Poly>(var, term), subres, false, dummy_vars, dummy_map, true)) {
             return std::nullopt;
         } else {
             return subres;

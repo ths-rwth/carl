@@ -25,6 +25,6 @@ int main(int argc, char** argv) {
 	Variable d = freshRealVariable("d");
     
 //	MultivariatePolynomial<Rational> e6({(Term<Rational>)1,(Rational)3*b, (Rational)1*createMonomial(c,2),(Rational)-1*createMonomial(d,3)});
-	MultivariatePolynomial<Interval<double>> e6({(Term<Interval<double>>)1,(Interval<double>)3*b, (Interval<double>)1*createMonomial(c,2),(Interval<double>)-1*createMonomial(d,3)});
+//	MultivariatePolynomial<Interval<double>> e6({(Term<Interval<double>>)(Interval<double>)1,(Interval<double>)3*b, (Interval<double>)1*createMonomial(c,2),(Interval<double>)-1*createMonomial(d,3)});
 //	MultivariatePolynomial<Interval<double>> e7({(Interval<double>)1});
 }

@@ -12,8 +12,8 @@ set(BOOST_OPTIONS --without-atomic --without-context --without-coroutine --witho
 
 ExternalProject_Add(
 	Boost-EP
-	URL https://dl.bintray.com/boostorg/release/${Boost_VERSION}/source/boost_${BOOST_VERSION_FILENAME}.zip
-	URL_MD5 ${Boost_ZIPHASH}
+	URL https://boostorg.jfrog.io/artifactory/main/release/${Boost_VERSION}/source/boost_${BOOST_VERSION_FILENAME}.zip
+	URL_HASH SHA256=${Boost_ZIPHASH}
 	BUILD_IN_SOURCE 1
 	DOWNLOAD_NO_PROGRESS 1
 	UPDATE_COMMAND ""

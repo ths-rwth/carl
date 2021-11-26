@@ -1,9 +1,10 @@
 #pragma once
 
 #include <carl-logging/carl-logging.h>
-#include "../core/VariablePool.h"
-#include "../formula/Formula.h"
-#include "debug.h"
+#include <carl/util/Singleton.h>
+#include <carl/core/VariablePool.h>
+#include <carl/formula/Formula.h>
+#include <carl/util/debug.h>
 
 #include <any>
 
@@ -14,7 +15,7 @@
 #include <utility>
 
 namespace carl {
-namespace checkpointverifier {
+namespace checkpoints {
 	class CheckpointVector {
 		template<typename... Args>
 		using Tuple = std::tuple<std::decay_t<Args>...>;
@@ -64,29 +65,27 @@ namespace checkpointverifier {
 		bool mayExceed = true;
 		bool printDebug = true;
 	};
-}
 
-	class CheckpointVerifier {
-		struct ChannelWrapper: std::map<std::string, checkpointverifier::CheckpointVector> {
-			ChannelWrapper() {
-				carl::VariablePool::getInstance();
-				carl::FormulaPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
-			}
-		};
+	class CheckpointVerifier : public carl::Singleton<CheckpointVerifier> {
 		template<typename... Args>
-		using Tuple = checkpointverifier::CheckpointVector::Tuple<Args...>;
-		using Channels = ChannelWrapper;
+		using Tuple = CheckpointVector::Tuple<Args...>;
+		using Channels = std::map<std::string, CheckpointVector>;
 	private:
-		static Channels mChannels;
+		Channels mChannels;
 	public:
+		CheckpointVerifier() {
+			carl::VariablePool::getInstance();
+			carl::ConstraintPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
+			carl::FormulaPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
+		}
 		template<typename... Args>
-		static void push(const std::string& channel, const std::string& description, bool forced, Args&&... args) {
+		void push(const std::string& channel, const std::string& description, bool forced, Args&&... args) {
 			mChannels[channel].add(description, forced, std::forward<Args>(args)...);
 			CARL_LOG_DEBUG("carl.checkpoint", "Added " << (forced ? "forced " : "") << description << ": " << Tuple<Args...>(args...) << " in " << channel);
 			CARL_LOG_DEBUG("carl.checkpoint", "Type: " << carl::demangle(typeid(Tuple<Args...>).name()));
 		}
 		template<typename... Args>
-		static bool check(const std::string& channel, const std::string& description, Args&&... args) {
+		bool check(const std::string& channel, const std::string& description, Args&&... args) {
 			
 			if (!mChannels[channel].valid()) {
 				CARL_LOG_WARN("carl.checkpoint", "No Checkpoints left in " << channel << ", got " << Tuple<Args...>(args...));
@@ -114,7 +113,7 @@ namespace checkpointverifier {
 			return res;
 		}
 		template<typename... Args>
-		static void expect(const std::string& channel, const std::string& description, Args&&... args) {
+		void expect(const std::string& channel, const std::string& description, Args&&... args) {
 			if (mChannels[channel].printDebug) {
 				CARL_LOG_ERROR("carl.checkpoint", "*****");
 				CARL_LOG_ERROR("carl.checkpoint", "***** Checkpoint for " << channel);
@@ -129,25 +128,16 @@ namespace checkpointverifier {
 			}
 			assert(res);
 		}
-		static void clear(const std::string& channel) {
+		void clear(const std::string& channel) {
 			CARL_LOG_DEBUG("carl.checkpoint", "Clearing " << channel);
 			mChannels[channel].clear();
 		}
-		static bool& mayExceed(const std::string& channel) {
+		bool& mayExceed(const std::string& channel) {
 			return mChannels[channel].mayExceed;
 		}
-		static bool& printDebug(const std::string& channel) {
+		bool& printDebug(const std::string& channel) {
 			return mChannels[channel].printDebug;
 		}
 	};
 }
-
-#if false
-#define CARL_ADD_CHECKPOINT(channel,description,forced,...) carl::CheckpointVerifier::push(channel, description, forced, __VA_ARGS__);
-#define CARL_CHECKPOINT(channel,description,...) carl::CheckpointVerifier::expect(channel, description, __VA_ARGS__);
-#define CARL_CLEAR_CHECKPOINT(channel) carl::CheckpointVerifier::clear(channel);
-#else
-#define CARL_ADD_CHECKPOINT(channel,description,forced,...)
-#define CARL_CHECKPOINT(channel,description,...)
-#define CARL_CLEAR_CHECKPOINT(channel)
-#endif
+}
