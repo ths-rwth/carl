@@ -51,7 +51,7 @@ option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 
-set(RAN_IMPLEMENTATION "LIBPOLY" CACHE STRING "The implementation for real algebraic numbers to be used")
+set(RAN_IMPLEMENTATION "INTERVAL" CACHE STRING "The implementation for real algebraic numbers to be used")
 set_property(CACHE RAN_IMPLEMENTATION PROPERTY STRINGS "INTERVAL" "THOM" "Z3" "LIBPOLY")
 if (RAN_IMPLEMENTATION STREQUAL "INTERVAL")
 	set(RAN_USE_INTERVAL ON)
