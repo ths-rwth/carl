@@ -18,7 +18,7 @@
 namespace carl{
 
 
-	class MonomialPool : public Singleton<MonomialPool>
+	class __attribute__((visibility("default"))) MonomialPool : public Singleton<MonomialPool>
 	{
 		friend class Singleton<MonomialPool>;
 		friend std::ostream& operator<<(std::ostream& os, const MonomialPool& mp);
