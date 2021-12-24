@@ -23,7 +23,7 @@ namespace carl
  * </ul>
  */
 template<typename T>
-class Singleton
+class __attribute__((visibility("default")))  Singleton
 {
 protected:
 	/**
