@@ -98,6 +98,7 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 	// Check nullification -- Easy cases
 	// Substitute rational numbers, and convert non-rational algebraic numbers to libpoly values and add to a libpoly assignment
 	poly::Assignment assignment;
+	bool assignedRAN = false;
 	for (Variable& v : carl::variables(polyCopy)) {
 		if (v == mainVar) continue;
 		if (m.count(v) == 0) {
@@ -118,19 +119,31 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 			assignment.set(VariableMapper::getInstance().getLibpolyVariable(v), poly::Value(&val));
 			// Destroy the value, but dont free the algebraic number!
 			lp_value_destruct(&val);
+
+			assignedRAN = true;
 		}
 	}
 	CARL_LOG_DEBUG("carl.ran.libpoly", "After rational substitution: " << polyCopy);
-	if (!carl::variables(polyCopy).has(mainVar)) {
-		CARL_LOG_DEBUG("carl.ran.libpoly", "poly does not contain MainVar -> nullified");
-		return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
-	} else if (carl::isZero(polyCopy)) {
+	CARL_LOG_DEBUG("carl.ran.libpoly", "Assignment: " << assignment);
+	if (carl::isZero(polyCopy)) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 -> nullified");
 		return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
-	} else if (assignment.get_internal()->size == 0) {
+	} else if (!assignedRAN) {
+		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is not 0 and has no assigned RANs -> non-univariate in mainVar now");
 		// No algebraic numbers in assignment --> we can use the univariate method
 		assert(polyCopy.isUnivariate());
 		return real_roots(polyCopy, interval);
+	}
+	// Handle case where the mainVar is not present anymore
+	if (!carl::variables(polyCopy).has(mainVar)) {
+		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is not 0 but the mainVar is not present anymore -> evaluate to check for nullification");
+		poly::Value eval_val = poly::evaluate(LibpolyConverter::getInstance().toLibpolyPolynomial(polyCopy), assignment);
+		CARL_LOG_DEBUG("carl.ran.libpoly", "Evaluation: " << eval_val);
+		if (eval_val == poly::Value(long(0))) {
+			return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
+		} else {
+			return real_roots_result<real_algebraic_number_libpoly<Number>>::no_roots_response();
+		}
 	}
 	// We have a non-univariate polynomial with algebraic numbers in the assignment
 
@@ -152,22 +165,20 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Found roots " << roots);
 
-	// If no roots or only 0 was returned we have to evaluate to check for nullification
-	if (roots.empty() || (roots.size() == 1 && roots.front() == poly::Value(poly::Integer(0)))) {
+	// If no roots we have to evaluate to check for nullification
+	if (roots.empty()) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", " Checking for nullification -> Evaluation at " << mainVar << "= 1");
-		assignment.set(VariableMapper::getInstance().getLibpolyVariable(mainVar), poly::Value(poly::Integer(1)));
+		assignment.set(VariableMapper::getInstance().getLibpolyVariable(mainVar), poly::Value(long(1)));
 		poly::Value eval_val = poly::evaluate(poly_p, assignment);
 		CARL_LOG_DEBUG("carl.ran.libpoly", " Got eval_val " << eval_val);
 
-		if (eval_val == poly::Value(poly::Integer(0))) {
+		if (eval_val == poly::Value(long(0))) {
 			CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 after substituting rational assignments -> nullified");
 			return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
+		} else {
+			CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has no roots");
+			return real_roots_result<real_algebraic_number_libpoly<Number>>::no_roots_response();
 		}
-	}
-
-	if (roots.empty()) {
-		CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has no roots");
-		return real_roots_result<real_algebraic_number_libpoly<Number>>::no_roots_response();
 	}
 
 	// Sort, as we have to return the roots in ascending order
