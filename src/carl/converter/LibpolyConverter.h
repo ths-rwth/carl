@@ -105,9 +105,11 @@ public:
 		}
 		Coeff coprimeFactor = p.coprimeFactor();
 
+		CARL_LOG_DEBUG("carl.converter", "Coprime Factor: " << coprimeFactor);
+
 		if (carl::getDenom(coprimeFactor) != 1) {
-			//if coprime factor is not an integer, TODO
-			denominator = coprimeFactor > 0 ? mpz_class(1) : mpz_class(-1);
+			//if coprime factor is not an integer
+			denominator = coprimeFactor > 0 ? mpz_class(carl::getNum(coprimeFactor)) : mpz_class(-carl::getNum(coprimeFactor));
 		} else if (coprimeFactor == 0) {
 			//Wie kann das überhaupt sein? TODO
 			denominator = mpz_class(1);
