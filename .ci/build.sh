@@ -39,11 +39,11 @@ elif [[ ${TASK} == "documentation" ]]; then
 	make doc || return 1
 	stop_keep_waiting
 	
-	git config --global user.email "gereon.kremer@cs.rwth-aachen.de"
-	git config --global user.name "Travis documentation daemon"
+	git config --global user.email "admin@ths.rwth-aachen.de"
+	git config --global user.name "Documentation daemon"
 	
-	git clone https://${GH_TOKEN}@github.com/smtrat/smtrat.github.io.git
-	cd smtrat.github.io/ || return 1
+	git clone https://${GH_TOKEN}@github.com/ths-rwth/ths-rwth.github.io.git
+	cd ths-rwth.github.io/ || return 1
 	git branch -m master old_master
 	git checkout --orphan master
 	
