@@ -120,7 +120,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const std::m
 	mCoefficients.reserve(coefficients.rbegin()->first);
 	for (const auto& expAndCoeff : coefficients)
 	{
-		if(expAndCoeff.first != mCoefficients.size() + 1)
+		if(expAndCoeff.first != mCoefficients.size())
 		{
 			mCoefficients.resize(expAndCoeff.first, Coeff(0));
 		}
