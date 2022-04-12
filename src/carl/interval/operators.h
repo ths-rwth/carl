@@ -436,7 +436,8 @@ inline Interval<Number>& operator*=(Interval<Number>& lhs, const Interval<Number
 template<typename Number>
 inline Interval<Number>& operator*=(Interval<Number>& lhs, const Number& rhs) {
 	if (carl::isZero(rhs) && !lhs.isEmpty()) {
-		return Interval<Number>{0};
+		lhs = Interval<Number>{0};
+		return lhs;
 	}
 	lhs.rContent() *= rhs;
 	return lhs;
