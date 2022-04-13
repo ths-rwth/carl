@@ -7,10 +7,10 @@ sonar.sourceEncoding=UTF-8
 #   Meta-data for the project
 # =====================================================
 
-sonar.links.homepage=https://github.com/smtrat/carl
+sonar.links.homepage=https://github.com/ths-rwth/carl
 sonar.links.ci=https://travis-ci.org/smtract/carl
-sonar.links.scm=https://github.com/smtrat/carl
-sonar.links.issue=https://github.com/smtrat/carl/issues
+sonar.links.scm=https://github.com/ths-rwth/carl
+sonar.links.issue=https://github.com/ths-rwth/carl/issues
 
 
 # =====================================================
