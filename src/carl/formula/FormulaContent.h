@@ -168,7 +168,7 @@ namespace carl {
             
             FormulaContent() = delete;
             FormulaContent(const FormulaContent&) = delete;
-            FormulaContent(FormulaContent&& o) : mContent(std::move(o.mContent)) {};
+            FormulaContent(FormulaContent&& o) : mHash(o.mHash), mId(o.mId), mType(o.mType), mContent(std::move(o.mContent)) {};
 
             /**
              * Constructs the formula (true), if the given bool is true and the formula (false) otherwise.
