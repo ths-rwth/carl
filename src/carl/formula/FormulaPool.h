@@ -560,32 +560,14 @@ namespace carl
             void forallDo( void (*_func)( ArgType*, const Formula<Pol>& ), ArgType* _arg ) const
             {
                 FORMULA_POOL_LOCK_GUARD
-                for( const FormulaContent<Pol>* formula : mPool )
+                for( const FormulaContent<Pol>& formula : mPool )
                 {
-                    (*_func)( _arg, Formula<Pol>( formula ) );
-                    if( formula != mpFalse )
+                    (*_func)( _arg, Formula<Pol>( &formula ) );
+                    if( &formula != mpFalse )
                     {
-                        (*_func)( _arg, Formula<Pol>( formula->mNegation ) );
+                        (*_func)( _arg, Formula<Pol>( formula.mNegation ) );
                     }
                 }
-            }
-
-            template<typename ReturnType, typename ArgType>
-            std::map<const Formula<Pol>,ReturnType> forallDo( ReturnType (*_func)( ArgType*, const Formula<Pol>& ), ArgType* _arg ) const
-            {
-                FORMULA_POOL_LOCK_GUARD
-                std::map<const Formula<Pol>,ReturnType> result;
-                for( const FormulaContent<Pol>* elem : mPool )
-                {
-                    Formula<Pol> form(elem);
-                    result[form] = (*_func)( _arg, form );
-                    if( elem != mpFalse )
-                    {
-                        Formula<Pol> form2(elem->mNegation);
-                        result[form2] = (*_func)( _arg, form2 );
-                    }
-                }
-                return result;
             }
 
             /**
