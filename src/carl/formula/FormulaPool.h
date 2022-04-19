@@ -15,11 +15,18 @@
 #include <boost/variant.hpp>
 #include "bitvector/BVConstraintPool.h"
 #include "bitvector/BVConstraint.h"
+#include <boost/intrusive/unordered_set.hpp>
 
 #define SIMPLIFY_FORMULA
 
 namespace carl
 {
+
+    template<typename Pol>
+    inline std::size_t hash_value(const carl::FormulaContent<Pol>& content) {
+        return content.hash();
+    }
+
 
     template<typename Pol>
     class FormulaPool : public Singleton<FormulaPool<Pol>>
@@ -36,10 +43,15 @@ namespace carl
             FormulaContent<Pol>* mpTrue;
             /// The unique formula representing false.
             FormulaContent<Pol>* mpFalse;
+
+            pool::RehashPolicy mRehashPolicy;
+            using underlying_set = boost::intrusive::unordered_set<FormulaContent<Pol>>;
+            std::unique_ptr<typename underlying_set::bucket_type[]> mPoolBuckets;
             /// The formula pool.
-            FastPointerSet<FormulaContent<Pol>> mPool;
+            underlying_set mPool;
             /// Mutex to avoid multiple access to the pool
             mutable std::recursive_mutex mMutexPool;
+
             ///
             FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*> mTseitinVars;
             ///
@@ -213,7 +225,7 @@ namespace carl
              * @return A formula with wrapping the given Boolean variable.
              */
             const FormulaContent<Pol>* create(Variable _variable) {
-                return add(new FormulaContent<Pol>(_variable));
+                return add(FormulaContent<Pol>(_variable));
             }
 
             /**
@@ -229,9 +241,9 @@ namespace carl
                 }
                 #endif
                 if (isBaseFormula(_constraint)) {
-                    return add(new FormulaContent<Pol>(std::move(_constraint)));
+                    return add(FormulaContent<Pol>(std::move(_constraint)));
                 } else {
-                    return add(new FormulaContent<Pol>(_constraint.negation()))->mNegation;
+                    return add(FormulaContent<Pol>(_constraint.negation()))->mNegation;
                 }
             }
             const FormulaContent<Pol>* create(const Constraint<Pol>& _constraint) {
@@ -239,9 +251,9 @@ namespace carl
             }
 			const FormulaContent<Pol>* create(VariableComparison<Pol>&& _variableComparison) {
 				if (isBaseFormula(_variableComparison)) {
-                    return add(new FormulaContent<Pol>(std::move(_variableComparison)));
+                    return add(FormulaContent<Pol>(std::move(_variableComparison)));
                 } else {
-                    return add(new FormulaContent<Pol>(_variableComparison.negation()))->mNegation;
+                    return add(FormulaContent<Pol>(_variableComparison.negation()))->mNegation;
                 }
             }
             const FormulaContent<Pol>* create(const VariableComparison<Pol>& _variableComparison) {
@@ -251,9 +263,9 @@ namespace carl
             }
 			const FormulaContent<Pol>* create(VariableAssignment<Pol>&& _variableAssignment) {
 				if (isBaseFormula(_variableAssignment)) {
-                    return add(new FormulaContent<Pol>(std::move(_variableAssignment)));
+                    return add(FormulaContent<Pol>(std::move(_variableAssignment)));
                 } else {
-                    return add(new FormulaContent<Pol>(_variableAssignment.negation()))->mNegation;
+                    return add(FormulaContent<Pol>(_variableAssignment.negation()))->mNegation;
                 }
             }
             const FormulaContent<Pol>* create(const VariableAssignment<Pol>& _variableAssignment) {
@@ -265,7 +277,7 @@ namespace carl
                 if (_constraint.isAlwaysConsistent()) return trueFormula();
                 if (_constraint.isAlwaysInconsistent()) return falseFormula();
                 #endif
-                return add(new FormulaContent<Pol>(std::move(_constraint)));
+                return add(FormulaContent<Pol>(std::move(_constraint)));
             }
             const FormulaContent<Pol>* create(const BVConstraint& _constraint) {
                 return create(std::move(BVConstraint(_constraint)));
@@ -382,7 +394,7 @@ namespace carl
 				if (_vars.empty()) {
 					return _term.mpContent;
 				} else {
-					return add( new FormulaContent<Pol>(_type, std::move(_vars), _term ) );
+					return add(FormulaContent<Pol>(_type, std::move(_vars), _term ) );
 				}
 			}
 
@@ -440,9 +452,9 @@ namespace carl
 			const FormulaContent<Pol>* create( UEquality&& eq )
 			{
 				if (isBaseFormula(eq)) {
-                    return add(new FormulaContent<Pol>(std::move(eq)));
+                    return add(FormulaContent<Pol>(std::move(eq)));
                 } else {
-                    return add(new FormulaContent<Pol>(eq.negation()))->mNegation;
+                    return add(FormulaContent<Pol>(eq.negation()))->mNegation;
                 }
 			}
 
@@ -466,8 +478,14 @@ namespace carl
                     if( !stillStoredAsTseitinVariable )
                     {
 						CARL_LOG_TRACE("carl.formula", "Deleting " << tmp << " / " << tmp->mNegation << " from pool");
-                        mPool.erase( tmp->mNegation );
-						mPool.erase( tmp );
+                        
+                        //auto it = mPool.find(*tmp->mNegation);
+                        //assert(it != mPool.end());
+                        //mPool.erase(it);
+                        assert(mPool.find(*tmp->mNegation) == mPool.end());
+                        auto it = mPool.find(*tmp);
+                        assert(it != mPool.end());
+                        mPool.erase(it);
                         delete tmp->mNegation;
                         delete tmp;
                     }
@@ -489,7 +507,7 @@ namespace carl
                         assert( mTseitinVarToFormula.find( tmp ) != mTseitinVarToFormula.end() );
                         mTseitinVarToFormula.erase( tmp );
 						CARL_LOG_TRACE("carl.formula", "Deleting " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << " from pool");
-                        mPool.erase( tmp );
+                        mPool.erase( *tmp );
                         delete tmp->mNegation;
                         delete tmp;
                     }
@@ -511,7 +529,7 @@ namespace carl
                             mTseitinVars.erase( tmpTVIter->second );
                             mTseitinVarToFormula.erase( tmpTVIter );
 							CARL_LOG_TRACE("carl.formula", "Deleting " << static_cast<const void*>(tmp) << " / " << static_cast<const void*>(tmp->mNegation) << " from pool");
-                            mPool.erase( tmp );
+                            mPool.erase( *tmp );
                             delete tmp->mNegation;
                             delete tmp;
                         }
@@ -588,21 +606,23 @@ namespace carl
     private:
 
             /**
-             * Inserts the given formula to the pool, if it does not yet occur in there.
-             * @param _formula The formula to add to the pool.
-             * @return The position of the given formula in the pool and true, if it did not yet occur in the pool;
-             *         The position of the equivalent formula in the pool and false, otherwise.
-             */
-            std::pair<typename FastPointerSet<FormulaContent<Pol>>::iterator,bool> insert( FormulaContent<Pol>* _formula );
-
-            /**
              * Adds the given formula to the pool, if it does not yet occur in there.
              * Note, that this method uses the allocator which is locked before calling.
              * @param _formula The formula to add to the pool.
              * @return The given formula, if it did not yet occur in the pool;
              *         The equivalent formula already occurring in the pool, otherwise.
              */
-            const FormulaContent<Pol>* add( FormulaContent<Pol>* _formula );
+            const FormulaContent<Pol>* add( FormulaContent<Pol>&& _formula );
+
+            void check_rehash() {
+                auto rehash = mRehashPolicy.needRehash(mPool.bucket_count(), mPool.size());
+                if (rehash.first) {
+                    auto new_buckets = new typename underlying_set::bucket_type[rehash.second];
+                    mPool.rehash(typename underlying_set::bucket_traits(new_buckets, rehash.second));
+                    mPoolBuckets.reset(new_buckets);
+                }
+            }
+
     };
 }    // namespace carl
 

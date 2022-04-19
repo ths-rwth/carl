@@ -121,7 +121,7 @@ namespace carl {
     };	
 	
     template<typename Pol>
-    class FormulaContent
+    class FormulaContent : public boost::intrusive::unordered_set_base_hook<>
     {
             friend class Formula<Pol>;
             friend class FormulaPool<Pol>;
@@ -168,7 +168,7 @@ namespace carl {
             
             FormulaContent() = delete;
             FormulaContent(const FormulaContent&) = delete;
-            FormulaContent(FormulaContent&&) = delete;
+            FormulaContent(FormulaContent&& o) : mContent(std::move(o.mContent)) {};
 
             /**
              * Constructs the formula (true), if the given bool is true and the formula (false) otherwise.

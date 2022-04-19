@@ -15,7 +15,8 @@ namespace carl
     FormulaPool<Pol>::FormulaPool( unsigned _capacity ):
         Singleton<FormulaPool<Pol>>(),
         mIdAllocator( 3 ),
-        mPool(),
+        mPoolBuckets(new typename underlying_set::bucket_type[mRehashPolicy.numBucketsFor(_capacity)]),
+	    mPool(typename underlying_set::bucket_traits(mPoolBuckets.get(), mRehashPolicy.numBucketsFor(_capacity))),
         mTseitinVars(),
         mTseitinVarToFormula()
     {
@@ -24,9 +25,8 @@ namespace carl
         mpFalse = new FormulaContent<Pol>( FALSE, 2 );
         mpTrue->mNegation = mpFalse;
      	mpFalse->mNegation = mpTrue;
-        mPool.reserve( _capacity );
-        mPool.insert( mpTrue );
-        mPool.insert( mpFalse );
+        mPool.insert( *mpTrue );
+        mPool.insert( *mpFalse );
         Formula<Pol>::init( *mpTrue );
         Formula<Pol>::init( *mpFalse );
         mpTrue->mUsages = 2; // avoids deleting it
@@ -43,47 +43,41 @@ namespace carl
     }
     
     template<typename Pol>
-    std::pair<typename FastPointerSet<FormulaContent<Pol>>::iterator,bool> FormulaPool<Pol>::insert( FormulaContent<Pol>* _element )
+    const FormulaContent<Pol>* FormulaPool<Pol>::add( FormulaContent<Pol>&& _element )
     {
-		CARL_LOG_DEBUG("carl.formula", "Inserting " << static_cast<const void*>(_element));
-        auto iterBoolPair = mPool.insert( _element );
-        if( !iterBoolPair.second ) // Formula has already been generated.
-        {
-			CARL_LOG_DEBUG("carl.formula", "Deleting " << static_cast<const void*>(_element) << " as it was already part of the pool");
-	        delete _element;
-        }
-        return iterBoolPair;
-    }
-    
-    template<typename Pol>
-    const FormulaContent<Pol>* FormulaPool<Pol>::add( FormulaContent<Pol>* _element )
-    {
-        assert( _element->mType != FormulaType::NOT );
+        assert( _element.mType != FormulaType::NOT );
         FORMULA_POOL_LOCK_GUARD
-        auto iterBoolPair = this->insert( _element );
-        if( iterBoolPair.second ) // Formula has not yet been generated.
+
+        typename underlying_set::insert_commit_data insert_data;
+	    auto res = mPool.insert_check(_element, /*content_hash(), content_equal(),*/ insert_data);
+        if( res.second ) // Formula has not yet been generated.
         {
-			CARL_LOG_DEBUG("carl.formula", "Just added " << static_cast<const void*>(_element) << " / " << static_cast<const void*>(*iterBoolPair.first) << " to the pool");
+            auto cont = new FormulaContent<Pol>(std::move(_element));
 			// Add also the negation of the formula to the pool in order to ensure that it
             // has the next id and hence would occur next to the formula in a set of sub-formula,
-            // which is sorted by the ids.
-            _element->mId = mIdAllocator; 
-            Formula<Pol>::init( *_element );
+            // which is sorted by the ids. 
+            cont->mId = mIdAllocator;
+            Formula<Pol>::init( *cont );
             ++mIdAllocator;
-            auto negation = createNegatedContent(_element);
-			assert(mPool.find(negation) == mPool.end());
-			//auto negation = new FormulaContent<Pol>(NOT, std::move( Formula<Pol>( *iterBoolPair.first ) ) );
-            _element->mNegation = negation;
+            mPool.insert_commit(*cont, insert_data);
+		    check_rehash();
+
+            auto negation = createNegatedContent(cont);
+            cont->mNegation = negation;
             negation->mId = mIdAllocator; 
-            negation->mNegation = _element;
+            negation->mNegation = cont;
             Formula<Pol>::init( *negation );
             ++mIdAllocator;
-			CARL_LOG_DEBUG("carl.formula", "Added " << _element << " / " << negation << " to pool");
+            assert(mPool.find(*negation) == mPool.end());
+            //auto res2 = mPool.insert(*negation);
+            //assert(res2.second);
+			CARL_LOG_DEBUG("carl.formula", "Added " << cont << " / " << negation << " to pool");
+            return cont;
         } else {
-			CARL_LOG_TRACE("carl.formula", "Found " << static_cast<const void*>(*iterBoolPair.first) << " in pool");
+			CARL_LOG_TRACE("carl.formula", "Found " << static_cast<const void*>(&*res.first) << " in pool");
+            return &*res.first;
 		}
-		CARL_LOG_TRACE("carl.formula", "Returning " << static_cast<const void*>(*iterBoolPair.first));
-        return *iterBoolPair.first;
+        
     }
     
     template<typename Pol>
@@ -128,7 +122,7 @@ namespace carl
             return conclusion.mpContent;
         }
         Formula<Pol> premise(AND, std::move(_subformulas));
-        return add(new FormulaContent<Pol>(IMPLIES, {premise, conclusion}));
+        return add(FormulaContent<Pol>(IMPLIES, {premise, conclusion}));
     }
     
     template<typename Pol>
@@ -262,7 +256,7 @@ namespace carl
         }
         else
         {
-            result = add( new FormulaContent<Pol>( _type, std::move( subformulas ) ) );
+            result = add(FormulaContent<Pol>( _type, std::move( subformulas ) ) );
         }
         return negateResult ? result->mNegation : result;
     }
@@ -318,7 +312,7 @@ namespace carl
             return create(FormulaType::OR, std::move(subFormulas));
         }
         #endif
-        return add(new FormulaContent<Pol>(ITE, std::move(_subformulas)));
+        return add(FormulaContent<Pol>(ITE, std::move(_subformulas)));
     }
     
 }    // namespace carl
