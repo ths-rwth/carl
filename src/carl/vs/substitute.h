@@ -42,6 +42,11 @@ namespace carl::vs::detail {
             return m_term;
         }
     };
+    template<class Poly>
+    inline std::ostream& operator<<(std::ostream& os, const Substitution<Poly>& s) {
+		os << "[" << s.term() << "//" << s.variable() << "]";
+        return os;
+ 	}
 
     using DoubleInterval = carl::Interval<double>;
     using EvalDoubleIntervalMap = std::map<carl::Variable, DoubleInterval>;
@@ -344,6 +349,21 @@ namespace carl::vs::detail {
 
 namespace carl::vs {
     /**
+     * @brief Simplifies the case distinction in place.
+     * 
+     * @tparam Poly Polynomial type.
+     * @param cases Case distiction to simplify.
+     * @return true On success.
+     * @return false Fail, cases is now invalid.
+     */
+    template<typename Poly>
+    inline bool simplify_inplace(CaseDistinction<Poly>& cases) {        
+        if (!detail::splitProducts(cases, true)) return false;
+        detail::splitSosDecompositions(cases);
+        return true;
+    }
+
+    /**
      * Applies a substitution to a constraint.
      * @param cons   The constraint to substitute in.
      * @param subs   The substitution to apply.
@@ -356,10 +376,15 @@ namespace carl::vs {
         CaseDistinction<Poly> subres;
         carl::Variables dummy_vars; // we do not make use of this feature here
         detail::EvalDoubleIntervalMap dummy_map; // we do not make use of this feature here
-        if (!detail::substitute(cons, detail::Substitution<Poly>(var, term), subres, false, dummy_vars, dummy_map, true)) {
+        if (!detail::substitute(cons, detail::Substitution<Poly>(var, term), subres, false, dummy_vars, dummy_map)) {
             return std::nullopt;
         } else {
             return subres;
+            // if (simplify_inplace(subres)) {
+            //     return subres;
+            // } else {
+            //     return std::nullopt;
+            // }
         }
     }
 

@@ -229,7 +229,6 @@ namespace carl {
              * Destructor.
              */
             ~FormulaContent() {
-                // TODO NOTE: in case of true, false, bool: mContent was not destroyed ...
                 if( mpVariables != nullptr )
                     delete mpVariables;
             }

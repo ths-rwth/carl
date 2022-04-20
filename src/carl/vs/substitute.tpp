@@ -555,8 +555,7 @@ namespace carl::vs::detail
                      CaseDistinction<Poly>& _result,
                      bool _accordingPaper,
                      Variables& _conflictingVariables,
-                     const detail::EvalDoubleIntervalMap& _solutionSpace,
-                     bool factorization )
+                     const detail::EvalDoubleIntervalMap& _solutionSpace)
     {
         #ifdef VS_DEBUG_SUBSTITUTION
         std::cout << "substitute: ( " << _cons << " )" << _subs << std::endl;
@@ -589,15 +588,6 @@ namespace carl::vs::detail
             {
                 std::cout << "Error in substitute: unexpected type of substitution." << std::endl;
             }
-        }
-        #ifdef VS_DEBUG_SUBSTITUTION
-        print( _result );
-        #endif
-        if( factorization && !splitProducts( _result, true ) ) 
-            result = false;
-        if( result )
-        {
-            splitSosDecompositions( _result );
         }
         #ifdef VS_DEBUG_SUBSTITUTION
         print( _result );

@@ -69,8 +69,6 @@ namespace carl
             Formula<Pol>::init( *negation );
             ++mIdAllocator;
             assert(mPool.find(*negation) == mPool.end());
-            //auto res2 = mPool.insert(*negation);
-            //assert(res2.second);
 			CARL_LOG_DEBUG("carl.formula", "Added " << cont << " / " << negation << " to pool");
             return cont;
         } else {
