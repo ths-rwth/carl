@@ -379,12 +379,12 @@ namespace carl::vs {
         if (!detail::substitute(cons, detail::Substitution<Poly>(var, term), subres, false, dummy_vars, dummy_map)) {
             return std::nullopt;
         } else {
-            return subres;
-            // if (simplify_inplace(subres)) {
-            //     return subres;
-            // } else {
-            //     return std::nullopt;
-            // }
+            // return subres;
+            if (simplify_inplace(subres)) {
+                return subres;
+            } else {
+                return std::nullopt;
+            }
         }
     }
 
