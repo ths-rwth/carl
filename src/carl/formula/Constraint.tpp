@@ -15,65 +15,6 @@
 namespace carl {
 
 template<typename Pol>
-Constraint<Pol>::Constraint(bool _valid)
-	: mLhs(RawConstraint<Pol>(_valid).mLhs), mRelation(RawConstraint<Pol>(_valid).mRelation), mHash(CONSTRAINT_HASH(mLhs, mRelation, Pol)) {
-}
-
-template<typename Pol>
-Constraint<Pol>::Constraint(carl::Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound) {
-	RawConstraint<Pol> raw(_var, _rel, _bound);
-	mLhs = raw.mLhs;
-	mRelation = raw.mRelation;
-	mHash = CONSTRAINT_HASH(mLhs, mRelation, Pol);
-}
-
-template<typename Pol>
-Constraint<Pol>::Constraint(const Pol& _lhs, Relation _rel) {
-	RawConstraint<Pol> raw(_lhs, _rel);
-	mLhs = raw.mLhs;
-	mRelation = raw.mRelation;
-	mHash = CONSTRAINT_HASH(mLhs, mRelation, Pol);
-}
-
-template<typename Pol>
-Constraint<Pol>::Constraint(const Constraint<Pol>& _constraint)
-	: mLhs(_constraint.mLhs), mRelation(_constraint.mRelation), mHash(_constraint.mHash), mFactorization(_constraint.mFactorization) {}
-
-template<typename Pol>
-Constraint<Pol>::Constraint(Constraint<Pol>&& _constraint) noexcept
-	: mLhs(std::move(_constraint.mLhs)), mRelation(_constraint.mRelation), mHash(_constraint.mHash), mFactorization(std::move(_constraint.mFactorization)) {}
-
-template<typename Pol>
-Constraint<Pol>& Constraint<Pol>::operator=(const Constraint<Pol>& _constraint) {
-	if (*this == _constraint) {
-		if (mFactorization.empty()) {
-			mFactorization = _constraint.mFactorization;
-		}
-	} else {
-		mLhs = _constraint.mLhs;
-		mRelation = _constraint.mRelation;
-		mHash = _constraint.mHash;
-		mFactorization = _constraint.mFactorization;
-	}
-	return *this;
-}
-
-template<typename Pol>
-Constraint<Pol>& Constraint<Pol>::operator=(Constraint<Pol>&& _constraint) noexcept {
-	if (*this == _constraint) {
-		if (mFactorization.empty()) {
-			mFactorization = std::move(_constraint.mFactorization);
-		}
-	} else {
-		mLhs = std::move(_constraint.mLhs);
-		mRelation = _constraint.mRelation;
-		mHash = _constraint.mHash;
-		mFactorization = std::move(_constraint.mFactorization);
-	}
-	return *this;
-}
-
-template<typename Pol>
 unsigned satisfiedBy(const Constraint<Pol>& c, const EvaluationMap<typename Pol::NumberType>& _assignment) {
 	unsigned result = 2;
 	Pol tmp = carl::substitute(c.lhs(), _assignment);

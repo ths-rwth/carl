@@ -200,7 +200,7 @@ namespace carl::vs::detail
     CaseDistinction<Poly> splitProducts( const Constraint<Poly>& _constraint, bool _onlyNeq )
     {
         CaseDistinction<Poly> result;
-        auto& factorization = carl::factorization(_constraint);
+        auto& factorization = _constraint.lhs_factorization();
         if( !carl::is_trivial(factorization) )
         {
             switch( _constraint.relation() )
@@ -395,7 +395,7 @@ namespace carl::vs::detail
     CaseDistinction<Poly> getSignCombinations( const Constraint<Poly>& _constraint )
     {
         CaseDistinction<Poly> combinations;
-        auto& factorization = carl::factorization(_constraint);
+        auto& factorization = _constraint.lhs_factorization();
         if( !carl::is_trivial(factorization) && factorization.size() <= MAX_PRODUCT_SPLIT_NUMBER )
         {
             assert( _constraint.relation() == Relation::GREATER || _constraint.relation() == Relation::LESS

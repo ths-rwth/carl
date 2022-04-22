@@ -14,13 +14,13 @@
 #include "../core/VariableInformation.h"
 #include "../core/Variables.h"
 #include "../core/VariablesInformation.h"
-#include "../core/polynomialfunctions/Definiteness.h"
 #include "../core/polynomialfunctions/Factorization.h"
 #include "../interval/Interval.h"
 #include "../interval/IntervalEvaluation.h"
 #include "../util/Common.h"
 #include "config.h"
-#include "ConstraintRaw.h"
+#include "../core/constraint/Simplification.h"
+#include "../datastructures/Pool.h"
 
 #include <cassert>
 #include <cstring>
@@ -28,6 +28,7 @@
 #include <sstream>
 
 namespace carl {
+
 // Forward definition.
 template<typename Pol>
 class Constraint;
@@ -35,7 +36,39 @@ class Constraint;
 template<typename Poly>
 using Constraints = std::set<Constraint<Poly>, carl::less<Constraint<Poly>, false>>;
 
-#define CONSTRAINT_HASH(_lhs, _rel, _type) (size_t)((size_t)(std::hash<_type>()(_lhs) << 3) ^ (size_t)_rel)
+template<typename Pol>
+using VarInfo = VariableInformation<true, Pol>;
+
+template<typename Pol>
+using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
+
+
+template<typename Pol>
+struct CachedConstraintContent {
+	/// Basic constraint.
+	BasicConstraint<Pol> m_constraint;
+	/// Cache for the factorization.
+	mutable Factors<Pol> m_lhs_factorization;
+	/// A container which includes all variables occurring in the polynomial considered by this constraint.
+	mutable carlVariables m_variables;
+	/// A map which stores information about properties of the variables in this constraint.
+	mutable VarInfoMap<Pol> m_var_info_map;
+	#ifdef THREAD_SAFE
+	/// Mutex for access to variable information map.
+	std::mutex m_var_info_map_mutex;
+	/// Mutex for access to the factorization.
+	std::mutex m_lhs_factorization_mutex;
+	/// Mutex for access to the variables.
+	std::mutex m_variables_mutex;
+	#endif
+
+	CachedConstraintContent(BasicConstraint<Pol>&& c) : m_constraint(std::move(c)) {}
+	const auto& key() const { return m_constraint; }
+};
+
+template<typename Pol>
+using ConstraintPool = pool::Pool<CachedConstraintContent<Pol>>;
+
 
 /**
  * Represent a polynomial (in)equality against zero. Such an (in)equality
@@ -45,63 +78,114 @@ template<typename Pol>
 class Constraint {
 
 private:
-	/// The polynomial which is compared by this constraint to zero.
-	Pol mLhs;
-	/// The relation symbol comparing the polynomial considered by this constraint to zero.
-	Relation mRelation;
-	/// Cache for the hash.
-	std::size_t mHash;
-	/// Cache for the factorization
-	mutable Factors<Pol> mFactorization;
-	// TODO caching factorizations should be optional
+	pool::PoolElement<CachedConstraintContent<Pol>> m_element;
 
 public:
-	explicit Constraint(bool _valid = true);
-	explicit Constraint(carl::Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound = constant_zero<typename Pol::NumberType>::get());
-	explicit Constraint(const Pol& _lhs, Relation _rel);
-	Constraint(const Constraint& _constraint);
-	Constraint(Constraint&& _constraint) noexcept;
-	Constraint& operator=(const Constraint& _constraint);
-	Constraint& operator=(Constraint&& _constraint) noexcept;
+	explicit Constraint(bool valid = true) : m_element(BasicConstraint<Pol>(valid)) {}
+
+	explicit Constraint(carl::Variable::Arg var, Relation rel, const typename Pol::NumberType& bound = constant_zero<typename Pol::NumberType>::get())  : m_element(constraint::create_normalized_bound<Pol>(var,rel,bound)) {}
+
+	explicit Constraint(const Pol& lhs, Relation rel) : m_element(constraint::create_normalized_constraint(lhs,rel)) {}
+
+	Constraint(const Constraint& constraint) : m_element(constraint.m_element) {}
+
+	Constraint(Constraint&& constraint) noexcept : m_element(std::move(constraint.m_element)) {}
+
+	Constraint& operator=(const Constraint& constraint) {
+		m_element = constraint.m_element;
+		return *this;
+	}
+
+	Constraint& operator=(Constraint&& constraint) noexcept {
+		m_element = std::move(constraint.m_element);
+		return *this;
+	}
 
 	/**
      * @return The considered polynomial being the left-hand side of this constraint.
      *          Hence, the right-hand side of any constraint is always 0.
      */
 	const Pol& lhs() const {
-		return mLhs;
-	}
-
-	/**
-     * @return A container containing all variables occurring in the polynomial of this constraint.
-     */
-	const auto variables() const {
-		return carl::variables(mLhs);
-	}
-
-	void gatherVariables(carlVariables& vars) const {
-		carl::variables(mLhs, vars);
+		return m_element->m_constraint.lhs();
 	}
 
 	/**
      * @return The relation symbol of this constraint.
      */
 	Relation relation() const {
-		return mRelation;
+		return m_element->m_constraint.relation();
 	}
 
 	/**
      * @return A hash value for this constraint.
      */
 	size_t hash() const {
-		return mHash;
+		return m_element->m_constraint.hash();
+	}
+
+	/**
+     * @return A container containing all variables occurring in the polynomial of this constraint.
+     */
+	const auto& variables() const {
+		#ifdef THREAD_SAFE
+		m_element->m_variables_mutex.lock();
+		#endif
+		if (m_element->m_variables.empty()) {
+			m_element->m_variables = carl::variables(lhs());
+		}
+		#ifdef THREAD_SAFE
+		m_element->m_variables_mutex.unlock();
+		#endif
+		return m_element->m_variables;
+	}
+
+	void gatherVariables(carlVariables& vars) const {
+		vars.add(variables().begin(), variables().end());
+	}
+
+	const Factors<Pol>& lhs_factorization() const {
+		#ifdef THREAD_SAFE
+		m_element->m_lhs_factorization_mutex.lock();
+		#endif
+		if (m_element->m_lhs_factorization.empty()) {
+			m_element->m_lhs_factorization = carl::factorization(lhs());
+		}
+		#ifdef THREAD_SAFE
+		m_element->m_lhs_factorization_mutex.unlock();
+		#endif
+		return m_element->m_lhs_factorization;
+	}
+
+	/**
+     * @param variable The variable to find variable information for.
+     * @tparam gatherCoeff
+     * @return The whole variable information object.
+     * Note, that if the given variable is not in this constraints, this method fails.
+     * Furthermore, the variable information returned do provide coefficients only, if
+     * the given flag gatherCoeff is set to true.
+     */
+	template<bool gatherCoeff = false>
+	const auto varInfo(const Variable variable) const {
+		#ifdef THREAD_SAFE
+		m_element->m_var_info_map_mutex.lock();
+		#endif
+		auto res = m_element->m_var_info_map.find(variable);
+		if (res == m_element->m_var_info_map.end() || (gatherCoeff && !res->second.hasCoeff())) {
+			m_element->m_var_info_map[variable] = lhs().template getVarInfo<gatherCoeff>(variable);
+			res = m_element->m_var_info_map.find(variable);
+			assert(res != m_element->m_var_info_map.end());
+		}
+		#ifdef THREAD_SAFE
+		m_element->m_var_info_map_mutex.unlock();
+		#endif
+		return res->second;
 	}
 
 	/**
      * @return The constant part of the polynomial compared by this constraint.
      */
 	typename Pol::NumberType constantPart() const {
-		return mLhs.constantPart();
+		return lhs().constantPart();
 	}
 
 	/**
@@ -126,26 +210,13 @@ public:
 	}
 
 	/**
-     * @param _variable The variable to find variable information for.
-     * @param gatherCoeff
-     * @return The whole variable information object.
-     * Note, that if the given variable is not in this constraints, this method fails.
-     * Furthermore, the variable information returned do provide coefficients only, if
-     * the given flag gatherCoeff is set to true.
-     */
-	template<bool gatherCoeff = false>
-	const auto varInfo(const Variable _variable) const {
-		return mLhs.template getVarInfo<gatherCoeff>(_variable);
-	}
-
-	/**
      * Checks if the given variable occurs in the constraint.
      * @param _var  The variable to check for.
      * @return true, if the given variable occurs in the constraint;
      *          false, otherwise.
      */
 	bool hasVariable(const Variable _var) const {
-		return mLhs.has(_var);
+		return variables().has(_var);
 	}
 
 	/**
@@ -186,9 +257,9 @@ public:
 	bool isBound(bool negated = false) const {
 		if (variables().size() != 1 || maxDegree(variables().as_vector()[0]) != 1) return false;
 		if (negated) {
-			return mRelation != Relation::EQ;
+			return relation() != Relation::EQ;
 		} else {
-			return mRelation != Relation::NEQ;
+			return relation() != Relation::NEQ;
 		}
 	}
 
@@ -197,13 +268,13 @@ public:
      */
 	bool isLowerBound() const {
 		if (isBound()) {
-			if (mRelation == Relation::EQ) return true;
-			const typename Pol::NumberType& coeff = mLhs.lterm().coeff();
+			if (relation() == Relation::EQ) return true;
+			const typename Pol::NumberType& coeff = lhs().lterm().coeff();
 			if (coeff < 0)
-				return (mRelation == Relation::LEQ || mRelation == Relation::LESS);
+				return (relation() == Relation::LEQ || relation() == Relation::LESS);
 			else {
 				assert(coeff > 0);
-				return (mRelation == Relation::GEQ || mRelation == Relation::GREATER);
+				return (relation() == Relation::GEQ || relation() == Relation::GREATER);
 			}
 		}
 		return false;
@@ -214,13 +285,13 @@ public:
      */
 	bool isUpperBound() const {
 		if (isBound()) {
-			if (mRelation == Relation::EQ) return true;
-			const typename Pol::NumberType& coeff = mLhs.lterm().coeff();
+			if (relation() == Relation::EQ) return true;
+			const typename Pol::NumberType& coeff = lhs().lterm().coeff();
 			if (coeff > 0)
-				return (mRelation == Relation::LEQ || mRelation == Relation::LESS);
+				return (relation() == Relation::LEQ || relation() == Relation::LESS);
 			else {
 				assert(coeff < 0);
-				return (mRelation == Relation::GEQ || mRelation == Relation::GREATER);
+				return (relation() == Relation::GEQ || relation() == Relation::GREATER);
 			}
 		}
 		return false;
@@ -234,9 +305,7 @@ public:
      *          2, if the constraint still contains variables.
      */
 	unsigned isConsistent() const {
-		if (mLhs == RawConstraint<Pol>(false).mLhs && mRelation == RawConstraint<Pol>(false).mRelation) return 0;
-		else if (mLhs == RawConstraint<Pol>(true).mLhs && mRelation == RawConstraint<Pol>(true).mRelation) return 1;
-		else return 2;
+		return m_element->m_constraint.is_consistent();
 	}
 
 	/**
@@ -291,35 +360,16 @@ public:
 	bool isPseudoBoolean() const;
 
 	template<typename P>
-	friend const Factors<P>& factorization(const Constraint<P>& c);
-
-	template<typename P>
 	friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs);
+	template<typename P>
+	friend bool operator<(const Constraint<P>& lhs, const Constraint<P>& rhs);
+	template<typename P>
+	friend std::ostream& operator<<(std::ostream& os, const Constraint<P>& c);
 };
-
-template <typename Pol>
-const Factors<Pol>& factorization(const Constraint<Pol>& c) {
-	// return carl::factorization(c.lhs());
-	if (c.mFactorization.empty()) {
-		c.mFactorization = carl::factorization(c.lhs());
-	}
-	return c.mFactorization;
-}
 
 template<typename P>
 bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs) {
-	return lhs.hash() == rhs.hash() && lhs.relation() == rhs.relation() && lhs.lhs() == rhs.lhs();
-	// if (lhs.hash() == rhs.hash() && lhs.relation() == rhs.relation() && lhs.lhs() == rhs.lhs()) {
-	// 	if (lhs.mFactorization.empty()) {
-	// 		lhs.mFactorization = rhs.mFactorization;
-	// 	} else {
-	// 		rhs.mFactorization = lhs.mFactorization;
-	// 	}
-	// 	return true;
-	// }
-	//  else {
-	// 	return false;
-	// }
+	return lhs.m_element.id() == rhs.m_element.id();
 }
 
 template<typename P>
@@ -329,8 +379,7 @@ bool operator!=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
 
 template<typename P>
 bool operator<(const Constraint<P>& lhs, const Constraint<P>& rhs) {
-	return lhs.hash() < rhs.hash() || (lhs.hash() == rhs.hash() && (lhs.relation() < rhs.relation() || (lhs.relation() == rhs.relation() && lhs.lhs() < rhs.lhs()))); 
-	// return lhs.lhs() < rhs.lhs() || (lhs.lhs() == rhs.lhs() && lhs.relation() < rhs.relation());
+	return lhs.m_element.id() < rhs.m_element.id();
 }
 
 template<typename P>
@@ -357,7 +406,7 @@ bool operator>=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
  */
 template<typename Poly>
 std::ostream& operator<<(std::ostream& os, const Constraint<Poly>& c) {
-	return os << c.lhs() << " " << c.relation() << " 0";
+	return os << c.m_element->m_constraint;
 }
 
 const signed A_IFF_B = 2;
@@ -393,7 +442,7 @@ unsigned satisfiedBy(const Constraint<Pol>&, const EvaluationMap<typename Pol::N
 
 template<typename Pol>
 void variables(const Constraint<Pol>& c, carlVariables& vars) {
-	variables(c.lhs(), vars);
+	vars.add(c.variables().begin(), c.variables().end());
 }
 
 } // namespace carl
@@ -406,11 +455,11 @@ namespace std {
 template<typename Pol>
 struct hash<carl::Constraint<Pol>> {
 	/**
-     * @param _constraint The constraint to get the hash for.
+     * @param constraint The constraint to get the hash for.
      * @return The hash of the given constraint.
      */
-	std::size_t operator()(const carl::Constraint<Pol>& _constraint) const {
-		return _constraint.hash();
+	std::size_t operator()(const carl::Constraint<Pol>& constraint) const {
+		return constraint.hash();
 	}
 };
 
@@ -420,12 +469,12 @@ struct hash<carl::Constraint<Pol>> {
 template<typename Pol>
 struct hash<std::vector<carl::Constraint<Pol>>> {
 	/**
-     * @param _arg The vector of constraints to get the hash for.
+     * @param arg The vector of constraints to get the hash for.
      * @return The hash of the given vector of constraints.
      */
-	std::size_t operator()(const std::vector<carl::Constraint<Pol>>& _arg) const {
-		std::size_t seed = _arg.size();
-		for(auto& c : _arg) {
+	std::size_t operator()(const std::vector<carl::Constraint<Pol>>& arg) const {
+		std::size_t seed = arg.size();
+		for(auto& c : arg) {
 			seed ^= std::hash<carl::Constraint<Pol>>()(c) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 		}
 		return seed;
