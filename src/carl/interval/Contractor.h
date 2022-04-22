@@ -2,7 +2,7 @@
 
 #include "../core/MultivariatePolynomial.h"
 #include "../core/Variables.h"
-#include "../formula/Constraint.h"
+#include "../formula/arithmetic/Constraint.h"
 #include "Interval.h"
 #include "IntervalEvaluation.h"
 #include "set_theory.h"

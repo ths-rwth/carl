@@ -2,7 +2,7 @@
 
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"
-#include "../../formula/Constraint.h"
+#include "../../constraint/BasicConstraint.h"
 
 namespace carl {
 
@@ -49,7 +49,7 @@ std::size_t complexity(const UnivariatePolynomial<Coeff>& p) {
  * @return An approximation of the complexity of this constraint.
  */
 template<typename Poly>
-std::size_t complexity(const Constraint<Poly>& c) {
+std::size_t complexity(const BasicConstraint<Poly>& c) {
 	return 1 + complexity(c.lhs());
 }
 

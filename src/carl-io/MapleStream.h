@@ -6,7 +6,7 @@
 #include <carl/core/Term.h>
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/Variable.h>
-#include <carl/formula/Constraint.h>
+#include <carl/formula/arithmetic/Constraint.h>
 #include <carl/formula/Formula.h>
 #include <carl/formula/Logic.h>
 #include <carl/formula/Sort.h>

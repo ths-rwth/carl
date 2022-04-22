@@ -151,7 +151,7 @@ namespace std {
 template<typename Pol>
 struct hash<carl::BasicConstraint<Pol>> {
 	/**
-     * @param _constraint The constraint to get the hash for.
+     * @param constraint The constraint to get the hash for.
      * @return The hash of the given constraint.
      */
 	std::size_t operator()(const carl::BasicConstraint<Pol>& constraint) const {

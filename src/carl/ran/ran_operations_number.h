@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../carl/util/SFINAE.h"
-#include "../../carl/formula/Constraint.h"
+#include "../../carl/formula/arithmetic/Constraint.h"
 #include "../../carl/core/polynomialfunctions/Substitution.h"
 
 

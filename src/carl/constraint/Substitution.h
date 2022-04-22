@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../formula/Constraint.h"
+#include "BasicConstraint.h"
 
 #include <optional>
 
@@ -15,17 +15,19 @@ namespace carl {
  *         false, otherwise.
  */
 template<typename Pol>
-std::optional<std::pair<Variable, Pol>> get_substitution(const Constraint<Pol>& c, bool _negated = false, Variable _exclude = carl::Variable::NO_VARIABLE) {
+std::optional<std::pair<Variable, Pol>> get_substitution(const BasicConstraint<Pol>& c, bool _negated = false, Variable _exclude = carl::Variable::NO_VARIABLE, std::optional<VariablesInformation<true, Pol>> var_info = std::nullopt) {
+	if (var_info == std::nullopt) {
+		var_info = c.lhs().template getVarInfo<true>();
+	}
 	if ((!_negated && c.relation() != Relation::EQ) || (_negated && c.relation() != Relation::NEQ))
 		return std::nullopt;
-	for (const auto& var : variables(c)) {
-		if (var == _exclude) continue;
-		auto vi = c.template varInfo<true>(var);
-		if (vi.maxDegree() == 1) {
-			auto d = vi.coeffs().find(1);
-			assert(d != vi.coeffs().end());
-			if (d->second.isConstant() && (var.type() != carl::VariableType::VT_INT || carl::isOne(carl::abs(d->second.constantPart())))) {
-				return std::make_pair(var, (Pol(var) * d->second - c.lhs()) / d->second.constantPart());
+	for (const auto& e : *var_info) {
+		if (e.first == _exclude) continue;
+		if (e.second.maxDegree() == 1) {
+			auto d = e.second.coeffs().find(1);
+			assert(d != e.second.coeffs().end());
+			if (d->second.isConstant() && (e.first.type() != carl::VariableType::VT_INT || carl::isOne(carl::abs(d->second.constantPart())))) {
+				return std::make_pair(e.first, (Pol(e.first) * d->second - c.lhs()) / d->second.constantPart());
 			}
 		}
 	}
@@ -33,7 +35,7 @@ std::optional<std::pair<Variable, Pol>> get_substitution(const Constraint<Pol>& 
 }
 
 template<typename Pol>
-std::optional<std::pair<Variable, typename Pol::NumberType>> get_assignment(const Constraint<Pol>& c) {
+std::optional<std::pair<Variable, typename Pol::NumberType>> get_assignment(const BasicConstraint<Pol>& c) {
 	if (c.relation() != Relation::EQ) return std::nullopt;
 	if (c.lhs().nrTerms() > 2) return std::nullopt;
 	if (c.lhs().nrTerms() == 0) return std::nullopt;

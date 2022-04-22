@@ -19,7 +19,10 @@
 #include "../interval/IntervalEvaluation.h"
 #include "../util/Common.h"
 #include "config.h"
-#include "../core/constraint/Simplification.h"
+#include "../constraint/Simplification.h"
+#include "../constraint/Comparison.h"
+#include "../constraint/Evaluation.h"
+#include "../constraint/Substitution.h"
 #include "../datastructures/Pool.h"
 
 #include <cassert>
@@ -37,13 +40,6 @@ template<typename Poly>
 using Constraints = std::set<Constraint<Poly>, carl::less<Constraint<Poly>, false>>;
 
 template<typename Pol>
-using VarInfo = VariableInformation<true, Pol>;
-
-template<typename Pol>
-using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
-
-
-template<typename Pol>
 struct CachedConstraintContent {
 	/// Basic constraint.
 	BasicConstraint<Pol> m_constraint;
@@ -52,7 +48,7 @@ struct CachedConstraintContent {
 	/// A container which includes all variables occurring in the polynomial considered by this constraint.
 	mutable carlVariables m_variables;
 	/// A map which stores information about properties of the variables in this constraint.
-	mutable VarInfoMap<Pol> m_var_info_map;
+	mutable VariablesInformation<true, Pol> m_var_info_map;
 	#ifdef THREAD_SAFE
 	/// Mutex for access to variable information map.
 	std::mutex m_var_info_map_mutex;
@@ -87,6 +83,8 @@ public:
 
 	explicit Constraint(const Pol& lhs, Relation rel) : m_element(constraint::create_normalized_constraint(lhs,rel)) {}
 
+	explicit Constraint(const BasicConstraint<Pol>& constraint) : m_element(constraint::create_normalized_constraint(constraint.lhs(),constraint.relation())) {}
+
 	Constraint(const Constraint& constraint) : m_element(constraint.m_element) {}
 
 	Constraint(Constraint&& constraint) noexcept : m_element(std::move(constraint.m_element)) {}
@@ -99,6 +97,18 @@ public:
 	Constraint& operator=(Constraint&& constraint) noexcept {
 		m_element = std::move(constraint.m_element);
 		return *this;
+	}
+
+	operator const BasicConstraint<Pol>& () const {
+		return m_element->m_constraint;
+	}
+
+	operator BasicConstraint<Pol> () const {
+		return m_element->m_constraint;
+	}
+
+	const BasicConstraint<Pol>& constr() const {
+		return m_element->m_constraint;
 	}
 
 	/**
@@ -165,20 +175,26 @@ public:
      * the given flag gatherCoeff is set to true.
      */
 	template<bool gatherCoeff = false>
-	const auto varInfo(const Variable variable) const {
+	const VariableInformation<true, Pol>& varInfo(const Variable variable) const {
 		#ifdef THREAD_SAFE
 		m_element->m_var_info_map_mutex.lock();
 		#endif
-		auto res = m_element->m_var_info_map.find(variable);
-		if (res == m_element->m_var_info_map.end() || (gatherCoeff && !res->second.hasCoeff())) {
-			m_element->m_var_info_map[variable] = lhs().template getVarInfo<gatherCoeff>(variable);
-			res = m_element->m_var_info_map.find(variable);
-			assert(res != m_element->m_var_info_map.end());
+		if (!m_element->m_var_info_map.occurs(variable) || (gatherCoeff && !m_element->m_var_info_map.getVarInfo(variable)->hasCoeff())) {
+			m_element->m_var_info_map.data()[variable] = lhs().template getVarInfo<gatherCoeff>(variable);
+			assert(m_element->m_var_info_map.occurs(variable) );
 		}
 		#ifdef THREAD_SAFE
 		m_element->m_var_info_map_mutex.unlock();
 		#endif
-		return res->second;
+		return *m_element->m_var_info_map.getVarInfo(variable);
+	}
+
+	template<bool gatherCoeff = false>
+	const VariablesInformation<true, Pol>& varInfo() const {
+		for (const auto& var : variables()) {
+			varInfo<gatherCoeff>(var);
+		}
+		return m_element->m_var_info_map;
 	}
 
 	/**
@@ -409,41 +425,24 @@ std::ostream& operator<<(std::ostream& os, const Constraint<Poly>& c) {
 	return os << c.m_element->m_constraint;
 }
 
-const signed A_IFF_B = 2;
-const signed A_IMPLIES_B = 1;
-const signed B_IMPLIES_A = -1;
-const signed NOT__A_AND_B = -2;
-const signed A_AND_B__IFF_C = -3;
-const signed A_XOR_B = -4;
-
-/**
- * Compares _constraintA with _constraintB.
- * @return  2, if it is easy to decide that _constraintA and _constraintB have the same solutions. _constraintA = _constraintB
- *           1, if it is easy to decide that _constraintB includes all solutions of _constraintA;   _constraintA -> _constraintB
- *          -1, if it is easy to decide that _constraintA includes all solutions of _constraintB;   _constraintB -> _constraintA
- *          -2, if it is easy to decide that _constraintA has no solution common with _constraintB; not(_constraintA and _constraintB)
- *          -3, if it is easy to decide that _constraintA and _constraintB can be intersected;      _constraintA and _constraintB = _constraintC
- *          -4, if it is easy to decide that _constraintA is the inverse of _constraintB;           _constraintA xor _constraintB
- *           0, otherwise.
- */
-template<typename Pol>
-signed compare(const Constraint<Pol>& _constraintA, const Constraint<Pol>& _constraintB);
-
-/**
- * Checks whether the given assignment satisfies this constraint.
- * @param _assignment The assignment.
- * @return 1, if the given assignment satisfies this constraint.
- *          0, if the given assignment contradicts this constraint.
- *          2, otherwise (possibly not defined for all variables in the constraint,
- *                       even then it could be possible to obtain the first two results.)
- */
-template<typename Pol>
-unsigned satisfiedBy(const Constraint<Pol>&, const EvaluationMap<typename Pol::NumberType>& _assignment);
 
 template<typename Pol>
 void variables(const Constraint<Pol>& c, carlVariables& vars) {
 	vars.add(c.variables().begin(), c.variables().end());
 }
+
+template<typename Pol>
+std::optional<std::pair<Variable, Pol>> get_substitution(const Constraint<Pol>& c, bool _negated = false, Variable _exclude = carl::Variable::NO_VARIABLE) {
+	return get_substitution(c.constr(), _negated, _exclude, std::optional(c.varInfo()));
+}
+
+// implicit conversions do not work for template argument deduction
+template<typename Pol>
+auto get_assignment(const Constraint<Pol>& c) { return get_assignment(c.constr()); }
+template<typename Pol>
+auto compare(const Constraint<Pol>& c1, const Constraint<Pol>& c2) { return compare(c1.constr(), c2.constr()); }
+template<typename Pol>
+auto satisfiedBy(const Constraint<Pol>& c, const EvaluationMap<typename Pol::NumberType>& a) { return satisfiedBy(c.constr(), a); }
 
 } // namespace carl
 

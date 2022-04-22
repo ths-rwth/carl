@@ -12,7 +12,7 @@
 #include "../core/Monomial.h"
 #include "../core/Term.h"
 #include "../core/MultivariatePolynomial.h"
-//#include "../formula/Constraint.h"
+//#include "../formula/arithmetic/Constraint.h"
 
 #include <boost/logic/tribool_io.hpp>
 

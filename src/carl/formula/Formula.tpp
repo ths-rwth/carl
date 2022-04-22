@@ -98,7 +98,7 @@ namespace carl
                     case FormulaType::FALSE:
                         break;
                     case FormulaType::CONSTRAINT:
-                        result += carl::complexity(_f.constraint()); break;
+                        result += carl::complexity(_f.constraint().constr()); break;
                     case FormulaType::BITVECTOR:
                         result += _f.bvConstraint().complexity(); break;
                     case FormulaType::UEQ:

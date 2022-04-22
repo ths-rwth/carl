@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BasicConstraint.h"
-#include "../polynomialfunctions/Definiteness.h"
+#include "../core/polynomialfunctions/Definiteness.h"
 
 namespace carl::constraint {
 

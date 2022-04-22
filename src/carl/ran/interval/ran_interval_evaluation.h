@@ -3,7 +3,7 @@
 #include <carl/interval/Interval.h>
 #include <carl/interval/IntervalEvaluation.h>
 #include <carl/interval/evaluate.h>
-#include <carl/formula/Constraint.h>
+#include <carl/formula/arithmetic/Constraint.h>
 
 #include "ran_interval.h"
 #include "AlgebraicSubstitution.h"

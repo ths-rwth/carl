@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <carl/formula/Formula.h>
-#include <carl/core/polynomialfunctions/Substitution_Constraint.h>
+#include <carl/constraint/Substitution.h>
 #include <carl-model/Model.h>
 #include <carl-model/evaluation/ModelEvaluation.h>
 

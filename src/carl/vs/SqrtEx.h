@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <carl/formula/Constraint.h>
+#include <carl/formula/arithmetic/Constraint.h>
 
 #include <carl/core/Variable.h>
 #include <carl/numbers/numbers.h>

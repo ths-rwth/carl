@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Model.h"
-#include <carl/formula/Constraint.h>
+#include <carl/formula/arithmetic/Constraint.h>
 #include <carl/formula/Formula.h>
 
 #include "ModelEvaluation_Polynomial.h"
