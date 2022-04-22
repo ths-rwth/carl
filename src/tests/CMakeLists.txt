@@ -27,6 +27,8 @@ add_subdirectory(groebner)
 add_subdirectory(interval)
 add_subdirectory(benchmarks)
 add_subdirectory(pycarl)
+add_subdirectory(poly)
+
 # Only for debugging.
 #add_subdirectory(debug)
 
