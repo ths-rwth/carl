@@ -27,7 +27,7 @@ template<typename Poly>
 static bool gather_zeros(const Constraint<Poly>& constraint, const Variable& eliminationVar, std::vector<zero<Poly>>& results) {
 	using Rational = typename Poly::NumberType;
     
-    if (!constraint.hasVariable(eliminationVar)) {
+    if (!constraint.variables().has(eliminationVar)) {
 		return true;
 	}
 

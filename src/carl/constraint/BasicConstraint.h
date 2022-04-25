@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../core/Relation.h"
+
 namespace carl {
 
 #define CONSTRAINT_HASH(_lhs, _rel, _type) (size_t)((size_t)(std::hash<_type>()(_lhs) << 3) ^ (size_t)_rel)

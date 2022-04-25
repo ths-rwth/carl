@@ -559,13 +559,13 @@ namespace carl
         bool multipliedByMinusOne = lhs.lterm().coeff() < typename Pol::NumberType( 0 );
         if( multipliedByMinusOne )
         {
-            boundValue = constraint.constantPart();
+            boundValue = constraint.lhs().constantPart();
             relation = carl::turn_around( relation );
             poly = Pol( -lhs + boundValue );
         }
         else
         {
-            boundValue = -constraint.constantPart();
+            boundValue = -constraint.lhs().constantPart();
             poly = Pol( lhs + boundValue );
         }
         typename Pol::NumberType cf( poly.coprimeFactor() );

@@ -9,21 +9,20 @@
 
 #pragma once
 
+#include "../../config.h"
+#include "../../core/VariableInformation.h"
+#include "../../core/Variables.h"
+#include "../../core/VariablesInformation.h"
+#include "../../core/polynomialfunctions/Factorization.h"
+#include "../../interval/Interval.h"
+#include "../../interval/IntervalEvaluation.h"
+#include "../../util/Common.h"
 #include "../config.h"
-#include "../core/Relation.h"
-#include "../core/VariableInformation.h"
-#include "../core/Variables.h"
-#include "../core/VariablesInformation.h"
-#include "../core/polynomialfunctions/Factorization.h"
-#include "../interval/Interval.h"
-#include "../interval/IntervalEvaluation.h"
-#include "../util/Common.h"
-#include "config.h"
-#include "../constraint/Simplification.h"
-#include "../constraint/Comparison.h"
-#include "../constraint/Evaluation.h"
-#include "../constraint/Substitution.h"
-#include "../datastructures/Pool.h"
+#include "../../constraint/Simplification.h"
+#include "../../constraint/Comparison.h"
+#include "../../constraint/Evaluation.h"
+#include "../../constraint/Substitution.h"
+#include "../../datastructures/Pool.h"
 
 #include <cassert>
 #include <cstring>
@@ -198,25 +197,18 @@ public:
 	}
 
 	/**
-     * @return The constant part of the polynomial compared by this constraint.
-     */
-	typename Pol::NumberType constantPart() const {
-		return lhs().constantPart();
-	}
-
-	/**
      * @param _variable The variable for which to determine the maximal degree.
      * @return The maximal degree of the given variable in this constraint. (Monomial-wise)
      */
-	uint maxDegree(const Variable& _variable) const {
-		if (!hasVariable(_variable)) return 0;
+	uint maxDegree(const Variable& _variable) const { // TODO remove
+		if (!variables().has(_variable)) return 0;
 		else return varInfo(_variable).maxDegree();
 	}
 
 	/**
      * @return The maximal degree of all variables in this constraint. (Monomial-wise)
      */
-	uint maxDegree() const {
+	uint maxDegree() const { // TODO move?
 		uint result = 0;
 		for (const auto& var : variables()) {
 			uint deg = maxDegree(var);
@@ -226,26 +218,16 @@ public:
 	}
 
 	/**
-     * Checks if the given variable occurs in the constraint.
-     * @param _var  The variable to check for.
-     * @return true, if the given variable occurs in the constraint;
-     *          false, otherwise.
-     */
-	bool hasVariable(const Variable _var) const {
-		return variables().has(_var);
-	}
-
-	/**
      * @return true, if it contains only integer valued variables.
      */
-	bool integerValued() const {
+	bool integerValued() const { // TODO move
 		return variables().filter(variable_type_filter::excluding({carl::VariableType::VT_INT})).size() == 0;
 	}
 
 	/**
      * @return true, if it contains only real valued variables.
      */
-	bool realValued() const {
+	bool realValued() const { // TODO move
 		return variables().filter(variable_type_filter::excluding({carl::VariableType::VT_REAL})).size() == 0;
 	}
 
@@ -254,7 +236,7 @@ public:
      * @return true, if it does;
      *          false, otherwise.
      */
-	bool hasIntegerValuedVariable() const {
+	bool hasIntegerValuedVariable() const { // TODO move
 		return !variables().integer().empty();
 	}
 
@@ -263,14 +245,14 @@ public:
      * @return true, if it does;
      *          false, otherwise.
      */
-	bool hasRealValuedVariable() const {
+	bool hasRealValuedVariable() const { // TODO move
 		return !variables().real().empty();
 	}
 
 	/**
      * @return true, if this constraint is a bound.
      */
-	bool isBound(bool negated = false) const {
+	bool isBound(bool negated = false) const { // TODO move
 		if (variables().size() != 1 || maxDegree(variables().as_vector()[0]) != 1) return false;
 		if (negated) {
 			return relation() != Relation::EQ;
@@ -282,7 +264,7 @@ public:
 	/**
      * @return true, if this constraint is a lower bound.
      */
-	bool isLowerBound() const {
+	bool isLowerBound() const { // TODO move
 		if (isBound()) {
 			if (relation() == Relation::EQ) return true;
 			const typename Pol::NumberType& coeff = lhs().lterm().coeff();
@@ -299,7 +281,7 @@ public:
 	/**
      * @return true, if this constraint is an upper bound.
      */
-	bool isUpperBound() const {
+	bool isUpperBound() const { // TODO move
 		if (isBound()) {
 			if (relation() == Relation::EQ) return true;
 			const typename Pol::NumberType& coeff = lhs().lterm().coeff();
@@ -332,7 +314,7 @@ public:
      *          0, if this constraint is not consistent with the given intervals;
      *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
      */
-	unsigned consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval) const;
+	unsigned consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval) const; // TODO move
 
 	/**
      * Checks whether this constraint is consistent with the given assignment from 
@@ -344,7 +326,7 @@ public:
      *          0, if this constraint is not consistent with the given intervals;
      *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
      */
-	unsigned consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation) const;
+	unsigned consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation) const; // TODO move
 
 	/**
      * @param _var The variable to check the size of its solution set for.
@@ -352,7 +334,7 @@ public:
      *                in the given variable;
      *          false, otherwise.
      */
-	bool hasFinitelyManySolutionsIn(const Variable& _var) const;
+	bool hasFinitelyManySolutionsIn(const Variable& _var) const; // TODO move
 
 	/**
      * Calculates the coefficient of the given variable with the given degree. Note, that it only
@@ -361,9 +343,13 @@ public:
      * @param _degree The according degree of the variable for which to calculate the coefficient.
      * @return The ith coefficient of the given variable, where i is the given degree.
      */
-	Pol coefficient(const Variable& _var, uint _degree) const;
+	Pol coefficient(const Variable& _var, uint _degree) const { // TODO move
+		auto& vi = varInfo<true>(_var);
+		auto d = vi.coeffs().find(_degree);
+		return d != vi.coeffs().end() ? d->second : Pol(typename Pol::NumberType(0));
+	}
 
-	Constraint negation() const {
+	Constraint negation() const { // TODO implement for BasicConstraint as well
 		CARL_LOG_DEBUG("carl.formula.constraint", "negation of " << *this << " is " << Constraint(lhs(), carl::inverse(relation())));
 		return Constraint(lhs(), carl::inverse(relation()));
 	}
@@ -373,7 +359,9 @@ public:
      *
      * @return True if this constraint is pseudo-boolean. False otherwise.
      */
-	bool isPseudoBoolean() const;
+	bool isPseudoBoolean() const { // TODO move
+		return !variables().boolean().empty();
+	}
 
 	template<typename P>
 	friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs);
@@ -413,7 +401,6 @@ bool operator>=(const Constraint<P>& lhs, const Constraint<P>& rhs) {
 	return rhs <= lhs;
 }
 
-
 /**
  * Prints the given constraint on the given stream.
  * @param os The stream to print the given constraint on.
@@ -424,7 +411,6 @@ template<typename Poly>
 std::ostream& operator<<(std::ostream& os, const Constraint<Poly>& c) {
 	return os << c.m_element->m_constraint;
 }
-
 
 template<typename Pol>
 void variables(const Constraint<Pol>& c, carlVariables& vars) {

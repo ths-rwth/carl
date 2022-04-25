@@ -605,7 +605,7 @@ namespace carl::vs::detail
     {
         
         bool result = true;
-        if( _cons.hasVariable( _subs.variable() ) )
+        if( _cons.variables().has( _subs.variable() ) )
         {
             // Collect all necessary left hand sides to create the new conditions of all cases referring to the virtual substitution.
             if( carl::pow( smtrat::Rational(smtrat::Rational(_subs.term().sqrt_ex().constantPart().size()) + smtrat::Rational(_subs.term().sqrt_ex().factor().size()) * smtrat::Rational(_subs.term().sqrt_ex().radicand().size())), _cons.maxDegree( _subs.variable() )) > (MAX_NUM_OF_TERMS*MAX_NUM_OF_TERMS) )
@@ -994,7 +994,7 @@ namespace carl::vs::detail
                                  Variables& _conflictingVariables,
                                  const detail::EvalDoubleIntervalMap& _solutionSpace )
     {
-        assert( _cons.hasVariable( _subs.variable() ) );
+        assert( _cons.variables().has( _subs.variable() ) );
         // Create a substitution formed by the given one without an addition of epsilon.
         auto term = Term<Poly>::normal(_subs.term().sqrt_ex());
         // Call the method substituteNormal with the constraint f(x)~0 and the substitution [x -> t],  where the parameter relation is ~.

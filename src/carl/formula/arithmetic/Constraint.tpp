@@ -8,9 +8,8 @@
  */
 
 #include "Constraint.h"
-#include "../core/polynomialfunctions/Definiteness.h"
-#include "../core/polynomialfunctions/Factorization.h"
-#include "../core/polynomialfunctions/Substitution.h"
+#include "../../core/polynomialfunctions/Factorization.h"
+#include "../../core/polynomialfunctions/Substitution.h"
 
 namespace carl {
 
@@ -18,7 +17,7 @@ template<typename Pol>
 unsigned Constraint<Pol>::consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval) const {
 	auto vars = variables();
 	if (vars.empty())
-		return carl::evaluate(constantPart(), relation()) ? 1 : 0;
+		return carl::evaluate(lhs().constantPart(), relation()) ? 1 : 0;
 	else {
 		auto varIter = vars.begin();
 		auto varIntervalIter = _solutionInterval.begin();
@@ -108,7 +107,7 @@ unsigned Constraint<Pol>::consistentWith(const EvaluationMap<Interval<double>>& 
 	_stricterRelation = relation();
 	auto vars = variables();
 	if (vars.empty())
-		return carl::evaluate(constantPart(), relation()) ? 1 : 0;
+		return carl::evaluate(lhs().constantPart(), relation()) ? 1 : 0;
 	else {
 		auto varIter = vars.begin();
 		auto varIntervalIter = _solutionInterval.begin();
@@ -214,7 +213,7 @@ unsigned Constraint<Pol>::consistentWith(const EvaluationMap<Interval<double>>& 
 
 template<typename Pol>
 bool Constraint<Pol>::hasFinitelyManySolutionsIn(const Variable& _var) const {
-	if (hasVariable(_var))
+	if (variables().has(_var))
 		return true;
 	if (relation() == Relation::EQ) {
 		if (variables().size() == 1)
@@ -223,19 +222,6 @@ bool Constraint<Pol>::hasFinitelyManySolutionsIn(const Variable& _var) const {
 	}
 	return false;
 }
-
-template<typename Pol>
-Pol Constraint<Pol>::coefficient(const Variable& _var, uint _degree) const {
-	auto& vi = varInfo<true>(_var);
-	auto d = vi.coeffs().find(_degree);
-	return d != vi.coeffs().end() ? d->second : Pol(typename Pol::NumberType(0));
-}
-
-template<typename Pol>
-bool Constraint<Pol>::isPseudoBoolean() const {
-	return !variables().boolean().empty();
-}
-
 
 
 } // namespace carl
