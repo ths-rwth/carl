@@ -3,6 +3,7 @@
 
 #include <carl/core/polynomialfunctions/Derivative.h>
 #include <carl/core/polynomialfunctions/SoSDecomposition.h>
+#include <carl/constraint/IntervalEvaluation.h>
 
 //#define VS_DEBUG_SUBSTITUTION
 const unsigned MAX_NUM_OF_TERMS = 512;
@@ -117,7 +118,7 @@ namespace carl::vs::detail
                     cons = (*conj).erase( cons );
                 else
                 {
-                    unsigned conflictingWithSolutionSpace = cons->consistentWith( _solutionSpace );
+                    unsigned conflictingWithSolutionSpace = consistentWith(cons->constr(), _solutionSpace );
                     
 //                    std::cout << "Is  " << cons << std::endl;
 //                    std::cout << std::endl;

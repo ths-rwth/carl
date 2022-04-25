@@ -1,12 +1,3 @@
-/**
- * Constraint.h
- * @author Florian Corzilius<corzilius@cs.rwth-aachen.de>
- * @author Sebastian Junges
- * @author Ulrich Loup
- * @since 2010-04-26
- * @version 2014-10-30
- */
-
 #pragma once
 
 #include "../../config.h"
@@ -14,8 +5,6 @@
 #include "../../core/Variables.h"
 #include "../../core/VariablesInformation.h"
 #include "../../core/polynomialfunctions/Factorization.h"
-#include "../../interval/Interval.h"
-#include "../../interval/IntervalEvaluation.h"
 #include "../../util/Common.h"
 #include "../config.h"
 #include "../../constraint/Simplification.h"
@@ -106,6 +95,9 @@ public:
 		return m_element->m_constraint;
 	}
 
+	/**
+	 * Returns the associated BasicConstraint.
+	 */
 	const BasicConstraint<Pol>& constr() const {
 		return m_element->m_constraint;
 	}
@@ -197,10 +189,27 @@ public:
 	}
 
 	/**
+     * Checks, whether the constraint is consistent.
+     * It differs between, containing variables, consistent, and inconsistent.
+     * @return 0, if the constraint is not consistent.
+     *          1, if the constraint is consistent.
+     *          2, if the constraint still contains variables.
+     */
+	unsigned isConsistent() const {
+		return m_element->m_constraint.is_consistent();
+	}
+
+	Constraint negation() const {
+		return Constraint(constr().negation());
+	}
+
+	/* (legacy) convenience methods */
+
+	/**
      * @param _variable The variable for which to determine the maximal degree.
      * @return The maximal degree of the given variable in this constraint. (Monomial-wise)
      */
-	uint maxDegree(const Variable& _variable) const { // TODO remove
+	uint maxDegree(const Variable& _variable) const {
 		if (!variables().has(_variable)) return 0;
 		else return varInfo(_variable).maxDegree();
 	}
@@ -208,7 +217,7 @@ public:
 	/**
      * @return The maximal degree of all variables in this constraint. (Monomial-wise)
      */
-	uint maxDegree() const { // TODO move?
+	uint maxDegree() const {
 		uint result = 0;
 		for (const auto& var : variables()) {
 			uint deg = maxDegree(var);
@@ -218,16 +227,29 @@ public:
 	}
 
 	/**
+     * Calculates the coefficient of the given variable with the given degree. Note, that it only
+     * computes the coefficient once and stores the result.
+     * @param _var The variable for which to calculate the coefficient.
+     * @param _degree The according degree of the variable for which to calculate the coefficient.
+     * @return The ith coefficient of the given variable, where i is the given degree.
+     */
+	Pol coefficient(const Variable& _var, uint _degree) const {
+		auto& vi = varInfo<true>(_var);
+		auto d = vi.coeffs().find(_degree);
+		return d != vi.coeffs().end() ? d->second : Pol(typename Pol::NumberType(0));
+	}
+
+	/**
      * @return true, if it contains only integer valued variables.
      */
-	bool integerValued() const { // TODO move
+	bool integerValued() const {
 		return variables().filter(variable_type_filter::excluding({carl::VariableType::VT_INT})).size() == 0;
 	}
 
 	/**
      * @return true, if it contains only real valued variables.
      */
-	bool realValued() const { // TODO move
+	bool realValued() const {
 		return variables().filter(variable_type_filter::excluding({carl::VariableType::VT_REAL})).size() == 0;
 	}
 
@@ -236,7 +258,7 @@ public:
      * @return true, if it does;
      *          false, otherwise.
      */
-	bool hasIntegerValuedVariable() const { // TODO move
+	bool hasIntegerValuedVariable() const {
 		return !variables().integer().empty();
 	}
 
@@ -245,8 +267,17 @@ public:
      * @return true, if it does;
      *          false, otherwise.
      */
-	bool hasRealValuedVariable() const { // TODO move
+	bool hasRealValuedVariable() const {
 		return !variables().real().empty();
+	}
+
+	/**
+     * Determines whether the constraint is pseudo-boolean.
+     *
+     * @return True if this constraint is pseudo-boolean. False otherwise.
+     */
+	bool isPseudoBoolean() const {
+		return !variables().boolean().empty();
 	}
 
 	/**
@@ -296,73 +327,22 @@ public:
 	}
 
 	/**
-     * Checks, whether the constraint is consistent.
-     * It differs between, containing variables, consistent, and inconsistent.
-     * @return 0, if the constraint is not consistent.
-     *          1, if the constraint is consistent.
-     *          2, if the constraint still contains variables.
-     */
-	unsigned isConsistent() const {
-		return m_element->m_constraint.is_consistent();
-	}
-
-	/**
-     * Checks whether this constraint is consistent with the given assignment from 
-     * the its variables to interval domains.
-     * @param _solutionInterval The interval domains of the variables.
-     * @return 1, if this constraint is consistent with the given intervals;
-     *          0, if this constraint is not consistent with the given intervals;
-     *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
-     */
-	unsigned consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval) const; // TODO move
-
-	/**
-     * Checks whether this constraint is consistent with the given assignment from 
-     * the its variables to interval domains.
-     * @param _solutionInterval The interval domains of the variables.
-     * @param _stricterRelation This relation is set to a relation R such that this constraint and the given variable bounds
-     *                           imply the constraint formed by R, comparing this constraint's left-hand side to zero.
-     * @return 1, if this constraint is consistent with the given intervals;
-     *          0, if this constraint is not consistent with the given intervals;
-     *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
-     */
-	unsigned consistentWith(const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation) const; // TODO move
-
-	/**
      * @param _var The variable to check the size of its solution set for.
      * @return true, if it is easy to decide whether this constraint has a finite solution set
      *                in the given variable;
      *          false, otherwise.
      */
-	bool hasFinitelyManySolutionsIn(const Variable& _var) const; // TODO move
-
-	/**
-     * Calculates the coefficient of the given variable with the given degree. Note, that it only
-     * computes the coefficient once and stores the result.
-     * @param _var The variable for which to calculate the coefficient.
-     * @param _degree The according degree of the variable for which to calculate the coefficient.
-     * @return The ith coefficient of the given variable, where i is the given degree.
-     */
-	Pol coefficient(const Variable& _var, uint _degree) const { // TODO move
-		auto& vi = varInfo<true>(_var);
-		auto d = vi.coeffs().find(_degree);
-		return d != vi.coeffs().end() ? d->second : Pol(typename Pol::NumberType(0));
+	bool hasFinitelyManySolutionsIn(const Variable& _var) const {
+		if (variables().has(_var))
+			return true;
+		if (relation() == Relation::EQ) {
+			if (variables().size() == 1)
+				return true;
+		}
+		return false;
 	}
 
-	Constraint negation() const { // TODO implement for BasicConstraint as well
-		CARL_LOG_DEBUG("carl.formula.constraint", "negation of " << *this << " is " << Constraint(lhs(), carl::inverse(relation())));
-		return Constraint(lhs(), carl::inverse(relation()));
-	}
-
-	/**
-     * Determines whether the constraint is pseudo-boolean.
-     *
-     * @return True if this constraint is pseudo-boolean. False otherwise.
-     */
-	bool isPseudoBoolean() const { // TODO move
-		return !variables().boolean().empty();
-	}
-
+	
 	template<typename P>
 	friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs);
 	template<typename P>
@@ -466,5 +446,3 @@ struct hash<std::vector<carl::Constraint<Pol>>> {
 	}
 };
 } // namespace std
-
-#include "Constraint.tpp"

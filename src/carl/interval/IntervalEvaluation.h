@@ -12,10 +12,6 @@
 #include "../core/Monomial.h"
 #include "../core/Term.h"
 #include "../core/MultivariatePolynomial.h"
-//#include "../formula/arithmetic/Constraint.h"
-
-#include <boost/logic/tribool_io.hpp>
-
 
 namespace carl
 {
@@ -46,9 +42,6 @@ public:
 	
 	template<typename PolynomialType, typename Number, class strategy>
 	static Interval<Number> evaluate(const MultivariateHorner<PolynomialType, strategy>& mvH, const std::map<Variable, Interval<Number>>& map);
-
-	//template<typename Poly>
-	//static boost::tribool evaluate(const Constraint<Poly>& c, const std::map<Variable, Interval<Numeric>>& map);
     
 private:
 
@@ -190,9 +183,6 @@ inline Interval<Number> IntervalEvaluation::evaluate(const MultivariateHorner<Po
 	return result;
 }
 
-//template<typename Poly>
-//static boost::tribool IntervalEvaluation::evaluate(const Constraint<Poly>& c, const std::map<Variable, Interval<Numeric>>& map) {
-//	return carl::evaluate(evaluate(c.lhs(), map), constr.relation());
-//}
+
 
 } //Namespace carl

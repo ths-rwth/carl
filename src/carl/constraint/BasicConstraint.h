@@ -94,6 +94,10 @@ public:
 		else if (is_trivial_true()) return 1;
 		else return 2;
 	}
+
+	BasicConstraint<Pol> negation() const {
+		return BasicConstraint<Pol>(lhs(), carl::inverse(relation()));
+	}
 };
 
 template<typename P>
