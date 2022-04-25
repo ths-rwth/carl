@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FactorizedPolynomial.h"
-#include <carl/interval/IntervalEvaluation.h>
+#include <carl/core/polynomialfunctions/IntervalEvaluation.h>
 
 namespace carl {
 

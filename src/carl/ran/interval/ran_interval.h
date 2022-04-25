@@ -10,7 +10,7 @@
 #include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
 
 #include <carl/interval/Interval.h>
-#include <carl/interval/IntervalEvaluation.h>
+#include <carl/core/polynomialfunctions/IntervalEvaluation.h>
 #include <carl/interval/set_theory.h>
 
 #include "../ran_common.h"

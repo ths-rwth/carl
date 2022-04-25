@@ -3,7 +3,7 @@
 #include "../util/Common.h"
 #include "BasicConstraint.h"
 #include "../interval/Interval.h"
-#include "../interval/IntervalEvaluation.h"
+#include "../core/polynomialfunctions/IntervalEvaluation.h"
 #include <boost/logic/tribool_io.hpp>
 
 namespace carl {
@@ -41,7 +41,7 @@ static unsigned consistentWith(const BasicConstraint<Pol>& c, const EvaluationMa
 		}
 		if (varIter != vars.end())
 			return 2;
-		Interval<double> solutionSpace = IntervalEvaluation::evaluate(c.lhs(), _solutionInterval);
+		Interval<double> solutionSpace = carl::evaluate(c.lhs(), _solutionInterval);
 		if (solutionSpace.isEmpty())
 			return 2;
 		switch (c.relation()) {
@@ -141,7 +141,7 @@ static unsigned consistentWith(const BasicConstraint<Pol>& c, const EvaluationMa
 		}
 		if (varIter != vars.end())
 			return 2;
-		Interval<double> solutionSpace = IntervalEvaluation::evaluate(c.lhs(), _solutionInterval);
+		Interval<double> solutionSpace = carl::evaluate(c.lhs(), _solutionInterval);
 		if (solutionSpace.isEmpty())
 			return 2;
 		switch (c.relation()) {

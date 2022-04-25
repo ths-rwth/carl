@@ -6,11 +6,11 @@
  */
 
 #pragma once
-#include "Interval.h"
-#include "set_theory.h"
+#include "../interval/Interval.h"
+#include "../interval/set_theory.h"
 #include "../core/Sign.h"
 #include "../core/MultivariateHorner.h"
-#include "IntervalEvaluation.h"
+#include "../core/polynomialfunctions/IntervalEvaluation.h"
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG
@@ -199,7 +199,7 @@ namespace carl {
                 std::vector<Interval<double>> result;
                 assert( intervals.find(mVar) != intervals.end() );
                 const Interval<double>& varInterval = intervals.at(mVar);
-                Interval<double> numerator = IntervalEvaluation::evaluate(mNumerator, intervals);
+                Interval<double> numerator = carl::evaluate(mNumerator, intervals);
 				CARL_LOG_DEBUG("carl.contraction", mNumerator << " -> " << numerator);
                 if (mDenominator == nullptr)
                 {
@@ -207,7 +207,7 @@ namespace carl {
 					CARL_LOG_DEBUG("carl.contraction", "no denominator -> " << result);
                     return result;
                 }
-                Interval<double> denominator = IntervalEvaluation::evaluate(*mDenominator, intervals);  
+                Interval<double> denominator = carl::evaluate(*mDenominator, intervals);  
 				CARL_LOG_DEBUG("carl.contraction", *mDenominator << " -> " << denominator);
                 Interval<double> result1, result2;
                 // divide:
@@ -526,8 +526,8 @@ namespace carl {
      
             
             // Create Newton Operator
-            numerator =   IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
-            denominator = IntervalEvaluation::evaluate(derivative, intervals);
+            numerator =   carl::evaluate(constraint, substitutedIntervalMap);
+            denominator = carl::evaluate(derivative, intervals);
 
 
             Interval<double> result1, result2;

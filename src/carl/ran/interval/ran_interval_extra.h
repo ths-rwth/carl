@@ -178,7 +178,7 @@ public:
 		}
 		CARL_LOG_TRACE("carl.ran", "Got intervals " << var_to_interval);
 		assert(!var_to_interval.empty());
-		Interval<Number> interval = IntervalEvaluation::evaluate(m_original_poly, var_to_interval);
+		Interval<Number> interval = carl::evaluate(m_original_poly, var_to_interval);
 
 		if (interval.isPointInterval()) {
 			return real_algebraic_number_interval<Number>(interval.lower());
@@ -202,7 +202,7 @@ public:
 					var_to_interval[var] = ran.interval();
 				}
 			}
-			interval = IntervalEvaluation::evaluate(m_original_poly, var_to_interval);
+			interval = carl::evaluate(m_original_poly, var_to_interval);
 		}
 		if (interval.isPointInterval()) {
 			return real_algebraic_number_interval<Number>(interval.lower());

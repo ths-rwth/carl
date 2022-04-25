@@ -1,7 +1,7 @@
 #pragma once
 
 #include <carl/interval/Interval.h>
-#include <carl/interval/IntervalEvaluation.h>
+#include <carl/core/polynomialfunctions/IntervalEvaluation.h>
 #include <carl/interval/evaluate.h>
 #include <carl/formula/arithmetic/Constraint.h>
 
@@ -71,7 +71,7 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 	}
 	
 	CARL_LOG_TRACE("carl.ran.evaluation", "Interval evaluation");
-	Interval<Number> interval = IntervalEvaluation::evaluate(p, var_to_interval);
+	Interval<Number> interval = carl::evaluate(p, var_to_interval);
 
 	if (interval.isPointInterval()) {
 		CARL_LOG_DEBUG("carl.ran.evaluation", "Interval is point interval " << interval);
@@ -124,7 +124,7 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 			}
 		}
 		CARL_LOG_TRACE("carl.ran.evaluation", "Interval evaluation");
-		interval = IntervalEvaluation::evaluate(p, var_to_interval);
+		interval = carl::evaluate(p, var_to_interval);
 	}
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Result is " << *res << " " << interval);
 	if (interval.isPointInterval()) {
@@ -182,7 +182,7 @@ boost::tribool evaluate(const Constraint<Poly>& c, const ran::ran_assignment_t<r
 			}
 		}
 
-		Interval<Number> interval = IntervalEvaluation::evaluate(p, var_to_interval);
+		Interval<Number> interval = carl::evaluate(p, var_to_interval);
 		{
 			CARL_LOG_TRACE("carl.ran.evaluation", "Interval evaluation of " << p << " under " << var_to_interval << " results in " << interval);
 			auto int_res = carl::evaluate(interval, constr.relation());
@@ -279,7 +279,7 @@ boost::tribool evaluate(const Constraint<Poly>& c, const ran::ran_assignment_t<r
 					var_to_interval[var] = ran.interval();
 				}
 			}
-			interval = IntervalEvaluation::evaluate(p, var_to_interval);
+			interval = carl::evaluate(p, var_to_interval);
 			auto int_res = carl::evaluate(interval, constr.relation());
 			if (!indeterminate(int_res)) {
 				CARL_LOG_DEBUG("carl.ran.evaluation", "Got result");

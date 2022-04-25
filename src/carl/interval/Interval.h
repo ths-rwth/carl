@@ -25,7 +25,6 @@
 
 #include "../core/Sign.h"
 #include "../core/Variable.h"
-#include "../core/Sign.h"
 #include "../numbers/numbers.h"
 #include "../util/hash.h"
 #include "../util/platform.h"

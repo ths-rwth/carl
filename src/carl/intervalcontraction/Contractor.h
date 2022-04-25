@@ -3,9 +3,9 @@
 #include "../core/MultivariatePolynomial.h"
 #include "../core/Variables.h"
 #include "../formula/arithmetic/Constraint.h"
-#include "Interval.h"
-#include "IntervalEvaluation.h"
-#include "set_theory.h"
+#include "../interval/Interval.h"
+#include "../core/polynomialfunctions/IntervalEvaluation.h"
+#include "../interval/set_theory.h"
 
 #include <algorithm>
 
@@ -137,12 +137,12 @@ public:
 	std::vector<Interval<Number>> evaluate(const std::map<Variable, Interval<Number>>& assignment, const Interval<Number>& h = Interval<Number>(0,0)) const {
 		std::vector<Interval<Number>> res;
 		CARL_LOG_DEBUG("carl.contractor", "Evaluating on " << assignment);
-		auto num = IntervalEvaluation::evaluate(numerator(), assignment);
+		auto num = carl::evaluate(numerator(), assignment);
 		CARL_LOG_DEBUG("carl.contractor", numerator() << " -> " << num);
 		num += h;
 		CARL_LOG_DEBUG("carl.contractor", "Subtracting " << h << " -> " << num);
 		if (!isOne(denominator())) {
-			auto den = IntervalEvaluation::evaluate(denominator(), assignment);;
+			auto den = carl::evaluate(denominator(), assignment);;
 			CARL_LOG_DEBUG("carl.contractor", denominator() << " -> " << den);
 			Interval<Number> resA;
 			Interval<Number> resB;
