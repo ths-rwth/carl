@@ -2,6 +2,7 @@
 
 #include "BasicConstraint.h"
 #include "../core/polynomialfunctions/Definiteness.h"
+#include "../util/Common.h"
 
 namespace carl::constraint {
 

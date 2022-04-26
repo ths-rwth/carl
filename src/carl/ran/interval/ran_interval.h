@@ -8,6 +8,7 @@
 #include <carl/core/polynomialfunctions/RootCounting.h>
 #include <carl/core/polynomialfunctions/SquareFreePart.h>
 #include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
+#include <carl/constraint/BasicConstraint.h>
 
 #include <carl/interval/Interval.h>
 #include <carl/core/polynomialfunctions/IntervalEvaluation.h>
@@ -34,7 +35,7 @@ class real_algebraic_number_interval {
 	friend bool compare(const real_algebraic_number_interval<Num>&, const Num&, const Relation);
 
 	template<typename Num, typename Poly>
-	friend boost::tribool evaluate(const Constraint<Poly>&, const ran::ran_assignment_t<real_algebraic_number_interval<Num>>&, bool, bool);
+	friend boost::tribool evaluate(const BasicConstraint<Poly>&, const ran::ran_assignment_t<real_algebraic_number_interval<Num>>&, bool, bool);
 
 	template<typename Num>
 	friend std::optional<real_algebraic_number_interval<Num>> evaluate(MultivariatePolynomial<Num>, const ran::ran_assignment_t<real_algebraic_number_interval<Num>>&, bool);

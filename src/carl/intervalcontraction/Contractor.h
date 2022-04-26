@@ -2,7 +2,7 @@
 
 #include "../core/MultivariatePolynomial.h"
 #include "../core/Variables.h"
-#include "../formula/arithmetic/Constraint.h"
+#include "../constraint/BasicConstraint.h"
 #include "../interval/Interval.h"
 #include "../core/polynomialfunctions/IntervalEvaluation.h"
 #include "../interval/set_theory.h"
@@ -191,7 +191,7 @@ private:
 	Interval<Number> mRelation;
 	Origin mOrigin;
 public:
-	Contractor(const Origin& origin, const Constraint<Polynomial>& c, Variable v):
+	Contractor(const Origin& origin, const BasicConstraint<Polynomial>& c, Variable v):
 		mEvaluation(c.lhs(), v),
 		mOrigin(origin)
 	{

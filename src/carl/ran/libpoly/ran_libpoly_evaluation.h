@@ -68,7 +68,7 @@ std::optional<real_algebraic_number_libpoly<Number>> evaluate(
 }
 
 template<typename Number, typename Poly>
-boost::tribool evaluate(const Constraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_libpoly<Number>>& evalMap) {
+boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_libpoly<Number>>& evalMap) {
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation constraint " << constraint << " for assignment " << evalMap);
 

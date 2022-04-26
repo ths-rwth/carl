@@ -55,7 +55,7 @@ TEST(RealAlgebraicNumber, EvalBug)
 	MultivariatePolynomial<Rational> mpx(x);
 	MultivariatePolynomial<Rational> mpy(y);
 	MultivariatePolynomial<Rational> poly(carl::pow(mpx, 2) + carl::pow(mpy, 2));
-	Constraint<MultivariatePolynomial<Rational>> constr(poly,carl::Relation::LEQ);
+	BasicConstraint<MultivariatePolynomial<Rational>> constr(poly,carl::Relation::LEQ);
 
 	Variable h = freshRealVariable("h"); 
 	UnivariatePolynomial<Rational> py(h, std::initializer_list<Rational>{-1, 1, 1});

@@ -3,12 +3,14 @@
 #include <carl/interval/Interval.h>
 #include <carl/core/polynomialfunctions/IntervalEvaluation.h>
 #include <carl/interval/evaluate.h>
-#include <carl/formula/arithmetic/Constraint.h>
+#include <carl/constraint/BasicConstraint.h>
+#include <carl/constraint/Simplification.h>
 
 #include "ran_interval.h"
 #include "AlgebraicSubstitution.h"
 
 #include <boost/logic/tribool_io.hpp>
+#include <optional>
 
 namespace carl {
 
@@ -135,7 +137,7 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 }
 
 template<typename Number, typename Poly>
-boost::tribool evaluate(const Constraint<Poly>& c, const ran::ran_assignment_t<real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
+boost::tribool evaluate(const BasicConstraint<Poly>& c, const ran::ran_assignment_t<real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << c << " on " << m);
 	
 	if (!use_root_bounds) {
@@ -166,12 +168,12 @@ boost::tribool evaluate(const Constraint<Poly>& c, const ran::ran_assignment_t<r
 			CARL_LOG_DEBUG("carl.ran.evaluation", "Left hand side is constant");
 			return carl::evaluate(p.constantPart(), c.relation());
 		}
-		Constraint<Poly> constr(p, c.relation());
-		if (constr.isConsistent() != 2) {
+		BasicConstraint<Poly> constr = constraint::create_normalized_constraint(p, c.relation());
+		if (constr.is_consistent() != 2) {
 			CARL_LOG_DEBUG("carl.ran.evaluation", "Constraint already evaluates to value");
-			return constr.isConsistent();
+			return constr.is_consistent();
 		}
-		p = constr.lhs(); // Constraint simplifies polynomial
+		p = constr.lhs();
 		CARL_LOG_TRACE("carl.ran.evaluation", "p = " << p << " (after simplification)");
 
 		std::map<Variable, Interval<Number>> var_to_interval;

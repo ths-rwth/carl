@@ -11,7 +11,7 @@
 
 using namespace carl;
 using RAN = RealAlgebraicNumber<Rational>;
-using ConstraintT = Constraint<MultivariatePolynomial<Rational>>;
+using ConstraintT = BasicConstraint<MultivariatePolynomial<Rational>>;
 
 TEST(IsolationAndEvaluation, Comparison) {
 	Variable a = freshRealVariable("a");
