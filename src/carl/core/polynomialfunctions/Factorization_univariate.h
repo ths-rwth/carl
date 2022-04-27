@@ -4,7 +4,7 @@
 #include "Division.h"
 #include "GCD_univariate.h"
 
-#include "../logging.h"
+#include <carl-logging/carl-logging.h>
 #include "../UnivariatePolynomial.h"
 
 namespace carl {

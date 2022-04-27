@@ -15,7 +15,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include "../core/logging.h"
+#include <carl-logging/carl-logging.h>
 
 #include "../core/VariablePool.h"
 #include "../core/Term.h"

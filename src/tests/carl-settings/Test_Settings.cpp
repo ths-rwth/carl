@@ -1,5 +1,5 @@
 #include <boost/program_options.hpp>
-#include <carl/util/Singleton.h>
+#include <carl-common/memory/Singleton.h>
 #include <carl-settings/settings_utils.h>
 #include <carl-settings/Settings.h>
 #include <carl-settings/SettingsParser.h>

@@ -9,7 +9,7 @@
 #include "../real_roots_common.h"
 
 #include "../../../carl/converter/LibpolyConverter.h"
-#include <carl/core/logging.h>
+#include <carl-logging/carl-logging.h>
 
 #include "ran_libpoly.h"
 

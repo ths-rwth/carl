@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../util/Singleton.h"
+#include <carl-common/memory/Singleton.h>
 #include "../core/VariablePool.h"
 #include "Formula.h"
 #include <mutex>

@@ -6,7 +6,7 @@
 #include "../core/Relation.h"
 #include "../core/Variable.h"
 #include "../numbers/numbers.h"
-#include "../util/hash.h"
+#include <carl-common/datastructures/hash.h>
 #include <carl/core/polynomialfunctions/Representation.h>
 
 #include <optional>

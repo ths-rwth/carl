@@ -1,0 +1,19 @@
+/**
+ * Auto generated file config.h from config.h.in.
+ */ 
+#pragma once
+
+#define CARL_BUILD_${CMAKE_BUILD_TYPE}
+#cmakedefine LOGGING
+#cmakedefine LOGGING_DISABLE_INEFFICIENT
+#cmakedefine THREAD_SAFE
+#cmakedefine USE_BLISS
+#cmakedefine USE_CLN_NUMBERS
+#cmakedefine USE_COCOA
+#cmakedefine USE_GINAC
+#cmakedefine USE_LIBPOLY
+
+#cmakedefine RAN_USE_INTERVAL
+#cmakedefine RAN_USE_THOM
+#cmakedefine RAN_USE_Z3
+#cmakedefine RAN_USE_LIBPOLY

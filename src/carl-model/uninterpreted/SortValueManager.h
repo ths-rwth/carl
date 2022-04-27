@@ -15,7 +15,7 @@
 #include <vector>
 
 #include <carl/util/Common.h>
-#include <carl/util/Singleton.h>
+#include <carl-common/memory/Singleton.h>
 #include "SortValue.h"
 
 namespace carl {

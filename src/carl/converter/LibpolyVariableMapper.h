@@ -7,7 +7,7 @@
 #include "../core/Variable.h"
 #include "../util/Common.h"
 #include "../util/SFINAE.h"
-#include "../util/Singleton.h"
+#include <carl-common/memory/Singleton.h>
 
 #include <map>
 

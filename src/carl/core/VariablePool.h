@@ -6,7 +6,7 @@
 #pragma once
 
 #include "../config.h"
-#include "../util/Singleton.h"
+#include <carl-common/memory/Singleton.h>
 #include "Variable.h"
 
 #include <array>

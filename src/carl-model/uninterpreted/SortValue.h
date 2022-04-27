@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <carl/util/hash.h>
+#include <carl-common/datastructures/hash.h>
 #include <carl/formula/Sort.h>
 
 #include <cassert>

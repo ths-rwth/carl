@@ -6,9 +6,9 @@
 #pragma once
 
 #include "../config.h"
-#include "../util/IDPool.h"
-#include "../util/Pool.h"
-#include "../util/Singleton.h"
+#include <carl-common/memory/IDPool.h>
+#include <carl-common/memory/PoolHelper.h>
+#include <carl-common/memory/Singleton.h>
 #include "Monomial.h"
 #include "config.h"
 

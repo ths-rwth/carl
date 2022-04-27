@@ -8,7 +8,7 @@
 #pragma once
 #include "../numbers/numbers.h"
 #include "UnivariatePolynomial.h"
-#include "logging.h"
+#include <carl-logging/carl-logging.h>
 #include <list>
 
 

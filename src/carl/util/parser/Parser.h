@@ -7,7 +7,7 @@
 
 #include <sstream>
 
-#include "../../core/logging.h"
+#include <carl-logging/carl-logging.h>
 #include "Common.h"
 #include "../../numbers/numbers.h"
 #include "FormulaParser.h"

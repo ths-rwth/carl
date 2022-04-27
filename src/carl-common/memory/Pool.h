@@ -1,7 +1,9 @@
+#pragma once
+
 #include "../config.h"
-#include "../util/IDPool.h"
-#include "../util/Pool.h"
-#include "../util/Singleton.h"
+#include "IDPool.h"
+#include "PoolHelper.h"
+#include "Singleton.h"
 
 #include <boost/intrusive/unordered_set.hpp>
 #include <memory>

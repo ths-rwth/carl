@@ -1,7 +1,7 @@
 #pragma once
 
 #include <carl-logging/carl-logging.h>
-#include <carl/util/Singleton.h>
+#include <carl-common/memory/Singleton.h>
 #include <carl/core/VariablePool.h>
 #include <carl/formula/Formula.h>
 #include <carl/util/debug.h>

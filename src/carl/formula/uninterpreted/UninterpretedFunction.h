@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../../util/hash.h"
+#include <carl-common/datastructures/hash.h>
 #include "../Sort.h"
 #include "../../io/streamingOperators.h"
 

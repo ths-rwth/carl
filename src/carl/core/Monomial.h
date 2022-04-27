@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../util/hash.h"
+#include <carl-common/datastructures/hash.h>
 #include "../numbers/numbers.h"
 #include "CompareResult.h"
 #include "Variable.h"

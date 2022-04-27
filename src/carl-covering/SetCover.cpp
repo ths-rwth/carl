@@ -1,6 +1,6 @@
 #include "SetCover.h"
 
-#include <carl/util/Bitset.h>
+#include <carl-common/datastructures/Bitset.h>
 
 #include <cassert>
 #include <numeric>

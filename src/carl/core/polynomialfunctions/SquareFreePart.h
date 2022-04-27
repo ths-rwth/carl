@@ -6,7 +6,7 @@
 #include "to_univariate_polynomial.h"
 
 #include "../../converter/CoCoAAdaptor.h"
-#include "../logging.h"
+#include <carl-logging/carl-logging.h>
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"
 

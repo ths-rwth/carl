@@ -10,7 +10,7 @@
 #include "PolynomialFactorizationPair.h"
 
 #include "FactorizedPolynomial.h"
-#include <carl/core/logging.h>
+#include <carl-logging/carl-logging.h>
 #include <carl/core/polynomialfunctions/Definiteness.h>
 #include <carl/core/polynomialfunctions/GCD.h>
 

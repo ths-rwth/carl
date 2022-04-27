@@ -2,7 +2,7 @@
 
 #include "internal.h"
 #include <carl/interval/Interval.h>
-#include <carl/core/logging.h>
+#include <carl-logging/carl-logging.h>
 #include <carl/core/Sign.h>
 #include <carl/core/UnivariatePolynomial.h>
 

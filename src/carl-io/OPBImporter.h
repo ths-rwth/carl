@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl/core/logging.h>
+#include <carl-logging/carl-logging.h>
 #include <carl/core/Relation.h>
 #include <carl/formula/Formula.h>
 

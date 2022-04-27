@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../numbers/numbers.h"
-#include "../util/Singleton.h"
+#include <carl-common/memory/Singleton.h>
 
 #include <map>
 #include <memory>

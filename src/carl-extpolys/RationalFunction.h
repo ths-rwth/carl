@@ -6,7 +6,7 @@
 
 #pragma once
 #include <carl/numbers/numbers.h>
-#include <carl/util/hash.h>
+#include <carl-common/datastructures/hash.h>
 #include "FactorizedPolynomial.h"
 #include <carl/core/polynomialfunctions/Evaluation.h>
 #include <carl/core/polynomialfunctions/GCD.h>

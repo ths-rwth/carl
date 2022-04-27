@@ -15,8 +15,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
 
-//#include "../../core/logging.h"
-#include "../../util/hash.h"
+#include <carl-common/datastructures/hash.h>
 #include "../../util/SFINAE.h"
 #include "roundingConversion.h"
 

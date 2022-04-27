@@ -3,8 +3,8 @@
 #include "remove_duplicates.h"
 #include "select_essential.h"
 
-#include <carl/core/logging.h>
-#include <carl/util/Bitset.h>
+#include <carl-logging/carl-logging.h>
+#include <carl-common/datastructures/Bitset.h>
 
 #include <optional>
 

@@ -17,7 +17,7 @@
 #include "../numbers/conversion/cln_gmp.h"
 #include "../util/Common.h"
 #include "../util/SFINAE.h"
-#include "../util/Singleton.h"
+#include <carl-common/memory/Singleton.h>
 #include "LibpolyVariableMapper.h"
 
 #include <poly/polyxx.h>

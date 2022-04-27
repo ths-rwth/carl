@@ -2,7 +2,7 @@
 
 #include "Power.h"
 
-#include "../logging.h"
+#include <carl-logging/carl-logging.h>
 #include "../../converter/CoCoAAdaptor.h"
 #include "../../converter/OldGinacConverter.h"
 #include "../../util/Common.h"

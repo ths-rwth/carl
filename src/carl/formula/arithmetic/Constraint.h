@@ -11,7 +11,7 @@
 #include "../../constraint/Comparison.h"
 #include "../../constraint/Evaluation.h"
 #include "../../constraint/Substitution.h"
-#include "../../datastructures/Pool.h"
+#include <carl-common/memory/Pool.h>
 
 #include <cassert>
 #include <cstring>
