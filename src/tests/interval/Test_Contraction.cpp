@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <carl/interval/Interval.h>
 #include <carl/core/VariablePool.h>
-#include <carl/interval/IntervalEvaluation.h>
-#include <carl/interval/Contraction.h>
+#include <carl/core/polynomialfunctions/IntervalEvaluation.h>
+#include <carl/intervalcontraction/Contraction.h>
 #include <carl/util/platform.h>
 
 #include "../number_types.h"

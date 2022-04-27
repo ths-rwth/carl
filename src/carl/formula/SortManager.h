@@ -9,7 +9,7 @@
 #pragma once
 
 #include "../util/pointerOperations.h"
-#include "../util/Singleton.h"
+#include <carl-common/memory/Singleton.h>
 #include "Sort.h"
 #include "../core/Variable.h"
 

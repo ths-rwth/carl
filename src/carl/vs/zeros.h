@@ -27,15 +27,16 @@ template<typename Poly>
 static bool gather_zeros(const Constraint<Poly>& constraint, const Variable& eliminationVar, std::vector<zero<Poly>>& results) {
 	using Rational = typename Poly::NumberType;
     
-    if (!constraint.hasVariable(eliminationVar)) {
+    if (!constraint.variables().has(eliminationVar)) {
 		return true;
 	}
 
 	std::vector<Poly> factors;
 	Constraints<Poly> sideConditions;
 
-	if (constraint.hasFactorization()) {
-		for (const auto& iter : constraint.factorization()) {
+	auto& factorization = constraint.lhs_factorization();
+	if (!carl::is_trivial(factorization)) {
+		for (const auto& iter : factorization) {
 			if (carl::variables(iter.first).has(eliminationVar)) {
 				factors.push_back(iter.first);
 			} else {

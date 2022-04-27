@@ -1,6 +1,6 @@
 #include "select_essential.h"
 
-#include <carl/util/Bitset.h>
+#include <carl-common/datastructures/Bitset.h>
 
 namespace carl::covering::heuristic {
 

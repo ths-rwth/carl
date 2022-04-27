@@ -7,7 +7,7 @@
 #include <string>
 
 #include <carl/formula/Formula.h>
-#include <carl/core/logging.h>
+#include <carl-logging/carl-logging.h>
 
 namespace carl {
 

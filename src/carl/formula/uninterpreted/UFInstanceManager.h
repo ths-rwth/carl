@@ -8,8 +8,8 @@
 #pragma once
 
 #include "../../util/Common.h"
-#include "../../util/Singleton.h"
-#include "../../util/hash.h"
+#include <carl-common/memory/Singleton.h>
+#include <carl-common/datastructures/hash.h>
 #include "../Sort.h"
 #include "UFInstance.h"
 #include "UTerm.h"

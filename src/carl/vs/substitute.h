@@ -2,7 +2,7 @@
 
 #include <bitset>
 #include <vector>
-#include <carl/formula/Constraint.h>
+#include <carl/formula/arithmetic/Constraint.h>
 
 #include "term.h"
 #include "zeros.h"
@@ -42,6 +42,11 @@ namespace carl::vs::detail {
             return m_term;
         }
     };
+    template<class Poly>
+    inline std::ostream& operator<<(std::ostream& os, const Substitution<Poly>& s) {
+		os << "[" << s.term() << "//" << s.variable() << "]";
+        return os;
+ 	}
 
     using DoubleInterval = carl::Interval<double>;
     using EvalDoubleIntervalMap = std::map<carl::Variable, DoubleInterval>;
@@ -102,7 +107,7 @@ namespace carl::vs::detail {
      *          true, otherwise.
      */
     template<typename Poly>
-    inline bool splitProducts( const ConstraintConjunction<Poly>&, CaseDistinction<Poly>&, bool = false );
+    inline bool splitProducts( const ConstraintConjunction<Poly>&, CaseDistinction<Poly>&, std::map<const Constraint<Poly>, CaseDistinction<Poly>>&, bool = false );
     
     /**
      * Splits the given constraint into a set of constraints which compare the factors of the
@@ -159,7 +164,7 @@ namespace carl::vs::detail {
      *          true, otherwise.
      */
     template<typename Poly>
-    inline bool substitute( const Constraint<Poly>&, const Substitution<Poly>&, CaseDistinction<Poly>&, bool _accordingPaper, carl::Variables&, const detail::EvalDoubleIntervalMap&, bool factorization = true );
+    inline bool substitute( const Constraint<Poly>&, const Substitution<Poly>&, CaseDistinction<Poly>&, bool _accordingPaper, carl::Variables&, const detail::EvalDoubleIntervalMap&);
     
     /**
      * Applies a substitution of a variable to a term, which is not minus infinity nor a to an square root expression plus an infinitesimal.
@@ -344,6 +349,21 @@ namespace carl::vs::detail {
 
 namespace carl::vs {
     /**
+     * @brief Simplifies the case distinction in place.
+     * 
+     * @tparam Poly Polynomial type.
+     * @param cases Case distiction to simplify.
+     * @return true On success.
+     * @return false Fail, cases is now invalid.
+     */
+    template<typename Poly>
+    inline bool simplify_inplace(CaseDistinction<Poly>& cases) {        
+        if (!detail::splitProducts(cases, true)) return false;
+        detail::splitSosDecompositions(cases);
+        return true;
+    }
+
+    /**
      * Applies a substitution to a constraint.
      * @param cons   The constraint to substitute in.
      * @param subs   The substitution to apply.
@@ -356,10 +376,15 @@ namespace carl::vs {
         CaseDistinction<Poly> subres;
         carl::Variables dummy_vars; // we do not make use of this feature here
         detail::EvalDoubleIntervalMap dummy_map; // we do not make use of this feature here
-        if (!detail::substitute(cons, detail::Substitution<Poly>(var, term), subres, false, dummy_vars, dummy_map, true)) {
+        if (!detail::substitute(cons, detail::Substitution<Poly>(var, term), subres, false, dummy_vars, dummy_map)) {
             return std::nullopt;
         } else {
-            return subres;
+            // return subres;
+            if (simplify_inplace(subres)) {
+                return subres;
+            } else {
+                return std::nullopt;
+            }
         }
     }
 
@@ -399,14 +424,19 @@ namespace carl::vs {
             auto subRes1 = substitute(Constraint<Poly>(Poly(subVar1) - subVar2, varcompRelation), subVar1, term);
             assert(subRes1);
             CaseDistinction<Poly> result;
+            std::map<std::reference_wrapper<const Constraint<Poly>>, CaseDistinction<Poly>, std::less<Constraint<Poly>>> result_cache;
             for (const auto& vcase : *subRes1) {
                 std::vector<CaseDistinction<Poly>> subresults;
                 size_t num_cases = 1;
                 for (const auto& constr : vcase) {
-                    auto subRes2 = substitute(constr, subVar2, Term<Poly>::normal(zeros[0].sqrt_ex));
-                    assert(subRes2);
-                    subresults.push_back(*subRes2);
-                    num_cases = num_cases * subRes2->size();
+                    if (result_cache.find(std::cref(constr)) == result_cache.end()) {
+                        auto subRes2 = substitute(constr, subVar2, Term<Poly>::normal(zeros[0].sqrt_ex));
+                        assert(subRes2);
+                        result_cache.emplace(std::cref(constr), *subRes2);
+                    }
+                    auto subRes2 = result_cache.at(std::cref(constr));
+                    subresults.push_back(subRes2);
+                    num_cases = num_cases * subRes2.size();
                 }
 
                 // distributive law                

@@ -3,7 +3,7 @@ namespace carl {
 
 	template<typename Pol>
     FormulaContent<Pol>::FormulaContent(FormulaType _type, size_t _id):
-        mHash(((size_t)(Constraint<Pol>(_type == FormulaType::TRUE).id())) << (sizeof(size_t)*4)),
+        mHash(std::hash<Constraint<Pol>>()(Constraint<Pol>(_type == FormulaType::TRUE))),
         mId( _id ),
 		mType(_type),
 		mContent(Constraint<Pol>(_type == FormulaType::TRUE))
@@ -29,7 +29,7 @@ namespace carl {
 	
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(Constraint<Pol>&& _constraint):
-        mHash( _constraint.id() << (sizeof(size_t)*4) ),
+        mHash( std::hash<Constraint<Pol>>()(_constraint) ),
 		mType(FormulaType::CONSTRAINT),
 		mContent(std::move(_constraint))
 	{

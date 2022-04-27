@@ -2,6 +2,7 @@
 
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"
+#include "../../constraint/BasicConstraint.h"
 
 namespace carl {
 
@@ -42,6 +43,14 @@ std::size_t complexity(const UnivariatePolynomial<Coeff>& p) {
 		result += complexity(p.coefficients()[deg]) + deg;
 	}
 	return result;
+}
+
+/**
+ * @return An approximation of the complexity of this constraint.
+ */
+template<typename Poly>
+std::size_t complexity(const BasicConstraint<Poly>& c) {
+	return 1 + complexity(c.lhs());
 }
 
 }

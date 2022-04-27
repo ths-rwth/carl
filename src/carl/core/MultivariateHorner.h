@@ -10,7 +10,7 @@
 #include <set>
 #include "MultivariatePolynomial.h"
 #include "../interval/Interval.h"
-#include "../interval/IntervalEvaluation.h"
+#include "polynomialfunctions/IntervalEvaluation.h"
  #include "MultivariateHornerSettings.h"
 
 #include "Term.h"

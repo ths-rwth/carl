@@ -15,7 +15,7 @@
 #include <set>
 #include <boost/dynamic_bitset.hpp>
 #include "Condition.h"
-#include "Constraint.h"
+#include "arithmetic/Constraint.h"
 #include "uninterpreted/UEquality.h"
 #include "uninterpreted/UFManager.h"
 #include "bitvector/BVConstraintPool.h"

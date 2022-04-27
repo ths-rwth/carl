@@ -10,7 +10,7 @@
 
 #include "Formula.h"
 #include "FormulaPool.h"
-#include "ConstraintPool.h"
+#include "../core/polynomialfunctions/Complexity.h"
 
 namespace carl
 {
@@ -98,7 +98,7 @@ namespace carl
                     case FormulaType::FALSE:
                         break;
                     case FormulaType::CONSTRAINT:
-                        result += _f.constraint().complexity(); break;
+                        result += carl::complexity(_f.constraint().constr()); break;
                     case FormulaType::BITVECTOR:
                         result += _f.bvConstraint().complexity(); break;
                     case FormulaType::UEQ:
@@ -559,13 +559,13 @@ namespace carl
         bool multipliedByMinusOne = lhs.lterm().coeff() < typename Pol::NumberType( 0 );
         if( multipliedByMinusOne )
         {
-            boundValue = constraint.constantPart();
+            boundValue = constraint.lhs().constantPart();
             relation = carl::turn_around( relation );
             poly = Pol( -lhs + boundValue );
         }
         else
         {
-            boundValue = -constraint.constantPart();
+            boundValue = -constraint.lhs().constantPart();
             poly = Pol( lhs + boundValue );
         }
         typename Pol::NumberType cf( poly.coprimeFactor() );

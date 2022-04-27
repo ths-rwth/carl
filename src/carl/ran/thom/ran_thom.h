@@ -134,7 +134,7 @@ Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, real
 }
 
 template<typename Number, typename Poly>
-bool evaluate(const Constraint<Poly>& c, std::map<Variable, real_algebraic_number_thom<Number>>& m) {
+bool evaluate(const BasicConstraint<Poly>& c, std::map<Variable, real_algebraic_number_thom<Number>>& m) {
 	auto res = evaluate(c.lhs(), m);
 	return evaluate(res, c.relation());
 }

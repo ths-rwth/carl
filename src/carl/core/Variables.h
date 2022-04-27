@@ -2,8 +2,6 @@
 
 #include "Variable.h"
 #include "../io/streamingOperators.h"
-#include "../formula/bitvector/BVVariable.h"
-#include "../formula/uninterpreted/UVariable.h"
 #include "../util/SFINAE.h"
 
 #include <algorithm>

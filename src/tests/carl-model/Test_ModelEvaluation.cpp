@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <carl/formula/Formula.h>
+#include <carl/constraint/Substitution.h>
 #include <carl-model/Model.h>
 #include <carl-model/evaluation/ModelEvaluation.h>
 
@@ -34,13 +35,11 @@ TEST(ModelEvaluation, Constraint)
 	ConstraintT c1(p, carl::Relation::EQ);
 	ConstraintT c2(Pol(x), carl::Relation::EQ);
 
-	Variable v;
-	Pol repl;
-	c1.getSubstitution(v, repl);
-	EXPECT_EQ(v, x);
-	EXPECT_EQ(repl, -Pol(y)*z - Pol(1));
+	auto subs = carl::get_substitution(c1);
+	EXPECT_EQ(subs->first, x);
+	EXPECT_EQ(subs->second, -Pol(y)*z - Pol(1));
 
-	m.emplace(v, carl::createSubstitution<Rational,Pol,carl::ModelPolynomialSubstitution<Rational, Pol>>(repl));
+	m.emplace(subs->first, carl::createSubstitution<Rational,Pol,carl::ModelPolynomialSubstitution<Rational, Pol>>(subs->second));
 	model::substituteIn(c2, m);
 	EXPECT_EQ(c2, ConstraintT(Pol(y)*z + Pol(1), carl::Relation::EQ));
 }

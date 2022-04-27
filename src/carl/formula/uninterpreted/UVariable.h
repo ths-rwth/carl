@@ -9,7 +9,7 @@
 
 #include "../../core/VariablePool.h"
 #include "../Sort.h"
-#include "../../util/hash.h"
+#include <carl-common/datastructures/hash.h>
 #include "../SortManager.h"
 
 namespace carl {

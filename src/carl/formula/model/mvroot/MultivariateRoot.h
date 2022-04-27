@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../core/logging.h"
+#include <carl-logging/carl-logging.h>
 #include "../../../core/polynomialfunctions/Substitution.h"
 #include "../../../core/Variable.h"
 #include "../../../numbers/numbers.h"

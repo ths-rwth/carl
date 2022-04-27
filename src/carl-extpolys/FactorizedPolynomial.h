@@ -314,10 +314,10 @@ namespace carl
             if( existsFactorization(*this) )
             {
                 if( factorizedTrivially() )
-                    return polynomial().complexity();
+                    return complexity(polynomial());
                 size_t result = 0;
                 for( const auto& factor : content().factorization() )
-                    result += factor.first.complexity();
+                    result += complexity(factor.first);
                 return result;
             }
             return 1;

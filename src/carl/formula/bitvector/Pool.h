@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../../util/Common.h"
-#include "../../util/Singleton.h"
+#include <carl-common/memory/Singleton.h>
 
 #include <mutex>
 

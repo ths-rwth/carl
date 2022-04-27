@@ -5,7 +5,7 @@
 
 #include "ModelEvaluation_Constraint.h"
 
-#include <carl/core/logging.h>
+#include <carl-logging/carl-logging.h>
 
 namespace carl {
 namespace model {

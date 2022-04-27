@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <carl/core/logging.h>
+#include <carl-logging/carl-logging.h>
 #include <carl/numbers/numbers.h>
 
 #ifndef THREAD_SAFE

@@ -25,9 +25,8 @@
 
 #include "../core/Sign.h"
 #include "../core/Variable.h"
-#include "../core/Sign.h"
 #include "../numbers/numbers.h"
-#include "../util/hash.h"
+#include <carl-common/datastructures/hash.h>
 #include "../util/platform.h"
 #include "../util/SFINAE.h"
 #include "BoundType.h"

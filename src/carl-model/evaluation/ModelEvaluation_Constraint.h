@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Model.h"
-#include <carl/formula/Constraint.h>
+#include <carl/formula/arithmetic/Constraint.h>
 #include <carl/formula/Formula.h>
 
 #include "ModelEvaluation_Polynomial.h"
@@ -28,7 +28,7 @@ namespace model {
 		
 		auto map = collectRANIR(carl::variables(c.lhs()).as_set(), m);
 		if (map.size() == carl::variables(c.lhs()).size()) {
-			auto eval_res = evaluate(c, map);
+			auto eval_res = evaluate(c.constr(), map);
 			assert(!indeterminate(eval_res));
 			res = (bool)eval_res;
 			return;

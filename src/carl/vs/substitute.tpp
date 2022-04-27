@@ -3,6 +3,7 @@
 
 #include <carl/core/polynomialfunctions/Derivative.h>
 #include <carl/core/polynomialfunctions/SoSDecomposition.h>
+#include <carl/constraint/IntervalEvaluation.h>
 
 //#define VS_DEBUG_SUBSTITUTION
 const unsigned MAX_NUM_OF_TERMS = 512;
@@ -117,7 +118,7 @@ namespace carl::vs::detail
                     cons = (*conj).erase( cons );
                 else
                 {
-                    unsigned conflictingWithSolutionSpace = cons->consistentWith( _solutionSpace );
+                    unsigned conflictingWithSolutionSpace = consistentWith(cons->constr(), _solutionSpace );
                     
 //                    std::cout << "Is  " << cons << std::endl;
 //                    std::cout << std::endl;
@@ -128,7 +129,8 @@ namespace carl::vs::detail
                     
                     if( conflictingWithSolutionSpace == 0 )
                     {
-                        _conflictingVars.insert( cons->variables().begin(), cons->variables().end() );
+                        auto vars = variables(*cons);
+                        _conflictingVars.insert( vars.begin(), vars.end() );
                         conjInconsistent = true;
                         break;
                     }
@@ -155,6 +157,7 @@ namespace carl::vs::detail
     template<typename Poly>
     bool splitProducts( CaseDistinction<Poly>& _toSimplify, bool _onlyNeq )
     {
+        std::map<const Constraint<Poly>, CaseDistinction<Poly>> result_cache;
         bool result = true;
         size_t toSimpSize = _toSimplify.size();
         for( size_t pos = 0; pos < toSimpSize; )
@@ -162,7 +165,7 @@ namespace carl::vs::detail
             if( !_toSimplify.begin()->empty() )
             {
                 CaseDistinction<Poly> temp;
-                if( !splitProducts( _toSimplify[pos], temp, _onlyNeq ) )
+                if( !splitProducts( _toSimplify[pos], temp, result_cache, _onlyNeq ) )
                     result = false;
                 _toSimplify.erase( _toSimplify.begin() );
                 _toSimplify.insert( _toSimplify.end(), temp.begin(), temp.end() );
@@ -175,68 +178,17 @@ namespace carl::vs::detail
     }
 
     template<typename Poly>
-    bool splitProducts( const ConstraintConjunction<Poly>& _toSimplify, CaseDistinction<Poly>& _result, bool _onlyNeq )
+    bool splitProducts( const ConstraintConjunction<Poly>& _toSimplify, CaseDistinction<Poly>& _result, std::map<const Constraint<Poly>, CaseDistinction<Poly>>& result_cache, bool _onlyNeq )
     {
         std::vector<CaseDistinction<Poly>> toCombine;
         for( auto constraint = _toSimplify.begin(); constraint != _toSimplify.end(); ++constraint )
         {
-            if( constraint->hasFactorization() )
-            {
-                switch( constraint->relation() )
-                {
-                    case Relation::EQ:
-                    {
-                        if( !_onlyNeq )
-                        {
-                            toCombine.emplace_back();
-                            const smtrat::Factorization& factorization = constraint->factorization();
-                            for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
-                            {
-                                toCombine.back().emplace_back();
-                                toCombine.back().back().push_back( Constraint<Poly>( factor->first, Relation::EQ ) );
-                            }
-                            simplify( toCombine.back() );
-                        }
-                        else
-                        {
-                            toCombine.emplace_back();
-                            toCombine.back().emplace_back();
-                            toCombine.back().back().push_back( *constraint );
-                        }
-                        break;
-                    }
-                    case Relation::NEQ:
-                    {
-                        toCombine.emplace_back();
-                        toCombine.back().emplace_back();
-                        const smtrat::Factorization& factorization = constraint->factorization();
-                        for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
-                            toCombine.back().back().push_back( Constraint<Poly>( factor->first, Relation::NEQ ) );
-                        simplify( toCombine.back() );
-                        break;
-                    }
-                    default:
-                    {
-                        if( !_onlyNeq )
-                        {
-                            toCombine.push_back( getSignCombinations( *constraint ) );
-                            simplify( toCombine.back() );
-                        }
-                        else
-                        {
-                            toCombine.emplace_back();
-                            toCombine.back().emplace_back();
-                            toCombine.back().back().push_back( *constraint );
-                        }
-                    }
-                }
+            auto i = result_cache.find(*constraint);
+            if (i == result_cache.end()) {
+                auto res = splitProducts(*constraint, _onlyNeq);
+                i = result_cache.emplace(*constraint, res).first;
             }
-            else
-            {
-                toCombine.emplace_back();
-                toCombine.back().emplace_back();
-                toCombine.back().back().push_back( *constraint );
-            }
+            toCombine.push_back(i->second);
         }
         bool result = true;
         if( !combine( toCombine, _result ) )
@@ -249,7 +201,8 @@ namespace carl::vs::detail
     CaseDistinction<Poly> splitProducts( const Constraint<Poly>& _constraint, bool _onlyNeq )
     {
         CaseDistinction<Poly> result;
-        if( _constraint.hasFactorization() )
+        auto& factorization = _constraint.lhs_factorization();
+        if( !carl::is_trivial(factorization) )
         {
             switch( _constraint.relation() )
             {
@@ -257,7 +210,6 @@ namespace carl::vs::detail
                 {
                     if( !_onlyNeq )
                     {
-                        const smtrat::Factorization& factorization = _constraint.factorization();
                         for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
                         {
                             result.emplace_back();
@@ -275,7 +227,6 @@ namespace carl::vs::detail
                 case Relation::NEQ:
                 {
                     result.emplace_back();
-                    const smtrat::Factorization& factorization = _constraint.factorization();
                     for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
                         result.back().push_back( Constraint<Poly>( factor->first, Relation::NEQ ) );
                     simplify( result );
@@ -445,7 +396,8 @@ namespace carl::vs::detail
     CaseDistinction<Poly> getSignCombinations( const Constraint<Poly>& _constraint )
     {
         CaseDistinction<Poly> combinations;
-        if( _constraint.hasFactorization() && _constraint.factorization().size() <= MAX_PRODUCT_SPLIT_NUMBER )
+        auto& factorization = _constraint.lhs_factorization();
+        if( !carl::is_trivial(factorization) && factorization.size() <= MAX_PRODUCT_SPLIT_NUMBER )
         {
             assert( _constraint.relation() == Relation::GREATER || _constraint.relation() == Relation::LESS
                     || _constraint.relation() == Relation::GEQ || _constraint.relation() == Relation::LEQ );
@@ -462,8 +414,7 @@ namespace carl::vs::detail
             ConstraintConjunction<Poly> negatives;
             ConstraintConjunction<Poly> alwaysnegatives;
             unsigned numOfAlwaysNegatives = 0;
-            const smtrat::Factorization& product = _constraint.factorization();
-            for( auto factor = product.begin(); factor != product.end(); ++factor )
+            for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
             {
                 Constraint<Poly> consPos = Constraint<Poly>( factor->first, relPos );
                 unsigned posConsistent = consPos.isConsistent();
@@ -605,8 +556,7 @@ namespace carl::vs::detail
                      CaseDistinction<Poly>& _result,
                      bool _accordingPaper,
                      Variables& _conflictingVariables,
-                     const detail::EvalDoubleIntervalMap& _solutionSpace,
-                     bool factorization )
+                     const detail::EvalDoubleIntervalMap& _solutionSpace)
     {
         #ifdef VS_DEBUG_SUBSTITUTION
         std::cout << "substitute: ( " << _cons << " )" << _subs << std::endl;
@@ -643,15 +593,6 @@ namespace carl::vs::detail
         #ifdef VS_DEBUG_SUBSTITUTION
         print( _result );
         #endif
-        if( factorization && !splitProducts( _result, true ) ) 
-            result = false;
-        if( result )
-        {
-            splitSosDecompositions( _result );
-        }
-        #ifdef VS_DEBUG_SUBSTITUTION
-        print( _result );
-        #endif
         return result;
     }
 
@@ -665,7 +606,7 @@ namespace carl::vs::detail
     {
         
         bool result = true;
-        if( _cons.hasVariable( _subs.variable() ) )
+        if( _cons.variables().has( _subs.variable() ) )
         {
             // Collect all necessary left hand sides to create the new conditions of all cases referring to the virtual substitution.
             if( carl::pow( smtrat::Rational(smtrat::Rational(_subs.term().sqrt_ex().constantPart().size()) + smtrat::Rational(_subs.term().sqrt_ex().factor().size()) * smtrat::Rational(_subs.term().sqrt_ex().radicand().size())), _cons.maxDegree( _subs.variable() )) > (MAX_NUM_OF_TERMS*MAX_NUM_OF_TERMS) )
@@ -987,9 +928,10 @@ namespace carl::vs::detail
                             const detail::EvalDoubleIntervalMap& _solutionSpace )
     {
         bool result = true;
-        if( !_cons.variables().empty() )
+        auto vars = variables(_cons);
+        if( !vars.empty() )
         {
-            if( _cons.variables().has( _subs.variable() ) )
+            if( vars.has( _subs.variable() ) )
             {
                 switch( _cons.relation() )
                 {
@@ -1053,7 +995,7 @@ namespace carl::vs::detail
                                  Variables& _conflictingVariables,
                                  const detail::EvalDoubleIntervalMap& _solutionSpace )
     {
-        assert( _cons.hasVariable( _subs.variable() ) );
+        assert( _cons.variables().has( _subs.variable() ) );
         // Create a substitution formed by the given one without an addition of epsilon.
         auto term = Term<Poly>::normal(_subs.term().sqrt_ex());
         // Call the method substituteNormal with the constraint f(x)~0 and the substitution [x -> t],  where the parameter relation is ~.
@@ -1098,9 +1040,10 @@ namespace carl::vs::detail
     template<typename Poly>
     void substituteInf( const Constraint<Poly>& _cons, const Substitution<Poly>& _subs, CaseDistinction<Poly>& _result, Variables& _conflictingVariables, const detail::EvalDoubleIntervalMap& _solutionSpace )
     {
-        if( !_cons.variables().empty() )
+        auto vars = variables(_cons);
+        if( !vars.empty() )
         {
-            if( _cons.variables().has( _subs.variable() ) )
+            if( vars.has( _subs.variable() ) )
             {
                 if( _cons.relation() == Relation::EQ )
                     substituteTrivialCase( _cons, _subs, _result );

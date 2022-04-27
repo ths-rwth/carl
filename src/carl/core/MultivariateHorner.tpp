@@ -155,9 +155,9 @@ namespace carl
 
 							currentTerm_div.divide(*variableIt, currentTerm_div);
 
-							currentInterval = IntervalEvaluation::evaluate( currentTerm_div, map );
+							currentInterval = carl::evaluate( currentTerm_div, map );
 
-							accMonomEval += carl::rationalize<CoeffType>(IntervalEvaluation::evaluate( currentTerm, map ).diameter());
+							accMonomEval += carl::rationalize<CoeffType>(carl::evaluate( currentTerm, map ).diameter());
 							accMonomDivEval += carl::rationalize<CoeffType>(currentInterval.diameter());
 
 						}

@@ -12,19 +12,7 @@ template<typename Number>
 std::optional<real_algebraic_number_z3<Number>> evaluate(const MultivariatePolynomial<Number>& polynomial, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap);
 
 template<typename Number, typename Poly>
-boost::tribool evaluate(const Constraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap);
-
-// TODO workaround, implement for z3
-namespace ran::interval {
-template<typename Coeff, typename Number>
-bool vanishes(
-		const UnivariatePolynomial<Coeff>& poly,
-		const std::map<Variable, real_algebraic_number_z3<Number>>& varToRANMap
-) {
-    assert(false && "Not implemented");
-	return false;
-}
-}
+boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_z3<Number>>& evalMap);
 
 }
 

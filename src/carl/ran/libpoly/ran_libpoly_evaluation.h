@@ -68,7 +68,7 @@ std::optional<real_algebraic_number_libpoly<Number>> evaluate(
 }
 
 template<typename Number, typename Poly>
-boost::tribool evaluate(const Constraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_libpoly<Number>>& evalMap) {
+boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_libpoly<Number>>& evalMap) {
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation constraint " << constraint << " for assignment " << evalMap);
 
@@ -127,24 +127,6 @@ boost::tribool evaluate(const Constraint<Poly>& constraint, const std::map<Varia
 	}
 }
 
-namespace ran::interval {
-template<typename Coeff, typename Number>
-bool vanishes(
-	const UnivariatePolynomial<Coeff>& poly,
-	const std::map<Variable, real_algebraic_number_libpoly<Number>>& varToRANMap) {
-	//taken from ran interval
-	if (carl::isZero(poly)) {
-		CARL_LOG_TRACE("carl.ran", "poly is 0");
-		return true;
-	}
-	if (poly.isNumber()) {
-		CARL_LOG_TRACE("carl.ran", "poly is constant but not zero");
-		return false;
-	}
-
-	return real_roots(poly, varToRANMap).is_nullified();
-}
-} // namespace ran::interval
 
 } // namespace carl
 

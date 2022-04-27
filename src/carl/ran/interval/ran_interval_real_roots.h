@@ -2,7 +2,7 @@
 
 #include "internal.h"
 #include <carl/interval/Interval.h>
-#include <carl/core/logging.h>
+#include <carl-logging/carl-logging.h>
 #include <carl/core/Sign.h>
 #include <carl/core/UnivariatePolynomial.h>
 
@@ -128,7 +128,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		}
 
 		CARL_LOG_TRACE("carl.ran.realroots", "Calling on " << *evaledpoly);
-		Constraint<MultivariatePolynomial<Number>> cons(MultivariatePolynomial<Number>(polyCopy), Relation::EQ);
+		BasicConstraint<MultivariatePolynomial<Number>> cons(MultivariatePolynomial<Number>(polyCopy), Relation::EQ);
 		std::vector<real_algebraic_number_interval<Number>> roots;
 		auto res = real_roots(*evaledpoly, interval);
 		for (const auto& r: res.roots()) { // TODO can be made more efficient!

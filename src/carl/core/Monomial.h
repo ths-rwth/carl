@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../util/hash.h"
+#include <carl-common/datastructures/hash.h>
 #include "../numbers/numbers.h"
 #include "CompareResult.h"
 #include "Variable.h"
@@ -545,6 +545,8 @@ namespace carl
 		if (rhs == nullptr) return false;
 		if ((lhs->id() != 0) && (rhs->id() != 0)) {
 			if (lhs->id() == rhs->id()) return false;
+			// TODO sort by id?
+			//return (lhs->id() < rhs->id());
 		}
 		if(lhs->tdeg() < rhs->tdeg()) return true;
 		if(lhs->tdeg() > rhs->tdeg()) return false;

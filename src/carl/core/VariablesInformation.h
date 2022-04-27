@@ -110,5 +110,9 @@ public:
 	{
 		return mVariableInfo.count(v) > 0;
 	}
+
+	auto& data() {
+		return mVariableInfo;
+	}
 };
 }

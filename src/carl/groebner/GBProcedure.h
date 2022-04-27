@@ -8,7 +8,7 @@
 #pragma once
 #include "Ideal.h"
 #include "Reductor.h"
-#include "../core/logging.h"
+#include <carl-logging/carl-logging.h>
 #include "../util/BitVector.h"
 
 namespace carl

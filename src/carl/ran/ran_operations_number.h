@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../carl/util/SFINAE.h"
-#include "../../carl/formula/Constraint.h"
+#include "../../carl/constraint/BasicConstraint.h"
 #include "../../carl/core/polynomialfunctions/Substitution.h"
 
 
@@ -25,7 +25,7 @@ Number evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable
 }
 
 template<typename Number, typename Poly, typename = std::enable_if_t<is_number<Number>::value>>
-bool evaluate(const Constraint<Poly>& c, const std::map<Variable, Number>& m) {
+bool evaluate(const BasicConstraint<Poly>& c, const std::map<Variable, Number>& m) {
 	auto res = evaluate(c.lhs(), m);
 	return evaluate(res, c.relation());
 }

@@ -11,7 +11,7 @@
 
 using namespace carl;
 using RAN = RealAlgebraicNumber<Rational>;
-using ConstraintT = Constraint<MultivariatePolynomial<Rational>>;
+using ConstraintT = BasicConstraint<MultivariatePolynomial<Rational>>;
 
 TEST(IsolationAndEvaluation, Comparison) {
 	Variable a = freshRealVariable("a");
@@ -56,7 +56,7 @@ TEST(IsolationAndEvaluation, Comparison) {
 
 	varToRANMap.erase(a);
 
-	bool is_nullified = carl::ran::interval::vanishes(carl::to_univariate_polynomial(poly, a), varToRANMap);
+	bool is_nullified = carl::ran::real_roots(carl::to_univariate_polynomial(poly, a), varToRANMap).is_nullified();
 	EXPECT_TRUE(is_nullified);
 
 	/*

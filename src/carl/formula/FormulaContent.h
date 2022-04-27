@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../core/logging.h"
+#include <carl-logging/carl-logging.h>
 
 #include <iostream>
 #include <variant>
@@ -121,7 +121,7 @@ namespace carl {
     };	
 	
     template<typename Pol>
-    class FormulaContent
+    class FormulaContent : public boost::intrusive::unordered_set_base_hook<>
     {
             friend class Formula<Pol>;
             friend class FormulaPool<Pol>;
@@ -168,7 +168,7 @@ namespace carl {
             
             FormulaContent() = delete;
             FormulaContent(const FormulaContent&) = delete;
-            FormulaContent(FormulaContent&&) = delete;
+            FormulaContent(FormulaContent&& o) : mHash(o.mHash), mId(o.mId), mType(o.mType), mContent(std::move(o.mContent)) {};
 
             /**
              * Constructs the formula (true), if the given bool is true and the formula (false) otherwise.
@@ -229,7 +229,6 @@ namespace carl {
              * Destructor.
              */
             ~FormulaContent() {
-                // TODO NOTE: in case of true, false, bool: mContent was not destroyed ...
                 if( mpVariables != nullptr )
                     delete mpVariables;
             }
