@@ -7,7 +7,7 @@
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/Variable.h>
 #include <carl/formula/arithmetic/Constraint.h>
-#include <carl/formula/VariableComparison.h>
+#include <carl/formula/arithmetic/VariableComparison.h>
 #include <carl/formula/Formula.h>
 #include <carl/formula/Logic.h>
 #include <carl-model/Model.h>

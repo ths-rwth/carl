@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VariableComparison.h"
+#include "arithmetic/VariableComparison.h"
 #include "../core/Relation.h"
 #include "../core/Variable.h"
 
