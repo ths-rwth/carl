@@ -1,7 +1,7 @@
 #include "../Common.h"
 
 #include <carl/core/MultivariatePolynomial.h>
-#include <carl/io/CodeWriter.h>
+#include <carl-io/CodeWriter.h>
 
 #include <fstream>
 

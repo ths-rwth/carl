@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "../../io/streamingOperators.h"
+#include <carl-common/datastructures/streamingOperators.h>
 
 using carl::operator<<;
 

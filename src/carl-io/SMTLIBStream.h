@@ -14,7 +14,7 @@
 #include <carl-formula/sort/Sort.h>
 #include <carl/numbers/numbers.h>
 #include <carl/util/tuple_util.h>
-#include <carl/io/streamingOperators.h>
+#include <carl-common/datastructures/streamingOperators.h>
 
 #include <iostream>
 #include <sstream>

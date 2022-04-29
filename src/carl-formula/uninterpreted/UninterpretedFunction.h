@@ -9,7 +9,7 @@
 
 #include <carl-common/datastructures/hash.h>
 #include "../sort/Sort.h"
-#include <carl/io/streamingOperators.h>
+#include <carl-common/datastructures/streamingOperators.h>
 
 #include <iostream>
 #include <utility>

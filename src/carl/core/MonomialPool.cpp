@@ -5,7 +5,7 @@
 
 #include "MonomialPool.h"
 
-#include "../io/streamingOperators.h"
+#include <carl-common/datastructures/streamingOperators.h>
 
 namespace carl {
 

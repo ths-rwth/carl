@@ -11,8 +11,8 @@
 #include <vector>
 
 
-#include "../core/Monomial.h"
-#include "../util/debug.h"
+#include <carl/core/Monomial.h>
+#include <carl/util/debug.h>
 
 namespace carl {
 

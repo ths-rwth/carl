@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Variable.h"
-#include "../io/streamingOperators.h"
+#include <carl-common/datastructures/streamingOperators.h>
 #include "../util/SFINAE.h"
 
 #include <algorithm>
