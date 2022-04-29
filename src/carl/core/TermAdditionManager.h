@@ -14,9 +14,9 @@
 #include <vector>
 
 #include "../config.h"
-#include "../core/Term.h"
+#include "Term.h"
 #include <carl-common/datastructures/streamingOperators.h>
-#include "pointerOperations.h"
+#include "../util/pointerOperations.h"
 
 namespace carl
 {

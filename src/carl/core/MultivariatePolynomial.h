@@ -18,7 +18,7 @@
 #include "Term.h"
 #include "VariableInformation.h"
 #include "../numbers/numbers.h"
-#include "../util/TermAdditionManager.h"
+#include "TermAdditionManager.h"
 
 
 namespace carl
