@@ -1,4 +1,4 @@
-#include <carl/formula/bitvector/BVValue.h>
+#include <carl-formula/bitvector/BVValue.h>
 #include <gtest/gtest.h>
 
 #include "../get_output.h"

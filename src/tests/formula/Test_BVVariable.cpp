@@ -1,5 +1,5 @@
-#include <carl/formula/bitvector/BVVariable.h>
-#include <carl/formula/SortManager.h>
+#include <carl-formula/bitvector/BVVariable.h>
+#include <carl-formula/sort/SortManager.h>
 #include <gtest/gtest.h>
 
 #include "../get_output.h"

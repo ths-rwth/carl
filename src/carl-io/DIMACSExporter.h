@@ -2,8 +2,8 @@
 
 #include <carl-logging/carl-logging.h>
 
-#include <carl/formula/Formula.h>
-#include <carl/formula/helpers/to_cnf.h>
+#include <carl-formula/formula/Formula.h>
+#include <carl-formula/formula/functions/to_cnf.h>
 
 #include <iostream>
 #include <map>

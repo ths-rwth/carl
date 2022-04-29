@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 
-#include <carl/formula/Formula.h>
+#include <carl-formula/formula/Formula.h>
 #include <carl/constraint/Substitution.h>
-#include <carl-model/Model.h>
-#include <carl-model/evaluation/ModelEvaluation.h>
+#include <carl-formula/model/Model.h>
+#include <carl-formula/model/evaluation/ModelEvaluation.h>
 
 #include "../Common.h"
 

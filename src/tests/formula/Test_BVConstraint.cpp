@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <carl/formula/bitvector/BVTermPool.h>
-#include <carl/formula/bitvector/BVConstraintPool.h>
+#include <carl-formula/bitvector/BVTermPool.h>
+#include <carl-formula/bitvector/BVConstraintPool.h>
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/VariablePool.h>
-#include <carl/formula/FormulaPool.h>
-#include <carl/formula/SortManager.h>
+#include <carl-formula/formula/FormulaPool.h>
+#include <carl-formula/sort/SortManager.h>
 #include <carl/numbers/config.h>
 
 #ifdef USE_CLN_NUMBERS

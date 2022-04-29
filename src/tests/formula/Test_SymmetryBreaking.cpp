@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <carl/core/MultivariatePolynomial.h>
-#include <carl/formula/Formula.h>
-#include <carl/formula/symmetry/symmetry.h>
+#include <carl-formula/formula/Formula.h>
+#include <carl-formula/symmetry/symmetry.h>
 
 #include "../number_types.h"
 

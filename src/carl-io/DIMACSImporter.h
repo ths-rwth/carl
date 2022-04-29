@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-#include <carl/formula/Formula.h>
+#include <carl-formula/formula/Formula.h>
 #include <carl-logging/carl-logging.h>
 
 namespace carl {

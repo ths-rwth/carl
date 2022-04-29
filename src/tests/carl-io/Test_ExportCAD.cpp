@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <carl/core/VariablePool.h>
-#include <carl/formula/Formula.h>
+#include <carl-formula/formula/Formula.h>
 #include <carl-io/MapleStream.h>
 #include <carl-io/QEPCADStream.h>
 #include <carl-io/SMTLIBStream.h>

@@ -2,7 +2,7 @@
 
 #include <carl-logging/carl-logging.h>
 #include <carl/core/Relation.h>
-#include <carl/formula/Formula.h>
+#include <carl-formula/formula/Formula.h>
 
 #include <iostream>
 #include <fstream>

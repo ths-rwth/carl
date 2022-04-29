@@ -2,7 +2,7 @@
 
 #include <bitset>
 #include <vector>
-#include <carl/formula/arithmetic/Constraint.h>
+#include <carl-formula/arithmetic/Constraint.h>
 
 #include "term.h"
 #include "zeros.h"
