@@ -400,7 +400,7 @@ void variables(const Constraint<Pol>& c, carlVariables& vars) {
 
 template<typename Pol>
 std::optional<std::pair<Variable, Pol>> get_substitution(const Constraint<Pol>& c, bool _negated = false, Variable _exclude = carl::Variable::NO_VARIABLE) {
-	return get_substitution(c.constr(), _negated, _exclude, std::optional(c.varInfo()));
+	return get_substitution(c.constr(), _negated, _exclude, std::optional(c.template varInfo<true>()));
 }
 
 // implicit conversions do not work for template argument deduction
