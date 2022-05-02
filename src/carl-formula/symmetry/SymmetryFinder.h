@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl/core/config.h>
+#include <carl/config.h>
 #include "../formula/Formula.h"
 
 #include <bliss/graph.hh>

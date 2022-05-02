@@ -35,7 +35,9 @@ TEST(ModelEvaluation, Constraint)
 	ConstraintT c1(p, carl::Relation::EQ);
 	ConstraintT c2(Pol(x), carl::Relation::EQ);
 
+	std::cout << "asdf" << std::endl;
 	auto subs = carl::get_substitution(c1);
+	std::cout << "asdf1" << std::endl;
 	EXPECT_EQ(subs->first, x);
 	EXPECT_EQ(subs->second, -Pol(y)*z - Pol(1));
 

@@ -10,7 +10,6 @@
 #include <carl-common/memory/PoolHelper.h>
 #include <carl-common/memory/Singleton.h>
 #include "Monomial.h"
-#include "config.h"
 
 #include <boost/intrusive/unordered_set.hpp>
 #include <memory>

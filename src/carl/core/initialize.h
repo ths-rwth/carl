@@ -11,7 +11,7 @@
 #pragma once
 
 #include "MonomialPool.h"
-#include "config.h"
+#include "../config.h"
 #include <carl-logging/carl-logging.h>
 
 #ifdef USE_COCOA
