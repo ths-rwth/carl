@@ -5,7 +5,7 @@ add_subdirectory(carl)
 add_subdirectory(carl-covering)
 add_subdirectory(carl-extpolys)
 add_subdirectory(carl-io)
-add_subdirectory(carl-model)
+add_subdirectory(carl-formula)
 add_subdirectory(carl-settings)
 add_subdirectory(carl-statistics)
 

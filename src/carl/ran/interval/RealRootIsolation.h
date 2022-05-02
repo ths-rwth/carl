@@ -7,7 +7,7 @@
 #include <carl/interval/sampling.h>
 #include <carl/core/polynomialfunctions/Factorization_univariate.h>
 #include <carl/core/polynomialfunctions/SignVariations.h>
-#include <carl/io/streamingOperators.h>
+#include <carl-common/datastructures/streamingOperators.h>
 #include <carl/core/polynomialfunctions/EigenWrapper.h>
 #include <carl/core/polynomialfunctions/Evaluation.h>
 #include <carl/core/polynomialfunctions/RootElimination.h>

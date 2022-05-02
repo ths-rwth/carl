@@ -1,4 +1,4 @@
-#include <carl/io/streamingOperators.h>
+#include <carl-common/datastructures/streamingOperators.h>
 using carl::operator<<;
 
 #include "../Common.h"

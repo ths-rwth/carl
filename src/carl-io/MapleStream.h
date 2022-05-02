@@ -6,10 +6,10 @@
 #include <carl/core/Term.h>
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/Variable.h>
-#include <carl/formula/arithmetic/Constraint.h>
-#include <carl/formula/Formula.h>
-#include <carl/formula/Logic.h>
-#include <carl/formula/Sort.h>
+#include <carl-formula/arithmetic/Constraint.h>
+#include <carl-formula/formula/Formula.h>
+#include <carl-formula/formula/Logic.h>
+#include <carl-formula/sort/Sort.h>
 
 #include <iostream>
 #include <sstream>

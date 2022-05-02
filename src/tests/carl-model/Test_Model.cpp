@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <carl/core/MultivariatePolynomial.h>
-#include <carl-model/Model.h>
+#include <carl-formula/model/Model.h>
 
 #include "../Common.h"
 

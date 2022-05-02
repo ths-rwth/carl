@@ -1,5 +1,5 @@
-#include <carl/formula/bitvector/BVTerm.h>
-#include <carl/formula/bitvector/BVTermPool.h>
+#include <carl-formula/bitvector/BVTerm.h>
+#include <carl-formula/bitvector/BVTermPool.h>
 #include <gtest/gtest.h>
 
 #include "../get_output.h"

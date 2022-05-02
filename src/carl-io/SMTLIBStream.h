@@ -6,15 +6,15 @@
 #include <carl/core/Term.h>
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/Variable.h>
-#include <carl/formula/arithmetic/Constraint.h>
-#include <carl/formula/VariableComparison.h>
-#include <carl/formula/Formula.h>
-#include <carl/formula/Logic.h>
-#include <carl-model/Model.h>
-#include <carl/formula/Sort.h>
+#include <carl-formula/arithmetic/Constraint.h>
+#include <carl-formula/arithmetic/VariableComparison.h>
+#include <carl-formula/formula/Formula.h>
+#include <carl-formula/formula/Logic.h>
+#include <carl-formula/model/Model.h>
+#include <carl-formula/sort/Sort.h>
 #include <carl/numbers/numbers.h>
 #include <carl/util/tuple_util.h>
-#include <carl/io/streamingOperators.h>
+#include <carl-common/datastructures/streamingOperators.h>
 
 #include <iostream>
 #include <sstream>

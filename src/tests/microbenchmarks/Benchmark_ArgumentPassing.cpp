@@ -1,9 +1,9 @@
 #include <benchmark/benchmark.h>
 
 #include <carl/core/Variable.h>
-#include <carl/formula/uninterpreted/UFInstance.h>
-#include <carl/formula/uninterpreted/UTerm.h>
-#include <carl/formula/uninterpreted/UVariable.h>
+#include <carl-formula/uninterpreted/UFInstance.h>
+#include <carl-formula/uninterpreted/UTerm.h>
+#include <carl-formula/uninterpreted/UVariable.h>
 
 template<typename T>
 void pass_by_ref(const T& v) {

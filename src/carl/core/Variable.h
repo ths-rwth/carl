@@ -84,19 +84,9 @@ class VariablePool;
  */
 class Variable {
 	friend VariablePool;
-	/// Type if a variable is passed by reference.
-	using ByRef = const Variable&;
-	/// Type if a variable is passed by value.
-	using ByValue = Variable;
-
 public:
-#ifdef VARIABLE_PASS_BY_VALUE
 	/// Argument type for variables being function arguments.
-	using Arg = VariableByValue;
-#else
-	/// Argument type for variables being function arguments.
-	using Arg = ByRef;
-#endif
+	using Arg = const Variable&;
 
 private:
 	/**

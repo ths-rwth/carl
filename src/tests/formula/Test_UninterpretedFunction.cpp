@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
 
-#include <carl/formula/SortManager.h>
-#include <carl/formula/uninterpreted/UFManager.h>
-#include <carl/formula/uninterpreted/UninterpretedFunction.h>
+#include <carl-formula/sort/SortManager.h>
+#include <carl-formula/uninterpreted/UFManager.h>
+#include <carl-formula/uninterpreted/UninterpretedFunction.h>
 
 #include "../Common.h"
 
