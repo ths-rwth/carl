@@ -681,7 +681,7 @@ namespace std {
 
 		std::size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const {
 			assert(mpoly.isConsistent());
-#ifdef true
+#if false
 			if (mpoly.nrTerms() == 0) return 0;
 			if (mpoly.nrTerms() == 1) return carl::hash_all(mpoly[0]);
 			std::size_t seed = 0;

@@ -139,11 +139,11 @@ inline void normalize_integer_inplace(BasicConstraint<Pol>& constraint) {
 	auto vars = variables(constraint);
 	if (!vars.integer().empty() && vars.real().empty()) {
 		if (constraint.relation() == Relation::LESS) {
-			constraint.lhs() += carl::constant_one<typename Pol::CoeffType>::get();
-			constraint.relation()  = Relation::LEQ;
+			constraint.set_lhs(constraint.lhs() + carl::constant_one<typename Pol::CoeffType>::get());
+			constraint.set_relation(Relation::LEQ);
 		} else if (constraint.relation()  == Relation::GREATER) {
-			constraint.lhs() -= carl::constant_one<typename Pol::CoeffType>::get();
-			constraint.relation()  = Relation::GEQ;
+			constraint.set_lhs(constraint.lhs() - carl::constant_one<typename Pol::CoeffType>::get());
+			constraint.set_relation(Relation::GEQ);
 		}
 	}
 }

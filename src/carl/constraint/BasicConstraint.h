@@ -36,8 +36,9 @@ public:
 	/**
      * @return The considered polynomial being the left-hand side of this constraint. Hence, the right-hand side of any constraint is always 0.
      */
-	Pol& lhs() {
-		return m_lhs;
+	void set_lhs(Pol&& lhs) {
+		m_lhs = std::move(lhs);
+		m_hash = CONSTRAINT_HASH(m_lhs, m_relation, Pol);
 	}
 
 	/**
@@ -50,8 +51,9 @@ public:
 	/**
      * @return The relation symbol of this constraint.
      */
-	Relation& relation() {
-		return m_relation;
+	void set_relation(Relation rel) {
+		m_relation = rel;
+		m_hash = CONSTRAINT_HASH(m_lhs, m_relation, Pol);
 	}
 
 	/**
