@@ -7,7 +7,7 @@
  */
 
 #pragma once
-#include "platform.h"
+#include <carl-common/meta/platform.h>
 #include <type_traits>
 
 namespace carl

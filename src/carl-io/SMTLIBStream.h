@@ -13,7 +13,7 @@
 #include <carl-formula/model/Model.h>
 #include <carl-formula/sort/Sort.h>
 #include <carl/numbers/numbers.h>
-#include <carl/util/tuple_util.h>
+#include <carl-common/datastructures/tuple_util.h>
 #include <carl-common/datastructures/streamingOperators.h>
 
 #include <iostream>

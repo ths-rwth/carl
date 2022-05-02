@@ -15,7 +15,7 @@
 #include "../core/Variables.h"
 #include "../numbers/numbers.h"
 #include "../util/Common.h"
-#include "../util/SFINAE.h"
+#include <carl-common/meta/SFINAE.h>
 #include <carl-common/memory/Singleton.h>
 #include "ginac.h"
 

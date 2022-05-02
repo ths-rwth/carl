@@ -9,8 +9,7 @@
 
 #pragma once
 
-#include "platform.h"
-
+#include <carl-common/meta/platform.h>
 #include <cassert>
 #include <ostream>
 

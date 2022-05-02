@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl/util/SFINAE.h>
+#include <carl-common/meta/SFINAE.h>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi.hpp>

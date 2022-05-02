@@ -6,7 +6,7 @@
 #pragma once
 
 #include <carl/core/Variables.h>
-#include <carl/util/variant_util.h>
+#include <carl-common/datastructures/variant_util.h>
 #include <boost/variant.hpp>
 
 #include "BVTermType.h"

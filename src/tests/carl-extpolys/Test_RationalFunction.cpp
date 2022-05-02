@@ -3,7 +3,7 @@
 #include <carl/core/VariablePool.h>
 #include <carl/util/stringparser.h>
 #include <carl-extpolys/FactorizedPolynomial.h>
-#include <carl/util/platform.h>
+#include <carl-common/meta/platform.h>
 
 #include "../Common.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <carl-common/memory/Singleton.h>
-#include "../carl/util/platform.h"
+#include <carl-common/meta/platform.h>
 #include "logging_utils.h"
 #include "config.h"
 

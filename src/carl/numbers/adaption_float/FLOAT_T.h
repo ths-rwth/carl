@@ -16,7 +16,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 
 
 #include <carl-common/datastructures/hash.h>
-#include "../../util/SFINAE.h"
+#include <carl-common/meta/SFINAE.h>
 #include "roundingConversion.h"
 
 #include <cfloat>

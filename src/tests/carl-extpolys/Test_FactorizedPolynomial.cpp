@@ -5,7 +5,7 @@
 #include <carl/core/polynomialfunctions/LCM.h>
 #include <carl/core/polynomialfunctions/Quotient.h>
 #include <carl/util/stringparser.h>
-#include <carl/util/platform.h>
+#include <carl-common/meta/platform.h>
 #include <carl/numbers/numbers.h>
 
 #include "../Common.h"

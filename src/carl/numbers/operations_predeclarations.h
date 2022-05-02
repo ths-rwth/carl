@@ -4,7 +4,7 @@
 static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
-#include "../util/SFINAE.h"
+#include <carl-common/meta/SFINAE.h>
 #include <string>
 
 namespace carl {

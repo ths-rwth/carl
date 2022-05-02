@@ -3,7 +3,7 @@
 
 #include "carl/groebner/Ideal.h"
 #include "carl/groebner/groebner.h"
-#include "carl/util/platform.h"
+#include <carl-common/meta/platform.h>
 
 #include "../Common.h"
 

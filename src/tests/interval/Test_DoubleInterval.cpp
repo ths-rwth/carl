@@ -14,7 +14,7 @@
 #include "carl/interval/set_theory.h"
 #include "carl/core/VariablePool.h"
 #include <iostream>
-#include "carl/util/platform.h"
+#include <carl-common/meta/platform.h>
 
 #include "../number_types.h"
 

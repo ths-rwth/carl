@@ -8,8 +8,8 @@
 #pragma once
 
 #include "../util/debug.h"
-#include "../util/platform.h"
-#include "../util/SFINAE.h"
+#include <carl-common/meta/platform.h>
+#include <carl-common/meta/SFINAE.h>
 #include <carl-logging/carl-logging.h>
 #include "MultivariatePolynomial.h"
 #include "Sign.h"

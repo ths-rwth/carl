@@ -8,7 +8,7 @@
  * @version 2014-11-11
  */
 
-#include "carl/util/platform.h"
+#include <carl-common/meta/platform.h>
 CLANG_WARNING_DISABLE("-Wsign-compare")
 #include "gtest/gtest.h"
 CLANG_WARNING_RESET

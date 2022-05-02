@@ -8,7 +8,7 @@
 #include "ran_interval_real_roots.h"
 #include "LazardEvaluation.h"
 
-#include <carl/util/SFINAE.h>
+#include <carl-common/meta/SFINAE.h>
 
 namespace carl::ran::interval {
 

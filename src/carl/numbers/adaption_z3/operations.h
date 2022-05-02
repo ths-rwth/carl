@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "../../util/platform.h"
+#include <carl-common/meta/platform.h>
 #include <limits.h>
 
 #include "include.h"

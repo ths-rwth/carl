@@ -3,7 +3,7 @@
 #include <carl/core/Monomial.h>
 #include <carl/groebner/Ideal.h>
 #include <carl/groebner/Reductor.h>
-#include <carl/util/platform.h>
+#include <carl-common/meta/platform.h>
 
 #include <gtest/gtest.h>
 

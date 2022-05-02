@@ -1,7 +1,7 @@
 #include "../Common.h"
 
 #include <carl/numbers/numbers.h>
-#include <carl/util/SFINAE.h>
+#include <carl-common/meta/SFINAE.h>
 
 #include <type_traits>
 #include <typeinfo>

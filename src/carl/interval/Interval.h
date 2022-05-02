@@ -27,8 +27,8 @@
 #include "../core/Variable.h"
 #include "../numbers/numbers.h"
 #include <carl-common/datastructures/hash.h>
-#include "../util/platform.h"
-#include "../util/SFINAE.h"
+#include <carl-common/meta/platform.h>
+#include <carl-common/meta/SFINAE.h>
 #include "BoundType.h"
 #include "checking.h"
 #include "rounding.h"

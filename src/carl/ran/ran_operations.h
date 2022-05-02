@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl/util/SFINAE.h>
+#include <carl-common/meta/SFINAE.h>
 
 #include <carl/core/polynomialfunctions/Substitution.h>
 #include <carl/core/Relation.h>

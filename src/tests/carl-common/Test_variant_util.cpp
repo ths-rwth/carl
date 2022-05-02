@@ -1,5 +1,5 @@
 #include <boost/variant.hpp>
-#include <carl/util/variant_util.h>
+#include <carl-common/datastructures/variant_util.h>
 #include <gtest/gtest.h>
 
 struct A {};

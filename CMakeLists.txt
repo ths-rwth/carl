@@ -147,7 +147,7 @@ include(resources/resources.cmake)
 
 enable_testing()
 
-#dl must be linked LAST as this is required for the stacktrace in util/platform.h
+#dl must be linked LAST as this is required for the stacktrace in carl-common/meta/platform.h
 if (NOT WIN32)
 	list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
 endif()

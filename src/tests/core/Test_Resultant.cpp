@@ -4,7 +4,7 @@
 #include <carl/core/polynomialfunctions/Resultant.h>
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
-#include "carl/util/platform.h"
+#include <carl-common/meta/platform.h>
 
 #include <random>
 #include <cmath>

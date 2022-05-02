@@ -10,7 +10,7 @@
 
 #include "../core/Variable.h"
 #include "../numbers/numbers.h"
-#include "pointerOperations.h"
+#include <carl-common/datastructures/pointerOperations.h>
 
 #include <cstring>
 #include <map>

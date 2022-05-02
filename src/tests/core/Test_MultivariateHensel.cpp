@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "carl/core/MultivariateHensel.h"
 #include "carl/core/VariablePool.h"
-#include "carl/util/platform.h"
+#include <carl-common/meta/platform.h>
 
 #include <carl/numbers/numbers.h>
 

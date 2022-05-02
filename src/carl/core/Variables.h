@@ -2,7 +2,7 @@
 
 #include "Variable.h"
 #include <carl-common/datastructures/streamingOperators.h>
-#include "../util/SFINAE.h"
+#include <carl-common/meta/SFINAE.h>
 
 #include <algorithm>
 #include <variant>

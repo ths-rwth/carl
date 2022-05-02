@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "carl/core/polynomialfunctions/GCD.h"
 #include <carl/numbers/numbers.h>
-#include "carl/util/platform.h"
+#include <carl-common/meta/platform.h>
 
 #include "../Common.h"
 

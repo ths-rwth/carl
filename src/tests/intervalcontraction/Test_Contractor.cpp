@@ -3,7 +3,7 @@
 #include <carl/core/VariablePool.h>
 #include <carl/core/polynomialfunctions/IntervalEvaluation.h>
 #include <carl/intervalcontraction/Contractor.h>
-#include <carl/util/platform.h>
+#include <carl-common/meta/platform.h>
 
 #include "../number_types.h"
 

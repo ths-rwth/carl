@@ -7,7 +7,7 @@
 #pragma once
 
 #include "../numbers/numbers.h"
-#include "../util/SFINAE.h"
+#include <carl-common/meta/SFINAE.h>
 #include <carl-common/datastructures/hash.h>
 #include "Polynomial.h"
 #include "Sign.h"

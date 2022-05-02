@@ -8,7 +8,7 @@
 #include <list>
 #include "carl/converter/OldGinacConverter.h"
 #include "carl/util/stringparser.h"
-#include "carl/util/platform.h"
+#include <carl-common/meta/platform.h>
 
 #include "../Common.h"
 
