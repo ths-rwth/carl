@@ -14,7 +14,7 @@ ExternalProject_Add(
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES
 	PATCH_COMMAND sh ${CMAKE_SOURCE_DIR}/resources/cocoa/patch_auto_ptr.sh
-	#COMMAND patch <SOURCE_DIR>/src/AlgebraicCore/TmpFactorDir/DUPZfactor_combine.c ${CMAKE_SOURCE_DIR}/resources/cocoa/DUPZfactor_combine.c.patch
+	COMMAND patch <SOURCE_DIR>/configuration/shell-fns.sh ${CMAKE_SOURCE_DIR}/resources/cocoa/shell-fns.sh.patch
 	CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --threadsafe-hack ${GMP_LIB_ARG}
 	BUILD_COMMAND make library
 	INSTALL_COMMAND ${CMAKE_COMMAND} -E touch <SOURCE_DIR>/examples/index.html
