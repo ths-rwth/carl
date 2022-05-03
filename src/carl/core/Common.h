@@ -13,7 +13,7 @@ namespace carl {
     using Assignment = std::map<Variable, T>;
 
     template<typename T> 
-    using OrderedAssignment = std::vector<Variable, T>;
+    using OrderedAssignment = std::vector<std::pair<Variable, T>>;
         
     using Variables = std::set<Variable>;
     

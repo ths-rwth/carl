@@ -25,7 +25,7 @@ namespace carl {
  * @return Evaluation result
  */
 template<typename Number>
-std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolynomial<Number> p, const ran::ran_assignment_t<real_algebraic_number_interval<Number>>& m, bool refine_model = true) {
+std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolynomial<Number> p, const Assignment<real_algebraic_number_interval<Number>>& m, bool refine_model = true) {
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << p << " on " << m);
 	
 	CARL_LOG_TRACE("carl.ran.evaluation", "Substitute rationals");
@@ -137,7 +137,7 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 }
 
 template<typename Number, typename Poly>
-boost::tribool evaluate(const BasicConstraint<Poly>& c, const ran::ran_assignment_t<real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
+boost::tribool evaluate(const BasicConstraint<Poly>& c, const Assignment<real_algebraic_number_interval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << c << " on " << m);
 	
 	if (!use_root_bounds) {

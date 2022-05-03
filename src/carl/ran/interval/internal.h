@@ -7,7 +7,7 @@ namespace carl::ran::interval {
     template<typename Number, typename Coeff>
     std::optional<UnivariatePolynomial<Number>> substitute_rans_into_polynomial(
             const UnivariatePolynomial<Coeff>& p,
-            const ordered_ran_assignment_t<real_algebraic_number_interval<Number>>& m,
+            const OrderedAssignment<real_algebraic_number_interval<Number>>& m,
             bool use_lazard = false // TODO revert
     ) {
         std::vector<MultivariatePolynomial<Number>> polys;

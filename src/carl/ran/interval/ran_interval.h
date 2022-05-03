@@ -14,7 +14,6 @@
 #include <carl/core/polynomialfunctions/IntervalEvaluation.h>
 #include <carl/interval/set_theory.h>
 
-#include "../ran_common.h"
 #include "../ran_operations.h"
 #include "../ran_operations_number.h"
 
@@ -35,10 +34,10 @@ class real_algebraic_number_interval {
 	friend bool compare(const real_algebraic_number_interval<Num>&, const Num&, const Relation);
 
 	template<typename Num, typename Poly>
-	friend boost::tribool evaluate(const BasicConstraint<Poly>&, const ran::ran_assignment_t<real_algebraic_number_interval<Num>>&, bool, bool);
+	friend boost::tribool evaluate(const BasicConstraint<Poly>&, const Assignment<real_algebraic_number_interval<Num>>&, bool, bool);
 
 	template<typename Num>
-	friend std::optional<real_algebraic_number_interval<Num>> evaluate(MultivariatePolynomial<Num>, const ran::ran_assignment_t<real_algebraic_number_interval<Num>>&, bool);
+	friend std::optional<real_algebraic_number_interval<Num>> evaluate(MultivariatePolynomial<Num>, const Assignment<real_algebraic_number_interval<Num>>&, bool);
 
 	template<typename Num>
 	friend Num branching_point(const real_algebraic_number_interval<Num>& n);

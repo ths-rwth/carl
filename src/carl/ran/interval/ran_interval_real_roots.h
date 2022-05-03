@@ -66,7 +66,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 template<typename Coeff, typename Number>
 real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		const UnivariatePolynomial<Coeff>& poly,
-		const ran::ran_assignment_t<real_algebraic_number_interval<Number>>& varToRANMap,
+		const Assignment<real_algebraic_number_interval<Number>>& varToRANMap,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
 	CARL_LOG_FUNC("carl.ran.realroots", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
@@ -83,7 +83,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 
   	// We want to simplify 'poly', but it's const, so make a copy.
 	UnivariatePolynomial<Coeff> polyCopy(poly);
-	ran::ran_assignment_t<real_algebraic_number_interval<Number>> ir_map;
+	Assignment<real_algebraic_number_interval<Number>> ir_map;
 
 	for (Variable v: carl::variables(polyCopy)) {
 		if (v == poly.mainVar()) continue;
@@ -111,7 +111,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		assert(ir_map.find(polyCopy.mainVar()) == ir_map.end());
 
 		// substitute RANs with low degrees first
-		ran::ordered_ran_assignment_t<real_algebraic_number_interval<Number>> ord_ass;
+		OrderedAssignment<real_algebraic_number_interval<Number>> ord_ass;
 		for (const auto& ass : ir_map) ord_ass.emplace_back(ass);
 		std::sort(ord_ass.begin(), ord_ass.end(), [](const auto& a, const auto& b){ 
 			return a.second.polynomial().degree() > b.second.polynomial().degree();
