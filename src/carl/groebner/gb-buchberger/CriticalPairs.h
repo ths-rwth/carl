@@ -29,7 +29,7 @@
 
 #include "../../core/CompareResult.h"
 #include "../../core/MonomialOrdering.h"
-#include "../../util/Heap.h"
+#include <carl-common/datastructures/Heap.h>
 #include "CriticalPairsEntry.h"
 
 #include <unordered_map>

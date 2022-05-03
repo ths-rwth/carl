@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <carl-common/datastructures/pointerOperations.h>
+#include <carl-common/util/pointerOperations.h>
 #include <carl-common/memory/Singleton.h>
 #include "Sort.h"
 #include <carl/core/Variable.h>

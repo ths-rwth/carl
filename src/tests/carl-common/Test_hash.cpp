@@ -1,4 +1,4 @@
-#include <carl-common/datastructures/hash.h>
+#include <carl-common/util/hash.h>
 #include <gtest/gtest.h>
 
 TEST(Hash, hash_add)

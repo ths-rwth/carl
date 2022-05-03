@@ -4,7 +4,7 @@
 #include <carl-formula/bitvector/BVVariable.h>
 #include <carl-formula/uninterpreted/UVariable.h>
 #include <carl-formula/uninterpreted/UninterpretedFunction.h>
-#include <carl-common/datastructures/variant_util.h>
+#include <carl-common/util/variant_util.h>
 
 #include <cassert>
 #include <variant>

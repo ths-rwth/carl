@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl-common/datastructures/hash.h>
+#include <carl-common/util/hash.h>
 #include <carl/ran/ran.h>
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/Relation.h>

@@ -19,7 +19,7 @@
 #include <carl-extpolys/RationalFunction.h>
 #include <carl/core/Variable.h>
 #include <carl/core/VariablePool.h>
-#include <carl-common/datastructures/streamingOperators.h>
+#include <carl-common/util/streamingOperators.h>
 
 namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;

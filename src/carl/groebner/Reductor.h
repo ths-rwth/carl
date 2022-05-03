@@ -9,8 +9,8 @@
 
 #include "Ideal.h"
 #include "ReductorEntry.h"
-#include "../util/Heap.h"
-#include "../util/BitVector.h"
+#include <carl-common/datastructures/Heap.h>
+#include <carl-common/datastructures/BitVector.h>
 
 namespace carl
 {

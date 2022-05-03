@@ -1,10 +1,10 @@
 #include "gtest/gtest.h"
 
-#include "carl/util/carlTree.h"
+#include <carl-common/datastructures/carlTree.h>
 
 using namespace carl;
 
-TEST(Allocator, Basic)
+TEST(carlTree, Basic)
 {
 	carl::tree<int> t;
 	auto i1 = t.append(1);

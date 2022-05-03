@@ -1,4 +1,4 @@
-#include <carl-common/datastructures/tuple_util.h>
+#include <carl-common/util/tuple_util.h>
 #include <gtest/gtest.h>
 
 int foo(int x, int y) {

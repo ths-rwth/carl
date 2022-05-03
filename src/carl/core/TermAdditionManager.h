@@ -15,8 +15,8 @@
 
 #include "../config.h"
 #include "Term.h"
-#include <carl-common/datastructures/streamingOperators.h>
-#include <carl-common/datastructures/pointerOperations.h>
+#include <carl-common/util/streamingOperators.h>
+#include <carl-common/util/pointerOperations.h>
 
 namespace carl
 {

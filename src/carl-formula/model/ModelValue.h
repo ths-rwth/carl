@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <carl-common/datastructures/variant_util.h>
+#include <carl-common/util/variant_util.h>
 #include <carl-formula/bitvector/BVValue.h>
 #include <carl-formula/arithmetic/MultivariateRoot.h>
 #include <carl/ran/ran.h>

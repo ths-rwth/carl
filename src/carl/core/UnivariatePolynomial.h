@@ -8,7 +8,7 @@
 
 #include "../numbers/numbers.h"
 #include <carl-common/meta/SFINAE.h>
-#include <carl-common/datastructures/hash.h>
+#include <carl-common/util/hash.h>
 #include "Polynomial.h"
 #include "Sign.h"
 #include "Variable.h"

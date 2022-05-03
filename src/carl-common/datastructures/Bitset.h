@@ -1,6 +1,6 @@
 #pragma once
 
-#include "boost_util.h"
+#include "../util/boost_util.h"
 
 #include <boost/dynamic_bitset.hpp>
 

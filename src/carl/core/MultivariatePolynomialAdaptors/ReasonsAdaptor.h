@@ -6,7 +6,7 @@
  */
 
 #pragma once
-#include "../../util/BitVector.h"
+#include <carl-common/datastructures/BitVector.h>
 
 namespace carl
 {

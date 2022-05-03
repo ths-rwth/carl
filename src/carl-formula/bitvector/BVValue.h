@@ -6,7 +6,7 @@
 #pragma once
 
 #include <carl/numbers/numbers.h>
-#include <carl-common/datastructures/boost_util.h>
+#include <carl-common/util/boost_util.h>
 
 #include <array>
 #include <boost/dynamic_bitset.hpp>

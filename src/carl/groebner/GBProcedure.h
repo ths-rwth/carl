@@ -9,7 +9,7 @@
 #include "Ideal.h"
 #include "Reductor.h"
 #include <carl-logging/carl-logging.h>
-#include "../util/BitVector.h"
+#include <carl-common/datastructures/BitVector.h>
 
 namespace carl
 {
