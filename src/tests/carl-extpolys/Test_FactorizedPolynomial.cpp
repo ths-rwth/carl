@@ -4,7 +4,7 @@
 #include <carl-extpolys/substitution.h>
 #include <carl/core/polynomialfunctions/LCM.h>
 #include <carl/core/polynomialfunctions/Quotient.h>
-#include <carl/util/stringparser.h>
+#include <carl-io/StringParser.h>
 #include <carl-common/meta/platform.h>
 #include <carl/numbers/numbers.h>
 

@@ -4,7 +4,7 @@
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/Interval.h"
-#include "carl/util/stringparser.h"
+#include <carl-io/StringParser.h>
 #include "gtest/gtest.h"
 #include <carl/numbers/numbers.h>
 #include <list>

@@ -7,8 +7,8 @@
 #pragma once
 
 #include <cassert>
-#include "../../core/MultivariatePolynomial.h"
-#include "../../util/stringparser.h"
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl-io/StringParser.h>
 
 namespace carl 
 {

@@ -7,7 +7,7 @@
 #include "carl/interval/Interval.h"
 #include <list>
 #include "carl/converter/OldGinacConverter.h"
-#include "carl/util/stringparser.h"
+#include <carl-io/StringParser.h>
 #include <carl-common/meta/platform.h>
 
 #include "../Common.h"

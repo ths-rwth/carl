@@ -1,6 +1,6 @@
 #include "../Common.h"
 
-#include <carl/util/stringparser.h>
+#include <carl-io/StringParser.h>
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/numbers/numbers.h>
 

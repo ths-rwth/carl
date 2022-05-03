@@ -1,11 +1,11 @@
 #include <vector>
 #include <sstream>
 
-#include "carl/groebner/groebner.h"
-#include "carl/groebner/benchmarks/katsura.h"
-#include "carl/groebner/benchmarks/cyclic.h"
-#include "carl/core/MultivariatePolynomial.h"
-#include "carl/util/Timer.h"
+#include <carl/groebner/groebner.h>
+#include "groebner/katsura.h"
+#include "groebner/cyclic.h"
+#include <carl/core/MultivariatePolynomial.h>
+#include <carl/util/Timer.h>
 
 using namespace carl;
 const static int MAX_KATSURA = 5;

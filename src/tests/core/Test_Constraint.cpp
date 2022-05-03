@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include <carl-extpolys/ConstraintOperations.h>
-#include "carl/util/stringparser.h"
+#include <carl-io/StringParser.h>
 
 #include "../Common.h"
 

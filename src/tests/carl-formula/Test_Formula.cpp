@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "../../carl/core/VariablePool.h"
 #include "../../carl-formula/formula/Formula.h"
-#include "../../carl/util/stringparser.h"
+#include <carl-io/StringParser.h>
 
 #include "../Common.h"
 

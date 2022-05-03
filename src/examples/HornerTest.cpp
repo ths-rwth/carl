@@ -1,7 +1,7 @@
 #include "../carl/core/MultivariateHorner.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
-#include "carl/util/stringparser.h"
+#include <carl-io/StringParser.h>
 #include "carl/core/polynomialfunctions/IntervalEvaluation.h"
 
 #ifdef USE_GINAC
