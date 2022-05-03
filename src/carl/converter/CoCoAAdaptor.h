@@ -10,7 +10,7 @@
 #include "../core/Variables.h"
 #include "../core/MultivariatePolynomial.h"
 #include "../numbers/conversion/cln_gmp.h"
-#include "../util/Common.h"
+#include "../core/Common.h"
 #include "CoCoAAdaptorStatistics.h"
 
 #include <algorithm>

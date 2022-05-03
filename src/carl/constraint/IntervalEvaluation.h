@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../util/Common.h"
+#include "../core/Common.h"
 #include "BasicConstraint.h"
 #include "../interval/Interval.h"
 #include "../core/polynomialfunctions/IntervalEvaluation.h"

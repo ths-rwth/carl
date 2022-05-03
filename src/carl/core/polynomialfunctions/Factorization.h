@@ -5,7 +5,7 @@
 #include <carl-logging/carl-logging.h>
 #include "../../converter/CoCoAAdaptor.h"
 #include "../../converter/OldGinacConverter.h"
-#include "../../util/Common.h"
+#include "../../core/Common.h"
 
 namespace carl {
 

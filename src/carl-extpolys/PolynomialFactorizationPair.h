@@ -11,7 +11,7 @@
 #include <mutex>
 
 #include <carl/core/Monomial.h>
-#include <carl/util/Common.h>
+#include <carl/core/Common.h>
 
 namespace carl
 {

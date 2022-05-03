@@ -7,10 +7,11 @@
 
 #pragma once
 
-#include <carl/util/Common.h>
+#include <carl-common/util/container_types.h>
 #include <carl-common/memory/Singleton.h>
 
 #include <mutex>
+#include <iostream>
 
 namespace carl
 {

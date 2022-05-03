@@ -15,7 +15,7 @@
 #include "../core/Variables.h"
 #include "../core/polynomialfunctions/Degree.h"
 #include "../numbers/conversion/cln_gmp.h"
-#include "../util/Common.h"
+#include "../core/Common.h"
 #include <carl-common/meta/SFINAE.h>
 #include <carl-common/memory/Singleton.h>
 #include "LibpolyVariableMapper.h"

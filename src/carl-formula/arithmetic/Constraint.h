@@ -6,7 +6,7 @@
 #include <carl/core/Variables.h>
 #include <carl/core/VariablesInformation.h>
 #include <carl/core/polynomialfunctions/Factorization.h>
-#include <carl/util/Common.h>
+#include <carl/core/Common.h>
 #include <carl/constraint/Simplification.h>
 #include <carl/constraint/Comparison.h>
 #include <carl/constraint/Evaluation.h>

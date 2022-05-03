@@ -5,7 +5,7 @@
 #if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
 
 #include "../core/Variable.h"
-#include "../util/Common.h"
+#include "../core/Common.h"
 #include <carl-common/meta/SFINAE.h>
 #include <carl-common/memory/Singleton.h>
 

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <carl/util/Common.h>
+#include <carl-common/util/container_types.h>
 #include <carl-common/memory/Singleton.h>
 #include <carl-common/util/hash.h>
 #include "../sort/Sort.h"

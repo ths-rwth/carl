@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BasicConstraint.h"
-#include "../util/Common.h"
+#include "../core/Common.h"
 #include "../core/polynomialfunctions/Substitution.h"
 
 namespace carl {

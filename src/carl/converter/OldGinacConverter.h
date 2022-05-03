@@ -14,7 +14,7 @@
 #include "../core/VariablePool.h"
 #include "../core/Variables.h"
 #include "../numbers/numbers.h"
-#include "../util/Common.h"
+#include "../core/Common.h"
 #include <carl-common/meta/SFINAE.h>
 #include <carl-common/memory/Singleton.h>
 #include "ginac.h"

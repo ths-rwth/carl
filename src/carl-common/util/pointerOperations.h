@@ -15,6 +15,7 @@
 
 #include <functional>
 #include <memory>
+#include <cassert>
 
 namespace carl {
 

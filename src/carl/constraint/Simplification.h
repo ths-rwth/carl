@@ -2,9 +2,11 @@
 
 #include "BasicConstraint.h"
 #include "../core/polynomialfunctions/Definiteness.h"
-#include "../util/Common.h"
+#include "../core/Common.h"
 
 namespace carl::constraint {
+
+static constexpr bool FULL_EFFORT_FOR_DEFINITENESS_CHECK = false;
 
 template<typename Pol>
 BasicConstraint<Pol> init_bound(Variable var, Relation rel, const typename Pol::NumberType& bound) {

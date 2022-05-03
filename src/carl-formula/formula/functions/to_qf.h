@@ -14,7 +14,7 @@ namespace carl {
  * @return The quantifier-free version of this formula.
  */
 template<typename Poly>
-Formula<Poly> toQF(QuantifiedVariables& variables, unsigned level = 0, bool negated = false) {
+Formula<Poly> toQF(std::vector<Variables>& variables, unsigned level = 0, bool negated = false) {
 	switch (getType()) {
 		case FormulaType::AND:
 		case FormulaType::IFF:
