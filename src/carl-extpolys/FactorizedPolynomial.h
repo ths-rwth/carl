@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <carl/numbers/numbers.h>
-#include <carl/util/Cache.h>
+#include <carl-common/memory/Cache.h>
 #include <carl/core/polynomialfunctions/Division.h>
 #include "PolynomialFactorizationPair.h"
 #include <carl/core/VariablesInformation.h>

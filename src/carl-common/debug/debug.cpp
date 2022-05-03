@@ -1,7 +1,5 @@
 #include "debug.h"
 
-#include <carl-logging/carl-logging.h>
-
 #include <boost/core/demangle.hpp>
 
 #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED
@@ -57,7 +55,8 @@ __declspec(noreturn) static void handle_signal(int signal) {
  * Installs the signal handler.
  */
 static bool install_signal_handler() noexcept {
-	CARL_LOG_INFO("carl.util", "Installing signal handler for SIGABRT");
+	// CARL_LOG_INFO("carl.util", "Installing signal handler for SIGABRT");
+	// std::cerr << "Installing signal handler for SIGABRT" << std::endl;
 	std::signal(SIGABRT, handle_signal);
 	return true;
 }

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../util/debug.h"
+#include <carl-common/debug/debug.h>
 #include <carl-common/meta/platform.h>
 #include <carl-common/meta/SFINAE.h>
 #include <carl-logging/carl-logging.h>

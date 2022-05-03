@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Common.h"
+#include "../util/container_types.h"
 
 #include <cassert>
 #include <limits>

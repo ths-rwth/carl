@@ -12,7 +12,7 @@
 
 
 #include <carl/core/Monomial.h>
-#include <carl/util/debug.h>
+#include <carl-common/debug/debug.h>
 
 namespace carl {
 

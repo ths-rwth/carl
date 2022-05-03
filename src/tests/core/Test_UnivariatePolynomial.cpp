@@ -13,7 +13,7 @@
 
 #include "carl/numbers/GFNumber.h"
 #include "carl/numbers/GaloisField.h"
-#include "carl/util/debug.h"
+#include <carl-common/debug/debug.h>
 #include <carl-common/meta/platform.h>
 
 #include <random>

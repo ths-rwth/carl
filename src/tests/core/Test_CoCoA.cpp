@@ -6,7 +6,7 @@
 #include <carl/core/MultivariatePolynomial.h>
 #include <carl/core/polynomialfunctions/CoprimePart.h>
 #include <carl/core/polynomialfunctions/SquareFreePart.h>
-#include <carl/util/Timer.h>
+#include <carl-common/debug/Timer.h>
 
 #include <random>
 #include <map>

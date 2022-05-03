@@ -183,7 +183,7 @@ namespace carl
     template<typename T>
     void Cache<T>::clean()
     {
-        CARL_LOG_TRACE( "carl.util.cache", "Cleaning cache..." );
+        //CARL_LOG_TRACE( "carl.util.cache", "Cleaning cache..." );
         if( double(mNumOfUnusedEntries) < (double(mCache.size()) * mCacheReductionAmount) )
         {
             if( mNumOfUnusedEntries > 0 )

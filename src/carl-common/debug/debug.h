@@ -17,7 +17,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <carl-common/meta/platform.h>
+#include "../meta/platform.h"
 
 #ifndef __VS
 #include <unistd.h>

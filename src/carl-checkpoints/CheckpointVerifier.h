@@ -4,7 +4,7 @@
 #include <carl-common/memory/Singleton.h>
 #include <carl/core/VariablePool.h>
 #include <carl-formula/formula/Formula.h>
-#include <carl/util/debug.h>
+#include <carl-common/debug/debug.h>
 
 #include <any>
 

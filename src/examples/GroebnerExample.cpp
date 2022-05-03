@@ -5,7 +5,7 @@
 #include "groebner/katsura.h"
 #include "groebner/cyclic.h"
 #include <carl/core/MultivariatePolynomial.h>
-#include <carl/util/Timer.h>
+#include <carl-common/debug/Timer.h>
 
 using namespace carl;
 const static int MAX_KATSURA = 5;
