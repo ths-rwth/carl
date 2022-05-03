@@ -9,7 +9,7 @@
 namespace carl {
 
 template<typename Number, typename Poly>
-inline boost::tribool evaluate(const BasicConstraint<Poly>& c, const EvaluationMap<Interval<Number>>& map) {
+inline boost::tribool evaluate(const BasicConstraint<Poly>& c, const Assignment<Interval<Number>>& map) {
 	return evaluate(evaluate(c.lhs(), map), c.relation());
 }
 
@@ -22,7 +22,7 @@ inline boost::tribool evaluate(const BasicConstraint<Poly>& c, const EvaluationM
  *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
  */
 template<typename Pol>
-static unsigned consistentWith(const BasicConstraint<Pol>& c, const EvaluationMap<Interval<double>>& _solutionInterval) {
+static unsigned consistentWith(const BasicConstraint<Pol>& c, const Assignment<Interval<double>>& _solutionInterval) {
 	auto vars = variables(c);
 	if (vars.empty())
 		return carl::evaluate(c.lhs().constantPart(), c.relation()) ? 1 : 0;
@@ -121,7 +121,7 @@ static unsigned consistentWith(const BasicConstraint<Pol>& c, const EvaluationMa
  *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
  */
 template<typename Pol>
-static unsigned consistentWith(const BasicConstraint<Pol>& c, const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation) {
+static unsigned consistentWith(const BasicConstraint<Pol>& c, const Assignment<Interval<double>>& _solutionInterval, Relation& _stricterRelation) {
 	_stricterRelation = c.relation();
 	auto vars = variables(c);
 	if (vars.empty())

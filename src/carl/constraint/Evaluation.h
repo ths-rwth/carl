@@ -15,7 +15,7 @@ namespace carl {
  *                       even then it could be possible to obtain the first two results.)
  */
 template<typename Pol>
-unsigned satisfiedBy(const BasicConstraint<Pol>& c, const EvaluationMap<typename Pol::NumberType>& _assignment) {
+unsigned satisfiedBy(const BasicConstraint<Pol>& c, const Assignment<typename Pol::NumberType>& _assignment) {
 	unsigned result = 2;
 	Pol tmp = carl::substitute(c.lhs(), _assignment);
 	if (tmp.isConstant()) {

@@ -409,7 +409,7 @@ auto get_assignment(const Constraint<Pol>& c) { return get_assignment(c.constr()
 template<typename Pol>
 auto compare(const Constraint<Pol>& c1, const Constraint<Pol>& c2) { return compare(c1.constr(), c2.constr()); }
 template<typename Pol>
-auto satisfiedBy(const Constraint<Pol>& c, const EvaluationMap<typename Pol::NumberType>& a) { return satisfiedBy(c.constr(), a); }
+auto satisfiedBy(const Constraint<Pol>& c, const Assignment<typename Pol::NumberType>& a) { return satisfiedBy(c.constr(), a); }
 
 } // namespace carl
 
