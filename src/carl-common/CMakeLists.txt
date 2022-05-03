@@ -2,7 +2,8 @@ include(${CMAKE_SOURCE_DIR}/cmake/carlmacros.cmake)
 
 add_definitions(-fPIC)
 
-#add_subdirectory(datastructures)
+# include util to properly set up variables for configure_everything()
+add_subdirectory(compile_info)
 # Configure all .in files
 configure_everything()
 

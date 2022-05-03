@@ -1,7 +1,3 @@
-
-# include util to properly set up variables for configure_everything()
-add_subdirectory(util)
-
 # Configure all .in files
 configure_everything()
 
