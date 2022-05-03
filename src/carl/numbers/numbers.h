@@ -20,7 +20,7 @@ namespace carl {
 	static_assert(std::is_arithmetic<sint>::value);
 }
 
-#include "config.h"
+#include <carl-common/config.h>
 #include "constants.h"
 #include "typetraits.h"
 #include "operations_predeclarations.h"

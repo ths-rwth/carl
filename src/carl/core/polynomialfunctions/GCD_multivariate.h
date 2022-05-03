@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../config.h"
+#include <carl-common/config.h>
 #include "PrimitiveEuclidean.h"
 #include "../MultivariatePolynomial.h"
 #include "../../numbers/typetraits.h"

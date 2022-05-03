@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl/config.h>
+#include <carl-common/config.h>
 #include <carl/numbers/numbers.h>
 
 using Rational = mpq_class;

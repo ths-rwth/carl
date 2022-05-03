@@ -10,6 +10,10 @@
 #include "BenchmarkTest.h"
 #include "framework/BenchmarkGenerator.h"
 
+#include <carl-common/config.h>
+#include <carl-logging/config.h>
+
+
 using namespace carl;
 
 namespace carl {

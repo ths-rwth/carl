@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../config.h"
+#include <carl-common/config.h>
 
 #ifdef USE_CLN_NUMBERS
 

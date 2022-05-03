@@ -6,7 +6,7 @@
 #include "VariablePool.h"
 
 #include "initialize.h"
-#include "../config.h"
+#include <carl-common/config.h>
 #include <carl-logging/carl-logging.h>
 
 namespace carl

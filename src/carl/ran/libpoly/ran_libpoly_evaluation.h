@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl/config.h>
+#include <carl-common/config.h>
 
 #ifdef RAN_USE_LIBPOLY
 

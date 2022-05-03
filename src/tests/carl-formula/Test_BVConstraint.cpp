@@ -6,7 +6,7 @@
 #include <carl/core/VariablePool.h>
 #include <carl-formula/formula/FormulaPool.h>
 #include <carl-formula/sort/SortManager.h>
-#include <carl/numbers/config.h>
+#include <carl-common/config.h>
 
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>

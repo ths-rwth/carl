@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "config.h"
+#include <carl-common/config.h>
 #include "../numbers/numbers.h"
 
 #if defined(RAN_USE_Z3) || defined(USE_Z3_NUMBERS)

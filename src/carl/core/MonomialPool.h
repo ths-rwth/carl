@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../config.h"
+#include <carl-common/config.h>
 #include <carl-common/memory/IDPool.h>
 #include <carl-common/memory/PoolHelper.h>
 #include <carl-common/memory/Singleton.h>

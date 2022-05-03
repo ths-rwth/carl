@@ -12,7 +12,7 @@
 #include <type_traits>
 
 #include <carl-common/util/enum_util.h>
-#include "../config.h"
+#include <carl-common/config.h>
 #include <carl-logging/carl-logging.h>
 
 namespace carl {

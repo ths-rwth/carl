@@ -1,6 +1,6 @@
 #pragma onceAlgebraicNumber
 
-#include "../../config.h"
+#include <carl-common/config.h>
 
 #ifdef RAN_USE_Z3
 

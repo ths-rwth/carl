@@ -1,7 +1,7 @@
 #pragma once
 
 #include <carl-common/memory/Pool.h>
-#include <carl/config.h>
+#include <carl-common/config.h>
 #include <carl/core/VariableInformation.h>
 #include <carl/core/Variables.h>
 #include <carl/core/VariablesInformation.h>
@@ -17,7 +17,6 @@
 #include <iostream>
 #include <sstream>
 
-#include "../config.h"
 
 namespace carl {
 

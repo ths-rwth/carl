@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../config.h"
+#include <carl-common/config.h>
 #include "Term.h"
 #include <carl-common/util/streamingOperators.h>
 #include <carl-common/util/pointerOperations.h>

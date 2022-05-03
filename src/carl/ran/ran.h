@@ -26,7 +26,7 @@
  */
 
 
-#include <carl/config.h>
+#include <carl-common/config.h>
 
 #ifdef RAN_USE_INTERVAL
 #include "interval/ran_interval.h"

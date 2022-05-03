@@ -1,6 +1,6 @@
 #pragma once
 
-#include "config.h"
+#include <carl-common/config.h>
 
 #ifdef USE_GINAC
 #include <ginac/ginac.h>

@@ -34,7 +34,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
 #include <carl-common/meta/platform.h>
-#include "config.h"
+#include <carl-common/config.h>
 #include <limits>
 #include <type_traits>
 

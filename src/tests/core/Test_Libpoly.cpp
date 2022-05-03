@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include "../../carl/config.h"
 #include "../Common.h"
 #include "carl/core/VariablePool.h"
 
