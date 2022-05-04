@@ -155,7 +155,7 @@ namespace carl
 				if (simple) value = evaluated(ass.first);
 
 				if (ass.first.isVariable()) {
-					os << "\t(define-fun " << ass.first << " () " << ass.first.asVariable().getType() << std::endl;
+					os << "\t(define-fun " << ass.first << " () " << ass.first.asVariable().type() << std::endl;
 					os << "\t\t" << value << ")" << std::endl;
 				} else if (ass.first.isBVVariable()) {
 					os << "\t(define-fun " << ass.first << " () " << ass.first.asBVVariable().sort() << std::endl;

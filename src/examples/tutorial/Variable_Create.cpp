@@ -31,10 +31,10 @@ int main() {
 	carl::Variable a = carl::freshRealVariable("x");
 	carl::Variable b = carl::freshIntegerVariable("y");
 
-	assert(a.getType() == carl::VariableType::VT_REAL);
-	assert(a.getName() == "x");
-	assert(b.getType() == carl::VariableType::VT_INT);
-	assert(b.getName() == "y");
+	assert(a.type() == carl::VariableType::VT_REAL);
+	assert(a.name() == "x");
+	assert(b.type() == carl::VariableType::VT_INT);
+	assert(b.name() == "y");
 
 	/*
 	 * You can create anonymous variables by omitting the first argument.
@@ -45,9 +45,9 @@ int main() {
 	carl::Variable d = carl::freshRealVariable("d");
 	carl::Variable e = carl::freshRealVariable();
 
-	assert(c.getType() == carl::VariableType::VT_INT);
-	assert(d.getName() == "d");
-	assert(e.getType() == carl::VariableType::VT_REAL);
+	assert(c.type() == carl::VariableType::VT_INT);
+	assert(d.name() == "d");
+	assert(e.type() == carl::VariableType::VT_REAL);
 	
 	/*
 	 * As a variable objects technically consists of a single unsigned, most
