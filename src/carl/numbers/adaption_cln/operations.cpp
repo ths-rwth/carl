@@ -136,12 +136,6 @@ namespace carl
 		auto res = cln::realpart(cln::expt(a, cln::cl_RA(1)/n));
 		return std::make_pair(cln::cl_RA(cln::floor1(res)), cln::cl_RA(cln::ceiling1(res)));
 	}
-
-    template<>
-    cln::cl_RA rationalize<cln::cl_RA>(const std::string& n)
-    {
-        return parse<cln::cl_RA>(n);
-    }
     
     template<>
     cln::cl_I parse<cln::cl_I>(const std::string& n) {

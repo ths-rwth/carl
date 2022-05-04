@@ -190,7 +190,7 @@ namespace carl
 
 		template<typename F = FloatType, EnableIf< carl::is_rational<F> > = dummy>
 		explicit FLOAT_T<FloatType>(const std::string& _string, CARL_RND /*unused*/ = CARL_RND::N):
-			mValue(carl::rationalize<FloatType>(_string))
+			mValue(carl::parse<FloatType>(_string))
 		{
 		}
 

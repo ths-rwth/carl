@@ -24,8 +24,6 @@ namespace carl {
 	template<typename T>
 	inline T rationalize(uint n);
 
-	template<typename T>
-	inline T rationalize(const std::string& n);
 
 	template<typename From, typename To, carl::DisableIf< std::is_same<From,To> > = dummy >
 	inline To convert(const From&);

@@ -242,9 +242,6 @@ inline mpq_class rationalize<mpq_class>(sint n) {
 	return mpq_class(static_cast<signed long>(n));
 }
 
-template<> [[deprecated("use parse() instead.")]]
-mpq_class rationalize<mpq_class>(const std::string& n);
-
 template<>
 inline mpq_class rationalize<mpq_class>(const PreventConversion<mpq_class>& n) {
 	return n;
