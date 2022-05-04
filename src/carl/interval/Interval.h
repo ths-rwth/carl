@@ -1230,16 +1230,6 @@ namespace carl
         void magnitude_assign();
 
         /**
-         * Returns the center point of the interval.
-         * @return Center.
-         */
-		[[deprecated("Use carl::center() instead.")]]
-		Number center() const
-		{
-			return carl::center(*this);
-		}
-
-        /**
          * Computes and assigns the center point of the interval.
          */
         void center_assign();

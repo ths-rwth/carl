@@ -9,9 +9,10 @@
 
 
 #include "gtest/gtest.h"
-#include "../../carl/numbers/numbers.h"
-#include "../../carl/interval/Interval.h"
+#include "carl/numbers/numbers.h"
+#include "carl/interval/Interval.h"
 #include "carl/interval/set_theory.h"
+#include "carl/interval/sampling.h"
 #include "carl/core/VariablePool.h"
 #include <iostream>
 #include <carl-common/meta/platform.h>
@@ -1123,10 +1124,10 @@ TEST(mpfrInterval, Properties)
     EXPECT_EQ(5, i4.magnitude());
 
     // Center
-    EXPECT_EQ(5, i1.center());
-    EXPECT_EQ(-1, i2.center());
-    EXPECT_EQ(5, i3.center());
-    EXPECT_EQ(-1, i4.center());
+    EXPECT_EQ(5, carl::center(i1));
+    EXPECT_EQ(-1, carl::center(i2));
+    EXPECT_EQ(5, carl::center(i3));
+    EXPECT_EQ(-1, carl::center(i4));
 }
 
 TEST(mpfrInterval, Contains)
