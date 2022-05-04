@@ -587,10 +587,10 @@ namespace carl
 
 			bool isBound() const
 			{
-				if (mpContent->mType == FormulaType::CONSTRAINT) return std::get<Constraint<Pol>>(mpContent->mContent).isBound();
+				if (mpContent->mType == FormulaType::CONSTRAINT) return is_bound(std::get<Constraint<Pol>>(mpContent->mContent));
 				if (mpContent->mType == FormulaType::NOT) {
 					if (std::get<Formula<Pol>>(mpContent->mContent).mpContent->mType != FormulaType::CONSTRAINT) return false;
-					return std::get<Constraint<Pol>>(std::get<Formula<Pol>>(mpContent->mContent).mpContent->mContent).isBound(true);
+					return is_bound(std::get<Constraint<Pol>>(std::get<Formula<Pol>>(mpContent->mContent).mpContent->mContent), true);
 				}
 				return false;
 			}

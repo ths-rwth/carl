@@ -11,6 +11,7 @@
 #include <carl/constraint/Comparison.h>
 #include <carl/constraint/Evaluation.h>
 #include <carl/constraint/Substitution.h>
+#include <carl/constraint/Bound.h>
 
 #include <cassert>
 #include <cstring>
@@ -279,69 +280,6 @@ public:
 	bool isPseudoBoolean() const {
 		return !variables().boolean().empty();
 	}
-
-	/**
-     * @return true, if this constraint is a bound.
-     */
-	bool isBound(bool negated = false) const { // TODO move
-		if (variables().size() != 1 || maxDegree(variables().as_vector()[0]) != 1) return false;
-		if (negated) {
-			return relation() != Relation::EQ;
-		} else {
-			return relation() != Relation::NEQ;
-		}
-	}
-
-	/**
-     * @return true, if this constraint is a lower bound.
-     */
-	bool isLowerBound() const { // TODO move
-		if (isBound()) {
-			if (relation() == Relation::EQ) return true;
-			const typename Pol::NumberType& coeff = lhs().lterm().coeff();
-			if (coeff < 0)
-				return (relation() == Relation::LEQ || relation() == Relation::LESS);
-			else {
-				assert(coeff > 0);
-				return (relation() == Relation::GEQ || relation() == Relation::GREATER);
-			}
-		}
-		return false;
-	}
-
-	/**
-     * @return true, if this constraint is an upper bound.
-     */
-	bool isUpperBound() const { // TODO move
-		if (isBound()) {
-			if (relation() == Relation::EQ) return true;
-			const typename Pol::NumberType& coeff = lhs().lterm().coeff();
-			if (coeff > 0)
-				return (relation() == Relation::LEQ || relation() == Relation::LESS);
-			else {
-				assert(coeff < 0);
-				return (relation() == Relation::GEQ || relation() == Relation::GREATER);
-			}
-		}
-		return false;
-	}
-
-	/**
-     * @param _var The variable to check the size of its solution set for.
-     * @return true, if it is easy to decide whether this constraint has a finite solution set
-     *                in the given variable;
-     *          false, otherwise.
-     */
-	bool hasFinitelyManySolutionsIn(const Variable& _var) const {
-		if (variables().has(_var))
-			return true;
-		if (relation() == Relation::EQ) {
-			if (variables().size() == 1)
-				return true;
-		}
-		return false;
-	}
-
 	
 	template<typename P>
 	friend bool operator==(const Constraint<P>& lhs, const Constraint<P>& rhs);
@@ -409,6 +347,18 @@ template<typename Pol>
 auto compare(const Constraint<Pol>& c1, const Constraint<Pol>& c2) { return compare(c1.constr(), c2.constr()); }
 template<typename Pol>
 auto satisfiedBy(const Constraint<Pol>& c, const Assignment<typename Pol::NumberType>& a) { return satisfiedBy(c.constr(), a); }
+template<typename Pol>
+bool is_bound(const Constraint<Pol>& constr, bool negated = false) {
+	if (negated) {
+		return is_bound(constr.constr().negation());
+	} else {
+		return is_bound(constr.constr());
+	}
+}
+template<typename Pol>
+bool is_lower_bound(const Constraint<Pol>& constr) { return is_lower_bound(constr.constr()); }
+template<typename Pol>
+bool is_upper_bound(const Constraint<Pol>& constr) { return is_upper_bound(constr.constr()); }
 
 } // namespace carl
 
