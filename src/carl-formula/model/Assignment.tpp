@@ -22,7 +22,7 @@ namespace carl
             }
             else if (ass->second.isSqrtEx())
             {
-                if( ass->second.asSqrtEx().isConstant() && !ass->second.asSqrtEx().hasSqrt() )
+                if( ass->second.asSqrtEx().isConstant() && !ass->second.asSqrtEx().has_sqrt() )
                 {
                     assert( ass->first.isVariable() );
                     Rational value = ass->second.asSqrtEx().constantPart().constantPart()/ass->second.asSqrtEx().denominator().constantPart();

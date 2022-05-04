@@ -23,13 +23,13 @@ namespace carl
 			using Rational = typename UnderlyingNumberType<Poly>::type;
         private:
             /// The constant part c of this square root expression (c + f * sqrt(r))/d.
-            Poly mConstantPart;
+            Poly m_constant_part;
             /// The factor f of this square root expression (c + f * sqrt(r))/d.
-            Poly mFactor;
+            Poly m_factor;
             /// The denominator d of this square root expression (c + f * sqrt(r))/d.
-            Poly mDenominator;
+            Poly m_denominator;
             /// The radicand r of this square root expression (c + f * sqrt(r))/d.
-            Poly mRadicand;
+            Poly m_radicand;
 
         public:
             /**
@@ -68,7 +68,7 @@ namespace carl
              */
             const Poly& constantPart() const
             {
-                return mConstantPart;
+                return m_constant_part;
             }
             
             /**
@@ -76,7 +76,7 @@ namespace carl
              */
             const Poly& factor() const
             {
-                return mFactor;
+                return m_factor;
             }
 
             /**
@@ -84,7 +84,7 @@ namespace carl
              */
             const Poly& denominator() const
             {
-                return mDenominator;
+                return m_denominator;
             }
 
             /**
@@ -92,35 +92,35 @@ namespace carl
              */
             const Poly& radicand() const
             {
-                return mRadicand;
+                return m_radicand;
             }
 
             /**
              * @return true, if the square root expression has a non trivial radicand;
              *          false, otherwise.
              */
-            bool hasSqrt() const
+            bool has_sqrt() const
             {
-                return !carl::isZero(mFactor);
+                return !carl::isZero(m_factor);
             }
 
             /**
              * @return true, if the square root expression can be expressed as a polynomial;
              *          false, otherwise.
              */
-            bool isPolynomial() const
+            bool is_polynomial() const
             {
-                return carl::isZero(mFactor) && mDenominator.isConstant();
+                return carl::isZero(m_factor) && m_denominator.isConstant();
             }
 
             /**
              * @return The square root expression as a polynomial (note that there must be no square root nor denominator
              */
-            Poly asPolynomial() const
+            Poly as_polynomial() const
             {
-                assert( isPolynomial() );
-                assert( !carl::isZero(mDenominator) );
-                return mConstantPart / mDenominator.constantPart();
+                assert( is_polynomial() );
+                assert( !carl::isZero(m_denominator) );
+                return m_constant_part / m_denominator.constantPart();
             }
 
             /**
@@ -129,7 +129,7 @@ namespace carl
              */
             bool isConstant() const
             {
-                return mConstantPart.isConstant() && mDenominator.isConstant() && mFactor.isConstant() && mRadicand.isConstant();
+                return m_constant_part.isConstant() && m_denominator.isConstant() && m_factor.isConstant() && m_radicand.isConstant();
             }
             
             /**
@@ -138,7 +138,7 @@ namespace carl
             Rational asConstant() const
             {
                 assert( isConstant() );
-                return mConstantPart.constantPart();
+                return m_constant_part.constantPart();
             }
 
             /**
@@ -147,7 +147,7 @@ namespace carl
              */
             bool isRational() const
             {
-                return mConstantPart.isConstant() && mDenominator.isConstant() && carl::isZero(mRadicand);
+                return m_constant_part.isConstant() && m_denominator.isConstant() && carl::isZero(m_radicand);
             }
             
             /**
@@ -158,7 +158,7 @@ namespace carl
                 if( isConstant() )
                     return asConstant();
                 assert( isRational() );
-                return mConstantPart.constantPart()/mFactor.constantPart();
+                return m_constant_part.constantPart()/m_factor.constantPart();
             }
             
         private:
@@ -245,19 +245,6 @@ namespace carl
              * @return The string representation of this square root expression.
              */
             std::string toString( bool _infix = false, bool _friendlyNames = true ) const;
-            
-            bool evaluate( Rational& _result, const std::map<Variable, Rational>& _evalMap, int _rounding = 0 ) const;
-            
-            SqrtEx substitute( const std::map<Variable, Rational>& _evalMap ) const;
-            
-            /**
-             * Substitutes a variable in an expression by a square root expression, which results in a square root expression.
-             * @param _substituteIn The polynomial to substitute in.
-             * @param _varToSubstitute The variable to substitute.
-             * @param _substituteBy The square root expression by which the variable gets substituted.
-             * @return The resulting square root expression.
-             */
-            static SqrtEx subBySqrtEx( const Poly& _substituteIn, const carl::Variable& _varToSubstitute, const SqrtEx& _substituteBy );
     };
 
     template<typename Poly>

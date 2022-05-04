@@ -5,6 +5,8 @@
 #include <carl/core/polynomialfunctions/SoSDecomposition.h>
 #include <carl/constraint/IntervalEvaluation.h>
 
+#include <carl/vs/Substitution.h>
+
 //#define VS_DEBUG_SUBSTITUTION
 const unsigned MAX_NUM_OF_TERMS = 512;
 
@@ -278,7 +280,7 @@ namespace carl::vs::detail
             while( foundNoInvalidConstraint && pos < cc.size() )
             {
                 const Constraint<Poly>& constraint = cc[pos];
-                std::vector<std::pair<smtrat::Rational,Poly>> sosDec;
+                std::vector<std::pair<typename Poly::NumberType,Poly>> sosDec;
                 bool lcoeffNeg = carl::isNegative(constraint.lhs().lcoeff());
                 if (lcoeffNeg)
                     sosDec = carl::sos_decomposition(-constraint.lhs());
@@ -608,17 +610,18 @@ namespace carl::vs::detail
         bool result = true;
         if( _cons.variables().has( _subs.variable() ) )
         {
+            using Rational = typename Poly::NumberType;
             // Collect all necessary left hand sides to create the new conditions of all cases referring to the virtual substitution.
-            if( carl::pow( smtrat::Rational(smtrat::Rational(_subs.term().sqrt_ex().constantPart().size()) + smtrat::Rational(_subs.term().sqrt_ex().factor().size()) * smtrat::Rational(_subs.term().sqrt_ex().radicand().size())), _cons.maxDegree( _subs.variable() )) > (MAX_NUM_OF_TERMS*MAX_NUM_OF_TERMS) )
+            if( carl::pow( Rational(Rational(_subs.term().sqrt_ex().constantPart().size()) + Rational(_subs.term().sqrt_ex().factor().size()) * Rational(_subs.term().sqrt_ex().radicand().size())), _cons.maxDegree( _subs.variable() )) > (MAX_NUM_OF_TERMS*MAX_NUM_OF_TERMS) )
             {
                 return false;
             }
-            smtrat::SqrtEx sub = smtrat::SqrtEx::subBySqrtEx( _cons.lhs(), _subs.variable(), _subs.term().sqrt_ex() );
+            carl::SqrtEx sub = carl::substitute( _cons.lhs(), _subs.variable(), _subs.term().sqrt_ex() );
             #ifdef VS_DEBUG_SUBSTITUTION
             std::cout << "Result of common substitution:" << sub << std::endl;
             #endif
             // The term then looks like:    q/s
-            if( !sub.hasSqrt() )
+            if( !sub.has_sqrt() )
             {
                 // Create the new decision tuples.
                 if( _cons.relation() == Relation::EQ || _cons.relation() == Relation::NEQ )
