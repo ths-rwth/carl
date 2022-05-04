@@ -11,7 +11,7 @@
 #include <tuple>
 #include <vector>
 
-namespace carl {
+namespace carl::io {
 
 using OPBPolynomial = std::vector<std::pair<int,carl::Variable>>;
 using OPBConstraint = std::tuple<OPBPolynomial, Relation, int>;

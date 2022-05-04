@@ -20,7 +20,7 @@
 #include <sstream>
 #include <type_traits>
 
-namespace carl {
+namespace carl::io {
 
 /**
  * Allows to print carl data structures in SMTLIB syntax.

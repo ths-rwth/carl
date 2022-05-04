@@ -20,7 +20,7 @@ namespace benchmarks
 template<typename C, typename O, typename P>
 std::vector<MultivariatePolynomial<C, O, P>> katsura2()
 {
-	carl::StringParser sp;
+	carl::io::StringParser sp;
 	sp.setVariables({"x", "y"});
 	std::vector<MultivariatePolynomial<C, O, P>> res;
 	//x + 2*y - 1, 
@@ -33,7 +33,7 @@ std::vector<MultivariatePolynomial<C, O, P>> katsura2()
 template<typename C, typename O, typename P>
 std::vector<MultivariatePolynomial<C, O, P>> katsura3()
 {
-	carl::StringParser sp;
+	carl::io::StringParser sp;
 	sp.setVariables({"x", "y", "z"});
 	std::vector<MultivariatePolynomial<C, O, P>> res;
 	//x + 2*y + 2*z - 1,
@@ -49,7 +49,7 @@ std::vector<MultivariatePolynomial<C, O, P>> katsura3()
 template<typename C, typename O, typename P>
 std::vector<MultivariatePolynomial<C, O, P>> katsura4()
 {
-	carl::StringParser sp;
+	carl::io::StringParser sp;
 	sp.setVariables({"x", "y", "z", "t"});
 	std::vector<MultivariatePolynomial<C, O, P>> res;
 	//x + 2*y + 2*z + 2*t - 1, 
@@ -68,7 +68,7 @@ std::vector<MultivariatePolynomial<C, O, P>> katsura4()
 template<typename C, typename O, typename P>
 std::vector<MultivariatePolynomial<C, O, P>> katsura5()
 {
-	carl::StringParser sp;
+	carl::io::StringParser sp;
 	sp.setVariables({"x", "y", "z", "t", "u"});
 	std::vector<MultivariatePolynomial<C, O, P>> res;
 	//x + 2*y + 2*z + 2*t + 2*u - 1, 

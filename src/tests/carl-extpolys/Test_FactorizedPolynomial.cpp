@@ -29,7 +29,7 @@ typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 bool testOperation( const std::list<std::string>& sVars, const std::string& sPol1, const std::string& sPol2, std::function<Pol( Pol, Pol )> operatorPol, std::function<FPol( FPol, FPol )> operatorFPol )
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables(sVars);
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>(sPol1);
@@ -58,7 +58,7 @@ bool testOperation( const std::list<std::string>& sVars, const std::string& sPol
 bool testOperation( const std::list<std::string>& sVars, const std::string& sPol1, const std::string& sPol2, const Pol (*functionPol)( const Pol&, const Pol& ), const FPol (*functionFPol)( const FPol&, const FPol& ) )
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables(sVars);
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>(sPol1);
@@ -86,7 +86,7 @@ bool testOperation( const std::list<std::string>& sVars, const std::string& sPol
 bool testOperation( const std::list<std::string>& sVars, const std::string& sPol1, const std::string& sPol2, const Pol (Pol::*functionPol)( const Pol& ), const FPol (FPol::*functionFPol)( const FPol& ) )
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables(sVars);
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>(sPol1);
@@ -105,7 +105,7 @@ bool testOperation( const std::list<std::string>& sVars, const std::string& sPol
 TEST(FactorizedPolynomial, Construction)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol c1 = sp.parseMultivariatePolynomial<Rational>("1");
@@ -237,7 +237,7 @@ TEST(FactorizedPolynomial, Construction)
 TEST(FactorizedPolynomial, Coefficient)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y"});
 
     Pol fA = sp.parseMultivariatePolynomial<Rational>("3*x*y");
@@ -260,7 +260,7 @@ TEST(FactorizedPolynomial, Coefficient)
 TEST(FactorizedPolynomial, CommonDivisor)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
@@ -282,7 +282,7 @@ TEST(FactorizedPolynomial, CommonDivisor)
 TEST(FactorizedPolynomial, GCD)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y");
@@ -346,7 +346,7 @@ TEST(FactorizedPolynomial, GCD)
 TEST(FactorizedPolynomial, Flattening)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y*z");
@@ -383,7 +383,7 @@ TEST(FactorizedPolynomial, Flattening)
 TEST(FactorizedPolynomial, Flattening2)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x"});
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("x");
@@ -400,7 +400,7 @@ TEST(FactorizedPolynomial, Flattening2)
 TEST(FactorizedPolynomial, LCM)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("x*y");
@@ -465,7 +465,7 @@ TEST(FactorizedPolynomial, Multiplication)
 TEST(FactorizedPolynomial, Quotient)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("9*x");
@@ -487,7 +487,7 @@ TEST(FactorizedPolynomial, Quotient)
 TEST(FactorizedPolynomial, Destructor)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("9*x");
@@ -511,7 +511,7 @@ TEST(FactorizedPolynomial, Destructor)
 TEST(FactorizedPolynomial, Equality)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("9*x");

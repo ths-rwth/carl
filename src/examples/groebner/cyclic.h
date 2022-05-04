@@ -19,7 +19,7 @@ namespace carl
 template<typename C, typename O, typename P>
 std::vector<MultivariatePolynomial<C, O, P>> cyclic2()
 {
-	carl::StringParser sp;
+	carl::io::StringParser sp;
 	sp.setVariables({"x", "y"});
 	std::vector<MultivariatePolynomial<C, O, P>> res;
 	// x + y
@@ -32,7 +32,7 @@ std::vector<MultivariatePolynomial<C, O, P>> cyclic2()
 template<typename C, typename O, typename P>
 std::vector<MultivariatePolynomial<C, O, P>> cyclic3()
 {
-	carl::StringParser sp;
+	carl::io::StringParser sp;
 	sp.setVariables({"x", "y", "z"});
 	std::vector<MultivariatePolynomial<C, O, P>> res;
 	// x + y + z

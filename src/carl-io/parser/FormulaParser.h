@@ -7,7 +7,7 @@
 
 #include "Common.h"
 
-namespace carl {
+namespace carl::io {
 namespace parser {
 
 template<typename Pol>

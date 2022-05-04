@@ -15,7 +15,7 @@
 #include <sstream>
 #include <type_traits>
 
-namespace carl {
+namespace carl::io {
 
 class QEPCADStream {
 private:

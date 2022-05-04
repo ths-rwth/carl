@@ -25,7 +25,7 @@ namespace spirit = boost::spirit;
 namespace qi = boost::spirit::qi;
 namespace px = boost::phoenix;
 
-namespace carl {
+namespace carl::io {
 namespace parser {
 
 using carl::operator<<;

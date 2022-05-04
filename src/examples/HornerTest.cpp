@@ -19,7 +19,7 @@ typedef MultivariatePolynomial<Rational> Pol;
 int main (int argc, char** argv)
 {
 	
-  StringParser sp;
+  io::StringParser sp;
 	sp.setVariables({"x", "y", "z"});
 	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2*y^4*z^5*3 + x^3*10*y^4 + 20*z^6*y^2 + 21*x^9*z^2 + 4*x*y");
 	Pol p1 = sp.parseMultivariatePolynomial<Rational>("x*y + x*z + 2*x");

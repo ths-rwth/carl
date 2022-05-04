@@ -9,7 +9,7 @@
 #include <carl-formula/formula/Formula.h>
 #include <carl-logging/carl-logging.h>
 
-namespace carl {
+namespace carl::io {
 
 /**
  * Parser for the DIMACS format.

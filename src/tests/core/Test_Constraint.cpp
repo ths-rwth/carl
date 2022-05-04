@@ -20,7 +20,7 @@ typedef carl::Constraint<RFunc> RFuncCon;
 TEST(Constraint, Operations)
 {
     using carl::Relation;
-    carl::StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     std::vector<RFuncCon> v1;

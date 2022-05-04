@@ -16,12 +16,12 @@ protected:
 		spSingleSymbExplicit.setImplicitMultiplicationMode(false);
 		spSingleSymbExplicit.setVariables({"x", "y", "z"});
 	}
-	StringParser spSingleSymbExplicit;
+	carl::io::StringParser spSingleSymbExplicit;
 };
 
 TEST_F(StringParserTest, termsWithExplicitMultiplication)
 {
-    const StringParser& sp = spSingleSymbExplicit;
+    const carl::io::StringParser& sp = spSingleSymbExplicit;
    
     EXPECT_NO_THROW(sp.parseTerm<mpq_class>("x*y^3*z^2"));
     Term<mpq_class> t1 = sp.parseTerm<mpq_class>("x*y^3*z^2");
@@ -38,15 +38,15 @@ TEST_F(StringParserTest, termsWithExplicitMultiplication)
     EXPECT_EQ((unsigned)5, t3.tdeg());
     EXPECT_EQ((unsigned)2, t3.getNrVariables());
     EXPECT_EQ((mpq_class)3, t3.coeff());
-    EXPECT_THROW(sp.parseTerm<mpq_class>("x^y"), InvalidInputStringException);
-    EXPECT_THROW(sp.parseTerm<mpq_class>("3^3"), InvalidInputStringException);
+    EXPECT_THROW(sp.parseTerm<mpq_class>("x^y"), io::InvalidInputStringException);
+    EXPECT_THROW(sp.parseTerm<mpq_class>("3^3"), io::InvalidInputStringException);
     
 }
 
 
 TEST_F(StringParserTest, polynomialsWithExplicitMultiplication)
 {
-    const StringParser& sp = spSingleSymbExplicit;
+    const carl::io::StringParser& sp = spSingleSymbExplicit;
     
     EXPECT_NO_THROW(sp.parseTerm<mpq_class>("x*y^3*z^2"));
     MultivariatePolynomial<mpq_class> p1 = sp.parseMultivariatePolynomial<mpq_class>("x*y^3*z^2");
@@ -57,8 +57,8 @@ TEST_F(StringParserTest, polynomialsWithExplicitMultiplication)
     EXPECT_NO_THROW(sp.parseMultivariatePolynomial<mpq_class>("x + y^2 + x*y"));
     MultivariatePolynomial<mpq_class> p3 = sp.parseMultivariatePolynomial<mpq_class>("x + y^2 + x*y");
     EXPECT_EQ((unsigned)3, p3.nrTerms());
-    EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("x^y"), InvalidInputStringException);
-    EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("3^3"), InvalidInputStringException);
+    EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("x^y"), io::InvalidInputStringException);
+    EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("3^3"), io::InvalidInputStringException);
 }
 
 TEST_F(StringParserTest, rationalFunctionsWithExplicitMultiplication)

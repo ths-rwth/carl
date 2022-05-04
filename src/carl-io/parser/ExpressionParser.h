@@ -76,7 +76,7 @@ namespace boost { namespace spirit { namespace traits {
 }}}
 #endif
 
-namespace carl {
+namespace carl::io {
 namespace parser {
 
 template<typename Pol>

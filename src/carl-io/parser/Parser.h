@@ -14,7 +14,7 @@
 #include "PolynomialParser.h"
 #include "RationalFunctionParser.h"
 
-namespace carl {
+namespace carl::io {
 namespace parser {
 
 template<typename Pol>

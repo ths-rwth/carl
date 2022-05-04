@@ -30,7 +30,7 @@ struct QEPCADExample: ::testing::Test {
 };
 
 TEST_F(QEPCADExample, Maple) {
-	carl::MapleStream s;
+	carl::io::MapleStream s;
 	s << "restart:" << std::endl;
 	s << "start := time():" << std::endl;
 	if (extended) {
@@ -58,7 +58,7 @@ TEST_F(QEPCADExample, Maple) {
 }
 
 TEST_F(QEPCADExample, QEPCAD) {
-	carl::QEPCADStream s;
+	carl::io::QEPCADStream s;
 	// informal description
 	s << "[Example]" << std::endl;
 	// variable list
@@ -91,9 +91,9 @@ TEST_F(QEPCADExample, QEPCAD) {
 TEST_F(QEPCADExample, SMTLIB) {
 	std::ofstream out("QEPCADExample.smt2");
 	if (extended) {
-		out << carl::outputSMTLIB(carl::Logic::QF_NRA, {this->f_2});
+		out << carl::io::outputSMTLIB(carl::Logic::QF_NRA, {this->f_2});
 	} else {
-		out << carl::outputSMTLIB(carl::Logic::QF_NRA, {this->f_1});
+		out << carl::io::outputSMTLIB(carl::Logic::QF_NRA, {this->f_1});
 	}
 	out.close();
 }

@@ -10,7 +10,7 @@ using namespace carl;
 
 TEST(Parser, Polynomial)
 {
-	carl::parser::Parser<MultivariatePolynomial<Rational>> parser;
+	carl::io::parser::Parser<MultivariatePolynomial<Rational>> parser;
 	carl::Variable x = freshRealVariable("x");
 	carl::Variable y = freshRealVariable("y");
 	parser.addVariable(x);
@@ -34,7 +34,7 @@ TEST(Parser, RationalFunction)
 {
 	using MP = MultivariatePolynomial<Rational>;
 	using RF = RationalFunction<MP>;
-	carl::parser::Parser<MP> parser;
+	carl::io::parser::Parser<MP> parser;
 	carl::Variable x = freshRealVariable("x");
 	parser.addVariable(x);
 
@@ -47,7 +47,7 @@ TEST(Parser, Formula)
 {
     using carl::VariableType;
     using FT = Formula<MultivariatePolynomial<Rational>>;
-    carl::parser::Parser<MultivariatePolynomial<Rational>> parser;
+    carl::io::parser::Parser<MultivariatePolynomial<Rational>> parser;
     carl::Variable b1 = freshBooleanVariable("O4853");
     carl::Variable b2 = freshBooleanVariable("O3838");
     carl::Variable b3 = freshBooleanVariable("O4848");

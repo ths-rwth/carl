@@ -541,7 +541,7 @@ TEST(MultivariatePolynomial, Quotient)
 
 TEST(MultivariatePolynomial, Quotient2)
 {
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"t", "u"});
     Variable t = carl::VariablePool::getInstance().findVariableWithName("t");
     MultivariatePolynomial<Rational> p1 = sp.parseMultivariatePolynomial<Rational>("t^3*u^6+(-3)*t*u^5+(-1)*u^6+(-3)*t^2*u^6+3*t*u^6+(-1)*t^3*u^5+(-1)*t^3+(-3)*t+3*t^2+(-3)*u+3*t^3*u+9*t*u+(-9)*t^2*u+5*u^2+(-5)*t^3*u^2+(-15)*t*u^2+15*t^2*u^2+3*t^2*u^4+(-3)*t*u^4+(-1)*t^3*u^4+(-4)*u^3+u^4+(-12)*t^2*u^3+12*t*u^3+4*t^3*u^3+u^5+3*t^2*u^5+1");

@@ -10,7 +10,7 @@
 #include <vector>
 
 
-namespace carl {
+namespace carl::io {
 
 /**
  * Write formulas to the DIMAS format.

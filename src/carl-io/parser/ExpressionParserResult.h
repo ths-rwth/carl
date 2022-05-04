@@ -18,7 +18,7 @@
 #include <carl-extpolys/RationalFunction.h>
 #include <carl-formula/formula/Formula.h>
 
-namespace carl {
+namespace carl::io {
 namespace parser {
 
 template<typename Pol>
