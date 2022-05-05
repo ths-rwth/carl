@@ -33,16 +33,15 @@ class MultivariateRoot {
 public:
 	using Number = typename UnderlyingNumberType<Poly>::type;
 	using RAN = RealAlgebraicNumber<Number>;
-	using EvalMap = ran::RANMap<Number>;
 private:
   /**
    * Distinguished, globally unique root-variable
    */
-	static const Variable sVar;
+	static const Variable s_var;
 	/// Polynomial defining this root.
-	Poly mPoly;
+	Poly m_poly;
 	/// Specifies which root to consider.
-	std::size_t mK;
+	std::size_t m_k;
 public:
 	/**
 	 * @param poly Must mention the root-variable "_z" and
@@ -51,22 +50,29 @@ public:
 	 * @param k The index of the root of the polynomial in "_z".
 	 * The first root has index 1, the second has index 2 and so on.
 	 */
-	MultivariateRoot(const Poly& poly, std::size_t k): mPoly(poly), mK(k) {
-		assert(mK > 0);
+	MultivariateRoot(const Poly& poly, std::size_t k): m_poly(poly), m_k(k) {
+		assert(m_k > 0);
 	}
 
 	/**
 	 * Return k, the index of the root.
 	 */
 	std::size_t k() const noexcept {
-		return mK;
+		return m_k;
 	}
 
 	/**
 	 * @return the raw underlying polynomial that still mentions the root-variable "_z".
 	 */
 	const Poly& poly() const noexcept {
-		return mPoly;
+		return m_poly;
+	}
+
+	/**
+	 * @return the raw underlying polynomial that still mentions the root-variable "_z".
+	 */
+	Poly& poly() noexcept {
+		return m_poly;
 	}
 
 	/**
@@ -74,7 +80,7 @@ public:
 	 * root-variable replaced by the given variable.
 	 */
 	Poly poly(Variable var) const {
-		return carl::substitute(mPoly, sVar, Poly(var));
+		return carl::substitute(m_poly, s_var, Poly(var));
 	}
 
 	/**
@@ -82,51 +88,19 @@ public:
 	 * to allow you to build a polynomial with this variable yourself.
 	 */
 	static Variable var() noexcept {
-		return sVar;
+		return s_var;
 	}
 
 	bool isUnivariate() const {
-		return mPoly.isUnivariate();
+		return m_poly.isUnivariate();
 	}
 
-	/**
-	 * Create a copy of the underlying polynomial with the given variable
-	 * replaced by the given polynomial.
-	 */
-	void substituteIn(Variable var, const Poly& poly) {
-		carl::substitute_inplace(mPoly, var, poly);
-	}
-
-	/**
-	 * Return the emerging algebraic real after pluggin in a subpoint to replace
-	 * all variables with algebraic reals that are not the root-variable "_z".
-	 * @param m must contain algebraic real assignments for all variables that are not "_z".
-	 * @return std::nullopt if the underlying polynomial has no root with index 'rootIdx' at
-	 * the given subpoint.
-	 */
-	std::optional<RAN> evaluate(const EvalMap& m) const {
-		CARL_LOG_DEBUG("carl.rootexpression", "Evaluate: " << *this << " against: " << m);
-		auto poly = carl::to_univariate_polynomial(mPoly, sVar);
-		auto result = carl::real_roots(poly, m);
-		if (!result.is_univariate()) {
-			CARL_LOG_TRACE("carl.rootexpression", poly << " is not univariate (nullified: " << result.is_nullified() << "; non-univariate: " << result.is_non_univariate() << ").");
-			return std::nullopt;
-		}
-		CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << result.roots());
-		if (result.roots().size() < mK) {
-			CARL_LOG_TRACE("carl.rootexpression", mK << "th root does not exist.");
-			return std::nullopt;
-		}
-		CARL_LOG_TRACE("carl.rootexpression", "Take " << mK << "th of isolated roots " << result.roots());
-		assert(result.roots().size() >= mK);
-		assert(mK > 0);
-		CARL_LOG_DEBUG("carl.rootexpression", "Result is " << result.roots()[mK-1]);
-		return result.roots()[mK-1];
-	}
+	template<typename P>
+	friend std::optional<typename MultivariateRoot<P>::RAN> evaluate(const MultivariateRoot<P>& mr, const carl::Assignment<typename MultivariateRoot<P>::RAN>& m);
 };
 
 template<typename Poly>
-const Variable MultivariateRoot<Poly>::sVar = carl::VariablePool::getInstance().getFreshPersistentVariable("__z");
+const Variable MultivariateRoot<Poly>::s_var = carl::VariablePool::getInstance().getFreshPersistentVariable("__z");
 
 template<typename Poly>
 inline bool operator==(const MultivariateRoot<Poly>& lhs, const MultivariateRoot<Poly>& rhs) {
@@ -151,6 +125,43 @@ template<typename Poly>
 void variables(const MultivariateRoot<Poly>& mr, carlVariables& vars) {
 	carl::variables(mr.poly(), vars);
 	vars.erase(mr.var());
+}
+
+/**
+ * Create a copy of the underlying polynomial with the given variable
+ * replaced by the given polynomial.
+ */
+template<typename Poly>
+void substitute_inplace(MultivariateRoot<Poly>& mr, Variable var, const Poly& poly) {
+	carl::substitute_inplace(mr.poly(), var, poly);
+}
+
+/**
+ * Return the emerging algebraic real after pluggin in a subpoint to replace
+ * all variables with algebraic reals that are not the root-variable "_z".
+ * @param m must contain algebraic real assignments for all variables that are not "_z".
+ * @return std::nullopt if the underlying polynomial has no root with index 'rootIdx' at
+ * the given subpoint.
+ */
+template<typename Poly>
+std::optional<typename MultivariateRoot<Poly>::RAN> evaluate(const MultivariateRoot<Poly>& mr, const carl::Assignment<typename MultivariateRoot<Poly>::RAN>& m) {
+	CARL_LOG_DEBUG("carl.rootexpression", "Evaluate: " << mr << " against: " << m);
+	auto poly = carl::to_univariate_polynomial(mr.poly(), MultivariateRoot<Poly>::s_var);
+	auto result = carl::real_roots(poly, m);
+	if (!result.is_univariate()) {
+		CARL_LOG_TRACE("carl.rootexpression", poly << " is not univariate (nullified: " << result.is_nullified() << "; non-univariate: " << result.is_non_univariate() << ").");
+		return std::nullopt;
+	}
+	CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << result.roots());
+	if (result.roots().size() < mr.k()) {
+		CARL_LOG_TRACE("carl.rootexpression", mr.k() << "th root does not exist.");
+		return std::nullopt;
+	}
+	CARL_LOG_TRACE("carl.rootexpression", "Take " << mr.k() << "th of isolated roots " << result.roots());
+	assert(result.roots().size() >= mr.k());
+	assert(mr.k() > 0);
+	CARL_LOG_DEBUG("carl.rootexpression", "Result is " << result.roots()[mr.k()-1]);
+	return result.roots()[mr.k()-1];
 }
 
 }

@@ -7,7 +7,7 @@
 #include <boost/optional.hpp>
 
 #include <carl-formula/formula/Formula.h>
-#include <carl-formula/arithmetic/MultivariateRoot.h>
+#include <carl/extended/MultivariateRoot.h>
 #include "ModelValue.h"
 #include "ModelVariable.h"
 

@@ -257,8 +257,8 @@ namespace carl
                 }
             }
             const FormulaContent<Pol>* create(const VariableComparison<Pol>& _variableComparison) {
-				auto val = _variableComparison.asConstraint();
-				if (val) return create(*val);
+				auto val = _variableComparison.as_constraint();
+				if (val) return create(Constraint<Pol>(*val));
                 return create(std::move(VariableComparison<Pol>(_variableComparison)));
             }
 			const FormulaContent<Pol>* create(VariableAssignment<Pol>&& _variableAssignment) {

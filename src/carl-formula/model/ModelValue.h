@@ -3,7 +3,7 @@
 
 #include <carl-common/util/variant_util.h>
 #include <carl-formula/bitvector/BVValue.h>
-#include <carl-formula/arithmetic/MultivariateRoot.h>
+#include <carl/extended/MultivariateRoot.h>
 #include <carl/ran/ran.h>
 #include <carl/vs/SqrtEx.h>
 #include <carl-formula/uninterpreted/SortValue.h>

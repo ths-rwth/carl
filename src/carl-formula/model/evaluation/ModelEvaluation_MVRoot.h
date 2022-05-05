@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Model.h"
-#include <carl-formula/arithmetic/MultivariateRoot.h>
+#include <carl/extended/MultivariateRoot.h>
 
 namespace carl {
 namespace model {
@@ -10,7 +10,7 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void substituteIn(MultivariateRoot<Poly>& mvr, Variable::Arg var, const Rational& r) {
-		mvr.substituteIn(var, Poly(r));
+		substitute_inplace(mvr, var, Poly(r));
 	}
 
 	/**
@@ -52,7 +52,7 @@ namespace model {
 		auto map = collectRANIR(carl::variables(mvr).as_set(), m);
 		if (map.size() == carl::variables(mvr).size()) {
 			CARL_LOG_DEBUG("carl.model.evaluation", "Fully evaluating " << mvr << " over " << map);
-			auto r = mvr.evaluate(map);
+			auto r = evaluate(mvr,map);
 			if (r) {
 				CARL_LOG_DEBUG("carl.model.evaluation", "Got result " << *r);
 				res = *r;

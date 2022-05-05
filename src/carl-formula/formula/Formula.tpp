@@ -27,10 +27,10 @@ namespace carl
 						f.constraint().gatherVariables(vars);
 						break;
 					case FormulaType::VARCOMPARE:
-						f.variableComparison().gatherVariables(vars);
+                        carl::variables(f.variableComparison(), vars);
 						break;
 					case FormulaType::VARASSIGN:
-						f.variableAssignment().gatherVariables(vars);
+                        carl::variables(f.variableAssignment(), vars);
 						break;
 					case FormulaType::BITVECTOR:
 						f.bvConstraint().gatherVariables(vars);

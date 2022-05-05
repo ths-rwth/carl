@@ -7,6 +7,7 @@
 #include <carl/core/Variable.h>
 #include <carl/numbers/numbers.h>
 #include <carl/core/polynomialfunctions/Representation.h>
+#include <carl/constraint/BasicConstraint.h>
 
 #include <optional>
 #include <tuple>
@@ -28,39 +29,39 @@ namespace carl {
 	public:
 		using Number = typename UnderlyingNumberType<Poly>::type;
 		using MR = MultivariateRoot<Poly>;
-		using RAN = real_algebraic_number<Number>;
+		using RAN = RealAlgebraicNumber<Number>;
 	private:
-		Variable mVar;
-		std::variant<MR, RAN> mValue;
-		Relation mRelation;
-		bool mNegated;
+		Variable m_var;
+		std::variant<MR, RAN> m_value;
+		Relation m_relation;
+		bool m_negated;
 	public:
-		VariableComparison(Variable v, const std::variant<MR, RAN>& value, Relation rel, bool neg): mVar(v), mValue(value), mRelation(rel), mNegated(neg) {}
-		VariableComparison(Variable v, const MR& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {
+		VariableComparison(Variable v, const std::variant<MR, RAN>& value, Relation rel, bool neg): m_var(v), m_value(value), m_relation(rel), m_negated(neg) {}
+		VariableComparison(Variable v, const MR& value, Relation rel): m_var(v), m_value(value), m_relation(rel), m_negated(false) {
 			if (value.isUnivariate()) {
 			  // If the value of type MultivariateRoot is really just univariate, we convert it to an algebraic real.
-				auto res = value.evaluate({});
+				auto res = evaluate(value, carl::Assignment<RAN>({}));
 				if (res) {
-					mValue = *res;
-					CARL_LOG_DEBUG("carl.multivariateroot", "Evaluated " << value << "-> " << mValue);
+					m_value = *res;
+					CARL_LOG_DEBUG("carl.multivariateroot", "Evaluated " << value << "-> " << m_value);
 				}
 			}
 		}
-		VariableComparison(Variable v, const RAN& value, Relation rel): mVar(v), mValue(value), mRelation(rel), mNegated(false) {}
+		VariableComparison(Variable v, const RAN& value, Relation rel): m_var(v), m_value(value), m_relation(rel), m_negated(false) {}
 
 		Variable var() const {
-			return mVar;
+			return m_var;
 		}
 		Relation relation() const {
-			return mRelation;
+			return m_relation;
 		}
 		bool negated() const {
-			return mNegated;
+			return m_negated;
 		}
 		const std::variant<MR, RAN>& value() const {
-			return mValue;
+			return m_value;
 		}
-		bool isEquality() const {
+		bool is_equality() const {
 			return negated() ? relation() == Relation::NEQ : relation() == Relation::EQ;
 		}
 
@@ -69,19 +70,19 @@ namespace carl {
 		 * polynomial (in)equality against zero "p(..) < 0" if that is possible.
 		 * @return std::nullopt if conversion impossible.
 		 */
-		std::optional<Constraint<Poly>> asConstraint() const {
-			Relation rel = negated() ? inverse(mRelation) : mRelation;
-			if (std::holds_alternative<MR>(mValue)) {
-				const MR& mr = std::get<MR>(mValue);
+		std::optional<BasicConstraint<Poly>> as_constraint() const {
+			Relation rel = negated() ? inverse(m_relation) : m_relation;
+			if (std::holds_alternative<MR>(m_value)) {
+				const MR& mr = std::get<MR>(m_value);
 				if (mr.poly().degree(mr.var()) != 1) return std::nullopt;
 				if (mr.k() != 1) return std::nullopt;
 				auto lcoeff = mr.poly().coeff(mr.var(), 1);
 				if (!lcoeff.isConstant()) return std::nullopt;
 				auto ccoeff = mr.poly().coeff(mr.var(), 0);
-				return Constraint<Poly>(Poly(mVar) + ccoeff / lcoeff, rel);
+				return BasicConstraint<Poly>(Poly(m_var) + ccoeff / lcoeff, rel);
 			}
-			if (!std::get<RAN>(mValue).is_numeric()) return std::nullopt;
-			return Constraint<Poly>(Poly(mVar) - Poly(std::get<RAN>(mValue).value()), rel);
+			if (!std::get<RAN>(m_value).is_numeric()) return std::nullopt;
+			return BasicConstraint<Poly>(Poly(m_var) - Poly(std::get<RAN>(m_value).value()), rel);
 		}
 
 		/**
@@ -90,34 +91,31 @@ namespace carl {
 		 * variable comparison is 'v < 3' then a defining polynomial could be 'v-3',
 		 * because it has the same root for variable v, i.e., v=3.
 		 */
-		Poly definingPolynomial() const {
-			if (std::holds_alternative<RAN>(mValue)) {
-				const auto& ran = std::get<RAN>(mValue);
-				if (ran.is_numeric()) return Poly(mVar) - ran.value();
-				return Poly(carl::replace_main_variable(ran.polynomial(), mVar));
+		Poly defining_polynomial() const {
+			if (std::holds_alternative<RAN>(m_value)) {
+				const auto& ran = std::get<RAN>(m_value);
+				if (ran.is_numeric()) return Poly(m_var) - ran.value();
+				return Poly(carl::replace_main_variable(ran.polynomial(), m_var));
 			} else {
-				const auto& mr = std::get<MR>(mValue);
-				return mr.poly(mVar);
+				const auto& mr = std::get<MR>(m_value);
+				return mr.poly(m_var);
 			}
 		}
 		VariableComparison negation() const {
-			return VariableComparison(mVar, mValue, mRelation, !mNegated);
+			return VariableComparison(m_var, m_value, m_relation, !m_negated);
 		}
-		VariableComparison invertRelation() const {
-			return VariableComparison(mVar, mValue, carl::inverse(mRelation), mNegated);
-		}
-		void gatherVariables(carlVariables& vars) const {
-			vars.add(mVar);
-			std::visit(overloaded {
-				[&vars](const MR& mr) { carl::variables(mr, vars); },
-				[](const RAN&) {}
-			}, mValue);
+		VariableComparison invert_relation() const {
+			return VariableComparison(m_var, m_value, carl::inverse(m_relation), m_negated);
 		}
 	};
 
 	template<typename Pol>
     inline void variables(const VariableComparison<Pol>& f, carlVariables& vars) {
-		f.gatherVariables(vars);
+		vars.add(f.var());
+		std::visit(overloaded {
+			[&vars](const typename VariableComparison<Pol>::MR& mr) { carl::variables(mr, vars); },
+			[](const typename VariableComparison<Pol>::RAN&) {}
+		}, f.value());
 	}
 
 	template<typename Poly>

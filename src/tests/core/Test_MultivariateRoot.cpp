@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include <carl-formula/arithmetic/MultivariateRoot.h>
+#include <carl/extended/MultivariateRoot.h>
 #include <carl-formula/formula/Formula.h>
 #include <carl-formula/model/Model.h>
 #include <carl-formula/model/evaluation/ModelEvaluation.h>
@@ -46,10 +46,10 @@ TYPED_TEST(MultivariateRootTest, Evaluate)
 	EXPECT_EQ(2, mr2.k());
 	EXPECT_EQ(y, mr2.var());
 
-	typename MultiRoot::EvalMap m;
+	carl::Assignment<typename MultivariateRoot<Poly>::RAN> m;
 	m.emplace(x, RealAlgebraicNumber<TypeParam>(2));
-	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(-1), *mr1.evaluate(m));
-	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(0), *mr2.evaluate(m));
+	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(-1), *evaluate(mr1,m));
+	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(0), *evaluate(mr2,m));
 }
 
 TYPED_TEST(MultivariateRootTest, Evaluate2)

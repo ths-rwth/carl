@@ -142,7 +142,7 @@ static bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable
 	if (varcomp.var() != eliminationVar && !carl::variables(varcomp).has(eliminationVar) ) {
 		return true;
 	}
-	auto as_constr = varcomp.asConstraint();
+	auto as_constr = varcomp.as_constraint();
 	if (as_constr) {
 		return gather_zeros(*as_constr, eliminationVar, results);
 	}
@@ -157,7 +157,7 @@ static bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable
 		return true;
 	}
 	else {
-		for (const auto& factor : carl::irreducibleFactors(varcomp.definingPolynomial(), false)) {
+		for (const auto& factor : carl::irreducibleFactors(varcomp.defining_polynomial(), false)) {
 			assert(factor.degree(eliminationVar) > 0);
 			if (factor.degree(eliminationVar) > 2) continue;
 

@@ -7,7 +7,7 @@
 #include <carl/core/UnivariatePolynomial.h>
 #include <carl/core/Variable.h>
 #include <carl-formula/arithmetic/Constraint.h>
-#include <carl-formula/arithmetic/VariableComparison.h>
+#include <carl/extended/VariableComparison.h>
 #include <carl-formula/formula/Formula.h>
 #include <carl-formula/formula/Logic.h>
 #include <carl-formula/model/Model.h>
@@ -47,7 +47,7 @@ private:
 	
 	template<typename Pol>
 	void write(const VariableComparison<Pol>& c) {
-		auto constraint = c.asConstraint();
+		auto constraint = c.as_constraint();
 		if (constraint) {
 			*this << *constraint;
 		} else {
