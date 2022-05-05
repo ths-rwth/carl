@@ -49,7 +49,7 @@ RealAlgebraicNumber<Number> evaluateTE(const MultivariatePolynomial<Number>& p, 
                 mTE.insert(std::make_pair(entry.first, entry.second.getThomEncoding()));
         }
         
-        CARL_LOG_ASSERT("carl.thom.evaluation", p.gatherVariables().size() == mTE.size(), "p = " << p << ", mTE = " << mTE);
+        CARL_LOG_ASSERT("carl.thom.evaluation", variables(p).size() == mTE.size(), "p = " << p << ", mTE = " << mTE);
         
         if(mTE.size() == 1) {
                 int sgn = int(mTE.begin()->second.signOnPolynomial(p));

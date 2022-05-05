@@ -24,7 +24,7 @@ namespace carl
 						vars.add(f.boolean());
 						break;
 					case FormulaType::CONSTRAINT:
-						f.constraint().gatherVariables(vars);
+                         carl::variables(f.constraint(), vars);
 						break;
 					case FormulaType::VARCOMPARE:
                         carl::variables(f.variableComparison(), vars);

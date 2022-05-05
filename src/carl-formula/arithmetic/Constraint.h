@@ -141,10 +141,6 @@ public:
 		return m_element->m_variables;
 	}
 
-	void gatherVariables(carlVariables& vars) const {
-		vars.add(variables().begin(), variables().end());
-	}
-
 	const Factors<Pol>& lhs_factorization() const {
 		#ifdef THREAD_SAFE
 		m_element->m_lhs_factorization_mutex.lock();

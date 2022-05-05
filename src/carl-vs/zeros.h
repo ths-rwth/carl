@@ -144,7 +144,7 @@ static bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable
 	}
 	auto as_constr = varcomp.as_constraint();
 	if (as_constr) {
-		return gather_zeros(*as_constr, eliminationVar, results);
+		return gather_zeros(Constraint<Poly>(*as_constr), eliminationVar, results);
 	}
 	if (std::holds_alternative<MultivariateRoot<Poly>>(varcomp.value())) {
 		return false;

@@ -116,7 +116,7 @@ Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, real
 			mTE.insert(std::make_pair(entry.first, entry.second.thom_encoding()));
 	}
 	
-	CARL_LOG_ASSERT("carl.thom.evaluation", p.gatherVariables().size() == mTE.size(), "p = " << p << ", mTE = " << mTE);
+	CARL_LOG_ASSERT("carl.thom.evaluation", variables(p).size() == mTE.size(), "p = " << p << ", mTE = " << mTE);
 	
 	if(mTE.size() == 1) {
 			int sgn = int(mTE.begin()->second.signOnPolynomial(p));
