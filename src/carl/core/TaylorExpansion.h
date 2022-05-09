@@ -43,7 +43,7 @@ class TaylorExpansion{
                 Polynomial ideal = Polynomial({(Term<FiniteInt>)x_v, Term<FiniteInt>(-a)});
                 // error term and it's initialization
                 Polynomial e;
-                e = p - p.substitute(x_v, value);
+                e = p - substitute(p,x_v, value);
                 // curr coeff being calculated
                 // when the calculation terminates this will contatin the result
                 Polynomial u;
@@ -54,7 +54,7 @@ class TaylorExpansion{
                 for(unsigned i = 1; i <= k; i++) {
                         e = e - u * ideal.pow(i-1);
                         temp = e / ideal.pow(i);
-                        u = temp.substitute(x_v, value);
+                        u = substitute(temp,x_v, value);
                 }
                 return u;
         }

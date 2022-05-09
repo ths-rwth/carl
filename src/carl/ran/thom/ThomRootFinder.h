@@ -284,7 +284,7 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
 		if (v == p.mainVar()) continue;
 		assert(m.count(v) > 0);
 		if (m.at(v).is_numeric()) {
-			tmp.substituteIn(v, Coeff(m.at(v).value()));
+			substitute_inplace(tmp, v, Coeff(m.at(v).value()));
 		} else {
 			TEmap.emplace(v, m.at(v).getThomEncoding());
 		}

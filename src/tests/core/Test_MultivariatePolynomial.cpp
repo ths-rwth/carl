@@ -426,7 +426,7 @@ TEST(MultivariatePolynomial, Substitute)
 //    Pol pz = sp.parseMultivariatePolynomial<Rat>("(-1)*x^2*z*y+(-1)*x*z*y^2+(-1)*z*y+(-1)*x^2*z+(-1)*x*w*y+(-1)*x*w+(-1)*w+1");
 //    Pol ztNum = sp.parseMultivariatePolynomial<Rat>("(-1)*x^2*w*y+w+x*w*y+(-1)*x^2*w");
 //    Pol ztDenom = sp.parseMultivariatePolynomial<Rat>("x^3*y+(-1)*x^2*y+(-1)*x^2+x^3+x*y+(-1)*x*y^2+(-1)*y+x^2*y^2+1");
-//    Pol pzSub = pz.substitute( z, ztNum );
+//    Pol pzSub = substitute(pz, z, ztNum );
 //    std::cout << pzSub << std::endl;
 //    Pol py1 = sp.parseMultivariatePolynomial<Rat>("x^3*y+(-1)*x^2+(-1)*x^2*y+(-1)*x*w*y+(-1)*y+(-1)*x*y^2+(-1)*x*w+x*y+x^3+(-1)*w+x^2*y^2+1");
 //    std::cout << py1 << std::endl;

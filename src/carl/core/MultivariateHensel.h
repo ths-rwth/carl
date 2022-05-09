@@ -91,10 +91,10 @@ class DiophantineEquations
                         // a_new = substitute(x_v = alpha_v, a)
                         std::vector<Polynomial> a_new;
                         for(unsigned i = 1; i <= r; i++) {
-                                a_new.pushBack(a[i].substitute(x_v, alpha_v));
+                                a_new.pushBack(substitute(a[i], x_v, alpha_v));
                         }
                         // c_new = substitute(x_v = alpha_v, c);
-                        Polynomial c_new = c.substitute(x_v, alpha_v);
+                        Polynomial c_new = substitute(c,x_v, alpha_v);
                         // I_new = updated list I with x_v = alpha_v deleted
                         std::map<Variable, GFNumber<Integer>> I_new(I);
                         I_new.erase(x_v);

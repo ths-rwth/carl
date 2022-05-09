@@ -33,7 +33,7 @@ UnivariatePolynomial<Coeff> replace_main_variable(const UnivariatePolynomial<Coe
 		return UnivariatePolynomial<Coeff>(newVar, p.coefficients());
 	} else {
 		using MP = MultivariatePolynomial<typename UnderlyingNumberType<Coeff>::type>;
-		return to_univariate_polynomial(MP(p).substitute(p.mainVar(), MP(newVar)), newVar);
+		return to_univariate_polynomial(substitute(MP(p), p.mainVar(), MP(newVar)), newVar);
 	}
 }
 
