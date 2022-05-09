@@ -728,7 +728,7 @@ namespace carl
              * Collects all constraint occurring in this formula.
              * @param _constraints The container to insert the constraint into.
              */
-            void getConstraints( std::vector<Constraint<Pol>>& _constraints ) const // TODO rename to gatherConstraints
+            void getConstraints( std::vector<Constraint<Pol>>& _constraints ) const // TODO rename to gatherConstraints; move
             {
                 if (mpContent->mType == FormulaType::CONSTRAINT)
                     _constraints.push_back(std::get<Constraint<Pol>>(mpContent->mContent));
@@ -745,7 +745,7 @@ namespace carl
              * Collects all constraint occurring in this formula.
              * @param _constraints The container to insert the constraint into.
              */
-            void getConstraints( std::vector<Formula>& _constraints ) const // TODO rename to gatherConstraints
+            void getConstraints( std::vector<Formula>& _constraints ) const // TODO rename to gatherConstraints; move
             {
                 if( mpContent->mType == FormulaType::CONSTRAINT )
                     _constraints.push_back( *this );
@@ -758,10 +758,10 @@ namespace carl
 				}
             }
 
-			void gatherVariables(carlVariables& vars) const;
-            void gatherUFs(std::set<UninterpretedFunction>& ufs) const;
-            void gatherUVariables(std::set<UVariable>& uvs) const;
-            void gatherBVVariables(std::set<BVVariable>& bvvs) const;
+			void gatherVariables(carlVariables& vars) const; // TODO move
+            void gatherUFs(std::set<UninterpretedFunction>& ufs) const; // TODO move
+            void gatherUVariables(std::set<UVariable>& uvs) const; // TODO move
+            void gatherBVVariables(std::set<BVVariable>& bvvs) const; // TODO move
 
 
             /**
@@ -864,50 +864,6 @@ namespace carl
              */
             Formula connectPrecedingSubformulas() const;
 
-            /**
-             * Substitutes all occurrences of the given variable in this formula by the given polynomial.
-             * @param _var The variable to substitute.
-             * @param _var The polynomial to substitute the variable for.
-             * @return The resulting formula after substitution.
-             */
-            Formula substitute( carl::Variable::Arg _var, const Pol& _pol ) const
-            {
-                std::map<carl::Variable, Formula> booleanSubstitutions;
-                std::map<carl::Variable, Pol> arithmeticSubstitutions;
-                arithmeticSubstitutions.emplace( _var, _pol );
-                return substitute( booleanSubstitutions, arithmeticSubstitutions );
-            }
-
-            /**
-             * Substitutes all occurrences of the given arithmetic variables in this formula by the given polynomials.
-             * @param _arithmeticSubstitutions A substitution-mapping of arithmetic variables to polynomials.
-             * @return The resulting formula after substitution.
-             */
-            Formula substitute( const std::map<carl::Variable, Pol>& _arithmeticSubstitutions ) const
-            {
-                std::map<carl::Variable, Formula> booleanSubstitutions;
-                return substitute( booleanSubstitutions, _arithmeticSubstitutions );
-            }
-
-            /**
-             * Substitutes all occurrences of the given Boolean variables in this formula by the given formulas.
-             * @param _booleanSubstitutions A substitution-mapping of Boolean variables to formulas.
-             * @return The resulting formula after substitution.
-             */
-            Formula substitute( const std::map<carl::Variable, Formula>& _booleanSubstitutions ) const
-            {
-                std::map<carl::Variable, Pol> arithmeticSubstitutions;
-                return substitute( _booleanSubstitutions, arithmeticSubstitutions );
-            }
-
-            /**
-             * Substitutes all occurrences of the given Boolean and arithmetic variables in this formula by the given formulas resp. polynomials.
-             * @param _booleanSubstitutions A substitution-mapping of Boolean variables to formulas.
-             * @param _arithmeticSubstitutions A substitution-mapping of arithmetic variables to polynomials.
-             * @return The resulting formula after substitution.
-             */
-            Formula substitute( const std::map<carl::Variable, Formula>& _booleanSubstitutions, const std::map<carl::Variable,Pol>& _arithmeticSubstitutions ) const;
-
             /// A map from formula pointers to a map of rationals to a pair of a constraint relation and a formula pointer. (internally used)
             typedef FastMap<Pol, std::map<typename Pol::NumberType, std::pair<Relation,Formula>>> ConstraintBounds;
 
@@ -924,7 +880,7 @@ namespace carl
              *                (_inConjunction == false) of which we got the given constraint is invalid resp. valid;
              *         false, the added constraint.
              */
-            static Formula addConstraintBound( ConstraintBounds& _constraintBounds, const Formula& _constraint, bool _inConjunction );
+            static Formula addConstraintBound( ConstraintBounds& _constraintBounds, const Formula& _constraint, bool _inConjunction ); // TODO move, change to operation on (Basic)Constraint!
 
             /**
              * Stores for every polynomial for which we determined bounds for given constraints a minimal set of constraints
@@ -938,7 +894,7 @@ namespace carl
              *                (_inConjunction == false) to which the bounds are added is invalid resp. valid;
              *         false, otherwise.
              */
-            static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoAsts, bool _inConjunction );
+            static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoAsts, bool _inConjunction ); // TODO move, change to operation on (Basic)Constraint!
     };
 
     template<typename Pol>

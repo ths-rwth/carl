@@ -451,67 +451,6 @@ namespace carl
         }
     }
 
-    template<typename Pol>
-    Formula<Pol> Formula<Pol>::substitute( const std::map<Variable, Formula<Pol>>& _booleanSubstitutions, const std::map<Variable, Pol>& _arithmeticSubstitutions ) const
-    {
-        switch( getType() )
-        {
-            case FormulaType::TRUE:
-            {
-                return *this;
-            }
-            case FormulaType::FALSE:
-            {
-                return *this;
-            }
-            case FormulaType::BOOL:
-            {
-                auto iter = _booleanSubstitutions.find( boolean() );
-                if( iter != _booleanSubstitutions.end() )
-                {
-                    return iter->second;
-                }
-                return *this;
-            }
-            case FormulaType::CONSTRAINT:
-            {
-                Pol lhsSubstituted = carl::substitute(constraint().lhs(), _arithmeticSubstitutions);
-                return Formula<Pol>( lhsSubstituted, constraint().relation() );
-            }
-            case FormulaType::NOT:
-            {
-                return Formula<Pol>( FormulaType::NOT, subformula().substitute( _booleanSubstitutions, _arithmeticSubstitutions ) );
-            }
-            case FormulaType::IMPLIES:
-            {
-                Formula<Pol> premiseSubstituted = premise().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
-                Formula<Pol> conclusionSubstituted = conclusion().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
-                return Formula<Pol>( FormulaType::IMPLIES, {premiseSubstituted, conclusionSubstituted} );
-            }
-            case FormulaType::ITE:
-            {
-                Formula<Pol> conditionSubstituted = condition().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
-                Formula<Pol> thenSubstituted = firstCase().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
-                Formula<Pol> elseSubstituted = secondCase().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
-                return Formula<Pol>( FormulaType::ITE, {conditionSubstituted, thenSubstituted, elseSubstituted} );
-            }
-            case FormulaType::EXISTS:
-            case FormulaType::FORALL:
-            {
-                std::vector<Variable> vars( quantifiedVariables() );
-                return Formula<Pol>(getType(), std::move( vars ), quantifiedFormula().substitute(_booleanSubstitutions, _arithmeticSubstitutions));
-            }
-            default:
-            {
-                assert( isNary() );
-                Formulas<Pol> subformulasSubstituted;
-                for( const Formula<Pol>& subFormula : subformulas() )
-                    subformulasSubstituted.push_back( subFormula.substitute( _booleanSubstitutions, _arithmeticSubstitutions ) );
-                return Formula<Pol>( getType(), subformulasSubstituted );
-            }
-        }
-    }
-
 //    #define CONSTRAINT_BOUND_DEBUG
 
     template<typename Pol>

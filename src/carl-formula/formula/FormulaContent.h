@@ -156,7 +156,7 @@ namespace carl {
             /// The negation
             const FormulaContent<Pol> *mNegation = nullptr;
             /// The propositions of this formula.
-            Condition mProperties;
+            Condition mProperties; // TODO maybe move to own function?
             /// Mutex for access to activity.
             mutable std::mutex mActivityMutex;
             /// Mutex for access to difficulty.

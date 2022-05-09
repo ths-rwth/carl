@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Formula.h"
+#include "Substitution.h"
 
 namespace carl {
 
@@ -75,8 +76,8 @@ Formula<Poly> toQF(std::vector<Variables>& variables, unsigned level = 0, bool n
 					if (cur > 0) {
 						f = Formula<Pol>(
 							(getType() == FormulaType::EXISTS ? FormulaType::OR : FormulaType::AND),
-							{f.substitute({{*it, Formula<Pol>( FormulaType::TRUE )}}),
-							f.substitute({{*it, Formula<Pol>( FormulaType::FALSE )}})}
+							{carl::substitute(f,*it, Formula<Pol>( FormulaType::TRUE )),
+							carl::substitute(f, *it, Formula<Pol>( FormulaType::FALSE ))}
 						);
 					}
 					it = vars.erase(it);
