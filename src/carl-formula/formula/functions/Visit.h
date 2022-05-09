@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../Formula.h"
-
 namespace carl {
 
 

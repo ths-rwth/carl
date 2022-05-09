@@ -763,10 +763,6 @@ namespace carl
             void gatherUVariables(std::set<UVariable>& uvs) const;
             void gatherBVVariables(std::set<BVVariable>& bvvs) const;
 
-            /**
-             * @return The formula's complexity, which is mainly the number of operations within this formula.
-             */
-            size_t complexity() const;
 
             /**
              * @param _formula The formula to compare with.
