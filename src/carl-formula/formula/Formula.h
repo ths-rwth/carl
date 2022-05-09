@@ -961,8 +961,6 @@ namespace carl
 	}
 }    // namespace carl
 
-#include "functions/FormulaVisitor.h"
-
 namespace std
 {
     /**

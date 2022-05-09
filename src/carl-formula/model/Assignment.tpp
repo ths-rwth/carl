@@ -7,6 +7,8 @@
 
 #include "Assignment.h"
 #include <carl-formula/uninterpreted/SortValueManager.h>
+#include <carl-formula/formula/functions/Substitution.h>
+
 
 namespace carl
 {
@@ -138,8 +140,7 @@ namespace carl
             }
 			case carl::FormulaType::BITVECTOR:
             {
-                carl::FormulaSubstitutor<Formula<Poly>> substitutor;
-                Formula<Poly> substituted = substitutor.substitute(_formula, _bvAssigns);
+                Formula<Poly> substituted = carl::substitute(_formula, _bvAssigns);
                 if(substituted.isTrue())
                     return 1;
                 else if(substituted.isFalse())

@@ -11,13 +11,13 @@
 #include "Formula.h"
 #include "FormulaPool.h"
 #include <carl/core/polynomialfunctions/Complexity.h>
+#include "functions/Visit.h"
 
 namespace carl
 {
 	template<typename Pol>
 	void Formula<Pol>::gatherVariables(carlVariables& vars) const {
-		FormulaVisitor<Formula<Pol>> visitor;
-		visitor.visit(*this,
+		carl::visit(*this,
 			[&vars](const Formula<Pol>& f) {
 				switch (f.getType()) {
 					case FormulaType::BOOL:
@@ -50,8 +50,7 @@ namespace carl
 
     template<typename Pol>
     void Formula<Pol>::gatherUFs(std::set<UninterpretedFunction>& ufs) const {
-		FormulaVisitor<Formula<Pol>> visitor;
-		visitor.visit(*this,
+		carl::visit(*this,
 			[&ufs](const Formula<Pol>& f) {
 				if (f.getType() == FormulaType::UEQ) {
 					f.uequality().gatherUFs(ufs);
@@ -62,8 +61,7 @@ namespace carl
 
     template<typename Pol>
     void Formula<Pol>::gatherUVariables(std::set<UVariable>& uvs) const {
-		FormulaVisitor<Formula<Pol>> visitor;
-		visitor.visit(*this,
+		carl::visit(*this,
 			[&uvs](const Formula<Pol>& f) {
 				if (f.getType() == FormulaType::UEQ) {
 					f.uequality().gatherUVariables(uvs);
@@ -74,8 +72,7 @@ namespace carl
 
     template<typename Pol>
     void Formula<Pol>::gatherBVVariables(std::set<BVVariable>& bvvs) const {
-		FormulaVisitor<Formula<Pol>> visitor;
-		visitor.visit(*this,
+		carl::visit(*this,
 			[&bvvs](const Formula<Pol>& f) {
 				if (f.getType() == FormulaType::BITVECTOR) {
 					f.bvConstraint().gatherBVVariables(bvvs);
@@ -88,8 +85,7 @@ namespace carl
     size_t Formula<Pol>::complexity() const
     {
         size_t result = 0;
-        carl::FormulaVisitor<Formula<Pol>> visitor;
-        visitor.visit(*this,
+        carl::visit(*this,
             [&](const Formula& _f)
             {
                 switch( _f.getType() )
