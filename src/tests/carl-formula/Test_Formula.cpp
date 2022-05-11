@@ -80,9 +80,9 @@ TEST(Formula, BooleanConstructors)
     Variable b2 = freshBooleanVariable("b2");
 
     FormulaT True = FormulaT(FormulaType::TRUE);
-    EXPECT_TRUE(True.isTrue());
+    EXPECT_TRUE(True.is_true());
     FormulaT False = FormulaT(FormulaType::FALSE);
-    EXPECT_TRUE(False.isFalse());
+    EXPECT_TRUE(False.is_false());
 
     FormulaT fb1 = FormulaT(b1);
     EXPECT_EQ(FormulaType::BOOL, fb1.type());

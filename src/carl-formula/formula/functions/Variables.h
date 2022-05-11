@@ -17,20 +17,20 @@ void variables(const Formula<Pol>& f, carlVariables& vars) {
                     carl::variables(f.constraint(), vars);
                     break;
                 case FormulaType::VARCOMPARE:
-                    carl::variables(f.variableComparison(), vars);
+                    carl::variables(f.variable_comparison(), vars);
                     break;
                 case FormulaType::VARASSIGN:
-                    carl::variables(f.variableAssignment(), vars);
+                    carl::variables(f.variable_assignment(), vars);
                     break;
                 case FormulaType::BITVECTOR:
-                    f.bvConstraint().gatherVariables(vars);
+                    f.bv_constraint().gatherVariables(vars);
                     break;
                 case FormulaType::UEQ:
-                    f.uequality().gatherVariables(vars);
+                    f.u_equality().gatherVariables(vars);
                     break;
                 case FormulaType::EXISTS:
                 case FormulaType::FORALL:
-                    vars.add(f.quantifiedVariables().begin(),f.quantifiedVariables().end());
+                    vars.add(f.quantified_variables().begin(),f.quantified_variables().end());
                     break;
                 default: break;
             }
@@ -43,7 +43,7 @@ void uninterpreted_functions(const Formula<Pol>& f, std::set<UninterpretedFuncti
     carl::visit(f,
         [&ufs](const Formula<Pol>& f) {
             if (f.type() == FormulaType::UEQ) {
-                f.uequality().gatherUFs(ufs);
+                f.u_equality().gatherUFs(ufs);
             }
         }
     );
@@ -54,7 +54,7 @@ void uninterpreted_variables(const Formula<Pol>& f, std::set<UVariable>& uvs) {
     carl::visit(f,
         [&uvs](const Formula<Pol>& f) {
             if (f.type() == FormulaType::UEQ) {
-                f.uequality().gatherUVariables(uvs);
+                f.u_equality().gatherUVariables(uvs);
             }
         }
     );
@@ -65,7 +65,7 @@ void bitvector_variables(const Formula<Pol>& f, std::set<BVVariable>& bvvs) {
     carl::visit(f,
         [&bvvs](const Formula<Pol>& f) {
             if (f.type() == FormulaType::BITVECTOR) {
-                f.bvConstraint().gatherBVVariables(bvvs);
+                f.bv_constraint().gatherBVVariables(bvvs);
             }
         }
     );

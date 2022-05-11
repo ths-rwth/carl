@@ -33,7 +33,7 @@ void visit(const Formula<Pol>& formula, /*std::function<void(const Formula<Pol>&
 			break;
 		case EXISTS:
 		case FORALL:
-			visit(formula.quantifiedFormula(), func);
+			visit(formula.quantified_formula(), func);
 			break;
 	}
 	func(formula);
@@ -82,9 +82,9 @@ Formula<Pol> visit_result(const Formula<Pol>& formula, /*std::function<Formula<P
 		}
 		case ITE: {
 			Formula<Pol> cond = visit_result(formula.condition(), func);
-			Formula<Pol> fCase = visit_result(formula.firstCase(), func);
-			Formula<Pol> sCase = visit_result(formula.secondCase(), func);
-			if ((cond != formula.condition()) || (fCase != formula.firstCase()) || (sCase != formula.secondCase())) {
+			Formula<Pol> fCase = visit_result(formula.first_case(), func);
+			Formula<Pol> sCase = visit_result(formula.second_case(), func);
+			if ((cond != formula.condition()) || (fCase != formula.first_case()) || (sCase != formula.second_case())) {
 				newFormula = Formula(ITE, {cond, fCase, sCase});
 			}
 			break;
@@ -100,9 +100,9 @@ Formula<Pol> visit_result(const Formula<Pol>& formula, /*std::function<Formula<P
 			break;
 		case EXISTS:
 		case FORALL: {
-			Formula<Pol> sub = visit_result(formula.quantifiedFormula(), func);
-			if (sub != formula.quantifiedFormula()) {
-				newFormula = Formula<Pol>(formula.type(), formula.quantifiedVariables(), sub);
+			Formula<Pol> sub = visit_result(formula.quantified_formula(), func);
+			if (sub != formula.quantified_formula()) {
+				newFormula = Formula<Pol>(formula.type(), formula.quantified_variables(), sub);
 			}
 			break;
 		}

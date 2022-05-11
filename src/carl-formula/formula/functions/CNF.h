@@ -64,7 +64,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 			case FormulaType::CONSTRAINT:
 				// Try simplification with ConstraintBounds
 				if (simplify_combinations) {
-					if (addConstraintBound(constraint_bounds, current, false).isFalse()) {
+					if (addConstraintBound(constraint_bounds, current, false).is_false()) {
 						CARL_LOG_DEBUG("carl.formula.cnf", "Adding " << current << " to constraint bounds yielded a tautology");
 						return Formula<Poly>(FormulaType::TRUE);
 					}
@@ -75,7 +75,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 			case FormulaType::NOT: {
 				// Resolve negation
 				auto resolved = resolve_negation(current, keep_constraints);
-				if (resolved.isLiteral()) {
+				if (resolved.is_literal()) {
 					subformulas.emplace_back(resolved);
 				} else {
 					subformula_queue.emplace_back(resolved);
@@ -91,10 +91,10 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 				// (ite C T E) -> (and (=> C T) (=> (not C) E)) -> (and (or (not C) T) (or C E))
 				subformula_queue.emplace_back(Formula<Poly>(FormulaType::AND, {
 					Formula<Poly>(FormulaType::OR, {
-						!current.condition(), current.firstCase()
+						!current.condition(), current.first_case()
 					}),
 					Formula<Poly>(FormulaType::OR, {
-						current.condition(), current.secondCase()
+						current.condition(), current.second_case()
 					})
 				}));
 				break;
@@ -165,14 +165,14 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
  */
 template<typename Poly>
 Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool simplify_combinations = false, bool tseitin_equivalence = true) {
-	if (!simplify_combinations && f.propertyHolds(PROP_IS_IN_CNF)) {
+	if (!simplify_combinations && f.property_holds(PROP_IS_IN_CNF)) {
 		if (keep_constraints) {
 			return f;
 		} else if (f.type() == FormulaType::NOT) {
-			assert(f.isLiteral());
+			assert(f.is_literal());
 			return resolve_negation(f,keep_constraints);
 		}
-	} else if (f.isAtom()) {
+	} else if (f.is_atom()) {
 		return f;
 	}
 
@@ -202,7 +202,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 			case FormulaType::CONSTRAINT:
 				// Try simplification with ConstraintBounds
 				if (simplify_combinations) {
-					if (addConstraintBound(constraint_bounds, current, true).isFalse()) {
+					if (addConstraintBound(constraint_bounds, current, true).is_false()) {
 						CARL_LOG_DEBUG("carl.formula.cnf", "Adding " << current << " to constraint bounds yielded a conflict");
 						return Formula<Poly>(FormulaType::FALSE);
 					}
@@ -213,7 +213,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 			case FormulaType::NOT: {
 				// Resolve negation
 				auto resolved = resolve_negation(current, keep_constraints);
-				if (resolved.isLiteral()) {
+				if (resolved.is_literal()) {
 					subformulas.emplace_back(resolved);
 				} else {
 					subformula_queue.emplace_back(resolved);
@@ -229,10 +229,10 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 			case FormulaType::ITE:
 				// (ite C T E) -> (=> C T), (=> (not C) E) -> (or (not C) T), (or C E)
 				subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, {
-					!current.condition(), current.firstCase()
+					!current.condition(), current.first_case()
 				}));
 				subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, {
-					current.condition(), current.secondCase()
+					current.condition(), current.second_case()
 				}));
 				break;
 			case FormulaType::IFF:
@@ -282,7 +282,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 				// Call to_cnf_or() to obtain a clause of literals res and the newly created tseitin variables defined in tseitin.
 				formula_to_cnf::TseitinConstraints<Poly> tseitin;
 				auto res = formula_to_cnf::to_cnf_or(current, keep_constraints, simplify_combinations, tseitin_equivalence, tseitin);
-				if (res.isFalse()) {
+				if (res.is_false()) {
 					return Formula<Poly>(FormulaType::FALSE);
 				}
 				subformula_queue.insert(subformula_queue.end(), tseitin.begin(), tseitin.end());

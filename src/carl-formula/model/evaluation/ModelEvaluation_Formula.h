@@ -27,7 +27,7 @@ namespace model {
 	void evaluateVarCompare(Formula<Poly>& f, const Model<Rational,Poly>& m) {
 		CARL_LOG_DEBUG("carl.model.evaluation", "Evaluating " << f << " on " << m);
 		assert(f.type() == FormulaType::VARCOMPARE);
-		const auto& vc = f.variableComparison();
+		const auto& vc = f.variable_comparison();
 		
 		ModelValue<Rational,Poly> cmp = vc.value();
 		if (cmp.isSubstitution()) {
@@ -93,7 +93,7 @@ namespace model {
 	template<typename Rational, typename Poly>
 	void evaluateVarAssign(Formula<Poly>& f, const Model<Rational,Poly>& m) {
 		assert(f.type() == FormulaType::VARASSIGN);
-		const auto& va = f.variableAssignment();
+		const auto& va = f.variable_assignment();
 		auto it = m.find(va.var());
 		if (it == m.end()) return;
 		const auto& value = m.evaluated(va.var());
@@ -114,7 +114,7 @@ namespace model {
 	void substituteIn(Formula<Poly>& f, const Model<Rational,Poly>& m) {
 		switch (f.type()) {
 			case FormulaType::ITE: {
-				f = Formula<Poly>(FormulaType::ITE, substitute(f.condition(), m), substitute(f.firstCase(), m), substitute(f.secondCase(), m));
+				f = Formula<Poly>(FormulaType::ITE, substitute(f.condition(), m), substitute(f.first_case(), m), substitute(f.second_case(), m));
 				break;
 			}
 			case FormulaType::EXISTS:
@@ -169,7 +169,7 @@ namespace model {
 				break;
 			}
 			case FormulaType::BITVECTOR: {
-				BVConstraint bvc = substitute(f.bvConstraint(), m);
+				BVConstraint bvc = substitute(f.bv_constraint(), m);
 				if (bvc.isAlwaysConsistent()) f = Formula<Poly>(FormulaType::TRUE);
 				else if (bvc.isAlwaysInconsistent()) f = Formula<Poly>(FormulaType::FALSE);
 				else f = Formula<Poly>(bvc);
@@ -177,13 +177,13 @@ namespace model {
 			}
 			case FormulaType::UEQ: {
 				std::set<UVariable> vars;
-				f.uequality().gatherUVariables(vars);
+				f.u_equality().gatherUVariables(vars);
 				if (m.contains(vars)) {
-					auto val = evaluate(f.uequality(), m);
+					auto val = evaluate(f.u_equality(), m);
 					assert(val.isBool());
 					f = Formula<Poly>(val.asBool() ? FormulaType::TRUE : FormulaType::FALSE);
 				} else {
-					CARL_LOG_WARN("carl.model.evaluation", "Could not evaluate " << f.uequality() << " as some variables are missing from the model.");
+					CARL_LOG_WARN("carl.model.evaluation", "Could not evaluate " << f.u_equality() << " as some variables are missing from the model.");
 				}
 				break;
 			}
@@ -197,8 +197,8 @@ namespace model {
 	template<typename Rational, typename Poly>
 	void evaluate(ModelValue<Rational,Poly>& res, Formula<Poly>& f, const Model<Rational,Poly>& m) {
 		substituteIn(f, m);
-		if (f.isTrue()) res = true;
-		else if (f.isFalse()) res = false;
+		if (f.is_true()) res = true;
+		else if (f.is_false()) res = false;
 		else res = createSubstitution<Rational,Poly,ModelFormulaSubstitution<Rational,Poly>>(f);
 	}
 }

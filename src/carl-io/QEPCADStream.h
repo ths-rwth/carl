@@ -66,10 +66,10 @@ private:
 				*this << f.constraint();
 				break;
 			case FormulaType::VARCOMPARE:
-				*this << f.variableComparison();
+				*this << f.variable_comparison();
 				break;
 			case FormulaType::VARASSIGN:
-				*this << f.variableAssignment();
+				*this << f.variable_assignment();
 				break;
 			case FormulaType::BITVECTOR:
 				CARL_LOG_ERROR("carl.qepcadstream", "Bitvectors are not supported by QEPCAD.");

@@ -141,9 +141,9 @@ namespace carl
 			case carl::FormulaType::BITVECTOR:
             {
                 Formula<Poly> substituted = carl::substitute(_formula, _bvAssigns);
-                if(substituted.isTrue())
+                if(substituted.is_true())
                     return 1;
-                else if(substituted.isFalse())
+                else if(substituted.is_false())
                     return 0;
                 return 2;
             }
@@ -213,9 +213,9 @@ namespace carl
                 switch( result )
                 {
                     case 0:
-                        return satisfies( _model, _assignment, _bvAssigns, _formula.secondCase() );
+                        return satisfies( _model, _assignment, _bvAssigns, _formula.second_case() );
                     case 1:
-                        return satisfies( _model, _assignment, _bvAssigns, _formula.firstCase() );
+                        return satisfies( _model, _assignment, _bvAssigns, _formula.first_case() );
                     default:
                         return 2;
                 }
@@ -274,7 +274,7 @@ namespace carl
             }
             case carl::FormulaType::UEQ:
             {
-                const carl::UEquality& eq = _formula.uequality();
+                const carl::UEquality& eq = _formula.u_equality();
                 std::size_t lhsResult = 0;
                 std::size_t rhsResult = 0;
                 // get sortvalue for lhs and rhs
@@ -393,17 +393,17 @@ namespace carl
                 getDefaultModel( _defaultModel, _formula.constraint(), _overwrite, _seed );
 				return;
             case carl::FormulaType::BITVECTOR:
-                getDefaultModel( _defaultModel, _formula.bvConstraint().lhs(), _overwrite, _seed );
-                getDefaultModel( _defaultModel, _formula.bvConstraint().rhs(), _overwrite, _seed );
+                getDefaultModel( _defaultModel, _formula.bv_constraint().lhs(), _overwrite, _seed );
+                getDefaultModel( _defaultModel, _formula.bv_constraint().rhs(), _overwrite, _seed );
                 return;
             case carl::FormulaType::UEQ:
-                getDefaultModel( _defaultModel, _formula.uequality(), _overwrite, _seed );
+                getDefaultModel( _defaultModel, _formula.u_equality(), _overwrite, _seed );
 				return;
             case carl::FormulaType::NOT:
                 getDefaultModel( _defaultModel, _formula.subformula(), _overwrite, _seed );
 				return;
             default:
-                assert( _formula.isNary() );
+                assert( _formula.is_nary() );
                 for (const auto& subFormula: _formula.subformulas() )
                     getDefaultModel(_defaultModel, subFormula, _overwrite, _seed);
         }

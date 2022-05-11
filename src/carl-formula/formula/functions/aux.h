@@ -11,7 +11,7 @@ namespace carl::formula::aux {
  */
 template<typename Pol>
 Formula<Pol> connectPrecedingSubformulas(const Formula<Pol>& f) {
-    assert( f.isNary() );
+    assert( f.is_nary() );
     if( f.subformulas().size() > 2 )
     {
         Formulas<Pol> tmpSubformulas;

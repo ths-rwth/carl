@@ -83,20 +83,20 @@ private:
 				*this << f.constraint();
 				break;
 			case FormulaType::VARCOMPARE:
-				*this << f.variableComparison();
+				*this << f.variable_comparison();
 				break;
 			case FormulaType::VARASSIGN:
-				*this << f.variableAssignment();
+				*this << f.variable_assignment();
 				break;
 			case FormulaType::BITVECTOR:
-				*this << f.bvConstraint();
+				*this << f.bv_constraint();
 				break;
 			case FormulaType::TRUE:
 			case FormulaType::FALSE:
 				*this << f.type();
 				break;
 			case FormulaType::UEQ:
-				*this << f.uequality();
+				*this << f.u_equality();
 				break;
 			case FormulaType::EXISTS:
 			case FormulaType::FORALL:

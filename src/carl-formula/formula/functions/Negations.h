@@ -21,7 +21,7 @@ Formula<Pol> resolve_negation( const Formula<Pol>& f, bool _keepConstraint = tru
                 return f;
             else
             {
-                const UEquality& ueq = f.subformula().uequality();
+                const UEquality& ueq = f.subformula().u_equality();
                 return Formula<Pol>( ueq.lhs(), ueq.rhs(), !ueq.negated() );
             }
         case FormulaType::CONSTRAINT:
@@ -67,15 +67,15 @@ Formula<Pol> resolve_negation( const Formula<Pol>& f, bool _keepConstraint = tru
             }
         }
         case FormulaType::VARCOMPARE: {
-            return Formula<Pol>(f.subformula().variableComparison().negation());
+            return Formula<Pol>(f.subformula().variable_comparison().negation());
         }
         case FormulaType::VARASSIGN: {
             assert(false);
             return Formula<Pol>();
         }
         case FormulaType::BITVECTOR: {
-            BVCompareRelation rel = inverse(f.subformula().bvConstraint().relation());
-            return Formula<Pol>( BVConstraint::create(rel, f.subformula().bvConstraint().lhs(), f.subformula().bvConstraint().rhs()));
+            BVCompareRelation rel = inverse(f.subformula().bv_constraint().relation());
+            return Formula<Pol>( BVConstraint::create(rel, f.subformula().bv_constraint().lhs(), f.subformula().bv_constraint().rhs()));
         }
         case FormulaType::TRUE: // (not true)  ->  false
             return Formula<Pol>( FormulaType::FALSE );
@@ -94,7 +94,7 @@ Formula<Pol> resolve_negation( const Formula<Pol>& f, bool _keepConstraint = tru
         }
         case FormulaType::ITE: // (not (ite cond then else))  ->  (ite cond (not then) (not else))
         {
-            return Formula<Pol>( ITE, {f.subformula().condition(), Formula<Pol>( NOT, f.subformula().firstCase() ), Formula<Pol>( NOT, f.subformula().secondCase() )} );
+            return Formula<Pol>( ITE, {f.subformula().condition(), Formula<Pol>( NOT, f.subformula().first_case() ), Formula<Pol>( NOT, f.subformula().second_case() )} );
         }
         case FormulaType::IFF: // (not (iff phi_1 .. phi_n))  ->  (and (or phi_1 .. phi_n) (or (not phi_1) .. (not phi_n)))
         {

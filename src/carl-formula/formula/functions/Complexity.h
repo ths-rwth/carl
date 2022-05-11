@@ -18,9 +18,9 @@ size_t complexity(const Formula<Pol>& f) {
                 case FormulaType::CONSTRAINT:
                     result += carl::complexity(_f.constraint().constr()); break;
                 case FormulaType::BITVECTOR:
-                    result += _f.bvConstraint().complexity(); break;
+                    result += _f.bv_constraint().complexity(); break;
                 case FormulaType::UEQ:
-                    result += _f.uequality().complexity(); break;
+                    result += _f.u_equality().complexity(); break;
                 default:
                     ++result;
             }

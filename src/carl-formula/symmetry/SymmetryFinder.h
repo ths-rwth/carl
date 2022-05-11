@@ -121,10 +121,10 @@ class GraphBuilder {
 				mGraph.add_edge(ifvert, addFormula(f.condition()));
 				unsigned thenvert = mGraph.add_vertex(mColor(SpecialColors::Then));
 				mGraph.add_edge(vert, thenvert);
-				mGraph.add_edge(thenvert, addFormula(f.firstCase()));
+				mGraph.add_edge(thenvert, addFormula(f.first_case()));
 				unsigned elsevert = mGraph.add_vertex(mColor(SpecialColors::Else));
 				mGraph.add_edge(vert, elsevert);
-				mGraph.add_edge(elsevert, addFormula(f.secondCase()));
+				mGraph.add_edge(elsevert, addFormula(f.second_case()));
 				break;
 			}
 			case carl::FormulaType::EXISTS:

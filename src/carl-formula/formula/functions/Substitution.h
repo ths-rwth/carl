@@ -33,9 +33,9 @@ namespace helper {
 		explicit BitvectorSubstitutor(const std::map<BVVariable,BVTerm>& repl): replacements(repl) {}
 		Formula<Pol> operator()(const Formula<Pol>& formula) {
 			if (formula.type() != FormulaType::BITVECTOR) return formula;
-			BVTerm lhs = formula.bvConstraint().lhs().substitute(replacements);
-			BVTerm rhs = formula.bvConstraint().rhs().substitute(replacements);
-			return Formula<Pol>(BVConstraint::create(formula.bvConstraint().relation(), lhs, rhs));
+			BVTerm lhs = formula.bv_constraint().lhs().substitute(replacements);
+			BVTerm rhs = formula.bv_constraint().rhs().substitute(replacements);
+			return Formula<Pol>(BVConstraint::create(formula.bv_constraint().relation(), lhs, rhs));
 		}
 	};
 

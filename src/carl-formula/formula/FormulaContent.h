@@ -236,7 +236,7 @@ namespace carl {
 				return mId;
 			}
             
-            bool isNary() const
+            bool is_nary() const
             {
                 switch (mType) {
                     case FormulaType::TRUE: return false;
@@ -297,7 +297,7 @@ namespace carl {
 				for (auto v: std::get<QuantifierContent<Pol>>(f.mContent).mVariables) os << " " << v;
 				return os << ")(" << std::get<QuantifierContent<Pol>>(f.mContent).mFormula << ")";
 			default:
-				assert(f.isNary());
+				assert(f.is_nary());
 				return os << "(" << carl::stream_joined(" " + formulaTypeToString(f.mType) + " ", std::get<Formulas<Pol>>(f.mContent)) << ")";
 		}
 	}

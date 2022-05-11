@@ -22,7 +22,7 @@ TEST(ModelEvaluation, Formula)
 	ModelT m;
 	FormulaT f = FormulaT(FormulaType::TRUE);
 	auto res = model::substitute(f, m);
-	EXPECT_TRUE(res.isTrue());
+	EXPECT_TRUE(res.is_true());
 }
 
 TEST(ModelEvaluation, Constraint)

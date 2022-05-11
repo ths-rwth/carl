@@ -216,20 +216,6 @@ namespace carl
         if( _constraint.isPseudoBoolean() )
             _properties |= PROP_CONTAINS_PSEUDOBOOLEAN;
     }
-
-    template<typename Pol>
-    void Formula<Pol>::printProposition( std::ostream& _out, const std::string _init ) const
-    {
-        _out << _init;
-        for( unsigned i = 0; i < properties().size(); ++i )
-        {
-            if( fmod( i, 10.0 ) == 0.0 )
-                _out << " ";
-            _out << properties()[i];
-        }
-        _out << std::endl;
-    }
-
-    
+   
 
 }    // namespace carl

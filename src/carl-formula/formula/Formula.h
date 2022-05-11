@@ -58,6 +58,7 @@ namespace carl
 			/// A typedef for the template argument.
 			using PolynomialType = Pol;
 
+        private:
             /**
              * Adds the propositions of the given constraint to the propositions of this formula.
              * @param _constraint The constraint to add propositions for.
@@ -65,7 +66,6 @@ namespace carl
              */
             static void addConstraintProperties( const Constraint<Pol>& _constraint, Condition& _properties );
 
-        private:
             // Members.
 
             /// The content of this formula.
@@ -276,7 +276,7 @@ namespace carl
             /**
              * @return true, if this formula represents TRUE.
              */
-            bool isTrue() const
+            bool is_true() const
             {
                 return mpContent->mType == FormulaType::TRUE;
             }
@@ -284,7 +284,7 @@ namespace carl
             /**
              * @return true, if this formula represents FALSE.
              */
-            bool isFalse() const
+            bool is_false() const
             {
                 return mpContent->mType == FormulaType::FALSE;
             }
@@ -310,15 +310,15 @@ namespace carl
             {
                 return Formula( mpContent->mNegation );
             }
-			Formula baseFormula() const
+			Formula base_formula() const
 			{
 				return Formula(FormulaPool<Pol>::getInstance().getBaseFormula(mpContent));
 			}
 
-            const Formula& removeNegations() const
+            const Formula& remove_negations() const
             {
                 if( type() == FormulaType::NOT )
-                    return subformula().removeNegations();
+                    return subformula().remove_negations();
                 return *this;
             }
 
@@ -361,7 +361,7 @@ namespace carl
             /**
              * @return A constant reference to the then-case, in case this formula is an ite-expression of formulas.
              */
-            const Formula& firstCase() const
+            const Formula& first_case() const
             {
                 assert( mpContent->mType == ITE );
                 return std::get<Formulas<Pol>>(mpContent->mContent)[1];
@@ -370,7 +370,7 @@ namespace carl
             /**
              * @return A constant reference to the else-case, in case this formula is an ite-expression of formulas.
              */
-            const Formula& secondCase() const
+            const Formula& second_case() const
             {
                 assert( mpContent->mType == ITE );
                 return std::get<Formulas<Pol>>(mpContent->mContent)[2];
@@ -379,7 +379,7 @@ namespace carl
             /**
              * @return A constant reference to the quantifed variables, in case this formula is a quantified formula.
              */
-			const std::vector<carl::Variable>& quantifiedVariables() const
+			const std::vector<carl::Variable>& quantified_variables() const
 			{
 				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
 				return std::get<QuantifierContent<Pol>>(mpContent->mContent).mVariables;
@@ -388,7 +388,7 @@ namespace carl
             /**
              * @return A constant reference to the bound formula, in case this formula is a quantified formula.
              */
-			const Formula& quantifiedFormula() const
+			const Formula& quantified_formula() const
 			{
 				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
 				return std::get<QuantifierContent<Pol>>(mpContent->mContent).mFormula;
@@ -400,7 +400,7 @@ namespace carl
              */
             const Formulas<Pol>& subformulas() const
             {
-                assert( isNary() );
+                assert( is_nary() );
                 return std::get<Formulas<Pol>>(mpContent->mContent);
             }
 
@@ -414,17 +414,17 @@ namespace carl
                 return std::get<Constraint<Pol>>(mpContent->mContent);
             }
 
-			const VariableComparison<Pol>& variableComparison() const {
+			const VariableComparison<Pol>& variable_comparison() const {
 				assert(mpContent->mType == FormulaType::VARCOMPARE);
                 return std::get<VariableComparison<Pol>>(mpContent->mContent);
 			}
 
-			const VariableAssignment<Pol>& variableAssignment() const {
+			const VariableAssignment<Pol>& variable_assignment() const {
 				assert(mpContent->mType == FormulaType::VARASSIGN);
                 return std::get<VariableAssignment<Pol>>(mpContent->mContent);
 			}
 
-            const BVConstraint& bvConstraint() const
+            const BVConstraint& bv_constraint() const
             {
                 assert( mpContent->mType == FormulaType::BITVECTOR );
                 return std::get<BVConstraint>(mpContent->mContent);
@@ -444,7 +444,7 @@ namespace carl
              * @return A constant reference to the uninterpreted equality represented by this formula. Note, that
              *          this formula has to be of type UEQ, if you invoke this method.
              */
-            const UEquality& uequality() const
+            const UEquality& u_equality() const
             {
                 assert( mpContent->mType == FormulaType::UEQ );
                 return std::get<UEquality>(mpContent->mContent);
@@ -482,7 +482,7 @@ namespace carl
              */
             const_iterator begin() const
             {
-                assert( isNary() );
+                assert( is_nary() );
 				return std::get<Formulas<Pol>>(mpContent->mContent).begin();
             }
 
@@ -501,7 +501,7 @@ namespace carl
              */
             const_reverse_iterator rbegin() const
             {
-                assert( isNary() );
+                assert( is_nary() );
                 return std::get<Formulas<Pol>>(mpContent->mContent).rbegin();
             }
 
@@ -510,7 +510,7 @@ namespace carl
              */
             const_reverse_iterator rend() const
             {
-                assert( isNary() );
+                assert( is_nary() );
                 return std::get<Formulas<Pol>>(mpContent->mContent).rend();
             }
 
@@ -519,7 +519,7 @@ namespace carl
              */
             const Formula& back() const
             {
-                assert( isBooleanCombination() );
+                assert( is_boolean_combination() );
 				if (mpContent->mType == FormulaType::NOT)
                     return std::get<Formula<Pol>>(mpContent->mContent);
 				else
@@ -532,7 +532,7 @@ namespace carl
              * @return true, if the given property holds for this formula;
              *         false, otherwise.
              */
-            bool propertyHolds( const Condition& _property ) const
+            bool property_holds( const Condition& _property ) const
             {
                 return (mpContent->mProperties | ~_property) == ~PROP_TRUE;
             }
@@ -540,7 +540,7 @@ namespace carl
             /**
              * @return true, if this formula is a Boolean atom.
              */
-            bool isAtom() const
+            bool is_atom() const
             {
                 return (mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::BOOL
 						|| mpContent->mType == FormulaType::VARCOMPARE || mpContent->mType == FormulaType::VARASSIGN
@@ -548,26 +548,26 @@ namespace carl
                         || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::TRUE);
             }
 
-            bool isLiteral() const
+            bool is_literal() const
             {
-                return propertyHolds( PROP_IS_A_LITERAL );
+                return property_holds( PROP_IS_A_LITERAL );
             }
 
             /**
              * @return true, if the outermost operator of this formula is Boolean;
              *          false, otherwise.
              */
-            bool isBooleanCombination() const
+            bool is_boolean_combination() const
             {
-                return !isAtom();
+                return !is_atom();
             }
 
-			bool isBound() const
+			bool is_bound() const
 			{
-				if (mpContent->mType == FormulaType::CONSTRAINT) return is_bound(std::get<Constraint<Pol>>(mpContent->mContent));
+				if (mpContent->mType == FormulaType::CONSTRAINT) return carl::is_bound(std::get<Constraint<Pol>>(mpContent->mContent));
 				if (mpContent->mType == FormulaType::NOT) {
 					if (std::get<Formula<Pol>>(mpContent->mContent).mpContent->mType != FormulaType::CONSTRAINT) return false;
-					return is_bound(std::get<Constraint<Pol>>(std::get<Formula<Pol>>(mpContent->mContent).mpContent->mContent), true);
+					return carl::is_bound(std::get<Constraint<Pol>>(std::get<Formula<Pol>>(mpContent->mContent).mpContent->mContent), true);
 				}
 				return false;
 			}
@@ -575,16 +575,16 @@ namespace carl
             /**
              * @return true, if the type of this formulas allows n-ary combinations of sub-formulas, for an arbitrary n.
              */
-            bool isNary() const
+            bool is_nary() const
             {
-                return mpContent->isNary();
+                return mpContent->is_nary();
             }
 
             /**
              * @return true, if this formula is a conjunction of constraints;
              *          false, otherwise.
              */
-            bool isConstraintConjunction() const
+            bool is_constraint_conjunction() const
             {
                 if( PROP_IS_PURE_CONJUNCTION <= properties() )
                     return !(PROP_CONTAINS_BOOLEAN <= properties());
@@ -596,7 +596,7 @@ namespace carl
              * @return true, if this formula is a conjunction of real constraints;
              *          false, otherwise.
              */
-            bool isRealConstraintConjunction() const
+            bool is_real_constraint_conjunction() const
             {
                 if( PROP_IS_PURE_CONJUNCTION <= properties() )
                     return (!(PROP_CONTAINS_INTEGER_VALUED_VARS <= properties()) && !(PROP_CONTAINS_BOOLEAN <= properties()));
@@ -608,7 +608,7 @@ namespace carl
              * @return true, if this formula is a conjunction of integer constraints;
              *         false, otherwise.
              */
-            bool isIntegerConstraintConjunction() const
+            bool is_integer_constraint_conjunction() const
             {
                 if( PROP_IS_PURE_CONJUNCTION <= properties() )
                     return (!(PROP_CONTAINS_REAL_VALUED_VARS <= properties()) && !(PROP_CONTAINS_BOOLEAN <= properties()));
@@ -620,7 +620,7 @@ namespace carl
              * @return true, if this formula is propositional;
              *         false, otherwise.
              */
-            bool isOnlyPropositional() const
+            bool is_only_propositional() const
             {
                 return !(carl::PROP_CONTAINS_BITVECTOR <= properties())
                     && !(carl::PROP_CONTAINS_UNINTERPRETED_EQUATIONS <= properties())
@@ -693,7 +693,7 @@ namespace carl
             {
                 if( *this == _formula )
                     return true;
-                if( isAtom() )
+                if( is_atom() )
                     return false;
                 if( mpContent->mType == FormulaType::NOT )
 					return std::get<Formula<Pol>>(mpContent->mContent) == _formula;
@@ -767,13 +767,6 @@ namespace carl
 			Formula operator!() const {
 				return negated();
 			}
-
-            /**
-             * Prints the propositions of this formula.
-             * @param _out The stream to print on.
-             * @param _init The string to print initially in every row.
-             */
-            void printProposition( std::ostream& _out = std::cout, const std::string _init = "" ) const;
     };
 
 	/**

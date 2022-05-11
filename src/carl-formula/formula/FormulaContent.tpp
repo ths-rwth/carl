@@ -94,7 +94,7 @@ namespace carl {
         mContent( std::move(_subformulas) )
     {
         assert( !std::get<Formulas<Pol>>(mContent).empty() );
-        assert( isNary() );
+        assert( is_nary() );
         for (const auto& subformula: std::get<Formulas<Pol>>(mContent)) {
 			carl::hash_add(mHash, subformula.hash());
         }

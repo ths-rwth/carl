@@ -162,7 +162,7 @@ namespace carl
         subformulas.reserve( _subformulas.size() );
         bool negateResult = false;
         size_t pos = 0;
-        while( pos < _subformulas.size() && _subformulas[pos].isTrue() )
+        while( pos < _subformulas.size() && _subformulas[pos].is_true() )
         {
             switch( _type )
             {
@@ -176,12 +176,12 @@ namespace carl
             }
             ++pos;
         }
-        while( pos < _subformulas.size() && _subformulas[pos].isFalse() )
+        while( pos < _subformulas.size() && _subformulas[pos].is_false() )
         {
             switch( _type )
             {
                 case FormulaType::IFF:
-                    if( _subformulas[0].isTrue() )
+                    if( _subformulas[0].is_true() )
                         return falseFormula();
                     negateResult = true;
                     break;
@@ -267,8 +267,8 @@ namespace carl
         Formula<Pol>& thencase = _subformulas[1];
         Formula<Pol>& elsecase = _subformulas[2];
         
-        if (condition.isTrue()) return thencase.mpContent;
-        if (condition.isFalse()) return elsecase.mpContent;
+        if (condition.is_true()) return thencase.mpContent;
+        if (condition.is_false()) return elsecase.mpContent;
         if (thencase == elsecase) return thencase.mpContent;
         
         if (condition.type() == FormulaType::NOT) {
@@ -281,28 +281,28 @@ namespace carl
         if (condition == thencase) thencase = Formula<Pol>(trueFormula());
         if (condition.mpContent == thencase.mpContent->mNegation) thencase = Formula<Pol>(falseFormula());
         
-        if (thencase.isFalse()) {
+        if (thencase.is_false()) {
             // (ite c false b) = (~c or false) and (c or b) = ~c and (c or b) = (~c and b)
             Formulas<Pol> subFormulas;
             subFormulas.push_back(Formula<Pol>(FormulaType::NOT, condition));
             subFormulas.push_back(elsecase);
             return create(FormulaType::AND, std::move(subFormulas));
         }
-        if (thencase.isTrue()) {
+        if (thencase.is_true()) {
             // (ite c true b) = (~c or true) and (c or b) = (c or b)
             Formulas<Pol> subFormulas;
             subFormulas.push_back(condition);
             subFormulas.push_back(elsecase);
             return create(FormulaType::OR, std::move(subFormulas));
         }
-        if (elsecase.isFalse()) {
+        if (elsecase.is_false()) {
             // (ite c false b) = (~c or a) and (c or false) = (~c or a) and c = (c and a)
             Formulas<Pol> subFormulas;
             subFormulas.push_back(condition);
             subFormulas.push_back(thencase);
             return create(FormulaType::AND, std::move(subFormulas));
         }
-        if (elsecase.isTrue()) {
+        if (elsecase.is_true()) {
             // (ite c true b) = (~c or a) and (c or true) = (~c or a)
             Formulas<Pol> subFormulas;
             subFormulas.push_back(Formula<Pol>(FormulaType::NOT, condition));

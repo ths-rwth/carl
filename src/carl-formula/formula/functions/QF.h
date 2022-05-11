@@ -71,8 +71,8 @@ Formula<Poly> toQF(std::vector<Variables>& variables, unsigned level = 0, bool n
 			unsigned cur = 0;
 			if ((level % 2 == (type() == FormulaType::EXISTS ? (unsigned)0 : (unsigned)1)) ^ negated) cur = level;
 			else cur = level+1;
-			Variables vars(quantifiedVariables().begin(), quantifiedVariables().end());
-			Formula<Pol> f = quantifiedFormula();
+			Variables vars(quantified_variables().begin(), quantified_variables().end());
+			Formula<Pol> f = quantified_formula();
 			for (auto it = vars.begin(); it != vars.end();) {
 				if (it->type() == VariableType::VT_BOOL) {
 					// Just leave boolean variables at the base level up to the SAT solver.
@@ -97,7 +97,7 @@ Formula<Poly> toQF(std::vector<Variables>& variables, unsigned level = 0, bool n
 			if (negated) return Formula<Pol>(FormulaType::AND, {premise().toQF(variables, level, false), conclusion().toQF(variables, level, true)});
 			else return Formula<Pol>( FormulaType::IMPLIES, {premise().toQF(variables, level, false), conclusion().toQF(variables, level, false)});
 		case FormulaType::ITE:
-			return Formula<Pol>( FormulaType::ITE, {condition().toQF(variables, level, negated), firstCase().toQF(variables, level, negated), secondCase().toQF(variables, level, negated)});
+			return Formula<Pol>( FormulaType::ITE, {condition().toQF(variables, level, negated), first_case().toQF(variables, level, negated), second_case().toQF(variables, level, negated)});
 		case FormulaType::NOT:
 			return subformula().toQF(variables, level, !negated);
 	}
