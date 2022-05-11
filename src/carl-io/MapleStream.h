@@ -33,7 +33,7 @@ private:
 	
 	template<typename Pol>
 	void write(const Formula<Pol>& f) {
-		switch (f.getType()) {
+		switch (f.type()) {
 			case FormulaType::AND:
 				write(f.subformulas(), "and");
 				break;
@@ -72,7 +72,7 @@ private:
 				break;
 			case FormulaType::TRUE:
 			case FormulaType::FALSE:
-				*this << f.getType();
+				*this << f.type();
 				break;
 			case FormulaType::UEQ:
 				CARL_LOG_ERROR("carl.maplestream", "Uninterpreted equalities are not supported by Maple.");

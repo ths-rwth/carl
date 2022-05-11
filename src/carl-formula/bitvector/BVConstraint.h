@@ -77,6 +77,9 @@ public:
 		return mId;
 	}
 
+	/**
+	 * @return A hash value for this constraint.
+	 */
 	std::size_t hash() const {
 		return mHash;
 	}
@@ -99,13 +102,6 @@ public:
 		for (const auto& bvv : bvvars) {
 			vars.add(bvv.variable());
 		}
-	}
-
-	/**
-	 * @return A hash value for this constraint.
-	 */
-	std::size_t getHash() const {
-		return mHash;
 	}
 
 	bool isConstant() const {

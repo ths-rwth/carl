@@ -75,7 +75,7 @@ namespace carl {
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(FormulaType _type, Formula<Pol>&& _subformula):
-        mHash( ((size_t)NOT << 5) ^ _subformula.getHash() ),
+        mHash( ((size_t)NOT << 5) ^ _subformula.hash() ),
 		mType(_type),
 		mContent(std::move(_subformula))
 	{
@@ -96,7 +96,7 @@ namespace carl {
         assert( !std::get<Formulas<Pol>>(mContent).empty() );
         assert( isNary() );
         for (const auto& subformula: std::get<Formulas<Pol>>(mContent)) {
-			carl::hash_add(mHash, subformula.getHash());
+			carl::hash_add(mHash, subformula.hash());
         }
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << std::get<Formulas<Pol>>(mContent));
     }
@@ -104,7 +104,7 @@ namespace carl {
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(FormulaType _type, std::vector<carl::Variable>&& _vars, const Formula<Pol>& _term):
         ///@todo Construct reasonable hash
-        mHash( _term.getHash() ),
+        mHash( _term.hash() ),
 		mType(_type),
 		mContent(QuantifierContent<Pol>(std::move(_vars), std::move(Formula<Pol>(_term))))
 	{

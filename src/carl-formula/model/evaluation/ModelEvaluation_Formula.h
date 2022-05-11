@@ -19,14 +19,14 @@ namespace model {
 			r = substitute(r, m);
 			CARL_LOG_DEBUG("carl.model.evaluation", "Result: " << r);
 		}
-		f = Formula<Poly>(f.getType(), std::move(res));
+		f = Formula<Poly>(f.type(), std::move(res));
 		CARL_LOG_DEBUG("carl.model.evaluation", "Result: " << f);
 	}
 
 	template<typename Rational, typename Poly>
 	void evaluateVarCompare(Formula<Poly>& f, const Model<Rational,Poly>& m) {
 		CARL_LOG_DEBUG("carl.model.evaluation", "Evaluating " << f << " on " << m);
-		assert(f.getType() == FormulaType::VARCOMPARE);
+		assert(f.type() == FormulaType::VARCOMPARE);
 		const auto& vc = f.variableComparison();
 		
 		ModelValue<Rational,Poly> cmp = vc.value();
@@ -92,7 +92,7 @@ namespace model {
 	
 	template<typename Rational, typename Poly>
 	void evaluateVarAssign(Formula<Poly>& f, const Model<Rational,Poly>& m) {
-		assert(f.getType() == FormulaType::VARASSIGN);
+		assert(f.type() == FormulaType::VARASSIGN);
 		const auto& va = f.variableAssignment();
 		auto it = m.find(va.var());
 		if (it == m.end()) return;
@@ -112,7 +112,7 @@ namespace model {
 	 */
 	template<typename Rational, typename Poly>
 	void substituteIn(Formula<Poly>& f, const Model<Rational,Poly>& m) {
-		switch (f.getType()) {
+		switch (f.type()) {
 			case FormulaType::ITE: {
 				f = Formula<Poly>(FormulaType::ITE, substitute(f.condition(), m), substitute(f.firstCase(), m), substitute(f.secondCase(), m));
 				break;

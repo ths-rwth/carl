@@ -59,22 +59,22 @@ private:
 
 	template<typename Pol>
 	void write(const Formula<Pol>& f) {
-		switch (f.getType()) {
+		switch (f.type()) {
 			case FormulaType::AND:
 			case FormulaType::OR:
 			case FormulaType::IFF:
 			case FormulaType::XOR:
 			case FormulaType::IMPLIES:
 			case FormulaType::ITE:
-				// 	*this << "(" << f.getType() << " " << stream_joined(" ", f.subformulas()) << ")";
-				*this << "(" << f.getType();
+				// 	*this << "(" << f.type() << " " << stream_joined(" ", f.subformulas()) << ")";
+				*this << "(" << f.type();
 				for (const auto& f : f.subformulas()) {
 					*this << " " << f;
 				}
 				*this << ")";
 				break;
 			case FormulaType::NOT:
-				*this << "(" << f.getType() << " " << f.subformula() << ")";
+				*this << "(" << f.type() << " " << f.subformula() << ")";
 				break;
 			case FormulaType::BOOL:
 				*this << f.boolean();
@@ -93,7 +93,7 @@ private:
 				break;
 			case FormulaType::TRUE:
 			case FormulaType::FALSE:
-				*this << f.getType();
+				*this << f.type();
 				break;
 			case FormulaType::UEQ:
 				*this << f.uequality();
@@ -103,7 +103,7 @@ private:
 				CARL_LOG_ERROR("carl.smtlibstream", "Printing exists or forall is not implemented yet.");
 				break;
 			default:
-				CARL_LOG_ERROR("carl.smtlibstream", "Not supported formula type: " << f.getType());
+				CARL_LOG_ERROR("carl.smtlibstream", "Not supported formula type: " << f.type());
 		}
 	}
 	

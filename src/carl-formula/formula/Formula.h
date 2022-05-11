@@ -243,7 +243,7 @@ namespace carl
              * Sets the activity to the given value.
              * @param _activity The value to set the activity to.
              */
-            void setActivity( double _activity ) const
+            void set_activity( double _activity ) const
             {
                 ACTIVITY_LOCK_GUARD
                 mpContent->mActivity = _activity;
@@ -252,7 +252,7 @@ namespace carl
             /**
              * @return The type of this formula.
              */
-            FormulaType getType() const
+            FormulaType type() const
             {
                 return mpContent->mType;
             }
@@ -260,7 +260,7 @@ namespace carl
             /**
              * @return A hash value for this formula.
              */
-            std::size_t getHash() const
+            std::size_t hash() const
             {
                 return mpContent->mHash;
             }
@@ -268,7 +268,7 @@ namespace carl
             /**
              * @return The unique id for this formula.
              */
-            std::size_t getId() const
+            std::size_t id() const
             {
                 return mpContent->mId;
             }
@@ -317,7 +317,7 @@ namespace carl
 
             const Formula& removeNegations() const
             {
-                if( getType() == FormulaType::NOT )
+                if( type() == FormulaType::NOT )
                     return subformula().removeNegations();
                 return *this;
             }
@@ -727,8 +727,8 @@ namespace carl
             bool operator<( const Formula& _formula ) const
             {
                 assert( mpContent->mId != 0 );
-                assert( _formula.getId() != 0 );
-                return mpContent->mId < _formula.getId();
+                assert( _formula.id() != 0 );
+                return mpContent->mId < _formula.id();
             }
 
             /**
@@ -738,8 +738,8 @@ namespace carl
             bool operator>( const Formula& _formula ) const
             {
                 assert( mpContent->mId != 0 );
-                assert( _formula.getId() != 0 );
-                return mpContent->mId > _formula.getId();
+                assert( _formula.id() != 0 );
+                return mpContent->mId > _formula.id();
             }
 
             /**
@@ -749,8 +749,8 @@ namespace carl
             bool operator<=( const Formula& _formula ) const
             {
                 assert( mpContent->mId != 0 );
-                assert( _formula.getId() != 0 );
-                return mpContent->mId <= _formula.getId();
+                assert( _formula.id() != 0 );
+                return mpContent->mId <= _formula.id();
             }
 
             /**
@@ -760,8 +760,8 @@ namespace carl
             bool operator>=( const Formula& _formula ) const
             {
                 assert( mpContent->mId != 0 );
-                assert( _formula.getId() != 0 );
-                return mpContent->mId >= _formula.getId();
+                assert( _formula.id() != 0 );
+                return mpContent->mId >= _formula.id();
             }
 
 			Formula operator!() const {
@@ -819,7 +819,7 @@ namespace std
          */
         std::size_t operator()( const carl::Formula<Pol>& _formula ) const
         {
-            return _formula.getHash();
+            return _formula.hash();
         }
     };
 }    // namespace std

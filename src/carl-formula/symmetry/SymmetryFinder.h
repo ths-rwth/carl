@@ -113,8 +113,8 @@ class GraphBuilder {
 		return vert;
 	}
 	unsigned addFormula(const Formula<Poly>& f) {
-		unsigned vert = mGraph.add_vertex(mColor(f.getType()));
-		switch (f.getType()) {
+		unsigned vert = mGraph.add_vertex(mColor(f.type()));
+		switch (f.type()) {
 			case carl::FormulaType::ITE: {
 				unsigned ifvert = mGraph.add_vertex(mColor(SpecialColors::If));
 				mGraph.add_edge(vert, ifvert);

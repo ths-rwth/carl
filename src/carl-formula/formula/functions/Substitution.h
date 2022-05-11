@@ -22,7 +22,7 @@ namespace helper {
 		const std::map<Variable,typename Formula<Pol>::PolynomialType>& replacements;
 		explicit PolynomialSubstitutor(const std::map<Variable,typename Formula<Pol>::PolynomialType>& repl): replacements(repl) {}
 		Formula<Pol> operator()(const Formula<Pol>& formula) {
-			if (formula.getType() != FormulaType::CONSTRAINT) return formula;
+			if (formula.type() != FormulaType::CONSTRAINT) return formula;
 			return Formula<Pol>(carl::substitute(formula.constraint().lhs(), replacements), formula.constraint().relation());
 		}
 	};
@@ -32,7 +32,7 @@ namespace helper {
 		const std::map<BVVariable,BVTerm>& replacements;
 		explicit BitvectorSubstitutor(const std::map<BVVariable,BVTerm>& repl): replacements(repl) {}
 		Formula<Pol> operator()(const Formula<Pol>& formula) {
-			if (formula.getType() != FormulaType::BITVECTOR) return formula;
+			if (formula.type() != FormulaType::BITVECTOR) return formula;
 			BVTerm lhs = formula.bvConstraint().lhs().substitute(replacements);
 			BVTerm rhs = formula.bvConstraint().rhs().substitute(replacements);
 			return Formula<Pol>(BVConstraint::create(formula.bvConstraint().relation(), lhs, rhs));
@@ -44,7 +44,7 @@ namespace helper {
 		const std::map<UVariable,UFInstance>& replacements;
 		explicit UninterpretedSubstitutor(const std::map<UVariable,UFInstance>& repl): replacements(repl) {}
 		Formula<Pol> operator()(const Formula<Pol>& formula) {
-			if (formula.getType() != FormulaType::UEQ) return formula;
+			if (formula.type() != FormulaType::UEQ) return formula;
 
 		}
 	};

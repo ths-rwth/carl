@@ -10,9 +10,9 @@ namespace carl {
  */
 template<typename Pol>
 Formula<Pol> resolve_negation( const Formula<Pol>& f, bool _keepConstraint = true ) {
-    if( f.getType() != FormulaType::NOT ) return f;
-    FormulaType newType = f.getType();
-    switch( f.subformula().getType() )
+    if( f.type() != FormulaType::NOT ) return f;
+    FormulaType newType = f.type();
+    switch( f.subformula().type() )
     {
         case FormulaType::BOOL:
             return f;
@@ -134,8 +134,8 @@ Formula<Pol> resolve_negation( const Formula<Pol>& f, bool _keepConstraint = tru
             std::cerr << "Unexpected type of formula!" << std::endl;
             return f;
     }
-    assert( newType != f.subformula().getType() );
-    assert( f.subformula().getType() == FormulaType::AND || f.subformula().getType() == FormulaType::OR );
+    assert( newType != f.subformula().type() );
+    assert( f.subformula().type() == FormulaType::AND || f.subformula().type() == FormulaType::OR );
     Formulas<Pol> subFormulas;
     for( const Formula<Pol>& subsubformula : f.subformula().subformulas() )
         subFormulas.push_back( Formula<Pol>( FormulaType::NOT, subsubformula ) );

@@ -223,7 +223,7 @@ namespace carl
             return false;
         std::lock_guard<std::recursive_mutex> lockA( _toUpdate.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _updateWith.mMutex );
-        assert( _toUpdate.getHash() == _updateWith.getHash() && _toUpdate == _updateWith );
+        assert( _toUpdate.hash() == _updateWith.hash() && _toUpdate == _updateWith );
         if( _toUpdate.mpPolynomial == nullptr && _updateWith.mpPolynomial != nullptr )
             return true;
         assert( _updateWith.mpPolynomial == nullptr || (*_toUpdate.mpPolynomial) == (*_updateWith.mpPolynomial) );

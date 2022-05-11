@@ -19,7 +19,7 @@ namespace carl {
  */
 template<typename Poly>
 Formula<Poly> toQF(std::vector<Variables>& variables, unsigned level = 0, bool negated = false) {
-	switch (getType()) {
+	switch (type()) {
 		case FormulaType::AND:
 		case FormulaType::IFF:
 		case FormulaType::OR:
@@ -30,15 +30,15 @@ Formula<Poly> toQF(std::vector<Variables>& variables, unsigned level = 0, bool n
 				for (auto& sub: subformulas()) {
 					subs.push_back(sub.toQF(variables, level, false));
 				}
-				return Formula<Pol>( getType(), std::move(subs) );
-			} else if (getType() == FormulaType::AND || getType() == FormulaType::OR) {
+				return Formula<Pol>( type(), std::move(subs) );
+			} else if (type() == FormulaType::AND || type() == FormulaType::OR) {
 				Formulas<Pol> subs;
 				for (auto& sub: subformulas()) {
 					subs.push_back(sub.toQF(variables, level, true));
 				}
-				if (getType() == FormulaType::AND) return Formula<Pol>(FormulaType::OR, std::move(subs));
+				if (type() == FormulaType::AND) return Formula<Pol>(FormulaType::OR, std::move(subs));
 				else return Formula<Pol>(FormulaType::AND, std::move(subs));
-			} else if (getType() == FormulaType::IFF) {
+			} else if (type() == FormulaType::IFF) {
 				Formulas<Pol> sub1;
 				Formulas<Pol> sub2;
 				for (auto& sub: subformulas()) {
@@ -46,7 +46,7 @@ Formula<Poly> toQF(std::vector<Variables>& variables, unsigned level = 0, bool n
 					sub2.push_back(sub.toQF(variables, level, false));
 				}
 				return Formula<Pol>(FormulaType::AND, {Formula<Pol>(FormulaType::OR, std::move(sub1)), Formula<Pol>(FormulaType::OR, std::move(sub2))});
-			} else if (getType() == FormulaType::XOR) {
+			} else if (type() == FormulaType::XOR) {
 				auto lhs = back().toQF(variables, level, false);
 				auto rhs = connectPrecedingSubformulas().toQF(variables, level, true);
 				return Formula<Pol>(FormulaType::IFF, {lhs, rhs});
@@ -69,7 +69,7 @@ Formula<Poly> toQF(std::vector<Variables>& variables, unsigned level = 0, bool n
 		case FormulaType::FORALL:
 		{
 			unsigned cur = 0;
-			if ((level % 2 == (getType() == FormulaType::EXISTS ? (unsigned)0 : (unsigned)1)) ^ negated) cur = level;
+			if ((level % 2 == (type() == FormulaType::EXISTS ? (unsigned)0 : (unsigned)1)) ^ negated) cur = level;
 			else cur = level+1;
 			Variables vars(quantifiedVariables().begin(), quantifiedVariables().end());
 			Formula<Pol> f = quantifiedFormula();
@@ -78,7 +78,7 @@ Formula<Poly> toQF(std::vector<Variables>& variables, unsigned level = 0, bool n
 					// Just leave boolean variables at the base level up to the SAT solver.
 					if (cur > 0) {
 						f = Formula<Pol>(
-							(getType() == FormulaType::EXISTS ? FormulaType::OR : FormulaType::AND),
+							(type() == FormulaType::EXISTS ? FormulaType::OR : FormulaType::AND),
 							{carl::substitute(f,*it, Formula<Pol>( FormulaType::TRUE )),
 							carl::substitute(f, *it, Formula<Pol>( FormulaType::FALSE ))}
 						);

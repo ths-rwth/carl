@@ -202,7 +202,7 @@ namespace carl
         /**
          * @return The hash of this polynomial factorization pair.
          */
-        size_t getHash() const
+        size_t hash() const
         {
             return mHash;
         }
@@ -297,7 +297,7 @@ namespace std
     {
         size_t operator()( const carl::PolynomialFactorizationPair<P>& _pfp ) const 
         {
-            return _pfp.getHash();
+            return _pfp.hash();
         }
     };
 } // namespace std

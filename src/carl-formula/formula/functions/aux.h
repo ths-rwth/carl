@@ -19,7 +19,7 @@ Formula<Pol> connectPrecedingSubformulas(const Formula<Pol>& f) {
         ++iter;
         for( ; iter != f.subformulas().rend(); ++iter )
             tmpSubformulas.push_back( *iter );
-        return Formula<Pol>( f.getType(), tmpSubformulas );
+        return Formula<Pol>( f.type(), tmpSubformulas );
     }
     else
     {

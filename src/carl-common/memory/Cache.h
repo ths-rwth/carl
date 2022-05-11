@@ -30,7 +30,7 @@ namespace std {
     template<typename T, class I>
     struct hash<carl::TypeInfoPair<T,I>> {
         std::size_t operator()(const carl::TypeInfoPair<T,I>& _tip) const {
-            return _tip.first->getHash();
+            return _tip.first->hash();
         }
     };
 }

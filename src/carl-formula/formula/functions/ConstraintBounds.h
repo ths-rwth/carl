@@ -27,8 +27,8 @@ Formula<Pol> addConstraintBound( ConstraintBounds<Pol>& _constraintBounds, const
     #ifdef CONSTRAINT_BOUND_DEBUG
     std::cout << "add from a " << (_inConjunction ? "conjunction" : "disjunction") << " to " << &_constraintBounds << ":   " << _constraint << std::endl;
     #endif
-    bool negated = _constraint.getType() == FormulaType::NOT;
-    assert( _constraint.getType() == FormulaType::CONSTRAINT || (negated && _constraint.subformula().getType() == FormulaType::CONSTRAINT ) );
+    bool negated = _constraint.type() == FormulaType::NOT;
+    assert( _constraint.type() == FormulaType::CONSTRAINT || (negated && _constraint.subformula().type() == FormulaType::CONSTRAINT ) );
     const Constraint<Pol>& constraint = negated ? _constraint.subformula().constraint() : _constraint.constraint();
     assert( constraint.isConsistent() == 2 );
     typename Pol::NumberType boundValue;

@@ -140,7 +140,7 @@ namespace carl
         {
             for( size_t pos = 0; pos < _subformulas.size(); )
             {
-                if( _subformulas[pos].getType() == _type )
+                if( _subformulas[pos].type() == _type )
                 {
                     // We have (op .. (op a1 .. an) b ..), so create (op .. a1 .. an b ..) instead.
                     // Note, that a1 to an are definitely created before b, as they were sub-formulas
@@ -271,7 +271,7 @@ namespace carl
         if (condition.isFalse()) return elsecase.mpContent;
         if (thencase == elsecase) return thencase.mpContent;
         
-        if (condition.getType() == FormulaType::NOT) {
+        if (condition.type() == FormulaType::NOT) {
             _subformulas[0] = condition.subformula();
             std::swap(_subformulas[1], _subformulas[2]);
             return createITE(std::move(_subformulas));

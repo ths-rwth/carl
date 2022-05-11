@@ -9,7 +9,7 @@ template<typename Pol>
 void variables(const Formula<Pol>& f, carlVariables& vars) {
     carl::visit(f,
         [&vars](const Formula<Pol>& f) {
-            switch (f.getType()) {
+            switch (f.type()) {
                 case FormulaType::BOOL:
                     vars.add(f.boolean());
                     break;
@@ -42,7 +42,7 @@ template<typename Pol>
 void uninterpreted_functions(const Formula<Pol>& f, std::set<UninterpretedFunction>& ufs) {
     carl::visit(f,
         [&ufs](const Formula<Pol>& f) {
-            if (f.getType() == FormulaType::UEQ) {
+            if (f.type() == FormulaType::UEQ) {
                 f.uequality().gatherUFs(ufs);
             }
         }
@@ -53,7 +53,7 @@ template<typename Pol>
 void uninterpreted_variables(const Formula<Pol>& f, std::set<UVariable>& uvs) {
     carl::visit(f,
         [&uvs](const Formula<Pol>& f) {
-            if (f.getType() == FormulaType::UEQ) {
+            if (f.type() == FormulaType::UEQ) {
                 f.uequality().gatherUVariables(uvs);
             }
         }
@@ -64,7 +64,7 @@ template<typename Pol>
 void bitvector_variables(const Formula<Pol>& f, std::set<BVVariable>& bvvs) {
     carl::visit(f,
         [&bvvs](const Formula<Pol>& f) {
-            if (f.getType() == FormulaType::BITVECTOR) {
+            if (f.type() == FormulaType::BITVECTOR) {
                 f.bvConstraint().gatherBVVariables(bvvs);
             }
         }
@@ -79,7 +79,7 @@ template<typename Pol>
 void arithmetic_constraints(const Formula<Pol>& f, std::vector<Constraint<Pol>>& constraints ) {
     carl::visit(f,
         [&constraints](const Formula<Pol>& f) {
-            switch (f.getType()) {
+            switch (f.type()) {
                 case FormulaType::CONSTRAINT:
                     constraints.push_back(f.constraint());
                     break;
@@ -97,7 +97,7 @@ template<typename Pol>
 void arithmetic_constraints(const Formula<Pol>& f, std::vector<Formula<Pol>>& constraints ) {
     carl::visit(f,
         [&constraints](const Formula<Pol>& f) {
-            switch (f.getType()) {
+            switch (f.type()) {
                 case FormulaType::CONSTRAINT:
                     constraints.push_back(f);
                     break;

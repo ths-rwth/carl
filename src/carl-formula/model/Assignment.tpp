@@ -119,7 +119,7 @@ namespace carl
     unsigned satisfies( const Model<Rational,Poly>& _model, const std::map<Variable,Rational>& _assignment, const std::map<carl::BVVariable, carl::BVTerm>& _bvAssigns, const Formula<Poly>& _formula )
     {
         assert( isPartOf( _assignment, _model ) );
-        switch( _formula.getType() )
+        switch( _formula.type() )
         {
             case carl::FormulaType::TRUE:
             {
@@ -372,7 +372,7 @@ namespace carl
 	template<typename Rational, typename Poly>
     void getDefaultModel( Model<Rational,Poly>& _defaultModel, const Formula<Poly>& _formula, bool _overwrite, size_t _seed )
     {
-        switch( _formula.getType() )
+        switch( _formula.type() )
         {
             case carl::FormulaType::TRUE:
             case carl::FormulaType::FALSE:

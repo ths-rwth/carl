@@ -58,7 +58,7 @@ TEST(Formula, Construction)
     FormulaT atomB( lhsB, Relation::EQ );
     FormulaT atomC( b );
     FormulaT inEq( lhsC, Relation::EQ );
-    EXPECT_TRUE( inEq.getType() == FormulaType::FALSE );
+    EXPECT_TRUE( inEq.type() == FormulaType::FALSE );
 
     // and the Ast itself:
     Formulas<Pol> subAstsA;
@@ -85,12 +85,12 @@ TEST(Formula, BooleanConstructors)
     EXPECT_TRUE(False.isFalse());
 
     FormulaT fb1 = FormulaT(b1);
-    EXPECT_EQ(FormulaType::BOOL, fb1.getType());
+    EXPECT_EQ(FormulaType::BOOL, fb1.type());
     FormulaT fb2 = FormulaT(b2);
-    EXPECT_EQ(FormulaType::BOOL, fb2.getType());
+    EXPECT_EQ(FormulaType::BOOL, fb2.type());
 
     FormulaT nb1 = FormulaT(FormulaType::NOT, fb1);
-    EXPECT_EQ(FormulaType::NOT, nb1.getType());
+    EXPECT_EQ(FormulaType::NOT, nb1.type());
 
     FormulaT Fimpl = FormulaT(FormulaType::IMPLIES, {nb1, fb2});
     FormulaT Fand = FormulaT(FormulaType::AND, {nb1, fb2});

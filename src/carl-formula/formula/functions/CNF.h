@@ -49,7 +49,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 		CARL_LOG_DEBUG("carl.formula.cnf", "Processing " << current << " from " << subformula_queue);
 		subformula_queue.pop_back();
 
-		switch (current.getType()) {
+		switch (current.type()) {
 			case FormulaType::TRUE:
 				return Formula<Poly>(FormulaType::TRUE);
 			case FormulaType::FALSE:
@@ -168,7 +168,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 	if (!simplify_combinations && f.propertyHolds(PROP_IS_IN_CNF)) {
 		if (keep_constraints) {
 			return f;
-		} else if (f.getType() == FormulaType::NOT) {
+		} else if (f.type() == FormulaType::NOT) {
 			assert(f.isLiteral());
 			return resolve_negation(f,keep_constraints);
 		}
@@ -187,7 +187,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 		CARL_LOG_DEBUG("carl.formula.cnf", "Processing " << current << " from " << subformula_queue);
 		subformula_queue.pop_back();
 
-		switch (current.getType()) {
+		switch (current.type()) {
 			case FormulaType::TRUE:
 				break;
 			case FormulaType::FALSE:
@@ -239,10 +239,10 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 				if (current.subformulas().size() == 2) {
 					const auto& lhs = current.subformulas().front();
 					const auto& rhs = current.subformulas().back();
-					if (lhs.getType() == FormulaType::AND) {
+					if (lhs.type() == FormulaType::AND) {
 						auto tmp = formula_to_cnf::construct_iff(rhs, lhs.subformulas());
 						subformula_queue.insert(subformula_queue.end(), tmp.begin(), tmp.end());
-					} else if (rhs.getType() == FormulaType::AND) {
+					} else if (rhs.type() == FormulaType::AND) {
 						auto tmp = formula_to_cnf::construct_iff(lhs, rhs.subformulas());
 						subformula_queue.insert(subformula_queue.end(), tmp.begin(), tmp.end());
 					} else {

@@ -10,7 +10,7 @@ namespace carl {
  */
 template<typename Pol, typename Visitor>
 void visit(const Formula<Pol>& formula, /*std::function<void(const Formula<Pol>&)>&*/ Visitor func) {
-	switch (formula.getType()) {
+	switch (formula.type()) {
 		case AND:
 		case OR:
 		case IFF:
@@ -48,7 +48,7 @@ void visit(const Formula<Pol>& formula, /*std::function<void(const Formula<Pol>&
 template<typename Pol, typename Visitor>
 Formula<Pol> visit_result(const Formula<Pol>& formula, /*std::function<Formula<Pol>(const Formula<Pol>&)>&*/ Visitor func) {
 	Formula<Pol> newFormula = formula;
-	switch (formula.getType()) {
+	switch (formula.type()) {
 		case AND:
 		case OR:
 		case IFF:
@@ -61,7 +61,7 @@ Formula<Pol> visit_result(const Formula<Pol>& formula, /*std::function<Formula<P
 				newSubformulas.push_back(newCur);
 			}
 			if (changed) {
-				newFormula = Formula(formula.getType(), std::move(newSubformulas));
+				newFormula = Formula(formula.type(), std::move(newSubformulas));
 			}
 			break;
 		}
@@ -102,7 +102,7 @@ Formula<Pol> visit_result(const Formula<Pol>& formula, /*std::function<Formula<P
 		case FORALL: {
 			Formula<Pol> sub = visit_result(formula.quantifiedFormula(), func);
 			if (sub != formula.quantifiedFormula()) {
-				newFormula = Formula<Pol>(formula.getType(), formula.quantifiedVariables(), sub);
+				newFormula = Formula<Pol>(formula.type(), formula.quantifiedVariables(), sub);
 			}
 			break;
 		}

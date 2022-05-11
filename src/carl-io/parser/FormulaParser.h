@@ -73,24 +73,24 @@ private:
         assert(!ops.empty());
 		switch (op) {
             case FormulaType::AND: {
-                if( first.getType() == FormulaType::FALSE )
+                if( first.type() == FormulaType::FALSE )
                     return Formula<Pol>( FormulaType::FALSE );
                 Formulas<Pol> subFormulas;
                 subFormulas.push_back( first );
                 for (const auto& subop: ops) {
-                    if( subop.getType() == FormulaType::FALSE )
+                    if( subop.type() == FormulaType::FALSE )
                         return Formula<Pol>( FormulaType::FALSE );
                     subFormulas.push_back( subop );
                 }
                 return Formula<Pol>( FormulaType::AND, subFormulas );
             }
             case FormulaType::OR: {
-                if( first.getType() == FormulaType::TRUE )
+                if( first.type() == FormulaType::TRUE )
                     return Formula<Pol>( FormulaType::TRUE );
                 Formulas<Pol> subFormulas;
                 subFormulas.push_back( first );
                 for (const auto& subop: ops) {
-                    if( subop.getType() == FormulaType::TRUE )
+                    if( subop.type() == FormulaType::TRUE )
                         return Formula<Pol>( FormulaType::TRUE );
                     subFormulas.push_back( subop );
                 }
@@ -105,12 +105,12 @@ private:
     Formula<Pol> mkAnd(const Formula<Pol>& first, const std::vector<Formula<Pol>>& ops) {
 //        std::cout << __func__ << " of " << first << " and " << ops << std::endl;
         assert(!ops.empty());
-		if( first.getType() == FormulaType::FALSE )
+		if( first.type() == FormulaType::FALSE )
             return Formula<Pol>( FormulaType::FALSE );
         Formulas<Pol> subFormulas;
         subFormulas.push_back( first );
 		for (const auto& op: ops) {
-			if( op.getType() == FormulaType::FALSE )
+			if( op.type() == FormulaType::FALSE )
                 return Formula<Pol>( FormulaType::FALSE );
             subFormulas.push_back( op );
 		}
@@ -121,12 +121,12 @@ private:
     Formula<Pol> mkOr(const Formula<Pol>& first, const std::vector<Formula<Pol>>& ops) {
 //        std::cout << __func__ << " of " << first << " and " << ops << std::endl;
         assert(!ops.empty());
-		if( first.getType() == FormulaType::TRUE )
+		if( first.type() == FormulaType::TRUE )
             return Formula<Pol>( FormulaType::TRUE );
         Formulas<Pol> subFormulas;
         subFormulas.push_back( first );
 		for (const auto& op: ops) {
-			if( op.getType() == FormulaType::TRUE )
+			if( op.type() == FormulaType::TRUE )
                 return Formula<Pol>( FormulaType::TRUE );
             subFormulas.push_back( op );
 		}

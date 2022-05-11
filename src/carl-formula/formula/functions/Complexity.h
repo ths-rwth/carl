@@ -10,7 +10,7 @@ size_t complexity(const Formula<Pol>& f) {
     carl::visit(f,
         [&](const Formula<Pol>& _f)
         {
-            switch( _f.getType() )
+            switch( _f.type() )
             {
                 case FormulaType::TRUE:
                 case FormulaType::FALSE:

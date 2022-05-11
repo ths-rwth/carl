@@ -189,11 +189,11 @@ namespace carl
         /**
          * @return The hash value of the entry in the cache corresponding to this factorized polynomial.
          */
-        size_t getHash() const
+        size_t hash() const
         {
             if( existsFactorization( *this ) )
             {
-                return mpCache->get( mCacheRef ).getHash();
+                return mpCache->get( mCacheRef ).hash();
             }
             return std::hash<CoeffType>()( mCoefficient );
         }
@@ -1016,7 +1016,7 @@ namespace std
     {
         size_t operator()( const carl::FactorizedPolynomial<P>& _factPoly ) const 
         {
-            return _factPoly.getHash();
+            return _factPoly.hash();
         }
     };
 } // namespace std
