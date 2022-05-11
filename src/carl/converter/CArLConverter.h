@@ -7,8 +7,6 @@
 
 #include "../numbers/numbers.h"
 
-#include "../converter/Z3Converter.h"
-
 namespace carl {
 
 class CArLConverter {

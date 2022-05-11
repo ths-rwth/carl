@@ -24,7 +24,6 @@ As of now, we provide adaptions of the following types:
 - FLOAT_T<mpfr_t>, our own wrapper for mpfr_t
 - GMPxx, the C++ interface of GMP.
 - Native datatypes as defined by @cite C++Standard
-- Z3 rationals.
 
 Note that these adaptions may not fully implement all methods described below, but only to some extend that is used.
 Finishing these adaptions is work in progress.

@@ -9,9 +9,6 @@
 #ifdef USE_GINAC
 #include "carl/converter/GiNaCConverter.h"
 #endif
-#if defined(COMPARE_WITH_Z3) || defined(USE_Z3_NUMBERS)
-#include "carl/converter/Z3Converter.h"
-#endif
 #include "carl/core/MultivariatePolynomial.h"
 #include <carl-common/util/tuple_util.h>
 
@@ -59,36 +56,8 @@ inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<cln::cl_RA>>(const
 	}
 	return res;
 }
-#ifdef USE_Z3_NUMBERS
-template<>
-inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& p, const CIPtr& ci) {
-	CMP<rational> res;
-	for (auto t: p) {
-		res += Term<rational>(z3().toZ3Rational(t.coeff()), t.monomial());
-	}
-	return res;
-}
-#endif
 #endif
 
-#ifdef USE_Z3_NUMBERS
-template<>
-inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<rational>>(const CMP<rational>& p, const CIPtr& ci) {
-	CMP<mpq_class> res;
-	for (auto t: p) {
-		res += Term<mpq_class>(z3().toNumber<mpq_class>(t.coeff()), t.monomial());
-	}
-	return res;
-}
-template<>
-inline CMP<rational> Conversion::convert<CMP<rational>, CMP<mpq_class>>(const CMP<mpq_class>& p, const CIPtr& ci) {
-	CMP<rational> res;
-	for (auto t: p) {
-		res += Term<rational>(z3().toZ3Rational(t.coeff()), t.monomial());
-	}
-	return res;
-}
-#endif
 
 #ifdef USE_COCOA
 //template<>
@@ -129,39 +98,6 @@ inline GMP Conversion::convert<GMP, CUMP<mpq_class>>(const CUMP<mpq_class>& m, c
 template<>
 inline GMP Conversion::convert<GMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->ginac(m);
-}
-#endif
-#ifdef USE_Z3_NUMBERS
-#ifdef USE_CLN_NUMBERS
-template<>
-ZMP Conversion::convert<ZMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
-	return z3().toZ3(m);
-}
-template<>
-ZMP Conversion::convert<ZMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
-	return z3().toZ3(m);
-}
-#endif
-
-template<>
-ZMP Conversion::convert<ZMP, CMP<mpq_class>>(const CMP<mpq_class>& m, const CIPtr& ci) {
-	return z3().toZ3(m);
-}
-template<>
-ZMP Conversion::convert<ZMP, CMP<rational>>(const CMP<rational>& m, const CIPtr& ci) {
-	return z3().toZ3(m);
-}
-template<>
-ZMP Conversion::convert<ZMP, CUMP<mpq_class>>(const CUMP<mpq_class>& m, const CIPtr& ci) {
-	return z3().toZ3(m);
-}
-template<>
-ZMP Conversion::convert<ZMP, CUMP<rational>>(const CUMP<rational>& m, const CIPtr& ci) {
-	return z3().toZ3(m);
-}
-template<>
-ZVAR Conversion::convert<ZVAR, CVAR>(const CVAR& v, const CIPtr& ci) {
-	return z3().toZ3(v);
 }
 #endif
 

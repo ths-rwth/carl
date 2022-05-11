@@ -167,15 +167,6 @@ IF(USE_MPFR_FLOAT)
 	load_library(carl MPFR 0.0 REQUIRED)
 endif()
 
-##### Z3
-if(COMPARE_WITH_Z3 OR USE_Z3_NUMBERS OR RAN_USE_Z3)
-	#load_library(carl Z3 4.0)
-	set(Z3_VERSION "4.7.1")
-	include(resources/z3.cmake)
-	print_resource_info("Z3" Z3_SHARED ${Z3_VERSION})
-	print_resource_info("Z3" Z3_STATIC ${Z3_VERSION})
-endif()
-
 ##### LIBPOLY
 if(USE_LIBPOLY OR RAN_USE_LIBPOLY)
 	if(NOT LIBPOLY_FOUND)

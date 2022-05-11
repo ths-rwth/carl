@@ -227,8 +227,8 @@ struct is_ran<real_algebraic_number_thom<Number>> {
 
 namespace std {
 template<typename Number>
-struct hash<carl::real_algebraic_number_z3<Number>> {
-    std::size_t operator()(const carl::real_algebraic_number_z3<Number>& n) const {
+struct hash<carl::real_algebraic_number_thom<Number>> {
+    std::size_t operator()(const carl::real_algebraic_number_thom<Number>& n) const {
 		return carl::hash_all(n.integer_below());
 	}
 };

@@ -27,9 +27,6 @@ protected:
 #ifdef USE_GINAC
 		,"GiNaC"
 #endif
-#ifdef COMPARE_WITH_Z3
-		,"Z3"
-#endif
     }) {
 	}
 	~BenchmarkTest() {

@@ -2,11 +2,7 @@
 add_custom_target(all-tests)
 
 add_library(TestCommon STATIC Common.cpp)
-if(COMPARE_WITH_Z3 OR RAN_USE_Z3 OR USE_Z3_NUMBERS)
-	target_link_libraries(TestCommon carl-shared ${GTEST_LIBRARIES} Z3_STATIC gomp)
-else()
-	target_link_libraries(TestCommon carl-shared ${GTEST_LIBRARIES})
-endif()
+target_link_libraries(TestCommon carl-shared ${GTEST_LIBRARIES})
 add_dependencies(TestCommon resources GTESTCORE_STATIC GTESTMAIN_STATIC)
 
 ################################

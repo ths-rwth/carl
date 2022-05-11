@@ -38,11 +38,6 @@
 #include "thom/ran_thom_evaluation.h"
 #endif
 
-#ifdef RAN_USE_Z3
-#include "z3/ran_z3.h"
-#include "z3/ran_z3_evaluation.h"
-#endif
-
 #ifdef RAN_USE_LIBPOLY
 #include "libpoly/ran_libpoly.h"
 #include "libpoly/ran_libpoly_evaluation.h"
@@ -57,11 +52,6 @@ namespace carl {
 	#ifdef RAN_USE_THOM
 	template<typename Number>
 	using real_algebraic_number = real_algebraic_number_thom<Number>;
-	#endif
-
-	#ifdef RAN_USE_Z3
-	template<typename Number>
-	using real_algebraic_number = real_algebraic_number_z3<Number>;
 	#endif
 
 	#ifdef RAN_USE_LIBPOLY
