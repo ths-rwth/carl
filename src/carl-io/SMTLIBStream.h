@@ -348,10 +348,10 @@ public:
 		std::set<BVVariable> bvvs;
 		std::set<UVariable> uvs;
 		for (const auto& f: formulas) {
-			f.gatherVariables(vars);
-			f.gatherUFs(ufs);
-			f.gatherBVVariables(bvvs);
-			f.gatherUVariables(uvs);
+			carl::variables(f,vars);
+			carl::uninterpreted_functions(f,ufs);
+			carl::bitvector_variables(f,bvvs);
+			carl::uninterpreted_variables(f,uvs);
 		}
 		initialize(l, vars, ufs, bvvs, uvs);
 	}

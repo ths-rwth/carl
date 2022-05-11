@@ -26,6 +26,8 @@
 
 #include "FormulaContent.h"
 
+#include "functions/Variables.h"
+
 namespace carl
 {
     // Forward definition.
@@ -319,13 +321,9 @@ namespace carl
             const Variables& variables() const
             {
                 VARIABLES_LOCK_GUARD
-                if( mpContent->mpVariables != nullptr )
-                {
-                    return *(mpContent->mpVariables);
+                if( mpContent->mpVariables == nullptr ) {
+                    mpContent->mpVariables = new Variables(carl::variables(*this).as_set());
                 }
-                carlVariables vars;
-                gatherVariables(vars);
-                mpContent->mpVariables = new Variables(vars.begin(), vars.end());
                 return *(mpContent->mpVariables);
             }
 
@@ -725,46 +723,6 @@ namespace carl
             }
 
             /**
-             * Collects all constraint occurring in this formula.
-             * @param _constraints The container to insert the constraint into.
-             */
-            void getConstraints( std::vector<Constraint<Pol>>& _constraints ) const // TODO rename to gatherConstraints; move
-            {
-                if (mpContent->mType == FormulaType::CONSTRAINT)
-                    _constraints.push_back(std::get<Constraint<Pol>>(mpContent->mContent));
-                else if (mpContent->mType == FormulaType::NOT)
-                    std::get<Formula<Pol>>(mpContent->mContent).getConstraints(_constraints);
-                else if (isNary())
-                {
-                    for (const_iterator subAst = std::get<Formulas<Pol>>(mpContent->mContent).begin(); subAst != std::get<Formulas<Pol>>(mpContent->mContent).end(); ++subAst)
-                        subAst->getConstraints(_constraints);
-                }
-            }
-
-            /**
-             * Collects all constraint occurring in this formula.
-             * @param _constraints The container to insert the constraint into.
-             */
-            void getConstraints( std::vector<Formula>& _constraints ) const // TODO rename to gatherConstraints; move
-            {
-                if( mpContent->mType == FormulaType::CONSTRAINT )
-                    _constraints.push_back( *this );
-				else if (mpContent->mType == FormulaType::NOT)
-					std::get<Formula<Pol>>(mpContent->mContent).getConstraints(_constraints);
-				else if (isNary())
-				{
-					for (const_iterator subAst = std::get<Formulas<Pol>>(mpContent->mContent).begin(); subAst != std::get<Formulas<Pol>>(mpContent->mContent).end(); ++subAst)
-						subAst->getConstraints(_constraints);
-				}
-            }
-
-			void gatherVariables(carlVariables& vars) const; // TODO move
-            void gatherUFs(std::set<UninterpretedFunction>& ufs) const; // TODO move
-            void gatherUVariables(std::set<UVariable>& uvs) const; // TODO move
-            void gatherBVVariables(std::set<BVVariable>& bvvs) const; // TODO move
-
-
-            /**
              * @param _formula The formula to compare with.
              * @return true, if this formula and the given formula are equal;
              *         false, otherwise.
@@ -896,11 +854,6 @@ namespace carl
              */
             static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoAsts, bool _inConjunction ); // TODO move, change to operation on (Basic)Constraint!
     };
-
-    template<typename Pol>
-    inline void variables(const Formula<Pol>& f, carlVariables& vars) {
-		f.gatherVariables(vars);
-	}
 
 	/**
 	 * The output operator of a formula.

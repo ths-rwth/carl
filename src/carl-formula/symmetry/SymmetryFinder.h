@@ -85,7 +85,7 @@ class GraphBuilder {
 	void gatherVariables(const Formula<Poly>& f) {
 		assert(mColor.next() == 0);
 		carlVariables vars;
-		f.gatherVariables(vars);
+		carl::variables(f,vars);
 		for (const auto& v: vars) {
 			auto res = mVariableIDs.emplace(v, mGraph.add_vertex(mColor(v.type())));
 			assert(res.first->second == mVariables.size());

@@ -372,19 +372,19 @@ TEST(Formula, gatherVariables)
 	{
 		carlVariables vars;
 		FormulaT f(Pol(x), Relation::LESS);
-		f.gatherVariables(vars);
+        variables(f,vars);
 		EXPECT_EQ(vars, carlVariables({x}));
 	}
 	{
 		carlVariables vars;
 		FormulaT f(Pol(x)+y, Relation::LESS);
-		f.gatherVariables(vars);
+		variables(f,vars);
 		EXPECT_EQ(vars, carlVariables({x,y}));
 	}
 	{
 		carlVariables vars;
 		FormulaT f(Pol(x)*y+z, Relation::LESS);
-		f.gatherVariables(vars);
+		variables(f,vars);
 		EXPECT_EQ(vars, carlVariables({x,y,z}));
 	}
 }

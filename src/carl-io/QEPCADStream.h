@@ -189,7 +189,7 @@ public:
 	void initialize(std::initializer_list<Formula<Pol>> formulas) {
 		carlVariables vars;
 		for (const auto& f: formulas) {
-			f.gatherVariables(vars);
+			carl::variables(f,vars);
 		}
 		initialize(vars);
 	}
