@@ -137,8 +137,6 @@ namespace carl {
             size_t mId = 0;
             /// The activity for this formula, which means, how much is this formula involved in the solving procedure.
             mutable double mActivity = 0.0;
-            /// Some value stating an expected difficulty of solving this formula for satisfiability.
-            mutable double mDifficulty = 0.0;
             /// The number of formulas existing with this content.
             mutable size_t mUsages = 0;
             /// The type of this formula.
@@ -159,8 +157,6 @@ namespace carl {
             Condition mProperties; // TODO maybe move to own function?
             /// Mutex for access to activity.
             mutable std::mutex mActivityMutex;
-            /// Mutex for access to difficulty.
-            mutable std::mutex mDifficultyMutex;
             /// Mutex for collecting the variables within this formula.
             mutable std::mutex mVariablesMutex;
             /// Container collecting the variables which occur in this formula.

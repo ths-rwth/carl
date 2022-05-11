@@ -81,11 +81,9 @@ namespace carl
 
             #ifdef THREAD_SAFE
             #define ACTIVITY_LOCK_GUARD std::lock_guard<std::mutex> lock1( mpContent->mActivityMutex );
-            #define DIFFICULTY_LOCK_GUARD std::lock_guard<std::mutex> lock2( mpContent->mDifficultyMutex );
             #define VARIABLES_LOCK_GUARD std::lock_guard<std::mutex> lock3( mpContent->mVariablesMutex );
             #else
             #define ACTIVITY_LOCK_GUARD
-            #define DIFFICULTY_LOCK_GUARD
             #define VARIABLES_LOCK_GUARD
             #endif
 
@@ -249,25 +247,6 @@ namespace carl
             {
                 ACTIVITY_LOCK_GUARD
                 mpContent->mActivity = _activity;
-            }
-
-            /**
-             * @return Some value stating an expected difficulty of solving this formula for satisfiability.
-             */
-            double difficulty() const
-            {
-                DIFFICULTY_LOCK_GUARD
-                return mpContent->mDifficulty;
-            }
-
-            /**
-             * Sets the difficulty to the given value.
-             * @param difficulty The value to set the difficulty to.
-             */
-            void setDifficulty( double difficulty ) const
-            {
-                DIFFICULTY_LOCK_GUARD
-                mpContent->mDifficulty = difficulty;
             }
 
             /**
@@ -788,15 +767,6 @@ namespace carl
 			Formula operator!() const {
 				return negated();
 			}
-
-        private:
-
-            /**
-             * @return
-             */
-            void initHash();
-
-        public:
 
             /**
              * Prints the propositions of this formula.

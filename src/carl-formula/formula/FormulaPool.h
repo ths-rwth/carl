@@ -135,7 +135,6 @@ namespace carl
                 if( iter.second )
                 {
                     const FormulaContent<Pol>* hi = create( carl::freshBooleanVariable() );
-                    hi->mDifficulty = _formula.difficulty();
                     iter.first->second = hi;
                     mTseitinVarToFormula[hi] = iter.first;
                 }
