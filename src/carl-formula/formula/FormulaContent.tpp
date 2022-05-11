@@ -14,7 +14,7 @@ namespace carl {
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(Variable _variable):
-		mHash(std::hash<Variable>()(_variable)), // TODO: subtract the id of the boolean variable with the smallest id
+		mHash(std::hash<Variable>()(_variable)),
 		mContent(_variable)
 	{
 		switch (_variable.type()) {

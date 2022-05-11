@@ -3,7 +3,7 @@
 #include <carl-logging/carl-logging.h>
 
 #include <carl-formula/formula/Formula.h>
-#include <carl-formula/formula/functions/to_cnf.h>
+#include <carl-formula/formula/functions/CNF.h>
 
 #include <iostream>
 #include <map>

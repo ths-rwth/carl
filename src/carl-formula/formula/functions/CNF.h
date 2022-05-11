@@ -1,6 +1,9 @@
 #pragma once
 
 #include "../Formula.h"
+#include "ConstraintBounds.h"
+#include "Negations.h"
+#include "aux.h"
 
 namespace carl {
 namespace formula_to_cnf {
@@ -61,7 +64,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 			case FormulaType::CONSTRAINT:
 				// Try simplification with ConstraintBounds
 				if (simplify_combinations) {
-					if (Formula<Poly>::addConstraintBound(constraint_bounds, current, false).isFalse()) {
+					if (addConstraintBound(constraint_bounds, current, false).isFalse()) {
 						CARL_LOG_DEBUG("carl.formula.cnf", "Adding " << current << " to constraint bounds yielded a tautology");
 						return Formula<Poly>(FormulaType::TRUE);
 					}
@@ -71,7 +74,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 				break;
 			case FormulaType::NOT: {
 				// Resolve negation
-				auto resolved = current.resolveNegation(keep_constraints);
+				auto resolved = resolve_negation(current, keep_constraints);
 				if (resolved.isLiteral()) {
 					subformulas.emplace_back(resolved);
 				} else {
@@ -109,7 +112,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 			}
 			case FormulaType::XOR: {
 				// (xor A B) -> (and A (not B)), (and (not A) B)
-				auto lhs = current.connectPrecedingSubformulas();
+				auto lhs = formula::aux::connectPrecedingSubformulas(current);
 				const auto& rhs = current.subformulas().back();
 				subformula_queue.emplace_back(Formula<Poly>(FormulaType::AND, { lhs, !rhs }));
 				subformula_queue.emplace_back(Formula<Poly>(FormulaType::AND, { !lhs, rhs }));
@@ -139,7 +142,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 				break;
 		}
 	}
-	if (simplify_combinations && Formula<Poly>::swapConstraintBounds(constraint_bounds, subformulas, false)) {
+	if (simplify_combinations && swapConstraintBounds(constraint_bounds, subformulas, false)) {
 		return Formula<Poly>(FormulaType::TRUE);
 	} else if (subformulas.empty()) {
 		tseitin.clear();
@@ -155,7 +158,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 /**
  * Converts the given formula to CNF.
  * @param f Formula to convert.
- * @param keep_constraints Indicates whether to keep constraints or allow to change them in resolveNegation().
+ * @param keep_constraints Indicates whether to keep constraints or allow to change them in resolve_negation().
  * @param simplify_combinations Indicates whether we attempt to simplify combinations of constraints with ConstraintBounds.
  * @param tseitin_equivalence Indicates whether we use implications or equivalences for tseitin variables.
  * @return The formula in CNF.
@@ -167,7 +170,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 			return f;
 		} else if (f.getType() == FormulaType::NOT) {
 			assert(f.isLiteral());
-			return f.resolveNegation(keep_constraints);
+			return resolve_negation(f,keep_constraints);
 		}
 	} else if (f.isAtom()) {
 		return f;
@@ -199,7 +202,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 			case FormulaType::CONSTRAINT:
 				// Try simplification with ConstraintBounds
 				if (simplify_combinations) {
-					if (Formula<Poly>::addConstraintBound(constraint_bounds, current, true).isFalse()) {
+					if (addConstraintBound(constraint_bounds, current, true).isFalse()) {
 						CARL_LOG_DEBUG("carl.formula.cnf", "Adding " << current << " to constraint bounds yielded a conflict");
 						return Formula<Poly>(FormulaType::FALSE);
 					}
@@ -209,7 +212,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 				break;
 			case FormulaType::NOT: {
 				// Resolve negation
-				auto resolved = current.resolveNegation(keep_constraints);
+				auto resolved = resolve_negation(current, keep_constraints);
 				if (resolved.isLiteral()) {
 					subformulas.emplace_back(resolved);
 				} else {
@@ -263,7 +266,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 				break;
 			case FormulaType::XOR: {
 				// (xor A B) -> (or A B), (or (not A) (not B))
-				auto lhs = current.connectPrecedingSubformulas();
+				auto lhs = formula::aux::connectPrecedingSubformulas(current);
 				const auto& rhs = current.subformulas().back();
 				subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, { lhs, rhs }));
 				subformula_queue.emplace_back(Formula<Poly>(FormulaType::OR, { !lhs, !rhs }));
@@ -293,7 +296,7 @@ Formula<Poly> to_cnf(const Formula<Poly>& f, bool keep_constraints = true, bool 
 				break;
 		}
 	}
-	if (simplify_combinations && Formula<Poly>::swapConstraintBounds(constraint_bounds, subformulas, true)) {
+	if (simplify_combinations && swapConstraintBounds(constraint_bounds, subformulas, true)) {
 		return Formula<Poly>(FormulaType::FALSE);
 	} else if (subformulas.empty()) {
 		return Formula<Poly>(FormulaType::TRUE);

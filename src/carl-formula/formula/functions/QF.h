@@ -2,8 +2,11 @@
 
 #include "../Formula.h"
 #include "Substitution.h"
+#include "aux.h"
 
 namespace carl {
+
+// not transformed yet; was a member of Formula
 
 /**
  * Transforms this formula to its quantifier free equivalent.

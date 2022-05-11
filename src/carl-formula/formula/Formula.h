@@ -774,55 +774,6 @@ namespace carl
              * @param _init The string to print initially in every row.
              */
             void printProposition( std::ostream& _out = std::cout, const std::string _init = "" ) const;
-
-            /**
-             * Resolves the outermost negation of this formula.
-             * @param _keepConstraints A flag indicating whether to change constraints in order
-             * to resolve the negation in front of them, or to keep the constraints and leave
-             * the negation.
-             */
-            Formula resolveNegation( bool _keepConstraints = true ) const;
-
-            /**
-             * [Auxiliary method]
-             * @return The formula combining the first to the second last sub-formula of this formula by the
-             *         same operator as the one of this formula.
-             *         Example: this = (op a1 a2 .. an) -> return = (op a1 .. an-1)
-             *                  If n = 2, return = a1
-             */
-            Formula connectPrecedingSubformulas() const;
-
-            /// A map from formula pointers to a map of rationals to a pair of a constraint relation and a formula pointer. (internally used)
-            typedef FastMap<Pol, std::map<typename Pol::NumberType, std::pair<Relation,Formula>>> ConstraintBounds;
-
-            /**
-             * Adds the bound to the bounds of the polynomial specified by this constraint. E.g., if the constraint is p+b~0, where p is a sum
-             * of terms, being a rational (actually integer) coefficient times a non-trivial (!=1) monomial( product of variables to the power
-             * of an exponent), b is a rational and ~ is any constraint relation. Furthermore, the leading coefficient of p is 1. Then we add
-             * the bound -b to the bounds of p (means that p ~ -b) stored in the given constraint bounds.
-             * @param _constraintBounds An object collecting bounds of polynomials.
-             * @param _constraint The constraint to find a bound for a polynomial for.
-             * @param _inConjunction true, if the constraint is part of a conjunction.
-             *                       false, if the constraint is part of a disjunction.
-             * @return Formula( FALSE ), if the yet determined bounds imply that the conjunction (_inConjunction == true) or disjunction
-             *                (_inConjunction == false) of which we got the given constraint is invalid resp. valid;
-             *         false, the added constraint.
-             */
-            static Formula addConstraintBound( ConstraintBounds& _constraintBounds, const Formula& _constraint, bool _inConjunction ); // TODO move, change to operation on (Basic)Constraint!
-
-            /**
-             * Stores for every polynomial for which we determined bounds for given constraints a minimal set of constraints
-             * representing these bounds into the given set of sub-formulas of a conjunction (_inConjunction == true) or disjunction
-             * (_inConjunction == false) to construct.
-             * @param _constraintBounds An object collecting bounds of polynomials.
-             * @param _intoAsts A set of sub-formulas of a conjunction (_inConjunction == true) or disjunction (_inConjunction == false) to construct.
-             * @param _inConjunction true, if constraints representing the polynomial's bounds are going to be part of a conjunction.
-             *                       false, if constraints representing the polynomial's bounds are going to be part of a disjunction.
-             * @return true, if the yet added bounds imply that the conjunction (_inConjunction == true) or disjunction
-             *                (_inConjunction == false) to which the bounds are added is invalid resp. valid;
-             *         false, otherwise.
-             */
-            static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoAsts, bool _inConjunction ); // TODO move, change to operation on (Basic)Constraint!
     };
 
 	/**
