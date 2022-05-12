@@ -12,7 +12,7 @@
 #include <carl-common/memory/Cache.h>
 #include <carl/poly/umvpoly/functions/Division.h>
 #include "PolynomialFactorizationPair.h"
-#include <carl/poly/VariablesInformation.h>
+#include <carl/poly/umvpoly/functions/VariablesInformation.h>
 
 namespace carl
 {

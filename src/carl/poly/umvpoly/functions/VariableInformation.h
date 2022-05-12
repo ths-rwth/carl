@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "umvpoly/MonomialPool.h" // TODO REFACTOR remove dependency!
+#include "../MonomialPool.h"
 #include <carl/core/Variable.h>
 
 #include <algorithm>

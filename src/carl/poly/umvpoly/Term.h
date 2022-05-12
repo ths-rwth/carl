@@ -8,7 +8,7 @@
 #pragma once
 
 #include "Monomial.h"
-#include "../VariablesInformation.h"
+#include "functions/VariablesInformation.h"
 #include <carl/numbers/numbers.h>
 
 #include <memory>

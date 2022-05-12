@@ -12,7 +12,7 @@
 #include "Polynomial.h"
 #include <carl/core/Sign.h>
 #include <carl/core/Variable.h>
-#include "../VariableInformation.h"
+#include "functions/VariableInformation.h"
 
 #include <functional>
 #include <list>

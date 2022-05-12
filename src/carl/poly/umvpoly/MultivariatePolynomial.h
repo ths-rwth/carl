@@ -16,7 +16,7 @@
 #include "MultivariatePolynomialPolicy.h"
 #include "Polynomial.h"
 #include "Term.h"
-#include "../VariableInformation.h"
+#include "functions/VariableInformation.h"
 #include <carl/numbers/numbers.h>
 #include "TermAdditionManager.h"
 

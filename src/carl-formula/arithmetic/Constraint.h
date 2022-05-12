@@ -2,9 +2,9 @@
 
 #include <carl-common/memory/Pool.h>
 #include <carl-common/config.h>
-#include <carl/poly/VariableInformation.h>
+#include <carl/poly/umvpoly/functions/VariableInformation.h>
 #include <carl/core/Variables.h>
-#include <carl/poly/VariablesInformation.h>
+#include <carl/poly/umvpoly/functions/VariablesInformation.h>
 #include <carl/poly/umvpoly/functions/Factorization.h>
 #include <carl/core/Common.h>
 #include <carl/constraint/Simplification.h>
