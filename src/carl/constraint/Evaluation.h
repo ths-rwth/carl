@@ -6,6 +6,12 @@
 
 namespace carl {
 
+template<typename Number, typename Poly, typename = std::enable_if_t<is_number<Number>::value>>
+bool evaluate(const BasicConstraint<Poly>& c, const Assignment<Number>& m) {
+	auto res = evaluate(c.lhs(), m);
+	return evaluate(res, c.relation());
+}
+
 /**
  * Checks whether the given assignment satisfies this constraint.
  * @param _assignment The assignment.
