@@ -4,7 +4,7 @@
  */
 
 #include "gtest/gtest.h"
-#include "../../carl/numbers/numbers.h"
+#include <carl/numbers/numbers.h>
 
 TEST(doubleFloatTest, Constructor)
 { 

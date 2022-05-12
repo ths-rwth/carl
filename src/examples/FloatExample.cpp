@@ -6,8 +6,8 @@
  * @since	2013-12-16
  * @version	2013-12-16
  */
-#include "../carl/interval/rounding.h"
-#include "../carl/numbers/numbers.h"
+#include <carl/interval/rounding.h>
+#include <carl/numbers/numbers.h>
 
 #ifdef USE_MPFR_FLOAT
 void toInt(mpz_t intRep, mpfr_t a) {
