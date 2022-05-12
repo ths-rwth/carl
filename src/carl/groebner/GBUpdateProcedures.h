@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../core/polynomialfunctions/SeparablePart.h"
+#include "../poly/umvpoly/functions/SeparablePart.h"
 
 namespace carl
 {

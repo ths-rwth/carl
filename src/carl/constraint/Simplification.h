@@ -1,8 +1,8 @@
 #pragma once
 
 #include "BasicConstraint.h"
-#include "../core/polynomialfunctions/Definiteness.h"
-#include "../core/Common.h"
+#include "../poly/umvpoly/functions/Definiteness.h"
+#include <carl/core/Common.h>
 
 namespace carl::constraint {
 

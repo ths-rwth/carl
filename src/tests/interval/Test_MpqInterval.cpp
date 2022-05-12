@@ -9,10 +9,10 @@
  */
 
 #include <gtest/gtest.h>
-#include "carl/interval/Interval.h"
-#include "carl/interval/set_theory.h"
-#include "carl/core/VariablePool.h"
-#include "carl/core/MultivariatePolynomial.h"
+#include <carl/interval/Interval.h>
+#include <carl/interval/set_theory.h>
+#include <carl/core/VariablePool.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl/numbers/numbers.h>
 
 using namespace carl;

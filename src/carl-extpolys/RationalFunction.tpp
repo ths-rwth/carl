@@ -9,7 +9,7 @@
 
 #include "RationalFunction.h"
 
-#include <carl/core/polynomialfunctions/LCM.h>
+#include <carl/poly/umvpoly/functions/LCM.h>
 
 namespace carl {
 

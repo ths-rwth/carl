@@ -10,9 +10,9 @@
 #include <iostream>
 #include <carl/numbers/numbers.h>
 #include <carl-common/memory/Cache.h>
-#include <carl/core/polynomialfunctions/Division.h>
+#include <carl/poly/umvpoly/functions/Division.h>
 #include "PolynomialFactorizationPair.h"
-#include <carl/core/VariablesInformation.h>
+#include <carl/poly/VariablesInformation.h>
 
 namespace carl
 {

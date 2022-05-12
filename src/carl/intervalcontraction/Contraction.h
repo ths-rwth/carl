@@ -6,11 +6,11 @@
  */
 
 #pragma once
-#include "../interval/Interval.h"
-#include "../interval/set_theory.h"
-#include "../core/Sign.h"
-#include "../core/MultivariateHorner.h"
-#include "../core/polynomialfunctions/IntervalEvaluation.h"
+#include <carl/interval/Interval.h>
+#include <carl/interval/set_theory.h>
+#include <carl/core/Sign.h>
+#include <carl/poly/umvpoly/functions/horner/MultivariateHorner.h>
+#include <carl/poly/umvpoly/functions/IntervalEvaluation.h>
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG

@@ -13,12 +13,12 @@
 
 #include "ginac.h"
 
-#include "../core/Monomial.h"
-#include "../core/MultivariatePolynomial.h"
-#include "../core/Term.h"
-#include "../core/Variable.h"
-#include "../core/VariablePool.h"
-#include "../numbers/numbers.h"
+#include <carl/poly/umvpoly/Monomial.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl/poly/umvpoly/Term.h>
+#include <carl/core/Variable.h>
+#include <carl/core/VariablePool.h>
+#include <carl/numbers/numbers.h>
 
 #include "GiNaCAdaptor.h"
 

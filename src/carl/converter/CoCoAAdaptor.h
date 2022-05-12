@@ -4,13 +4,13 @@
 
 #ifdef USE_COCOA
 
-#include "../core/MonomialPool.h"
-#include "../core/Term.h"
-#include "../core/Variable.h"
-#include "../core/Variables.h"
-#include "../core/MultivariatePolynomial.h"
-#include "../numbers/conversion/cln_gmp.h"
-#include "../core/Common.h"
+#include <carl/poly/umvpoly/MonomialPool.h>
+#include <carl/poly/umvpoly/Term.h>
+#include <carl/core/Variable.h>
+#include <carl/core/Variables.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl/numbers/conversion/cln_gmp.h>
+#include <carl/core/Common.h>
 #include "CoCoAAdaptorStatistics.h"
 
 #include <algorithm>

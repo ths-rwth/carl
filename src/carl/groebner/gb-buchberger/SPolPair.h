@@ -5,7 +5,7 @@
  */
 #pragma once 
 
-#include "../../core/Monomial.h"
+#include <carl/poly/umvpoly/Monomial.h>
 
 namespace carl 
 {

@@ -9,7 +9,7 @@
 
 #include "SignDetermination/SignDetermination.h"
 #include "ThomRootFinder.h"
-#include <carl/core/polynomialfunctions/Substitution.h>
+#include <carl/poly/umvpoly/functions/Substitution.h>
 
 // some settings
 #define INITIAL_OFFSET (Number(1)/10)

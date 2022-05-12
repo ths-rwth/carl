@@ -1,4 +1,4 @@
-#include <carl/core/polynomialfunctions/GCD.h>
+#include <carl/poly/umvpoly/functions/GCD.h>
 #include <carl/numbers/numbers.h>
 #include <gtest/gtest.h>
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Visit.h"
+#include <carl/constraint/Complexity.h>
 
 namespace carl {
 

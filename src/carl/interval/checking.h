@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "../numbers/numbers.h"
+#include <carl/numbers/numbers.h>
 
 #include <cassert>
 

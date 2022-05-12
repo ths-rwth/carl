@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../core/MultivariatePolynomial.h"
-#include "../core/Variables.h"
-#include "../constraint/BasicConstraint.h"
-#include "../interval/Interval.h"
-#include "../core/polynomialfunctions/IntervalEvaluation.h"
-#include "../interval/set_theory.h"
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl/core/Variables.h>
+#include <carl/constraint/BasicConstraint.h>
+#include <carl/interval/Interval.h>
+#include <carl/poly/umvpoly/functions/IntervalEvaluation.h>
+#include <carl/interval/set_theory.h>
 
 #include <algorithm>
 

@@ -23,9 +23,9 @@
 
 #pragma once
 
-#include "../core/Sign.h"
-#include "../core/Variable.h"
-#include "../numbers/numbers.h"
+#include <carl/core/Sign.h>
+#include <carl/core/Variable.h>
+#include <carl/numbers/numbers.h>
 #include <carl-common/util/hash.h>
 #include <carl-common/meta/platform.h>
 #include <carl-common/meta/SFINAE.h>

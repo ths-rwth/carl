@@ -1,7 +1,7 @@
 #pragma once
 
 #include <carl-logging/carl-logging.h>
-#include <carl/core/polynomialfunctions/Substitution.h>
+#include <carl/poly/umvpoly/functions/Substitution.h>
 #include <carl/core/Variable.h>
 #include <carl/numbers/numbers.h>
 #include <carl/ran/ran.h>

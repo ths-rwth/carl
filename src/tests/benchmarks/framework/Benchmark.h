@@ -15,7 +15,7 @@
 
 #include "../config.h"
 #include <carl-common/debug/Timer.h>
-#include "carl/core/MultivariatePolynomial.h"
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
 
 #include "BenchmarkConversions.h"
 #include "BenchmarkGenerator.h"

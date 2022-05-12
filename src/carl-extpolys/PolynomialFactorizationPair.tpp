@@ -11,8 +11,8 @@
 
 #include "FactorizedPolynomial.h"
 #include <carl-logging/carl-logging.h>
-#include <carl/core/polynomialfunctions/Definiteness.h>
-#include <carl/core/polynomialfunctions/GCD.h>
+#include <carl/poly/umvpoly/functions/Definiteness.h>
+#include <carl/poly/umvpoly/functions/GCD.h>
 
 namespace carl
 {

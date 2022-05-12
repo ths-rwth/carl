@@ -4,8 +4,8 @@
 
 #if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
 
-#include "../core/Variable.h"
-#include "../core/Common.h"
+#include <carl/core/Variable.h>
+#include <carl/core/Common.h>
 #include <carl-common/meta/SFINAE.h>
 #include <carl-common/memory/Singleton.h>
 

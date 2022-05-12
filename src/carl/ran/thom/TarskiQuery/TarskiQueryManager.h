@@ -13,7 +13,7 @@
 #include "MultivariateTarskiQuery.h"
 #include "UnivariateTarskiQuery.h"
 
-#include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
+#include <carl/poly/umvpoly/functions/to_univariate_polynomial.h>
 
 namespace carl {
         

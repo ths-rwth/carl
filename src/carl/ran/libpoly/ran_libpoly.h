@@ -8,7 +8,7 @@
 
 
 #include <boost/logic/tribool.hpp>
-#include <carl/core/polynomialfunctions/SquareFreePart.h>
+#include <carl/poly/umvpoly/functions/SquareFreePart.h>
 
 #include <list>
 

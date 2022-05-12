@@ -1,6 +1,6 @@
 #include "../Common.h"
 
-#include <carl/core/Monomial.h>
+#include <carl/poly/umvpoly/Monomial.h>
 #include <carl/groebner/Ideal.h>
 #include <carl/groebner/Reductor.h>
 #include <carl-common/meta/platform.h>

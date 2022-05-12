@@ -9,8 +9,8 @@
 #include "ideal-ds/IdealDSVector.h"
 #include "ideal-ds/PolynomialSorts.h"
 
-#include "../core/MultivariatePolynomial.h"
-#include "../core/Term.h"
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl/poly/umvpoly/Term.h>
 #include <unordered_set>
 
 namespace carl

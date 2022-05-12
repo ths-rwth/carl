@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../core/Term.h"
+#include <carl/poly/umvpoly/Term.h>
 
 #include <cassert>
 #include <memory>

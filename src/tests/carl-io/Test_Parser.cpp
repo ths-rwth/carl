@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "carl/numbers/numbers.h"
-#include "carl/core/Variable.h"
+#include <carl/numbers/numbers.h>
+#include <carl/core/Variable.h>
 #include "carl-io/parser/Parser.h"
 #include <carl-common/meta/platform.h>
 

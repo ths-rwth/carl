@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../../core/Term.h"
-#include "../../core/VariablePool.h"
+#include <carl/poly/umvpoly/Term.h>
+#include <carl/core/VariablePool.h>
 #include "../DivisionLookupResult.h"
 #include "PolynomialSorts.h"
 

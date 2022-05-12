@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../core/Relation.h"
+#include <carl/core/Relation.h>
 
 namespace carl {
 

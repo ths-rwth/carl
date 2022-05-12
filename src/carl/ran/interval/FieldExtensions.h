@@ -2,7 +2,7 @@
 
 #include "ran_interval_evaluation.h"
 
-#include <carl/core/polynomialfunctions/Representation.h>
+#include <carl/poly/umvpoly/functions/Representation.h>
 
 #ifdef USE_COCOA
 

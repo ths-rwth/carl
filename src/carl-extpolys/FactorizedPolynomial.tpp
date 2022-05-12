@@ -7,9 +7,9 @@
 
 #include "FactorizedPolynomial.h"
 
-#include <carl/core/polynomialfunctions/Division.h>
-#include <carl/core/polynomialfunctions/Substitution.h>
-#include <carl/core/UnivariatePolynomial.h>
+#include <carl/poly/umvpoly/functions/Division.h>
+#include <carl/poly/umvpoly/functions/Substitution.h>
+#include <carl/poly/umvpoly/UnivariatePolynomial.h>
 
 #pragma once
 

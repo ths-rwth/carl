@@ -7,15 +7,15 @@
 #include <algorithm>
 #include <map>
 
-#include "../core/MultivariatePolynomial.h"
-#include "../core/Term.h"
-#include "../interval/Interval.h"
-#include "../core/UnivariatePolynomial.h"
-#include "../core/Variable.h"
-#include "../core/Variables.h"
-#include "../core/polynomialfunctions/Degree.h"
-#include "../numbers/conversion/cln_gmp.h"
-#include "../core/Common.h"
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl/poly/umvpoly/Term.h>
+#include <carl/interval/Interval.h>
+#include <carl/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl/core/Variable.h>
+#include <carl/core/Variables.h>
+#include <carl/poly/umvpoly/functions/Degree.h>
+#include <carl/numbers/conversion/cln_gmp.h>
+#include <carl/core/Common.h>
 #include <carl-common/meta/SFINAE.h>
 #include <carl-common/memory/Singleton.h>
 #include "LibpolyVariableMapper.h"

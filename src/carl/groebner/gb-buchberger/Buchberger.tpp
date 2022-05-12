@@ -8,7 +8,7 @@
 #pragma once
 #include "Buchberger.h"
 
-#include "../../core/polynomialfunctions/SPolynomial.h"
+#include <carl/poly/umvpoly/functions/SPolynomial.h>
 //
 //
 namespace carl

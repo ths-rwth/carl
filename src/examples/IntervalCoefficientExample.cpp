@@ -1,9 +1,9 @@
 
 
-#include "carl/core/VariablePool.h"
-#include "carl/core/Term.h"
-#include "carl/core/MultivariatePolynomial.h"
-#include "carl/interval/Interval.h"
+#include <carl/core/VariablePool.h>
+#include <carl/poly/umvpoly/Term.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl/interval/Interval.h>
 
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>

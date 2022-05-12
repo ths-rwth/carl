@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../numbers/numbers.h"
+#include <carl/numbers/numbers.h>
 
 namespace carl {
 

@@ -9,11 +9,11 @@
 
 
 #include "gtest/gtest.h"
-#include "carl/numbers/numbers.h"
-#include "carl/interval/Interval.h"
-#include "carl/interval/set_theory.h"
-#include "carl/interval/sampling.h"
-#include "carl/core/VariablePool.h"
+#include <carl/numbers/numbers.h>
+#include <carl/interval/Interval.h>
+#include <carl/interval/set_theory.h>
+#include <carl/interval/sampling.h>
+#include <carl/core/VariablePool.h>
 #include <iostream>
 #include <carl-common/meta/platform.h>
 

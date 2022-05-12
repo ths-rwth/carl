@@ -8,7 +8,7 @@
 #pragma once
 
 #include <carl/core/Sign.h>
-#include <carl/core/UnivariatePolynomial.h>
+#include <carl/poly/umvpoly/UnivariatePolynomial.h>
 
 namespace carl {
 

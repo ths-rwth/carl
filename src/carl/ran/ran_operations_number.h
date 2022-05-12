@@ -2,7 +2,7 @@
 
 #include <carl-common/meta/SFINAE.h>
 #include "../../carl/constraint/BasicConstraint.h"
-#include "../../carl/core/polynomialfunctions/Substitution.h"
+#include "../../carl/poly/umvpoly/functions/Substitution.h"
 
 
 namespace carl {
@@ -14,6 +14,7 @@ const Number& branching_point(const Number& n) {
 	return n;
 }
 
+// TODO move:
 template<typename Number, typename = std::enable_if_t<is_number<Number>::value>>
 Number evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable, Number>& m) {
 	MultivariatePolynomial<Number> res = p;
@@ -24,6 +25,7 @@ Number evaluate(const MultivariatePolynomial<Number>& p, const std::map<Variable
 	return res.constantPart();
 }
 
+// TODO move:
 template<typename Number, typename Poly, typename = std::enable_if_t<is_number<Number>::value>>
 bool evaluate(const BasicConstraint<Poly>& c, const std::map<Variable, Number>& m) {
 	auto res = evaluate(c.lhs(), m);

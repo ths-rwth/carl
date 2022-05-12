@@ -2,11 +2,11 @@
 
 #include <carl-common/util/hash.h>
 #include <carl/ran/ran.h>
-#include <carl/core/MultivariatePolynomial.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl/core/Relation.h>
 #include <carl/core/Variable.h>
 #include <carl/numbers/numbers.h>
-#include <carl/core/polynomialfunctions/Representation.h>
+#include <carl/poly/umvpoly/functions/Representation.h>
 #include <carl/constraint/BasicConstraint.h>
 
 #include <optional>

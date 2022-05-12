@@ -5,7 +5,7 @@
  * @version 2013-10-07
  */
 
-#include <carl/core/polynomialfunctions/GCD.h>
+#include <carl/poly/umvpoly/functions/GCD.h>
 
 namespace carl
 {

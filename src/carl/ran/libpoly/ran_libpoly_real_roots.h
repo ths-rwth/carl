@@ -4,11 +4,11 @@
 
 #ifdef RAN_USE_LIBPOLY
 
-#include "../../../carl/core/UnivariatePolynomial.h"
-#include "../../../carl/core/Variable.h"
+#include <carl/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl/core/Variable.h>
 #include "../real_roots_common.h"
 
-#include "../../../carl/converter/LibpolyConverter.h"
+#include <carl/converter/LibpolyConverter.h>
 #include <carl-logging/carl-logging.h>
 
 #include "ran_libpoly.h"

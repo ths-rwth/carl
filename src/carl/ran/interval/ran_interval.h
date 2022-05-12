@@ -1,17 +1,17 @@
 #pragma once
 
-#include <carl/core/UnivariatePolynomial.h>
-#include <carl/core/polynomialfunctions/Division.h>
-#include <carl/core/polynomialfunctions/Evaluation.h>
-#include <carl/core/polynomialfunctions/Representation.h>
-#include <carl/core/polynomialfunctions/RootBounds.h>
-#include <carl/core/polynomialfunctions/RootCounting.h>
-#include <carl/core/polynomialfunctions/SquareFreePart.h>
-#include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
+#include <carl/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl/poly/umvpoly/functions/Division.h>
+#include <carl/poly/umvpoly/functions/Evaluation.h>
+#include <carl/poly/umvpoly/functions/Representation.h>
+#include <carl/poly/umvpoly/functions/RootBounds.h>
+#include <carl/poly/umvpoly/functions/RootCounting.h>
+#include <carl/poly/umvpoly/functions/SquareFreePart.h>
+#include <carl/poly/umvpoly/functions/to_univariate_polynomial.h>
 #include <carl/constraint/BasicConstraint.h>
 
 #include <carl/interval/Interval.h>
-#include <carl/core/polynomialfunctions/IntervalEvaluation.h>
+#include <carl/poly/umvpoly/functions/IntervalEvaluation.h>
 #include <carl/interval/set_theory.h>
 
 #include "../ran_operations.h"

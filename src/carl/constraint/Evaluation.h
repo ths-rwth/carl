@@ -1,8 +1,8 @@
 #pragma once
 
 #include "BasicConstraint.h"
-#include "../core/Common.h"
-#include "../core/polynomialfunctions/Substitution.h"
+#include <carl/core/Common.h>
+#include "../poly/umvpoly/functions/Substitution.h"
 
 namespace carl {
 

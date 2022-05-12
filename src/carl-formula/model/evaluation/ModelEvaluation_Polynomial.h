@@ -2,9 +2,9 @@
 
 #include "../Model.h"
 #include <carl/ran/real_roots.h>
-#include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
-#include <carl/core/MultivariatePolynomial.h>
-#include <carl/core/UnivariatePolynomial.h>
+#include <carl/poly/umvpoly/functions/to_univariate_polynomial.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl/poly/umvpoly/UnivariatePolynomial.h>
 
 namespace carl {
 namespace model {

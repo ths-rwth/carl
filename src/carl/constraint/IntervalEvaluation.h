@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../core/Common.h"
+#include <carl/core/Common.h>
 #include "BasicConstraint.h"
-#include "../interval/Interval.h"
-#include "../core/polynomialfunctions/IntervalEvaluation.h"
+#include <carl/interval/Interval.h>
+#include <carl/poly/umvpoly/functions/IntervalEvaluation.h>
 #include <boost/logic/tribool_io.hpp>
 
 namespace carl {

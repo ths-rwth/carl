@@ -4,7 +4,7 @@
 #include <carl/groebner/groebner.h>
 #include "groebner/katsura.h"
 #include "groebner/cyclic.h"
-#include <carl/core/MultivariatePolynomial.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-common/debug/Timer.h>
 
 using namespace carl;

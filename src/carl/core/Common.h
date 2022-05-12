@@ -5,8 +5,8 @@
 #include <vector>
 
 
-#include "../core/Variable.h"
-#include "../numbers/numbers.h"
+#include <carl/core/Variable.h>
+#include <carl/numbers/numbers.h>
 
 namespace carl {	
     template<typename T> 

@@ -8,8 +8,8 @@
  */
 #pragma once
 
-#include "../../core/CompareResult.h"
-#include "../../core/MonomialOrdering.h"
+#include <carl/core/CompareResult.h>
+#include <carl/poly/umvpoly/MonomialOrdering.h>
 #include <carl-common/datastructures/Heap.h>
 #include "CriticalPairsEntry.h"
 

@@ -13,8 +13,8 @@
 #include <boost/variant/variant.hpp>
 
 #include <carl/core/Variable.h>
-#include <carl/core/Monomial.h>
-#include <carl/core/Term.h>
+#include <carl/poly/umvpoly/Monomial.h>
+#include <carl/poly/umvpoly/Term.h>
 #include <carl-extpolys/RationalFunction.h>
 #include <carl-formula/formula/Formula.h>
 

@@ -1,7 +1,7 @@
 #include <cassert>
 
-#include "carl/core/Variable.h"
-#include "carl/core/VariablePool.h"
+#include <carl/core/Variable.h>
+#include <carl/core/VariablePool.h>
 
 int main() {
 	/*

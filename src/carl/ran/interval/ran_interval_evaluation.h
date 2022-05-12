@@ -1,7 +1,7 @@
 #pragma once
 
 #include <carl/interval/Interval.h>
-#include <carl/core/polynomialfunctions/IntervalEvaluation.h>
+#include <carl/poly/umvpoly/functions/IntervalEvaluation.h>
 #include <carl/interval/evaluate.h>
 #include <carl/constraint/BasicConstraint.h>
 #include <carl/constraint/Simplification.h>

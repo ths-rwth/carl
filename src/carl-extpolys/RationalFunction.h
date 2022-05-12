@@ -8,8 +8,8 @@
 #include <carl/numbers/numbers.h>
 #include <carl-common/util/hash.h>
 #include "FactorizedPolynomial.h"
-#include <carl/core/polynomialfunctions/Evaluation.h>
-#include <carl/core/polynomialfunctions/GCD.h>
+#include <carl/poly/umvpoly/functions/Evaluation.h>
+#include <carl/poly/umvpoly/functions/GCD.h>
 
 #include "evaluation.h"
 

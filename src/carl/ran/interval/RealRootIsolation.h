@@ -1,16 +1,16 @@
 #pragma once
 
-#include <carl/core/UnivariatePolynomial.h>
+#include <carl/poly/umvpoly/UnivariatePolynomial.h>
 #include "ran_interval.h"
 
 #include <carl/interval/set_theory.h>
 #include <carl/interval/sampling.h>
-#include <carl/core/polynomialfunctions/Factorization_univariate.h>
-#include <carl/core/polynomialfunctions/SignVariations.h>
+#include <carl/poly/umvpoly/functions/Factorization_univariate.h>
+#include <carl/poly/umvpoly/functions/SignVariations.h>
 #include <carl-common/util/streamingOperators.h>
-#include <carl/core/polynomialfunctions/EigenWrapper.h>
-#include <carl/core/polynomialfunctions/Evaluation.h>
-#include <carl/core/polynomialfunctions/RootElimination.h>
+#include <carl/poly/umvpoly/functions/EigenWrapper.h>
+#include <carl/poly/umvpoly/functions/Evaluation.h>
+#include <carl/poly/umvpoly/functions/RootElimination.h>
 
 namespace carl::ran::interval {
 

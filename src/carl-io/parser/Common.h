@@ -13,8 +13,8 @@
 #include <boost/spirit/include/phoenix.hpp>
 
 #include <carl-formula/formula/Formula.h>
-#include <carl/core/MonomialPool.h>
-#include <carl/core/MultivariatePolynomial.h>
+#include <carl/poly/umvpoly/MonomialPool.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-extpolys/FactorizedPolynomial.h>
 #include <carl-extpolys/RationalFunction.h>
 #include <carl/core/Variable.h>

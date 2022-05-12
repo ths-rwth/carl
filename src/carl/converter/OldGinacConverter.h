@@ -12,9 +12,9 @@
 #ifdef USE_GINAC
 
 #include "../core/VariablePool.h"
-#include "../core/Variables.h"
-#include "../numbers/numbers.h"
-#include "../core/Common.h"
+#include <carl/core/Variables.h>
+#include <carl/numbers/numbers.h>
+#include <carl/core/Common.h>
 #include <carl-common/meta/SFINAE.h>
 #include <carl-common/memory/Singleton.h>
 #include "ginac.h"

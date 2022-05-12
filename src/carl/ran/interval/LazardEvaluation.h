@@ -1,8 +1,8 @@
 #pragma once
 
 #include "FieldExtensions.h"
-#include <carl/core/polynomialfunctions/Quotient.h>
-#include <carl/core/polynomialfunctions/Substitution.h>
+#include <carl/poly/umvpoly/functions/Quotient.h>
+#include <carl/poly/umvpoly/functions/Substitution.h>
 
 #ifdef USE_COCOA
 

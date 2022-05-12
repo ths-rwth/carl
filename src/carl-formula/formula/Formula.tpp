@@ -10,7 +10,7 @@
 
 #include "Formula.h"
 #include "FormulaPool.h"
-#include <carl/core/polynomialfunctions/Complexity.h>
+#include <carl/poly/umvpoly/functions/Complexity.h>
 #include "functions/Visit.h"
 
 namespace carl

@@ -2,7 +2,7 @@
 
 #include <carl-common/meta/SFINAE.h>
 
-#include <carl/core/polynomialfunctions/Substitution.h>
+#include <carl/poly/umvpoly/functions/Substitution.h>
 #include <carl/core/Relation.h>
 
 #include <functional>

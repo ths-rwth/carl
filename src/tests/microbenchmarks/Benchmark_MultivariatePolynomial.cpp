@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include <carl/core/MultivariatePolynomial.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl/numbers/numbers.h>
 
 using MVP = carl::MultivariatePolynomial<mpq_class>;

@@ -5,7 +5,7 @@
 
 #include "VariablePool.h"
 
-#include "initialize.h"
+#include "../initialize.h" // TODO get rid of this include
 #include <carl-common/config.h>
 #include <carl-logging/carl-logging.h>
 

@@ -16,13 +16,13 @@
  * Thus the first defining polynomials may contain all variables, the last must be univariate.
  */
 
-#include <carl/core/MultivariatePolynomial.h>
-#include <carl/core/UnivariatePolynomial.h>
+#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl/poly/umvpoly/UnivariatePolynomial.h>
 #include <carl/converter/CoCoAAdaptor.h>
 
-#include <carl/core/polynomialfunctions/Remainder.h>
-#include <carl/core/polynomialfunctions/Resultant.h>
-#include <carl/core/polynomialfunctions/to_univariate_polynomial.h>
+#include <carl/poly/umvpoly/functions/Remainder.h>
+#include <carl/poly/umvpoly/functions/Resultant.h>
+#include <carl/poly/umvpoly/functions/to_univariate_polynomial.h>
 
 namespace carl::ran::interval {
 

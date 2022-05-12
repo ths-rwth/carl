@@ -8,7 +8,7 @@
 #pragma once
 
 #include <carl-logging/carl-logging.h>
-#include "../numbers/numbers.h"
+#include <carl/numbers/numbers.h>
 
 #include <functional>
 #include <iostream>
