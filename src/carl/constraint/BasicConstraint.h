@@ -66,7 +66,7 @@ public:
 	bool is_trivial_true() const  {
 		if(m_lhs.isConstant()) {
 			if(m_lhs.constantPart() == 0) {
-				return isWeak(m_relation);
+				return is_weak(m_relation);
 			} else if(m_lhs.constantPart() > 0) {
 				return m_relation == Relation::GEQ || m_relation == Relation::GREATER || m_relation == Relation::NEQ;
 			} else {
@@ -80,7 +80,7 @@ public:
 	bool is_trivial_false() const {
 		if(m_lhs.isConstant()) {
 			if(m_lhs.constantPart() == 0) {
-				return isStrict(m_relation);
+				return is_strict(m_relation);
 			} else if(m_lhs.constantPart() > 0) {
 				return m_relation == Relation::LEQ || m_relation == Relation::LESS || m_relation == Relation::EQ;
 			} else {

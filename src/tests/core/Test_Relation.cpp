@@ -41,24 +41,24 @@ TEST(Relation, inverse)
 #endif
 }
 
-TEST(Relation, isStrict)
+TEST(Relation, is_strict)
 {
-	EXPECT_FALSE(carl::isStrict(carl::Relation::EQ));
-	EXPECT_TRUE(carl::isStrict(carl::Relation::NEQ));
-	EXPECT_TRUE(carl::isStrict(carl::Relation::LESS));
-	EXPECT_TRUE(carl::isStrict(carl::Relation::GREATER));
-	EXPECT_FALSE(carl::isStrict(carl::Relation::LEQ));
-	EXPECT_FALSE(carl::isStrict(carl::Relation::GEQ));
+	EXPECT_FALSE(carl::is_strict(carl::Relation::EQ));
+	EXPECT_TRUE(carl::is_strict(carl::Relation::NEQ));
+	EXPECT_TRUE(carl::is_strict(carl::Relation::LESS));
+	EXPECT_TRUE(carl::is_strict(carl::Relation::GREATER));
+	EXPECT_FALSE(carl::is_strict(carl::Relation::LEQ));
+	EXPECT_FALSE(carl::is_strict(carl::Relation::GEQ));
 }
 
-TEST(Relation, isWeak)
+TEST(Relation, is_weak)
 {
-	EXPECT_TRUE(carl::isWeak(carl::Relation::EQ));
-	EXPECT_FALSE(carl::isWeak(carl::Relation::NEQ));
-	EXPECT_FALSE(carl::isWeak(carl::Relation::LESS));
-	EXPECT_FALSE(carl::isWeak(carl::Relation::GREATER));
-	EXPECT_TRUE(carl::isWeak(carl::Relation::LEQ));
-	EXPECT_TRUE(carl::isWeak(carl::Relation::GEQ));
+	EXPECT_TRUE(carl::is_weak(carl::Relation::EQ));
+	EXPECT_FALSE(carl::is_weak(carl::Relation::NEQ));
+	EXPECT_FALSE(carl::is_weak(carl::Relation::LESS));
+	EXPECT_FALSE(carl::is_weak(carl::Relation::GREATER));
+	EXPECT_TRUE(carl::is_weak(carl::Relation::LEQ));
+	EXPECT_TRUE(carl::is_weak(carl::Relation::GEQ));
 }
 
 TEST(Relation, evaluate)

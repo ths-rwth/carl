@@ -76,11 +76,11 @@ inline std::string toString(Relation r) {
 	return ss.str();
 }
 
-inline bool isStrict(Relation r) {
+inline bool is_strict(Relation r) {
 	return r == Relation::LESS || r == Relation::GREATER || r == Relation::NEQ;
 }
-inline bool isWeak(Relation r) {
-	return !isStrict(r);
+inline bool is_weak(Relation r) {
+	return !is_strict(r);
 }
 
 inline bool evaluate(Sign s, Relation r) {
