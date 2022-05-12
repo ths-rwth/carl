@@ -342,7 +342,7 @@ auto get_assignment(const Constraint<Pol>& c) { return get_assignment(c.constr()
 template<typename Pol>
 auto compare(const Constraint<Pol>& c1, const Constraint<Pol>& c2) { return compare(c1.constr(), c2.constr()); }
 template<typename Pol>
-auto satisfiedBy(const Constraint<Pol>& c, const Assignment<typename Pol::NumberType>& a) { return satisfiedBy(c.constr(), a); }
+auto satisfied_by(const Constraint<Pol>& c, const Assignment<typename Pol::NumberType>& a) { return satisfied_by(c.constr(), a); }
 template<typename Pol>
 bool is_bound(const Constraint<Pol>& constr, bool negated = false) {
 	if (negated) {

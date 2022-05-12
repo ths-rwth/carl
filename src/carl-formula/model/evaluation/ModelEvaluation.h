@@ -58,7 +58,7 @@ ModelValue<Rational,Poly> evaluate(const T& t, const Model<Rational,Poly>& m) {
 }
 
 template<typename T, typename Rational, typename Poly>
-unsigned satisfiedBy(const T& t, const Model<Rational,Poly>& m) {
+unsigned satisfied_by(const T& t, const Model<Rational,Poly>& m) {
 	auto mv = evaluate(t, m);
 	if (mv.isBool()) {
 		return mv.asBool() ? 1 : 0;

@@ -136,7 +136,7 @@ namespace carl
             }
             case carl::FormulaType::CONSTRAINT:
             {
-                return satisfiedBy(_formula.constraint(), _assignment);
+                return satisfied_by(_formula.constraint(), _assignment);
             }
 			case carl::FormulaType::BITVECTOR:
             {

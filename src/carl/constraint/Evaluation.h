@@ -21,7 +21,7 @@ bool evaluate(const BasicConstraint<Poly>& c, const Assignment<Number>& m) {
  *                       even then it could be possible to obtain the first two results.)
  */
 template<typename Pol>
-unsigned satisfiedBy(const BasicConstraint<Pol>& c, const Assignment<typename Pol::NumberType>& _assignment) {
+unsigned satisfied_by(const BasicConstraint<Pol>& c, const Assignment<typename Pol::NumberType>& _assignment) {
 	unsigned result = 2;
 	Pol tmp = carl::substitute(c.lhs(), _assignment);
 	if (tmp.isConstant()) {
