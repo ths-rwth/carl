@@ -84,18 +84,5 @@ namespace model {
 		}
 		res = createSubstitution<Rational,Poly,ModelPolynomialSubstitution<Rational,Poly>>(p);
 	}
-	
-	template<typename Rational, typename Poly>
-	auto real_roots(const MultivariatePolynomial<Rational>& p, carl::Variable v, const Model<Rational,Poly>& m) {
-		Poly tmp = substitute(p, m);
-		auto map = collectRANIR(carl::variables(tmp).as_set(), m);
-		return carl::real_roots(carl::to_univariate_polynomial(tmp, v), map);
-	}
-	template<typename Rational, typename Poly>
-	auto real_roots(const UnivariatePolynomial<Poly>& p, const Model<Rational,Poly>& m) {
-		UnivariatePolynomial<Poly> tmp = substitute(p, m);
-		auto map = collectRANIR(carl::variables(tmp).as_set(), m);
-		return carl::real_roots(tmp, map);
-	}
 }
 }

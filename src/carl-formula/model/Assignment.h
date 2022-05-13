@@ -67,6 +67,22 @@ namespace carl
 	
 	template<typename Rational, typename Poly>
 	Formula<Poly> representingFormula(const ModelVariable& mv, const Model<Rational,Poly>& model);
+
+    template<typename Rational, typename Poly>
+    std::optional<Assignment<RealAlgebraicNumber<Rational>>> get_ran_assignment(const carlVariables& vars, const Model<Rational,Poly>& model) {
+        Assignment<RealAlgebraicNumber<Rational>> result;
+        for (const auto& var : vars) {
+            if (model.find(var) == model.end()) return std::nullopt;
+            if (model[var].isRational()) {
+                result.emplace(var, RealAlgebraicNumber<Rational>(model[var].asRational()));
+            } else if (model[var].isRAN()) {
+                result.emplace(var, model[var].asRAN());
+            } else {
+                return std::nullopt;
+            }
+        }
+        return result;
+    }
 }
 
 #include "Assignment.tpp"

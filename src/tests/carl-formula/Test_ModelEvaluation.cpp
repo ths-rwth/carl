@@ -85,25 +85,6 @@ TEST(ModelEvaluation, EvaluateRANIRConstraint)
 	EXPECT_FALSE(res.asBool());
 }
 
-TEST(ModelEvaluation, EvaluateWithMVR)
-{
-	Variable x = fresh_real_variable("x");
-	Variable y = fresh_real_variable("y");
-	ModelT m;
-	Pol p = Pol(x*x) - y*y - Rational(4);
-	Pol mvrpol = Pol(MVRootT::var() * MVRootT::var()) - Rational(3);
-	m.assign(y, createSubstitution<Rational>(MVRootT(mvrpol, 1)));
-	auto res = carl::model::real_roots(p, x, m).roots();
-
-	using UPol = UnivariatePolynomial<Rational>;
-
-	UPol upol(x, {Rational(-7), 0, 1});
-	RANT r1 = RANT::create_safe(upol, Interval<Rational>(-3,BoundType::STRICT,-1,BoundType::STRICT));
-	RANT r2 = RANT::create_safe(upol, Interval<Rational>(1,BoundType::STRICT,3,BoundType::STRICT));
-
-	EXPECT_EQ(res, std::decay<decltype(res)>::type({r1, r2}));
-}
-
 TEST(ModelEvaluation, EvaluateBV)
 {
 	carl::SortManager& sm = carl::SortManager::getInstance();
