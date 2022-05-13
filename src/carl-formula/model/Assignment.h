@@ -73,10 +73,10 @@ namespace carl
         Assignment<RealAlgebraicNumber<Rational>> result;
         for (const auto& var : vars) {
             if (model.find(var) == model.end()) return std::nullopt;
-            if (model[var].isRational()) {
-                result.emplace(var, RealAlgebraicNumber<Rational>(model[var].asRational()));
-            } else if (model[var].isRAN()) {
-                result.emplace(var, model[var].asRAN());
+            if (model.at(var).isRational()) {
+                result.emplace(var, RealAlgebraicNumber<Rational>(model.at(var).asRational()));
+            } else if (model.at(var).isRAN()) {
+                result.emplace(var, model.at(var).asRAN());
             } else {
                 return std::nullopt;
             }
