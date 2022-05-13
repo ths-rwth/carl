@@ -126,7 +126,7 @@ TEST(RationalFunction, Multiplication)
 
 //(1/4*PF)/((-1/4)*PF+1) * ((-1/4)*PF+1)/((-1/2)*PF+1)
     //carl::VariablePool::getInstance().clear();
-    Variable t = carl::freshRealVariable("t");
+    Variable t = carl::fresh_real_variable("t");
     Pol pf(t);
     Pol nomA( Rational(1)/Rational(4)*pf );
     Pol denA( Rational(-1)/Rational(4)*pf+Rational(1) );
@@ -345,7 +345,7 @@ TEST(RationalFunction, Simplification)
 TEST(RationalFunction, Evaluation)
 {
     //carl::VariablePool::getInstance().clear();
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     Pol p1({Rational(3)*x});
     Pol p2(Rational(2));
 
@@ -369,9 +369,9 @@ TEST(RationalFunction, Substitute)
 {
     carl::io::StringParser parser;
     parser.setVariables({"x", "y", "z"});
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Variable z = freshRealVariable("z");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
+	Variable z = fresh_real_variable("z");
 
     // Nessecessary - if not present, later formula parsing fails with BUGGY exception!
     RFunc rf1 = RFunc(Pol(x));

@@ -15,14 +15,14 @@ void pass_by_value(T v) {
 }
 
 static void Variable_by_ref(benchmark::State& state) {
-	carl::Variable v = carl::freshBooleanVariable();
+	carl::Variable v = carl::fresh_boolean_variable();
 	for (auto _ : state)
 		pass_by_ref(v);
 }
 BENCHMARK(Variable_by_ref);
 
 static void Variable_by_value(benchmark::State& state) {
-	carl::Variable v = carl::freshBooleanVariable();
+	carl::Variable v = carl::fresh_boolean_variable();
 	for (auto _ : state)
 		pass_by_value(v);
 }

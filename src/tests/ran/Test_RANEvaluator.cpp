@@ -18,8 +18,8 @@ using RAN = RealAlgebraicNumber<Rational>;
 
 TEST(RealAlgebraicNumber, RANEvaluator)
 {
-	Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+	Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
     
 	Poly p = Poly(x)*Poly(x) - Poly(y) * Poly(y);
 	RAN sqrt2 = RAN::create_safe(UPoly(x, {-2,0,1}), Interval<Rational>(0, BoundType::STRICT, 2, BoundType::STRICT));

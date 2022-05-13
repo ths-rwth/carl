@@ -11,8 +11,8 @@ using namespace carl;
 TEST(Parser, Polynomial)
 {
 	carl::io::parser::Parser<MultivariatePolynomial<Rational>> parser;
-	carl::Variable x = freshRealVariable("x");
-	carl::Variable y = freshRealVariable("y");
+	carl::Variable x = fresh_real_variable("x");
+	carl::Variable y = fresh_real_variable("y");
 	parser.addVariable(x);
 	parser.addVariable(y);
 
@@ -35,7 +35,7 @@ TEST(Parser, RationalFunction)
 	using MP = MultivariatePolynomial<Rational>;
 	using RF = RationalFunction<MP>;
 	carl::io::parser::Parser<MP> parser;
-	carl::Variable x = freshRealVariable("x");
+	carl::Variable x = fresh_real_variable("x");
 	parser.addVariable(x);
 
 	EXPECT_EQ(RF(MP(Rational(2)*x)), parser.rationalFunction("2*x"));
@@ -48,17 +48,17 @@ TEST(Parser, Formula)
     using carl::VariableType;
     using FT = Formula<MultivariatePolynomial<Rational>>;
     carl::io::parser::Parser<MultivariatePolynomial<Rational>> parser;
-    carl::Variable b1 = freshBooleanVariable("O4853");
-    carl::Variable b2 = freshBooleanVariable("O3838");
-    carl::Variable b3 = freshBooleanVariable("O4848");
-    carl::Variable b4 = freshBooleanVariable("O4851");
-    carl::Variable b5 = freshBooleanVariable("O4849");
-    carl::Variable b6 = freshBooleanVariable("O4850");
-    carl::Variable b7 = freshBooleanVariable("O6262");
-    carl::Variable b8 = freshBooleanVariable("O6285");
-    carl::Variable b9 = freshBooleanVariable("O6217");
-    carl::Variable b10 = freshBooleanVariable("O8504");
-    carl::Variable b11 = freshBooleanVariable("O8665");
+    carl::Variable b1 = fresh_boolean_variable("O4853");
+    carl::Variable b2 = fresh_boolean_variable("O3838");
+    carl::Variable b3 = fresh_boolean_variable("O4848");
+    carl::Variable b4 = fresh_boolean_variable("O4851");
+    carl::Variable b5 = fresh_boolean_variable("O4849");
+    carl::Variable b6 = fresh_boolean_variable("O4850");
+    carl::Variable b7 = fresh_boolean_variable("O6262");
+    carl::Variable b8 = fresh_boolean_variable("O6285");
+    carl::Variable b9 = fresh_boolean_variable("O6217");
+    carl::Variable b10 = fresh_boolean_variable("O8504");
+    carl::Variable b11 = fresh_boolean_variable("O8665");
     parser.addVariable(b1);
     parser.addVariable(b2);
     parser.addVariable(b3);

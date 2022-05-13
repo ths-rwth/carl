@@ -6,7 +6,7 @@ namespace carl
 	const Variable Variable::NO_VARIABLE = Variable();
 	
 	std::string Variable::name() const {
-		return carl::VariablePool::getInstance().getName(*this, true);
+		return carl::VariablePool::getInstance().get_name(*this, true);
 	}
 	std::string Variable::safe_name() const {
 		switch (type()) {

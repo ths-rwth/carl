@@ -156,7 +156,7 @@ public:
 	 * @param uf An uninterpreted function.
 	 * @return The name of the uninterpreted function of the given uninterpreted function.
 	 */
-	const std::string& getName(const UninterpretedFunction& uf) const {
+	const std::string& get_name(const UninterpretedFunction& uf) const {
 		return getUF(uf)->name();
 	}
 

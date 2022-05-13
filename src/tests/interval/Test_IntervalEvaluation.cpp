@@ -16,10 +16,10 @@ TEST(IntervalEvaluation, Monomial)
     Interval<Rational> id( 0, 2 );
 
     std::map<Variable, Interval<Rational>> map;
-    Variable a = freshRealVariable("a");
-	Variable b = freshRealVariable("b");
-	Variable c = freshRealVariable("c");
-	Variable d = freshRealVariable("d");
+    Variable a = fresh_real_variable("a");
+	Variable b = fresh_real_variable("b");
+	Variable c = fresh_real_variable("c");
+	Variable d = fresh_real_variable("d");
     
     map[a] = ia;
     map[b] = ib;
@@ -64,8 +64,8 @@ TEST(IntervalEvaluation, Monomial)
 TEST(IntervalEvaluation, Term)
 {
     std::map<Variable, Interval<Rational>> map;
-    Variable a = freshRealVariable("a");
-    Variable b = freshRealVariable("b");
+    Variable a = fresh_real_variable("a");
+    Variable b = fresh_real_variable("b");
 	//MultivariatePolynomial<Rational> p({(Rational)1*a*a*b*b});
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> p(b,
 		{MultivariatePolynomial<Rational>(), MultivariatePolynomial<Rational>(),

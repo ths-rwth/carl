@@ -55,13 +55,13 @@ struct FormulaParser: public qi::grammar<Iterator, Formula<Pol>(), Skipper> {
 	}
 
 	void addVariable(Variable::Arg v) {
-		varmap.add(VariablePool::getInstance().getName(v), v);
+		varmap.add(VariablePool::getInstance().get_name(v), v);
 	}
 
 private:
 
 	Variable newVariable(const std::string& s) {
-		Variable v = freshBooleanVariable(s);
+		Variable v = fresh_boolean_variable(s);
 		varmap.add(s, v);
 		return v;
 	}

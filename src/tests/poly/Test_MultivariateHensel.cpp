@@ -10,8 +10,8 @@ using namespace carl;
 TEST(Diophantine, Constructor)
 {
 	VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
+    Variable x = vpool.get_fresh_variable();
+    vpool.set_name(x, "x");
     UnivariatePolynomial<mpz_class> A1(x, {(mpz_class)1, (mpz_class)1, (mpz_class)0, (mpz_class)1});
 	const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
     UnivariatePolynomial<GFNumber<mpz_class>> a1 = A1.toFiniteDomain(gf5);

@@ -99,7 +99,7 @@ namespace carl::io
 					mSingleSymbVariables = false;
 					mImplicitMultiplicationMode = false;
 				}
-				mVars.emplace(v, freshRealVariable(v));
+				mVars.emplace(v, fresh_real_variable(v));
 			}
 		}
 			

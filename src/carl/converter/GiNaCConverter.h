@@ -26,7 +26,7 @@ public:
 	GiNaC::symbol operator()(const carl::Variable& v) {
 		auto it = vars.find(v);
 		if (it == vars.end()) {
-			it = vars.insert(std::make_pair(v, GiNaC::symbol(carl::VariablePool::getInstance().getName(v)))).first;
+			it = vars.insert(std::make_pair(v, GiNaC::symbol(carl::VariablePool::getInstance().get_name(v)))).first;
 		}
 		return it->second;
 	}

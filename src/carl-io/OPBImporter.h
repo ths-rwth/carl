@@ -41,7 +41,7 @@ private:
 			auto it = variableCache.find(term.second);
 			if (it == variableCache.end()) {
 				// We haven't seen this variable, yet. Create a new map entry for it.
-				carl::Variable boolVar = carl::freshBooleanVariable();
+				carl::Variable boolVar = carl::fresh_boolean_variable();
 				variableCache[term.second] = boolVar;
 			}
 

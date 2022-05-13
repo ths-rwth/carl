@@ -72,7 +72,7 @@ namespace carl::io {
 		
 	private:
 		Variable addVariable(const std::string& s) {
-			carl::Variable var = freshIntegerVariable(s);
+			carl::Variable var = fresh_integer_variable(s);
 			mVariables.add(s, var);
 			return var;
 		}

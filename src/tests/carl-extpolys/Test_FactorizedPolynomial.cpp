@@ -288,7 +288,7 @@ TEST(FactorizedPolynomial, GCD)
     Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y");
     Pol pB = sp.parseMultivariatePolynomial<Rational>("2*x*y*z");
 
-    Variable t = freshRealVariable("t");
+    Variable t = fresh_real_variable("t");
     Pol one(Rational(1));
     Pol g1 = t*t - one;
     Pol g2 = t - one;
@@ -415,8 +415,8 @@ TEST(FactorizedPolynomial, LCM)
     EXPECT_EQ( pLCM, computePolynomial( fpLCM ) );
 
     carl::VariablePool::getInstance().clear();
-    Variable y = carl::freshRealVariable("y");
-    Variable x = carl::freshRealVariable("x");
+    Variable y = carl::fresh_real_variable("y");
+    Variable x = carl::fresh_real_variable("x");
     Pol px( x );
     Pol py( y );
     Pol p1( px*py-py+Rational(1) );
@@ -552,7 +552,7 @@ TEST(FactorizedPolynomial, Equality)
 TEST(FactorizedPolynomial, Evaluation)
 {
     carl::VariablePool::getInstance().clear();
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     Pol p1({(Rational)6*x});
     Pol p2({x});
 
@@ -575,8 +575,8 @@ TEST(FactorizedPolynomial, Evaluation)
 TEST(FactorizedPolynomial, Substitution)
 {
     carl::VariablePool::getInstance().clear();
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
     Pol pc(-3);
     Pol p1({(Rational)6*x});
     Pol p2({x});
@@ -634,7 +634,7 @@ TEST(FactorizedPolynomial, Substitution)
 TEST(FactorizedPolynomial, Derivation)
 {
     carl::VariablePool::getInstance().clear();
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 
     FPol c(3);
     FPol der = c.derivative(x);

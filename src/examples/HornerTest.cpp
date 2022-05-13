@@ -73,12 +73,12 @@ int main (int argc, char** argv)
 
   std::map<Variable, Interval<Rational>> map;
   VariablePool& vpool = VariablePool::getInstance();
-  Variable a = vpool.getFreshVariable();
-  vpool.setName(a, "a");
-  Variable b = vpool.getFreshVariable();
-  vpool.setName(b, "b");
-  Variable c = vpool.getFreshVariable();
-  vpool.setName(c, "c");
+  Variable a = vpool.get_fresh_variable();
+  vpool.set_name(a, "a");
+  Variable b = vpool.get_fresh_variable();
+  vpool.set_name(b, "b");
+  Variable c = vpool.get_fresh_variable();
+  vpool.set_name(c, "c");
 
   int l = 0;
   int n = 0;

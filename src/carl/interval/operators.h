@@ -86,8 +86,8 @@ inline bool bounds_connect(const UpperBound<Number>& lhs, const LowerBound<Numbe
  */
 template<typename Number>
 inline bool operator==(const Interval<Number>& lhs, const Interval<Number>& rhs) {
-	return std::forward_as_tuple(lhs.lowerBoundType(), lhs.upperBoundType(), lhs.lower(), lhs.upper())
-		== std::forward_as_tuple(rhs.lowerBoundType(), rhs.upperBoundType(), rhs.lower(), rhs.upper());
+	return std::forward_as_tuple(lhs.lower_bound_type(), lhs.upper_bound_type(), lhs.lower(), lhs.upper())
+		== std::forward_as_tuple(rhs.lower_bound_type(), rhs.upper_bound_type(), rhs.lower(), rhs.upper());
 }
 
 template<>
@@ -96,13 +96,13 @@ inline bool operator==(const Interval<double>& lhs, const Interval<double>& rhs)
 		!AlmostEqual2sComplement(lhs.upper(),rhs.upper())) {
 			return false;
 		}
-	return std::forward_as_tuple(lhs.lowerBoundType(), lhs.upperBoundType())
-		== std::forward_as_tuple(rhs.lowerBoundType(), rhs.upperBoundType());
+	return std::forward_as_tuple(lhs.lower_bound_type(), lhs.upper_bound_type())
+		== std::forward_as_tuple(rhs.lower_bound_type(), rhs.upper_bound_type());
 }
 
 template<typename Number>
 inline bool operator==(const Interval<Number>& lhs, const Number& rhs) {
-	return lhs.isPointInterval() && lhs.lower() == rhs;
+	return lhs.is_point_interval() && lhs.lower() == rhs;
 }
 template<typename Number>
 inline bool operator==(const Number& lhs, const Interval<Number>& rhs) {
@@ -136,13 +136,13 @@ inline bool operator!=(const Number& lhs, const Interval<Number>& rhs) {
  */
 template<typename Number>
 inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs) {
-	if (lhs.upperBound() < rhs.lowerBound()) return true;
+	if (lhs.upper_bound() < rhs.lower_bound()) return true;
 	if (lhs.upper() == rhs.lower()) {
-		switch (lhs.upperBoundType()) {
+		switch (lhs.upper_bound_type()) {
 			case BoundType::STRICT:
-				return rhs.lowerBoundType() != BoundType::INFTY;
+				return rhs.lower_bound_type() != BoundType::INFTY;
 			case BoundType::WEAK:
-				return rhs.lowerBoundType() == BoundType::STRICT;
+				return rhs.lower_bound_type() == BoundType::STRICT;
 			default:
 				return false;
 		}
@@ -151,7 +151,7 @@ inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs) 
 }
 template<typename Number>
 inline bool operator<(const Interval<Number>& lhs, const Number& rhs) {
-	switch (lhs.upperBoundType()) {
+	switch (lhs.upper_bound_type()) {
 		case BoundType::STRICT:
 			return lhs.upper() <= rhs;
 		case BoundType::WEAK:
@@ -165,7 +165,7 @@ inline bool operator<(const Interval<Number>& lhs, const Number& rhs) {
 }
 template<typename Number>
 inline bool operator<(const Number& lhs, const Interval<Number>& rhs) {
-	switch (rhs.lowerBoundType()) {
+	switch (rhs.lower_bound_type()) {
 		case BoundType::STRICT:
 			return lhs <= rhs.lower();
 		case BoundType::WEAK:
@@ -207,12 +207,12 @@ inline bool operator>(const Number& lhs, const Interval<Number>& rhs) {
  */
 template<typename Number>
 inline bool operator<=(const Interval<Number>& lhs, const Interval<Number>& rhs) {
-	if (lhs.upperBound() < rhs.lowerBound()) return true;
+	if (lhs.upper_bound() < rhs.lower_bound()) return true;
 	if (lhs.upper() == rhs.lower()) {
-		switch (lhs.upperBoundType()) {
+		switch (lhs.upper_bound_type()) {
 			case BoundType::STRICT:
 			case BoundType::WEAK:
-				return rhs.lowerBoundType() != BoundType::INFTY;
+				return rhs.lower_bound_type() != BoundType::INFTY;
 			default:
 				return false;
 		}
@@ -221,12 +221,12 @@ inline bool operator<=(const Interval<Number>& lhs, const Interval<Number>& rhs)
 }
 template<typename Number>
 inline bool operator<=(const Interval<Number>& lhs, const Number& rhs) {
-	if (lhs.upperBoundType() == BoundType::INFTY) return false;
+	if (lhs.upper_bound_type() == BoundType::INFTY) return false;
 	return lhs.upper() <= rhs;
 }
 template<typename Number>
 inline bool operator<=(const Number& lhs, const Interval<Number>& rhs) {
-	if (rhs.lowerBoundType() == BoundType::INFTY) return false;
+	if (rhs.lower_bound_type() == BoundType::INFTY) return false;
 	return rhs.lower() >= lhs;
 }
 
@@ -270,7 +270,7 @@ inline Interval<Number> operator+(const Interval<Number>& lhs, const Interval<Nu
  */
 template<typename Number>
 inline Interval<Number> operator+(const Interval<Number>& lhs, const Number& rhs) {
-	return Interval<Number>(lhs.rContent() + rhs, lhs.lowerBoundType(), lhs.upperBoundType());
+	return Interval<Number>(lhs.content() + rhs, lhs.lower_bound_type(), lhs.upper_bound_type());
 }
 
 /**
@@ -305,7 +305,7 @@ inline Interval<Number>& operator+=(Interval<Number>& lhs, const Interval<Number
  */
 template<typename Number>
 inline Interval<Number>& operator+=(Interval<Number>& lhs, const Number& rhs) {
-	lhs.rContent() += rhs;
+	lhs.content() += rhs;
 	return lhs;
 }
 
@@ -338,7 +338,7 @@ inline Interval<Number> operator-(const Interval<Number>& lhs, const Interval<Nu
  */
 template<typename Number>
 inline Interval<Number> operator-(const Interval<Number>& lhs, const Number& rhs) {
-	return Interval<Number>(lhs.rContent() - rhs, lhs.lowerBoundType(), lhs.upperBoundType());
+	return Interval<Number>(lhs.content() - rhs, lhs.lower_bound_type(), lhs.upper_bound_type());
 }
 
 /**
@@ -372,7 +372,7 @@ inline Interval<Number>& operator-=(Interval<Number>& lhs, const Interval<Number
  */
 template<typename Number>
 inline Interval<Number>& operator-=(Interval<Number>& lhs, const Number& rhs) {
-	lhs.rContent() -= rhs;
+	lhs.content() -= rhs;
 	return lhs;
 }
 
@@ -395,10 +395,10 @@ inline Interval<Number> operator*(const Interval<Number>& lhs, const Interval<Nu
  */
 template<typename Number>
 inline Interval<Number> operator*(const Interval<Number>& lhs, const Number& rhs) {
-	if (rhs > 0 || lhs.isEmpty()) {
-		return Interval<Number>(lhs.rContent() * rhs, lhs.lowerBoundType(), lhs.upperBoundType());
+	if (rhs > 0 || lhs.is_empty()) {
+		return Interval<Number>(lhs.content() * rhs, lhs.lower_bound_type(), lhs.upper_bound_type());
 	} else if (rhs < 0) {
-		return Interval<Number>(lhs.rContent() * rhs, lhs.upperBoundType(), lhs.lowerBoundType());
+		return Interval<Number>(lhs.content() * rhs, lhs.upper_bound_type(), lhs.lower_bound_type());
 	} else {
 		return Interval<Number>{0};
 	}
@@ -435,11 +435,11 @@ inline Interval<Number>& operator*=(Interval<Number>& lhs, const Interval<Number
  */
 template<typename Number>
 inline Interval<Number>& operator*=(Interval<Number>& lhs, const Number& rhs) {
-	if (carl::isZero(rhs) && !lhs.isEmpty()) {
+	if (carl::isZero(rhs) && !lhs.is_empty()) {
 		lhs = Interval<Number>{0};
 		return lhs;
 	}
-	lhs.rContent() *= rhs;
+	lhs.content() *= rhs;
 	return lhs;
 }
 
@@ -453,9 +453,9 @@ template<typename Number>
 inline Interval<Number> operator/(const Interval<Number>& lhs, const Number& rhs) {
 	assert(!carl::isZero(rhs));
 	if (rhs >= 0) {
-		return Interval<Number>(lhs.rContent() / rhs, lhs.lowerBoundType(), lhs.upperBoundType());
+		return Interval<Number>(lhs.content() / rhs, lhs.lower_bound_type(), lhs.upper_bound_type());
 	} else {
-		return Interval<Number>(lhs.rContent() / rhs, lhs.upperBoundType(), lhs.lowerBoundType());
+		return Interval<Number>(lhs.content() / rhs, lhs.upper_bound_type(), lhs.lower_bound_type());
 	}
 }
 

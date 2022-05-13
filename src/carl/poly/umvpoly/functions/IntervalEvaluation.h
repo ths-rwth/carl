@@ -52,7 +52,7 @@ inline Interval<Numeric> evaluate(const MultivariatePolynomial<Coeff, Policy, Or
 	} else {
 		Interval<Numeric> result(evaluate(p[0], map)); 
 		for (unsigned i = 1; i < p.nrTerms(); ++i) {
-            if( result.isInfinite() )
+            if( result.is_infinite() )
                 return result;
 			result += evaluate(p[i], map);
 		}
@@ -64,12 +64,12 @@ template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>
 inline Interval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
 	CARL_LOG_FUNC("carl.core.intervalevaluation", p << ", " << map);
 	assert(map.count(p.mainVar()) > 0);
-	Interval<Numeric> res = Interval<Numeric>::emptyInterval();
+	Interval<Numeric> res = Interval<Numeric>::empty_interval();
 	const Interval<Numeric> varValue = map.at(p.mainVar());
 	Interval<Numeric> exp(1);
 	for (unsigned i = 0; i < p.degree(); i++) {
 		res += p.coefficients()[i] * exp;
-        if( res.isInfinite() )
+        if( res.is_infinite() )
             return res;
 		exp = varValue.pow(i+1);
 	}
@@ -85,7 +85,7 @@ inline Interval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const st
 	Interval<Numeric> exp(1);
 	for (uint i = 0; i <= p.degree(); i++) {
 		res += evaluate(p.coefficients()[i], map) * exp;
-        if( res.isInfinite() )
+        if( res.is_infinite() )
             return res;
 		exp = carl::pow(varValue, i+1);
 	}

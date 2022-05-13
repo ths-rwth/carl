@@ -196,7 +196,7 @@ public:
 	 * @param sort A sort.
 	 * @return The name if the given sort.
 	 */
-	const std::string& getName(const Sort& sort) const {
+	const std::string& get_name(const Sort& sort) const {
 		return getContent(sort).name;
 	}
 	const std::vector<Sort>* getParameters(const Sort& sort) const {

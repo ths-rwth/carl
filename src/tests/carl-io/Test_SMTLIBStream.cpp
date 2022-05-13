@@ -10,7 +10,7 @@ using FormulaT = carl::Formula<carl::MultivariatePolynomial<Rational>>;
 
 TEST(SMTLIBStream, Base)
 {
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	Rational r = 4;
 	carl::MultivariatePolynomial<Rational> mp = Rational(r*r)*x*x + r*x + r;
 

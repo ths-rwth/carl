@@ -20,10 +20,10 @@ TEST(Contraction, SimpleNewton)
     Interval<double> id = Interval<double>( 0, 2 );
 
     Interval<double>::evalintervalmap map;
-	Variable a = freshRealVariable("a");
-	Variable b = freshRealVariable("b");
-	Variable c = freshRealVariable("c");
-	Variable d = freshRealVariable("d");
+	Variable a = fresh_real_variable("a");
+	Variable b = fresh_real_variable("b");
+	Variable c = fresh_real_variable("c");
+	Variable d = fresh_real_variable("d");
     
     map[a] = ia;
     map[b] = ib;
@@ -54,19 +54,19 @@ TEST(Contraction, SimpleNewton)
 
     split = e1_contractor(map,a,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(Interval<double>::emptyInterval(), resultA);
+    EXPECT_EQ(Interval<double>::empty_interval(), resultA);
 
     split = e1_contractor(map,b,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(Interval<double>::emptyInterval(), resultA);
+    EXPECT_EQ(Interval<double>::empty_interval(), resultA);
 
     split = e1_contractor(map,c,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(Interval<double>::emptyInterval(), resultA);
+    EXPECT_EQ(Interval<double>::empty_interval(), resultA);
 
     split = e1_contractor(map,d,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(Interval<double>::emptyInterval(), resultA);
+    EXPECT_EQ(Interval<double>::empty_interval(), resultA);
 
     split = e6_contractor(map,a,resultA,resultB);
     EXPECT_EQ(split, false);
@@ -89,7 +89,7 @@ TEST(Contraction, SimpleNewton)
     split = e6_contractor(map,d,resultA,resultB);
     EXPECT_EQ(split, false);
 
-    EXPECT_EQ(resultA.isEmpty(), true);
+    EXPECT_EQ(resultA.is_empty(), true);
 }
 
 #ifndef THREAD_SAFE
@@ -98,8 +98,8 @@ typedef cln::cl_RA RationalB;
 
 TEST(Contraction, WithPropagation)
 {
-    Variable y = freshRealVariable("y");
-    Variable r = freshRealVariable("_r_9");
+    Variable y = fresh_real_variable("y");
+    Variable r = fresh_real_variable("_r_9");
     
     Interval<double>::evalintervalmap map;
     
@@ -123,8 +123,8 @@ TEST(Contraction, WithPropagation)
     std::cout << "resultA = " << resultA << std::endl;
     std::cout << "resultB = " << resultB << std::endl;
     EXPECT_FALSE( split );
-    EXPECT_FALSE( resultA.isEmpty() );
-    EXPECT_TRUE( resultB.isEmpty() );
+    EXPECT_FALSE( resultA.is_empty() );
+    EXPECT_TRUE( resultB.is_empty() );
 }
 #endif
 #endif

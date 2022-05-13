@@ -21,7 +21,7 @@ namespace carl::ran::interval {
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, EnableIf<std::is_same<Coeff, Number>> = dummy>
 real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		const UnivariatePolynomial<Coeff>& polynomial,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
+		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
 	if (carl::isZero(polynomial)) {
 		return real_roots_result<real_algebraic_number_interval<Number>>::nullified_response();
@@ -42,7 +42,7 @@ real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, DisableIf<std::is_same<Coeff, Number>> = dummy>
 real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		const UnivariatePolynomial<Coeff>& polynomial,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
+		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
 	assert(polynomial.isUnivariate());
 	return real_roots(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constantPart(); })), interval);
@@ -67,7 +67,7 @@ template<typename Coeff, typename Number>
 real_roots_result<real_algebraic_number_interval<Number>> real_roots(
 		const UnivariatePolynomial<Coeff>& poly,
 		const Assignment<real_algebraic_number_interval<Number>>& varToRANMap,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
+		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
 	CARL_LOG_FUNC("carl.ran.realroots", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 	assert(varToRANMap.count(poly.mainVar()) == 0);

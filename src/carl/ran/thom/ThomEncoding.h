@@ -97,13 +97,13 @@ public:
 	}
 
 	bool containedIn(const Interval<Number>& i) const {
-		if(i.lowerBoundType() != BoundType::INFTY) {
-			if(i.lowerBoundType() == BoundType::STRICT && *this <= i.lower()) return false;
-			if(i.lowerBoundType() == BoundType::WEAK && *this < i.lower()) return false;
+		if(i.lower_bound_type() != BoundType::INFTY) {
+			if(i.lower_bound_type() == BoundType::STRICT && *this <= i.lower()) return false;
+			if(i.lower_bound_type() == BoundType::WEAK && *this < i.lower()) return false;
 		}
-		if(i.upperBoundType() != BoundType::INFTY) {
-			if(i.upperBoundType() == BoundType::STRICT && *this >= i.upper()) return false;
-			if(i.upperBoundType() == BoundType::WEAK && *this > i.upper()) return false;
+		if(i.upper_bound_type() != BoundType::INFTY) {
+			if(i.upper_bound_type() == BoundType::STRICT && *this >= i.upper()) return false;
+			if(i.upper_bound_type() == BoundType::WEAK && *this > i.upper()) return false;
 		}
 		return true;
 	}

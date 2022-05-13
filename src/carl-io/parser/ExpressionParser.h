@@ -391,7 +391,7 @@ struct ExpressionParser: public qi::grammar<Iterator, ExpressionType<Pol>(), Ski
 	}
 
 	void addVariable(Variable::Arg v) {
-		auto s = VariablePool::getInstance().getName(v);
+		auto s = VariablePool::getInstance().get_name(v);
 		varmap.add(s, v);
 	}
 	
@@ -403,13 +403,13 @@ private:
 		if ((vptr = varmap.find(s)) != nullptr) {
 			return *vptr;
 		}
-		Variable v = VariablePool::getInstance().findVariableWithName(s);
+		Variable v = VariablePool::getInstance().find_variable_with_name(s);
 		if (v != Variable::NO_VARIABLE) {
 	        varmap.add(s, v);
 	        return v;
 		}
 
-		v = freshRealVariable(s);
+		v = fresh_real_variable(s);
 		varmap.add(s, v);
 		return v;
 	}

@@ -44,10 +44,10 @@ int main(int argc, char** argv) {
 
     DoubleInterval::evalintervalmap map;
     
-    Variable a = freshRealVariable("a");
-    Variable b = freshRealVariable("b");
-    Variable c = freshRealVariable("c");
-    Variable d = freshRealVariable("d");
+    Variable a = fresh_real_variable("a");
+    Variable b = fresh_real_variable("b");
+    Variable c = fresh_real_variable("c");
+    Variable d = fresh_real_variable("d");
     
     map[a] = ia;
     map[b] = ib;

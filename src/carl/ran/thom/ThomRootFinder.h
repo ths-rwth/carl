@@ -26,7 +26,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 const MultivariatePolynomial<Number>& p,
                 Variable::Arg mainVar,
 		std::shared_ptr<ThomEncoding<Number>> point_ptr,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
+		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 );
         
 /*
@@ -37,7 +37,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 const MultivariatePolynomial<Number>& p,
                 Variable::Arg mainVar,
 		const std::map<Variable, ThomEncoding<Number>>& m = {},
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
+		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
         CARL_LOG_INFO("carl.thom.rootfinder",
                 "\n---------------------------------------------\n"
@@ -207,20 +207,20 @@ std::list<ThomEncoding<Number>> realRootsThom(
         
         // check bounds
         // this could be optimized e.g. using binary search ...
-        if(interval.lowerBoundType() == BoundType::STRICT) {
+        if(interval.lower_bound_type() == BoundType::STRICT) {
                 auto it = result.begin();
                 while(it != result.end() && *it <= interval.lower()) {
                         it = result.erase(it);
                 }
         }
-        else if(interval.lowerBoundType() == BoundType::WEAK) {
+        else if(interval.lower_bound_type() == BoundType::WEAK) {
                 auto it = result.begin();
                 while(it != result.end() && *it < interval.lower()) {
                         it = result.erase(it);
                 }
         }
         
-        if(interval.upperBoundType() == BoundType::STRICT) {
+        if(interval.upper_bound_type() == BoundType::STRICT) {
                 std::reverse(result.begin(), result.end());
                 auto it = result.begin();
                 while(it != result.end() && *it >= interval.upper()) {
@@ -228,7 +228,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 }
                 std::reverse(result.begin(), result.end());
         }
-        else if(interval.upperBoundType() == BoundType::WEAK) {
+        else if(interval.upper_bound_type() == BoundType::WEAK) {
                 std::reverse(result.begin(), result.end());
                 auto it = result.begin();
                 while(it != result.end() && *it > interval.upper()) {

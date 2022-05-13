@@ -134,7 +134,7 @@ namespace carl
                 auto iter = mTseitinVars.insert( std::make_pair( _formula.mpContent, nullptr ) );
                 if( iter.second )
                 {
-                    const FormulaContent<Pol>* hi = create( carl::freshBooleanVariable() );
+                    const FormulaContent<Pol>* hi = create( carl::fresh_boolean_variable() );
                     iter.first->second = hi;
                     mTseitinVarToFormula[hi] = iter.first;
                 }

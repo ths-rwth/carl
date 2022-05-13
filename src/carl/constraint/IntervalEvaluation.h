@@ -42,7 +42,7 @@ static unsigned consistent_with(const BasicConstraint<Pol>& c, const Assignment<
 		if (varIter != vars.end())
 			return 2;
 		Interval<double> solutionSpace = carl::evaluate(c.lhs(), _solutionInterval);
-		if (solutionSpace.isEmpty())
+		if (solutionSpace.is_empty())
 			return 2;
 		switch (c.relation()) {
 		case Relation::EQ: {
@@ -58,45 +58,45 @@ static unsigned consistent_with(const BasicConstraint<Pol>& c, const Assignment<
 			break;
 		}
 		case Relation::LESS: {
-			if (solutionSpace.upperBoundType() != BoundType::INFTY) {
+			if (solutionSpace.upper_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.upper() < 0)
 					return 1;
-				else if (solutionSpace.upper() == 0 && solutionSpace.upperBoundType() == BoundType::STRICT)
+				else if (solutionSpace.upper() == 0 && solutionSpace.upper_bound_type() == BoundType::STRICT)
 					return 1;
 			}
-			if (solutionSpace.lowerBoundType() != BoundType::INFTY && solutionSpace.lower() >= 0)
+			if (solutionSpace.lower_bound_type() != BoundType::INFTY && solutionSpace.lower() >= 0)
 				return 0;
 			break;
 		}
 		case Relation::GREATER: {
-			if (solutionSpace.lowerBoundType() != BoundType::INFTY) {
+			if (solutionSpace.lower_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.lower() > 0)
 					return 1;
-				else if (solutionSpace.lower() == 0 && solutionSpace.lowerBoundType() == BoundType::STRICT)
+				else if (solutionSpace.lower() == 0 && solutionSpace.lower_bound_type() == BoundType::STRICT)
 					return 1;
 			}
-			if (solutionSpace.upperBoundType() != BoundType::INFTY && solutionSpace.upper() <= 0)
+			if (solutionSpace.upper_bound_type() != BoundType::INFTY && solutionSpace.upper() <= 0)
 				return 0;
 			break;
 		}
 		case Relation::LEQ: {
-			if (solutionSpace.upperBoundType() != BoundType::INFTY && solutionSpace.upper() <= 0)
+			if (solutionSpace.upper_bound_type() != BoundType::INFTY && solutionSpace.upper() <= 0)
 				return 1;
-			if (solutionSpace.lowerBoundType() != BoundType::INFTY) {
+			if (solutionSpace.lower_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.lower() > 0)
 					return 0;
-				else if (solutionSpace.lower() == 0 && solutionSpace.lowerBoundType() == BoundType::STRICT)
+				else if (solutionSpace.lower() == 0 && solutionSpace.lower_bound_type() == BoundType::STRICT)
 					return 0;
 			}
 			break;
 		}
 		case Relation::GEQ: {
-			if (solutionSpace.lowerBoundType() != BoundType::INFTY && solutionSpace.lower() >= 0)
+			if (solutionSpace.lower_bound_type() != BoundType::INFTY && solutionSpace.lower() >= 0)
 				return 1;
-			if (solutionSpace.upperBoundType() != BoundType::INFTY) {
+			if (solutionSpace.upper_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.upper() < 0)
 					return 0;
-				else if (solutionSpace.upper() == 0 && solutionSpace.upperBoundType() == BoundType::STRICT)
+				else if (solutionSpace.upper() == 0 && solutionSpace.upper_bound_type() == BoundType::STRICT)
 					return 0;
 			}
 			break;
@@ -142,7 +142,7 @@ static unsigned consistent_with(const BasicConstraint<Pol>& c, const Assignment<
 		if (varIter != vars.end())
 			return 2;
 		Interval<double> solutionSpace = carl::evaluate(c.lhs(), _solutionInterval);
-		if (solutionSpace.isEmpty())
+		if (solutionSpace.is_empty())
 			return 2;
 		switch (c.relation()) {
 		case Relation::EQ: {
@@ -155,46 +155,46 @@ static unsigned consistent_with(const BasicConstraint<Pol>& c, const Assignment<
 		case Relation::NEQ: {
 			if (!solutionSpace.contains(0))
 				return 1;
-			if (solutionSpace.upperBoundType() == BoundType::WEAK && solutionSpace.upper() == 0) {
+			if (solutionSpace.upper_bound_type() == BoundType::WEAK && solutionSpace.upper() == 0) {
 				_stricterRelation = Relation::LESS;
-			} else if (solutionSpace.lowerBoundType() == BoundType::WEAK && solutionSpace.lower() == 0) {
+			} else if (solutionSpace.lower_bound_type() == BoundType::WEAK && solutionSpace.lower() == 0) {
 				_stricterRelation = Relation::GREATER;
 			}
 			break;
 		}
 		case Relation::LESS: {
-			if (solutionSpace.upperBoundType() != BoundType::INFTY) {
+			if (solutionSpace.upper_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.upper() < 0)
 					return 1;
-				else if (solutionSpace.upper() == 0 && solutionSpace.upperBoundType() == BoundType::STRICT)
+				else if (solutionSpace.upper() == 0 && solutionSpace.upper_bound_type() == BoundType::STRICT)
 					return 1;
 			}
-			if (solutionSpace.lowerBoundType() != BoundType::INFTY && solutionSpace.lower() >= 0)
+			if (solutionSpace.lower_bound_type() != BoundType::INFTY && solutionSpace.lower() >= 0)
 				return 0;
 			break;
 		}
 		case Relation::GREATER: {
-			if (solutionSpace.lowerBoundType() != BoundType::INFTY) {
+			if (solutionSpace.lower_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.lower() > 0)
 					return 1;
-				else if (solutionSpace.lower() == 0 && solutionSpace.lowerBoundType() == BoundType::STRICT)
+				else if (solutionSpace.lower() == 0 && solutionSpace.lower_bound_type() == BoundType::STRICT)
 					return 1;
 			}
-			if (solutionSpace.upperBoundType() != BoundType::INFTY && solutionSpace.upper() <= 0)
+			if (solutionSpace.upper_bound_type() != BoundType::INFTY && solutionSpace.upper() <= 0)
 				return 0;
 			break;
 		}
 		case Relation::LEQ: {
-			if (solutionSpace.upperBoundType() != BoundType::INFTY) {
+			if (solutionSpace.upper_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.upper() <= 0) {
 					return 1;
 				}
 			}
-			if (solutionSpace.lowerBoundType() != BoundType::INFTY) {
+			if (solutionSpace.lower_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.lower() > 0) {
 					return 0;
 				} else if (solutionSpace.lower() == 0) {
-					if (solutionSpace.lowerBoundType() == BoundType::STRICT) {
+					if (solutionSpace.lower_bound_type() == BoundType::STRICT) {
 						return 0;
 					} else {
 						_stricterRelation = Relation::EQ;
@@ -204,15 +204,15 @@ static unsigned consistent_with(const BasicConstraint<Pol>& c, const Assignment<
 			break;
 		}
 		case Relation::GEQ: {
-			if (solutionSpace.lowerBoundType() != BoundType::INFTY) {
+			if (solutionSpace.lower_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.lower() >= 0)
 					return 1;
 			}
-			if (solutionSpace.upperBoundType() != BoundType::INFTY) {
+			if (solutionSpace.upper_bound_type() != BoundType::INFTY) {
 				if (solutionSpace.upper() < 0)
 					return 0;
 				else if (solutionSpace.upper() == 0) {
-					if (solutionSpace.upperBoundType() == BoundType::STRICT)
+					if (solutionSpace.upper_bound_type() == BoundType::STRICT)
 						return 0;
 					else
 						_stricterRelation = Relation::EQ;

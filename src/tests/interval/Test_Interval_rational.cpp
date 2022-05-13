@@ -23,102 +23,102 @@ TYPED_TEST(IntervalRationalTest, Constructor) {
 
 	{ // Interval()
 		Interval i;
-		EXPECT_EQ(BoundType::STRICT, i.lowerBoundType());
-		EXPECT_EQ(BoundType::STRICT, i.upperBoundType());
-		EXPECT_EQ(0, i.rContent().lower());
-		EXPECT_EQ(0, i.rContent().upper());
+		EXPECT_EQ(BoundType::STRICT, i.lower_bound_type());
+		EXPECT_EQ(BoundType::STRICT, i.upper_bound_type());
+		EXPECT_EQ(0, i.content().lower());
+		EXPECT_EQ(0, i.content().upper());
 	}
 	{ // Interval(const Number&)
 		Interval i0(TypeParam(0));
-		EXPECT_EQ(BoundType::WEAK, i0.lowerBoundType());
-		EXPECT_EQ(BoundType::WEAK, i0.upperBoundType());
-		EXPECT_EQ(0, i0.rContent().lower());
-		EXPECT_EQ(0, i0.rContent().upper());
+		EXPECT_EQ(BoundType::WEAK, i0.lower_bound_type());
+		EXPECT_EQ(BoundType::WEAK, i0.upper_bound_type());
+		EXPECT_EQ(0, i0.content().lower());
+		EXPECT_EQ(0, i0.content().upper());
 
 		Interval i1(TypeParam(1));
-		EXPECT_EQ(BoundType::WEAK, i1.lowerBoundType());
-		EXPECT_EQ(BoundType::WEAK, i1.upperBoundType());
-		EXPECT_EQ(1, i1.rContent().lower());
-		EXPECT_EQ(1, i1.rContent().upper());
+		EXPECT_EQ(BoundType::WEAK, i1.lower_bound_type());
+		EXPECT_EQ(BoundType::WEAK, i1.upper_bound_type());
+		EXPECT_EQ(1, i1.content().lower());
+		EXPECT_EQ(1, i1.content().upper());
 	}
 	{ // Interval(const Number&, const Number&)
 		Interval i0(TypeParam(1), TypeParam(1));
-		EXPECT_EQ(BoundType::WEAK, i0.lowerBoundType());
-		EXPECT_EQ(BoundType::WEAK, i0.upperBoundType());
-		EXPECT_EQ(1, i0.rContent().lower());
-		EXPECT_EQ(1, i0.rContent().upper());
+		EXPECT_EQ(BoundType::WEAK, i0.lower_bound_type());
+		EXPECT_EQ(BoundType::WEAK, i0.upper_bound_type());
+		EXPECT_EQ(1, i0.content().lower());
+		EXPECT_EQ(1, i0.content().upper());
 
 		Interval i1(TypeParam(1), TypeParam(2));
-		EXPECT_EQ(BoundType::WEAK, i1.lowerBoundType());
-		EXPECT_EQ(BoundType::WEAK, i1.upperBoundType());
-		EXPECT_EQ(1, i1.rContent().lower());
-		EXPECT_EQ(2, i1.rContent().upper());
+		EXPECT_EQ(BoundType::WEAK, i1.lower_bound_type());
+		EXPECT_EQ(BoundType::WEAK, i1.upper_bound_type());
+		EXPECT_EQ(1, i1.content().lower());
+		EXPECT_EQ(2, i1.content().upper());
 
 		Interval i2(TypeParam(2), TypeParam(1));
-		EXPECT_EQ(BoundType::STRICT, i2.lowerBoundType());
-		EXPECT_EQ(BoundType::STRICT, i2.upperBoundType());
-		EXPECT_EQ(0, i2.rContent().lower());
-		EXPECT_EQ(0, i2.rContent().upper());
-		EXPECT_EQ(Interval::emptyInterval(), i2);
+		EXPECT_EQ(BoundType::STRICT, i2.lower_bound_type());
+		EXPECT_EQ(BoundType::STRICT, i2.upper_bound_type());
+		EXPECT_EQ(0, i2.content().lower());
+		EXPECT_EQ(0, i2.content().upper());
+		EXPECT_EQ(Interval::empty_interval(), i2);
 	}
 }
 
 TYPED_TEST(IntervalRationalTest, StaticConstructor) {
 	using Interval = Interval<TypeParam>;
-	{ // unboundedInterval()
-		Interval i = Interval::unboundedInterval();
-		EXPECT_EQ(BoundType::INFTY, i.lowerBoundType());
-		EXPECT_EQ(BoundType::INFTY, i.upperBoundType());
-		EXPECT_EQ(0, i.rContent().lower());
-		EXPECT_EQ(0, i.rContent().upper());
+	{ // unbounded_interval()
+		Interval i = Interval::unbounded_interval();
+		EXPECT_EQ(BoundType::INFTY, i.lower_bound_type());
+		EXPECT_EQ(BoundType::INFTY, i.upper_bound_type());
+		EXPECT_EQ(0, i.content().lower());
+		EXPECT_EQ(0, i.content().upper());
 	}
-	{ // emptyInterval()
-		Interval i = Interval::emptyInterval();
-		EXPECT_EQ(BoundType::STRICT, i.lowerBoundType());
-		EXPECT_EQ(BoundType::STRICT, i.upperBoundType());
-		EXPECT_EQ(0, i.rContent().lower());
-		EXPECT_EQ(0, i.rContent().upper());
+	{ // empty_interval()
+		Interval i = Interval::empty_interval();
+		EXPECT_EQ(BoundType::STRICT, i.lower_bound_type());
+		EXPECT_EQ(BoundType::STRICT, i.upper_bound_type());
+		EXPECT_EQ(0, i.content().lower());
+		EXPECT_EQ(0, i.content().upper());
 	}
-	{ // zeroInterval()
-		Interval i = Interval::zeroInterval();
-		EXPECT_EQ(BoundType::WEAK, i.lowerBoundType());
-		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
-		EXPECT_EQ(0, i.rContent().lower());
-		EXPECT_EQ(0, i.rContent().upper());
+	{ // zero_interval()
+		Interval i = Interval::zero_interval();
+		EXPECT_EQ(BoundType::WEAK, i.lower_bound_type());
+		EXPECT_EQ(BoundType::WEAK, i.upper_bound_type());
+		EXPECT_EQ(0, i.content().lower());
+		EXPECT_EQ(0, i.content().upper());
 	}
 }
 
 TYPED_TEST(IntervalRationalTest, integralPart) {
 	using Interval = Interval<TypeParam>;
 	{
-		Interval i = Interval::emptyInterval();
-		EXPECT_EQ(i, i.integralPart());
+		Interval i = Interval::empty_interval();
+		EXPECT_EQ(i, i.integral_part());
 	}
 	{
-		Interval i = Interval(-5, BoundType::STRICT, 5, BoundType::STRICT).integralPart();
-		EXPECT_EQ(BoundType::WEAK, i.lowerBoundType());
-		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
+		Interval i = Interval(-5, BoundType::STRICT, 5, BoundType::STRICT).integral_part();
+		EXPECT_EQ(BoundType::WEAK, i.lower_bound_type());
+		EXPECT_EQ(BoundType::WEAK, i.upper_bound_type());
 		EXPECT_EQ(-4, i.lower());
 		EXPECT_EQ(4, i.upper());
 	}
 	{
-		Interval i = Interval(-5, BoundType::STRICT, 5, BoundType::WEAK).integralPart();
-		EXPECT_EQ(BoundType::WEAK, i.lowerBoundType());
-		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
+		Interval i = Interval(-5, BoundType::STRICT, 5, BoundType::WEAK).integral_part();
+		EXPECT_EQ(BoundType::WEAK, i.lower_bound_type());
+		EXPECT_EQ(BoundType::WEAK, i.upper_bound_type());
 		EXPECT_EQ(-4, i.lower());
 		EXPECT_EQ(5, i.upper());
 	}
 	{
-		Interval i = Interval(-5, BoundType::WEAK, 5, BoundType::STRICT).integralPart();
-		EXPECT_EQ(BoundType::WEAK, i.lowerBoundType());
-		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
+		Interval i = Interval(-5, BoundType::WEAK, 5, BoundType::STRICT).integral_part();
+		EXPECT_EQ(BoundType::WEAK, i.lower_bound_type());
+		EXPECT_EQ(BoundType::WEAK, i.upper_bound_type());
 		EXPECT_EQ(-5, i.lower());
 		EXPECT_EQ(4, i.upper());
 	}
 	{
-		Interval i = Interval(-5, BoundType::WEAK, 5, BoundType::WEAK).integralPart();
-		EXPECT_EQ(BoundType::WEAK, i.lowerBoundType());
-		EXPECT_EQ(BoundType::WEAK, i.upperBoundType());
+		Interval i = Interval(-5, BoundType::WEAK, 5, BoundType::WEAK).integral_part();
+		EXPECT_EQ(BoundType::WEAK, i.lower_bound_type());
+		EXPECT_EQ(BoundType::WEAK, i.upper_bound_type());
 		EXPECT_EQ(-5, i.lower());
 		EXPECT_EQ(5, i.upper());
 	}
@@ -136,14 +136,14 @@ TYPED_TEST(IntervalRationalTest, containsInteger) {
 		Interval i6(HALF, BoundType::STRICT, 1, BoundType::STRICT);
 		Interval i7(HALF, BoundType::STRICT, 1 + HALF, BoundType::STRICT);
 		Interval i8(HALF, BoundType::STRICT, HALF, BoundType::STRICT);
-		EXPECT_TRUE(i1.containsInteger());
-		EXPECT_FALSE(i2.containsInteger());
-		EXPECT_TRUE(i3.containsInteger());
-		EXPECT_FALSE(i4.containsInteger());
-		EXPECT_TRUE(i5.containsInteger());
-		EXPECT_FALSE(i6.containsInteger());
-		EXPECT_TRUE(i7.containsInteger());
-		EXPECT_FALSE(i8.containsInteger());
+		EXPECT_TRUE(i1.contains_integer());
+		EXPECT_FALSE(i2.contains_integer());
+		EXPECT_TRUE(i3.contains_integer());
+		EXPECT_FALSE(i4.contains_integer());
+		EXPECT_TRUE(i5.contains_integer());
+		EXPECT_FALSE(i6.contains_integer());
+		EXPECT_TRUE(i7.contains_integer());
+		EXPECT_FALSE(i8.contains_integer());
 	}
 	{ // strict / weak
 		Interval i1(0, BoundType::STRICT, 1, BoundType::WEAK);
@@ -152,18 +152,18 @@ TYPED_TEST(IntervalRationalTest, containsInteger) {
 		Interval i5(HALF, BoundType::STRICT, 1, BoundType::WEAK);
 		Interval i7(HALF, BoundType::STRICT, 1 + HALF, BoundType::WEAK);
 		Interval i8(HALF, BoundType::STRICT, HALF, BoundType::WEAK);
-		EXPECT_TRUE(i1.containsInteger());
-		EXPECT_TRUE(i3.containsInteger());
-		EXPECT_FALSE(i4.containsInteger());
-		EXPECT_TRUE(i5.containsInteger());
-		EXPECT_TRUE(i7.containsInteger());
-		EXPECT_FALSE(i8.containsInteger());
+		EXPECT_TRUE(i1.contains_integer());
+		EXPECT_TRUE(i3.contains_integer());
+		EXPECT_FALSE(i4.contains_integer());
+		EXPECT_TRUE(i5.contains_integer());
+		EXPECT_TRUE(i7.contains_integer());
+		EXPECT_FALSE(i8.contains_integer());
 	}
 	{ // strict / infty
 		Interval i1(0, BoundType::STRICT, 0, BoundType::INFTY);
 		Interval i2(HALF, BoundType::STRICT, 0, BoundType::INFTY);
-		EXPECT_TRUE(i1.containsInteger());
-		EXPECT_TRUE(i2.containsInteger());
+		EXPECT_TRUE(i1.contains_integer());
+		EXPECT_TRUE(i2.contains_integer());
 	}
 	{ // weak / strict
 		Interval i1(0, BoundType::WEAK, 1, BoundType::STRICT);
@@ -172,12 +172,12 @@ TYPED_TEST(IntervalRationalTest, containsInteger) {
 		Interval i6(HALF, BoundType::WEAK, 1, BoundType::STRICT);
 		Interval i7(HALF, BoundType::WEAK, 1 + HALF, BoundType::STRICT);
 		Interval i8(HALF, BoundType::WEAK, HALF, BoundType::STRICT);
-		EXPECT_TRUE(i1.containsInteger());
-		EXPECT_TRUE(i3.containsInteger());
-		EXPECT_TRUE(i5.containsInteger());
-		EXPECT_FALSE(i6.containsInteger());
-		EXPECT_TRUE(i7.containsInteger());
-		EXPECT_FALSE(i8.containsInteger());
+		EXPECT_TRUE(i1.contains_integer());
+		EXPECT_TRUE(i3.contains_integer());
+		EXPECT_TRUE(i5.contains_integer());
+		EXPECT_FALSE(i6.contains_integer());
+		EXPECT_TRUE(i7.contains_integer());
+		EXPECT_FALSE(i8.contains_integer());
 	}
 	{ // weak / weak
 		Interval i1(0, BoundType::WEAK, 1, BoundType::WEAK);
@@ -185,28 +185,28 @@ TYPED_TEST(IntervalRationalTest, containsInteger) {
 		Interval i5(HALF, BoundType::WEAK, 1, BoundType::WEAK);
 		Interval i7(HALF, BoundType::WEAK, 1 + HALF, BoundType::WEAK);
 		Interval i8(HALF, BoundType::WEAK, HALF, BoundType::WEAK);
-		EXPECT_TRUE(i1.containsInteger());
-		EXPECT_TRUE(i3.containsInteger());
-		EXPECT_TRUE(i5.containsInteger());
-		EXPECT_TRUE(i7.containsInteger());
-		EXPECT_FALSE(i8.containsInteger());
+		EXPECT_TRUE(i1.contains_integer());
+		EXPECT_TRUE(i3.contains_integer());
+		EXPECT_TRUE(i5.contains_integer());
+		EXPECT_TRUE(i7.contains_integer());
+		EXPECT_FALSE(i8.contains_integer());
 	}
 	{ // weak / infty
 		Interval i1(0, BoundType::WEAK, 0, BoundType::INFTY);
 		Interval i2(HALF, BoundType::WEAK, 0, BoundType::INFTY);
-		EXPECT_TRUE(i1.containsInteger());
-		EXPECT_TRUE(i2.containsInteger());
+		EXPECT_TRUE(i1.contains_integer());
+		EXPECT_TRUE(i2.contains_integer());
 	}
 	{ // infty / infty
 		Interval i1(0, BoundType::INFTY, 0, BoundType::INFTY);
-		EXPECT_TRUE(i1.containsInteger());
+		EXPECT_TRUE(i1.contains_integer());
 	}
 }
 
 TYPED_TEST(IntervalRationalTest, center) {
 	using Interval = Interval<TypeParam>;
 	{ // unbounded
-		Interval i = Interval::unboundedInterval();
+		Interval i = Interval::unbounded_interval();
 		EXPECT_EQ(0, center(i));
 	}
 	{ // bounded / unbounded
@@ -294,14 +294,14 @@ TYPED_TEST(IntervalRationalTest, abs) {
 	Interval i4(-ONE, BoundType::STRICT, -HALF, BoundType::WEAK);
 	EXPECT_EQ(i4.abs().lower(), HALF);
 	EXPECT_EQ(i4.abs().upper(), ONE);
-	EXPECT_EQ(i4.abs().lowerBoundType(), BoundType::WEAK);
-	EXPECT_EQ(i4.abs().upperBoundType(), BoundType::STRICT);
+	EXPECT_EQ(i4.abs().lower_bound_type(), BoundType::WEAK);
+	EXPECT_EQ(i4.abs().upper_bound_type(), BoundType::STRICT);
 
 	Interval i5(-ONE, BoundType::STRICT, ONE, BoundType::STRICT);
 	EXPECT_EQ(i5.abs().lower(), 0);
 	EXPECT_EQ(i5.abs().upper(), ONE);
-	EXPECT_EQ(i5.abs().lowerBoundType(), BoundType::WEAK);
-	EXPECT_EQ(i5.abs().upperBoundType(), BoundType::STRICT);
+	EXPECT_EQ(i5.abs().lower_bound_type(), BoundType::WEAK);
+	EXPECT_EQ(i5.abs().upper_bound_type(), BoundType::STRICT);
 }
 
 TYPED_TEST(IntervalRationalTest, mul_assign) {
@@ -338,7 +338,7 @@ TYPED_TEST(IntervalRationalTest, mul_assign) {
 
 TYPED_TEST(IntervalRationalTest, set_is_subset) {
 	
-	Interval<TypeParam> e = Interval<TypeParam>::emptyInterval();
+	Interval<TypeParam> e = Interval<TypeParam>::empty_interval();
 	Interval<TypeParam> i1(TypeParam(-1), TypeParam(1));
 	Interval<TypeParam> i2(TypeParam(2), TypeParam(3));
 	EXPECT_FALSE(carl::set_is_subset(i1, e));

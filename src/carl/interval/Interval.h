@@ -86,10 +86,10 @@ namespace carl
         using checkingP = boost::numeric::interval_lib::checking_no_nan<double, boost::numeric::interval_lib::checking_no_nan<double> >;
 		static void sanitize(Interval& n) {
 			if (std::isinf(n.lower())) {
-				n.setLowerBoundType(BoundType::INFTY);
+				n.set_lower_bound_type(BoundType::INFTY);
 			}
 			if (std::isinf(n.upper())) {
-				n.setUpperBoundType(BoundType::INFTY);
+				n.set_upper_bound_type(BoundType::INFTY);
 			}
 			assert(!std::isnan(n.lower()));
 			assert(!std::isnan(n.upper()));
@@ -329,7 +329,7 @@ namespace carl
         template<typename Other, DisableIf<std::is_same<Number, Other >> = dummy >
         explicit Interval(const Interval<Other>& o)
         {
-            *this = Interval<Number>(carl::convert<Other,Number>(o.lower()), o.lowerBoundType(), carl::convert<Other,Number>(o.upper()), o.upperBoundType());
+            *this = Interval<Number>(carl::convert<Other,Number>(o.lower()), o.lower_bound_type(), carl::convert<Other,Number>(o.upper()), o.upper_bound_type());
         }
 
         /**
@@ -792,12 +792,12 @@ namespace carl
 		}
 
 		Interval(const LowerBound<Number>& lb, const LowerBound<Number>& ub):
-			Interval(lb.number, lb.bound_type, ub.number, getOtherBoundType(ub.bound_type))
+			Interval(lb.number, lb.bound_type, ub.number, get_other_bound_type(ub.bound_type))
 		{
 		}
 
 		Interval(const UpperBound<Number>& lb, const UpperBound<Number>& ub):
-			Interval(lb.number, getOtherBoundType(lb.bound_type), ub.number, ub.bound_type)
+			Interval(lb.number, get_other_bound_type(lb.bound_type), ub.number, ub.bound_type)
 		{
 		}
 
@@ -805,7 +805,7 @@ namespace carl
          * Method which returns the unbounded interval rooted at 0.
          * @return Unbounded interval.
          */
-        static Interval<Number> unboundedInterval()
+        static Interval<Number> unbounded_interval()
         {
             return Interval<Number>(carl::constant_zero<Number>().get(), BoundType::INFTY, carl::constant_zero<Number>().get(), BoundType::INFTY);
         }
@@ -814,7 +814,7 @@ namespace carl
          * Method which returns the empty interval rooted at 0.
          * @return Empty interval.
          */
-        static Interval<Number> emptyInterval()
+        static Interval<Number> empty_interval()
         {
             return Interval<Number>(carl::constant_zero<Number>().get(), BoundType::STRICT, carl::constant_zero<Number>().get(), BoundType::STRICT);
         }
@@ -823,7 +823,7 @@ namespace carl
          * Method which returns the pointinterval rooted at 0.
          * @return Pointinterval(0).
          */
-        static Interval<Number> zeroInterval()
+        static Interval<Number> zero_interval()
         {
             return Interval<Number>(carl::constant_zero<Number>().get(), BoundType::WEAK, carl::constant_zero<Number>().get(), BoundType::WEAK);
         }
@@ -855,31 +855,27 @@ namespace carl
             return mContent.upper();
         }
 
-		auto lowerBound() const {
-			return LowerBound<Number>{ lower(), lowerBoundType() };
+		auto lower_bound() const {
+			return LowerBound<Number>{ lower(), lower_bound_type() };
 		}
-		auto upperBound() const {
-			return UpperBound<Number>{ upper(), upperBoundType() };
+		auto upper_bound() const {
+			return UpperBound<Number>{ upper(), upper_bound_type() };
 		}
 
         /**
          * Returns a reference to the included boost interval.
          * @return Boost interval reference.
          */
-        inline BoostInterval& rContent()
-        {
-            return mContent;
-        }
-		const BoostInterval& rContent() const
+        const BoostInterval& content() const
         {
             return mContent;
         }
 
         /**
-         * Returns a copy of the included boost interval.
-         * @return Boost interval.
+         * Returns a reference to the included boost interval.
+         * @return Boost interval reference.
          */
-        inline BoostInterval content() const
+        BoostInterval& content()
         {
             return mContent;
         }
@@ -888,7 +884,7 @@ namespace carl
          * The getter for the lower bound type of the interval.
          * @return Lower bound type.
          */
-        inline BoundType lowerBoundType() const
+        inline BoundType lower_bound_type() const
         {
             return mLowerBoundType;
         }
@@ -897,7 +893,7 @@ namespace carl
          * The getter for the upper bound type of the interval.
          * @return Upper bound type.
          */
-        inline BoundType upperBoundType() const
+        inline BoundType upper_bound_type() const
         {
             return mUpperBoundType;
         }
@@ -906,7 +902,7 @@ namespace carl
          * The setter for the lower boundary of the interval.
          * @param n Lower boundary.
          */
-        inline void setLower(const Number& n)
+        inline void set_lower(const Number& n)
         {
             this->set(n, mContent.upper());
         }
@@ -915,7 +911,7 @@ namespace carl
          * The setter for the upper boundary of the interval.
          * @param n Upper boundary.
          */
-        inline void setUpper(const Number& n)
+        inline void set_upper(const Number& n)
         {
             this->set(mContent.lower(), n);
         }
@@ -924,7 +920,7 @@ namespace carl
          * The setter for the lower boundary of the interval.
          * @param n Lower boundary.
          */
-        inline void setLowerBound(const Number& n, BoundType b)
+        inline void set_lower_bound(const Number& n, BoundType b)
         {
 			/// TODO: Fix this.
         	if(b == BoundType::INFTY) {
@@ -946,7 +942,7 @@ namespace carl
          * The setter for the upper boundary of the interval.
          * @param n Upper boundary.
          */
-        inline void setUpperBound(const Number& n, BoundType b)
+        inline void set_upper_bound(const Number& n, BoundType b)
         {
 			/// TODO: Fix this.
             if(b == BoundType::INFTY) {
@@ -968,12 +964,12 @@ namespace carl
          * The setter for the lower bound type of the interval.
          * @param b Lower bound type.
          */
-        inline void setLowerBoundType(BoundType b)
+        inline void set_lower_bound_type(BoundType b)
         {
 			mLowerBoundType = b;
             if (b == BoundType::INFTY) {
-				//setLower(carl::constant_zero<Number>().get());
-				setLower(upper());
+				//set_lower(carl::constant_zero<Number>().get());
+				set_lower(upper());
             }
         }
 
@@ -981,12 +977,12 @@ namespace carl
          * The setter for the upper bound type of the interval.
          * @param b Upper bound type.
          */
-        inline void setUpperBoundType(BoundType b)
+        inline void set_upper_bound_type(BoundType b)
         {
 			mUpperBoundType = b;
             if (b == BoundType::INFTY) {
-				//setUpper(carl::constant_zero<Number>().get());
-				setUpper(lower());
+				//set_upper(carl::constant_zero<Number>().get());
+				set_upper(lower());
             }
         }
 
@@ -998,8 +994,8 @@ namespace carl
         Interval<Number>& operator =(const Interval<Number>& rhs)
         {
             mContent = rhs.content();
-            mLowerBoundType = rhs.lowerBoundType();
-            mUpperBoundType = rhs.upperBoundType();
+            mLowerBoundType = rhs.lower_bound_type();
+            mUpperBoundType = rhs.upper_bound_type();
             return *this;
         }
 
@@ -1031,7 +1027,7 @@ namespace carl
          * Function which determines, if the interval is (-oo,oo).
          * @return True if both bounds are INFTY.
          */
-        inline bool isInfinite() const
+        inline bool is_infinite() const
         {
             assert(this->isConsistent());
             return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
@@ -1041,7 +1037,7 @@ namespace carl
          * Function which determines, if the interval is unbounded.
          * @return True if at least one bound is INFTY.
          */
-        inline bool isUnbounded() const
+        inline bool is_unbounded() const
         {
             assert(this->isConsistent());
             return mLowerBoundType == BoundType::INFTY || mUpperBoundType == BoundType::INFTY;
@@ -1051,7 +1047,7 @@ namespace carl
          * Function which determines, if the interval is half-bounded.
          * @return True if exactly one bound is INFTY.
          */
-        inline bool isHalfBounded() const
+        inline bool is_half_bounded() const
         {
             assert(this->isConsistent());
             return (mLowerBoundType == BoundType::INFTY) != (mUpperBoundType == BoundType::INFTY);
@@ -1061,7 +1057,7 @@ namespace carl
          * Function which determines, if the interval is empty.
          * @return True if the interval is empty.
          */
-        inline bool isEmpty() const
+        inline bool is_empty() const
         {
             assert(this->isConsistent());
 			if (mContent.lower() == mContent.upper()) {
@@ -1076,17 +1072,17 @@ namespace carl
          * Function which determines, if the interval is a pointinterval.
          * @return True if this is a pointinterval.
          */
-        inline bool isPointInterval() const
+        inline bool is_point_interval() const
         {
             assert(this->isConsistent());
-            return (this->isClosedInterval() && mContent.lower() == mContent.upper());
+            return (this->is_closed_interval() && mContent.lower() == mContent.upper());
         }
 
         /**
          * Function which determines, if the interval is open.
          * @return True if both bounds are STRICT.
          */
-        inline bool isOpenInterval() const
+        inline bool is_open_interval() const
         {
             assert(this->isConsistent());
             return (mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT);
@@ -1096,7 +1092,7 @@ namespace carl
          * Function which determines, if the interval is closed.
          * @return True if both bounds are WEAK.
          */
-        inline bool isClosedInterval() const
+        inline bool is_closed_interval() const
         {
             assert(this->isConsistent());
             return (mLowerBoundType == BoundType::WEAK && mUpperBoundType == BoundType::WEAK);
@@ -1109,7 +1105,7 @@ namespace carl
         inline bool isZero() const
         {
             assert(this->isConsistent());
-            return this->isPointInterval() && (mContent.lower() == carl::constant_zero<Number>().get());
+            return this->is_point_interval() && (mContent.lower() == carl::constant_zero<Number>().get());
         }
 
 		/**
@@ -1119,13 +1115,13 @@ namespace carl
         inline bool isOne() const
         {
             assert(this->isConsistent());
-            return this->isPointInterval() && (mContent.lower() == carl::constant_one<Number>().get());
+            return this->is_point_interval() && (mContent.lower() == carl::constant_one<Number>().get());
         }
 
 		/**
          * @return true, if it this interval contains only positive values.
          */
-        inline bool isPositive() const
+        inline bool is_positive() const
         {
             assert(this->isConsistent());
             if( mLowerBoundType == BoundType::WEAK )
@@ -1138,7 +1134,7 @@ namespace carl
 		/**
          * @return true, if it this interval contains only negative values.
          */
-        inline bool isNegative() const
+        inline bool is_negative() const
         {
             assert(this->isConsistent());
             if( mUpperBoundType == BoundType::WEAK )
@@ -1151,7 +1147,7 @@ namespace carl
 		/**
          * @return true, if it this interval contains only positive values or 0.
          */
-        inline bool isSemiPositive() const
+        inline bool is_semi_positive() const
         {
             assert(this->isConsistent());
             if( mLowerBoundType != BoundType::INFTY )
@@ -1162,7 +1158,7 @@ namespace carl
 		/**
          * @return true, if it this interval contains only negative values or 0.
          */
-        inline bool isSemiNegative() const
+        inline bool is_semi_negative() const
         {
             assert(this->isConsistent());
             if( mUpperBoundType != BoundType::INFTY )
@@ -1180,7 +1176,7 @@ namespace carl
          * Computes the integral part of the given interval.
          * @return Interval.
          */
-        Interval<Number> integralPart() const;
+        Interval<Number> integral_part() const;
 
         /**
          * Computes and assigns the integral part of the given interval.
@@ -1192,7 +1188,7 @@ namespace carl
          * Checks if the interval contains at least one integer value.
          * @return true, if the interval contains an integer.
          */
-        bool containsInteger() const;
+        bool contains_integer() const;
 
         /**
          * Returns the diameter of the interval.
@@ -1210,13 +1206,13 @@ namespace carl
          * @param rhs Other interval.
          * @return Ratio.
          */
-        Number diameterRatio(const Interval<Number>& rhs) const;
+        Number diameter_ratio(const Interval<Number>& rhs) const;
 
         /**
          * Computes and assigns the ratio of the diameters of the given intervals.
          * @param rhs Other interval.
          */
-        void diameterRatio_assign(const Interval<Number>& rhs);
+        void diameter_ratio_assign(const Interval<Number>& rhs);
 
         /**
          * Returns the magnitude of the interval.
@@ -1442,7 +1438,7 @@ namespace carl
     */
     Number distance(const Interval<Number>& intervalA);
 
-    Interval<Number> convexHull(const Interval<Number>& interval) const;
+    Interval<Number> convex_hull(const Interval<Number>& interval) const;
 
     };
 
@@ -1451,7 +1447,7 @@ namespace carl
 
 	template<typename Number>
 	inline bool isInteger(const Interval<Number>& n) {
-		return n.isPointInterval() && carl::isInteger(n.lower());
+		return n.is_point_interval() && carl::isInteger(n.lower());
 	}
 
 /**
@@ -1460,7 +1456,7 @@ namespace carl
 template<typename Number>
 bool isZero(const Interval<Number>& i) {
 	assert(i.isConsistent());
-	return i.isPointInterval() && carl::isZero(i.lower());
+	return i.is_point_interval() && carl::isZero(i.lower());
 }
 
 /**
@@ -1469,7 +1465,7 @@ bool isZero(const Interval<Number>& i) {
 template<typename Number>
 bool isOne(const Interval<Number>& i) {
 	assert(i.isConsistent());
-	return i.isPointInterval() && carl::isOne(i.lower());
+	return i.is_point_interval() && carl::isOne(i.lower());
 }
 
 
@@ -1507,7 +1503,7 @@ bool isOne(const Interval<Number>& i) {
     template<typename Integer, typename Number>
     inline Integer toInt(const Interval<Number>& _floatInterval)
     {
-        return Interval<Integer>(_floatInterval.lower(), _floatInterval.lowerBoundType(), _floatInterval.upper(), _floatInterval.upperBoundType());
+        return Interval<Integer>(_floatInterval.lower(), _floatInterval.lower_bound_type(), _floatInterval.upper(), _floatInterval.upper_bound_type());
     }
 
     /**
@@ -1530,7 +1526,7 @@ bool isOne(const Interval<Number>& i) {
     template<typename Number>
     inline Interval<Number> floor(const Interval<Number>& _in)
     {
-        return Interval<Number>(floor(_in.lower()), _in.lowerBoundType(), floor(_in.upper()), _in.upperBoundType());
+        return Interval<Number>(floor(_in.lower()), _in.lower_bound_type(), floor(_in.upper()), _in.upper_bound_type());
     }
 
     /**
@@ -1542,7 +1538,7 @@ bool isOne(const Interval<Number>& i) {
     template<typename Number>
     inline Interval<Number> ceil(const Interval<Number>& _in)
     {
-        return Interval<Number>(ceil(_in.lower()), _in.lowerBoundType(), ceil(_in.upper()), _in.upperBoundType());
+        return Interval<Number>(ceil(_in.lower()), _in.lower_bound_type(), ceil(_in.upper()), _in.upper_bound_type());
     }
 
 }
@@ -1560,7 +1556,7 @@ namespace std {
 		 */
 		std::size_t operator()(const carl::Interval<Number>& interval) const {
 			return carl::hash_all(
-				interval.lowerBoundType(), interval.upperBoundType(),
+				interval.lower_bound_type(), interval.upper_bound_type(),
 				interval.lower(), interval.upper()
 			);
 		}

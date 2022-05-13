@@ -70,8 +70,8 @@ UnivariatePolynomial<Coefficient> shift(const UnivariatePolynomial<Coefficient>&
  */
 template<typename Coefficient>
 uint sign_variations(const UnivariatePolynomial<Coefficient>& polynomial, const Interval<Coefficient>& interval) {
-	if (interval.isEmpty()) return 0;
-	if (interval.isPointInterval()) {
+	if (interval.is_empty()) return 0;
+	if (interval.is_point_interval()) {
 		std::vector<Coefficient> vals;
 		Coefficient factor = carl::constant_one<Coefficient>::get();
 		for (const auto& c: polynomial.coefficients()) {

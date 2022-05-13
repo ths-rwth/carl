@@ -11,8 +11,8 @@ using namespace carl;
 
 TEST(RealAlgebraicNumber, Evaluation)
 {
-    Variable y = freshRealVariable("skoY");
-    Variable x = freshRealVariable("skoX");
+    Variable y = fresh_real_variable("skoY");
+    Variable x = fresh_real_variable("skoX");
 
 	MultivariatePolynomial<Rational> mpx(x);
 	MultivariatePolynomial<Rational> mpy(y);
@@ -50,14 +50,14 @@ TEST(RealAlgebraicNumber, EvalBug)
 {
 	// Evaluating skoY^2 + skoX^2 <= 0 on {skoY : (IR ]-212079/131072, -1696631/1048576[, __r^2 + __r^1 + -1), skoD : (NR 1), skoX : (NR 0)} -> 1
 
-    Variable y = freshRealVariable("skoY");
-    Variable x = freshRealVariable("skoX");
+    Variable y = fresh_real_variable("skoY");
+    Variable x = fresh_real_variable("skoX");
 	MultivariatePolynomial<Rational> mpx(x);
 	MultivariatePolynomial<Rational> mpy(y);
 	MultivariatePolynomial<Rational> poly(carl::pow(mpx, 2) + carl::pow(mpy, 2));
 	BasicConstraint<MultivariatePolynomial<Rational>> constr(poly,carl::Relation::LEQ);
 
-	Variable h = freshRealVariable("h"); 
+	Variable h = fresh_real_variable("h"); 
 	UnivariatePolynomial<Rational> py(h, std::initializer_list<Rational>{-1, 1, 1});
 	Interval<Rational> iy(Rational("-212079")/Rational("131072"), BoundType::STRICT, -Rational("1696631")/Rational("1048576"), BoundType::STRICT);
 	RealAlgebraicNumber<Rational> ry = RealAlgebraicNumber<Rational>::create_safe(py, iy);
@@ -74,9 +74,9 @@ TEST(RealAlgebraicNumber, EvalBug2)
 {
 	// Poly : 2*x1 + 3*x2  
 	// Assignment : {x1 : (NR -4), x2 : (IR ]-3, -2[, (2)*__r^3 + (6)*__r^2 + (4)*__r^1 + 11), x0 : (NR -8)} 
-	Variable x0 = freshRealVariable("x0");
-	Variable x1 = freshRealVariable("x1");
-	Variable x2 = freshRealVariable("x2");
+	Variable x0 = fresh_real_variable("x0");
+	Variable x1 = fresh_real_variable("x1");
+	Variable x2 = fresh_real_variable("x2");
 	MultivariatePolynomial<Rational> mpx1(x1) ;
 	MultivariatePolynomial<Rational> mpx2(x2) ;
 
@@ -84,7 +84,7 @@ TEST(RealAlgebraicNumber, EvalBug2)
 	MultivariatePolynomial<Rational> poly(Rational("2")*mpx1 + Rational("3")*mpx2) ;
 
 	//build ran
-	Variable h = freshRealVariable("h"); 
+	Variable h = fresh_real_variable("h"); 
 	UnivariatePolynomial<Rational> py(h, std::initializer_list<Rational>{11, 4, 6, 2});
 	Interval<Rational> iy(Rational("-3"), BoundType::STRICT, Rational("-2"), BoundType::STRICT);
 	RealAlgebraicNumber<Rational> ry = RealAlgebraicNumber<Rational>::create_safe(py, iy);

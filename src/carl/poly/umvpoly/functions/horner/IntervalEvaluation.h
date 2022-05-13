@@ -19,7 +19,7 @@ inline Interval<Number> evaluate(const MultivariateHorner<PolynomialType, strate
 
 	if (mvH.getVariable() != Variable::NO_VARIABLE){
 		assert(map.count(mvH.getVariable()) > 0);
-		Interval<Number> res = Interval<Number>::emptyInterval();
+		Interval<Number> res = Interval<Number>::empty_interval();
 		const Interval<Number> varValue = map.find(mvH.getVariable())->second;
 
 		//Case 1: no further Horner schemes in mvH

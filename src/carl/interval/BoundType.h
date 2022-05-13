@@ -28,18 +28,18 @@ inline std::ostream& operator<<(std::ostream& os, BoundType b) {
 	}
 }
 
-inline static BoundType getWeakestBoundType(BoundType type1, BoundType type2) {
+inline static BoundType get_weakest_bound_type(BoundType type1, BoundType type2) {
 	if (type1 == BoundType::INFTY || type2 == BoundType::INFTY) return BoundType::INFTY;
 	if (type1 == BoundType::WEAK || type2 == BoundType::WEAK) return BoundType::WEAK;
 	return BoundType::STRICT;
 }
-inline static BoundType getStrictestBoundType(BoundType type1, BoundType type2) {
+inline static BoundType get_strictest_bound_type(BoundType type1, BoundType type2) {
 	if (type1 == BoundType::INFTY || type2 == BoundType::INFTY) return BoundType::INFTY;
 	if (type1 == BoundType::STRICT || type2 == BoundType::STRICT) return BoundType::STRICT;
 	return BoundType::WEAK;
 }
 
-inline static BoundType getOtherBoundType(BoundType type) {
+inline static BoundType get_other_bound_type(BoundType type) {
 	if (type == BoundType::INFTY) return BoundType::INFTY;
 	if (type == BoundType::WEAK) return BoundType::STRICT;
 	return BoundType::WEAK;

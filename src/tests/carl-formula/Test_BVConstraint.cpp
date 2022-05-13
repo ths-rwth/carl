@@ -16,8 +16,8 @@ using namespace carl;
 
 TEST(BVConstraint, Construction)
 {
-    Variable a = freshBitvectorVariable("a");
-    Variable b = freshBitvectorVariable("b");
+    Variable a = fresh_bitvector_variable("a");
+    Variable b = fresh_bitvector_variable("b");
 
 	carl::SortManager::getInstance().clear();
     Sort bvSort = SortManager::getInstance().addSort("BitVec");

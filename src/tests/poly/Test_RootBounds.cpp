@@ -16,28 +16,28 @@ class RootBoundTest: public testing::Test {};
 TYPED_TEST_CASE(RootBoundTest, RationalTypes); // TODO should use NumberTypes
 
 TYPED_TEST(RootBoundTest, CauchyBound) {
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	carl::UnivariatePolynomial<TypeParam> p(x, {12, 4, 9, 5, 0, 3});
 	TypeParam bound = carl::cauchyBound(p);
 	EXPECT_EQ(bound, TypeParam(5));
 }
 
 TYPED_TEST(RootBoundTest, HirstMacey) {
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	carl::UnivariatePolynomial<TypeParam> p(x, {12, 4, 9, 5, 0, 3});
 	TypeParam bound = carl::hirstMaceyBound(p);
 	EXPECT_EQ(bound, TypeParam(10));
 }
 
 TYPED_TEST(RootBoundTest, Lagrange) {
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	carl::UnivariatePolynomial<TypeParam> p(x, {12, 4, 9, 5, 0, 3});
 	TypeParam bound = carl::lagrangeBound(p);
 	EXPECT_TRUE(bound <= TypeParam(6));
 }
 
 TYPED_TEST(RootBoundTest, Chebyshev) {
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	carl::Chebyshev<TypeParam> chebyshev(x);
 	auto p = chebyshev(50);
 	

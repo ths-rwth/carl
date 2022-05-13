@@ -16,8 +16,8 @@ int main() {
 	 * - the id, a unique identifier managed by the carl::MonomialPool and
 	 * - the hash of the monomial.
 	 */
-	carl::Variable x = carl::freshRealVariable("x");
-	carl::Variable y = carl::freshRealVariable("y");
+	carl::Variable x = carl::fresh_real_variable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
 
 	/*
 	 * However, carl::Monomial objects are managed by a carl::MonomialPool,

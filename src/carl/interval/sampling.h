@@ -10,15 +10,15 @@ namespace carl {
  */
 template<typename Number>
 Number center(const Interval<Number>& i) {
-	assert(i.isConsistent() && !i.isEmpty());
-	if (i.isInfinite()) return carl::constant_zero<Number>().get();
-	if (i.lowerBoundType() == BoundType::INFTY) {
+	assert(i.isConsistent() && !i.is_empty());
+	if (i.is_infinite()) return carl::constant_zero<Number>().get();
+	if (i.lower_bound_type() == BoundType::INFTY) {
 		return carl::floor(i.upper()) - carl::constant_one<Number>().get();
 	}
-	if (i.upperBoundType() == BoundType::INFTY) {
+	if (i.upper_bound_type() == BoundType::INFTY) {
 		return carl::ceil(i.lower()) + carl::constant_one<Number>().get();
 	}
-	return boost::numeric::median(i.rContent());
+	return boost::numeric::median(i.content());
 }
 
 /**
@@ -28,13 +28,13 @@ Number center(const Interval<Number>& i) {
  */
 template<typename Number>
 Number sample(const Interval<Number>& i, bool includingBounds = true) {
-	assert(i.isConsistent() && !i.isEmpty());
-	assert(includingBounds || !i.isPointInterval());
+	assert(i.isConsistent() && !i.is_empty());
+	assert(includingBounds || !i.is_point_interval());
 	Number mid = center(i);
-	if (Number midf = carl::floor(mid); i.contains(midf) && (includingBounds || i.lowerBoundType() == BoundType::INFTY || i.lower() < midf)) {
+	if (Number midf = carl::floor(mid); i.contains(midf) && (includingBounds || i.lower_bound_type() == BoundType::INFTY || i.lower() < midf)) {
 		return midf;
 	}
-	if (Number midc = carl::ceil(mid); i.contains(midc) && (includingBounds || i.upperBoundType() == BoundType::INFTY || i.upper() > midc)) {
+	if (Number midc = carl::ceil(mid); i.contains(midc) && (includingBounds || i.upper_bound_type() == BoundType::INFTY || i.upper() > midc)) {
 		return midc;
 	}
 	return mid;
@@ -47,7 +47,7 @@ Number sample(const Interval<Number>& i, bool includingBounds = true) {
  */
 template<typename Number>
 Number sample_stern_brocot(const Interval<Number>& i, bool includingBounds = true) {
-	assert(i.isConsistent() && !i.isEmpty());
+	assert(i.isConsistent() && !i.is_empty());
 
 	using Int = typename carl::IntegralType<Number>::type;
 	Int leftnum = Int(carl::floor(center(i)));
@@ -81,8 +81,8 @@ Number sample_stern_brocot(const Interval<Number>& i, bool includingBounds = tru
  */
 template<typename Number>
 Number sample_left(const Interval<Number>& i) {
-	assert(i.isConsistent() && !i.isEmpty());
-	if (i.lowerBoundType() == BoundType::INFTY) {
+	assert(i.isConsistent() && !i.is_empty());
+	if (i.lower_bound_type() == BoundType::INFTY) {
 		return carl::floor(i.upper()) - carl::constant_one<Number>().get();
 	}
 	Number res = carl::floor(i.lower()) + carl::constant_one<Number>().get();
@@ -96,8 +96,8 @@ Number sample_left(const Interval<Number>& i) {
  */
 template<typename Number>
 Number sample_right(const Interval<Number>& i) {
-	assert(i.isConsistent() && !i.isEmpty());
-	if (i.upperBoundType() == BoundType::INFTY) {
+	assert(i.isConsistent() && !i.is_empty());
+	if (i.upper_bound_type() == BoundType::INFTY) {
 		return carl::ceil(i.lower()) + carl::constant_one<Number>().get();
 	}
 	Number res = carl::ceil(i.upper()) - carl::constant_one<Number>().get();
@@ -113,9 +113,9 @@ Number sample_right(const Interval<Number>& i) {
 */
 template<typename Number>
 Number sample_zero(const Interval<Number>& i) {
-	assert(i.isConsistent() && !i.isEmpty());
-	if (i.isSemiPositive()) return sample_left(i);
-	if (i.isSemiNegative()) return sample_right(i);
+	assert(i.isConsistent() && !i.is_empty());
+	if (i.is_semi_positive()) return sample_left(i);
+	if (i.is_semi_negative()) return sample_right(i);
 	return carl::constant_zero<Number>::get();
 }
 /**
@@ -127,9 +127,9 @@ Number sample_zero(const Interval<Number>& i) {
 */
 template<typename Number>
 Number sample_infty(const Interval<Number>& i) {
-	assert(i.isConsistent() && !i.isEmpty());
-	if (i.isSemiPositive()) return sample_right(i);
-	if (i.isSemiNegative()) return sample_left(i);
+	assert(i.isConsistent() && !i.is_empty());
+	if (i.is_semi_positive()) return sample_right(i);
+	if (i.is_semi_negative()) return sample_left(i);
 	return carl::constant_zero<Number>::get();
 }
 

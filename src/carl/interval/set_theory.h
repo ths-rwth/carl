@@ -16,24 +16,24 @@ template<typename Number>
 bool set_complement(const Interval<Number>& interval, Interval<Number>& resA, Interval<Number>& resB) {
 	assert(interval.isConsistent());
 
-	if (interval.lowerBoundType() == BoundType::INFTY) {
-		if (interval.upperBoundType() == BoundType::INFTY) {
-			resA = Interval<Number>::emptyInterval();
-			resB = Interval<Number>::emptyInterval();
+	if (interval.lower_bound_type() == BoundType::INFTY) {
+		if (interval.upper_bound_type() == BoundType::INFTY) {
+			resA = Interval<Number>::empty_interval();
+			resB = Interval<Number>::empty_interval();
 			return false;
 		} else {
-			resA = Interval<Number>(interval.upper(), getOtherBoundType(interval.upperBoundType()), 0, BoundType::INFTY);
-			resB = Interval<Number>::emptyInterval();
+			resA = Interval<Number>(interval.upper(), get_other_bound_type(interval.upper_bound_type()), 0, BoundType::INFTY);
+			resB = Interval<Number>::empty_interval();
 			return false;
 		}
 	} else {
-		if (interval.upperBoundType() == BoundType::INFTY) {
-			resA = Interval<Number>(0, BoundType::INFTY, interval.lower(), getOtherBoundType(interval.lowerBoundType()));
-			resB = Interval<Number>::emptyInterval();
+		if (interval.upper_bound_type() == BoundType::INFTY) {
+			resA = Interval<Number>(0, BoundType::INFTY, interval.lower(), get_other_bound_type(interval.lower_bound_type()));
+			resB = Interval<Number>::empty_interval();
 			return false;
 		} else {
-			resA = Interval<Number>(0, BoundType::INFTY, interval.lower(), getOtherBoundType(interval.lowerBoundType()));
-			resB = Interval<Number>(interval.upper(), getOtherBoundType(interval.upperBoundType()), 0, BoundType::INFTY);
+			resA = Interval<Number>(0, BoundType::INFTY, interval.lower(), get_other_bound_type(interval.lower_bound_type()));
+			resB = Interval<Number>(interval.upper(), get_other_bound_type(interval.upper_bound_type()), 0, BoundType::INFTY);
 			return true;
 		}
 	}
@@ -52,38 +52,38 @@ template<typename Number>
 bool set_difference(const Interval<Number>& lhs, const Interval<Number>& rhs, Interval<Number>& resA, Interval<Number>& resB) {
 	assert(lhs.isConsistent() && rhs.isConsistent());
 
-	if (rhs.isEmpty()) {
+	if (rhs.is_empty()) {
 		resA = lhs;
-		resB = Interval<Number>::emptyInterval();
+		resB = Interval<Number>::empty_interval();
 		return false;
 	}
-	if (lhs.upperBound() < rhs.lowerBound()) {
+	if (lhs.upper_bound() < rhs.lower_bound()) {
 		resA = lhs;
-		resB = Interval<Number>::emptyInterval();
+		resB = Interval<Number>::empty_interval();
 		return false;
 	}
-	if (rhs.upperBound() < lhs.lowerBound()) {
+	if (rhs.upper_bound() < lhs.lower_bound()) {
 		resA = lhs;
-		resB = Interval<Number>::emptyInterval();
+		resB = Interval<Number>::empty_interval();
 		return false;
 	}
-	if (lhs.lowerBound() < rhs.lowerBound()) {
-		if (lhs.upperBound() < rhs.upperBound()) {
-			resA = Interval<Number>(lhs.lowerBound(), rhs.lowerBound());
+	if (lhs.lower_bound() < rhs.lower_bound()) {
+		if (lhs.upper_bound() < rhs.upper_bound()) {
+			resA = Interval<Number>(lhs.lower_bound(), rhs.lower_bound());
 			return false;
 		} else {
-			resA = Interval<Number>(lhs.lowerBound(), rhs.lowerBound());
-			resB = Interval<Number>(rhs.upperBound(), lhs.upperBound());
-			return !resB.isEmpty();
+			resA = Interval<Number>(lhs.lower_bound(), rhs.lower_bound());
+			resB = Interval<Number>(rhs.upper_bound(), lhs.upper_bound());
+			return !resB.is_empty();
 		}
 	} else {
-		if (lhs.upperBound() < rhs.upperBound()) {
-			resA = Interval<Number>::emptyInterval();
-			resB = Interval<Number>::emptyInterval();
+		if (lhs.upper_bound() < rhs.upper_bound()) {
+			resA = Interval<Number>::empty_interval();
+			resB = Interval<Number>::empty_interval();
 			return false;
 		} else {
-			resA = Interval<Number>(rhs.upperBound(), lhs.upperBound());
-			resB = Interval<Number>::emptyInterval();
+			resA = Interval<Number>(rhs.upper_bound(), lhs.upper_bound());
+			resB = Interval<Number>::empty_interval();
 			return false;
 		}
 	}
@@ -99,25 +99,25 @@ template<typename Number>
 Interval<Number> set_intersection(const Interval<Number>& lhs, const Interval<Number>& rhs) {
 	assert(lhs.isConsistent() && rhs.isConsistent());
 
-	if (lhs.lowerBound() < rhs.lowerBound()) {
-		if (lhs.upperBound() < rhs.upperBound()) {
-			return Interval<Number>(rhs.lowerBound(), lhs.upperBound());
+	if (lhs.lower_bound() < rhs.lower_bound()) {
+		if (lhs.upper_bound() < rhs.upper_bound()) {
+			return Interval<Number>(rhs.lower_bound(), lhs.upper_bound());
 		} else {
 			return rhs;
 		}
 	} else {
-		if (lhs.upperBound() < rhs.upperBound()) {
+		if (lhs.upper_bound() < rhs.upper_bound()) {
 			return lhs;
 		} else {
-			return Interval<Number>(lhs.lowerBound(), rhs.upperBound());
+			return Interval<Number>(lhs.lower_bound(), rhs.upper_bound());
 		}
 	}
 }
 
 template<typename Number>
 bool set_have_intersection(const Interval<Number>& lhs, const Interval<Number>& rhs) {
-	if (lhs.lowerBound() <= rhs.lowerBound() && rhs.lowerBound() <= lhs.upperBound()) return true;
-	if (rhs.lowerBound() <= lhs.lowerBound() && lhs.lowerBound() <= rhs.upperBound()) return true;
+	if (lhs.lower_bound() <= rhs.lower_bound() && rhs.lower_bound() <= lhs.upper_bound()) return true;
+	if (rhs.lower_bound() <= lhs.lower_bound() && lhs.lower_bound() <= rhs.upper_bound()) return true;
 	return false;
 }
 
@@ -128,11 +128,11 @@ template<typename Number>
 bool set_is_proper_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
 	assert(lhs.isConsistent() && rhs.isConsistent());
 
-	if (lhs.isEmpty()) return !rhs.isEmpty();
-	if (lhs.lowerBound() < rhs.lowerBound()) return false;
-	if (rhs.upperBound() < lhs.upperBound()) return false;
-	if (rhs.lowerBound() < lhs.lowerBound()) return true;
-	if (lhs.upperBound() < rhs.upperBound()) return true;
+	if (lhs.is_empty()) return !rhs.is_empty();
+	if (lhs.lower_bound() < rhs.lower_bound()) return false;
+	if (rhs.upper_bound() < lhs.upper_bound()) return false;
+	if (rhs.lower_bound() < lhs.lower_bound()) return true;
+	if (lhs.upper_bound() < rhs.upper_bound()) return true;
 	return false;
 }
 
@@ -143,9 +143,9 @@ template<typename Number>
 bool set_is_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
 	assert(lhs.isConsistent() && rhs.isConsistent());
 
-	if (lhs.isEmpty()) return true;
-	if (lhs.lowerBound() < rhs.lowerBound()) return false;
-	if (rhs.upperBound() < lhs.upperBound()) return false;
+	if (lhs.is_empty()) return true;
+	if (lhs.lower_bound() < rhs.lower_bound()) return false;
+	if (rhs.upper_bound() < lhs.upper_bound()) return false;
 	return true;
 }
 
@@ -163,7 +163,7 @@ bool set_symmetric_difference(const Interval<Number>& lhs, const Interval<Number
 	assert(lhs.isConsistent() && rhs.isConsistent());
 
 	auto intersection = set_intersection(lhs, rhs);
-	if (intersection.isEmpty()) {
+	if (intersection.is_empty()) {
 		resA = lhs;
 		resB = rhs;
 		return true;
@@ -187,40 +187,40 @@ template<typename Number>
 bool set_union(const Interval<Number>& lhs, const Interval<Number>& rhs, Interval<Number>& resA, Interval<Number>& resB) {
 	assert(lhs.isConsistent() && rhs.isConsistent());
 
-	if (carl::bounds_connect(lhs.upperBound(), rhs.lowerBound())) {
-		resA = Interval<Number>(lhs.lowerBound(), rhs.upperBound());
-		resB = Interval<Number>::emptyInterval();
+	if (carl::bounds_connect(lhs.upper_bound(), rhs.lower_bound())) {
+		resA = Interval<Number>(lhs.lower_bound(), rhs.upper_bound());
+		resB = Interval<Number>::empty_interval();
 		return false;
 	}
-	if (carl::bounds_connect(rhs.upperBound(), lhs.lowerBound())) {
-		resA = Interval<Number>(rhs.lowerBound(), lhs.upperBound());
-		resB = Interval<Number>::emptyInterval();
+	if (carl::bounds_connect(rhs.upper_bound(), lhs.lower_bound())) {
+		resA = Interval<Number>(rhs.lower_bound(), lhs.upper_bound());
+		resB = Interval<Number>::empty_interval();
 		return false;
 	}
-	if (lhs.upperBound() < rhs.lowerBound()) {
+	if (lhs.upper_bound() < rhs.lower_bound()) {
 		resA = lhs;
 		resB = rhs;
 		return true;
 	}
-	if (rhs.upperBound() < lhs.lowerBound()) {
+	if (rhs.upper_bound() < lhs.lower_bound()) {
 		resA = rhs;
 		resB = lhs;
 		return true;
 	}
-	if (lhs.lowerBound() < rhs.lowerBound()) {
-		if (lhs.upperBound() < rhs.upperBound()) {
-			resA = Interval<Number>(lhs.lowerBound(), rhs.upperBound());
+	if (lhs.lower_bound() < rhs.lower_bound()) {
+		if (lhs.upper_bound() < rhs.upper_bound()) {
+			resA = Interval<Number>(lhs.lower_bound(), rhs.upper_bound());
 		} else {
 			resA = lhs;
 		}
 	} else {
-		if (lhs.upperBound() < rhs.upperBound()) {
+		if (lhs.upper_bound() < rhs.upper_bound()) {
 			resA = rhs;
 		} else {
-			resA = Interval<Number>(rhs.lowerBound(), lhs.upperBound());
+			resA = Interval<Number>(rhs.lower_bound(), lhs.upper_bound());
 		}
 	}
-	resB = Interval<Number>::emptyInterval();
+	resB = Interval<Number>::empty_interval();
 	return false;
 }
 

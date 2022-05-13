@@ -14,21 +14,21 @@ using RAN = RealAlgebraicNumber<Rational>;
 using ConstraintT = BasicConstraint<MultivariatePolynomial<Rational>>;
 
 TEST(IsolationAndEvaluation, Comparison) {
-	Variable a = freshRealVariable("a");
-	Variable b = freshRealVariable("b");
-	Variable c = freshRealVariable("c");
-	Variable d = freshRealVariable("d");
+	Variable a = fresh_real_variable("a");
+	Variable b = fresh_real_variable("b");
+	Variable c = fresh_real_variable("c");
+	Variable d = fresh_real_variable("d");
 
 	MultivariatePolynomial<Rational> poly(Rational(-11) + Rational(49) * b + Rational(10) * d * a + carl::pow(c, 2) + Rational(-49) * c * b);
 
 	Rational d_value = Rational(0);
 
 	Interval<Rational> i1(Rational("-4") / Rational("1"), BoundType::STRICT, -Rational("-2") / Rational("1"), BoundType::STRICT);
-	UnivariatePolynomial<Rational> p1(freshRealVariable("__r1"), std::initializer_list<Rational>{-11, 1, 1});
+	UnivariatePolynomial<Rational> p1(fresh_real_variable("__r1"), std::initializer_list<Rational>{-11, 1, 1});
 	RealAlgebraicNumber<Rational> c_value = RealAlgebraicNumber<Rational>::create_safe(p1, i1);
 
 	Interval<Rational> i2(Rational("-1245") / Rational("76832"), BoundType::STRICT, -Rational("-22409") / Rational("1382976"), BoundType::STRICT);
-	UnivariatePolynomial<Rational> p2(freshRealVariable("__r2"), std::initializer_list<Rational>{-11, -1029, -21609});
+	UnivariatePolynomial<Rational> p2(fresh_real_variable("__r2"), std::initializer_list<Rational>{-11, -1029, -21609});
 	RealAlgebraicNumber<Rational> b_value = RealAlgebraicNumber<Rational>::create_safe(p2, i2);
 
 	Rational a_value = Rational(-1);

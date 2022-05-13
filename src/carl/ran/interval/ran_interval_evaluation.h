@@ -75,13 +75,13 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 	CARL_LOG_TRACE("carl.ran.evaluation", "Interval evaluation");
 	Interval<Number> interval = carl::evaluate(p, var_to_interval);
 
-	if (interval.isPointInterval()) {
+	if (interval.is_point_interval()) {
 		CARL_LOG_DEBUG("carl.ran.evaluation", "Interval is point interval " << interval);
 		return real_algebraic_number_interval<Number>(interval.lower());
 	}
 
 	CARL_LOG_TRACE("carl.ran.evaluation", "Compute result polynomial");
-	Variable v = freshRealVariable();
+	Variable v = fresh_real_variable();
 	std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
 	for (const auto& [var, ran] : m) {
 		if (var_to_interval.find(var) == var_to_interval.end()) continue;
@@ -110,7 +110,7 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 	CARL_LOG_TRACE("carl.ran.evaluation", "Refine intervals");
 	assert(!carl::isZero(*res));
 	assert(carl::is_root_of(*res, interval.lower()) || carl::is_root_of(*res, interval.upper()) || count_real_roots(sturm_seq, interval) >= 1);
-	while (!interval.isPointInterval() && (carl::is_root_of(*res, interval.lower()) || carl::is_root_of(*res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
+	while (!interval.is_point_interval() && (carl::is_root_of(*res, interval.lower()) || carl::is_root_of(*res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
 		CARL_LOG_TRACE("carl.ran.evaluation", "Refinement step");
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (const auto& [var, ran] : m) {
@@ -129,7 +129,7 @@ std::optional<real_algebraic_number_interval<Number>> evaluate(MultivariatePolyn
 		interval = carl::evaluate(p, var_to_interval);
 	}
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Result is " << *res << " " << interval);
-	if (interval.isPointInterval()) {
+	if (interval.is_point_interval()) {
 		return real_algebraic_number_interval<Number>(interval.lower());
 	} else {
 		return real_algebraic_number_interval<Number>(*res, interval);
@@ -209,7 +209,7 @@ boost::tribool evaluate(const BasicConstraint<Poly>& c, const Assignment<real_al
 		}
 
 		// compute the result polynomial	
-		Variable v = freshRealVariable();
+		Variable v = fresh_real_variable();
 		std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
 		for (const auto& [var, ran] : m) {
 			if (var_to_interval.find(var) == var_to_interval.end()) continue;

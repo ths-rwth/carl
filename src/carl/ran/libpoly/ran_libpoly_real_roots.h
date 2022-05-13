@@ -19,7 +19,7 @@ namespace carl::ran::libpoly {
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, EnableIf<std::is_same<Coeff, Number>> = dummy>
 real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 	const UnivariatePolynomial<Coeff>& polynomial,
-	const Interval<Number>& interval = Interval<Number>::unboundedInterval()) {
+	const Interval<Number>& interval = Interval<Number>::unbounded_interval()) {
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << polynomial << " within " << interval);
 
@@ -65,7 +65,7 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, DisableIf<std::is_same<Coeff, Number>> = dummy>
 real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 	const UnivariatePolynomial<Coeff>& polynomial,
-	const Interval<Number>& interval = Interval<Number>::unboundedInterval()) {
+	const Interval<Number>& interval = Interval<Number>::unbounded_interval()) {
 	assert(polynomial.isUnivariate());
 	return real_roots(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c) { return c.constantPart(); })), interval);
 }
@@ -76,7 +76,7 @@ template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>:
 real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 	const UnivariatePolynomial<Coeff>& p,
 	const std::map<Variable, real_algebraic_number_libpoly<Number>>& m,
-	const Interval<Number>& interval = Interval<Number>::unboundedInterval()) {
+	const Interval<Number>& interval = Interval<Number>::unbounded_interval()) {
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << p << " within " << interval << " with assignment: " << m);
 

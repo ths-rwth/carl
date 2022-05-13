@@ -146,13 +146,13 @@ class RealRootIsolation {
 	/// Check whether the interval bounds are roots.
 	bool check_interval_bounds() {
 		bool found_root = false;
-		if (mInterval.lowerBoundType() == BoundType::WEAK) {
+		if (mInterval.lower_bound_type() == BoundType::WEAK) {
 			if (carl::is_root_of(mPolynomial, mInterval.lower())) {
 				add_root(mInterval.lower());
 				found_root = true;
 			}
 		}
-		if (mInterval.upperBoundType() == BoundType::WEAK) {
+		if (mInterval.upper_bound_type() == BoundType::WEAK) {
 			if (carl::is_root_of(mPolynomial, mInterval.upper())) {
 				add_root(mInterval.upper());
 				found_root = true;

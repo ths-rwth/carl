@@ -33,7 +33,7 @@ public:
 	Variable operator()(carl::Variable::Arg v) {
 		auto it = GiNaCConversion::vars.find(v);
 		if (it == GiNaCConversion::vars.end()) {
-			it = GiNaCConversion::vars.insert(std::make_pair(v, GiNaC::symbol(carl::VariablePool::getInstance().getName(v)))).first;
+			it = GiNaCConversion::vars.insert(std::make_pair(v, GiNaC::symbol(carl::VariablePool::getInstance().get_name(v)))).first;
 		}
 		return it->second;
 	}

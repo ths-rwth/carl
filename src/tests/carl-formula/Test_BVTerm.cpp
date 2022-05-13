@@ -27,7 +27,7 @@ TEST(BVTerm, Variable)
 	carl::Sort bvSort = sm.addSort("BitVec", carl::VariableType::VT_UNINTERPRETED);
 	sm.makeSortIndexable(bvSort, 1, carl::VariableType::VT_BITVECTOR);
 	bvSort = carl::getSort("BitVec", std::vector<std::size_t>({8}));
-	carl::Variable var = carl::freshBitvectorVariable("a");
+	carl::Variable var = carl::fresh_bitvector_variable("a");
 	carl::BVVariable bvv(var, bvSort);
 	carl::BVTerm bvt(carl::BVTermType::VARIABLE, bvv);
 	EXPECT_EQ(8, bvt.width());

@@ -7,7 +7,7 @@ using Poly = carl::UnivariatePolynomial<mpq_class>;
 
 class RAN_Fixture: public benchmark::Fixture {
 public:
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	Poly p = Poly(x, {-2, 0, 1}); // * Poly(x, {-2, 0, 0, 1});
 };
 

@@ -21,8 +21,8 @@ TEST(TaylorExpansion, ideal_adic_coefficient) {
     GFNumber<cln::cl_I> a4(4, gf5);
 
 
-    Variable x_1 = carl::freshIntegerVariable("x_1");
-    Variable x_2 = carl::freshIntegerVariable("x_2");
+    Variable x_1 = carl::fresh_integer_variable("x_1");
+    Variable x_2 = carl::fresh_integer_variable("x_2");
 
     MultivariatePolynomial<GFNumber<cln::cl_I>> p({a1 * x_1, a2 * x_2 * x_2, a1 * x_1 * x_2});
 

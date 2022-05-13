@@ -152,35 +152,35 @@ namespace carl {
                     {   
 						CARL_LOG_DEBUG("carl.contraction", tmp << " and " << -tmp << " = " << rootA << " and " << rootB);
                         if (mVar.type() == VariableType::VT_INT) {
-                            rootA = rootA.integralPart();
+                            rootA = rootA.integral_part();
                         }
                         rootA = set_intersection(rootA, _varInterval);
 						CARL_LOG_DEBUG("carl.contraction", "first intersected with " << _varInterval << " = " << rootA);
-                        if( !rootA.isEmpty() )
+                        if( !rootA.is_empty() )
                             _result.push_back(std::move(rootA));
                         if (mVar.type() == VariableType::VT_INT) {
-                            rootB = rootB.integralPart();
+                            rootB = rootB.integral_part();
                         }
                         rootB = set_intersection(rootB, _varInterval);
 						CARL_LOG_DEBUG("carl.contraction", "second intersected with " << _varInterval << " = " << rootB);
-                        if( !rootB.isEmpty() )
+                        if( !rootB.is_empty() )
                             _result.push_back(std::move(rootB));
                     }
                     else
                     {
 						CARL_LOG_DEBUG("carl.contraction", tmp << " and " << -tmp << " = " << rootA << " and " << rootB);
                         if (mVar.type() == VariableType::VT_INT) {
-                            rootA = rootA.integralPart();
+                            rootA = rootA.integral_part();
                         }
                         rootA = set_intersection(rootA, _varInterval);
-                        if( !rootA.isEmpty() )
+                        if( !rootA.is_empty() )
                             _result.push_back(std::move(rootA));
                     }
                 }
                 else
                 {
                     if (mVar.type() == VariableType::VT_INT) {
-                        tmp = tmp.integralPart();
+                        tmp = tmp.integral_part();
                     }
                     _result.push_back( std::move(tmp) );
                 }
@@ -349,7 +349,7 @@ namespace carl {
             {
 				CARL_LOG_DEBUG("carl.contraction", "Trivial case...");
                 resA = intervals.at(variable);
-                resB = Interval<double>::emptyInterval();
+                resB = Interval<double>::empty_interval();
             }
 
             CARL_LOG_DEBUG("carl.contraction", "  after propagation: " << resA << " / " << resB);
@@ -372,8 +372,8 @@ namespace carl {
 
                 if( resultPropagation.empty() )
                 {
-                    resA = Interval<double>::emptyInterval();
-                    resB = Interval<double>::emptyInterval();
+                    resA = Interval<double>::empty_interval();
+                    resB = Interval<double>::empty_interval();
 					CARL_LOG_DEBUG("carl.contraction", "  after propagation: " << resA << " / " << resB);
                     return false;
                 }
@@ -387,11 +387,11 @@ namespace carl {
                     {
                         tmp = carl::set_intersection(i, resA);
 						CARL_LOG_DEBUG("carl.contraction", "  intersection(" << i << ", " << resA << ") = " << tmp);
-                        if( !tmp.isEmpty() )
+                        if( !tmp.is_empty() )
                             resultingIntervals.push_back(tmp);
                         tmp = carl::set_intersection(i, resB);
 						CARL_LOG_DEBUG("carl.contraction", "  intersection(" << i << ", " << resB << ") = " << tmp);
-                        if( !tmp.isEmpty() )
+                        if( !tmp.is_empty() )
                             resultingIntervals.push_back(tmp);
                     }
                 }
@@ -403,21 +403,21 @@ namespace carl {
                     {
                         tmp = carl::set_intersection(i, resA);
 						CARL_LOG_DEBUG("carl.contraction", "  intersection(" << i << ", " << resA << ") = " << tmp);
-                        if( !tmp.isEmpty() )
+                        if( !tmp.is_empty() )
                             resultingIntervals.push_back(tmp);
                     }
                 }
                 if( resultingIntervals.empty() )
                 {
-                    resA = Interval<double>::emptyInterval();
-                    resB = Interval<double>::emptyInterval();
+                    resA = Interval<double>::empty_interval();
+                    resB = Interval<double>::empty_interval();
                     CARL_LOG_DEBUG("carl.contraction", "  after propagation: " << resA << " / " << resB);
                     return false;
                 }
                 if( resultingIntervals.size() == 1 )
                 {
                     resA = resultingIntervals[0];
-                    resB = Interval<double>::emptyInterval();
+                    resB = Interval<double>::empty_interval();
                     CARL_LOG_DEBUG("carl.contraction", "  after propagation: " << resA << " / " << resB);
                     return false;
                 }
@@ -468,16 +468,16 @@ namespace carl {
                     resA = *intervalBeforeBiggestGap;
                     for( iter = resultPropagation.begin(); iter != intervalBeforeBiggestGap; ++iter )
                     {
-                        resA = resA.convexHull( *iter );
+                        resA = resA.convex_hull( *iter );
                     }
                     ++iter;
                     resB = *iter;
                     for( ; iter != resultPropagation.end(); ++iter )
                     {
-                        resB = resB.convexHull( *iter );
+                        resB = resB.convex_hull( *iter );
                     }
                     #ifdef CONTRACTION_DEBUG
-                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    std::cout << "  after propagation: " << resA; if( !resB.is_empty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
                     #endif
                     return true;
                 }              
@@ -552,20 +552,20 @@ namespace carl {
                     resB = carl::set_intersection(intervals.at(variable), centerInterval.sub(result1));
                 }
                 if (variable.type() == VariableType::VT_INT) {
-                    resA = resA.integralPart();
-                    resB = resB.integralPart();
+                    resA = resA.integral_part();
+                    resB = resB.integral_part();
                 }
                 #ifdef CONTRACTION_DEBUG
                 std::cout << __func__ << ": result after intersection: " << resA << " and " << resB << std::endl;
                 #endif
-                if( resB.isEmpty() )
+                if( resB.is_empty() )
                 {
                     splitOccurred = false;
                 }
-                else if( resA.isEmpty() ) // resB is not empty at this state
+                else if( resA.is_empty() ) // resB is not empty at this state
                 {
                     resA = resB;
-                    resB = Interval<double>::emptyInterval();
+                    resB = Interval<double>::empty_interval();
                     splitOccurred = false;
                 }
                 else
@@ -573,7 +573,7 @@ namespace carl {
                     Interval<double> tmpA, tmpB;
                     if (!carl::set_union(resA, resB, tmpA, tmpB)) {
                         resA = std::move(tmpA);
-                        resB = Interval<double>::emptyInterval();
+                        resB = Interval<double>::empty_interval();
                         splitOccurred = false;
                     }
                 }
@@ -586,7 +586,7 @@ namespace carl {
 				#endif
                 resA = carl::set_intersection(intervals.at(variable), centerInterval.sub(result1));
 				if (variable.type() == VariableType::VT_INT) {
-					resA = resA.integralPart();
+					resA = resA.integral_part();
 				}
 				#ifdef CONTRACTION_DEBUG
 				std::cout << __func__ << ": result after intersection: " << resA << std::endl;

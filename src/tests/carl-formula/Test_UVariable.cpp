@@ -14,8 +14,8 @@ TEST(UVariable, Basics)
 	sm.clear();
 	carl::Sort sort = sm.addSort("S", carl::VariableType::VT_UNINTERPRETED);
 
-	carl::Variable a = carl::freshUninterpretedVariable("a");
-	carl::Variable b = carl::freshUninterpretedVariable("b");
+	carl::Variable a = carl::fresh_uninterpreted_variable("a");
+	carl::Variable b = carl::fresh_uninterpreted_variable("b");
 	carl::UVariable v1;
 	carl::UVariable v2(a, sort);
 	carl::UVariable v3(a, sort);
@@ -37,9 +37,9 @@ TEST(UVariable, Evaluation)
 	sm.clear();
 	carl::Sort sort = sm.addSort("S", carl::VariableType::VT_UNINTERPRETED);
 
-	carl::Variable a = carl::freshUninterpretedVariable("a");
-	carl::Variable b = carl::freshUninterpretedVariable("b");
-	carl::Variable c = carl::freshUninterpretedVariable("c");
+	carl::Variable a = carl::fresh_uninterpreted_variable("a");
+	carl::Variable b = carl::fresh_uninterpreted_variable("b");
+	carl::Variable c = carl::fresh_uninterpreted_variable("c");
 	carl::UVariable v1(a, sort);
 	carl::UVariable v2(b, sort);
 	carl::UVariable v3(c, sort);

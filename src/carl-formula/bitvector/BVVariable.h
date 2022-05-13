@@ -53,7 +53,7 @@ namespace carl {
 		 * @return The string representation of this bit vector variable.
 		 */
 		std::string toString(bool _friendlyNames) const	{
-			return VariablePool::getInstance().getName(mVar, _friendlyNames);
+			return VariablePool::getInstance().get_name(mVar, _friendlyNames);
 		}
 
 		/**

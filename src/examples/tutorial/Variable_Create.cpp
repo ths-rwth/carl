@@ -28,8 +28,8 @@ int main() {
 	 * The VariablePool makes sure that a new variable gets a fresh consecutive
 	 * ID and stores variable names.
 	 */
-	carl::Variable a = carl::freshRealVariable("x");
-	carl::Variable b = carl::freshIntegerVariable("y");
+	carl::Variable a = carl::fresh_real_variable("x");
+	carl::Variable b = carl::fresh_integer_variable("y");
 
 	assert(a.type() == carl::VariableType::VT_REAL);
 	assert(a.name() == "x");
@@ -41,9 +41,9 @@ int main() {
 	 * The variables will be printed in any output as "x_<id>" in this case.
 	 * You can also omit the second argument, in this case the type is VT_REAL.
 	 */
-	carl::Variable c = carl::freshIntegerVariable();
-	carl::Variable d = carl::freshRealVariable("d");
-	carl::Variable e = carl::freshRealVariable();
+	carl::Variable c = carl::fresh_integer_variable();
+	carl::Variable d = carl::fresh_real_variable("d");
+	carl::Variable e = carl::fresh_real_variable();
 
 	assert(c.type() == carl::VariableType::VT_INT);
 	assert(d.name() == "d");

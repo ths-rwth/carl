@@ -55,7 +55,7 @@ private:
 				std::size_t varCount = std::stoull(m[1]);
 				variables.reserve(varCount);
 				while (variables.size() < varCount) {
-					variables.emplace_back(freshBooleanVariable());
+					variables.emplace_back(fresh_boolean_variable());
 				}
 				continue;
 			}

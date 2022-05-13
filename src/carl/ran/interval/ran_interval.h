@@ -77,7 +77,7 @@ private:
 		content(const Polynomial& p, const Interval<Number>& i)
 			: polynomial(p), interval(i), lower_sign(Sign::ZERO) {}
 		void simplify_to_point() {
-			assert(interval.isPointInterval());
+			assert(interval.is_point_interval());
 			polynomial = std::nullopt;
 			lower_sign = Sign::ZERO;
 		}
@@ -90,10 +90,10 @@ private:
 	}
 
 	bool is_consistent() const {
-		if (interval_int().isPointInterval()) {
+		if (interval_int().is_point_interval()) {
 			return !m_content->polynomial && m_content->lower_sign == Sign::ZERO;
 		} else {
-			if (interval_int().contains(0) || interval_int().containsInteger()) {
+			if (interval_int().contains(0) || interval_int().contains_integer()) {
 				CARL_LOG_DEBUG("carl.ran.ir", "Interval contains 0 or integer");
 				return false;
 			}
@@ -116,7 +116,7 @@ private:
 	}
 
 	void set_polynomial(const Polynomial& p, Sign lower_sign) const {
-		assert(!interval_int().isPointInterval());
+		assert(!interval_int().is_point_interval());
 		polynomial_int() = replaceVariable(p);
 		m_content->lower_sign = lower_sign;
 		assert(is_consistent());
@@ -131,7 +131,7 @@ private:
 	Sign refine_internal(const Number& pivot) const {
 		// assert(is_consistent());
 		assert(interval_int().contains(pivot));
-		assert(!interval_int().isPointInterval());
+		assert(!interval_int().is_point_interval());
 		auto psgn = carl::sgn(carl::evaluate(polynomial_int(), pivot));
 		if (psgn == Sign::ZERO) {
 			interval_int() = Interval<Number>(pivot, pivot);
@@ -139,11 +139,11 @@ private:
 			return Sign::ZERO;
 		}
 		if (psgn == m_content->lower_sign) {
-			interval_int().setLower(pivot);
+			interval_int().set_lower(pivot);
 			assert(interval_int().isConsistent());
 			return Sign::POSITIVE;
 		} else {
-			interval_int().setUpper(pivot);
+			interval_int().set_upper(pivot);
 			assert(interval_int().isConsistent());
 			return Sign::NEGATIVE;
 		}
@@ -167,7 +167,7 @@ private:
 
 	/// Refines until the number is either numeric or the interval does not contain any integer.
 	void refine_to_integrality() const {
-		while (!interval_int().isPointInterval() && interval_int().containsInteger()) {
+		while (!interval_int().is_point_interval() && interval_int().contains_integer()) {
 			refine();
 		}
 	}
@@ -190,9 +190,9 @@ public:
 		: m_content(std::make_shared<content>(replaceVariable(p), i)) {
 		CARL_LOG_DEBUG("carl.ran.ir", "Creating (" << p << "," << i << ")");
 		assert(!carl::isZero(polynomial_int()) && polynomial_int().degree() > 0);
-		assert(interval_int().isOpenInterval() || interval_int().isPointInterval());
-		// assert(interval_int().isPointInterval() || count_real_roots(sturm_sequence(), interval_int()) == 1);
-		if (interval_int().isPointInterval()) {
+		assert(interval_int().is_open_interval() || interval_int().is_point_interval());
+		// assert(interval_int().is_point_interval() || count_real_roots(sturm_sequence(), interval_int()) == 1);
+		if (interval_int().is_point_interval()) {
 			m_content->simplify_to_point();
 		} else if (polynomial_int().degree() == 1) {
 			Number a = polynomial_int().coefficients()[1];
@@ -221,13 +221,13 @@ public:
 		return carl::isZero(interval_int());
 	}
 	bool is_integral() const {
-		return interval_int().isPointInterval() && carl::isInteger(interval_int().lower());
+		return interval_int().is_point_interval() && carl::isInteger(interval_int().lower());
 	}
 	Number integer_below() const {
 		return carl::floor(interval_int().lower());
 	}
 	bool is_numeric() const {
-		return interval_int().isPointInterval();
+		return interval_int().is_point_interval();
 	}
 
 	const auto& polynomial() const {
@@ -245,8 +245,8 @@ public:
 	}
 
 	real_algebraic_number_interval<Number> abs() const {
-		assert(!interval_int().contains(constant_zero<Number>::get()) || interval_int().isPointInterval());
-		if (interval_int().isSemiPositive()) {
+		assert(!interval_int().contains(constant_zero<Number>::get()) || interval_int().is_point_interval());
+		if (interval_int().is_semi_positive()) {
 			return *this;
 		}
 		else {
@@ -267,12 +267,12 @@ public:
 	}
 
 	Sign sgn() const {
-		if (interval_int().isPointInterval()) return carl::sgn(interval_int().lower());
+		if (interval_int().is_point_interval()) return carl::sgn(interval_int().lower());
 		assert(!interval_int().contains(constant_zero<Number>::get()));
-		if (interval_int().isSemiPositive())
+		if (interval_int().is_semi_positive())
 			return Sign::POSITIVE;
 		else {
-			assert(interval_int().isSemiNegative());
+			assert(interval_int().is_semi_negative());
 			return Sign::NEGATIVE;
 		}
 	}
@@ -377,7 +377,7 @@ bool compare(const real_algebraic_number_interval<Number>& lhs, const real_algeb
 		return evaluate(Sign::ZERO, relation);
 	}
 
-	if (lhs.interval_int().isPointInterval() && rhs.interval_int().isPointInterval()) {
+	if (lhs.interval_int().is_point_interval() && rhs.interval_int().is_point_interval()) {
 		CARL_LOG_TRACE("carl.ran", "Point interval comparison");
 		return evaluate(lhs.interval_int().lower(), relation, rhs.interval_int().lower());
 	}
@@ -385,10 +385,10 @@ bool compare(const real_algebraic_number_interval<Number>& lhs, const real_algeb
 	if (carl::set_have_intersection(lhs.interval_int(), rhs.interval_int())) {
 		CARL_LOG_TRACE("carl.ran", "Intervals " << lhs.interval_int() << " and " << rhs.interval_int() << " do intersect");
 		auto intersection = carl::set_intersection(lhs.interval_int(), rhs.interval_int());
-		assert(!intersection.isEmpty());
+		assert(!intersection.is_empty());
 		lhs.refine_using(intersection.lower());
 		rhs.refine_using(intersection.lower());
-		if (!intersection.isPointInterval()) {
+		if (!intersection.is_point_interval()) {
 			lhs.refine_using(intersection.upper());
 			rhs.refine_using(intersection.upper());
 		}
@@ -469,7 +469,7 @@ std::ostream& operator<<(std::ostream& os, const real_algebraic_number_interval<
 }
 
 template<typename Number>
-const Variable real_algebraic_number_interval<Number>::auxVariable = freshRealVariable("__r");
+const Variable real_algebraic_number_interval<Number>::auxVariable = fresh_real_variable("__r");
 
 template<typename Number>
 struct is_ran<real_algebraic_number_interval<Number>>: std::true_type {};

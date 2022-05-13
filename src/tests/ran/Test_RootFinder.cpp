@@ -27,8 +27,8 @@ bool represents(const carl::RealAlgebraicNumber<Number> root, const Number& exac
 
 TEST(RootFinder, real_roots)
 {
-	carl::Variable x = freshRealVariable("x");
-	carl::Variable y = freshRealVariable("y");
+	carl::Variable x = fresh_real_variable("x");
+	carl::Variable y = fresh_real_variable("y");
 
 	{
 		UPolynomial p(x, {(Rational)-1, (Rational)0, (Rational)0, (Rational)1});
@@ -80,8 +80,8 @@ TEST(RootFinder, real_roots)
 
 TEST(RootFinder, evalRoots)
 {
-	carl::Variable x = freshRealVariable("x");
-	carl::Variable y = freshRealVariable("y");
+	carl::Variable x = fresh_real_variable("x");
+	carl::Variable y = fresh_real_variable("y");
 	
 	UPolynomial xpoly(x, {-2, 0, 1});
 	carl::Interval<Rational> xint(Rational(5)/4, carl::BoundType::STRICT, Rational(3)/2, carl::BoundType::STRICT);
@@ -97,7 +97,7 @@ TEST(RootFinder, evalRoots)
 
 TEST(RootFinder, Chebyshev)
 {
-	carl::Chebyshev<Rational> chebyshev(freshRealVariable("x"));
+	carl::Chebyshev<Rational> chebyshev(fresh_real_variable("x"));
 	std::size_t n = 50;
 	auto roots = real_roots(chebyshev(n)).roots();
 	EXPECT_TRUE(roots.size() == n);
@@ -111,7 +111,7 @@ TEST(RootFinder, Chebyshev)
 using Poly = carl::UnivariatePolynomial<mpq_class>;
 TEST(RootFinder, Comparison)
 {
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	Poly p = Poly(x, {-66864570625487788604261524190527488000000000000000000000000000000000000000000000000_mpq, 29854830731431634049898015056382132224000000000000000000000000000000000000000000000_mpq,
 	-505416087363206530647584374267211415552000000000000000000000000000000000000000000_mpq, 4175633824067780996197090619870479908864000000000000000000000000000000000000000_mpq,
 	-22123075889900509025587890607637359755264000000000000000000000000000000000000_mpq, 84105767440004379479396048598450604867584000000000000000000000000000000000_mpq,
@@ -122,7 +122,7 @@ TEST(RootFinder, Comparison)
 	662971140168469203991742914981670449102848000000000_mpq, -221093370976852468477758191983112847898368000000_mpq,
 	35982863100180637437263547995778211974592000_mpq, -222040198421806427031529186994264976123_mpq});
 
-	auto ran1 = carl::real_roots(p, carl::Interval<mpq_class>::unboundedInterval()).roots();
+	auto ran1 = carl::real_roots(p, carl::Interval<mpq_class>::unbounded_interval()).roots();
 
 	std::cout << ran1 << std::endl;
 }

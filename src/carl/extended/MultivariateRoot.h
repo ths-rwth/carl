@@ -100,7 +100,7 @@ public:
 };
 
 template<typename Poly>
-const Variable MultivariateRoot<Poly>::s_var = carl::VariablePool::getInstance().getFreshPersistentVariable("__z");
+const Variable MultivariateRoot<Poly>::s_var = carl::VariablePool::getInstance().get_fresh_persistent_variable("__z");
 
 template<typename Poly>
 inline bool operator==(const MultivariateRoot<Poly>& lhs, const MultivariateRoot<Poly>& rhs) {

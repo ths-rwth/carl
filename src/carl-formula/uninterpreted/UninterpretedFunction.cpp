@@ -16,7 +16,7 @@
 namespace carl
 {
 	const std::string& UninterpretedFunction::name() const {
-		return UFManager::getInstance().getName(*this);
+		return UFManager::getInstance().get_name(*this);
 	}
 
 	const std::vector<Sort>& UninterpretedFunction::domain() const {

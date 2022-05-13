@@ -17,7 +17,7 @@ TYPED_TEST_CASE(MultivariateRootTest, RationalTypes);
 TYPED_TEST(MultivariateRootTest, Constructor)
 {
 	using Poly = MultivariatePolynomial<TypeParam>;
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	Variable y = MultivariateRoot<Poly>::var();
 	Poly p = x*y + TypeParam(2)*y*y;
 	
@@ -32,7 +32,7 @@ TYPED_TEST(MultivariateRootTest, Evaluate)
 {
 	using Poly = MultivariatePolynomial<TypeParam>;
 	using MultiRoot = MultivariateRoot<Poly>;
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	Variable y = MultivariateRoot<Poly>::var();
 	Poly p = x*y + TypeParam(2)*y*y;
 	
@@ -62,8 +62,8 @@ TYPED_TEST(MultivariateRootTest, Evaluate2)
 	using RANT = RealAlgebraicNumber<TypeParam>;
 	using ModelT = Model<TypeParam,Poly>;
 	
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
 	Variable z = MultivariateRoot<Poly>::var();
 	Poly p = -Poly(z)*x+Poly(z)*z+Poly(2)*z-x+Poly(1);
 	

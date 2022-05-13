@@ -23,7 +23,7 @@ private:
 
 public:
 	ran_evaluator(const MultivariatePolynomial<Number>& p)
-		: m_var(freshRealVariable()),
+		: m_var(fresh_real_variable()),
 		  m_original_poly(p),
 		  m_poly(m_var, {MultivariatePolynomial<Number>(-m_original_poly), MultivariatePolynomial<Number>(1)})
 	{}
@@ -114,7 +114,7 @@ public:
 		assert(!var_to_interval.empty());
 		Interval<Number> interval = carl::evaluate(m_original_poly, var_to_interval);
 
-		if (interval.isPointInterval()) {
+		if (interval.is_point_interval()) {
 			return real_algebraic_number_interval<Number>(interval.lower());
 		}
 
@@ -122,7 +122,7 @@ public:
 		// the interval should include at least one root.
 		assert(!carl::isZero(res));
 		assert(carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) >= 1);
-		while (!interval.isPointInterval() && (carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
+		while (!interval.is_point_interval() && (carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
 			// refine the result interval until it isolates exactly one real root of the result polynomial
 			for (const auto& [var, ran] : m_ir_assignments) {
 				if (var_to_interval.find(var) == var_to_interval.end()) continue;
@@ -138,7 +138,7 @@ public:
 			}
 			interval = carl::evaluate(m_original_poly, var_to_interval);
 		}
-		if (interval.isPointInterval()) {
+		if (interval.is_point_interval()) {
 			return real_algebraic_number_interval<Number>(interval.lower());
 		} else {
 			return real_algebraic_number_interval<Number>(res, interval);

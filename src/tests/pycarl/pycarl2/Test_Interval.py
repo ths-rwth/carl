@@ -17,32 +17,32 @@ class TestInterval(TestCarl):
 
 	
 	def testIsMethods(self):
-		self.assertEqual(i1.isInfinite(),false)
-		self.assertEqual(i1.isUnbounded(),false)
-		self.assertEqual(i1.isHalfBounded(),false)
-		self.assertEqual(i1.isEmpty(),false)
-		self.assertEqual(i1.isPointInterval(),true)
-		self.assertEqual(i1.isOpenInterval(),false)
-		self.assertEqual(i1.isClosedInterval(),true)
+		self.assertEqual(i1.is_infinite(),false)
+		self.assertEqual(i1.is_unbounded(),false)
+		self.assertEqual(i1.is_half_bounded(),false)
+		self.assertEqual(i1.is_empty(),false)
+		self.assertEqual(i1.is_point_interval(),true)
+		self.assertEqual(i1.is_open_interval(),false)
+		self.assertEqual(i1.is_closed_interval(),true)
 		self.assertEqual(i1.isZero(),true)
 		self.assertEqual(i1.isOne(),false)
-		self.assertEqual(i1.isPositive(),false)
-		self.assertEqual(i1.isNegative(),false)
-		self.assertEqual(i1.isSemiPositive(),true)
-		self.assertEqual(i1.isSemiNegative(),true)
+		self.assertEqual(i1.is_positive(),false)
+		self.assertEqual(i1.is_negative(),false)
+		self.assertEqual(i1.is_semi_positive(),true)
+		self.assertEqual(i1.is_semi_negative(),true)
 
 
 	def testSetBounds(self):
 		i = IntervalRational(Rational(-5),Rational(5))
-		i.setLower(Rational(-1))
-		i.setUpper(Rational(1))
+		i.set_lower(Rational(-1))
+		i.set_upper(Rational(1))
 		self.assertTrue(i.lower().equals(Rational(-1)))
 		self.assertTrue(i.upper().equals(Rational(1)))
 
 
 	def testSomeMoreMethods(self):
-		self.assertTrue(i1.integralPart().lower().equals(i1.lower()))
-		self.assertTrue(i1.integralPart().upper().equals(i1.upper()))
+		self.assertTrue(i1.integral_part().lower().equals(i1.lower()))
+		self.assertTrue(i1.integral_part().upper().equals(i1.upper()))
 		self.assertTrue(i1.diameter().equals(Rational(0)))
 		self.assertTrue(i1.center().equals(Rational(0)))
 		self.assertTrue(i1.sample().equals(Rational(0)))
@@ -65,7 +65,7 @@ class TestInterval(TestCarl):
 		self.assertTrue(result.upper().equals(Rational(0)))
 		result = i2.inverse()
 		self.assertTrue(result.upper().equals(Rational(100)))
-		self.assertEqual(result.isHalfBounded(),true)
+		self.assertEqual(result.is_half_bounded(),true)
 		result = i2.intersect(i1)
 		self.assertTrue(result.lower().equals(Rational(0)))
 		self.assertTrue(result.upper().equals(Rational(0)))
@@ -86,17 +86,17 @@ class TestInterval(TestCarl):
 		i2.difference(i1,res1,res2);
 		self.assertTrue(res1.lower().equals(i2.lower()))
 		self.assertTrue(res1.upper().equals(Rational(0)))
-		self.assertTrue(res2.isHalfBounded())
+		self.assertTrue(res2.is_half_bounded())
 		self.assertTrue(res2.lower().equals(Rational(0)))
 		i1.complement(res1,res2)
 		self.assertTrue(res1.upper().equals(Rational(0)))
 		self.assertTrue(res2.lower().equals(Rational(0)))
-		self.assertEqual(res1.isHalfBounded(),true)
-		self.assertEqual(res2.isHalfBounded(),true)
+		self.assertEqual(res1.is_half_bounded(),true)
+		self.assertEqual(res2.is_half_bounded(),true)
 		i2.symmetricDifference(i1,res1,res2)
 		self.assertTrue(res1.lower().equals(i2.lower()))
 		self.assertTrue(res1.upper().equals(Rational(0)))
-		self.assertTrue(res2.isHalfBounded())
+		self.assertTrue(res2.is_half_bounded())
 		self.assertTrue(res2.lower().equals(Rational(0)))
 	
 

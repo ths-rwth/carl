@@ -21,7 +21,7 @@ TYPED_TEST_CASE(MultivariatePolynomialTest, NumberTypes);
 
 TYPED_TEST(MultivariatePolynomialTest, Constructor)
 {
-	Variable v0 = carl::freshRealVariable("x");
+	Variable v0 = carl::fresh_real_variable("x");
     Term<TypeParam> t0(v0);
     MultivariatePolynomial<TypeParam> p0(t0);
 	
@@ -32,7 +32,7 @@ TYPED_TEST(MultivariatePolynomialTest, Constructor)
 
 TYPED_TEST(MultivariatePolynomialTest, Operators)
 {
-	Variable v0 = carl::freshRealVariable("x");
+	Variable v0 = carl::fresh_real_variable("x");
     Term<TypeParam> t0(v0);
     MultivariatePolynomial<TypeParam> p0a(t0);
     MultivariatePolynomial<TypeParam> p0b(v0);
@@ -43,7 +43,7 @@ TYPED_TEST(MultivariatePolynomialTest, Operators)
 
 TYPED_TEST(MultivariatePolynomialTest, getTerms)
 {
-	Variable v0 = carl::freshRealVariable("x");
+	Variable v0 = carl::fresh_real_variable("x");
 	MultivariatePolynomial<TypeParam> p;
 	p += TypeParam(1);
 	p += v0;
@@ -58,8 +58,8 @@ TYPED_TEST(MultivariatePolynomialTest, getTerms)
 
 TEST(MultivariatePolynomial, remainder)
 {
-	Variable x = carl::freshRealVariable("x");
-	Variable y = carl::freshRealVariable("y");
+	Variable x = carl::fresh_real_variable("x");
+	Variable y = carl::fresh_real_variable("y");
     MultivariatePolynomial<Rational> px( x );
     MultivariatePolynomial<Rational> py( y );
     MultivariatePolynomial<Rational> p( px - Rational(3) );
@@ -71,8 +71,8 @@ TEST(MultivariatePolynomial, remainder)
 
 TEST(MultivariatePolynomial, to_univariate_polynomial)
 {
-    Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
 	{
 		MultivariatePolynomial<Rational> p({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
 		UnivariatePolynomial<Rational> res(x, {(Rational)0, (Rational)1, (Rational)-1, (Rational)3});
@@ -92,7 +92,7 @@ TEST(MultivariatePolynomial, to_univariate_polynomial)
 
 TYPED_TEST(MultivariatePolynomialTest, Addition)
 {
-    Variable v0 = freshRealVariable("v0");
+    Variable v0 = fresh_real_variable("v0");
     Term<TypeParam> t0(v0);
     MultivariatePolynomial<TypeParam> p0(v0);
     p0 += 3;
@@ -102,8 +102,8 @@ TYPED_TEST(MultivariatePolynomialTest, Addition)
     p0 += -6;
     EXPECT_EQ((unsigned)1, p0.nrTerms());
 
-    Variable v1 = freshRealVariable("v1");
-    Variable v2 = freshRealVariable("v2");
+    Variable v1 = fresh_real_variable("v1");
+    Variable v2 = fresh_real_variable("v2");
     p0 += v1;
     p0 += createMonomial(v2, (exponent) 1);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
@@ -140,7 +140,7 @@ TYPED_TEST(MultivariatePolynomialTest, Addition)
 
 TYPED_TEST(MultivariatePolynomialTest, Substraction)
 {
-    Variable v0 = freshRealVariable("v0");
+    Variable v0 = fresh_real_variable("v0");
     MultivariatePolynomial<TypeParam> p0(v0);
     p0 -= 3;
     EXPECT_EQ((unsigned)2, p0.nrTerms());
@@ -148,8 +148,8 @@ TYPED_TEST(MultivariatePolynomialTest, Substraction)
     EXPECT_EQ((unsigned)2, p0.nrTerms());
     p0 -= -6;
     EXPECT_EQ((unsigned)1, p0.nrTerms());
-    Variable v1 = freshRealVariable("v1");
-    Variable v2 = freshRealVariable("v2");
+    Variable v1 = fresh_real_variable("v1");
+    Variable v2 = fresh_real_variable("v2");
     p0 -= v1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     p0 -= createMonomial(v2, (exponent) 1);
@@ -168,8 +168,8 @@ TYPED_TEST(MultivariatePolynomialTest, Substraction)
 
 TYPED_TEST(MultivariatePolynomialTest, Multiplication)
 {
-    Variable v0 = freshRealVariable("v0");
-    Variable v1 = freshRealVariable("v1");
+    Variable v0 = fresh_real_variable("v0");
+    Variable v1 = fresh_real_variable("v1");
     MultivariatePolynomial<TypeParam> p0(v0);
 
     p0 *= v0;
@@ -194,8 +194,8 @@ TEST(MultivariatePolynomial, toString)
 
 TEST(MultivariatePolynomial, Normalize)
 {
-    Variable v0 = freshRealVariable("v0");
-    Variable v1 = freshRealVariable("v1");
+    Variable v0 = fresh_real_variable("v0");
+    Variable v1 = fresh_real_variable("v1");
     MultivariatePolynomial<Rational> mp(v0);
     MultivariatePolynomial<Rational> mp2 = mp * Rational(2);
     EXPECT_EQ(mp, mp.normalize());
@@ -212,8 +212,8 @@ TEST(MultivariatePolynomial, Normalize)
 
 TEST(MultivariatePolynomial, Coprime)
 {
-    Variable v0 = freshRealVariable("v0");
-    Variable v1 = freshRealVariable("v1");
+    Variable v0 = fresh_real_variable("v0");
+    Variable v1 = fresh_real_variable("v1");
     MultivariatePolynomial<Rational> mp;
     mp += v0;
     MultivariatePolynomial<Rational> mp2 = mp * (Rational)2;
@@ -248,8 +248,8 @@ TEST(MultivariatePolynomial, Coprime)
 
 TEST(MultivariatePolynomial, Substitute)
 {
-    Variable v0 = freshRealVariable("v0");
-    Variable v1 = freshRealVariable("v1");
+    Variable v0 = fresh_real_variable("v0");
+    Variable v1 = fresh_real_variable("v1");
 	{
 		MultivariatePolynomial<Rational> p(v0);
 		carl::substitute_inplace(p, v0, MultivariatePolynomial<Rational>(-1));
@@ -264,12 +264,12 @@ TEST(MultivariatePolynomial, Substitute)
     EXPECT_EQ(mp2, carl::substitute(mp, substitutions));
     substitutions[v0] = MultivariatePolynomial<Rational>((Rational)0);
     EXPECT_EQ(MultivariatePolynomial<Rational>((Rational)4 * v1), carl::substitute(mp, substitutions));
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 
     #ifdef USE_GINAC
-	Variable v = freshRealVariable("v");
-	Variable y = freshRealVariable("y");
-	Variable z = freshRealVariable("z");
+	Variable v = fresh_real_variable("v");
+	Variable y = fresh_real_variable("y");
+	Variable z = fresh_real_variable("z");
     std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> vars;
     GiNaC::symbol vg("v"), xg("x"), yg("y"), zg("z");
     vars.insert(std::pair<GiNaC::ex, Variable>(vg, v));
@@ -393,9 +393,9 @@ TEST(MultivariatePolynomial, Substitute)
     EXPECT_EQ(carl::substitute(pxB, evMapB),carl::constant_zero<Rational>::get());
 
 	{
-		Variable x = freshRealVariable("x");
-		Variable y = freshRealVariable("y");
-		Variable z = freshRealVariable("z");
+		Variable x = fresh_real_variable("x");
+		Variable y = fresh_real_variable("y");
+		Variable z = fresh_real_variable("z");
 		using P = MultivariatePolynomial<Rational>;
 		P p = P(x)*x*x*y + P(y)*y*y + P(x)*x*x + P(x)*x*y + P(x)*y*y + P(x)*y*y*y;
 		std::map<Variable,P> repl;
@@ -445,8 +445,8 @@ TEST(MultivariatePolynomial, Substitute)
 
 TEST(MultivariatePolynomial, SPolynomial)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     MultivariatePolynomial<Rational> g1({(Rational)3*x*x*x*x*y, (Rational)1*y*y});
     EXPECT_EQ((unsigned)3, carl::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
@@ -462,8 +462,8 @@ TEST(MultivariatePolynomial, SPolynomial)
 
 TEST(MultivariatePolynomial, GatherVariables)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     std::set<Variable> vars = carl::variables(f1).as_set();
     EXPECT_EQ(x, *vars.begin());
@@ -477,8 +477,8 @@ TEST(MultivariatePolynomial, GatherVariables)
 
 TEST(MultivariatePolynomial, Derivative)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
     MultivariatePolynomial<Rational> fx({x});
     EXPECT_EQ((Rational)1, carl::derivative(fx, x));
     EXPECT_EQ((Rational)0, carl::derivative(fx, y));
@@ -494,9 +494,9 @@ TEST(MultivariatePolynomial, Derivative)
 
 TEST(MultivariatePolynomial, varInfo)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
-    Variable z = freshRealVariable("z");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
+    Variable z = fresh_real_variable("z");
 
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
 
@@ -531,7 +531,7 @@ TEST(MultivariatePolynomial, varInfo)
 
 TEST(MultivariatePolynomial, Quotient)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     MultivariatePolynomial<Rational> one(Rational(1));
     MultivariatePolynomial<Rational> m1 = x*x - one;
     MultivariatePolynomial<Rational> m2 = x - one;
@@ -543,7 +543,7 @@ TEST(MultivariatePolynomial, Quotient2)
 {
     carl::io::StringParser sp;
     sp.setVariables({"t", "u"});
-    Variable t = carl::VariablePool::getInstance().findVariableWithName("t");
+    Variable t = carl::VariablePool::getInstance().find_variable_with_name("t");
     MultivariatePolynomial<Rational> p1 = sp.parseMultivariatePolynomial<Rational>("t^3*u^6+(-3)*t*u^5+(-1)*u^6+(-3)*t^2*u^6+3*t*u^6+(-1)*t^3*u^5+(-1)*t^3+(-3)*t+3*t^2+(-3)*u+3*t^3*u+9*t*u+(-9)*t^2*u+5*u^2+(-5)*t^3*u^2+(-15)*t*u^2+15*t^2*u^2+3*t^2*u^4+(-3)*t*u^4+(-1)*t^3*u^4+(-4)*u^3+u^4+(-12)*t^2*u^3+12*t*u^3+4*t^3*u^3+u^5+3*t^2*u^5+1");
     MultivariatePolynomial<Rational> p2 = sp.parseMultivariatePolynomial<Rational>("u^2+(-1)*u+1");
     EXPECT_TRUE( carl::quotient(p1, p2).has(t) );
@@ -561,8 +561,8 @@ TEST(MultivariatePolynomial, Quotient2)
 
 TYPED_TEST(MultivariatePolynomialTest, MultivariatePolynomialMultiplication)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
 
     EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)12*x*x*x*x*x*y, (TypeParam)6*x*x*x*y*y*y, (TypeParam)27*x*x*y*y, (TypeParam)28*x*x*x*x*y, (TypeParam)14*x*x*y*y*y, (TypeParam)63*x*y*y}),
             MultivariatePolynomial<TypeParam>({(TypeParam)3*x*x*y, (TypeParam)7*x*y}) * MultivariatePolynomial<TypeParam>({(TypeParam)4*x*x*x, (TypeParam)2*x*y*y, (TypeParam)9*y}));
@@ -590,8 +590,8 @@ TYPED_TEST(MultivariatePolynomialTest, MultivariatePolynomialMultiplication)
 
 TYPED_TEST(MultivariatePolynomialTest, CreationViaOperators)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
 
     EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)5*x*y, (TypeParam)7*y, (TypeParam)11*x*x}), (TypeParam)5*x*y+(TypeParam)7*y+(TypeParam)11*x*x);
     EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)1*y}), (TypeParam)1*x + (TypeParam)1*y);
@@ -600,9 +600,9 @@ TYPED_TEST(MultivariatePolynomialTest, CreationViaOperators)
 
 TYPED_TEST(MultivariatePolynomialTest, Comparison)
 {
-    Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Variable z = freshRealVariable("z");
+    Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
+	Variable z = fresh_real_variable("z");
 
     MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * x * y * y + (TypeParam)7 * y * z;
     MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * x * y * y + (TypeParam)2 * x * x * y;
@@ -622,8 +622,8 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
 {
     ComparisonList<Variable, Monomial::Arg, Term<TypeParam>, MultivariatePolynomial<TypeParam>> list;
 
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
 
     list.push_back(Term<TypeParam>((TypeParam)0));
     list.push_back(Term<TypeParam>((TypeParam)1));
@@ -647,8 +647,8 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
 
 TEST(MultivariatePolynomialTest, Resultant)
 {
-    Variable x = freshRealVariable("x0");
-    Variable y = freshRealVariable("x1");
+    Variable x = fresh_real_variable("x0");
+    Variable y = fresh_real_variable("x1");
 	typedef Rational T;
 	carl::CIPtr ci = carl::CIPtr(new ConversionInformation({x,y}));
 
@@ -666,10 +666,10 @@ TEST(MultivariatePolynomialTest, Resultant)
 
 TEST(MultivariatePolynomialTest, Definiteness)
 {
-    Variable w = freshRealVariable("w");
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
-    Variable z = freshRealVariable("z");
+    Variable w = fresh_real_variable("w");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
+    Variable z = fresh_real_variable("z");
     MultivariatePolynomial<Rational> p1({(Rational)6*x*x, (Rational)49*y*y, (Rational)51*z*z, (Rational)-82*y*z, (Rational)20*x*z, (Rational)-4*x*y});
     EXPECT_TRUE(carl::definiteness(p1) == Definiteness::POSITIVE_SEMI);
     MultivariatePolynomial<Rational> p2 = p1 + Rational(1);

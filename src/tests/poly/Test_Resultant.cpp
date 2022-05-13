@@ -14,15 +14,15 @@ using namespace carl;
 
 TEST(Resultant, det)
 {
-    //Variable m = freshRealVariable("m");
-    Variable r = freshRealVariable("r");
+    //Variable m = fresh_real_variable("m");
+    Variable r = fresh_real_variable("r");
 
     MultivariatePolynomial<Rational> mr(r);
     MultivariatePolynomial<Rational> one((Rational)1);
     MultivariatePolynomial<Rational> zero((Rational)0);
-    Variable x = freshRealVariable("x");
-	Variable c = freshRealVariable("c");
-	Variable t = freshRealVariable("t");
+    Variable x = fresh_real_variable("x");
+	Variable c = fresh_real_variable("c");
+	Variable t = fresh_real_variable("t");
 
 	MultivariatePolynomial<Rational> mc(c);
 	MultivariatePolynomial<Rational> mt(t);

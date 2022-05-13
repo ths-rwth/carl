@@ -28,7 +28,7 @@ inline bool isOne(const T& t) {
 
 template<typename T, EnableIf<has_isPositive<T>>>
 inline bool isPositive(const T& t) {
-	return t.isPositive();
+	return t.is_positive();
 }
 
 template<typename T, DisableIf<has_isPositive<T>>>
@@ -38,7 +38,7 @@ inline bool isPositive(const T& t) {
 
 template<typename T, EnableIf<has_isNegative<T>>>
 inline bool isNegative(const T& t) {
-	return t.isNegative();
+	return t.is_negative();
 }
 
 template<typename T, DisableIf<has_isNegative<T>>>

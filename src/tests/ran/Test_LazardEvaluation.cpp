@@ -10,9 +10,9 @@
 TEST(LazardEvaluation, Test)
 {
 	using Poly = carl::MultivariatePolynomial<Rational>;
-	carl::Variable x = carl::freshRealVariable("x");
-	carl::Variable y = carl::freshRealVariable("y");
-	carl::Variable z = carl::freshRealVariable("z");
+	carl::Variable x = carl::fresh_real_variable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
+	carl::Variable z = carl::fresh_real_variable("z");
 	
 	Poly p = (Poly(x)-Poly(y))*z;
 	
@@ -40,9 +40,9 @@ TEST(LazardEvaluation, Test)
 TEST(LazardEvaluation, Test2)
 {
 	using Poly = carl::MultivariatePolynomial<Rational>;
-	carl::Variable x = carl::freshRealVariable("x");
-	carl::Variable y = carl::freshRealVariable("y");
-	carl::Variable z = carl::freshRealVariable("z");
+	carl::Variable x = carl::fresh_real_variable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
+	carl::Variable z = carl::fresh_real_variable("z");
 	
 	Poly p = (Poly(y)*Poly(y)-Poly(x))*z;
 	
@@ -73,9 +73,9 @@ protected:
 	carl::Variable x, y, z;
 
 	LazardTest() :
-		x(carl::freshRealVariable("x")),
-		y(carl::freshRealVariable("y")),
-		z(carl::freshRealVariable("z"))
+		x(carl::fresh_real_variable("x")),
+		y(carl::fresh_real_variable("y")),
+		z(carl::fresh_real_variable("z"))
 	{
 		CARL_LOG_INFO("carl.core", "Variables " << x << ", " << y);
 	}

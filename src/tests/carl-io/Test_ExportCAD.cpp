@@ -15,8 +15,8 @@ using FormulaT = carl::Formula<carl::MultivariatePolynomial<Rational>>;
 
 struct QEPCADExample: ::testing::Test {
 	// Taken from "Improved Projection for Cylindrical Algebraic Decomposition", Figure 1
-	carl::Variable y = carl::freshRealVariable("y");
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
+	carl::Variable x = carl::fresh_real_variable("x");
 	Poly p1 = Poly(x)*x + Poly(y)*y - Poly(4);
 	Poly p2 = Poly(x)*y - Poly(1);
 	Poly p3 = Poly(x)*x + Poly(y) - Poly(3);

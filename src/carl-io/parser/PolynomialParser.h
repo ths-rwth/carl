@@ -100,14 +100,14 @@ struct PolynomialParser: public qi::grammar<Iterator, Pol(), Skipper> {
 	}
 	
 	void addVariable(Variable::Arg v) {
-		varmap.add(VariablePool::getInstance().getName(v), v);
+		varmap.add(VariablePool::getInstance().get_name(v), v);
 	}
 	
 private:
 	enum Operation { ADD, SUB };
 	
 	Variable newVariable(const std::string& s) {
-		Variable v = freshRealVariable(s);
+		Variable v = fresh_real_variable(s);
 		varmap.add(s, v);
 		return v;
 	}

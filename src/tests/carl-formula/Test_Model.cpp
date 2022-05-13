@@ -32,8 +32,8 @@ TYPED_TEST(Model, ModelSubstitution)
 	using Poly = carl::MultivariatePolynomial<TypeParam>;
 	using ModelPolySubs = carl::ModelPolynomialSubstitution<TypeParam,Poly>;
 
-	carl::Variable x = carl::freshRealVariable("x");
-	carl::Variable y = carl::freshRealVariable("y");
+	carl::Variable x = carl::fresh_real_variable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
 	carl::MultivariatePolynomial<TypeParam> p(TypeParam(2) * x*x);
 	carl::Model<TypeParam,Poly> m;
 	m.emplace(carl::ModelVariable(x), TypeParam(3));

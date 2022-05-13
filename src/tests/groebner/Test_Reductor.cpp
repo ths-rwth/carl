@@ -13,9 +13,9 @@ TEST(Reductor, Constructor)
 
 TEST(Reductor, Reduction)
 {
-    Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Variable z = freshRealVariable("z");
+    Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
+	Variable z = fresh_real_variable("z");
     Ideal<MultivariatePolynomial<Rational>> ideal;
     MultivariatePolynomial<Rational> p1;
     p1 += x*x;

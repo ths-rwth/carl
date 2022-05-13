@@ -7,9 +7,9 @@ using MVP = carl::MultivariatePolynomial<mpq_class>;
 
 class MVP_Add_Fixture: public benchmark::Fixture {
 public:
-    carl::Variable x = carl::freshRealVariable("x");
-    carl::Variable y = carl::freshRealVariable("y");
-    carl::Variable z = carl::freshRealVariable("z");
+    carl::Variable x = carl::fresh_real_variable("x");
+    carl::Variable y = carl::fresh_real_variable("y");
+    carl::Variable z = carl::fresh_real_variable("z");
     MVP p = MVP(x)*x*x + MVP(x)*y*y + MVP(y)*z;
     MVP q = MVP(x)*x*y + MVP(x)*y*z + MVP(y)*z;
     static constexpr auto& tam = MVP::mTermAdditionManager;

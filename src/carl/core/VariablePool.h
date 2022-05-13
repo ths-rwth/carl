@@ -22,7 +22,7 @@ namespace carl {
  *
  * As we want only a single unique VariablePool and need global access to it, it is implemented as a singleton.
  *
- * All methods that modify the pool, that are getInstance(), getFreshVariable() and setName(), are thread-safe.
+ * All methods that modify the pool, that are getInstance(), get_fresh_variable() and set_name(), are thread-safe.
  */
 class VariablePool : public Singleton<VariablePool> {
 	friend Singleton<VariablePool>;
@@ -35,14 +35,14 @@ private:
 	std::array<std::size_t, static_cast<std::size_t>(VariableType::TYPE_SIZE)> mNextIDs;
 
 	/**
-	 * Mutex for calling getFreshVariable().
+	 * Mutex for calling get_fresh_variable().
 	 */
 	mutable std::mutex freshVarMutex;
 
 	/**
 	 * Mutex for calling setVariableName().
 	 */
-	mutable std::mutex setNameMutex;
+	mutable std::mutex set_nameMutex;
 
 	std::size_t& nextID(VariableType vt) noexcept {
 		assert(static_cast<std::size_t>(vt) < mNextIDs.size());
@@ -70,7 +70,7 @@ private:
 
 #ifdef THREAD_SAFE
 #define FRESHVAR_LOCK_GUARD std::lock_guard<std::mutex> lock1(freshVarMutex);
-#define SETNAME_LOCK_GUARD std::lock_guard<std::mutex> lock2(setNameMutex);
+#define SETNAME_LOCK_GUARD std::lock_guard<std::mutex> lock2(set_nameMutex);
 #else
 #define FRESHVAR_LOCK_GUARD
 #define SETNAME_LOCK_GUARD
@@ -88,7 +88,7 @@ protected:
 	 * @param type Type for the new variable.
 	 * @return A new variable.
 	 */
-	Variable getFreshVariable(VariableType type = VariableType::VT_REAL) noexcept;
+	Variable get_fresh_variable(VariableType type = VariableType::VT_REAL) noexcept;
 
 	/**
 	 * Get a variable with was not used before and set a name for it.
@@ -97,11 +97,11 @@ protected:
 	 * @param type Type for the new variable.
 	 * @return A new variable.
 	 */
-	Variable getFreshVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
+	Variable get_fresh_variable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 public:
-	Variable getFreshPersistentVariable(VariableType type = VariableType::VT_REAL) noexcept;
-	Variable getFreshPersistentVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
+	Variable get_fresh_persistent_variable(VariableType type = VariableType::VT_REAL) noexcept;
+	Variable get_fresh_persistent_variable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 	/**
 	 * Clears everything already created in this pool.
@@ -112,12 +112,12 @@ public:
 		for (const auto& pv : mPersistentVariables) {
 			Variable v = pv.first;
 			while (nextID(v.type()) < v.id()) {
-				getFreshVariable(v.type());
+				get_fresh_variable(v.type());
 			}
 			if (!pv.second.empty()) {
-				getFreshVariable(pv.second, v.type());
+				get_fresh_variable(pv.second, v.type());
 			} else {
-				getFreshVariable(v.type());
+				get_fresh_variable(v.type());
 			}
 		}
 	}
@@ -127,7 +127,7 @@ public:
 	 * @param name The friendly variable name to look for.
 	 * @return The first variable with that friendly name.
 	 */
-	Variable findVariableWithName(const std::string& name) const noexcept;
+	Variable find_variable_with_name(const std::string& name) const noexcept;
 	/**
 	 * Get a human-readable name for the given variable.
 	 * If the given Variable is Variable::NO_VARIABLE, "NO_VARIABLE" is returned.
@@ -137,85 +137,85 @@ public:
 	 * @param variableName Flag, if a name set via setVariableName shall be considered.
 	 * @return Some name for the Variable.
 	 */
-	std::string getName(Variable v, bool variableName = true) const;
+	std::string get_name(Variable v, bool variableName = true) const;
 	/**
 	 * Add a name for a given Variable.
 	 * This method is thread-safe.
 	 * @param v Variable.
 	 * @param name Some string naming the variable.
 	 */
-	void setName(Variable v, const std::string& name);
+	void set_name(Variable v, const std::string& name);
 
 	/**
 	 * Sets the prefix used when printing anonymous variables.
 	 * The default is "_", hence they look like "_x_5".
      * @param prefix Prefix for anonymous variable names.
      */
-	void setPrefix(std::string prefix = "_") noexcept {
+	void set_prefix(std::string prefix = "_") noexcept {
 		mVariablePrefix = std::move(prefix);
 	}
 
-	/**
-	 * Returns the number of variables initialized by the pool.
-	 * @return Number of variables.
-	 */
-	std::size_t nrVariables(VariableType type = VariableType::VT_REAL) const noexcept {
-		return nextID(type) - 1;
-	}
+	// /**
+	//  * Returns the number of variables initialized by the pool.
+	//  * @return Number of variables.
+	//  */
+	// std::size_t nrVariables(VariableType type = VariableType::VT_REAL) const noexcept {
+	// 	return nextID(type) - 1;
+	// }
 
-	/**
-	 * Print variable names to the stream.
-	 */
-	void printVariableNamesToStream(std::ostream& os) {
-		for (auto const& v : mVariableNames) {
-			os << v.second << " ";
-		}
-	}
+	// /**
+	//  * Print variable names to the stream.
+	//  */
+	// void printVariableNamesToStream(std::ostream& os) {
+	// 	for (auto const& v : mVariableNames) {
+	// 		os << v.second << " ";
+	// 	}
+	// }
 
-	friend Variable freshVariable(VariableType vt) noexcept;
-	friend Variable freshVariable(const std::string& name, VariableType vt);
+	friend Variable fresh_variable(VariableType vt) noexcept;
+	friend Variable fresh_variable(const std::string& name, VariableType vt);
 };
 
-inline Variable freshVariable(VariableType vt) noexcept {
-	return VariablePool::getInstance().getFreshVariable(vt);
+inline Variable fresh_variable(VariableType vt) noexcept {
+	return VariablePool::getInstance().get_fresh_variable(vt);
 }
-inline Variable freshVariable(const std::string& name, VariableType vt) {
-	return VariablePool::getInstance().getFreshVariable(name, vt);
-}
-
-inline Variable freshBitvectorVariable() noexcept {
-	return freshVariable(VariableType::VT_BITVECTOR);
-}
-inline Variable freshBitvectorVariable(const std::string& name) {
-	return freshVariable(name, VariableType::VT_BITVECTOR);
-}
-inline Variable freshBooleanVariable() noexcept {
-	return freshVariable(VariableType::VT_BOOL);
-}
-inline Variable freshBooleanVariable(const std::string& name) {
-	return freshVariable(name, VariableType::VT_BOOL);
-}
-inline Variable freshRealVariable() noexcept {
-	return freshVariable(VariableType::VT_REAL);
-}
-inline Variable freshRealVariable(const std::string& name) {
-	return freshVariable(name, VariableType::VT_REAL);
-}
-inline Variable freshIntegerVariable() noexcept {
-	return freshVariable(VariableType::VT_INT);
-}
-inline Variable freshIntegerVariable(const std::string& name) {
-	return freshVariable(name, VariableType::VT_INT);
-}
-inline Variable freshUninterpretedVariable() noexcept {
-	return freshVariable(VariableType::VT_UNINTERPRETED);
-}
-inline Variable freshUninterpretedVariable(const std::string& name) {
-	return freshVariable(name, VariableType::VT_UNINTERPRETED);
+inline Variable fresh_variable(const std::string& name, VariableType vt) {
+	return VariablePool::getInstance().get_fresh_variable(name, vt);
 }
 
-inline void printRegisteredVariableNames(std::ostream& os) {
-	return VariablePool::getInstance().printVariableNamesToStream(os);
+inline Variable fresh_bitvector_variable() noexcept {
+	return fresh_variable(VariableType::VT_BITVECTOR);
 }
+inline Variable fresh_bitvector_variable(const std::string& name) {
+	return fresh_variable(name, VariableType::VT_BITVECTOR);
+}
+inline Variable fresh_boolean_variable() noexcept {
+	return fresh_variable(VariableType::VT_BOOL);
+}
+inline Variable fresh_boolean_variable(const std::string& name) {
+	return fresh_variable(name, VariableType::VT_BOOL);
+}
+inline Variable fresh_real_variable() noexcept {
+	return fresh_variable(VariableType::VT_REAL);
+}
+inline Variable fresh_real_variable(const std::string& name) {
+	return fresh_variable(name, VariableType::VT_REAL);
+}
+inline Variable fresh_integer_variable() noexcept {
+	return fresh_variable(VariableType::VT_INT);
+}
+inline Variable fresh_integer_variable(const std::string& name) {
+	return fresh_variable(name, VariableType::VT_INT);
+}
+inline Variable fresh_uninterpreted_variable() noexcept {
+	return fresh_variable(VariableType::VT_UNINTERPRETED);
+}
+inline Variable fresh_uninterpreted_variable(const std::string& name) {
+	return fresh_variable(name, VariableType::VT_UNINTERPRETED);
+}
+
+// inline void printRegisteredVariableNames(std::ostream& os) {
+// 	return VariablePool::getInstance().printVariableNamesToStream(os);
+// }
 
 } // namespace carl

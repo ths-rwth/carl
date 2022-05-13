@@ -19,14 +19,14 @@ TYPED_TEST_CASE(TermTest, RationalTypes); // TODO should use NumberTypes
 TYPED_TEST(TermTest, Constructor)
 {
     Term<TypeParam> t(1);
-    Variable v0 = carl::freshRealVariable("v0");
+    Variable v0 = carl::fresh_real_variable("v0");
     Term<TypeParam> t0(v0);
 }
 
 TYPED_TEST(TermTest, Operators)
 {
     Term<TypeParam> t(1);
-    Variable v0 = carl::freshRealVariable("v0");
+    Variable v0 = carl::fresh_real_variable("v0");
     Term<TypeParam> t0(v0);
     EXPECT_TRUE(t0.isLinear());
     EXPECT_TRUE(t.isLinear());
@@ -36,7 +36,7 @@ TYPED_TEST(TermTest, Operators)
 TYPED_TEST(TermTest, Multiplication)
 {
     Term<TypeParam> t(1);
-    Variable v0 = carl::freshRealVariable("v0");
+    Variable v0 = carl::fresh_real_variable("v0");
     t *= v0;
     Term<TypeParam> t0(v0);
     EXPECT_EQ(t0,t);
@@ -48,8 +48,8 @@ TYPED_TEST(TermTest, Multiplication)
 
 TYPED_TEST(TermTest, VariableMultiplication)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
 
     EXPECT_EQ(Term<TypeParam>(3, x * y),  static_cast<TypeParam>(3) * x * y);
     EXPECT_EQ(Term<TypeParam>(1, x * y), x * y);
@@ -58,8 +58,8 @@ TYPED_TEST(TermTest, VariableMultiplication)
 
 TYPED_TEST(TermTest, TermMultiplication)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
 
     EXPECT_EQ(Term<TypeParam>(12, x * x * y), Term<TypeParam>(3, x * y) * Term<TypeParam>(4, x, 1));
     EXPECT_EQ(Term<TypeParam>(TypeParam(0)), Term<TypeParam>(3, x * x) * Term<TypeParam>(0, y * y * y));
@@ -68,8 +68,8 @@ TYPED_TEST(TermTest, TermMultiplication)
 
 TYPED_TEST(TermTest, Derivative)
 {
-    Variable v0 = carl::freshRealVariable("v0");
-    Variable v1 = carl::freshRealVariable("v1");
+    Variable v0 = carl::fresh_real_variable("v0");
+    Variable v1 = carl::fresh_real_variable("v1");
     Term<TypeParam> t(3);
     t *= v0 * v0 * v0 * v1;
     Term<TypeParam> tprime = carl::derivative(t, v0);
@@ -78,8 +78,8 @@ TYPED_TEST(TermTest, Derivative)
 
 TYPED_TEST(TermTest, Substitute)
 {
-    Variable v0 = carl::freshRealVariable("v0");
-    Variable v1 = carl::freshRealVariable("v1");
+    Variable v0 = carl::fresh_real_variable("v0");
+    Variable v1 = carl::fresh_real_variable("v1");
     Term<TypeParam> t(3);
     Term<TypeParam> c4(4);
     t *= v0 * v0 * v1;
@@ -92,9 +92,9 @@ TYPED_TEST(TermTest, Substitute)
 
 TYPED_TEST(TermTest, Comparison)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
-    Variable z = freshRealVariable("z");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
+    Variable z = fresh_real_variable("z");
 
     ComparisonList<Term<TypeParam> > terms;
     terms.push_back( static_cast<TypeParam>(2) * x * y * z);
@@ -110,8 +110,8 @@ TYPED_TEST(TermTest, OtherComparison)
 {
     ComparisonList<Variable, Monomial::Arg, Term<TypeParam> > list;
 
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
 
     list.push_back(x);
     list.push_back( static_cast<TypeParam>(7) * x);

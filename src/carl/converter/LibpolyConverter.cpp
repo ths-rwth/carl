@@ -129,7 +129,7 @@ template<>
 poly::Interval LibpolyConverter::toInterval(const carl::Interval<mpq_class>& inter) {
 	poly::Value low;
 	bool low_open;
-	switch (inter.lowerBoundType()) {
+	switch (inter.lower_bound_type()) {
 	case BoundType::STRICT:
 		low = poly::Value(poly::Rational(inter.lower()));
 		low_open = true;
@@ -145,7 +145,7 @@ poly::Interval LibpolyConverter::toInterval(const carl::Interval<mpq_class>& int
 	}
 	poly::Value up;
 	bool up_open;
-	switch (inter.upperBoundType()) {
+	switch (inter.upper_bound_type()) {
 	case BoundType::STRICT:
 		up = poly::Value(poly::Rational(inter.upper()));
 		up_open = true;

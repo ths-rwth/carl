@@ -11,8 +11,8 @@ TEST(BVVariable, Basics)
 	carl::Sort bvSort = sm.addSort("BitVec", carl::VariableType::VT_UNINTERPRETED);
 	sm.makeSortIndexable(bvSort, 1, carl::VariableType::VT_BITVECTOR);
 	
-	carl::Variable a = carl::freshBitvectorVariable("a");
-	carl::Variable b = carl::freshBitvectorVariable("b");
+	carl::Variable a = carl::fresh_bitvector_variable("a");
+	carl::Variable b = carl::fresh_bitvector_variable("b");
 	carl::Sort s = carl::getSort("BitVec", std::vector<std::size_t>({8}));
 	carl::BVVariable v1;
 	carl::BVVariable v2(a, s);

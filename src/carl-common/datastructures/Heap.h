@@ -59,7 +59,7 @@ namespace carl
                 return _conf;
             }
 
-            std::string getName() const;
+            std::string get_name() const;
             void push( Entry entry );
             void push( const Entry* begin, const Entry* end );
             Entry pop();
@@ -189,7 +189,7 @@ namespace carl
     }
 
     template<class C>
-    std::string Heap<C>::getName() const
+    std::string Heap<C>::get_name() const
     {
         return std::string( "heap(" ) + (C::fastIndex ? "fi" : "si") + (C::supportDeduplicationWhileOrdering ? " dedup" : "") + ')';
     }
@@ -233,7 +233,7 @@ namespace carl
     template<class C>
     void Heap<C>::print( std::ostream& out ) const
     {
-        out << getName() << _tree.size() << ": {" << _tree << "}\n";
+        out << get_name() << _tree.size() << ": {" << _tree << "}\n";
     }
 
     template<class C>

@@ -36,13 +36,13 @@ TYPED_TEST_CASE(UnivariatePolynomialIntTest, IntegerTypes);
 
 TEST(UnivariatePolynomial, Constructor)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     UnivariatePolynomial<Rational> pol(x, {(Rational)0, (Rational)2});
 }
 
 TEST(UnivariatePolynomial, toInteger)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	UnivariatePolynomial<Rational> pRA(x, {(Rational)0, (Rational)2});
 	UnivariatePolynomial<IntegralType<Rational>::type> pI(x, {(IntegralType<Rational>::type)0, (IntegralType<Rational>::type)2});
 	EXPECT_EQ(pI, pRA.toIntegerDomain());
@@ -50,7 +50,7 @@ TEST(UnivariatePolynomial, toInteger)
 
 TEST(UnivariatePolynomial, Reduction)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 
 	{
 		UnivariatePolynomial<Rational> p(x, {(Rational)1, (Rational)1,(Rational)0, (Rational)0,(Rational)1});
@@ -70,7 +70,7 @@ TEST(UnivariatePolynomial, Reduction)
 
 TEST(UnivariatePolynomial, Divide)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     UnivariatePolynomial<Rational> p(x, {(Rational)6, (Rational)7,(Rational)1});
     UnivariatePolynomial<Rational> q(x, {(Rational)-6, (Rational)-5,(Rational)1});
     DivisionResult<UnivariatePolynomial<Rational>> d = carl::divide(p, p);
@@ -80,7 +80,7 @@ TEST(UnivariatePolynomial, Divide)
 
 TYPED_TEST(UnivariatePolynomialIntTest, DivideInteger)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     UnivariatePolynomial<TypeParam> p(x, {(TypeParam)0, (TypeParam)0,(TypeParam)5});
     UnivariatePolynomial<TypeParam> q(x, {(TypeParam)0, (TypeParam)0,(TypeParam)3});
     //DivisionResult<UnivariatePolynomial<TypeParam>> d = p.divideBy(q);
@@ -90,7 +90,7 @@ TYPED_TEST(UnivariatePolynomialIntTest, DivideInteger)
 
 TEST(UnivariatePolynomial, GCD)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 	UnivariatePolynomial<Rational> s(x);
     UnivariatePolynomial<Rational> t(x);
 
@@ -122,7 +122,7 @@ TEST(UnivariatePolynomial, GCD)
 
 TYPED_TEST(UnivariatePolynomialIntTest, GCD)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 	UnivariatePolynomial<Rational> s(x);
     UnivariatePolynomial<Rational> t(x);
 	
@@ -150,7 +150,7 @@ TYPED_TEST(UnivariatePolynomialIntTest, GCD)
 
 TEST(UnivariatePolynomial, cauchyBounds)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 
     UnivariatePolynomial<Rational> p(x, {(Rational)6, (Rational)7,(Rational)1});
     //p.cauchyBound();
@@ -159,7 +159,7 @@ TEST(UnivariatePolynomial, cauchyBounds)
 
 TYPED_TEST(UnivariatePolynomialIntTest, toFiniteDomain)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 
     UnivariatePolynomial<TypeParam> pol(x, {(TypeParam)1, (TypeParam)2});
     auto gf5 = std::make_unique<GaloisField<TypeParam>>(5);
@@ -172,7 +172,7 @@ TYPED_TEST(UnivariatePolynomialIntTest, toFiniteDomain)
 
 TYPED_TEST(UnivariatePolynomialIntTest, normalizeCoefficients)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 
 	UnivariatePolynomial<TypeParam> pol(x, {(TypeParam)1, (TypeParam)2});
     auto gf5 = std::make_unique<GaloisField<TypeParam>>(5);
@@ -184,7 +184,7 @@ TYPED_TEST(UnivariatePolynomialIntTest, normalizeCoefficients)
 
 TEST(UnivariatePolynomial, factorization)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 
     UnivariatePolynomial<Rational> linA(x, {(Rational)-2, (Rational)5});
     UnivariatePolynomial<Rational> linB(x, {(Rational)1, (Rational)3});
@@ -271,15 +271,15 @@ TEST(UnivariatePolynomial, factorization)
 
 TEST(UnivariatePolynomial, isNumber)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	EXPECT_FALSE(UnivariatePolynomial<Rational>(x, {1,2,3}).isNumber());
 	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, 1).isNumber());
 }
 
 TEST(UnivariatePolynomial, isUnivariate)
 {
-	Variable x = freshRealVariable("x");
-	//Variable y = VariablePool::getInstance().freshRealVariable();
+	Variable x = fresh_real_variable("x");
+	//Variable y = VariablePool::getInstance().fresh_real_variable();
 	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, {1,2,3}).isUnivariate());
 	//TODO: How does this work?
 	//EXPECT_FALSE(UnivariatePolynomial<UnivariatePolynomial<int>>(x, UnivariatePolynomial<int>(y, {1,2,3})).isUnivariate());
@@ -287,14 +287,14 @@ TEST(UnivariatePolynomial, isUnivariate)
 
 TEST(UnivariatePolynomial, numericUnit)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numericUnit(), 1);
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,-3}).numericUnit(), -1);
 }
 
 TEST(UnivariatePolynomial, numericContent)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numericContent(), 1);
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {15,27,3}).numericContent(), 3);
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {-1,-2,-3}).numericContent(), 1);
@@ -303,7 +303,7 @@ TEST(UnivariatePolynomial, numericContent)
 
 TYPED_TEST(UnivariatePolynomialIntTest, unitPart)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {1,2,3}).unitPart());
 	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {15,27,3}).unitPart());
 	EXPECT_EQ(-1,UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).unitPart());
@@ -312,7 +312,7 @@ TYPED_TEST(UnivariatePolynomialIntTest, unitPart)
 
 TYPED_TEST(UnivariatePolynomialIntTest, content)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 	EXPECT_EQ(1,carl::content(UnivariatePolynomial<TypeParam>(x, {1,2,3}).normalized()));
 	EXPECT_EQ(3,carl::content(UnivariatePolynomial<TypeParam>(x, {15,27,3}).normalized()));
 	EXPECT_EQ(1,carl::content(UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).normalized()));
@@ -322,7 +322,7 @@ TYPED_TEST(UnivariatePolynomialIntTest, content)
 
 TYPED_TEST(UnivariatePolynomialIntTest, primitivePart)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {1,2,3}),carl::primitive_part(UnivariatePolynomial<TypeParam>(x, {1,2,3}).normalized()));
 	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {5,9,1}),carl::primitive_part(UnivariatePolynomial<TypeParam>(x, {15,27,3}).normalized()));
 	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {1,2,3}),carl::primitive_part(UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).normalized()));
@@ -331,8 +331,8 @@ TYPED_TEST(UnivariatePolynomialIntTest, primitivePart)
 
 TYPED_TEST(UnivariatePolynomialIntTest, switchVariable)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
 	UnivariatePolynomial<TypeParam> p(x, {1,2,3});
 	MultivariatePolynomial<TypeParam> mp = TypeParam(3)*x*x + TypeParam(2)*x + TypeParam(1);
 	UnivariatePolynomial<MultivariatePolynomial<TypeParam>> res(y, {mp});
@@ -342,7 +342,7 @@ TYPED_TEST(UnivariatePolynomialIntTest, switchVariable)
 
 TYPED_TEST(UnivariatePolynomialTest, derivative)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 
 	{
 		UnivariatePolynomial<TypeParam> p(x, {1,2,3,4,5,6,7});
@@ -372,8 +372,8 @@ TYPED_TEST(UnivariatePolynomialTest, derivative)
 
 TEST(UnivariatePolynomial, resultant)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
 
 	// p1 = x - y
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> p1(x, {MultivariatePolynomial<Rational>(-Term<Rational>(y)), MultivariatePolynomial<Rational>(1)});
@@ -399,9 +399,9 @@ TEST(UnivariatePolynomial, resultant)
 
 TEST(UnivariatePolynomial, resultant2)
 {
-	Variable x = freshRealVariable("x");
-	Variable c = freshRealVariable("c");
-	Variable t = freshRealVariable("t");
+	Variable x = fresh_real_variable("x");
+	Variable c = fresh_real_variable("c");
+	Variable t = fresh_real_variable("t");
 
 	MultivariatePolynomial<Rational> mc(c);
 	MultivariatePolynomial<Rational> mt(t);
@@ -417,8 +417,8 @@ TEST(UnivariatePolynomial, resultant2)
 
 TEST(UnivariatePolynomial, resultant3)
 {
-	Variable a = freshRealVariable("a");
-	Variable t = freshRealVariable("t");
+	Variable a = fresh_real_variable("a");
+	Variable t = fresh_real_variable("t");
 
 	MultivariatePolynomial<Rational> ma(a);
 	MultivariatePolynomial<Rational> mt(t);
@@ -435,8 +435,8 @@ TEST(UnivariatePolynomial, resultant3)
 
 TEST(UnivariatePolynomial, resultant4)
 {
-    Variable m = freshRealVariable("m");
-    Variable r = freshRealVariable("r");
+    Variable m = fresh_real_variable("m");
+    Variable r = fresh_real_variable("r");
 
     MultivariatePolynomial<Rational> mr(r);
     MultivariatePolynomial<Rational> one((Rational)1);
@@ -451,8 +451,8 @@ TEST(UnivariatePolynomial, resultant4)
 
 TEST(UnivariatePolynomial, PrincipalSubresultantCoefficient)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
     MultivariatePolynomial<Rational> my(y);
     MultivariatePolynomial<Rational> one((Rational)1);
     MultivariatePolynomial<Rational> zero((Rational)0);
@@ -475,7 +475,7 @@ TEST(UnivariatePolynomial, PrincipalSubresultantCoefficient)
 
 TEST(UnivariatePolynomial, intervalCoeffs)
 {
-	Variable a = freshRealVariable("a");
+	Variable a = fresh_real_variable("a");
 	UnivariatePolynomial<carl::Interval<double>> p(a);
 	p *= p;
 	p += p;
@@ -484,8 +484,8 @@ TEST(UnivariatePolynomial, intervalCoeffs)
 
 TEST(UnivariatePolynomial, coprimeFactor)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
 	MultivariatePolynomial<Rational> polY(y);
 
 	MultivariatePolynomial<Rational> coeff1(Rational(12)*polY*polY + Rational(6)*polY);

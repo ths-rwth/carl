@@ -557,7 +557,7 @@ bool compare(const real_algebraic_number_libpoly<Number>& lhs, const real_algebr
 }
 
 template<typename Number>
-const carl::Variable real_algebraic_number_libpoly<Number>::auxVariable = freshRealVariable("__r");
+const carl::Variable real_algebraic_number_libpoly<Number>::auxVariable = fresh_real_variable("__r");
 
 template<typename Number>
 bool compare(const real_algebraic_number_libpoly<Number>& lhs, const Number& rhs, const Relation relation) {

@@ -40,10 +40,10 @@ private:
 		auto tmp = i.root(static_cast<int>(mRoot));
 		CARL_LOG_DEBUG("carl.contractor", mRoot << "th root: " << tmp);
 		if (make_integer()) {
-			tmp = tmp.integralPart();
+			tmp = tmp.integral_part();
 			CARL_LOG_DEBUG("carl.contractor", "Strictening for integer: " << tmp);
 		}
-		if (tmp.isEmpty()) {
+		if (tmp.is_empty()) {
 			CARL_LOG_DEBUG("carl.contractor", "Is empty.");
 			return;
 		}
@@ -242,7 +242,7 @@ public:
 		std::size_t last = 0;
 		for (std::size_t i = 0; i < res.size(); ++i) {
 			auto tmp = set_intersection(res[i], cur);
-			if (!tmp.isEmpty()) {
+			if (!tmp.is_empty()) {
 				res[last] = tmp;
 				last++;
 			}

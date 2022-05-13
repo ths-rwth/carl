@@ -18,9 +18,9 @@ TEST(LIBPOLY, createVars) {
 }
 
 TEST(LIBPOLY, convertVariables) {
-	auto carl_var = freshRealVariable("x");
+	auto carl_var = fresh_real_variable("x");
 	auto var_x = VariableMapper::getInstance().getLibpolyVariable(carl_var);
-	auto var_y = VariableMapper::getInstance().getLibpolyVariable(freshRealVariable("y"));
+	auto var_y = VariableMapper::getInstance().getLibpolyVariable(fresh_real_variable("y"));
 	auto test = VariableMapper::getInstance().getCarlVariable(var_x); //convert back
 
 	EXPECT_FALSE(var_x == var_y);
@@ -28,8 +28,8 @@ TEST(LIBPOLY, convertVariables) {
 }
 
 TEST(LIBPOLY, convertFromLibpolyMultivariate) {
-	auto x = freshRealVariable("x");
-	auto y = freshRealVariable("y");
+	auto x = fresh_real_variable("x");
+	auto y = fresh_real_variable("y");
 	auto lp_x = VariableMapper::getInstance().getLibpolyVariable(x);
 	auto lp_y = VariableMapper::getInstance().getLibpolyVariable(y);
 
@@ -50,8 +50,8 @@ TEST(LIBPOLY, convertFromLibpolyMultivariate) {
 }
 
 TEST(LIBPOLY, convertToLibpolyMultivariate) {
-	auto x = freshRealVariable("x");
-	auto y = freshRealVariable("y");
+	auto x = fresh_real_variable("x");
+	auto y = fresh_real_variable("y");
 	auto lp_x = VariableMapper::getInstance().getLibpolyVariable(x);
 	auto lp_y = VariableMapper::getInstance().getLibpolyVariable(y);
 
@@ -84,7 +84,7 @@ TEST(LIBPOLY, convertToLibpolyMultivariate) {
 }
 
 TEST(LIBPOLY, convertToLibpolyUnivariate) {
-	auto x = freshRealVariable("x");
+	auto x = fresh_real_variable("x");
 
 	UnivariatePolynomial<Rational> carl_pol1(x, {Rational(-6), Rational(-5), Rational(1)});
 	poly::UPolynomial lp_pol1({-6, -5, 1});
@@ -98,7 +98,7 @@ TEST(LIBPOLY, convertToLibpolyUnivariate) {
 }
 
 TEST(LIBPOLY, convertToCarlUnivariate) {
-	auto x = freshRealVariable("x");
+	auto x = fresh_real_variable("x");
 
 	UnivariatePolynomial<Rational> carl_pol1(x, {Rational(-6), Rational(-5), Rational(1)});
 	poly::UPolynomial lp_pol1({-6, -5, 1});
@@ -107,8 +107,8 @@ TEST(LIBPOLY, convertToCarlUnivariate) {
 }
 
 TEST(LIBPOLY, variableOrder) {
-	auto x = freshRealVariable("x");
-	auto y = freshRealVariable("y");
+	auto x = fresh_real_variable("x");
+	auto y = fresh_real_variable("y");
 	auto lp_x = VariableMapper::getInstance().getLibpolyVariable(x);
 	auto lp_y = VariableMapper::getInstance().getLibpolyVariable(y);
 
@@ -142,8 +142,8 @@ TEST(LIBPOLY, variableOrder) {
 }
 
 TEST(LIBPOLY, nullificationBug){
-	auto x0 = freshRealVariable("x0");
-	auto x1 = freshRealVariable("x1");
+	auto x0 = fresh_real_variable("x0");
+	auto x1 = fresh_real_variable("x1");
 
 	carl::MultivariatePolynomial<mpq_class> carl_poly({ carl::Term<mpq_class>(1) , mpq_class(-1) * x0 * x1});
 	std::map<Variable, real_algebraic_number_libpoly<mpq_class>> assignment ; 
@@ -157,9 +157,9 @@ TEST(LIBPOLY, nullificationBug){
 }
 
 TEST(LIBPOLY, nullificationBug2){
-	auto skoX = freshRealVariable("skoX");
-	auto skoY = freshRealVariable("skoY");
-	auto skoZ = freshRealVariable("skoZ");
+	auto skoX = fresh_real_variable("skoX");
+	auto skoY = fresh_real_variable("skoY");
+	auto skoZ = fresh_real_variable("skoZ");
 
 	// -1*skoX + -1*skoY + -1*skoZ + skoX*skoY*skoZ 
 	carl::MultivariatePolynomial<mpq_class> carl_poly({mpq_class(-1) * skoX , mpq_class(-1) * skoY , mpq_class(-1) * skoZ , mpq_class(1) * skoX * skoY * skoZ });

@@ -13,13 +13,13 @@ typedef Formula<Pol> FormulaT;
 
 TEST(Formula, Construction)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
-    Variable i1 = freshIntegerVariable("i1");
-    Variable i2 = freshIntegerVariable("i2");
-    Variable i3 = freshIntegerVariable("i3");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
+    Variable i1 = fresh_integer_variable("i1");
+    Variable i2 = fresh_integer_variable("i2");
+    Variable i3 = fresh_integer_variable("i3");
 //    Variable i = newArithmeticVariable( "i", VariableType::VT_INT );
-    Variable b = freshBooleanVariable("b");
+    Variable b = fresh_boolean_variable("b");
 //    Sort sortS = newSort( "S" );
 //    Sort sortT = newSort( "T" );
 //    Variable u = VariableNamePool::getInstance().newUninterpretedVariable( "u" );
@@ -76,8 +76,8 @@ TEST(Formula, Construction)
 
 TEST(Formula, BooleanConstructors)
 {
-    Variable b1 = freshBooleanVariable("b1");
-    Variable b2 = freshBooleanVariable("b2");
+    Variable b1 = fresh_boolean_variable("b1");
+    Variable b2 = fresh_boolean_variable("b2");
 
     FormulaT True = FormulaT(FormulaType::TRUE);
     EXPECT_TRUE(True.is_true());
@@ -102,16 +102,16 @@ TEST(Formula, BooleanConstructors)
 TEST(Formula, FormulaPoolDestructor)
 {
     using carl::VariableType;
-    carl::Variable b1 = freshBooleanVariable("b1");
-    carl::Variable b2 = freshBooleanVariable("b2");
+    carl::Variable b1 = fresh_boolean_variable("b1");
+    carl::Variable b2 = fresh_boolean_variable("b2");
     FormulaT test(AND, {FormulaT(b1), FormulaT(b2)});
 }
 
 TEST(Formula, ANDConstruction)
 {
-    FormulaT a( freshBooleanVariable("a") );
+    FormulaT a( fresh_boolean_variable("a") );
     FormulaT na( FormulaType::NOT, a );
-    FormulaT b( freshBooleanVariable("b") );
+    FormulaT b( fresh_boolean_variable("b") );
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
@@ -149,9 +149,9 @@ TEST(Formula, ANDConstruction)
 
 TEST(Formula, ORConstruction)
 {
-    FormulaT a( freshBooleanVariable("a") );
+    FormulaT a( fresh_boolean_variable("a") );
     FormulaT na( FormulaType::NOT, a );
-    FormulaT b( freshBooleanVariable("b") );
+    FormulaT b( fresh_boolean_variable("b") );
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
@@ -189,9 +189,9 @@ TEST(Formula, ORConstruction)
 
 TEST(Formula, XORConstruction)
 {
-    FormulaT a( freshBooleanVariable("a") );
+    FormulaT a( fresh_boolean_variable("a") );
     FormulaT na( FormulaType::NOT, a );
-    FormulaT b( freshBooleanVariable("b") );
+    FormulaT b( fresh_boolean_variable("b") );
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
@@ -229,9 +229,9 @@ TEST(Formula, XORConstruction)
 
 TEST(Formula, IFFConstruction)
 {
-    FormulaT a( freshBooleanVariable("a") );
+    FormulaT a( fresh_boolean_variable("a") );
     FormulaT na( FormulaType::NOT, a );
-    FormulaT b( freshBooleanVariable("b") );
+    FormulaT b( fresh_boolean_variable("b") );
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
@@ -267,7 +267,7 @@ TEST(Formula, IFFConstruction)
 
 TEST(Formula, ConstraintConstruction)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     Pol px( x );
     EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GEQ, Rational(1) ) ), FormulaT( Constr( -px+Rational(1), carl::Relation::LEQ ) ) );
     EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GEQ, -Rational(1) ) ), FormulaT( Constr( -px-Rational(1), carl::Relation::LEQ ) ) );
@@ -282,7 +282,7 @@ TEST(Formula, ConstraintConstruction)
     EXPECT_EQ( FormulaT( Constr( -px+Rational(1), carl::Relation::GREATER ) ), FormulaT( Constr( px-Rational(1), carl::Relation::LESS ) ) );
     EXPECT_EQ( FormulaT( Constr( -px, carl::Relation::GREATER ) ), FormulaT( Constr( px, carl::Relation::LESS ) ) );
 
-    Variable i = freshIntegerVariable("i");
+    Variable i = fresh_integer_variable("i");
     Pol pi( i );
     EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, Rational(1) ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LEQ ) ) );
     EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, -Rational(1) ) ), FormulaT( Constr( -pi-Rational(1), carl::Relation::LEQ ) ) );
@@ -338,7 +338,7 @@ TEST(Formula, ConstraintConstruction)
     EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, -Rational(3)/Rational(2) ) ), FormulaT( Constr( -pi-Rational(1), carl::Relation::LEQ ) ) );
     
     // check if the integer normalization works
-    Variable j = freshIntegerVariable("j");
+    Variable j = fresh_integer_variable("j");
     Pol pj( j );
     EXPECT_EQ( Constr( pi+pj-Rational(3), carl::Relation::LESS ).relation(), carl::Relation::LEQ );
     EXPECT_EQ( Constr( Rational(9)*pi+Rational(18)*pj-Rational(4), carl::Relation::GEQ ), Constr( pi+Rational(2)*pj-Rational(1), carl::Relation::GEQ ) );
@@ -349,7 +349,7 @@ TEST(Formula, ConstraintConstruction)
 
 TEST(Formula, ConstraintSimplication)
 {
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     {
         FormulaT ref(Pol(x), Relation::LESS);
         EXPECT_EQ(ref, FormulaT(-Pol(x), Relation::GREATER));
@@ -366,9 +366,9 @@ TEST(Formula, ConstraintSimplication)
 
 TEST(Formula, gatherVariables)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Variable z = freshRealVariable("z");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
+	Variable z = fresh_real_variable("z");
 	{
 		carlVariables vars;
 		FormulaT f(Pol(x), Relation::LESS);
@@ -392,7 +392,7 @@ TEST(Formula, gatherVariables)
 TEST(Formula, Uniqueness)
 {
 	//(X !> (IR ]-594743/343, -1189485/686[, __r^2 + -1031250000/343 R))
-	Variable X = freshRealVariable("X");
+	Variable X = fresh_real_variable("X");
 	Variable r = MultivariateRoot<Pol>::var();
 	
 	Interval<Rational> ir(Rational(-594743)/343, BoundType::STRICT, Rational(-1189485)/686, BoundType::STRICT);

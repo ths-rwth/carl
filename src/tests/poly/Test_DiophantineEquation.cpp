@@ -76,10 +76,10 @@ cln::cl_I evaluatePolynomial(MultivariatePolynomial<cln::cl_I>& p, std::vector<c
 }
 
 TEST(DiophantineEquation, solve_linear) {
-	Variable x = carl::freshRealVariable();
-	Variable y = carl::freshRealVariable();
-	Variable z = carl::freshRealVariable();
-	Variable w = carl::freshRealVariable();
+	Variable x = carl::fresh_real_variable();
+	Variable y = carl::fresh_real_variable();
+	Variable z = carl::fresh_real_variable();
+	Variable w = carl::fresh_real_variable();
 	std::vector<cln::cl_I> res;
 	MultivariatePolynomial<cln::cl_I> p;
 

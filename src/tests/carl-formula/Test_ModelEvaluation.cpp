@@ -27,9 +27,9 @@ TEST(ModelEvaluation, Formula)
 
 TEST(ModelEvaluation, Constraint)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Variable z = freshRealVariable("z");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
+	Variable z = fresh_real_variable("z");
 	ModelT m;
 	Pol p = Pol(x) + Pol(y)*z + Pol(1);
 	ConstraintT c1(p, carl::Relation::EQ);
@@ -49,7 +49,7 @@ TEST(ModelEvaluation, Constraint)
 
 TEST(ModelEvaluation, EvaluateMVR)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	Variable z = MultivariateRoot<Pol>::var();
 	ModelT m;
 	m.assign(x, Rational(-1));
@@ -61,7 +61,7 @@ TEST(ModelEvaluation, EvaluateMVR)
 
 TEST(ModelEvaluation, EvaluateRANIR)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	ModelT m;
 	IntervalT i(Rational(-3)/2, BoundType::STRICT, Rational(-1), BoundType::STRICT);
 	UnivariatePolynomial<Rational> p(x, {Rational(-2), Rational(0), Rational(1)});
@@ -74,7 +74,7 @@ TEST(ModelEvaluation, EvaluateRANIR)
 
 TEST(ModelEvaluation, EvaluateRANIRConstraint)
 {
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	ModelT m;
 	IntervalT i(Rational(27)/32, BoundType::STRICT, Rational(7)/8, BoundType::STRICT);
 	UnivariatePolynomial<Rational> p(x, {Rational(-3), Rational(0), Rational(4)}); // 4*r^2 -3
@@ -87,8 +87,8 @@ TEST(ModelEvaluation, EvaluateRANIRConstraint)
 
 TEST(ModelEvaluation, EvaluateWithMVR)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
 	ModelT m;
 	Pol p = Pol(x*x) - y*y - Rational(4);
 	Pol mvrpol = Pol(MVRootT::var() * MVRootT::var()) - Rational(3);
@@ -110,7 +110,7 @@ TEST(ModelEvaluation, EvaluateBV)
 	sm.clear();
 	carl::Sort bvSort = sm.addSort("BitVec", carl::VariableType::VT_UNINTERPRETED);
 	sm.makeSortIndexable(bvSort, 1, carl::VariableType::VT_BITVECTOR);
-	carl::Variable a = carl::freshBitvectorVariable("a");
+	carl::Variable a = carl::fresh_bitvector_variable("a");
 	carl::Sort s = carl::getSort("BitVec", std::vector<std::size_t>({4}));
 	carl::BVVariable v(a, s);
 	carl::BVTerm bvt_v(carl::BVTermType::VARIABLE, v);

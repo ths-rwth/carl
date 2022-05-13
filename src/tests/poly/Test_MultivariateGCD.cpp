@@ -11,7 +11,7 @@ typedef mpq_class Rational;
 
 TEST(GCD, constants) {
 	using P = MultivariatePolynomial<Rational>;
-	Variable x = freshRealVariable("x");
+	Variable x = fresh_real_variable("x");
 	EXPECT_EQ(P(1), carl::gcd(P(1), P(2)));
 	EXPECT_EQ(P(1), carl::gcd(P(2), P(1)));
 	EXPECT_EQ(P(1), carl::gcd(P(1), P(x)));
@@ -24,9 +24,9 @@ TEST(GCD, constants) {
 
 TEST(MultivariateGCD, test1)
 {
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
-    Variable z = freshRealVariable("z");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
+    Variable z = fresh_real_variable("z");
     typedef MultivariatePolynomial<Rational> P;
     P f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x*y});
     P g1({(Rational)1*x*x*x*x*y, (Rational)3*x*y*y});

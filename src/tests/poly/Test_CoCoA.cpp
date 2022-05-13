@@ -32,7 +32,7 @@ TEST(CoCoA, Basic) {
 
 TEST(CoCoA, GCD) {
 	using Poly = carl::MultivariatePolynomial<mpq_class>;
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 
 	Poly p1 = (x * x) - mpq_class(1);
 	Poly p2 = (x + mpq_class(1)) * (x - mpq_class(2));
@@ -45,7 +45,7 @@ TEST(CoCoA, GCD) {
 
 TEST(CoCoA, Factorize) {
 	using Poly = carl::MultivariatePolynomial<mpq_class>;
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 
 	Poly p1 = (x * x) - mpq_class(1);
 	Poly p2 = (x + mpq_class(1)) * (x - mpq_class(2));
@@ -76,7 +76,7 @@ TEST(CoCoA, Factorize) {
 
 TEST(CoCoA, IrreducibleFactors) {
 	using Poly = carl::MultivariatePolynomial<mpq_class>;
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 
 	Poly p1 = (x * x) - mpq_class(1);
 	Poly p2 = (x + mpq_class(1)) * (x - mpq_class(2));
@@ -115,8 +115,8 @@ TEST(CoCoA, IrreducibleFactors) {
 
 TEST(CoCoA, SquareFreePart) {
 	using Poly = carl::MultivariatePolynomial<mpq_class>;
-	carl::Variable x = carl::freshRealVariable("x");
-	carl::Variable y = carl::freshRealVariable("y");
+	carl::Variable x = carl::fresh_real_variable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
 
 	carl::CoCoAAdaptor<Poly> c({Poly(x * y)});
 	{
@@ -134,8 +134,8 @@ TEST(CoCoA, SquareFreePart) {
 TEST(CoCoA, SquareFreeBase)
 {
 	using Poly = carl::MultivariatePolynomial<mpq_class>;
-	carl::Variable x = carl::freshRealVariable("x");
-	carl::Variable y = carl::freshRealVariable("y");
+	carl::Variable x = carl::fresh_real_variable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
 	carl::CoCoAAdaptor<Poly> c({Poly(x*y)});
 
 	Poly p = (x*x - mpq_class(1)) * (x*x - mpq_class(1)) * (x-mpq_class(2));
@@ -179,8 +179,8 @@ carl::MultivariatePolynomial<mpq_class> randomPoly(const std::initializer_list<c
 
 TEST(CoCoA, Benchmark) {
 	using Poly = carl::MultivariatePolynomial<mpq_class>;
-	carl::Variable x = carl::freshRealVariable("x");
-	carl::Variable y = carl::freshRealVariable("y");
+	carl::Variable x = carl::fresh_real_variable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
 
 	std::size_t count = 10;
 	std::cout << "Generating " << count << "..." << std::endl;
