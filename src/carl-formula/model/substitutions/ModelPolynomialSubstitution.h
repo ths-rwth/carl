@@ -31,7 +31,7 @@ namespace carl {
 			return Formula<Poly>(mPoly - mv.asVariable(), Relation::EQ);
 		}
 		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& m) const {
-			return model::evaluate(mPoly, m);
+			return evaluate(mPoly, m);
 		}
 		virtual bool dependsOn(const ModelVariable& var) const {
 			if (!var.isVariable()) return false;

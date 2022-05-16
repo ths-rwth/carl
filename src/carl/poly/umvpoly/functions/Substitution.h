@@ -402,4 +402,16 @@ UnivariatePolynomial<Coeff> substitute(const UnivariatePolynomial<Coeff>& p, Var
 	}
 }
 
+/**
+ * Substitutes a variable with a rational within a polynomial.
+ */
+template<typename Rational>
+void substitute_inplace(MultivariatePolynomial<Rational>& p, Variable var, const Rational& r) {
+	carl::substitute_inplace(p, var, MultivariatePolynomial<Rational>(r));
+}
+template<typename Poly, typename Rational>
+void substitute_inplace(UnivariatePolynomial<Poly>& p, Variable var, const Rational& r) {
+	carl::substitute_inplace(p, var, Poly(r));
+}
+
 }

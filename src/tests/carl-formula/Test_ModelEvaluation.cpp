@@ -21,7 +21,7 @@ TEST(ModelEvaluation, Formula)
 {
 	ModelT m;
 	FormulaT f = FormulaT(FormulaType::TRUE);
-	auto res = model::substitute(f, m);
+	auto res = substitute(f, m);
 	EXPECT_TRUE(res.is_true());
 }
 
@@ -42,7 +42,7 @@ TEST(ModelEvaluation, Constraint)
 	EXPECT_EQ(subs->second, -Pol(y)*z - Pol(1));
 
 	m.emplace(subs->first, carl::createSubstitution<Rational,Pol,carl::ModelPolynomialSubstitution<Rational, Pol>>(subs->second));
-	model::substituteIn(c2, m);
+	substitute_inplace(c2, m);
 	EXPECT_EQ(c2, ConstraintT(Pol(y)*z + Pol(1), carl::Relation::EQ));
 }
 
@@ -54,7 +54,7 @@ TEST(ModelEvaluation, EvaluateMVR)
 	ModelT m;
 	m.assign(x, Rational(-1));
 	MultivariateRoot<Pol> mvr(Pol(x)*z, 1);
-	auto res = model::evaluate(mvr, m);
+	auto res = evaluate(mvr, m);
 	EXPECT_TRUE(res.isRational());
 	EXPECT_TRUE(isZero(res.asRational()));
 }
@@ -67,7 +67,7 @@ TEST(ModelEvaluation, EvaluateRANIR)
 	UnivariatePolynomial<Rational> p(x, {Rational(-2), Rational(0), Rational(1)});
 	m.assign(x, RANT::create_safe(p, i));
 	FormulaT f = FormulaT(ConstraintT(Pol(p), Relation::EQ));
-	auto res = model::evaluate(f, m);
+	auto res = evaluate(f, m);
 	EXPECT_TRUE(res.isBool());
 	EXPECT_TRUE(res.asBool());
 }
@@ -80,7 +80,7 @@ TEST(ModelEvaluation, EvaluateRANIRConstraint)
 	UnivariatePolynomial<Rational> p(x, {Rational(-3), Rational(0), Rational(4)}); // 4*r^2 -3
 	m.assign(x, RANT::create_safe(p, i)); // x = (IR ]27/32, 7/8[, (4)*__r^2 + -3 R)
 	FormulaT f = FormulaT(ConstraintT(Pol(x), Relation::LEQ));
-	auto res = model::evaluate(f, m);
+	auto res = evaluate(f, m);
 	EXPECT_TRUE(res.isBool());
 	EXPECT_FALSE(res.asBool());
 }
@@ -108,6 +108,6 @@ TEST(ModelEvaluation, EvaluateBV)
 	m.emplace(v, bv2);
 	std::cout << m << std::endl;
 	
-	auto res = carl::model::evaluate(f, m);
+	auto res = carl::evaluate(f, m);
 	std::cout << res << std::endl;
 }

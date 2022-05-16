@@ -7,7 +7,6 @@
  */
 
 namespace carl {
-namespace model {
 	
 template<typename T, typename Rational, typename Poly>
 T substitute(const T& t, const Model<Rational,Poly>& m);
@@ -15,7 +14,6 @@ T substitute(const T& t, const Model<Rational,Poly>& m);
 template<typename T, typename Rational, typename Poly>
 ModelValue<Rational,Poly> evaluate(const T& t, const Model<Rational,Poly>& m);
 
-}
 }
 
 #include "ModelEvaluation_helper.h"
@@ -28,7 +26,6 @@ ModelValue<Rational,Poly> evaluate(const T& t, const Model<Rational,Poly>& m);
 #include "ModelEvaluation_Uninterpreted.h"
 
 namespace carl {
-namespace model {
 
 /**
  * Substitutes a model into an expression t.
@@ -38,7 +35,7 @@ namespace model {
 template<typename T, typename Rational, typename Poly>
 T substitute(const T& t, const Model<Rational,Poly>& m) {
 	T res = t;
-	substituteIn(res, m);
+	substitute_inplace(res, m);
 	return res;
 }
 
@@ -50,7 +47,7 @@ template<typename T, typename Rational, typename Poly>
 ModelValue<Rational,Poly> evaluate(const T& t, const Model<Rational,Poly>& m) {
 	T tmp = t;
 	ModelValue<Rational,Poly> res;
-	evaluate(res, tmp, m);
+	evaluate_inplace(res, tmp, m);
 	if (res.isRAN() && res.asRAN().is_numeric()) {
 		res = res.asRAN().value();
 	}
@@ -66,5 +63,4 @@ unsigned satisfied_by(const T& t, const Model<Rational,Poly>& m) {
 	return 2;
 }
 
-}
 }

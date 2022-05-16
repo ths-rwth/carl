@@ -4,38 +4,21 @@
 #include <carl/extended/MultivariateRoot.h>
 
 namespace carl {
-namespace model {
-	/**
-	 * Substitutes a variable with a rational within a MultivariateRoot.
-	 */
-	template<typename Rational, typename Poly>
-	void substituteIn(MultivariateRoot<Poly>& mvr, Variable::Arg var, const Rational& r) {
-		substitute_inplace(mvr, var, Poly(r));
-	}
-
-	/**
-	 * Substitutes a variable with a real algebraic number within a MultivariateRoot.
-	 * Only works if the real algebraic number is actually numeric.
-	 */
-	template<typename Rational, typename Poly>
-	void substituteIn(MultivariateRoot<Poly>& mvr, Variable::Arg var, const RealAlgebraicNumber<Rational>& r) {
-		if (r.is_numeric()) substituteIn(mvr, var, r.value());
-	}
 
 	/**
 	 * Substitutes all variables from a model within a MultivariateRoot.
 	 * May fail to substitute some variables, for example if the values are RANs or SqrtEx.
 	 */
 	template<typename Rational, typename Poly>
-	void substituteIn(MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
+	void substitute_inplace(MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
 		for (auto var: carl::variables(mvr)) {
 			auto it = m.find(var);
 			if (it == m.end()) continue;
 			const ModelValue<Rational,Poly>& value = m.evaluated(var);
 			if (value.isRational()) {
-				substituteIn(mvr, var, value.asRational());
+				substitute_inplace(mvr, var, Poly(value.asRational()));
 			} else if (value.isRAN()) {
-				substituteIn(mvr, var, value.asRAN());
+				if (value.asRAN().is_numeric()) substitute_inplace(mvr, var, Poly(value.asRAN().value()));
 			}
 		}
 	}
@@ -45,11 +28,11 @@ namespace model {
 	 * If evaluation can not be done for some variables, the result may actually be a ModelMVRootSubstitution.
 	 */
 	template<typename Rational, typename Poly>
-	void evaluate(ModelValue<Rational,Poly>& res, MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
+	void evaluate_inplace(ModelValue<Rational,Poly>& res, MultivariateRoot<Poly>& mvr, const Model<Rational,Poly>& m) {
 		CARL_LOG_DEBUG("carl.model.evaluation", "Substituting " << m << " into " << mvr);
-		substituteIn(mvr, m);
+		substitute_inplace(mvr, m);
 		
-		auto map = collectRANIR(carl::variables(mvr).as_set(), m);
+		auto map = model::collectRANIR(carl::variables(mvr).as_set(), m);
 		if (map.size() == carl::variables(mvr).size()) {
 			CARL_LOG_DEBUG("carl.model.evaluation", "Fully evaluating " << mvr << " over " << map);
 			auto r = evaluate(mvr,map);
@@ -66,5 +49,5 @@ namespace model {
 		CARL_LOG_DEBUG("carl.model.evaluation", "Could not evaluate, returning " << mvr);
 		res = createSubstitution<Rational,Poly,ModelMVRootSubstitution<Rational,Poly>>(mvr);
 	}
-}
+
 }

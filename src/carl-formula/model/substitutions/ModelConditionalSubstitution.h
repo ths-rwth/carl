@@ -33,7 +33,7 @@ namespace carl {
 			return Formula<Poly>(FormulaType::AND, std::move(subs));
 		}
 		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& model) const {
-			//return model::evaluate(mPoly, model);
+			//return evaluate(mPoly, model);
 			return true;
 		}
 		virtual bool dependsOn(const ModelVariable& var) const {

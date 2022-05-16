@@ -5,13 +5,12 @@
 #include <carl-formula/bitvector/BVTerm.h>
 
 namespace carl {
-namespace model {
 
 	/**
 	 * Substitutes all variables from a model within a bitvector term.
 	 */
 	template<typename Rational, typename Poly>
-	void substituteIn(BVTerm& bvt, const Model<Rational,Poly>& m) {
+	void substitute_inplace(BVTerm& bvt, const Model<Rational,Poly>& m) {
 		BVTermType type = bvt.type();
 		if (type == BVTermType::CONSTANT) {
 		} else if (type == BVTermType::VARIABLE) {
@@ -35,7 +34,7 @@ namespace model {
 	 * Substitutes all variables from a model within a bitvector constraint.
 	 */
 	template<typename Rational, typename Poly>
-	void substituteIn(BVConstraint& bvc, const Model<Rational,Poly>& m) {
+	void substitute_inplace(BVConstraint& bvc, const Model<Rational,Poly>& m) {
 		bvc = BVConstraint::create(bvc.relation(), substitute(bvc.lhs(), m), substitute(bvc.rhs(), m));
 	}
 	
@@ -43,8 +42,8 @@ namespace model {
 	 * Evaluates a bitvector term to a ModelValue over a Model.
 	 */
 	template<typename Rational, typename Poly>
-	void evaluate(ModelValue<Rational,Poly>& res, BVTerm& bvt, const Model<Rational,Poly>& m) {
-		substituteIn(bvt, m);
+	void evaluate_inplace(ModelValue<Rational,Poly>& res, BVTerm& bvt, const Model<Rational,Poly>& m) {
+		substitute_inplace(bvt, m);
 		if (bvt.type() == BVTermType::CONSTANT) {
 			res = bvt.value();
 		} else {
@@ -57,8 +56,8 @@ namespace model {
 	 * Evaluates a bitvector constraint to a ModelValue over a Model.
 	 */
 	template<typename Rational, typename Poly>
-	void evaluate(ModelValue<Rational,Poly>& res, BVConstraint& bvc, const Model<Rational,Poly>& m) {
-		substituteIn(bvc, m);
+	void evaluate_inplace(ModelValue<Rational,Poly>& res, BVConstraint& bvc, const Model<Rational,Poly>& m) {
+		substitute_inplace(bvc, m);
 		if (bvc.isAlwaysConsistent()) res = true;
 		else if (bvc.isAlwaysInconsistent()) res = false;
 		else {
@@ -66,5 +65,5 @@ namespace model {
 			assert(false);
 		}
 	}
-}
+
 }

@@ -105,13 +105,14 @@ namespace model {
 		}
 		if (va.negated()) f = f.negated();
 	}
-	
+}
+
 	/**
 	 * Substitutes all variables from a model within a formula.
 	 * May fail to substitute some variables, for example if the values are RANs or SqrtEx.
 	 */
 	template<typename Rational, typename Poly>
-	void substituteIn(Formula<Poly>& f, const Model<Rational,Poly>& m) {
+	void substitute_inplace(Formula<Poly>& f, const Model<Rational,Poly>& m) {
 		switch (f.type()) {
 			case FormulaType::ITE: {
 				f = Formula<Poly>(FormulaType::ITE, substitute(f.condition(), m), substitute(f.first_case(), m), substitute(f.second_case(), m));
@@ -143,10 +144,10 @@ namespace model {
 				f = Formula<Poly>(FormulaType::IMPLIES, substitute(f.premise(), m), substitute(f.conclusion(), m));
 				break;
 			}
-			case FormulaType::AND: substituteSubformulas(f, m); break;
-			case FormulaType::OR: substituteSubformulas(f, m); break;
-			case FormulaType::XOR: substituteSubformulas(f, m); break;
-			case FormulaType::IFF: substituteSubformulas(f, m); break;
+			case FormulaType::AND: model::substituteSubformulas(f, m); break;
+			case FormulaType::OR: model::substituteSubformulas(f, m); break;
+			case FormulaType::XOR: model::substituteSubformulas(f, m); break;
+			case FormulaType::IFF: model::substituteSubformulas(f, m); break;
 			case FormulaType::CONSTRAINT: {
 				auto res = evaluate(f.constraint(), m);
 				if (res.isBool()) {
@@ -161,11 +162,11 @@ namespace model {
 				break;
 			}
 			case FormulaType::VARCOMPARE: {
-				evaluateVarCompare(f, m);
+				model::evaluateVarCompare(f, m);
 				break;
 			}
 			case FormulaType::VARASSIGN: {
-				evaluateVarAssign(f, m);
+				model::evaluateVarAssign(f, m);
 				break;
 			}
 			case FormulaType::BITVECTOR: {
@@ -195,11 +196,11 @@ namespace model {
 	 * If evaluation can not be done for some variables, the result may actually be a ModelPolynomialSubstitution.
 	 */
 	template<typename Rational, typename Poly>
-	void evaluate(ModelValue<Rational,Poly>& res, Formula<Poly>& f, const Model<Rational,Poly>& m) {
-		substituteIn(f, m);
+	void evaluate_inplace(ModelValue<Rational,Poly>& res, Formula<Poly>& f, const Model<Rational,Poly>& m) {
+		substitute_inplace(f, m);
 		if (f.is_true()) res = true;
 		else if (f.is_false()) res = false;
 		else res = createSubstitution<Rational,Poly,ModelFormulaSubstitution<Rational,Poly>>(f);
 	}
-}
+
 }

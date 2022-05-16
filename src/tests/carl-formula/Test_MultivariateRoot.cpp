@@ -76,6 +76,6 @@ TYPED_TEST(MultivariateRootTest, Evaluate2)
 	m.assign(x, RANT::create_safe(ranp, rani));
 	m.assign(y, RANT(-1));
 	
-	auto res = model::evaluate(f, m);
+	auto res = evaluate(f, m);
 	EXPECT_TRUE(res.isBool() && res.asBool());
 }

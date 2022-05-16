@@ -60,5 +60,5 @@ TEST(UVariable, Evaluation)
 	m.emplace(v3, sv2);
 
 	carl::ModelValue<mpq_class, P> reference(true);
-	EXPECT_EQ(carl::model::evaluate(f, m), reference);
+	EXPECT_EQ(carl::evaluate(f, m), reference);
 }

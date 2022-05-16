@@ -22,7 +22,7 @@ namespace carl {
 			return Formula<Poly>(FormulaType::IFF, Formula<Poly>(mv.asVariable()), mFormula);
 		}
 		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& m) const {
-			return model::evaluate(mFormula, m);
+			return evaluate(mFormula, m);
 		}
 		virtual bool dependsOn(const ModelVariable& var) const {
 			if (var.isVariable()) {
