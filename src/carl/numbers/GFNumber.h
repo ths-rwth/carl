@@ -26,7 +26,7 @@ class GFNumber
 
 	GFNumber() = default;
 	explicit GFNumber(IntegerType n, const GaloisField<IntegerType>* gf = nullptr):
-		mN(gf == nullptr ? n : gf->symmetricModulo(n)),
+		mN(gf == nullptr ? n : gf->symmetric_modulo(n)),
 		mGf(gf)
 	{
 	}

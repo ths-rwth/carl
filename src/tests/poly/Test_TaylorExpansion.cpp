@@ -11,7 +11,7 @@ TEST(TaylorExpansion, ideal_adic_coefficient) {
 
     // the Field Z_5
     GaloisFieldManager<cln::cl_I>& gfm = GaloisFieldManager<cln::cl_I>::getInstance();
-    const GaloisField<cln::cl_I>* gf5 = gfm.getField(5,1);
+    const GaloisField<cln::cl_I>* gf5 = gfm.field(5,1);
 
     // the five numbers from Z_5
     GFNumber<cln::cl_I> a0(0, gf5);

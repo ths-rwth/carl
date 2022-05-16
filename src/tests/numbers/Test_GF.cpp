@@ -12,7 +12,7 @@ TEST(GaloisField, integers)
     GaloisField<mpz_class> gf3(3,1);
     GaloisFieldManager<mpz_class>& gfm = GaloisFieldManager<mpz_class>::getInstance();
     
-    const GaloisField<mpz_class>* gf5 = gfm.getField(5,1);
+    const GaloisField<mpz_class>* gf5 = gfm.field(5,1);
     GFNumber<mpz_class> a0(0,gf5);
     GFNumber<mpz_class> a1(1,gf5);
     GFNumber<mpz_class> a2(2,gf5);

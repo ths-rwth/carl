@@ -75,10 +75,10 @@ private:
 	}
 	
 	IntegerType modulo(const IntegerType& n) const {
-		return symmetricModulo(n);
+		return symmetric_modulo(n);
 	}
 	
-	IntegerType symmetricModulo(const IntegerType& n) const	{
+	IntegerType symmetric_modulo(const IntegerType& n) const	{
 		if (n > mMaxValue) {
 			return carl::mod(IntegerType(n-mModulus), mPK) - mMaxValue;
 		} else {
@@ -103,7 +103,7 @@ private:
 	std::map<std::pair<BaseIntType,BaseIntType>, std::unique_ptr<GaloisField<IntegerType>>, IntegerPairCompare<unsigned>> mGaloisFields;
 public:
 	
-	const GaloisField<IntegerType>* getField(BaseIntType p, BaseIntType k = 1)
+	const GaloisField<IntegerType>* field(BaseIntType p, BaseIntType k = 1)
 	{
 		auto it = mGaloisFields.find(std::make_pair(p,k));
 		if (it == mGaloisFields.end()) {	

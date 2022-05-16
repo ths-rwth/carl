@@ -209,7 +209,7 @@ class EZGCD
 		Integer p;
 		do 
 		{
-			p = mPrimeFactory.nextPrime();
+			p = mPrimeFactory.next_prime();
 		} while( !A.lcoeff().mod(p).isZero() || !A.lcoeff().mod(p).isZero());
 		return p;
 		

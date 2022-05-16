@@ -29,11 +29,11 @@ public:
 	}
 	/// Provides access to the computed primes. If id is at least size(), the missing primes are computed on-the-fly.
 	const T& operator[](std::size_t id) {
-		while (id >= mPrimes.size()) nextPrime();
+		while (id >= mPrimes.size()) next_prime();
 		return mPrimes[id];
 	}
 	/// Computed the next prime and returns it.
-	const T& nextPrime();
+	const T& next_prime();
 };
 
 template<typename T>
@@ -71,7 +71,7 @@ namespace detail {
 }
 
 template<typename T>
-const T& PrimeFactory<T>::nextPrime() {
+const T& PrimeFactory<T>::next_prime() {
 	if (mNext == mPrimes.size()) {
 #ifdef THREAD_SAFE
 		std::lock_guard<std::mutex> guard(mPrimeMutex);

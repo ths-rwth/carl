@@ -31,8 +31,8 @@ class DiophantineEquations
 	
 	public:
 	DiophantineEquations(unsigned p, unsigned k) :
-	mGf_pk(GaloisFieldManager<Integer>::getInstance().getField(p,k)),
-    mGf_p(GaloisFieldManager<Integer>::getInstance().getField(p))
+	mGf_pk(GaloisFieldManager<Integer>::getInstance().field(p,k)),
+    mGf_p(GaloisFieldManager<Integer>::getInstance().field(p))
 	{
 		
 	}
