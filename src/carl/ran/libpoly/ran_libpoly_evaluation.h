@@ -9,9 +9,9 @@
 namespace carl {
 
 template<typename Number>
-std::optional<real_algebraic_number_libpoly<Number>> evaluate(
+std::optional<RealAlgebraicNumberLibpoly<Number>> evaluate(
 	const MultivariatePolynomial<Number>& polynomial,
-	const std::map<Variable, real_algebraic_number_libpoly<Number>>& evalMap) {
+	const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& evalMap) {
 	mpz_class denom;
 	poly::Polynomial poly = LibpolyConverter::getInstance().toLibpolyPolynomial(polynomial, denom);
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation converted to poly: " << poly << " With denominator: " << denom);
@@ -36,7 +36,7 @@ std::optional<real_algebraic_number_libpoly<Number>> evaluate(
 	}
 
 	//Turn value into algebraic number
-	real_algebraic_number_libpoly<Number> res = real_algebraic_number_libpoly<Number>::create_from_value(val);
+	RealAlgebraicNumberLibpoly<Number> res = RealAlgebraicNumberLibpoly<Number>::create_from_value(val);
 
 	lp_value_delete(val);
 
@@ -58,17 +58,17 @@ std::optional<real_algebraic_number_libpoly<Number>> evaluate(
 
 	lp_algebraic_number_div(&ret_val, res.get_internal(), &algebraic_denom);
 
-	real_algebraic_number_libpoly<Number> ret(std::move(ret_val));
+	RealAlgebraicNumberLibpoly<Number> ret(std::move(ret_val));
 
 	lp_algebraic_number_destruct(&ret_val);
 	lp_algebraic_number_destruct(&algebraic_denom);
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation got " << ret);
-	return std::optional<real_algebraic_number_libpoly<Number>>(std::move(ret));
+	return std::optional<RealAlgebraicNumberLibpoly<Number>>(std::move(ret));
 }
 
 template<typename Number, typename Poly>
-boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<Variable, real_algebraic_number_libpoly<Number>>& evalMap) {
+boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& evalMap) {
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation constraint " << constraint << " for assignment " << evalMap);
 

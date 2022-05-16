@@ -17,7 +17,7 @@ namespace carl::ran::libpoly {
 
 // Returns roots in ascending order
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, EnableIf<std::is_same<Coeff, Number>> = dummy>
-real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
+real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots(
 	const UnivariatePolynomial<Coeff>& polynomial,
 	const Interval<Number>& interval = Interval<Number>::unbounded_interval()) {
 
@@ -26,10 +26,10 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 	// Easy checks
 	if (carl::isZero(polynomial)) {
 		CARL_LOG_TRACE("carl.ran.libpoly", "poly is 0 -> nullified");
-		return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
+		return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::nullified_response();
 	} else if (polynomial.isNumber()) {
 		CARL_LOG_TRACE("carl.ran.libpoly", "poly is constant but not zero -> no root");
-		return real_roots_result<real_algebraic_number_libpoly<Number>>::no_roots_response();
+		return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::no_roots_response();
 	}
 
 	// We care for roots, so denominator is not important
@@ -42,16 +42,16 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 
 	if (roots.empty()) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has no roots");
-		return real_roots_result<real_algebraic_number_libpoly<Number>>::no_roots_response();
+		return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::no_roots_response();
 	}
 
 	// sort roots in ascending order
 	std::sort(roots.begin(), roots.end(), std::less<poly::AlgebraicNumber>());
 
 	// turn into real_roots_result
-	std::vector<real_algebraic_number_libpoly<Number>> res;
+	std::vector<RealAlgebraicNumberLibpoly<Number>> res;
 	for (const auto& val : roots) {
-		auto tmp = real_algebraic_number_libpoly<Number>(val);
+		auto tmp = RealAlgebraicNumberLibpoly<Number>(val);
 		// filter out roots not in interval
 		if (poly::contains(inter_poly, poly::Value(val))) {
 			CARL_LOG_DEBUG("carl.ran.libpoly", " Found Root " << val);
@@ -59,11 +59,11 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 		}
 	}
 
-	return real_roots_result<real_algebraic_number_libpoly<Number>>::roots_response(std::move(res));
+	return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::roots_response(std::move(res));
 }
 
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, DisableIf<std::is_same<Coeff, Number>> = dummy>
-real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
+real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots(
 	const UnivariatePolynomial<Coeff>& polynomial,
 	const Interval<Number>& interval = Interval<Number>::unbounded_interval()) {
 	assert(polynomial.isUnivariate());
@@ -73,9 +73,9 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 // Returns root in ascending order
 // Finds nullification in rational cases
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
+real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots(
 	const UnivariatePolynomial<Coeff>& p,
-	const std::map<Variable, real_algebraic_number_libpoly<Number>>& m,
+	const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& m,
 	const Interval<Number>& interval = Interval<Number>::unbounded_interval()) {
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << p << " within " << interval << " with assignment: " << m);
@@ -83,11 +83,11 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 	// Easy checks
 	if (carl::isZero(p)) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 -> nullified");
-		return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
+		return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::nullified_response();
 	}
 	if (carl::is_constant(p)) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is constant but not zero -> no root");
-		return real_roots_result<real_algebraic_number_libpoly<Number>>::no_roots_response();
+		return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::no_roots_response();
 	}
 
 	// Iterate over terms with mainVariable and check whether another Variable is 0
@@ -103,7 +103,7 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 		if (v == mainVar) continue;
 		if (m.count(v) == 0) {
 			CARL_LOG_DEBUG("carl.ran.libpoly", "poly still contains unassigned variable -> non-univariate");
-			return real_roots_result<real_algebraic_number_libpoly<Number>>::non_univariate_response();
+			return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::non_univariate_response();
 		}
 		assert(m.count(v) > 0);
 		if (m.at(v).is_numeric()) {
@@ -127,7 +127,7 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Assignment: " << assignment);
 	if (carl::isZero(polyCopy)) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 -> nullified");
-		return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
+		return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::nullified_response();
 	} else if (!assignedRAN) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is not 0 and has no assigned RANs -> non-univariate in mainVar now");
 		// No algebraic numbers in assignment --> we can use the univariate method
@@ -140,9 +140,9 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 		poly::Value eval_val = poly::evaluate(LibpolyConverter::getInstance().toLibpolyPolynomial(polyCopy), assignment);
 		CARL_LOG_DEBUG("carl.ran.libpoly", "Evaluation: " << eval_val);
 		if (eval_val == poly::Value(long(0))) {
-			return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
+			return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::nullified_response();
 		} else {
-			return real_roots_result<real_algebraic_number_libpoly<Number>>::no_roots_response();
+			return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::no_roots_response();
 		}
 	}
 	// We have a non-univariate polynomial with algebraic numbers in the assignment
@@ -174,10 +174,10 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 
 		if (eval_val == poly::Value(long(0))) {
 			CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 after substituting rational assignments -> nullified");
-			return real_roots_result<real_algebraic_number_libpoly<Number>>::nullified_response();
+			return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::nullified_response();
 		} else {
 			CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has no roots");
-			return real_roots_result<real_algebraic_number_libpoly<Number>>::no_roots_response();
+			return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::no_roots_response();
 		}
 	}
 
@@ -187,9 +187,9 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 	std::sort(roots.begin(), roots.end(), std::less<poly::Value>());
 
 	// turn result into real_roots_result
-	std::vector<real_algebraic_number_libpoly<Number>> res;
+	std::vector<RealAlgebraicNumberLibpoly<Number>> res;
 	for (const poly::Value& val : roots) {
-		auto tmp = real_algebraic_number_libpoly<Number>::create_from_value(val.get_internal());
+		auto tmp = RealAlgebraicNumberLibpoly<Number>::create_from_value(val.get_internal());
 		// filter out roots not in interval
 		if (poly::contains(inter_poly, val)) {
 			CARL_LOG_DEBUG("carl.ran.libpoly", " Found root " << val);
@@ -197,7 +197,7 @@ real_roots_result<real_algebraic_number_libpoly<Number>> real_roots(
 		}
 	}
 
-	return real_roots_result<real_algebraic_number_libpoly<Number>>::roots_response(std::move(res));
+	return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::roots_response(std::move(res));
 }
 } // namespace carl::ran::libpoly
 

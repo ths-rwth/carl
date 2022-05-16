@@ -22,57 +22,57 @@
 namespace carl {
 
 template<typename Number>
-class real_algebraic_number_libpoly {
+class RealAlgebraicNumberLibpoly {
 
 	lp_algebraic_number_t mContent;
 
 	static const Variable auxVariable;
 
 	template<typename Num>
-	friend bool compare(const real_algebraic_number_libpoly<Num>&, const real_algebraic_number_libpoly<Num>&, const Relation);
+	friend bool compare(const RealAlgebraicNumberLibpoly<Num>&, const RealAlgebraicNumberLibpoly<Num>&, const Relation);
 
 	template<typename Num>
-	friend bool compare(const real_algebraic_number_libpoly<Num>&, const Num&, const Relation);
+	friend bool compare(const RealAlgebraicNumberLibpoly<Num>&, const Num&, const Relation);
 
 	template<typename Num, typename Poly>
-	friend boost::tribool evaluate(const BasicConstraint<Poly>&, const Assignment<real_algebraic_number_libpoly<Num>>&, bool, bool);
+	friend boost::tribool evaluate(const BasicConstraint<Poly>&, const Assignment<RealAlgebraicNumberLibpoly<Num>>&, bool, bool);
 
 	template<typename Num>
-	friend std::optional<real_algebraic_number_libpoly<Num>> evaluate(MultivariatePolynomial<Num>, const Assignment<real_algebraic_number_libpoly<Num>>&, bool);
+	friend std::optional<RealAlgebraicNumberLibpoly<Num>> evaluate(MultivariatePolynomial<Num>, const Assignment<RealAlgebraicNumberLibpoly<Num>>&, bool);
 
 	template<typename Num>
-	friend Num branching_point(const real_algebraic_number_libpoly<Num>& n);
+	friend Num branching_point(const RealAlgebraicNumberLibpoly<Num>& n);
 
 	template<typename Num>
-	friend Num sample_above(const real_algebraic_number_libpoly<Num>& n);
+	friend Num sample_above(const RealAlgebraicNumberLibpoly<Num>& n);
 
 	template<typename Num>
-	friend Num sample_below(const real_algebraic_number_libpoly<Num>& n);
+	friend Num sample_below(const RealAlgebraicNumberLibpoly<Num>& n);
 
 	template<typename Num>
-	friend Num sample_between(const real_algebraic_number_libpoly<Num>& lower, const real_algebraic_number_libpoly<Num>& upper);
+	friend Num sample_between(const RealAlgebraicNumberLibpoly<Num>& lower, const RealAlgebraicNumberLibpoly<Num>& upper);
 
 	template<typename Num>
-	friend Num sample_between(const real_algebraic_number_libpoly<Num>& lower, const Num& upper);
+	friend Num sample_between(const RealAlgebraicNumberLibpoly<Num>& lower, const Num& upper);
 
 	template<typename Num>
-	friend Num sample_between(const Num& lower, const real_algebraic_number_libpoly<Num>& upper);
+	friend Num sample_between(const Num& lower, const RealAlgebraicNumberLibpoly<Num>& upper);
 
 	template<typename Num>
-	friend Num floor(const real_algebraic_number_libpoly<Num>& n);
+	friend Num floor(const RealAlgebraicNumberLibpoly<Num>& n);
 
 	template<typename Num>
-	friend Num ceil(const real_algebraic_number_libpoly<Num>& n);
+	friend Num ceil(const RealAlgebraicNumberLibpoly<Num>& n);
 
 public:
-	~real_algebraic_number_libpoly() {
+	~RealAlgebraicNumberLibpoly() {
 		lp_algebraic_number_destruct(get_internal());
 	}
 
 	/**
 	 * Construct as zero
 	 */
-	real_algebraic_number_libpoly() {
+	RealAlgebraicNumberLibpoly() {
 		lp_algebraic_number_construct_zero(get_internal());
 	}
 
@@ -80,7 +80,7 @@ public:
 	 * Construct from libpoly Algebraic Number and takes ownership
 	 * @param num, LibPoly Algebraic Number
 	 */
-	real_algebraic_number_libpoly(const poly::AlgebraicNumber& num) {
+	RealAlgebraicNumberLibpoly(const poly::AlgebraicNumber& num) {
 		lp_algebraic_number_construct_copy(get_internal(), num.get_internal());
 	}
 
@@ -88,7 +88,7 @@ public:
 	 * Construct from libpoly Algebraic Number and takes ownership
 	 * @param num, LibPoly Algebraic Number
 	 */
-	real_algebraic_number_libpoly(const lp_algebraic_number_t& num) {
+	RealAlgebraicNumberLibpoly(const lp_algebraic_number_t& num) {
 		lp_algebraic_number_construct_copy(get_internal(), &num);
 	}
 
@@ -96,8 +96,8 @@ public:
 	 * Move from libpoly Algebraic Number (C++ Interface)
 	 * @param num, LibPoly Algebraic Number
 	 */
-	real_algebraic_number_libpoly(poly::AlgebraicNumber&& num)
-		: real_algebraic_number_libpoly() {
+	RealAlgebraicNumberLibpoly(poly::AlgebraicNumber&& num)
+		: RealAlgebraicNumberLibpoly() {
 		lp_algebraic_number_swap(get_internal(), num.get_internal());
 	}
 
@@ -105,8 +105,8 @@ public:
 	 * Move from libpoly Algebraic Number (C Interface) 
 	 * @param num, LibPoly Algebraic Number
 	 */
-	real_algebraic_number_libpoly(lp_algebraic_number_t&& num)
-		: real_algebraic_number_libpoly() {
+	RealAlgebraicNumberLibpoly(lp_algebraic_number_t&& num)
+		: RealAlgebraicNumberLibpoly() {
 		lp_algebraic_number_swap(get_internal(), &num);
 	}
 
@@ -117,7 +117,7 @@ public:
 	 * @param p Polynomial, which roots represents the algebraic number
 	 * @param i Interval, in which the root must lie
 	 */
-	real_algebraic_number_libpoly(const carl::UnivariatePolynomial<Number>& p, const Interval<Number>& i) {
+	RealAlgebraicNumberLibpoly(const carl::UnivariatePolynomial<Number>& p, const Interval<Number>& i) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", " Create safe from poly: " << p << " in interval: " << i);
 
 		poly::UPolynomial upoly = LibpolyConverter::getInstance().toLibpolyUPolynomial(p);
@@ -146,24 +146,24 @@ public:
 	/**
 	 * Construct from Number (usually mpq_class)
 	 */
-	real_algebraic_number_libpoly(const Number& num) {
+	RealAlgebraicNumberLibpoly(const Number& num) {
 		poly::Rational rat = LibpolyConverter::getInstance().toLibpolyRational(num);
 		lp_algebraic_number_construct_from_rational(get_internal(), rat.get_internal());
 	}
 
-	real_algebraic_number_libpoly(const real_algebraic_number_libpoly& ran) {
+	RealAlgebraicNumberLibpoly(const RealAlgebraicNumberLibpoly& ran) {
 		lp_algebraic_number_construct_copy(get_internal(), ran.get_internal());
 	}
-	real_algebraic_number_libpoly(real_algebraic_number_libpoly&& ran)
-		: real_algebraic_number_libpoly() {
+	RealAlgebraicNumberLibpoly(RealAlgebraicNumberLibpoly&& ran)
+		: RealAlgebraicNumberLibpoly() {
 		lp_algebraic_number_swap(get_internal(), ran.get_internal());
 	}
-	real_algebraic_number_libpoly& operator=(const real_algebraic_number_libpoly& n) {
+	RealAlgebraicNumberLibpoly& operator=(const RealAlgebraicNumberLibpoly& n) {
 		lp_algebraic_number_destruct(get_internal());
 		lp_algebraic_number_construct_copy(get_internal(), n.get_internal());
 		return *this;
 	}
-	real_algebraic_number_libpoly& operator=(real_algebraic_number_libpoly&& n) {
+	RealAlgebraicNumberLibpoly& operator=(RealAlgebraicNumberLibpoly&& n) {
 		lp_algebraic_number_swap(get_internal(), n.get_internal());
 		return *this;
 	}
@@ -171,8 +171,8 @@ public:
 	/**
 	 * Create from univariate polynomial and interval with correctness checks
 	 */
-	static real_algebraic_number_libpoly<Number> create_safe(const carl::UnivariatePolynomial<Number>& p, const Interval<Number>& i) {
-		return real_algebraic_number_libpoly<Number>(p, i);
+	static RealAlgebraicNumberLibpoly<Number> create_safe(const carl::UnivariatePolynomial<Number>& p, const Interval<Number>& i) {
+		return RealAlgebraicNumberLibpoly<Number>(p, i);
 	}
 
 	/**
@@ -182,7 +182,7 @@ public:
 	 * @param Libpoly Value (C interface)
 	 * @return Copy of val as a algebraic number
 	 */
-	static real_algebraic_number_libpoly<Number> create_from_value(const lp_value_t* val) {
+	static RealAlgebraicNumberLibpoly<Number> create_from_value(const lp_value_t* val) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "Converting value into algebraic number");
 		lp_algebraic_number_t mVal;
 		if (val->type == lp_value_type_t::LP_VALUE_NONE || val->type == lp_value_type_t::LP_VALUE_MINUS_INFINITY || val->type == lp_value_type_t::LP_VALUE_PLUS_INFINITY) {
@@ -191,7 +191,7 @@ public:
 		} else if (val->type == lp_value_type_t::LP_VALUE_ALGEBRAIC) {
 			//val is already an algebraic number
 			lp_algebraic_number_construct_copy(&mVal, &val->value.a);
-			real_algebraic_number_libpoly<Number> ret(std::move(mVal));
+			RealAlgebraicNumberLibpoly<Number> ret(std::move(mVal));
 			lp_algebraic_number_destruct(&mVal);
 			return ret;
 		} else if (lp_value_is_rational(val)) {
@@ -200,7 +200,7 @@ public:
 			lp_rational_construct(&rat);
 			lp_value_get_rational(val, &rat);
 			lp_algebraic_number_construct_from_rational(&mVal, &rat);
-			real_algebraic_number_libpoly<Number> ret(std::move(mVal));
+			RealAlgebraicNumberLibpoly<Number> ret(std::move(mVal));
 			lp_algebraic_number_destruct(&mVal);
 			lp_rational_destruct(&rat);
 			return ret;
@@ -306,11 +306,11 @@ public:
 	 * Does not change the current value, checks the sign and returns a copy or negates if necessary
 	 * @return Absolute Value of the stored RAN
 	 */
-	real_algebraic_number_libpoly<Number> abs() const {
+	RealAlgebraicNumberLibpoly<Number> abs() const {
 
 		if (is_numeric()) {
 			CARL_LOG_DEBUG("carl.ran.libpoly", "Algebraic Number abs got numeric value");
-			return real_algebraic_number_libpoly<Number>(carl::abs(value()));
+			return RealAlgebraicNumberLibpoly<Number>(carl::abs(value()));
 		}
 
 		int sign = lp_algebraic_number_sgn(get_internal());
@@ -318,12 +318,12 @@ public:
 
 
 		if (sign >= 0) {
-			return real_algebraic_number_libpoly<Number>(*this);
+			return RealAlgebraicNumberLibpoly<Number>(*this);
 		} else {
 			lp_algebraic_number_t val;
 			lp_algebraic_number_construct_zero(&val);
 			lp_algebraic_number_neg(&val, get_internal());
-			auto ret = real_algebraic_number_libpoly<Number>(std::move(val));
+			auto ret = RealAlgebraicNumberLibpoly<Number>(std::move(val));
 			lp_algebraic_number_destruct(&val);
 			return ret ;
 		}
@@ -377,7 +377,7 @@ public:
  * NOT CONST, the number is the same, but internally might change 
  */
 template<typename Number>
-void refine(const real_algebraic_number_libpoly<Number>& n) {
+void refine(const RealAlgebraicNumberLibpoly<Number>& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Refining Algebraic Number : " << n);
 
 	while (poly::log_size(n.libpoly_interval()) > 0 && !n.is_numeric()) {
@@ -391,7 +391,7 @@ void refine(const real_algebraic_number_libpoly<Number>& n) {
  * NOT CONST, the number is the same, but internally might change 
  */
 template<typename Number>
-void refine_using(const real_algebraic_number_libpoly<Number>& n, const Number& pivot) {
+void refine_using(const RealAlgebraicNumberLibpoly<Number>& n, const Number& pivot) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Refining Algebraic Number : " << n);
 	//Convert pivot to libpoly rational
 	poly::Rational pivot_libpoly = LibpolyConverter::getInstance().toLibpolyRational(pivot);
@@ -405,7 +405,7 @@ void refine_using(const real_algebraic_number_libpoly<Number>& n, const Number& 
  * Same as above, but with libpoly dyadic rational as pivot 
  */
 template<typename Number>
-void refine_using(const real_algebraic_number_libpoly<Number>& n, const poly::DyadicRational& pivot) {
+void refine_using(const RealAlgebraicNumberLibpoly<Number>& n, const poly::DyadicRational& pivot) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Refining Algebraic Number : " << n);
 	while (!n.is_numeric() && n.libpoly_interval() == pivot) {
 		lp_algebraic_number_refine_const(n.get_internal());
@@ -414,7 +414,7 @@ void refine_using(const real_algebraic_number_libpoly<Number>& n, const poly::Dy
 }
 
 template<typename Number>
-Number branching_point(const real_algebraic_number_libpoly<Number>& n) {
+Number branching_point(const RealAlgebraicNumberLibpoly<Number>& n) {
 	//return carl::sample(n.interval_int());
 	refine(n);
 	poly::DyadicRational res;
@@ -424,7 +424,7 @@ Number branching_point(const real_algebraic_number_libpoly<Number>& n) {
 }
 
 template<typename Number>
-Number sample_above(const real_algebraic_number_libpoly<Number>& n) {
+Number sample_above(const RealAlgebraicNumberLibpoly<Number>& n) {
 	//return carl::floor(n.interval_int().upper()) + 1; From ran_interval.h
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling above: " << n);
 	refine(n);
@@ -433,7 +433,7 @@ Number sample_above(const real_algebraic_number_libpoly<Number>& n) {
 }
 
 template<typename Number>
-Number sample_below(const real_algebraic_number_libpoly<Number>& n) {
+Number sample_below(const RealAlgebraicNumberLibpoly<Number>& n) {
 	//return carl::ceil(n.interval_int().lower()) - 1; From ran_interval.h
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling below: " << n);
 	refine(n);
@@ -442,7 +442,7 @@ Number sample_below(const real_algebraic_number_libpoly<Number>& n) {
 }
 
 template<typename Number>
-Number sample_between(const real_algebraic_number_libpoly<Number>& lower, const real_algebraic_number_libpoly<Number>& upper) {
+Number sample_between(const RealAlgebraicNumberLibpoly<Number>& lower, const RealAlgebraicNumberLibpoly<Number>& upper) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling between: " << lower << " and " << upper);
 
 	//Make sure that the intervals are disjoint
@@ -469,7 +469,7 @@ Number sample_between(const real_algebraic_number_libpoly<Number>& lower, const 
 	}
 }
 template<typename Number>
-Number sample_between(const real_algebraic_number_libpoly<Number>& lower, const Number& upper) {
+Number sample_between(const RealAlgebraicNumberLibpoly<Number>& lower, const Number& upper) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling between: " << lower << " and " << upper);
 	//Make sure that the intervals are disjoint
 	while (!(lower.get_upper_bound() < upper) && !lower.is_numeric()) {
@@ -490,7 +490,7 @@ Number sample_between(const real_algebraic_number_libpoly<Number>& lower, const 
 
 //Make sure that the intervals are disjoint
 template<typename Number>
-Number sample_between(const Number& lower, const real_algebraic_number_libpoly<Number>& upper) {
+Number sample_between(const Number& lower, const RealAlgebraicNumberLibpoly<Number>& upper) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling between: " << lower << " and " << upper);
 
 	while (!(lower < upper.get_lower_bound()) && !upper.is_numeric()) {
@@ -507,7 +507,7 @@ Number sample_between(const Number& lower, const real_algebraic_number_libpoly<N
 	}
 }
 template<typename Number>
-Number floor(const real_algebraic_number_libpoly<Number>& n) {
+Number floor(const RealAlgebraicNumberLibpoly<Number>& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Floor of: " << n);
 	refine(n);
 	lp_integer_t val;
@@ -518,7 +518,7 @@ Number floor(const real_algebraic_number_libpoly<Number>& n) {
 }
 
 template<typename Number>
-Number ceil(const real_algebraic_number_libpoly<Number>& n) {
+Number ceil(const RealAlgebraicNumberLibpoly<Number>& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Ceil of: " << n);
 	refine(n);
 	lp_integer_t val;
@@ -529,13 +529,13 @@ Number ceil(const real_algebraic_number_libpoly<Number>& n) {
 }
 
 template<typename Number>
-bool isZero(const real_algebraic_number_libpoly<Number>& n) {
+bool isZero(const RealAlgebraicNumberLibpoly<Number>& n) {
 	refine(n);
 	return n.is_zero();
 }
 
 template<typename Number>
-bool compare(const real_algebraic_number_libpoly<Number>& lhs, const real_algebraic_number_libpoly<Number>& rhs, const Relation relation) {
+bool compare(const RealAlgebraicNumberLibpoly<Number>& lhs, const RealAlgebraicNumberLibpoly<Number>& rhs, const Relation relation) {
 	int cmp = lp_algebraic_number_cmp(lhs.get_internal(), rhs.get_internal());
 	switch (relation) {
 	case Relation::EQ:
@@ -557,10 +557,10 @@ bool compare(const real_algebraic_number_libpoly<Number>& lhs, const real_algebr
 }
 
 template<typename Number>
-const carl::Variable real_algebraic_number_libpoly<Number>::auxVariable = fresh_real_variable("__r");
+const carl::Variable RealAlgebraicNumberLibpoly<Number>::auxVariable = fresh_real_variable("__r");
 
 template<typename Number>
-bool compare(const real_algebraic_number_libpoly<Number>& lhs, const Number& rhs, const Relation relation) {
+bool compare(const RealAlgebraicNumberLibpoly<Number>& lhs, const Number& rhs, const Relation relation) {
 
 	poly::Rational rat = LibpolyConverter::getInstance().toLibpolyRational<Number>(rhs);
 
@@ -590,7 +590,7 @@ bool compare(const real_algebraic_number_libpoly<Number>& lhs, const Number& rhs
 }
 
 template<typename Num>
-std::ostream& operator<<(std::ostream& os, const real_algebraic_number_libpoly<Num>& ran) {
+std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberLibpoly<Num>& ran) {
 	char* str = lp_algebraic_number_to_string(ran.get_internal());
 	os << str;
 	free(str);
@@ -598,13 +598,13 @@ std::ostream& operator<<(std::ostream& os, const real_algebraic_number_libpoly<N
 }
 
 template<typename Number>
-struct is_ran<real_algebraic_number_libpoly<Number>> : std::true_type {};
+struct is_ran<RealAlgebraicNumberLibpoly<Number>> : std::true_type {};
 } // namespace carl
 
 namespace std {
 template<typename Number>
-struct hash<carl::real_algebraic_number_libpoly<Number>> {
-	std::size_t operator()(const carl::real_algebraic_number_libpoly<Number>& n) const {
+struct hash<carl::RealAlgebraicNumberLibpoly<Number>> {
+	std::size_t operator()(const carl::RealAlgebraicNumberLibpoly<Number>& n) const {
 		//Todo test if the precisions needs to be adjusted
 		return lp_algebraic_number_hash_approx(n.get_internal(), 0);
 	}

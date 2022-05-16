@@ -62,7 +62,7 @@ TEST(RealAlgebraicNumber, EvalBug)
 	Interval<Rational> iy(Rational("-212079")/Rational("131072"), BoundType::STRICT, -Rational("1696631")/Rational("1048576"), BoundType::STRICT);
 	RealAlgebraicNumber<Rational> ry = RealAlgebraicNumber<Rational>::create_safe(py, iy);
 
-	carl::ran::RANMap<Rational> eval;
+	carl::Assignment<RealAlgebraicNumber<Rational>> eval;
 	eval.emplace(y,ry);
 	eval.emplace(x,Rational(0));
 
@@ -90,7 +90,7 @@ TEST(RealAlgebraicNumber, EvalBug2)
 	RealAlgebraicNumber<Rational> ry = RealAlgebraicNumber<Rational>::create_safe(py, iy);
 
 	//build assignment
-	carl::ran::RANMap<Rational> eval;
+	carl::Assignment<RealAlgebraicNumber<Rational>> eval;
 	eval.emplace(x0, Rational("-8"));
 	eval.emplace(x1, Rational("-4"));
 	eval.emplace(x2, ry);

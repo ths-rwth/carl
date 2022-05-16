@@ -146,8 +146,8 @@ TEST(LIBPOLY, nullificationBug){
 	auto x1 = fresh_real_variable("x1");
 
 	carl::MultivariatePolynomial<mpq_class> carl_poly({ carl::Term<mpq_class>(1) , mpq_class(-1) * x0 * x1});
-	std::map<Variable, real_algebraic_number_libpoly<mpq_class>> assignment ; 
-	assignment[x0] = real_algebraic_number_libpoly<mpq_class>(0) ;
+	std::map<Variable, RealAlgebraicNumberLibpoly<mpq_class>> assignment ; 
+	assignment[x0] = RealAlgebraicNumberLibpoly<mpq_class>(0) ;
 
 	auto roots = carl::ran::real_roots(carl::to_univariate_polynomial(carl_poly, x1), assignment);
 	
@@ -164,9 +164,9 @@ TEST(LIBPOLY, nullificationBug2){
 	// -1*skoX + -1*skoY + -1*skoZ + skoX*skoY*skoZ 
 	carl::MultivariatePolynomial<mpq_class> carl_poly({mpq_class(-1) * skoX , mpq_class(-1) * skoY , mpq_class(-1) * skoZ , mpq_class(1) * skoX * skoY * skoZ });
 	//{skoX : -3/4, skoY : -1/2}
-	std::map<Variable, real_algebraic_number_libpoly<mpq_class>> assignment ; 
-	assignment[skoX] = real_algebraic_number_libpoly<mpq_class>(mpq_class(-3,4)) ;
-	assignment[skoY] = real_algebraic_number_libpoly<mpq_class>(mpq_class(-1,2)) ;
+	std::map<Variable, RealAlgebraicNumberLibpoly<mpq_class>> assignment ; 
+	assignment[skoX] = RealAlgebraicNumberLibpoly<mpq_class>(mpq_class(-3,4)) ;
+	assignment[skoY] = RealAlgebraicNumberLibpoly<mpq_class>(mpq_class(-1,2)) ;
 
 
 	auto roots = carl::ran::real_roots(carl::to_univariate_polynomial(carl_poly, skoZ), assignment);

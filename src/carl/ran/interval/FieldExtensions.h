@@ -126,7 +126,7 @@ template<typename Rational, typename Poly>
 class FieldExtensions {
 private:
 	CoCoA::ring mQ = CoCoA::RingQQ();
-	std::map<Variable,real_algebraic_number_interval<Rational>> mModel;
+	std::map<Variable,RealAlgebraicNumberInterval<Rational>> mModel;
 	
 	detail_field_extensions::CoCoAConverter cc;
 	
@@ -159,7 +159,7 @@ public:
 	 * In the first case, we return true and the term to substitute with.
 	 * In the second case, we return false and the new minimal polynomial.
 	 */
-	std::pair<bool,Poly> extend(Variable v, const real_algebraic_number_interval<Rational>& r) {
+	std::pair<bool,Poly> extend(Variable v, const RealAlgebraicNumberInterval<Rational>& r) {
 		mModel.emplace(v, r);
 		if (r.is_numeric()) {
 			CARL_LOG_DEBUG("carl.fieldext", "Is numeric: " << v << " -> " << r);

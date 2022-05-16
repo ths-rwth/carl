@@ -17,7 +17,7 @@ private:
 public:
 	LazardEvaluation(const Poly& p): mLiftingPoly(p) {}
 	
-	auto substitute(Variable v, const real_algebraic_number_interval<Rational>& r, bool divideZeroFactors = true) {
+	auto substitute(Variable v, const RealAlgebraicNumberInterval<Rational>& r, bool divideZeroFactors = true) {
 		auto red = mFieldExtensions.extend(v, r);
 		Poly newPoly;
 		if (red.first) {

@@ -46,31 +46,17 @@
 namespace carl {
 	#ifdef RAN_USE_INTERVAL
 	template<typename Number>
-	using real_algebraic_number = real_algebraic_number_interval<Number>;
+	using RealAlgebraicNumber = RealAlgebraicNumberInterval<Number>;
 	#endif
 
 	#ifdef RAN_USE_THOM
 	template<typename Number>
-	using real_algebraic_number = real_algebraic_number_thom<Number>;
+	using RealAlgebraicNumber = RealAlgebraicNumberThom<Number>;
 	#endif
 
 	#ifdef RAN_USE_LIBPOLY
 	template<typename Number>
-	using real_algebraic_number = real_algebraic_number_libpoly<Number>;
+	using RealAlgebraicNumber = RealAlgebraicNumberLibpoly<Number>;
 	#endif
 
-	template<typename Number>
-	using ran_assignment = Assignment<real_algebraic_number<Number>>;
-
-	template<typename Number>
-	using ordered_ran_assignment = OrderedAssignment<real_algebraic_number<Number>>;
-
-
-	template<typename Number>
-	using RealAlgebraicNumber = real_algebraic_number<Number>;
-
-	namespace ran {
-		template<typename Number>
-		using RANMap = ran_assignment<Number>;
-	}
 }

@@ -32,7 +32,7 @@ class RealRootIsolation {
 	/// The polynomial.
 	UnivariatePolynomial<Number> mPolynomial;
 	/// The list of roots.
-	std::vector<real_algebraic_number_interval<Number>> mRoots;
+	std::vector<RealAlgebraicNumberInterval<Number>> mRoots;
 	/// The bounding interval.
 	Interval<Number> mInterval;
 	/// The sturm sequence for mPolynomial.
