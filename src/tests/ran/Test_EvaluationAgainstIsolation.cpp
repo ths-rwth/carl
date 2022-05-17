@@ -41,38 +41,8 @@ TEST(IsolationAndEvaluation, Comparison) {
 	varToRANMap[b] = b_value;
 	varToRANMap[a] = a_value;
 
-/*
-	bool b1 = carl::evaluate(ConstraintT(poly, carl::Relation::EQ), varToRANMap);
-	bool b3 = carl::evaluate(poly, varToRANMap).is_zero();
-	EXPECT_EQ(b1, b3);
-*/
-
-/*
-	std::cout << "test if poly is not nullified" << std::endl;
-	varToRANMap[variableOrder[3]] = Rational(123);
-	bool b4= carl::evaluate(ConstraintT(poly, carl::Relation::EQ), varToRANMap);
-	EXPECT_FALSE(b4);
-*/
-
 	varToRANMap.erase(a);
 
 	bool is_nullified = carl::ran::real_roots(carl::to_univariate_polynomial(poly, a), varToRANMap).is_nullified();
 	EXPECT_TRUE(is_nullified);
-
-	/*
-	auto isolatedRoots = carl::real_roots(carl::to_univariate_polynomial(poly, variableOrder[3]), varToRANMap);
-	std::size_t rootIdx = 0;
-	bool b2 = false;
-	for (const auto& root : isolatedRoots) {
-		rootIdx++;
-		if (root == a_value) {
-			b2 = true;
-		}
-	}
-
-	//EXPECT_TRUE(b1);
-	//EXPECT_TRUE(b2);
-	
-	EXPECT_EQ(b1, b2);
-	*/
 }
