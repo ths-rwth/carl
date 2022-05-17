@@ -165,10 +165,10 @@ std::size_t total_degree(const UnivariatePolynomial<Coeff>& p) {
 	if constexpr (carl::is_number_type<Coeff>::value) {
 		return p.degree();
 	} else {
-		if (p.is_zero()) return 0;
+		if (carl::is_zero(p)) return 0;
 		uint max = 0;
 		for (std::size_t deg = 0; deg < p.coefficients().size(); deg++) {
-			if (!p.coefficients()[deg].is_zero()) {
+			if (!carl::is_zero(p.coefficients()[deg])) {
 				uint tdeg = deg + total_degree(p.coefficients()[deg]);
 				if (tdeg > max) max = tdeg;
 			}

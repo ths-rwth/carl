@@ -210,7 +210,7 @@ class EZGCD
 		do 
 		{
 			p = mPrimeFactory.next_prime();
-		} while( !A.lcoeff().mod(p).is_zero() || !A.lcoeff().mod(p).is_zero());
+		} while( carl::is_zero(!A.lcoeff().mod(p)) || carl::is_zero(!A.lcoeff().mod(p)));
 		return p;
 		
 	}
