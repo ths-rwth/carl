@@ -121,11 +121,11 @@ TEST(DoubleInterval, Getters)
     EXPECT_EQ(3, test1.lower());
     EXPECT_EQ(27, test1.upper());
 
-	EXPECT_TRUE(test7.isOne());
-	EXPECT_TRUE(isOne(test7));
+	EXPECT_TRUE(test7.is_one());
+	EXPECT_TRUE(is_one(test7));
 
-	EXPECT_TRUE(test8.isZero());
-	EXPECT_TRUE(isZero(test8));
+	EXPECT_TRUE(test8.is_zero());
+	EXPECT_TRUE(is_zero(test8));
 }
 
 TEST(DoubleInterval, StaticCreators)
@@ -143,11 +143,11 @@ TEST(DoubleInterval, StaticCreators)
     EXPECT_EQ(BoundType::INFTY, i2.lower_bound_type());
     EXPECT_EQ(BoundType::INFTY, i2.upper_bound_type());
 
-	EXPECT_TRUE(i3.isOne());
-	EXPECT_TRUE(isOne(i3));
+	EXPECT_TRUE(i3.is_one());
+	EXPECT_TRUE(is_one(i3));
 
-	EXPECT_TRUE(i4.isZero());
-	EXPECT_TRUE(isZero(i4));
+	EXPECT_TRUE(i4.is_zero());
+	EXPECT_TRUE(is_zero(i4));
 }
 
 TEST(DoubleInterval, Addition)

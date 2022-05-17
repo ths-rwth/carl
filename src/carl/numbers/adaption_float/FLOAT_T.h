@@ -38,7 +38,7 @@ namespace carl
 	/**
 	 * Struct which holds the conversion operator for any two instanciations of
 	 * FLOAT_T with different underlying floating point implementations. Note
-	 * that this conversion introduces loss of precision, as it uses the toDouble()
+	 * that this conversion introduces loss of precision, as it uses the to_double()
 	 * method and the corresponding double constructor from the target type.
 	 */
 	template<typename T1, typename T2>
@@ -52,7 +52,7 @@ namespace carl
 		 */
 		FLOAT_T<T1> operator() (const FLOAT_T<T2>& _op2) const
 		{
-			return FLOAT_T<T1>(_op2.toDouble());
+			return FLOAT_T<T1>(_op2.to_double());
 		}
 	};
 
@@ -112,7 +112,7 @@ namespace carl
 	template<typename FloatType>
 	class FLOAT_T
 	{
-		static_assert(carl::is_subset_of_integers<FloatType>::value == false, "FLOAT_T may not be used with integers.");
+		static_assert(carl::is_subset_of_integers_type<FloatType>::value == false, "FLOAT_T may not be used with integers.");
 	private:
 		FloatType mValue;
 
@@ -188,7 +188,7 @@ namespace carl
 		{
 		}
 
-		template<typename F = FloatType, EnableIf< carl::is_rational<F> > = dummy>
+		template<typename F = FloatType, EnableIf< carl::is_rational_type<F> > = dummy>
 		explicit FLOAT_T<FloatType>(const std::string& _string, CARL_RND /*unused*/ = CARL_RND::N):
 			mValue(carl::parse<FloatType>(_string))
 		{
@@ -420,7 +420,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& div_assign(const FLOAT_T<FloatType>& _op2, CARL_RND /*unused*/ = CARL_RND::N)
 		{
-			assert(!isZero(_op2));
+			assert(!is_zero(_op2));
 			mValue = mValue / _op2.mValue;
 			return *this;
 		}
@@ -965,9 +965,9 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Double representation of this
 		 */
-		double toDouble(CARL_RND /*unused*/ = CARL_RND::N) const
+		double to_double(CARL_RND /*unused*/ = CARL_RND::N) const
 		{
-			return carl::toDouble(mValue);
+			return carl::to_double(mValue);
 		}
 
 
@@ -978,9 +978,9 @@ namespace carl
 		explicit operator int() const
 		{
 			if(*this >= 0)
-				return carl::toInt<int>(carl::floor(mValue));
+				return carl::to_int<int>(carl::floor(mValue));
 			else
-				return carl::toInt<int>(carl::ceil(mValue));
+				return carl::to_int<int>(carl::ceil(mValue));
 		}
 
 		/**
@@ -989,7 +989,7 @@ namespace carl
 		 */
 		explicit operator long() const
 		{
-			return carl::toInt<long>(mValue);
+			return carl::to_int<long>(mValue);
 		}
 
 		/**
@@ -998,7 +998,7 @@ namespace carl
 		 */
 		explicit operator double() const
 		{
-			return carl::toDouble(mValue);
+			return carl::to_double(mValue);
 		}
 
 		explicit operator mpq_class() const {
@@ -1351,8 +1351,8 @@ namespace carl
 	};
 
 	template<typename FloatType>
-	inline bool isInteger(const FLOAT_T<FloatType>& in) {
-		return carl::isInteger(in.value());
+	inline bool is_integer(const FLOAT_T<FloatType>& in) {
+		return carl::is_integer(in.value());
 	}
 
 	/**
@@ -1392,13 +1392,13 @@ namespace carl
 	 * @return Integer type which holds floor(_float).
 	 */
 	template<typename Integer, typename FloatType>
-	inline Integer toInt(const FLOAT_T<FloatType>& _float)
+	inline Integer to_int(const FLOAT_T<FloatType>& _float)
 	{
-		return carl::toInt<Integer>(_float.value());
+		return carl::to_int<Integer>(_float.value());
 	}
 
 	template<typename FloatType>
-	inline double toDouble(const FLOAT_T<FloatType>& _float)
+	inline double to_double(const FLOAT_T<FloatType>& _float)
 	{
 		return double(_float);
 	}
@@ -1555,9 +1555,9 @@ namespace carl
 	 * @param _in Number.
 	 * @return Cln interger which holds the result.
 	 */
-	inline cln::cl_I getDenom(const FLOAT_T<cln::cl_RA>& _in)
+	inline cln::cl_I get_denom(const FLOAT_T<cln::cl_RA>& _in)
 	{
-		return carl::getDenom(_in.value());
+		return carl::get_denom(_in.value());
 	}
 
 	/**
@@ -1565,9 +1565,9 @@ namespace carl
 	 * @param _in Number.
 	 * @return Cln interger which holds the result.
 	 */
-	inline cln::cl_I getNum(const FLOAT_T<cln::cl_RA>& _in)
+	inline cln::cl_I get_num(const FLOAT_T<cln::cl_RA>& _in)
 	{
-		return carl::getNum(_in.value());
+		return carl::get_num(_in.value());
 	}
 	#endif
 	/**
@@ -1575,9 +1575,9 @@ namespace carl
 	 * @param _in Number.
 	 * @return GMP interger which holds the result.
 	 */
-	inline mpz_class getDenom(const FLOAT_T<mpq_class>& _in)
+	inline mpz_class get_denom(const FLOAT_T<mpq_class>& _in)
 	{
-		return carl::getDenom(_in.value());
+		return carl::get_denom(_in.value());
 	}
 
 	/**
@@ -1585,14 +1585,14 @@ namespace carl
 	 * @param _in Number.
 	 * @return GMP interger which holds the result.
 	 */
-	inline mpz_class getNum(const FLOAT_T<mpq_class>& _in)
+	inline mpz_class get_num(const FLOAT_T<mpq_class>& _in)
 	{
-		return carl::getNum(_in.value());
+		return carl::get_num(_in.value());
 	}
 
 	template<typename FloatType>
-	inline bool isZero(const FLOAT_T<FloatType>& _in) {
-		return isZero(_in.value());
+	inline bool is_zero(const FLOAT_T<FloatType>& _in) {
+		return is_zero(_in.value());
 	}
 
 	template<typename FloatType>

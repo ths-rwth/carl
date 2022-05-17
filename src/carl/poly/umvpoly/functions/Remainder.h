@@ -18,14 +18,14 @@ namespace carl {
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> remainder_helper(const UnivariatePolynomial<Coeff>& dividend, const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor = nullptr) {
-	assert(!carl::isZero(divisor));
-	if(carl::isZero(dividend)) {
+	assert(!carl::is_zero(divisor));
+	if(carl::is_zero(dividend)) {
 		return dividend;
 	}
 	if(dividend.degree() < divisor.degree()) return dividend;
 	assert(dividend.degree() >= divisor.degree());
 	// Remainder in a field is zero by definition.
-	if (is_field<Coeff>::value && is_constant(divisor)) {
+	if (is_field_type<Coeff>::value && is_constant(divisor)) {
 		return UnivariatePolynomial<Coeff>(dividend.mainVar());
 	}
 
@@ -76,7 +76,7 @@ UnivariatePolynomial<Coeff> remainder_helper(const UnivariatePolynomial<Coeff>& 
 	// strip zeros from the end as we might have pushed zeros.
 	result.stripLeadingZeroes();
 	
-	if(carl::isZero(result) || result.degree() < divisor.degree())
+	if(carl::is_zero(result) || result.degree() < divisor.degree())
 	{
 		return result;
 	}
@@ -93,7 +93,7 @@ UnivariatePolynomial<Coeff> remainder(const UnivariatePolynomial<Coeff>& dividen
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> remainder(const UnivariatePolynomial<Coeff>& dividend, const UnivariatePolynomial<Coeff>& divisor) {
-	static_assert(is_field<Coeff>::value, "Reduce must be called with a prefactor if the Coefficients are not from a field.");
+	static_assert(is_field_type<Coeff>::value, "Reduce must be called with a prefactor if the Coefficients are not from a field.");
 	return remainder_helper(dividend, divisor);
 }
 
@@ -115,7 +115,7 @@ UnivariatePolynomial<Coeff> pseudo_remainder(const UnivariatePolynomial<Coeff>& 
 
 	std::size_t reductions = 0;
 	while (true) {
-		if (carl::isZero(res)) {
+		if (carl::is_zero(res)) {
 			return res;
 		}
 		if (divisor.degree() > res.degree()) {
@@ -132,7 +132,7 @@ UnivariatePolynomial<Coeff> pseudo_remainder(const UnivariatePolynomial<Coeff>& 
 			assert(!newR[i].has(v));
 		}
 		if (res.degree() == divisor.degree()) {
-			if (!carl::isZero(reduct)) {
+			if (!carl::is_zero(reduct)) {
 				for (std::size_t i = 0; i <= reduct.degree(); i++) {
 					newR[i] -= lc * reduct.coefficients()[i];
 					assert(!newR[i].has(v));
@@ -140,7 +140,7 @@ UnivariatePolynomial<Coeff> pseudo_remainder(const UnivariatePolynomial<Coeff>& 
 			}
 		} else {
 			assert(!lc.has(v));
-			if (!carl::isZero(reduct)) {
+			if (!carl::is_zero(reduct)) {
 				for (std::size_t i = 0; i <= reduct.degree(); i++) {
 					newR[res.degree() - divisor.degree() + i] -= lc * reduct.coefficients()[i];
 					assert(!newR[res.degree() - divisor.degree() + i].has(v));
@@ -157,7 +157,7 @@ UnivariatePolynomial<Coeff> pseudo_remainder(const UnivariatePolynomial<Coeff>& 
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> signed_pseudo_remainder(const UnivariatePolynomial<Coeff>& dividend, const UnivariatePolynomial<Coeff>& divisor) {
-	if(carl::isZero(dividend) || dividend.degree() < divisor.degree())
+	if(carl::is_zero(dividend) || dividend.degree() < divisor.degree())
 	{
 		// According to definition.
 		return dividend;
@@ -171,16 +171,16 @@ UnivariatePolynomial<Coeff> signed_pseudo_remainder(const UnivariatePolynomial<C
 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> remainder(const MultivariatePolynomial<C,O,P>& dividend, const MultivariatePolynomial<C,O,P>& divisor) {
-	static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	assert(!carl::isZero(divisor));
-	if(&dividend == &divisor || carl::isOne(divisor) || dividend == divisor)
+	static_assert(is_field_type<C>::value, "Division only defined for field coefficients");
+	assert(!carl::is_zero(divisor));
+	if(&dividend == &divisor || carl::is_one(divisor) || dividend == divisor)
 	{
 		return MultivariatePolynomial<C,O,P>();
 	}
 
 	MultivariatePolynomial<C,O,P> remainder;
 	MultivariatePolynomial p = dividend;
-	while(!carl::isZero(p))
+	while(!carl::is_zero(p))
 	{
 		if(p.lterm().tdeg() < divisor.lterm().tdeg())
 		{
@@ -215,7 +215,7 @@ MultivariatePolynomial<C,O,P> remainder(const MultivariatePolynomial<C,O,P>& div
 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> pseudo_remainder(const MultivariatePolynomial<C,O,P>& dividend, const MultivariatePolynomial<C,O,P>& divisor, Variable var) {
-	assert(!carl::isZero(divisor));
+	assert(!carl::is_zero(divisor));
 	return MultivariatePolynomial<C,O,P>(pseudo_remainder(to_univariate_polynomial(dividend, var), to_univariate_polynomial(divisor, var)));
 }
 

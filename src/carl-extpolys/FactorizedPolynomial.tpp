@@ -35,8 +35,8 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& _pCache, bool _polyNormalized ):
         mCacheRef( CACHE::NO_REF ),
-        mpCache( carl::isZero(_polynomial) ? nullptr : _pCache ),
-        mCoefficient( carl::isZero(_polynomial) ? CoeffType(0) : (_polyNormalized ? CoeffType(1) : CoeffType(1)/_polynomial.coprimeFactor()) )
+        mpCache( carl::is_zero(_polynomial) ? nullptr : _pCache ),
+        mCoefficient( carl::is_zero(_polynomial) ? CoeffType(0) : (_polyNormalized ? CoeffType(1) : CoeffType(1)/_polynomial.coprimeFactor()) )
     {
         assert( !_polyNormalized || (_polynomial.coprimeFactor() == CoeffType(1)) );
         if ( _polynomial.isConstant() )
@@ -56,7 +56,7 @@ namespace carl
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
              * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
              */
-            if ( _polyNormalized || carl::isOne(mCoefficient) )
+            if ( _polyNormalized || carl::is_one(mCoefficient) )
             {
                 assert( mpCache != nullptr );
                 Factorization<P> factorization;
@@ -96,7 +96,7 @@ namespace carl
         mpCache( _pCache ),
         mCoefficient( _coefficient )
     {
-        assert( !carl::isZero(_coefficient) );
+        assert( !carl::is_zero(_coefficient) );
         if ( _factorization.empty() )
             mpCache = nullptr;
         else
@@ -104,7 +104,7 @@ namespace carl
             assert( mpCache != nullptr );
             // TODO expensive
             for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
-                assert( carl::isOne(factor->first.coefficient()) );
+                assert( carl::is_one(factor->first.coefficient()) );
             PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( _factorization ) );
             auto ret = mpCache->cache( pfPair );//, &carl::canBeUpdated, &carl::update );
             mCacheRef = ret.first;
@@ -231,7 +231,7 @@ namespace carl
     }
     
     template<typename P>
-    template<typename C, EnableIf<is_subset_of_rationals<C>>>
+    template<typename C, EnableIf<is_subset_of_rationals_type<C>>>
     typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::coprimeFactorWithoutConstant() const
     {
         if( existsFactorization( *this ) )
@@ -243,14 +243,14 @@ namespace carl
             }
             auto factor = content().factorization().begin();
             CoeffType cf = factor->first.coprimeFactorWithoutConstant();
-            auto resultNum = carl::getNum( cf );
-            auto resultDenom = carl::getDenom( cf );
+            auto resultNum = carl::get_num( cf );
+            auto resultDenom = carl::get_denom( cf );
             ++factor;
             while( factor != content().factorization().end() )
             {
                 cf = factor->first.coprimeFactorWithoutConstant();
-                resultNum = carl::lcm( resultNum, carl::getNum( cf ) );
-                resultDenom = carl::gcd( resultDenom, carl::getDenom( cf ) );
+                resultNum = carl::lcm( resultNum, carl::get_num( cf ) );
+                resultDenom = carl::gcd( resultDenom, carl::get_denom( cf ) );
                 ++factor;
             }
             assert( computePolynomial(*this).coprimeFactorWithoutConstant() == (resultNum / (mCoefficient*resultDenom)) );
@@ -310,7 +310,7 @@ namespace carl
             assert( computePolynomial(*this).totalDegree() == result );
             return result;
         }
-        assert( !carl::isZero(mCoefficient) );
+        assert( !carl::is_zero(mCoefficient) );
         return 0;
     }
 
@@ -401,7 +401,7 @@ namespace carl
     {
         if( existsFactorization( *this ) )
         {
-            assert( !carl::isZero( mCoefficient ) );
+            assert( !carl::is_zero( mCoefficient ) );
             if( factorizedTrivially() )
                 return polynomial().hasConstantTerm();
             TermType result( mCoefficient );
@@ -416,7 +416,7 @@ namespace carl
             assert( computePolynomial(*this).hasConstantTerm() );
             return true;
         }
-        return !carl::isZero( mCoefficient );
+        return !carl::is_zero( mCoefficient );
     }
 
     template<typename P>
@@ -560,7 +560,7 @@ namespace carl
     {
 		if( _exp == 0 )
             return FactorizedPolynomial<P>( constant_one<CoeffType>::get() );
-        if( isZero() )
+        if( is_zero() )
             return FactorizedPolynomial<P>( constant_zero<CoeffType>::get() );
         FactorizedPolynomial<P> res( constant_one<CoeffType>::get() );
         FactorizedPolynomial<P> mult( *this );
@@ -623,8 +623,8 @@ namespace carl
     template<typename P>
     DivisionResult<FactorizedPolynomial<P>> FactorizedPolynomial<P>::divideBy( const FactorizedPolynomial<P>& _divisor ) const
     {
-        static_assert(is_field<CoeffType>::value, "Division only defined for field coefficients");
-        if( _divisor.isOne() || this->isZero() )
+        static_assert(is_field_type<CoeffType>::value, "Division only defined for field coefficients");
+        if( _divisor.is_one() || this->is_zero() )
             return DivisionResult<FactorizedPolynomial<P>>( *this, FactorizedPolynomial<P>() );
         if( this->isConstant() && _divisor.isConstant() )
             return DivisionResult<FactorizedPolynomial<P>>( FactorizedPolynomial<P>( this->coefficient()/_divisor.coefficient() ), FactorizedPolynomial<P>() );
@@ -642,7 +642,7 @@ namespace carl
     }
     
     template<typename P>
-    template<typename C, EnableIf<is_field<C>>>
+    template<typename C, EnableIf<is_field_type<C>>>
     FactorizedPolynomial<P> FactorizedPolynomial<P>::divideBy( const CoeffType& _divisor ) const
     {
         FactorizedPolynomial<P> result( *this );
@@ -651,12 +651,12 @@ namespace carl
     }
     
     template<typename P>
-    template<typename C, EnableIf<is_field<C>>>
+    template<typename C, EnableIf<is_field_type<C>>>
     bool FactorizedPolynomial<P>::divideBy( const FactorizedPolynomial<P>& _divisor, FactorizedPolynomial<P>& _quotient ) const
     {
-        static_assert(is_field<C>::value, "Division only defined for field coefficients");
+        static_assert(is_field_type<C>::value, "Division only defined for field coefficients");
         DivisionResult<FactorizedPolynomial<P>> dr = this->divideBy( _divisor );
-        if( dr.remainder.isZero() )
+        if( dr.remainder.is_zero() )
         {
             _quotient = dr.quotient;
             return true;
@@ -785,12 +785,12 @@ namespace carl
             return result;
         }
 
-        Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::getNum( _lhs.coefficient() ), carl::getNum( _rhs.coefficient() ) )) /
-                Coeff<P>(carl::lcm( carl::getDenom( _lhs.coefficient() ), carl::getDenom( _rhs.coefficient() ) ));
+        Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::get_num( _lhs.coefficient() ), carl::get_num( _rhs.coefficient() ) )) /
+                Coeff<P>(carl::lcm( carl::get_denom( _lhs.coefficient() ), carl::get_denom( _rhs.coefficient() ) ));
         Coeff<P> coefficientRestA = _lhs.coefficient() / coefficientCommon;
         Coeff<P> coefficientRestB = _rhs.coefficient() / coefficientCommon;
 
-        if (carl::isZero(coefficientCommon))
+        if (carl::is_zero(coefficientCommon))
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );
@@ -818,7 +818,7 @@ namespace carl
             sum = computePolynomial( factorizationRestA ) * coefficientRestA;
             sum += computePolynomial( factorizationRestB ) * coefficientRestB;
         }
-        if ( carl::isZero(sum) )
+        if ( carl::is_zero(sum) )
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );
@@ -906,7 +906,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpoly, const typename FactorizedPolynomial<P>::CoeffType& _coeff )
     {
-        if( carl::isZero( _coeff ) )
+        if( carl::is_zero( _coeff ) )
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _fpoly ) * _coeff == computePolynomial( result ) );
@@ -925,7 +925,7 @@ namespace carl
         _lhs.strengthenActivity();
         _rhs.strengthenActivity();
 
-        if( _lhs.isZero() || _rhs.isZero() )
+        if( _lhs.is_zero() || _rhs.is_zero() )
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _lhs ) * computePolynomial( _rhs ) == computePolynomial( result ) );
@@ -993,7 +993,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator*=( const CoeffType& _coef )
     {
-        if( carl::isZero( _coef ) && mpCache != nullptr )
+        if( carl::is_zero( _coef ) && mpCache != nullptr )
         {
             mpCache->dereg( mCacheRef );
             mCacheRef = CACHE::NO_REF;
@@ -1014,7 +1014,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const CoeffType& _coef )
     {
-        assert( !carl::isZero( _coef ) );
+        assert( !carl::is_zero( _coef ) );
         FactorizedPolynomial<P> tmp = *this;
         this->mCoefficient /= _coef;
         assert(computePolynomial(tmp) * (static_cast<CoeffType>(1)/_coef) == computePolynomial(*this));
@@ -1024,7 +1024,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const FactorizedPolynomial<P>& _fpoly )
     {
-        assert( !_fpoly.isZero() );
+        assert( !_fpoly.is_zero() );
         FactorizedPolynomial<P> result = this->quotient( _fpoly );
         assert( computePolynomial( *this ) / computePolynomial( _fpoly ) == computePolynomial( result ) );
         return *this = result;
@@ -1033,8 +1033,8 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P> FactorizedPolynomial<P>::quotient(const FactorizedPolynomial<P>& _fdivisor) const
     {
-        assert( !_fdivisor.isZero() );
-        if( isZero() )
+        assert( !_fdivisor.is_zero() );
+        if( is_zero() )
         {
             FactorizedPolynomial<P> result;
             assert( carl::quotient(computePolynomial( *this ), computePolynomial( _fdivisor ) ) == computePolynomial( result ) );
@@ -1082,15 +1082,15 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P> quotient( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( !_fpolyB.isZero() );
+        assert( !_fpolyB.is_zero() );
         return _fpolyA.quotient( _fpolyB );
     }
 
     template<typename P>
     std::pair<FactorizedPolynomial<P>,FactorizedPolynomial<P>> lazyDiv( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( !_fpolyB.isZero() );
-        if( _fpolyA.isZero() )
+        assert( !_fpolyB.is_zero() );
+        if( _fpolyA.is_zero() )
             return std::make_pair( FactorizedPolynomial<P>(), FactorizedPolynomial<P>( Coeff<P>( 1 ) ) );
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         _fpolyA.strengthenActivity();
@@ -1099,7 +1099,7 @@ namespace carl
         if( !existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> fPolyASimplified( _fpolyA );
-            assert( !carl::isZero(_fpolyB.mCoefficient) );
+            assert( !carl::is_zero(_fpolyB.mCoefficient) );
             fPolyASimplified.mCoefficient /= _fpolyB.mCoefficient;
             auto result = std::make_pair( fPolyASimplified, FactorizedPolynomial<P>( Coeff<P>( 1 ) ) );
             assert( computePolynomial( result.first ) * computePolynomial( _fpolyB ) == computePolynomial( result.second ) * computePolynomial( _fpolyA ) );
@@ -1108,10 +1108,10 @@ namespace carl
         else if( !existsFactorization( _fpolyA ) )
         {
             FactorizedPolynomial<P> fPolyASimplified( _fpolyA );
-            assert( !carl::isZero(_fpolyB.mCoefficient) );
+            assert( !carl::is_zero(_fpolyB.mCoefficient) );
             fPolyASimplified.mCoefficient /= _fpolyB.mCoefficient;
             FactorizedPolynomial<P> fPolyBSimplified( _fpolyB );
-            assert( !carl::isZero(_fpolyA.mCoefficient) );
+            assert( !carl::is_zero(_fpolyA.mCoefficient) );
             fPolyBSimplified.mCoefficient = Coeff<P>( 1 );
             auto result = std::make_pair( fPolyASimplified, fPolyBSimplified );
             assert( computePolynomial( result.first ) * computePolynomial( _fpolyB ) == computePolynomial( result.second ) * computePolynomial( _fpolyA ) );
@@ -1166,29 +1166,29 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P> lcm( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
+        assert( !_fpolyA.is_zero() && !_fpolyB.is_zero() );
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         bool rehashFPolyA = false;
         bool rehashFPolyB = false;
-        Coeff<P> coefficientLCM = Coeff<P>(carl::lcm( carl::getNum(_fpolyA.coefficient()), carl::getNum(_fpolyB.coefficient()) )) /
-                Coeff<P>(carl::gcd( carl::getDenom(_fpolyA.coefficient()), carl::getDenom(_fpolyB.coefficient()) ));
+        Coeff<P> coefficientLCM = Coeff<P>(carl::lcm( carl::get_num(_fpolyA.coefficient()), carl::get_num(_fpolyB.coefficient()) )) /
+                Coeff<P>(carl::gcd( carl::get_denom(_fpolyA.coefficient()), carl::get_denom(_fpolyB.coefficient()) ));
         // Handle cases where one or both are constant
         if( !existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> result( _fpolyA );
             result.mCoefficient = coefficientLCM;
-            assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
-            assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
             return result;
         }
         else if( !existsFactorization( _fpolyA ) )
         {
             FactorizedPolynomial<P> result( _fpolyB );
             result.mCoefficient = coefficientLCM;
-            assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
-            assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
             return result;
         }
         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "Compute LCM of " << _fpolyA << " and " << _fpolyB );
@@ -1217,36 +1217,36 @@ namespace carl
         coefficientLCM *= distributeCoefficients( lcmFactorization );
         FactorizedPolynomial<P> result( std::move( lcmFactorization ), coefficientLCM, _fpolyA.pCache() );
         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "LCM of " << _fpolyA << " and " << _fpolyB << ": " << result);
-        assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
-        assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
+        assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
+        assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
         return result;
     }
 
     template<typename P>
     FactorizedPolynomial<P> commonMultiple( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
+        assert( !_fpolyA.is_zero() && !_fpolyB.is_zero() );
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         
-        Coeff<P> coefficientLCM = Coeff<P>(carl::lcm( carl::getNum(_fpolyA.coefficient()), carl::getNum(_fpolyB.coefficient()) )) /
-                Coeff<P>(carl::gcd( carl::getDenom(_fpolyA.coefficient()), carl::getDenom(_fpolyB.coefficient()) ));
+        Coeff<P> coefficientLCM = Coeff<P>(carl::lcm( carl::get_num(_fpolyA.coefficient()), carl::get_num(_fpolyB.coefficient()) )) /
+                Coeff<P>(carl::gcd( carl::get_denom(_fpolyA.coefficient()), carl::get_denom(_fpolyB.coefficient()) ));
         // Handle cases where one or both are constant
         if( !existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> result( _fpolyA );
             result.mCoefficient = coefficientLCM;
-            assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
-            assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
             return result;
         }
         else if( !existsFactorization( _fpolyA ) )
         {
             FactorizedPolynomial<P> result( _fpolyB );
             result.mCoefficient = coefficientLCM;
-            assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
-            assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
             return result;
         }
         
@@ -1285,26 +1285,26 @@ namespace carl
             factorB++;
         }
         FactorizedPolynomial<P> result( std::move( cmFactorization ), coefficientLCM, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
-        assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
-        assert( carl::isZero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
+        assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyA ) )) );
+        assert( carl::is_zero(carl::remainder(computePolynomial( result ), computePolynomial( _fpolyB ) )) );
         return result;
     }
 
     template<typename P>
     FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
+        assert( !_fpolyA.is_zero() && !_fpolyB.is_zero() );
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
-        Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::getNum( _fpolyA.coefficient() ), carl::getNum( _fpolyB.coefficient() ) )) /
-                Coeff<P>(carl::lcm( carl::getDenom( _fpolyA.coefficient() ), carl::getDenom( _fpolyB.coefficient() ) ));
+        Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::get_num( _fpolyA.coefficient() ), carl::get_num( _fpolyB.coefficient() ) )) /
+                Coeff<P>(carl::lcm( carl::get_denom( _fpolyA.coefficient() ), carl::get_denom( _fpolyB.coefficient() ) ));
         // Handle cases where one or both are constant
         if( !existsFactorization( _fpolyA ) || !existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> result( coefficientCommon );
-            assert( carl::isZero(carl::remainder(computePolynomial( _fpolyA ), computePolynomial( result ) )) );
-            assert( carl::isZero(carl::remainder(computePolynomial( _fpolyB ), computePolynomial( result ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( _fpolyA ), computePolynomial( result ) )) );
+            assert( carl::is_zero(carl::remainder(computePolynomial( _fpolyB ), computePolynomial( result ) )) );
             return result;
         }
         
@@ -1327,8 +1327,8 @@ namespace carl
                 factorB++;
         }
         FactorizedPolynomial<P> result( std::move( cdFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
-        assert( carl::isZero(carl::remainder(computePolynomial( _fpolyA ), computePolynomial( result ) )) );
-        assert( carl::isZero(carl::remainder(computePolynomial( _fpolyB ), computePolynomial( result ) )) );
+        assert( carl::is_zero(carl::remainder(computePolynomial( _fpolyA ), computePolynomial( result ) )) );
+        assert( carl::is_zero(carl::remainder(computePolynomial( _fpolyB ), computePolynomial( result ) )) );
         return result;
     }
 
@@ -1391,7 +1391,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
+        assert( !_fpolyA.is_zero() && !_fpolyB.is_zero() );
         FactorizedPolynomial<P> restA, restB;
         return gcd( _fpolyA, _fpolyB, restA, restB );
     }
@@ -1399,12 +1399,12 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB, FactorizedPolynomial<P>& _fpolyRestA, FactorizedPolynomial<P>& _fpolyRestB )
     {
-        assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
+        assert( !_fpolyA.is_zero() && !_fpolyB.is_zero() );
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
 
-        Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::getNum( _fpolyA.coefficient() ), carl::getNum( _fpolyB.coefficient() ) )) /
-        Coeff<P>(carl::lcm( carl::getDenom( _fpolyA.coefficient() ), carl::getDenom( _fpolyB.coefficient() ) ));
+        Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::get_num( _fpolyA.coefficient() ), carl::get_num( _fpolyB.coefficient() ) )) /
+        Coeff<P>(carl::lcm( carl::get_denom( _fpolyA.coefficient() ), carl::get_denom( _fpolyB.coefficient() ) ));
         Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
         Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon;
         

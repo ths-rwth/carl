@@ -10,13 +10,13 @@ namespace carl {
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> gcd_recursive(const UnivariatePolynomial<Coeff>& a, const UnivariatePolynomial<Coeff>& b) {
-	assert(!carl::isZero(a));
-	assert(carl::isZero(b) || b.degree() <= a.degree());
+	assert(!carl::is_zero(a));
+	assert(carl::is_zero(b) || b.degree() <= a.degree());
 	
-	if(carl::isZero(b)) {
+	if(carl::is_zero(b)) {
 		return a;
 	}
-//	if(is_field<Coeff>::value)
+//	if(is_field_type<Coeff>::value)
 //	{
 //		if(b.isConstant()) return b;
 //	}
@@ -41,8 +41,8 @@ UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, c
 	assert(a.mainVar() == b.mainVar());
 	assert(a.mainVar() == s.mainVar());
 	assert(a.mainVar() == t.mainVar());
-	assert(!isZero(a));
-	assert(!isZero(b));
+	assert(!is_zero(a));
+	assert(!is_zero(b));
 	
 	CARL_LOG_DEBUG("carl.core", "UnivEEA: a=" << a << ", b=" << b );
 	Variable x = a.mainVar();
@@ -59,7 +59,7 @@ UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, c
 	UnivariatePolynomial<Coeff> d1(x);
 	UnivariatePolynomial<Coeff> d2 = a.one();
 	
-	while(!isZero(d))
+	while(!is_zero(d))
 	{
 		DivisionResult<UnivariatePolynomial<Coeff>> divres = carl::divide(c, d);
 		assert(divres.remainder == c - divres.quotient * d);
@@ -81,7 +81,7 @@ UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, c
 		CARL_LOG_TRACE("carl.core", "UnivEEA: c1=" << c1 << ", c2=" << c2 );
 		CARL_LOG_TRACE("carl.core", "UnivEEA: d1=" << d1 << ", d2=" << d2 );
 	}
-	assert(!isZero(c));
+	assert(!is_zero(c));
 	s = c1 / (a.lcoeff() * c.lcoeff());
 	t = c2 / (b.lcoeff() * c.lcoeff());
 	c = c.normalized();
@@ -103,8 +103,8 @@ UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, c
 template<typename Coeff>
 UnivariatePolynomial<Coeff> gcd(const UnivariatePolynomial<Coeff>& a, const UnivariatePolynomial<Coeff>& b) {
 	// We want degree(b) <= degree(a).
-	assert(!carl::isZero(a));
-	assert(!carl::isZero(b));
+	assert(!carl::is_zero(a));
+	assert(!carl::is_zero(b));
 	assert(a.mainVar() == b.mainVar());
 	if(a.degree() < b.degree()) {
 		return gcd_recursive(b.normalized(),a.normalized()).normalized();

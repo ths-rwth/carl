@@ -11,7 +11,7 @@ namespace carl {
 template<typename Rational>
 double roundDown(const Rational& o, bool overapproximate = false) {
 	using limits = std::numeric_limits<double>;
-	double result = carl::toDouble(o);
+	double result = carl::to_double(o);
 	if (result == -limits::infinity()) {
 		return result;
 	}
@@ -37,7 +37,7 @@ double roundDown(const Rational& o, bool overapproximate = false) {
 template<typename Rational>
 double roundUp(const Rational& o, bool overapproximate = false) {
 	using limits = std::numeric_limits<double>;
-	double result = carl::toDouble(o);
+	double result = carl::to_double(o);
 	if (result == limits::infinity()) {
 		return result;
 	}

@@ -35,7 +35,7 @@ namespace gcd_detail {
 		auto A = a.toUnivariatePolynomial(x);
 		auto B = b.toUnivariatePolynomial(x);
 		Polynomial result(primitive_euclidean(A.normalized(), B.normalized()));
-		if (carl::isNegative(result.lcoeff()) && !(carl::isNegative(a.lcoeff()) && carl::isNegative(b.lcoeff()))) {
+		if (carl::is_negative(result.lcoeff()) && !(carl::is_negative(a.lcoeff()) && carl::is_negative(b.lcoeff()))) {
 			return -result;
 		}
 		return result;
@@ -45,10 +45,10 @@ namespace gcd_detail {
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b) {
 	CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ")");
-	assert(!isZero(a));
-	assert(!isZero(b));
+	assert(!is_zero(a));
+	assert(!is_zero(b));
 
-	if (isOne(a) || isOne(b)) {
+	if (is_one(a) || is_one(b)) {
 		return MultivariatePolynomial<C,O,P>(1);
 	}
 	if (a.isConstant() && b.isConstant()) {

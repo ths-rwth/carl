@@ -34,7 +34,7 @@ int count_real_roots(const std::vector<UnivariatePolynomial<Coefficient>>& seq, 
  */
 template<typename Coefficient>
 int count_real_roots(const UnivariatePolynomial<Coefficient>& p, const Interval<Coefficient>& i) {
-	assert(!isZero(p));
+	assert(!is_zero(p));
 	assert(!carl::is_root_of(p, i.lower()));
 	assert(!carl::is_root_of(p, i.upper()));
 	return count_real_roots(sturm_sequence(p), i);

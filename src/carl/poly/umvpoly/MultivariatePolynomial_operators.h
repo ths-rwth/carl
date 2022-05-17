@@ -39,7 +39,7 @@ inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Multivari
 }
 template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-	if (isZero(lhs) && isZero(rhs)) return true;
+	if (is_zero(lhs) && is_zero(rhs)) return true;
 	if (lhs.nrTerms() > 1) return false;
 	return lhs.lterm() == rhs;
 }
@@ -47,13 +47,13 @@ template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 	if (lhs.nrTerms() != 1) return false;
 	if (lhs.lmon() != rhs) return false;
-	return carl::isOne(lhs.lcoeff());
+	return carl::is_one(lhs.lcoeff());
 }
 template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable rhs) {
 	if (lhs.nrTerms() != 1) return false;
 	if (lhs.lmon() != rhs) return false;
-	return carl::isOne(lhs.lcoeff());
+	return carl::is_one(lhs.lcoeff());
 }
 template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
@@ -173,9 +173,9 @@ inline bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Univariat
  */
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (isZero(lhs) && isZero(rhs)) return false;
-	if (isZero(lhs)) return true;
-	if (isZero(rhs)) return false;
+	if (is_zero(lhs) && is_zero(rhs)) return false;
+	if (is_zero(lhs)) return true;
+	if (is_zero(rhs)) return false;
 	if (lhs.totalDegree() != rhs.totalDegree()) return lhs.totalDegree() < rhs.totalDegree();
 	if (lhs.totalDegree() == 0) return lhs.constantPart() < rhs.constantPart();
 	if (lhs.lterm() < rhs.lterm()) return true;
@@ -194,48 +194,48 @@ inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Multivaria
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-	if (isZero(lhs)) return carl::constant_zero<C>().get() < rhs;
+	if (is_zero(lhs)) return carl::constant_zero<C>().get() < rhs;
 	return lhs.lterm() < rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
-	if (isZero(lhs)) return true;
+	if (is_zero(lhs)) return true;
 	return lhs.lterm() < rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, Variable rhs) {
-	if (isZero(lhs)) return true;
+	if (is_zero(lhs)) return true;
 	return lhs.lterm() < rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-	if (isZero(lhs)) return true;
+	if (is_zero(lhs)) return true;
 	return lhs.lterm() < rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (isZero(rhs)) return lhs < carl::constant_zero<C>().get();
+	if (is_zero(rhs)) return lhs < carl::constant_zero<C>().get();
 	if (lhs < rhs.lterm()) return true;
 	if (lhs == rhs.lterm()) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (isZero(rhs)) return false;
+	if (is_zero(rhs)) return false;
 	if (lhs < rhs.lterm()) return true;
 	if (lhs == rhs.lterm()) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(Variable lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (isZero(rhs)) return false;
+	if (is_zero(rhs)) return false;
 	if (lhs < rhs.lterm()) return true;
 	if (lhs == rhs.lterm()) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (isZero(rhs)) return lhs < carl::constant_zero<C>().get();
+	if (is_zero(rhs)) return lhs < carl::constant_zero<C>().get();
 	return lhs < rhs.lterm();
 }
 /// @}
@@ -486,7 +486,7 @@ template<typename C>
 inline auto operator+(const Monomial::Arg& lhs, const Term<C>& rhs) {
 	return MultivariatePolynomial<C>(rhs) += lhs;
 }
-template<typename C, EnableIf<carl::is_number<C>> = dummy>
+template<typename C, EnableIf<carl::is_number_type<C>> = dummy>
 inline auto operator+(const Monomial::Arg& lhs, const C& rhs) {
 	return MultivariatePolynomial<C>(lhs) += rhs;
 }
@@ -498,7 +498,7 @@ template<typename C>
 inline auto operator+(Variable lhs, const Term<C>& rhs) {
 	return MultivariatePolynomial<C>(rhs) += lhs;
 }
-template<typename C, EnableIf<carl::is_number<C>> = dummy>
+template<typename C, EnableIf<carl::is_number_type<C>> = dummy>
 inline auto operator+(Variable lhs, const C& rhs) {
 	return MultivariatePolynomial<C>(lhs) += rhs;
 }
@@ -510,11 +510,11 @@ template<typename C>
 inline auto operator+(const C& lhs, const Term<C>& rhs) {
 	return MultivariatePolynomial<C>(rhs) += lhs;
 }
-template<typename C, EnableIf<carl::is_number<C>> = dummy>
+template<typename C, EnableIf<carl::is_number_type<C>> = dummy>
 inline auto operator+(const C& lhs, const Monomial::Arg& rhs) {
 	return MultivariatePolynomial<C>(rhs) += lhs;
 }
-template<typename C, EnableIf<carl::is_number<C>> = dummy>
+template<typename C, EnableIf<carl::is_number_type<C>> = dummy>
 inline auto operator+(const C& lhs, Variable rhs) {
 	return MultivariatePolynomial<C>(rhs) += lhs;
 }
@@ -576,7 +576,7 @@ template<typename C>
 inline auto operator-(const Monomial::Arg& lhs, const Term<C>& rhs) {
 	return -rhs + lhs;
 }
-template<typename C, EnableIf<carl::is_number<C>> = dummy>
+template<typename C, EnableIf<carl::is_number_type<C>> = dummy>
 inline auto operator-(const Monomial::Arg& lhs, const C& rhs) {
 	return MultivariatePolynomial<C>(lhs) -= rhs;
 }
@@ -588,7 +588,7 @@ template<typename C>
 inline auto operator-(Variable lhs, const Term<C>& rhs) {
 	return -rhs + lhs;
 }
-template<typename C, EnableIf<carl::is_number<C>> = dummy>
+template<typename C, EnableIf<carl::is_number_type<C>> = dummy>
 inline auto operator-(Variable lhs, const C& rhs) {
 	return MultivariatePolynomial<C>(lhs) -= rhs;
 }
@@ -600,11 +600,11 @@ template<typename C>
 inline auto operator-(const C& lhs, const Term<C>& rhs) {
 	return -rhs + lhs;
 }
-template<typename C, EnableIf<carl::is_number<C>> = dummy>
+template<typename C, EnableIf<carl::is_number_type<C>> = dummy>
 inline auto operator-(const C& lhs, const Monomial::Arg& rhs) {
 	return -MultivariatePolynomial<C>(rhs) + lhs;
 }
-template<typename C, EnableIf<carl::is_number<C>> = dummy>
+template<typename C, EnableIf<carl::is_number_type<C>> = dummy>
 inline auto operator-(const C& lhs, Variable rhs) {
 	return -MultivariatePolynomial<C>(rhs) + lhs;
 }

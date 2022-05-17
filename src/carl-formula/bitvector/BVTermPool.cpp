@@ -64,13 +64,13 @@ namespace carl
     {
         // Catch expressions leading to an "undefined" result (i.e., division by zero)
         // As of SMT-LIB 2.6, this is defined as #b111...
-        if (_second.isConstant() && _second.value().isZero()) {
+        if (_second.isConstant() && _second.value().is_zero()) {
 			switch (_type) {
 				case BVTermType::DIV_U:
 					return create(BVTermType::CONSTANT, ~BVValue(_first.width(), 0));
 				case BVTermType::DIV_S:
 					if (_first.isConstant()) {
-						if (_first.value().isZero()) {
+						if (_first.value().is_zero()) {
 							// Zero -> 1
 							return create(BVTermType::CONSTANT, BVValue(_first.width(), 1));
 						} else if (_first.value()[_first.width()-1]) {

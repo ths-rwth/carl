@@ -24,15 +24,15 @@ namespace carl {
  * The following functions return informations about the given numbers.
  */
 
-inline bool isZero(double n) {
+inline bool is_zero(double n) {
 	return std::fpclassify(n) == FP_ZERO;
 }
 
-inline bool isPositive(double n) {
+inline bool is_positive(double n) {
 	return n > 0;
 }
 
-inline bool isNegative(double n) {
+inline bool is_negative(double n) {
 	return n < 0;
 }
 
@@ -55,12 +55,12 @@ inline bool isNumber(double d) {
 	return !isNaN(d) && !isInf(d);
 }
 
-inline bool isInteger(double d) {
+inline bool is_integer(double d) {
 	double tmp;
 	return std::fpclassify(std::modf(d, &tmp)) == FP_ZERO;
 }
 
-inline bool isInteger(sint /*unused*/) {
+inline bool is_integer(sint /*unused*/) {
 	return true;
 }
 
@@ -74,23 +74,23 @@ inline std::size_t bitsize(unsigned /*unused*/) {
  * The following function convert types to other types.
  */
 
-inline double toDouble(sint n) {
+inline double to_double(sint n) {
 	return double(n);
 }
-inline double toDouble(double n) {
+inline double to_double(double n) {
 	return n;
 }
 
 template<typename Integer>
-inline Integer toInt(double n);
+inline Integer to_int(double n);
 
 template<>
-inline sint toInt<sint>(double n) {
+inline sint to_int<sint>(double n) {
 	return sint(n);
 }
 
 template<>
-inline uint toInt<uint>(double n) {
+inline uint to_int<uint>(double n) {
 	return uint(n);
 }
 

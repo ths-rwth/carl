@@ -28,7 +28,7 @@ namespace carl
             {
                 for(auto f = super::begin(); f != super::end(); ++f )
                 {
-                    if( !carl::isOne( f->first.coefficient() ) )
+                    if( !carl::is_one( f->first.coefficient() ) )
                         return false;
                 }
                 return true;

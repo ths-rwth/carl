@@ -52,9 +52,9 @@ TYPED_TEST(BVValueTest, toString)
 
 TYPED_TEST(BVValueTest, isZero)
 {
-	EXPECT_TRUE(this->bv32_0.isZero());
-	EXPECT_FALSE(this->bv32_1.isZero());
-	EXPECT_FALSE(this->bv32_e30.isZero());
+	EXPECT_TRUE(this->bv32_0.is_zero());
+	EXPECT_FALSE(this->bv32_1.is_zero());
+	EXPECT_FALSE(this->bv32_e30.is_zero());
 }
 
 TYPED_TEST(BVValueTest, UnaryMinus)

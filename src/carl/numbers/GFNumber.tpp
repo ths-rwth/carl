@@ -26,8 +26,8 @@ GFNumber<IntegerT> GFNumber<IntegerT>::inverse() const
 template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {	
-	if (lhs.isZero() && rhs.isZero()) return true;
-	if (lhs.isUnit() && rhs.isUnit()) return true;
+	if (lhs.is_zero() && rhs.is_zero()) return true;
+	if (lhs.is_unit() && rhs.is_unit()) return true;
 	if (lhs.mN == rhs.mN) return true;
 	if (!lhs.mGf || !rhs.mGf) return false;
 	assert(lhs.mGf != nullptr);
@@ -48,10 +48,10 @@ bool operator==(const IntegerT& lhs, const GFNumber<IntegerT>& rhs)
 template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, int rhs)
 {
-	if(lhs.isZero() && rhs == 0) return true;
-	if(lhs.isUnit() && rhs == 1) return true;
-	if(lhs.isZero() && rhs != 0) return false;
-	if(lhs.isUnit() && rhs != 1) return false;
+	if(lhs.is_zero() && rhs == 0) return true;
+	if(lhs.is_unit() && rhs == 1) return true;
+	if(lhs.is_zero() && rhs != 0) return false;
+	if(lhs.is_unit() && rhs != 1) return false;
 	assert(lhs.mGf != nullptr);
 	return lhs.mGf->modulo(lhs.mN) == rhs;
 }
@@ -165,7 +165,7 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator --()
 template<typename IntegerType>
 GFNumber<IntegerType>& GFNumber<IntegerType>::operator -=(const GFNumber& rhs)
 {
-	if (rhs.isZero()) return *this;
+	if (rhs.is_zero()) return *this;
 	if (mGf == nullptr) {
 		mGf = rhs.mGf;
 	}
@@ -217,7 +217,7 @@ GFNumber<IntegerType>& GFNumber<IntegerType>::operator *=(const IntegerType& rhs
 template<typename IntegerT>
 GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {
-	assert(!rhs.isZero());
+	assert(!rhs.is_zero());
 	assert(rhs.mGf != nullptr);
 	return GFNumber<IntegerT>(lhs.mN * rhs.inverse().mN, rhs.mGf);
 }
@@ -226,7 +226,7 @@ GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<Integ
 template<typename IntegerT>
 GFNumber<IntegerT>& GFNumber<IntegerT>::operator /=(const GFNumber<IntegerT>& rhs)
 {
-	assert(!rhs.isZero());
+	assert(!rhs.is_zero());
 	mN * rhs.inverse().mN;
 	return *this;
 }

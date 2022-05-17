@@ -19,7 +19,7 @@ inline Interval<Numeric> evaluate(const Monomial& m, const std::map<Variable, In
 		// We expect every variable to be in the map.
 		CARL_LOG_ASSERT("carl.core.intervalevaluation", map.count(m[i].first) > (size_t)0, "Every variable is expected to be in the map.");
 		result *= carl::pow(map.at(m[i].first), m[i].second);
-        if( result.isZero() )
+        if( result.is_zero() )
             return result;
 	}
 	return result;
@@ -47,7 +47,7 @@ template<typename Coeff, typename Policy, typename Ordering, typename Numeric>
 inline Interval<Numeric> evaluate(const MultivariatePolynomial<Coeff, Policy, Ordering>& p, const std::map<Variable, Interval<Numeric>>& map)
 {
 	CARL_LOG_FUNC("carl.core.intervalevaluation", p << ", " << map);
-	if(isZero(p)) {
+	if(is_zero(p)) {
 		return Interval<Numeric>(0);
 	} else {
 		Interval<Numeric> result(evaluate(p[0], map)); 

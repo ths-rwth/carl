@@ -29,7 +29,7 @@ UnivariatePolynomial<MultivariatePolynomial<typename UnderlyingNumberType<Coeff>
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> replace_main_variable(const UnivariatePolynomial<Coeff>& p, Variable newVar) {
-	if constexpr (carl::is_number<Coeff>::value) {
+	if constexpr (carl::is_number_type<Coeff>::value) {
 		return UnivariatePolynomial<Coeff>(newVar, p.coefficients());
 	} else {
 		using MP = MultivariatePolynomial<typename UnderlyingNumberType<Coeff>::type>;

@@ -529,7 +529,7 @@ Number ceil(const RealAlgebraicNumberLibpoly<Number>& n) {
 }
 
 template<typename Number>
-bool isZero(const RealAlgebraicNumberLibpoly<Number>& n) {
+bool is_zero(const RealAlgebraicNumberLibpoly<Number>& n) {
 	refine(n);
 	return n.is_zero();
 }

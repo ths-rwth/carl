@@ -8,7 +8,7 @@ namespace carl {
 
     template<>
     inline double convert<mpq_class, double>(const mpq_class& n) {
-    	return carl::toDouble(n);
+    	return carl::to_double(n);
     }
 
     template<>
@@ -18,12 +18,12 @@ namespace carl {
 
     template<>
     inline double convert<FLOAT_T<mpq_class>, double>(const FLOAT_T<mpq_class>& n) {
-    	return carl::toDouble(n.value());
+    	return carl::to_double(n.value());
     }
 
     template<>
     inline FLOAT_T<double> convert<mpq_class, FLOAT_T<double>>(const mpq_class& n) {
-    	return FLOAT_T<double>(carl::toDouble(n));
+    	return FLOAT_T<double>(carl::to_double(n));
     }
 
     template<>
@@ -54,7 +54,7 @@ namespace carl {
     #ifdef USE_MPFR_FLOAT
     template<>
     inline double convert<FLOAT_T<mpfr_t>, double>(const FLOAT_T<mpfr_t>& n) {
-    	return carl::toDouble(n);
+    	return carl::to_double(n);
     }
 
     template<>
@@ -66,7 +66,7 @@ namespace carl {
     #ifdef USE_CLN_NUMBERS
     template<>
     inline double convert<cln::cl_RA, double>(const cln::cl_RA& n) {
-    	return carl::toDouble(n);
+    	return carl::to_double(n);
     }
 
 	template<>
@@ -76,7 +76,7 @@ namespace carl {
 
     template<>
     inline double convert<FLOAT_T<cln::cl_RA>, double>(const FLOAT_T<cln::cl_RA>& n) {
-    	return carl::toDouble(n);
+    	return carl::to_double(n);
     }
 
     template<>

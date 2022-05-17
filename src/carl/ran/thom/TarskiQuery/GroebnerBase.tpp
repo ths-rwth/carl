@@ -17,7 +17,7 @@ bool GroebnerBase<Number>::hasFiniteMon() const {
 		for (const auto& v: vars) {
 			bool found = true;
 			for (const auto& m : lmons) {
-				assert(isOne(m.coeff()));
+				assert(is_one(m.coeff()));
 				if (m.hasNoOtherVariable(v)) {
 					found = false;
 					break;
@@ -42,9 +42,9 @@ std::vector<typename GroebnerBase<Number>::Monomial> GroebnerBase<Number>::cor()
 // returns true iff any of the monomials in list divides m
 template<typename Number>
 bool anyDivides(const std::vector<typename GroebnerBase<Number>::Monomial>& list, const typename GroebnerBase<Number>::Monomial& m) {
-        CARL_LOG_ASSERT("carl.thom.groebner", isOne(m.coeff()), "invalid monomial!");
+        CARL_LOG_ASSERT("carl.thom.groebner", is_one(m.coeff()), "invalid monomial!");
         for(const auto& m_prime : list) {
-                CARL_LOG_ASSERT("carl.thom.groebner", isOne(m_prime.coeff()), "invalid monomial!");
+                CARL_LOG_ASSERT("carl.thom.groebner", is_one(m_prime.coeff()), "invalid monomial!");
                 if(m.divisible(m_prime)) {
                         return true;
                 }
@@ -89,7 +89,7 @@ std::vector<typename GroebnerBase<Number>::Monomial> GroebnerBase<Number>::mon()
         std::vector<uint> degrees;
         for(const auto& v : vars) {
                 for(const auto& m : lmons) {
-                        CARL_LOG_ASSERT("carl.thom.groebner", isOne(m.coeff()), "invalid monomial!");
+                        CARL_LOG_ASSERT("carl.thom.groebner", is_one(m.coeff()), "invalid monomial!");
                         if(m.hasNoOtherVariable(v)) {
                                 degrees.push_back(m.monomial()->tdeg());
                                 break;
@@ -126,7 +126,7 @@ std::vector<typename GroebnerBase<Number>::Monomial> GroebnerBase<Number>::bor()
         std::vector<typename GroebnerBase<Number>::Monomial> _mon = this->mon();
         for(const Variable& v : vars) {
                 for(const auto& m : _mon) {
-                        assert(isOne(m.coeff()));
+                        assert(is_one(m.coeff()));
                         typename GroebnerBase<Number>::Monomial currMon = m * v;
                         if(std::find(res.begin(), res.end(), currMon) == res.end()) { // not already contained in res
                                 if(std::find(_mon.begin(), _mon.end(), currMon) == _mon.end()) { // not contained in _mon

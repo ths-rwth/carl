@@ -498,5 +498,5 @@ TEST(UnivariatePolynomial, coprimeFactor)
 
 	std::cout << pol << " -> " << pol.coprimeFactor() << std::endl;
 
-	ASSERT_EQ(carl::getDenom(pol.coprimeFactor()), 1);
+	ASSERT_EQ(carl::get_denom(pol.coprimeFactor()), 1);
 }

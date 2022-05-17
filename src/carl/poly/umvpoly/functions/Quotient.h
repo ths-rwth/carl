@@ -12,18 +12,18 @@ namespace carl {
  */
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& dividend, const MultivariatePolynomial<C,O,P>& divisor) {
-	assert(!carl::isZero(divisor));
+	assert(!carl::is_zero(divisor));
 	if (dividend == divisor) {
 		return MultivariatePolynomial<C,O,P>(1);
 	}
-	if (carl::isOne(divisor)) {
+	if (carl::is_one(divisor)) {
 		return dividend;
 	}
-	//static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	//static_assert(is_field_type<C>::value, "Division only defined for field coefficients");
 	MultivariatePolynomial<C,O,P> p(dividend);
 	auto& tam = MultivariatePolynomial<C,O,P>::mTermAdditionManager;
 	auto id = tam.getId(p.nrTerms());
-	while(!carl::isZero(p))
+	while(!carl::is_zero(p))
 	{
 		Term<C> factor;
 		if (p.lterm().divide(divisor.lterm(), factor)) {

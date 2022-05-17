@@ -165,7 +165,7 @@ public:
 	
 	Sign signOnPolynomial(const Polynomial& p) const {
 		CARL_LOG_ASSERT("carl.thom", carl::variables(p).size() <= this->dimension(), "\np = " << p << "\nthis = " << *this);
-		if(carl::isZero(p)) return Sign(0);
+		if(carl::is_zero(p)) return Sign(0);
 		if(p.isConstant()) return Sign(carl::sgn(p.lcoeff()));
 		std::list<SignCondition> signs = mSd->getSigns(p);
 		SignCondition relevant = accumulateRelevantSigns();
@@ -178,7 +178,7 @@ public:
 	}
 	
 	bool makesPolynomialZero(const Polynomial& pol, Variable::Arg pol_mainVar) const {
-		assert(!carl::isZero(pol));
+		assert(!carl::is_zero(pol));
 		assert(mMainVar != pol_mainVar);
 		UnivariatePolynomial<Polynomial> pol_univ = carl::to_univariate_polynomial(pol, pol_mainVar);
 		// maybe check first if pol_univ has some constant coefficient...

@@ -59,21 +59,21 @@ std::size_t total_degree(const Term<Coeff>& t) {
 	return total_degree(*t.monomial());
 }
 
-/**
- * Checks whether a term is zero.
- */
-template<typename Coeff>
-bool is_zero(const Term<Coeff>& term) {
-	return carl::isZero(term.coeff());
-}
-
-/**
- * Checks whether a term is one.
- */
-template<typename Coeff>
-bool is_one(const Term<Coeff>& term) {
-	return is_constant(term) && carl::isOne(term.coeff());
-}
+// /**
+//  * Checks whether a term is zero.
+//  */
+// template<typename Coeff>
+// bool is_zero(const Term<Coeff>& term) {
+// 	return carl::is_zero(term.coeff());
+// }
+// 
+// /**
+//  * Checks whether a term is one.
+//  */
+// template<typename Coeff>
+// bool is_one(const Term<Coeff>& term) {
+// 	return is_constant(term) && carl::is_one(term.coeff());
+// }
 
 /**
  * Checks whether the monomial is a constant.
@@ -112,7 +112,7 @@ bool is_at_most_linear(const Term<Coeff>& t) {
  */
 template<typename Coeff, typename Ordering, typename Policies>
 std::size_t total_degree(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
-	if (carl::isZero(p)) return 0;
+	if (carl::is_zero(p)) return 0;
 	assert(p.size() != 0);
 	if (Ordering::degreeOrder) {
 		return total_degree(p.lterm());
@@ -121,15 +121,15 @@ std::size_t total_degree(const MultivariatePolynomial<Coeff,Ordering,Policies>& 
 	}
 }
 
-template<typename C, typename O, typename P>
-bool is_one(const MultivariatePolynomial<C,O,P>& p) {
-	return (p.nrTerms() == 1) && is_one(p.lterm());
-}
-
-template<typename C, typename O, typename P>
-bool is_zero(const MultivariatePolynomial<C,O,P>& p) {
-	return p.nrTerms() == 0;
-}
+// template<typename C, typename O, typename P>
+// bool is_one(const MultivariatePolynomial<C,O,P>& p) {
+// 	return (p.nrTerms() == 1) && is_one(p.lterm());
+// }
+// 
+// template<typename C, typename O, typename P>
+// bool is_zero(const MultivariatePolynomial<C,O,P>& p) {
+// 	return p.nrTerms() == 0;
+// }
 
 /**
  * Check if the polynomial is linear.
@@ -144,7 +144,7 @@ bool is_constant(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
  */
 template<typename Coeff, typename Ordering, typename Policies>
 bool is_linear(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
-	if (carl::isZero(p)) return true;
+	if (carl::is_zero(p)) return true;
 	if (Ordering::degreeOrder) {
 		return is_linear(p.lterm());
 	} else {
@@ -162,13 +162,13 @@ bool is_linear(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
  */
 template<typename Coeff>
 std::size_t total_degree(const UnivariatePolynomial<Coeff>& p) {
-	if constexpr (carl::is_number<Coeff>::value) {
+	if constexpr (carl::is_number_type<Coeff>::value) {
 		return p.degree();
 	} else {
-		if (p.isZero()) return 0;
+		if (p.is_zero()) return 0;
 		uint max = 0;
 		for (std::size_t deg = 0; deg < p.coefficients().size(); deg++) {
-			if (!p.coefficients()[deg].isZero()) {
+			if (!p.coefficients()[deg].is_zero()) {
 				uint tdeg = deg + total_degree(p.coefficients()[deg]);
 				if (tdeg > max) max = tdeg;
 			}
@@ -177,23 +177,23 @@ std::size_t total_degree(const UnivariatePolynomial<Coeff>& p) {
 	}
 }
 
-/**
- * Checks if the polynomial is equal to zero.
- * @return If polynomial is zero.
- */
-template<typename Coeff>
-bool is_zero(const UnivariatePolynomial<Coeff>& p) {
-	return p.coefficients().size() == 0;
-}
-
-/**
- * Checks if the polynomial is equal to one.
- * @return If polynomial is one.
- */
-template<typename Coeff>
-bool is_one(const UnivariatePolynomial<Coeff>& p) {
-	return p.coefficients().size() == 1 && carl::isOne(p.coefficients().front());
-}
+// /**
+//  * Checks if the polynomial is equal to zero.
+//  * @return If polynomial is zero.
+//  */
+// template<typename Coeff>
+// bool is_zero(const UnivariatePolynomial<Coeff>& p) {
+// 	return p.coefficients().size() == 0;
+// }
+// 
+// /**
+//  * Checks if the polynomial is equal to one.
+//  * @return If polynomial is one.
+//  */
+// template<typename Coeff>
+// bool is_one(const UnivariatePolynomial<Coeff>& p) {
+// 	return p.coefficients().size() == 1 && carl::is_one(p.coefficients().front());
+// }
 
 /**
  * Checks whether the polynomial is constant with respect to the main variable.

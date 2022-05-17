@@ -43,16 +43,16 @@ The following interface should be implemented for every number type `T`.
   - `T operator-(const T&)` 
   - `T operator*(const T&, const T&)` and `T& operator*=(const T&, const T&)`
   - `T& operator=(const T&)`
-- `bool carl::isZero(const T&)` and `bool carl::isOne(const T&)`
-- If `carl::is_rational<T>::value`:
-  - `carl::getNum(const T&)` and `carl::getDenom(const T&)`
+- `bool carl::is_zero(const T&)` and `bool carl::is_one(const T&)`
+- If `carl::is_rational_type<T>::value`:
+  - `carl::get_num(const T&)` and `carl::get_denom(const T&)`
   - `T carl::rationalize(double)`
-- `bool carl::isInteger(const T&)`
+- `bool carl::is_integer(const T&)`
 - `std::size_t carl::bitsize(const T&)`
-- `double carl::toDouble(const T&)` and `I carl::toInt<I>(const T&)` for some integer types `I`.
+- `double carl::to_double(const T&)` and `I carl::to_int<I>(const T&)` for some integer types `I`.
 - `T carl::abs(const T&)`
 - `T carl::floor(const T&)` and `T carl::ceil(const T&)`
-- If `carl::is_integer<T>::value`:
+- If `carl::is_integer_type<T>::value`:
   - `T carl::gcd(const T&, const T&)` and `T carl::lcm(const T&, const T&)`
   - `T carl::mod(const T&, const T&)`
 - `T carl::pow(const T&, unsigned)`

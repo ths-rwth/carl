@@ -72,7 +72,7 @@ class RealRootIsolation {
 				CARL_LOG_DEBUG("carl.ran.realroots", "Trivially solving linear mPolynomial " << mPolynomial);
 				const auto& a = mPolynomial.coefficients()[1];
 				const auto& b = mPolynomial.coefficients()[0];
-				assert(!carl::isZero(a));
+				assert(!carl::is_zero(a));
 				add_trivial_root(-b / a);
 				break;
 			}
@@ -81,7 +81,7 @@ class RealRootIsolation {
 				const auto& a = mPolynomial.coefficients()[2];
 				const auto& b = mPolynomial.coefficients()[1];
 				const auto& c = mPolynomial.coefficients()[0];
-				assert(!carl::isZero(a));
+				assert(!carl::is_zero(a));
 				/* Use this formulation of p-q-formula:
 				* x = ( -b +- \sqrt{ b*b - 4*a*c } ) / (2*a)
 				*/
@@ -179,7 +179,7 @@ class RealRootIsolation {
 		// Convert polynomial coeffs to double
 		std::vector<double> coeffs;
 		for (const auto& n: mPolynomial.coefficients()) {
-			coeffs.emplace_back(toDouble(n));
+			coeffs.emplace_back(to_double(n));
 		}
 		CARL_LOG_DEBUG("carl.ran.realroots", "Double coeffs: " << coeffs);
 		
@@ -268,12 +268,12 @@ class RealRootIsolation {
 	/// Do actual root isolation.
 	void compute_roots() {
 		// Handle zero polynomial
-		if (carl::isZero(mPolynomial)) {
+		if (carl::is_zero(mPolynomial)) {
 			return;
 		}
 		// Check for p(0) == 0
 		eliminate_zero_roots();
-		assert(!carl::isZero(mPolynomial));
+		assert(!carl::is_zero(mPolynomial));
 		// Handle other easy cases
 		while (true) {
 			// Degree of at most 2 -> use p-q-formula

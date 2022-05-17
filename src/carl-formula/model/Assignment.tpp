@@ -28,7 +28,7 @@ namespace carl
                 {
                     assert( ass->first.isVariable() );
                     Rational value = ass->second.asSqrtEx().constantPart().constantPart()/ass->second.asSqrtEx().denominator().constantPart();
-                    assert( !(ass->first.asVariable().type() == carl::VariableType::VT_INT) || carl::isInteger( value ) );
+                    assert( !(ass->first.asVariable().type() == carl::VariableType::VT_INT) || carl::is_integer( value ) );
                     _rationalAssigns.insert( _rationalAssigns.end(), std::make_pair(ass->first.asVariable(), value));
                 }
                 else

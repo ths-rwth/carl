@@ -35,7 +35,7 @@ struct BaseRepresentation : public std::map<uint, Number> {
 		}
 	}
 		
-	bool isZero() const { return this->empty(); }
+	bool is_zero() const { return this->empty(); }
 	bool contains(uint i) const { return this->find(i) != this->end(); }
 	Number get(uint index) const {
 		auto it = this->find(index);
@@ -121,7 +121,7 @@ public:
 	BaseRepresentation<Number> multiply(const BaseRepresentation<Number>& f, const BaseRepresentation<Number>& g) const {
 		BaseRepresentation<Number> res;
 		for(const auto& entry : this->mTable) {
-			if(entry.second.br.isZero()) continue;
+			if(entry.second.br.is_zero()) continue;
 			for(const auto& index_coeff : entry.second.br) {
 				Number newCoeff(0);
 				for(const auto& pair : entry.second.pairs) {
@@ -200,7 +200,7 @@ private:
 				// find the polynomial in the basis with the corresponding leading monomial
 				MultivariatePolynomial<Number> G;
 				for(const auto& p : gb.get()) {
-					assert(!carl::isZero(p));
+					assert(!carl::is_zero(p));
 					if(p.lterm() == m) {
 						G = p;
 						break;
@@ -210,7 +210,7 @@ private:
 				diff *= Number(-1);
 				BaseRepresentation<Number> baseRepr(mBase, diff);
 				IndexPairs pairs;
-				if(!baseRepr.isZero()) {
+				if(!baseRepr.is_zero()) {
 					pairs = indexPairs(m);
 				}
 				mTable[m] = {baseRepr, pairs};
@@ -253,7 +253,7 @@ private:
 				}
 				IndexPairs pairs;
 				BaseRepresentation<Number> baseRepr(mBase, sum);
-				if(!baseRepr.isZero()) {
+				if(!baseRepr.is_zero()) {
 					pairs = indexPairs(m);
 				}
 				mTable[m] = {baseRepr, pairs};
@@ -286,7 +286,7 @@ private:
 				
 				IndexPairs pairs;
 				BaseRepresentation<Number> baseRepr(mBase, nf_m);
-				if(!baseRepr.isZero()) {
+				if(!baseRepr.is_zero()) {
 					pairs = indexPairs(m);
 				}
 				mTable[m] = {baseRepr, pairs};

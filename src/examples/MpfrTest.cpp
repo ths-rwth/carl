@@ -34,7 +34,7 @@ void compare() {
 }
 
 
-void toInt(mpz_t intRep, mpfr_t a) {
+void to_int(mpz_t intRep, mpfr_t a) {
 	std::cout << "Bits per limb " << mp_bits_per_limb << std::endl;
 	std::cout << "Number limbs " << std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb)) << std::endl;
 	std::cout << "Precision is " << a->_mpfr_prec << std::endl;
@@ -119,7 +119,7 @@ int main (int argc, char** argv)
 	mpz_init(b);
 	mpz_set_ui(b,0);
 
-	toInt(b,a);
+	to_int(b,a);
 
 	mpz_get_str(outStr, 10,b);
 	std::cout << std::string(outStr) << std::endl;

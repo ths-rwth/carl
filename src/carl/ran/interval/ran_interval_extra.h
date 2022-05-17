@@ -120,7 +120,7 @@ public:
 
 		auto sturm_seq = sturm_sequence(res);
 		// the interval should include at least one root.
-		assert(!carl::isZero(res));
+		assert(!carl::is_zero(res));
 		assert(carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) >= 1);
 		while (!interval.is_point_interval() && (carl::is_root_of(res, interval.lower()) || carl::is_root_of(res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
 			// refine the result interval until it isolates exactly one real root of the result polynomial

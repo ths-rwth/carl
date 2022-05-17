@@ -37,7 +37,7 @@ namespace carl
 				{
 					out = PCon(false);
 				}
-				else if(it->lhs().denominator().isOne())
+				else if(it->lhs().denominator().is_one())
 				{
 					out = PCon(it->lhs().nominator(), it->rel());
 				} 

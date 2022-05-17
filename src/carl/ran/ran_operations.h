@@ -15,12 +15,12 @@ struct is_ran : std::false_type {};
 /* operators */
 
 template<typename RAN, typename = std::enable_if_t<is_ran<RAN>::value>>
-inline bool isZero(const RAN& n) {
-	return n.isZero();
+inline bool is_zero(const RAN& n) {
+	return n.is_zero();
 }
 
 template<typename RAN, typename = std::enable_if_t<is_ran<RAN>::value>>
-inline bool isInteger(const RAN& n) {
+inline bool is_integer(const RAN& n) {
 	return n.is_integral();
 }
 

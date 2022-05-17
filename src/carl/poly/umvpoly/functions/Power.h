@@ -40,7 +40,7 @@ Term<Coeff> pow(const Term<Coeff>& t, uint exp) {
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, std::size_t exp) {
 	//std::cout << "pw(" << *this << " ^ " << exp << ")" << std::endl;
-	if (carl::isZero(p)) return MultivariatePolynomial<C,O,P>(constant_zero<C>::get());
+	if (carl::is_zero(p)) return MultivariatePolynomial<C,O,P>(constant_zero<C>::get());
 	if (exp == 0) return MultivariatePolynomial<C,O,P>(constant_one<C>::get());
 	if (exp == 1) return MultivariatePolynomial<C,O,P>(p);
 	if (exp == 2) return p*p;
@@ -76,7 +76,7 @@ MultivariatePolynomial<C,O,P> pow_naive(const MultivariatePolynomial<C,O,P>& p, 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> pow(const UnivariatePolynomial<Coeff>& p, std::size_t exp) {
 	if (exp == 0) return UnivariatePolynomial<Coeff>(p.mainVar(), constant_one<Coeff>::get());
-	if (carl::isZero(p)) return UnivariatePolynomial<Coeff>(p.mainVar());
+	if (carl::is_zero(p)) return UnivariatePolynomial<Coeff>(p.mainVar());
 	UnivariatePolynomial<Coeff> res(p.mainVar(), constant_one<Coeff>::get());
 	UnivariatePolynomial<Coeff> mult(p);
 	while (exp > 0) {

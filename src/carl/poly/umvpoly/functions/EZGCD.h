@@ -134,13 +134,13 @@ class EZGCD
 			UnivReprPol U_I(x);
 			UnivPol H_I(x);
 			Polynomial c;
-			if(UnivPol::gcd(B_I, C_I).isOne())
+			if(UnivPol::gcd(B_I, C_I).is_one())
 			{
 				U_I = B;   //  B = G.
 				H_I = B_I.divideBy(C_I).quotient; // B_o[hat] = G_b / D_b
 				c = b; // Could not find in MY73
 			}
-			else if(UnivPol::gcd(A_I, C_I).isOne())
+			else if(UnivPol::gcd(A_I, C_I).is_one())
 			{
 				U_I = A; // B = F.
 				H_I = A_I.divideBy(C_I).quotient; //B_o[hat] = F_b / D_b
@@ -210,7 +210,7 @@ class EZGCD
 		do 
 		{
 			p = mPrimeFactory.next_prime();
-		} while( !A.lcoeff().mod(p).isZero() || !A.lcoeff().mod(p).isZero());
+		} while( !A.lcoeff().mod(p).is_zero() || !A.lcoeff().mod(p).is_zero());
 		return p;
 		
 	}

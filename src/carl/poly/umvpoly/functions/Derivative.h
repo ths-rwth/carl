@@ -19,7 +19,7 @@ namespace detail_derivative {
 /**
  * Computes the n'th derivative of a number, which is either the number itself (for n = 0) or zero.
  */
-template<typename T, EnableIf<is_number<T>> = dummy>
+template<typename T, EnableIf<is_number_type<T>> = dummy>
 const T& derivative(const T& t, Variable, std::size_t n = 1) {
 	if (n == 0) return t;
 	return constant_zero<T>::get();
@@ -92,7 +92,7 @@ MultivariatePolynomial<C,O,P> derivative(const MultivariatePolynomial<C,O,P>& p,
 	typename MultivariatePolynomial<C,O,P>::TermsType newTerms;
 	for (const auto& t: p) {
 		newTerms.emplace_back(derivative(t, v, n));
-		if (isZero(newTerms.back())) newTerms.pop_back();
+		if (is_zero(newTerms.back())) newTerms.pop_back();
 	}
 	return MultivariatePolynomial<C,O,P>(std::move(newTerms));
 }
@@ -103,7 +103,7 @@ MultivariatePolynomial<C,O,P> derivative(const MultivariatePolynomial<C,O,P>& p,
 template<typename C>
 UnivariatePolynomial<C> derivative(const UnivariatePolynomial<C>& p, std::size_t n = 1) {
 	if (n == 0) return p;
-	if (isZero(p)) return p;
+	if (is_zero(p)) return p;
 	if (p.degree() < n) {
 		CARL_LOG_DEBUG("carl.core", "derivative(" << p << ", " << n << ") = 0");
 		return UnivariatePolynomial<C>(p.mainVar());
@@ -124,7 +124,7 @@ UnivariatePolynomial<C> derivative(const UnivariatePolynomial<C>& p, std::size_t
 template<typename C>
 UnivariatePolynomial<C> derivative(const UnivariatePolynomial<C>& p, Variable v, std::size_t n = 1) {
 	if (n == 0) return p;
-	if (isZero(p)) return p;
+	if (is_zero(p)) return p;
 	if (v == p.mainVar()) return derivative(p, n);
 
 	std::vector<C> newCoeffs;

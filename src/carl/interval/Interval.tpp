@@ -96,7 +96,7 @@ bool Interval<Number>::contains_integer() const
 			case BoundType::STRICT:
 				break;
 			case BoundType::WEAK:
-				if (carl::isInteger(mContent.lower())) return true;
+				if (carl::is_integer(mContent.lower())) return true;
 		}
 		switch (mUpperBoundType) {
 			case BoundType::INFTY:
@@ -104,7 +104,7 @@ bool Interval<Number>::contains_integer() const
 			case BoundType::STRICT:
 				break;
 			case BoundType::WEAK:
-				if (carl::isInteger(mContent.upper())) return true;
+				if (carl::is_integer(mContent.upper())) return true;
 		}
 		return carl::floor(mContent.lower()) + carl::constant_one<Number>::get() < mContent.upper();
 	}
@@ -628,17 +628,17 @@ Interval<Number> Interval<Number>::div(const Interval<Number>& rhs) const
         const BoundType& xut = mUpperBoundType;
         const BoundType& ylt = rhs.lower_bound_type();
         const BoundType& yut = rhs.upper_bound_type();
-        if( (xlt == BoundType::INFTY && (carl::isPositive(yu) || yut == BoundType::INFTY))
-		   || (xut == BoundType::INFTY && (carl::isNegative(yl) || ylt == BoundType::INFTY))
-		   || (ylt == BoundType::INFTY && (carl::isPositive(xl) || xut == BoundType::INFTY))
-		   || (yut == BoundType::INFTY && (carl::isNegative(xl) || (carl::isNegative(xl) || xlt == BoundType::INFTY))) )
+        if( (xlt == BoundType::INFTY && (carl::is_positive(yu) || yut == BoundType::INFTY))
+		   || (xut == BoundType::INFTY && (carl::is_negative(yl) || ylt == BoundType::INFTY))
+		   || (ylt == BoundType::INFTY && (carl::is_positive(xl) || xut == BoundType::INFTY))
+		   || (yut == BoundType::INFTY && (carl::is_negative(xl) || (carl::is_negative(xl) || xlt == BoundType::INFTY))) )
         {
             lowerBoundType = BoundType::INFTY;
         }
-        if( (xlt == BoundType::INFTY && (carl::isNegative(yu) || (carl::isNegative(yl) || ylt == BoundType::INFTY)))
-		   || (xut == BoundType::INFTY && (carl::isPositive(yl) || (carl::isPositive(yu) || yut == BoundType::INFTY)))
-		   || (ylt == BoundType::INFTY && (carl::isNegative(xl) || (carl::isNegative(xl) || xlt == BoundType::INFTY)))
-		   || (yut == BoundType::INFTY && (carl::isPositive(xl) || (carl::isPositive(xl) || xut == BoundType::INFTY))) )
+        if( (xlt == BoundType::INFTY && (carl::is_negative(yu) || (carl::is_negative(yl) || ylt == BoundType::INFTY)))
+		   || (xut == BoundType::INFTY && (carl::is_positive(yl) || (carl::is_positive(yu) || yut == BoundType::INFTY)))
+		   || (ylt == BoundType::INFTY && (carl::is_negative(xl) || (carl::is_negative(xl) || xlt == BoundType::INFTY)))
+		   || (yut == BoundType::INFTY && (carl::is_positive(xl) || (carl::is_positive(xl) || xut == BoundType::INFTY))) )
         {
             upperBoundType = BoundType::INFTY;
         }

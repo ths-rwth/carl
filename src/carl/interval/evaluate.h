@@ -12,7 +12,7 @@ inline boost::tribool evaluate(Interval<Number> interval, Relation relation) {
         return evaluate(Sign::POSITIVE, relation);
     } else if (interval.is_negative()) {
         return evaluate(Sign::NEGATIVE, relation);
-    } else if (interval.isZero()) {
+    } else if (interval.is_zero()) {
         return evaluate(Sign::ZERO, relation);
     } else if (interval.is_semi_negative()) {
         if (relation == Relation::GREATER) {

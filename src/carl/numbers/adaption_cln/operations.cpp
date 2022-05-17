@@ -89,14 +89,14 @@ namespace carl
 			auto factor = int(cln::integer_length(cln::denominator(a))) - int(cln::integer_length(cln::numerator(a)));
 			if (cln::oddp(factor)) factor += 1;
 			cln::cl_RA n = scaleByPowerOfTwo(a, factor);
-			double dn = toDouble(n);
+			double dn = to_double(n);
 			cln::cl_RA nra = cln::rationalize(dn);
 			boost::numeric::interval<double> i;
 			if (nra > n) {
-				i.assign(toDouble(2*n-nra), dn);
+				i.assign(to_double(2*n-nra), dn);
 				assert(2*n-nra <= n);
 			} else {
-				i.assign(dn, toDouble(2*n-nra));
+				i.assign(dn, to_double(2*n-nra));
 				assert(n <= 2*n-nra);
 			}
 			i = boost::numeric::sqrt(i);
@@ -124,7 +124,7 @@ namespace carl
 			// compute an approximation with sqrt(). we can assume that the surrounding integers contain the actual root.
 			//auto factor = cln::integer_length(cln::denominator(a)) - cln::integer_length(cln::numerator(a));
 			//if (cln::oddp(factor)) factor += 1;
-			cln::cl_I lower = cln::floor1(cln::sqrt(toLF(a)));
+			cln::cl_I lower = cln::floor1(cln::sqrt(to_lf(a)));
             cln::cl_I upper = lower + 1;
             assert(cln::expt_pos(lower,2) < a);
             assert(cln::expt_pos(upper,2) > a);
@@ -171,8 +171,8 @@ namespace carl
         if(_infix) s << carl::abs(_number);
         else
         {
-            cln::cl_I d = carl::getDenom(_number);
-            if(d != cln::cl_I(1)) s << "(/ " << carl::abs(carl::getNum(_number)) << " " << carl::abs(d) << ")";
+            cln::cl_I d = carl::get_denom(_number);
+            if(d != cln::cl_I(1)) s << "(/ " << carl::abs(carl::get_num(_number)) << " " << carl::abs(d) << ")";
             else s << carl::abs(_number);
         }
         if(negative)

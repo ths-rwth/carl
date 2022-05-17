@@ -14,10 +14,10 @@ public:
 #ifdef USE_CLN_NUMBERS
 	mpq_class toGMP(const cln::cl_RA& n) {
 		std::stringstream ss1;
-		ss1 << carl::getDenom(n);
+		ss1 << carl::get_denom(n);
 		mpz_class denom(ss1.str());
 		std::stringstream ss2;
-		ss2 << carl::getNum(n);
+		ss2 << carl::get_num(n);
 		mpz_class num(ss2.str());
 		return carl::quotient(num, denom);
 	}

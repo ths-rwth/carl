@@ -265,17 +265,17 @@ namespace carl
         /**
          * @return true, if the factorized polynomial is one.
          */
-        bool isOne() const
+        bool is_one() const
         {
-            return isConstant() && carl::isOne(mCoefficient);
+            return isConstant() && carl::is_one(mCoefficient);
         }
 
         /**
          * @return true, if the factorized polynomial is zero.
          */
-        bool isZero() const
+        bool is_zero() const
         {
-            return isConstant() && carl::isZero(mCoefficient);
+            return isConstant() && carl::is_zero(mCoefficient);
         }
         
         /**
@@ -342,7 +342,7 @@ namespace carl
          * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
          *		 of the coefficients in p.
          */
-        template<typename C = CoeffType, EnableIf<is_subset_of_rationals<C>> = dummy>
+        template<typename C = CoeffType, EnableIf<is_subset_of_rationals_type<C>> = dummy>
         CoeffType coprimeFactor() const
         {
             return constant_one<CoeffType>::get()/mCoefficient;
@@ -352,7 +352,7 @@ namespace carl
          * @return The lcm of the denominators of the coefficients (without the constant one) in p divided by the gcd of numerators 
          *		 of the coefficients in p.
          */
-        template<typename C = CoeffType, EnableIf<is_subset_of_rationals<C>> = dummy>
+        template<typename C = CoeffType, EnableIf<is_subset_of_rationals_type<C>> = dummy>
         CoeffType coprimeFactorWithoutConstant() const;
 
         /**
@@ -556,7 +556,7 @@ namespace carl
          * @param _divisor
          * @return 
          */
-        template<typename C = CoeffType, EnableIf<is_field<C>> = dummy>
+        template<typename C = CoeffType, EnableIf<is_field_type<C>> = dummy>
         FactorizedPolynomial<P> divideBy( const CoeffType& _divisor ) const;
         
         /**
@@ -579,7 +579,7 @@ namespace carl
          * @param _quotient
          * @return 
          */
-        template<typename C = CoeffType, EnableIf<is_field<C>> = dummy>
+        template<typename C = CoeffType, EnableIf<is_field_type<C>> = dummy>
         bool divideBy( const FactorizedPolynomial<P>& _divisor, FactorizedPolynomial<P>& _quotient ) const;
 
         /**
@@ -757,16 +757,16 @@ namespace carl
  * @return true, if the factorized polynomial is one.
  */
 template <typename P>
-bool isOne(const FactorizedPolynomial<P>& fp) {
-	return fp.isOne();
+bool is_one(const FactorizedPolynomial<P>& fp) {
+	return fp.is_one();
 }
 
 /**
  * @return true, if the factorized polynomial is zero.
  */
 template <typename P>
-bool isZero(const FactorizedPolynomial<P>& fp) {
-	return fp.isZero();
+bool is_zero(const FactorizedPolynomial<P>& fp) {
+	return fp.is_zero();
 }
     
     /**
@@ -787,9 +787,9 @@ bool isZero(const FactorizedPolynomial<P>& fp) {
     template <typename P>
     std::ostream& operator<<( std::ostream& _out, const FactorizedPolynomial<P>& _fpoly );
 
-    template<typename P> struct needs_cache<FactorizedPolynomial<P>>: std::true_type {};
+    template<typename P> struct needs_cache_type<FactorizedPolynomial<P>>: std::true_type {};
     
-    template<typename P> struct is_factorized<FactorizedPolynomial<P>>: std::true_type {};
+    template<typename P> struct is_factorized_type<FactorizedPolynomial<P>>: std::true_type {};
     
     /// @name Equality comparison operators
 	/// @{

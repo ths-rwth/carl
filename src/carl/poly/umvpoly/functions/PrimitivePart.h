@@ -17,7 +17,7 @@ namespace  carl {
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> primitive_part(const UnivariatePolynomial<Coeff>& p) {
-	if (carl::isZero(p)) {
+	if (carl::is_zero(p)) {
 		// By definition
 		return p;
 	}

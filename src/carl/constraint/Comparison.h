@@ -41,7 +41,7 @@ signed compare(const BasicConstraint<Pol>& _constraintA, const BasicConstraint<P
 	typename Pol::NumberType one_divided_by_b = _constraintB.lhs().coprimeFactorWithoutConstant();
 	typename Pol::NumberType c = _constraintA.lhs().constantPart();
 	typename Pol::NumberType d = _constraintB.lhs().constantPart();
-	assert(carl::isOne(carl::getNum(carl::abs(one_divided_by_b))));
+	assert(carl::is_one(carl::get_num(carl::abs(one_divided_by_b))));
 	Pol tmpA = (_constraintA.lhs() - c) * one_divided_by_a;
 	Pol tmpB = (_constraintB.lhs() - d) * one_divided_by_b;
 	//        std::cout << "tmpA = " << tmpA << std::endl;
@@ -50,14 +50,14 @@ signed compare(const BasicConstraint<Pol>& _constraintA, const BasicConstraint<P
 	bool termACoeffGreater = false;
 	bool signsDiffer = (one_divided_by_a < carl::constant_zero<typename Pol::NumberType>::get()) != (one_divided_by_b < carl::constant_zero<typename Pol::NumberType>::get());
 	typename Pol::NumberType g;
-	if (carl::getDenom(one_divided_by_a) > carl::getDenom(one_divided_by_b)) {
-		g = typename Pol::NumberType(carl::getDenom(one_divided_by_a)) / carl::getDenom(one_divided_by_b);
+	if (carl::get_denom(one_divided_by_a) > carl::get_denom(one_divided_by_b)) {
+		g = typename Pol::NumberType(carl::get_denom(one_divided_by_a)) / carl::get_denom(one_divided_by_b);
 		if (signsDiffer)
 			g = -g;
 		termACoeffGreater = true;
 		d *= g;
 	} else {
-		g = typename Pol::NumberType(carl::getDenom(one_divided_by_b)) / carl::getDenom(one_divided_by_a);
+		g = typename Pol::NumberType(carl::get_denom(one_divided_by_b)) / carl::get_denom(one_divided_by_a);
 		if (signsDiffer)
 			g = -g;
 		c *= g;

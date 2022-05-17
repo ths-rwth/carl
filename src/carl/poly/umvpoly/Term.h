@@ -108,8 +108,8 @@ public:
 		 * @return 
 		 */
 	[[deprecated("use carl::is_zero(t) instead.")]]
-	bool isZero() const {
-		return carl::isZero(mCoeff); //change this to mCoeff.isZero() at some point
+	bool is_zero() const {
+		return carl::is_zero(mCoeff); //change this to mCoeff.is_zero() at some point
 	}
 
 	/**
@@ -117,8 +117,8 @@ public:
          * @return 
          */
 	[[deprecated("use carl::is_one(t) instead.")]]
-	bool isOne() const {
-		return isConstant() && carl::isOne(mCoeff); //change this to mCoeff.isOne() at some point
+	bool is_one() const {
+		return isConstant() && carl::is_one(mCoeff); //change this to mCoeff.is_one() at some point
 	}
 	/**
 		 * Checks whether the monomial is a constant.
@@ -132,7 +132,7 @@ public:
          * @return true, if the image of this term is integer-valued.
          */
 	bool integerValued() const {
-		if (!carl::isInteger(mCoeff)) return false;
+		if (!carl::is_integer(mCoeff)) return false;
 		return !mMonomial || mMonomial->integerValued();
 	}
 
@@ -243,9 +243,9 @@ public:
 		 */
 	bool sqrt(Term& res) const;
 
-	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
+	template<typename C = Coefficient, EnableIf<is_field_type<C>> = dummy>
 	bool divisible(const Term& t) const;
-	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
+	template<typename C = Coefficient, DisableIf<is_field_type<C>> = dummy>
 	bool divisible(const Term& t) const;
 
 	template<bool gatherCoeff, typename CoeffType>
@@ -304,8 +304,8 @@ public:
  * Checks whether a term is zero.
  */
 template<typename Coeff>
-inline bool isZero(const Term<Coeff>& term) {
-	return carl::isZero(term.coeff());
+inline bool is_zero(const Term<Coeff>& term) {
+	return carl::is_zero(term.coeff());
 }
 
 /// Add the variables of the given term to the variables.
@@ -318,8 +318,8 @@ void variables(const Term<Coeff>& t, carlVariables& vars) {
  * Checks whether a term is one.
  */
 template<typename Coeff>
-inline bool isOne(const Term<Coeff>& term) {
-	return term.isConstant() && carl::isOne(term.coeff());
+inline bool is_one(const Term<Coeff>& term) {
+	return term.isConstant() && carl::is_one(term.coeff());
 }
 
 template<typename Coeff>
@@ -337,7 +337,7 @@ Term<Coeff> operator-(const Term<Coeff>& rhs) {
  */
 template<typename Coeff>
 Term<Coeff>& operator*=(Term<Coeff>& lhs, const Coeff& rhs) {
-	if (carl::isZero(rhs)) {
+	if (carl::is_zero(rhs)) {
 		lhs.clear();
 	} else {
 		lhs.coeff() *= rhs;
@@ -346,7 +346,7 @@ Term<Coeff>& operator*=(Term<Coeff>& lhs, const Coeff& rhs) {
 }
 template<typename Coeff>
 Term<Coeff>& operator*=(Term<Coeff>& lhs, Variable rhs) {
-	if (carl::isZero(lhs.coeff())) {
+	if (carl::is_zero(lhs.coeff())) {
 		return lhs;
 	}
 	if (lhs.monomial()) {
@@ -358,7 +358,7 @@ Term<Coeff>& operator*=(Term<Coeff>& lhs, Variable rhs) {
 }
 template<typename Coeff>
 Term<Coeff>& operator*=(Term<Coeff>& lhs, const Monomial::Arg& rhs) {
-	if (carl::isZero(lhs.coeff())) {
+	if (carl::is_zero(lhs.coeff())) {
 		return lhs;
 	}
 	if (lhs.monomial()) {
@@ -370,10 +370,10 @@ Term<Coeff>& operator*=(Term<Coeff>& lhs, const Monomial::Arg& rhs) {
 }
 template<typename Coeff>
 Term<Coeff>& operator*=(Term<Coeff>& lhs, const Term<Coeff>& rhs) {
-	if (carl::isZero(lhs.coeff())) {
+	if (carl::is_zero(lhs.coeff())) {
 		return lhs;
 	}
-	if (carl::isZero(rhs.coeff())) {
+	if (carl::is_zero(rhs.coeff())) {
 		lhs.clear();
 		return lhs;
 	}
@@ -572,7 +572,7 @@ template<typename Coeff>
 inline Term<Coeff> operator*(const Monomial::Arg& lhs, const Term<Coeff>& rhs) {
 	return rhs * lhs;
 }
-template<typename Coeff, EnableIf<carl::is_number<Coeff>> = dummy>
+template<typename Coeff, EnableIf<carl::is_number_type<Coeff>> = dummy>
 inline Term<Coeff> operator*(const Monomial::Arg& lhs, const Coeff& rhs) {
 	return Term<Coeff>(rhs, lhs);
 }
@@ -588,7 +588,7 @@ template<typename Coeff>
 inline Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs) {
 	return rhs * lhs;
 }
-template<typename Coeff, EnableIf<carl::is_number<Coeff>> = dummy>
+template<typename Coeff, EnableIf<carl::is_number_type<Coeff>> = dummy>
 inline Term<Coeff> operator*(const Coeff& lhs, const Monomial::Arg& rhs) {
 	return rhs * lhs;
 }
@@ -596,15 +596,15 @@ template<typename Coeff>
 inline Term<Coeff> operator*(const Coeff& lhs, Variable rhs) {
 	return rhs * lhs;
 }
-template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
+template<typename Coeff, EnableIf<carl::is_subset_of_rationals_type<Coeff>> = dummy>
 inline Term<Coeff> operator/(const Term<Coeff>& lhs, const Coeff& rhs) {
 	return lhs * reciprocal(rhs);
 }
-template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
+template<typename Coeff, EnableIf<carl::is_subset_of_rationals_type<Coeff>> = dummy>
 inline Term<Coeff> operator/(const Monomial::Arg& lhs, const Coeff& rhs) {
 	return lhs * reciprocal(rhs);
 }
-template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
+template<typename Coeff, EnableIf<carl::is_subset_of_rationals_type<Coeff>> = dummy>
 inline Term<Coeff> operator/(Variable& lhs, const Coeff& rhs) {
 	return lhs * reciprocal(rhs);
 }

@@ -141,7 +141,7 @@ public:
 		CARL_LOG_DEBUG("carl.contractor", numerator() << " -> " << num);
 		num += h;
 		CARL_LOG_DEBUG("carl.contractor", "Subtracting " << h << " -> " << num);
-		if (!isOne(denominator())) {
+		if (!is_one(denominator())) {
 			auto den = carl::evaluate(denominator(), assignment);;
 			CARL_LOG_DEBUG("carl.contractor", denominator() << " -> " << den);
 			Interval<Number> resA;
@@ -176,7 +176,7 @@ std::ostream& operator<<(std::ostream& os, const Evaluation<Polynomial>& e) {
 	if (e.root() != 1) {
 		os << e.root() << "th root of ";
 	}
-	if (!isOne(e.denominator())) {
+	if (!is_one(e.denominator())) {
 		os << "(" << e.numerator() << " / " << e.denominator() << ")";
 	} else {
 		os << e.numerator();

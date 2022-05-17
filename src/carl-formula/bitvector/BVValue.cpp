@@ -98,7 +98,7 @@ BVValue BVValue::modSigned(const BVValue& _other) const {
 
 	BVValue u = absFirst % absSecond;
 
-	if (u.isZero()) {
+	if (u.is_zero()) {
 		return u;
 	} else if (!firstNegative && !secondNegative) {
 		return u;

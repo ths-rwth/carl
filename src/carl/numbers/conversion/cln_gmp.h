@@ -30,7 +30,7 @@ namespace carl {
     inline mpz_class convert<cln::cl_I, mpz_class>(const cln::cl_I& n) {
         if( n <= std::numeric_limits<sint>::max() && n >= std::numeric_limits<sint>::min() )
         {
-            return mpz_class(static_cast<signed long>(carl::toInt<sint>(n)));
+            return mpz_class(static_cast<signed long>(carl::to_int<sint>(n)));
         }
 
         std::stringstream s;
@@ -41,13 +41,13 @@ namespace carl {
 
     template<>
     inline mpq_class convert<cln::cl_RA, mpq_class>(const cln::cl_RA& n) {
-        cln::cl_I den = carl::getDenom(n);
+        cln::cl_I den = carl::get_denom(n);
         if( den <= std::numeric_limits<sint>::max() && den >= std::numeric_limits<sint>::min() )
         {
-            cln::cl_I num = carl::getNum(n);
+            cln::cl_I num = carl::get_num(n);
             if( num <= std::numeric_limits<sint>::max() && num >= std::numeric_limits<sint>::min() )
             {
-                return mpq_class(static_cast<signed long>(carl::toInt<sint>(num)))/mpq_class(static_cast<signed long>(carl::toInt<sint>(den)));
+                return mpq_class(static_cast<signed long>(carl::to_int<sint>(num)))/mpq_class(static_cast<signed long>(carl::to_int<sint>(den)));
             }
         }
         std::stringstream s;
@@ -70,7 +70,7 @@ namespace carl {
     inline cln::cl_I convert<mpz_class, cln::cl_I>(const mpz_class& n) {
         if( n <= std::numeric_limits<int>::max() && n >= std::numeric_limits<int>::min() )
         {
-            return cln::cl_I(carl::toInt<sint>(n));
+            return cln::cl_I(carl::to_int<sint>(n));
         }
         std::stringstream s;
         s << n;
@@ -80,13 +80,13 @@ namespace carl {
 
     template<>
     inline cln::cl_RA convert<mpq_class, cln::cl_RA>(const mpq_class& n) {
-        mpz_class den = carl::getDenom(n);
+        mpz_class den = carl::get_denom(n);
         if( den <= std::numeric_limits<int>::max() && den >= std::numeric_limits<int>::min() )
         {
-            mpz_class num = carl::getNum(n);
+            mpz_class num = carl::get_num(n);
             if( num <= std::numeric_limits<int>::max() && num >= std::numeric_limits<int>::min() )
             {
-                return cln::cl_RA(carl::toInt<sint>(num))/cln::cl_RA(carl::toInt<sint>(den));
+                return cln::cl_RA(carl::to_int<sint>(num))/cln::cl_RA(carl::to_int<sint>(den));
             }
         }
         std::stringstream s;

@@ -60,7 +60,7 @@ FactorizedPolynomial<P> substitute(const FactorizedPolynomial<P>& p, const std::
 		// Substitute in all factors
 		for (const auto& factor : p.factorization()) {
 			FactorizedPolynomial<P> subResult = substitute(factor.first,substitutions);
-			if (subResult.isZero()) {
+			if (subResult.is_zero()) {
 				return FactorizedPolynomial<P>(constant_zero<P>::get());
 			}
 			if (subResult.isConstant()) {
@@ -105,7 +105,7 @@ FactorizedPolynomial<P> substitute(const FactorizedPolynomial<P>& p, const std::
 		// Substitute in all factors
 		for (const auto& factor : p.factorization()) {
 			FactorizedPolynomial<P> subResult = carl::substitute(factor.first, substitutions);
-			if (subResult.isZero())
+			if (subResult.is_zero())
 				return FactorizedPolynomial<P>(constant_zero<typename P::CoeffType>::get());
 			if (subResult.isConstant()) {
 				resultCoeff *= carl::pow(subResult.constantPart(), factor.second);

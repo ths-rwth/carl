@@ -42,7 +42,7 @@ TEST(RationalFunction, Construction)
     RFunc r1(p1, p2);
     EXPECT_EQ(p1, r1.nominator());
     EXPECT_EQ(p2, r1.denominator());
-    EXPECT_FALSE(r1.isZero());
+    EXPECT_FALSE(r1.is_zero());
 
     RFunc r2(p4);
     std::cout << "Construct rational function from " << p4 << " leads to " << r2 << std::endl;
@@ -61,7 +61,7 @@ TEST(RationalFunction, Construction)
     RFactFunc rf1(fp1, fp2);
     EXPECT_EQ(computePolynomial(fp1), computePolynomial(rf1.nominator()));
     EXPECT_EQ(computePolynomial(fp2), computePolynomial(rf1.denominator()));
-    EXPECT_FALSE(rf1.isZero());
+    EXPECT_FALSE(rf1.is_zero());
 
     RFactFunc rf2(fp3);
     std::cout << "Construct factorized rational function from " << p4 << " leads to " << r2 << std::endl;
@@ -100,8 +100,8 @@ TEST(RationalFunction, Multiplication)
     RFunc r4( x );
     r4 *= x;
     EXPECT_EQ(sp.parseMultivariatePolynomial<Rational>("x^2"), r4.nominator());
-    EXPECT_FALSE(needs_cache<Pol>::value);
-    EXPECT_TRUE(needs_cache<FPol>::value);
+    EXPECT_FALSE(needs_cache_type<Pol>::value);
+    EXPECT_TRUE(needs_cache_type<FPol>::value);
 
     auto pCache = std::make_shared<CachePol>();
 
@@ -143,7 +143,7 @@ TEST(RationalFunction, Multiplication)
     if( !AutoSimplify )
         rfC.simplify();
     std::cout << rfC << std::endl;
-    EXPECT_TRUE( isZero(carl::remainder(computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ), computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) )) );
+    EXPECT_TRUE( is_zero(carl::remainder(computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ), computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) )) );
 }
 
 TEST(RationalFunction, Division)
@@ -335,11 +335,11 @@ TEST(RationalFunction, Simplification)
     std::cout << r1 << std::endl;
     r1.simplify();
     std::cout << r1 << std::endl;
-    EXPECT_TRUE( r1.denominator().isOne() );
+    EXPECT_TRUE( r1.denominator().is_one() );
 
     RFactFunc r2( (fq2*fq2), fp4 );
     r2.simplify();
-    EXPECT_TRUE( r2.nominator().isOne() );
+    EXPECT_TRUE( r2.nominator().is_one() );
 }
 
 TEST(RationalFunction, Evaluation)

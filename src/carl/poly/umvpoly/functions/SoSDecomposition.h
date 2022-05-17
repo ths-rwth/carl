@@ -10,13 +10,13 @@ namespace carl {
 template<typename C, typename O, typename P>
 std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> sos_decomposition(const MultivariatePolynomial<C,O,P>& p, bool not_trivial = false) {
 	std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> result;
-	if (carl::isNegative(p.lcoeff())) {
+	if (carl::is_negative(p.lcoeff())) {
 		return result;
 	}
 	if (!not_trivial) {
 		for (auto term = p.rbegin(); term != p.rend(); ++term) {
-			if (!carl::isNegative(term->coeff())) {
-				assert(!carl::isZero(term->coeff()));
+			if (!carl::is_negative(term->coeff())) {
+				assert(!carl::is_zero(term->coeff()));
 				if (is_constant(*term)) {
 					result.emplace_back(term->coeff(), MultivariatePolynomial<C,O,P>(constant_one<C>::get()));
 				} else {
@@ -51,11 +51,11 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> sos_decomposition(const 
 			return {};
 		}
 		assert(lcoeffIter->second.isConstant());
-		if (carl::isNegative(lcoeffIter->second.constantPart())) {
+		if (carl::is_negative(lcoeffIter->second.constantPart())) {
 			CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__);
 			return {};
 		}
-		assert(!carl::isZero(lcoeffIter->second.constantPart()));
+		assert(!carl::is_zero(lcoeffIter->second.constantPart()));
 		auto constCoeffIter = varInfos.coeffs().find(0);
 		rem = constCoeffIter != varInfos.coeffs().end() ? constCoeffIter->second : MultivariatePolynomial<C,O,P>();
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Constant part is " << rem);
@@ -69,10 +69,10 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> sos_decomposition(const 
 		}
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Add " << result.back().first << " * (" << result.back().second << ")^2");
 	}
-	if (carl::isNegative(rem.constantPart())) {
+	if (carl::is_negative(rem.constantPart())) {
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__);
 		return {};
-	} else if(!carl::isZero(rem.constantPart())) {
+	} else if(!carl::is_zero(rem.constantPart())) {
 		result.emplace_back(rem.constantPart(), MultivariatePolynomial<C,O,P>(constant_one<C>::get()));
 	}
 	CARL_LOG_TRACE("carl.core.sos_decomposition", "Add " << result.back().first << " * (" << result.back().second << ")^2");

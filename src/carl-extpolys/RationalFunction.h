@@ -42,7 +42,7 @@ public:
 		: mNumberQuotient(c),
 		  mIsSimplified(true) {}
 
-	template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
+	template<typename P = Pol, DisableIf<needs_cache_type<P>> = dummy>
 	explicit RationalFunction(Variable v)
 		: mPolynomialQuotient(std::pair<Pol, Pol>(std::move(P(v)), std::move(Pol(1)))),
 		  mNumberQuotient(),
@@ -75,7 +75,7 @@ public:
 		} else {
 			mPolynomialQuotient = std::pair<Pol, Pol>(nom, denom);
 			eliminateCommonFactor(!AutoSimplify);
-			assert(isConstant() || !carl::isZero(denominatorAsPolynomial()));
+			assert(isConstant() || !carl::is_zero(denominatorAsPolynomial()));
 		}
 	}
 
@@ -84,7 +84,7 @@ public:
 		  mNumberQuotient(),
 		  mIsSimplified(false) {
 		eliminateCommonFactor(!AutoSimplify);
-		assert(isConstant() || !carl::isZero(denominatorAsPolynomial()));
+		assert(isConstant() || !carl::is_zero(denominatorAsPolynomial()));
 	}
 
 	explicit RationalFunction(boost::optional<std::pair<Pol, Pol>>&& quotient, const CoeffType& num, bool simplified)
@@ -107,7 +107,7 @@ public:
 	 */
 	Pol nominator() const {
 		if (isConstant())
-			return Pol(carl::getNum(mNumberQuotient));
+			return Pol(carl::get_num(mNumberQuotient));
 		else
 			return mPolynomialQuotient->first;
 	}
@@ -117,7 +117,7 @@ public:
 	 */
 	Pol denominator() const {
 		if (isConstant())
-			return Pol(carl::getDenom(mNumberQuotient));
+			return Pol(carl::get_denom(mNumberQuotient));
 		return mPolynomialQuotient->second;
 	}
 
@@ -142,7 +142,7 @@ public:
 	 */
 	CoeffType nominatorAsNumber() const {
 		assert(isConstant());
-		return carl::getNum(mNumberQuotient);
+		return carl::get_num(mNumberQuotient);
 	}
 
 	/**
@@ -150,7 +150,7 @@ public:
 	 */
 	CoeffType denominatorAsNumber() const {
 		assert(isConstant());
-		return carl::getDenom(mNumberQuotient);
+		return carl::get_denom(mNumberQuotient);
 	}
 
 	/**
@@ -174,7 +174,7 @@ public:
 	 * @return Inverse of this.
 	 */
 	RationalFunction inverse() const {
-		assert(!this->isZero());
+		assert(!this->is_zero());
 		if (isConstant()) {
 			return RationalFunction(boost::none, 1 / mNumberQuotient, mIsSimplified);
 		} else {
@@ -186,17 +186,17 @@ public:
 	 * Check whether the rational function is zero
 	 * @return true if it is
 	 */
-	bool isZero() const {
+	bool is_zero() const {
 		if (isConstant())
-			return carl::isZero(mNumberQuotient);
-		assert(!carl::isZero(denominatorAsPolynomial()));
-		return carl::isZero(nominatorAsPolynomial());
+			return carl::is_zero(mNumberQuotient);
+		assert(!carl::is_zero(denominatorAsPolynomial()));
+		return carl::is_zero(nominatorAsPolynomial());
 	}
 
-	bool isOne() const {
+	bool is_one() const {
 		if (isConstant())
-			return carl::isOne(mNumberQuotient);
-		assert(!carl::isZero(denominatorAsPolynomial()));
+			return carl::is_one(mNumberQuotient);
+		assert(!carl::is_zero(denominatorAsPolynomial()));
 		return nominatorAsPolynomial() == denominatorAsPolynomial();
 	}
 
@@ -278,7 +278,7 @@ private:
 	template<bool byInverse = false>
 	RationalFunction& add(const Pol& rhs);
 
-	template<bool byInverse = false, typename P = Pol, DisableIf<needs_cache<P>> = dummy>
+	template<bool byInverse = false, typename P = Pol, DisableIf<needs_cache_type<P>> = dummy>
 	RationalFunction& add(Variable rhs);
 
 	template<bool byInverse = false>
@@ -310,7 +310,7 @@ public:
 		return this->template add<false>(tmp);
 	}
 
-	template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
+	template<typename P = Pol, DisableIf<needs_cache_type<P>> = dummy>
 	RationalFunction& operator+=(Variable rhs) {
 		return this->template add<false>(rhs);
 	}
@@ -343,7 +343,7 @@ public:
 		return (*this -= Pol(rhs));
 	}
 
-	template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
+	template<typename P = Pol, DisableIf<needs_cache_type<P>> = dummy>
 	RationalFunction& operator-=(Variable rhs) {
 		return this->template add<true>(rhs);
 	}
@@ -368,7 +368,7 @@ public:
 	RationalFunction& operator*=(const Monomial::Arg& rhs) {
 		return (*this *= Pol(rhs));
 	}
-	template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
+	template<typename P = Pol, DisableIf<needs_cache_type<P>> = dummy>
 	RationalFunction& operator*=(Variable rhs);
 	RationalFunction& operator*=(const CoeffType& rhs);
 	RationalFunction& operator*=(carl::sint rhs);
@@ -389,7 +389,7 @@ public:
 	RationalFunction& operator/=(const Monomial::Arg& rhs) {
 		return (*this /= Pol(rhs));
 	}
-	template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
+	template<typename P = Pol, DisableIf<needs_cache_type<P>> = dummy>
 	RationalFunction& operator/=(Variable rhs);
 	RationalFunction& operator/=(const CoeffType& rhs);
 	RationalFunction& operator/=(unsigned long rhs);
@@ -415,17 +415,17 @@ RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const 
 	return RationalFunction<Pol, AS>(lhs) += rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs) {
 	return RationalFunction<Pol, AS>(lhs) += rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Monomial::Arg& rhs) {
 	return RationalFunction<Pol, AS>(lhs) += rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, Variable rhs) {
 	return RationalFunction<Pol, AS>(lhs) += rhs;
 }
@@ -450,17 +450,17 @@ RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const 
 	return RationalFunction<Pol, AS>(lhs) -= rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs) {
 	return RationalFunction<Pol, AS>(lhs) -= rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Monomial::Arg& rhs) {
 	return RationalFunction<Pol, AS>(lhs) -= rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, Variable rhs) {
 	return RationalFunction<Pol, AS>(lhs) -= rhs;
 }
@@ -480,17 +480,17 @@ RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const 
 	return RationalFunction<Pol, AS>(lhs) *= rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs) {
 	return RationalFunction<Pol, AS>(lhs) *= rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Monomial::Arg& rhs) {
 	return RationalFunction<Pol, AS>(lhs) *= rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, Variable rhs) {
 	return RationalFunction<Pol, AS>(lhs) *= rhs;
 }
@@ -525,17 +525,17 @@ RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const 
 	return RationalFunction<Pol, AS>(lhs) /= rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs) {
 	return RationalFunction<Pol, AS>(lhs) /= rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Monomial::Arg& rhs) {
 	return RationalFunction<Pol, AS>(lhs) /= rhs;
 }
 
-template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+template<typename Pol, bool AS, DisableIf<needs_cache_type<Pol>> = dummy>
 RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, Variable rhs) {
 	return RationalFunction<Pol, AS>(lhs) /= rhs;
 }

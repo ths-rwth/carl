@@ -114,7 +114,7 @@ private:
 	Monomial::Arg newMonomial(const std::vector<boost::fusion::vector2<Variable,typename Pol::CoeffType>>& data) const {
 		Monomial::Arg res;
 		for (const auto& term: data) {
-			res = res * createMonomial(boost::fusion::at_c<0>(term), exponent(carl::toInt<uint>(boost::fusion::at_c<1>(term))));
+			res = res * createMonomial(boost::fusion::at_c<0>(term), exponent(carl::to_int<uint>(boost::fusion::at_c<1>(term))));
 		}
 		return res;
 	}

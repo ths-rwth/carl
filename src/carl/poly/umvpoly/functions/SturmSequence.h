@@ -15,11 +15,11 @@ namespace carl {
 template<typename Coeff>
 std::vector<UnivariatePolynomial<Coeff>> sturm_sequence(const UnivariatePolynomial<Coeff>& p, const UnivariatePolynomial<Coeff>& q) {
 	std::vector<UnivariatePolynomial<Coeff>> seq({ p, q });
-	if (isZero(p) || isZero(q)) return seq;
+	if (is_zero(p) || is_zero(q)) return seq;
 
 	for (std::size_t k = 2; ; ++k) {
 		auto tmp = - remainder(seq[k-2], seq[k-1]);
-		if (isZero(tmp)) return seq;
+		if (is_zero(tmp)) return seq;
 		seq.emplace_back(std::move(tmp));
 	}
 }

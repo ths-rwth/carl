@@ -16,7 +16,7 @@ BasicConstraint<Pol> init_bound(Variable var, Relation rel, const typename Pol::
 	case Relation::GREATER:
 		lhs = -lhs;
 		if (var.type() == VariableType::VT_INT) {
-			if (isInteger(bound))
+			if (is_integer(bound))
 				lhs += bound + typename Pol::NumberType(1);
 			else
 				lhs += carl::ceil(bound);
@@ -29,7 +29,7 @@ BasicConstraint<Pol> init_bound(Variable var, Relation rel, const typename Pol::
 	case Relation::GEQ:
 		lhs = -lhs;
 		if (var.type() == VariableType::VT_INT) {
-			if (isInteger(bound))
+			if (is_integer(bound))
 				lhs += bound;
 			else
 				lhs += carl::ceil(bound);
@@ -41,7 +41,7 @@ BasicConstraint<Pol> init_bound(Variable var, Relation rel, const typename Pol::
 		break;
 	case Relation::LESS:
 		if (var.type() == VariableType::VT_INT) {
-			if (isInteger(bound))
+			if (is_integer(bound))
 				lhs -= (bound - typename Pol::NumberType(1));
 			else
 				lhs -= carl::floor(bound);
@@ -52,7 +52,7 @@ BasicConstraint<Pol> init_bound(Variable var, Relation rel, const typename Pol::
 		break;
 	case Relation::LEQ:
 		if (var.type() == VariableType::VT_INT) {
-			if (isInteger(bound))
+			if (is_integer(bound))
 				lhs -= bound;
 			else
 				lhs -= carl::floor(bound);
@@ -62,7 +62,7 @@ BasicConstraint<Pol> init_bound(Variable var, Relation rel, const typename Pol::
 		break;
 	case Relation::EQ:
 		if (var.type() == VariableType::VT_INT) {
-			if (isInteger(bound)) {
+			if (is_integer(bound)) {
 				lhs -= bound;
 			} else {
 				lhs = Pol(typename Pol::NumberType(0));
@@ -74,7 +74,7 @@ BasicConstraint<Pol> init_bound(Variable var, Relation rel, const typename Pol::
 		break;
 	case Relation::NEQ:
 		if (var.type() == VariableType::VT_INT) {
-			if (isInteger(bound)) {
+			if (is_integer(bound)) {
 				lhs -= bound;
 			} else {
 				lhs = Pol(typename Pol::NumberType(0));
@@ -95,7 +95,7 @@ BasicConstraint<Pol> init_constraint(const Pol& lhs, Relation rel) {
 		CARL_LOG_TRACE("carl.core.constraint", lhs << " is constant, we simply evaluate.");
 		return evaluate(lhs.constantPart(), rel) ? BasicConstraint<Pol>(true) : BasicConstraint<Pol>(false);
 	} else if (lhs.totalDegree() == 1 && (rel != Relation::EQ && rel != Relation::NEQ) && lhs.isUnivariate()) {
-		if (carl::isNegative(lhs.lcoeff())) {
+		if (carl::is_negative(lhs.lcoeff())) {
 			CARL_LOG_TRACE("carl.core.constraint", "Normalizing leading coefficient of linear poly.");
 			switch (rel) {
 			case Relation::LESS:
@@ -119,16 +119,16 @@ BasicConstraint<Pol> init_constraint(const Pol& lhs, Relation rel) {
 		return init_bound<Pol>(lhs.getSingleVariable(), rel, (-lhs.constantPart()) / lhs.lcoeff());
 	} else {
 		CARL_LOG_TRACE("carl.core.constraint", "Normalizing " << lhs << " " << rel << " 0");
-		auto new_lhs = isZero(lhs) ? Pol(typename Pol::NumberType(0)) : lhs.coprimeCoefficients();
+		auto new_lhs = is_zero(lhs) ? Pol(typename Pol::NumberType(0)) : lhs.coprimeCoefficients();
 		if (rel == Relation::EQ || rel == Relation::NEQ) {
-			if (!isZero(new_lhs) && new_lhs.lterm().coeff() < typename Pol::NumberType(0)) new_lhs = -new_lhs;
+			if (!is_zero(new_lhs) && new_lhs.lterm().coeff() < typename Pol::NumberType(0)) new_lhs = -new_lhs;
 		} else if (rel == Relation::LEQ || rel == Relation::LESS) {
-			if (!isZero(new_lhs) && (lhs.lterm().coeff() < 0) != (new_lhs.lterm().coeff() < 0)) new_lhs = -new_lhs;
+			if (!is_zero(new_lhs) && (lhs.lterm().coeff() < 0) != (new_lhs.lterm().coeff() < 0)) new_lhs = -new_lhs;
 		} else if (rel == Relation::GREATER) {
-			if (!isZero(new_lhs) && (lhs.lterm().coeff() < 0) == (new_lhs.lterm().coeff() < 0)) new_lhs = -new_lhs;
+			if (!is_zero(new_lhs) && (lhs.lterm().coeff() < 0) == (new_lhs.lterm().coeff() < 0)) new_lhs = -new_lhs;
 			rel = Relation::LESS;
 		} else if (rel == Relation::GEQ) {
-			if (!isZero(new_lhs) && (lhs.lterm().coeff() < 0) == (new_lhs.lterm().coeff() < 0)) new_lhs = -new_lhs;
+			if (!is_zero(new_lhs) && (lhs.lterm().coeff() < 0) == (new_lhs.lterm().coeff() < 0)) new_lhs = -new_lhs;
 			rel = Relation::LEQ;
 		}
 		
@@ -281,7 +281,7 @@ inline bool simplify_integer_inplace(BasicConstraint<Pol>& constraint) {
 		// Find the gcd of the coefficients of the non-constant terms.
 		typename Pol::NumberType g = carl::abs(constraint.lhs().coprimeFactorWithoutConstant());
 		assert(g != typename Pol::NumberType(0));
-		if (carl::mod(carl::getNum(constPart), carl::getDenom(g)) != 0) {
+		if (carl::mod(carl::get_num(constPart), carl::get_denom(g)) != 0) {
 			switch (constraint.relation()) {
 			case Relation::EQ: {
 				constraint = BasicConstraint<Pol>(Pol(typename Pol::NumberType(0)), Relation::LESS);

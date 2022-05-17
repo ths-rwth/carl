@@ -39,7 +39,7 @@ public:
     ReductorEntry(const Term<Coeff>&  multiple, const Polynomial& pol) :
     mTail(pol.tail()), mLead(multiple * pol.lterm()), mMultiple(multiple)
     {
-		assert(!carl::isZero(multiple));
+		assert(!carl::is_zero(multiple));
     }
 
     /**
@@ -83,7 +83,7 @@ public:
     void removeLeadingTerm()
     {
         assert(mTail.nrTerms() != 0);
-		assert(!carl::isZero(mMultiple));
+		assert(!carl::is_zero(mMultiple));
 		mLead = mMultiple * mTail.lterm();
         mTail.stripLT();
     }
@@ -120,8 +120,8 @@ public:
      */
     bool empty() const
     {
-		assert(!carl::isZero(mLead) || carl::isZero(mTail));
-        return carl::isZero(mLead);
+		assert(!carl::is_zero(mLead) || carl::is_zero(mTail));
+        return carl::is_zero(mLead);
     }
 
     /**

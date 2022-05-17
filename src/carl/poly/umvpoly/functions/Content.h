@@ -20,22 +20,22 @@ namespace  carl {
  */
 template<typename Coeff>
 Coeff content(const UnivariatePolynomial<Coeff>& p) {
-	if (isZero(p)) {
+	if (is_zero(p)) {
 		// By definition
 		return Coeff(0);
 	}
 	assert(p.isNormal());
-	if constexpr (is_field<Coeff>::value) {
+	if constexpr (is_field_type<Coeff>::value) {
 		// For fields, content(p) = 1
 		return Coeff(1);
 	}
 	auto it = p.coefficients().rbegin();
 	Coeff gcd = *it;
 	for (++it; it != p.coefficients().rend(); ++it) {
-		if (isOne(gcd)) {
+		if (is_one(gcd)) {
 			break;
 		}
-		if (isZero(*it)) {
+		if (is_zero(*it)) {
 			continue;
 		}
 		gcd = carl::gcd(gcd, *it);

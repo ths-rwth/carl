@@ -13,8 +13,8 @@ class TestRational(TestCarl):
 		self.assertEqual(r2.toString(),'10')
 
 	def testGetters(self):
-		self.assertEqual(r1.toDouble(),-0.5,0)
-		self.assertEqual(r1.toInt(),0)
+		self.assertEqual(r1.to_double(),-0.5,0)
+		self.assertEqual(r1.to_int(),0)
 		self.assertEqual(r1.numerator(),-1)
 		self.assertEqual(r1.nominator(),-1)
 		self.assertEqual(r1.denominator(),2)

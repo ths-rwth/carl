@@ -59,7 +59,7 @@ namespace carl {
 
                 assert(p.has(x));
                 assert(!p.hasConstantTerm());
-                assert(p.isLinear() || (p.nrTerms() == 2 && (carl::isOne(p.begin()->coeff()) || carl::isOne(p.rbegin()->coeff()))
+                assert(p.isLinear() || (p.nrTerms() == 2 && (carl::is_one(p.begin()->coeff()) || carl::is_one(p.rbegin()->coeff()))
                                         && ((p.begin()->has(x) && !p.rbegin()->has(x)) 
                                         || (p.rbegin()->has(x) && !p.begin()->has(x)))));
                 

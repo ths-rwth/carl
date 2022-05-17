@@ -10,7 +10,7 @@
 #include <carl/numbers/numbers.h>
 
 #ifdef USE_MPFR_FLOAT
-void toInt(mpz_t intRep, mpfr_t a) {
+void to_int(mpz_t intRep, mpfr_t a) {
 	//std::cout << "Bits per limb " << mp_bits_per_limb << std::endl;
 	//std::cout << "Number limbs " << std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb)) << std::endl;
 	//std::cout << "Precision is " << a->_mpfr_prec << std::endl;
@@ -95,8 +95,8 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 	//std::cout << "Offset " << offset << std::endl;
 
 	// get integer representations, we use absolute values for simplicity.
-	toInt(intRepA, a);
-	toInt(intRepB, b);
+	to_int(intRepA, a);
+	to_int(intRepB, b);
 	mpz_abs(intRepA, intRepA);
 	mpz_abs(intRepB, intRepB);
 
@@ -124,7 +124,7 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 			mpfr_nextbelow(zero);
 		}
 
-		toInt(intRepZero, zero);
+		to_int(intRepZero, zero);
 		mpz_abs(intRepZero, intRepZero);
 		mpz_sub(distance, intRepB,intRepZero);
 		mpz_add_ui(distance,distance, 1);
@@ -145,7 +145,7 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 		}
 
 
-		toInt(intRepZero, zero);
+		to_int(intRepZero, zero);
 		mpz_abs(intRepZero, intRepZero);
 		mpz_sub(distance, intRepA,intRepZero);
 		mpz_add_ui(distance,distance, 1);
@@ -178,9 +178,9 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 		mpz_t d2;
 		mpz_init(d2);
 
-		toInt(intRepZeroA, zeroA);
+		to_int(intRepZeroA, zeroA);
 		mpz_abs(intRepZeroA, intRepZeroA);
-		toInt(intRepZeroB, zeroB);
+		to_int(intRepZeroB, zeroB);
 		mpz_abs(intRepZeroB, intRepZeroB);
 
 		mpz_sub(distance, intRepA,intRepZeroA);

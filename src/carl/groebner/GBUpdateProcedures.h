@@ -99,7 +99,7 @@ public:
 				mStats->TSQWithoutConstant();
 #endif
 				Polynomial remainder(p);
-				while(!carl::isZero(remainder))
+				while(!carl::is_zero(remainder))
 				{
 					Polynomial r1(carl::separable_part(*remainder.lmon()));
 #ifdef BUCHBERGER_STATISTICS

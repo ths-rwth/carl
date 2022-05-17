@@ -142,7 +142,7 @@ namespace carl::io
 			{
 				auto nom = parseMultivariatePolynomial<C>(nomAndDenom.front());
 				auto denom = parseMultivariatePolynomial<C>(nomAndDenom.back());
-				if(denom.isZero())
+				if(denom.is_zero())
 				{
 					throw InvalidInputStringException("Denominator is zero", nomAndDenom.back() , inputString);
 				}

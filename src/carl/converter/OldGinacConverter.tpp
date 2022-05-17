@@ -137,7 +137,7 @@ namespace carl
         gatherVariables(polyB, carlToGinacVarMap, ginacToCarlVarMap);
         GiNaC::ex ginacResult = GiNaC::gcd(convertToGinac(polyA, carlToGinacVarMap), convertToGinac(polyB, carlToGinacVarMap));
         result = convertToCarl(ginacResult, ginacToCarlVarMap);
-        if( !carl::isZero(result) && result.lcoeff() < carl::constant_zero<typename Poly::CoeffType>().get() )
+        if( !carl::is_zero(result) && result.lcoeff() < carl::constant_zero<typename Poly::CoeffType>().get() )
             return -result;
         return result;
     }

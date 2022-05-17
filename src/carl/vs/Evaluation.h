@@ -30,7 +30,7 @@ std::pair<typename SqrtEx<Poly>::Rational, bool> evaluate(const SqrtEx<Poly>& sq
     Poly denomEvaluated = carl::substitute(sqrt_ex.denominator(), eval_map );
     assert( denomEvaluated.isConstant() );
     Rational denomValue = denomEvaluated.constantPart();
-    assert( !carl::isZero( denomValue ) );
+    assert( !carl::is_zero( denomValue ) );
     // Check whether the resulting assignment is integer.
     bool exact = true;
     Rational sqrtExValue;
@@ -39,7 +39,7 @@ std::pair<typename SqrtEx<Poly>::Rational, bool> evaluate(const SqrtEx<Poly>& sq
         assert( rounding != 0 );
         exact = false;
         assert( factorValue != 0 );
-        double dbSqrt = sqrt( carl::toDouble( radicandValue ) );
+        double dbSqrt = sqrt( carl::to_double( radicandValue ) );
         sqrtExValue = carl::rationalize<Rational>( dbSqrt ) ;
         // As there is no rational number representing the resulting square root we have to round.
         if( rounding < 0 ) // If the result should round down in this case.

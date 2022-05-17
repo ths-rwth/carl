@@ -48,6 +48,8 @@ CLANG_WARNING_RESET
 #include <map>
 #include <sstream>
 
+#include "typetraits.h"
+
 
 namespace carl
 {
@@ -57,11 +59,11 @@ namespace carl
    /**
     * States that `boost::variant` is indeed a `boost::variant`.
     */
-   template <class Number> struct is_interval<carl::Interval<Number>> : std::true_type {};
+   template <class Number> struct is_interval_type<carl::Interval<Number>> : std::true_type {};
    /**
     * States that `const boost::variant` is indeed a `boost::variant`.
     */
-   template <class Number> struct is_interval<const carl::Interval<Number>> : std::true_type {};
+   template <class Number> struct is_interval_type<const carl::Interval<Number>> : std::true_type {};
 
     /**
      * Struct which holds the rounding and checking policies required for boost
@@ -336,7 +338,7 @@ namespace carl
          * Constructor which constructs a pointinterval from a passed double.
          * @param n The passed double.
          */
-        template<typename N = Number, DisableIf<std::is_same<N, double >> = dummy, DisableIf<is_rational<N >> = dummy >
+        template<typename N = Number, DisableIf<std::is_same<N, double >> = dummy, DisableIf<is_rational_type<N >> = dummy >
         explicit Interval(const double& n) :
         mContent(carl::Interval<Number>::BoostInterval(n, n)),
         mLowerBoundType(BoundType::WEAK),
@@ -349,7 +351,7 @@ namespace carl
          * @param lower The desired lower bound.
          * @param upper The desired upper bound.
          */
-        template<typename N = Number, DisableIf<std::is_same<N, double >> = dummy, DisableIf<is_rational<N >> = dummy >
+        template<typename N = Number, DisableIf<std::is_same<N, double >> = dummy, DisableIf<is_rational_type<N >> = dummy >
         explicit Interval(double lower, double upper)
         {
             if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK))
@@ -377,7 +379,7 @@ namespace carl
          * @param upper The desired double upper bound.
          * @param upperBoundType The desired upper bound type.
          */
-        template<typename N = Number, DisableIf<std::is_same<N, double >> = dummy, DisableIf<is_rational<N >> = dummy>
+        template<typename N = Number, DisableIf<std::is_same<N, double >> = dummy, DisableIf<is_rational_type<N >> = dummy>
         Interval(double lower, BoundType lowerBoundType, double upper, BoundType upperBoundType)
         {
             if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType))
@@ -652,7 +654,7 @@ namespace carl
          * float number (e.g. FLOAT_T).
          * @param n The passed double.
          */
-        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
+        template<typename Num = Number, typename Float, EnableIf<is_rational_type<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
         explicit Interval(Float n):
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
@@ -666,7 +668,7 @@ namespace carl
          * @param lower The desired lower bound.
          * @param upper The desired upper bound.
          */
-        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
+        template<typename Num = Number, typename Float, EnableIf<is_rational_type<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
         explicit Interval(Float lower, Float upper):
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
@@ -684,12 +686,12 @@ namespace carl
          * @param upper The desired upper bound.
          * @param upperBoundType The desired upper bound type.
          */
-        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy, DisableIf<std::is_floating_point<Num >> = dummy>
+        template<typename Num = Number, typename Float, EnableIf<is_rational_type<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy, DisableIf<std::is_floating_point<Num >> = dummy>
         Interval(Float lower, BoundType lowerBoundType, Float upper, BoundType upperBoundType):
 			mContent(), mLowerBoundType(lowerBoundType), mUpperBoundType(upperBoundType)
         {
-            Num left = carl::rationalize<Num>(toDouble(lower));
-            Num right = carl::rationalize<Num>(toDouble(upper));
+            Num left = carl::rationalize<Num>(to_double(lower));
+            Num right = carl::rationalize<Num>(to_double(upper));
             //if(left == -std::numeric_limits<double>::infinity()) mLowerBoundType = BoundType::INFTY;
             //if(right == std::numeric_limits<double>::infinity()) mUpperBoundType = BoundType::INFTY;
             if (mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY)
@@ -722,7 +724,7 @@ namespace carl
          * float number (e.g. FLOAT_T).
          * @param n The passed double.
          */
-        template<typename Num = Number, typename Rational, EnableIf<is_rational<Num >> = dummy, EnableIf<is_rational<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
+        template<typename Num = Number, typename Rational, EnableIf<is_rational_type<Num >> = dummy, EnableIf<is_rational_type<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
         explicit Interval(Rational n):
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
@@ -736,7 +738,7 @@ namespace carl
          * @param lower The desired lower bound.
          * @param upper The desired upper bound.
          */
-        template<typename Num = Number, typename Rational, EnableIf<is_rational<Num >> = dummy, EnableIf<is_rational<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
+        template<typename Num = Number, typename Rational, EnableIf<is_rational_type<Num >> = dummy, EnableIf<is_rational_type<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
         explicit Interval(Rational lower, Rational upper):
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
@@ -754,13 +756,13 @@ namespace carl
          * @param upper The desired upper bound.
          * @param upperBoundType The desired upper bound type.
          */
-        template<typename Num = Number, typename Rational, EnableIf<is_rational<Num >> = dummy, EnableIf<is_rational<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
+        template<typename Num = Number, typename Rational, EnableIf<is_rational_type<Num >> = dummy, EnableIf<is_rational_type<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
         Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType)
         {
             mLowerBoundType = lowerBoundType;
             mUpperBoundType = upperBoundType;
-            Num left = carl::rationalize<Num>(toDouble(lower));
-            Num right = carl::rationalize<Num>(toDouble(upper));
+            Num left = carl::rationalize<Num>(to_double(lower));
+            Num right = carl::rationalize<Num>(to_double(upper));
             if (mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY)
             {
                 mContent = BoostInterval(carl::constant_zero<Num>().get());
@@ -1102,7 +1104,7 @@ namespace carl
          * Function which determines, if the interval is the zero interval.
          * @return True if it is a pointinterval rooted at 0.
          */
-        inline bool isZero() const
+        inline bool is_zero() const
         {
             assert(this->isConsistent());
             return this->is_point_interval() && (mContent.lower() == carl::constant_zero<Number>().get());
@@ -1112,7 +1114,7 @@ namespace carl
          * Function which determines, if the interval is the one interval.
          * @return True if it is a pointinterval rooted at 1.
          */
-        inline bool isOne() const
+        inline bool is_one() const
         {
             assert(this->isConsistent());
             return this->is_point_interval() && (mContent.lower() == carl::constant_one<Number>().get());
@@ -1443,29 +1445,29 @@ namespace carl
     };
 
 	template<typename T>
-	struct is_number<Interval<T>> : std::true_type {};
+	struct is_number_type<Interval<T>> : std::true_type {};
 
 	template<typename Number>
-	inline bool isInteger(const Interval<Number>& n) {
-		return n.is_point_interval() && carl::isInteger(n.lower());
+	inline bool is_integer(const Interval<Number>& n) {
+		return n.is_point_interval() && carl::is_integer(n.lower());
 	}
 
 /**
 * Check if this interval is a point-interval containing 0.
 */
 template<typename Number>
-bool isZero(const Interval<Number>& i) {
+bool is_zero(const Interval<Number>& i) {
 	assert(i.isConsistent());
-	return i.is_point_interval() && carl::isZero(i.lower());
+	return i.is_point_interval() && carl::is_zero(i.lower());
 }
 
 /**
 * Check if this interval is a point-interval containing 1.
 */
 template<typename Number>
-bool isOne(const Interval<Number>& i) {
+bool is_one(const Interval<Number>& i) {
 	assert(i.isConsistent());
-	return i.is_point_interval() && carl::isOne(i.lower());
+	return i.is_point_interval() && carl::is_one(i.lower());
 }
 
 
@@ -1501,7 +1503,7 @@ bool isOne(const Interval<Number>& i) {
      * @return Integer type which holds floor(_float).
      */
     template<typename Integer, typename Number>
-    inline Integer toInt(const Interval<Number>& _floatInterval)
+    inline Integer to_int(const Interval<Number>& _floatInterval)
     {
         return Interval<Integer>(_floatInterval.lower(), _floatInterval.lower_bound_type(), _floatInterval.upper(), _floatInterval.upper_bound_type());
     }

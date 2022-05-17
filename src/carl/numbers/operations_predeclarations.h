@@ -32,7 +32,7 @@ namespace carl {
 	inline To convert(const From& n);
 
 	template<typename Number>
-	inline int toInt(const Number& n);
+	inline int to_int(const Number& n);
 	
 	template<typename T>
 	inline T parse(const std::string& n);

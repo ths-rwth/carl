@@ -23,7 +23,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
-	if (carl::isZero(polynomial)) {
+	if (carl::is_zero(polynomial)) {
 		return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
 	}
 	CARL_LOG_DEBUG("carl.ran.realroots", polynomial << " within " << interval);
@@ -72,7 +72,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 	CARL_LOG_FUNC("carl.ran.realroots", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
 	assert(varToRANMap.count(poly.mainVar()) == 0);
 
-	if (carl::isZero(poly)) {
+	if (carl::is_zero(poly)) {
 		CARL_LOG_TRACE("carl.ran.realroots", "poly is 0 -> nullified");
 		return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
 	}
@@ -98,7 +98,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 			ir_map.emplace(v, varToRANMap.at(v));
 		}
 	}
-	if (carl::isZero(polyCopy)) {
+	if (carl::is_zero(polyCopy)) {
 		CARL_LOG_TRACE("carl.ran.realroots", "poly is 0 after substituting rational assignments -> nullified");
 		return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
 	}
@@ -122,7 +122,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 			CARL_LOG_TRACE("carl.ran.realroots", "poly still contains unassigned variable -> non-univariate");
 			return real_roots_result<RealAlgebraicNumberInterval<Number>>::non_univariate_response();
 		}
-		if (carl::isZero(*evaledpoly)) {
+		if (carl::is_zero(*evaledpoly)) {
 			CARL_LOG_TRACE("carl.ran.realroots", "got zero polynomial -> nullified");
 			return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
 		}

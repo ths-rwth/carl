@@ -36,24 +36,24 @@ public:
 
 	// CARL TO LIBPOLY CONVERSION -> These methods cannot be easily placed in the cpp file because of some linker issues due to templates
 
-	template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>
+	template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
 	poly::Polynomial toLibpolyPolynomial(const carl::MultivariatePolynomial<Coeff>& p) {
 		mpz_class placeholder;
 		return toLibpolyPolynomial(p, placeholder);
 	}
 	
-	template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>
+	template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
 	poly::Polynomial toLibpolyPolynomial(const carl::MultivariatePolynomial<Coeff>& p, mpz_class& denominator) {
 		CARL_LOG_DEBUG("carl.converter", "Converting Carl Multivariate Poly " << p);
 		if (carl::is_constant(p)) {
 			CARL_LOG_DEBUG("carl.converter", "Poly is constant");
-			denominator = carl::getDenom(p.constantPart());
-			auto res = poly::Polynomial(poly::Integer(carl::getNum(p.constantPart())));
+			denominator = carl::get_denom(p.constantPart());
+			auto res = poly::Polynomial(poly::Integer(carl::get_num(p.constantPart())));
 			return res;
 		}
 		//Libpoly polynomials have integer coefficients -> so we have to store the lcm of the coefficients of every term
 		Coeff coprimeFactor = p.mainDenom();
-		if (carl::getDenom(coprimeFactor) != 1) {
+		if (carl::get_denom(coprimeFactor) != 1) {
 			//if coprime factor is not an integer
 			denominator = coprimeFactor > 0 ? mpz_class(1) : mpz_class(-1);
 		} else if (coprimeFactor == 0) {
@@ -82,34 +82,34 @@ public:
 		return res;
 	}
 	
-	template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>
+	template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
 	poly::UPolynomial toLibpolyUPolynomial(const carl::UnivariatePolynomial<Coeff>& p) {
 		mpz_class placeholder;
 		return toLibpolyUPolynomial(p, placeholder);
 	}
 
-	template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>
+	template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
 	poly::UPolynomial toLibpolyUPolynomial(const carl::UnivariatePolynomial<Coeff>& p, mpz_class& denominator) {
 		carl::Variable placeholder;
 		return toLibpolyUPolynomial(p, denominator, placeholder);
 	}
 
-	template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>
+	template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
 	poly::UPolynomial toLibpolyUPolynomial(const carl::UnivariatePolynomial<Coeff>& p, mpz_class& denominator, carl::Variable& mainVar) {
 		CARL_LOG_DEBUG("carl.converter", "Converting Carl Univariate Poly " << p);
 		if (carl::is_constant(p)) {
 			CARL_LOG_DEBUG("carl.converter", "Poly is constant");
-			denominator = carl::getDenom(p.lcoeff());
+			denominator = carl::get_denom(p.lcoeff());
 			CARL_LOG_DEBUG("carl.converter", "Coprime Factor/ Denominator: " << denominator);
-			return poly::UPolynomial(poly::Integer(carl::getNum(p.lcoeff())));
+			return poly::UPolynomial(poly::Integer(carl::get_num(p.lcoeff())));
 		}
 		Coeff coprimeFactor = p.coprimeFactor();
 
 		CARL_LOG_DEBUG("carl.converter", "Coprime Factor: " << coprimeFactor);
 
-		if (carl::getDenom(coprimeFactor) != 1) {
+		if (carl::get_denom(coprimeFactor) != 1) {
 			//if coprime factor is not an integer
-			denominator = coprimeFactor > 0 ? mpz_class(carl::getNum(coprimeFactor)) : mpz_class(-carl::getNum(coprimeFactor));
+			denominator = coprimeFactor > 0 ? mpz_class(carl::get_num(coprimeFactor)) : mpz_class(-carl::get_num(coprimeFactor));
 		} else if (coprimeFactor == 0) {
 			//Wie kann das überhaupt sein? TODO
 			denominator = mpz_class(1);
@@ -130,13 +130,13 @@ public:
 		return poly::UPolynomial(coefficients);
 	}
 
-	template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>
+	template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
 	poly::Polynomial toLibpolyPolynomial(const carl::UnivariatePolynomial<carl::MultivariatePolynomial<Coeff>>& p) {
 		mpz_class placeholder;
 		return toLibpolyPolynomial(p, placeholder);
 	}
 
-	template<typename Coeff, EnableIf<is_subset_of_rationals<Coeff>> = dummy>
+	template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
 	poly::Polynomial toLibpolyPolynomial(const carl::UnivariatePolynomial<carl::MultivariatePolynomial<Coeff>>& p, mpz_class& denominator) {
 		//turn into carl::Multivariate
 		return toLibpolyPolynomial(carl::MultivariatePolynomial(p), denominator);

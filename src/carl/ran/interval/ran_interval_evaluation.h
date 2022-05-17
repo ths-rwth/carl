@@ -108,7 +108,7 @@ std::optional<RealAlgebraicNumberInterval<Number>> evaluate(MultivariatePolynomi
 	auto sturm_seq = sturm_sequence(*res);
 	// the interval should include at least one root.
 	CARL_LOG_TRACE("carl.ran.evaluation", "Refine intervals");
-	assert(!carl::isZero(*res));
+	assert(!carl::is_zero(*res));
 	assert(carl::is_root_of(*res, interval.lower()) || carl::is_root_of(*res, interval.upper()) || count_real_roots(sturm_seq, interval) >= 1);
 	while (!interval.is_point_interval() && (carl::is_root_of(*res, interval.lower()) || carl::is_root_of(*res, interval.upper()) || count_real_roots(sturm_seq, interval) != 1)) {
 		CARL_LOG_TRACE("carl.ran.evaluation", "Refinement step");
@@ -264,7 +264,7 @@ boost::tribool evaluate(const BasicConstraint<Poly>& c, const Assignment<RealAlg
 			return evaluate(Sign::ZERO, constr.relation());
 		}
 
-		assert(!carl::isZero(*res));
+		assert(!carl::is_zero(*res));
 
 		// refine the interval until it is either positive or negative or is contained in (neg_ub,pos_lb)
 		CARL_LOG_DEBUG("carl.ran.evaluation", "Refine until interval is in (" << neg_ub << "," << pos_lb << ") or interval is positive or negative");

@@ -17,7 +17,7 @@ namespace carl {
  */
 template<typename Coeff>
 Coeff cauchyBound(const UnivariatePolynomial<Coeff>& p) {
-	static_assert(is_field<Coeff>::value, "Cauchy bounds are only defined for field-coefficients");
+	static_assert(is_field_type<Coeff>::value, "Cauchy bounds are only defined for field-coefficients");
 	if (is_constant(p)) return carl::constant_zero<Coeff>::get();
 	
 	auto it = std::max_element(p.coefficients().begin(), std::prev(p.coefficients().end()), 
@@ -33,7 +33,7 @@ Coeff cauchyBound(const UnivariatePolynomial<Coeff>& p) {
  */
 template<typename Coeff>
 Coeff hirstMaceyBound(const UnivariatePolynomial<Coeff>& p) {
-	static_assert(is_field<Coeff>::value, "HirstMacey bounds are only defined for field-coefficients");
+	static_assert(is_field_type<Coeff>::value, "HirstMacey bounds are only defined for field-coefficients");
 	if (is_constant(p)) return carl::constant_zero<Coeff>::get();
 	auto sum = std::accumulate(
 		p.coefficients().begin(),
@@ -53,13 +53,13 @@ Coeff hirstMaceyBound(const UnivariatePolynomial<Coeff>& p) {
  */
 template<typename Coeff>
 Coeff lagrangeBound(const UnivariatePolynomial<Coeff>& p) {
-	static_assert(is_field<Coeff>::value, "Lagrange bounds are only defined for field-coefficients");
+	static_assert(is_field_type<Coeff>::value, "Lagrange bounds are only defined for field-coefficients");
 	if (is_constant(p)) return carl::constant_zero<Coeff>::get();
 	
 	Coeff max;
 	Coeff lc = carl::abs(p.lcoeff());
 	for (std::size_t i = 1; i <= p.degree(); ++i) {
-		if (carl::isZero(p.coefficients()[p.degree()-i])) continue;
+		if (carl::is_zero(p.coefficients()[p.degree()-i])) continue;
 		auto cur = carl::abs(p.coefficients()[p.degree()-i]) / lc;
 		if (i > 1) {
 			cur = carl::root_safe(cur, i).second;
@@ -83,15 +83,15 @@ Coeff lagrangeBound(const UnivariatePolynomial<Coeff>& p) {
 template<typename Coeff>
 Coeff lagrangePositiveUpperBound(const UnivariatePolynomial<Coeff>& p) {
 
-	static_assert(is_field<Coeff>::value, "Lagrange bounds are only defined for field-coefficients");
+	static_assert(is_field_type<Coeff>::value, "Lagrange bounds are only defined for field-coefficients");
 	if (is_constant(p)) return carl::constant_zero<Coeff>::get();
 
 	Coeff max;
 	Coeff lc = p.lcoeff();
 
 	for (std::size_t i = 1; i <= p.degree(); ++i) {
-		if (carl::isZero(p.coefficients()[p.degree()-i])) continue;
-		if (carl::isPositive(lc * p.coefficients()[p.degree()-i])) continue;
+		if (carl::is_zero(p.coefficients()[p.degree()-i])) continue;
+		if (carl::is_positive(lc * p.coefficients()[p.degree()-i])) continue;
 
 		auto cur = carl::abs(p.coefficients()[p.degree()-i]) / carl::abs(lc);
 		if (i > 1) {

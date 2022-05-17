@@ -46,7 +46,7 @@ static unsigned consistent_with(const BasicConstraint<Pol>& c, const Assignment<
 			return 2;
 		switch (c.relation()) {
 		case Relation::EQ: {
-			if (solutionSpace.isZero())
+			if (solutionSpace.is_zero())
 				return 1;
 			else if (!solutionSpace.contains(0))
 				return 0;
@@ -146,7 +146,7 @@ static unsigned consistent_with(const BasicConstraint<Pol>& c, const Assignment<
 			return 2;
 		switch (c.relation()) {
 		case Relation::EQ: {
-			if (solutionSpace.isZero())
+			if (solutionSpace.is_zero())
 				return 1;
 			else if (!solutionSpace.contains(0))
 				return 0;

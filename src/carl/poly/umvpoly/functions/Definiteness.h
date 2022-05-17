@@ -48,7 +48,7 @@ Definiteness definiteness(const Term<Coeff>& t) {
 		if (t.monomial()->isSquare()) {
 			return (t.coeff() < Coeff(0) ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
 		}
-	} else if (!carl::isZero(t.coeff())) {
+	} else if (!carl::is_zero(t.coeff())) {
 		return (t.coeff() < Coeff(0) ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
 	}
 	return Definiteness::NON;
@@ -92,11 +92,11 @@ Definiteness definiteness(const MultivariatePolynomial<C,O,P>& p, bool full_effo
 	if( full_effort && result == Definiteness::NON && total_degree(p) == 2 )
 	{
 		assert( !is_constant(p) );
-		bool lTermNegative = carl::isNegative( p.lterm().coeff() );
+		bool lTermNegative = carl::is_negative( p.lterm().coeff() );
 		MultivariatePolynomial<C,O,P> tmp = p;
 		if( p.hasConstantTerm() )
 		{
-			bool constPartNegative = carl::isNegative( p.constantPart() );
+			bool constPartNegative = carl::is_negative( p.constantPart() );
 			if( constPartNegative != lTermNegative ) return Definiteness::NON;
 			result = lTermNegative ? Definiteness::NEGATIVE : Definiteness::POSITIVE;
 			tmp -= p.constantPart();

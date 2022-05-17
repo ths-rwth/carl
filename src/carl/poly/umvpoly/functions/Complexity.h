@@ -38,7 +38,7 @@ template<typename Coeff>
 std::size_t complexity(const UnivariatePolynomial<Coeff>& p) {
 	std::size_t result = 0;
 	for (std::size_t deg = 0; deg <= p.degree(); ++deg) {
-		if (p.coefficients()[deg].isZero()) continue;
+		if (p.coefficients()[deg].is_zero()) continue;
 		result += complexity(p.coefficients()[deg]) + deg;
 	}
 	return result;

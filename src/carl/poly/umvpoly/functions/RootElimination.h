@@ -13,7 +13,7 @@ namespace carl {
 template<typename Coeff>
 void eliminate_zero_root(UnivariatePolynomial<Coeff>& p) {
 	std::size_t i = 0;
-	while ((i < p.coefficients().size()) && (isZero(p.coefficients()[i]))) i++;
+	while ((i < p.coefficients().size()) && (is_zero(p.coefficients()[i]))) i++;
 	if (i == 0) return;
 	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
 	for (std::size_t j = 0; j < p.coefficients().size()-i; j++) {
@@ -36,7 +36,7 @@ template<typename Coeff>
 void eliminate_root(UnivariatePolynomial<Coeff>& p, const Coeff& root) {
 	assert(is_root_of(p, root));
 	if (carl::is_zero(p)) return;
-	if (isZero(root)) {
+	if (is_zero(root)) {
 		eliminate_zero_root(p);
 		return;
 	}
@@ -47,7 +47,7 @@ void eliminate_root(UnivariatePolynomial<Coeff>& p, const Coeff& root) {
 			p.coefficients()[i-1] += p.coefficients()[i] * root;
 		}
 		p.coefficients() = tmp;
-	} while ((isZero(evaluate(p, root))) && (p.coefficients().size() > 0));
+	} while ((is_zero(evaluate(p, root))) && (p.coefficients().size() > 0));
 }
 
 }

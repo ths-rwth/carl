@@ -11,7 +11,7 @@ SqrtEx<Poly> substitute( const SqrtEx<Poly>& sqrt_ex, const std::map<Variable, t
     Poly factorEvaluated = carl::substitute(sqrt_ex.factor(), eval_map );
     Poly constantPartEvaluated = carl::substitute(sqrt_ex.constantPart(), eval_map );
     Poly denomEvaluated = carl::substitute(sqrt_ex.denominator(), eval_map );
-    assert( !denomEvaluated.isConstant() || !carl::isZero( denomEvaluated.constantPart() ) );
+    assert( !denomEvaluated.isConstant() || !carl::is_zero( denomEvaluated.constantPart() ) );
     Rational sqrtExValue;
     if( radicandEvaluated.isConstant() && carl::sqrt_exact( radicandEvaluated.constantPart(), sqrtExValue ) )
     {

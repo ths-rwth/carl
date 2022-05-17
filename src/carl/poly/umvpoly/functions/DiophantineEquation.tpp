@@ -12,7 +12,7 @@ namespace carl {
 
 template<typename T>
 std::vector<T> solveDiophantine(MultivariatePolynomial<T>& p) {
-	static_assert(carl::is_integer<T>::value, "Diophantine equations are build from integral coefficients only!");
+	static_assert(carl::is_integer_type<T>::value, "Diophantine equations are build from integral coefficients only!");
 	std::vector<T> res;
         res = std::vector<T>();
 	
@@ -90,7 +90,7 @@ std::vector<T> solveLinearDiophantine(MultivariatePolynomial<T>& equation) {
 // implementation of extended euklid for integers
 template<typename T>
 T extended_gcd_integer(T a, T b, T& s, T& t) {
-    static_assert(carl::is_integer<T>::value, "extended gcd algorithmn is for integral types only!");
+    static_assert(carl::is_integer_type<T>::value, "extended gcd algorithmn is for integral types only!");
     
     // gcd(0, 0) := 0
     if(a == 0 && b == 0) {

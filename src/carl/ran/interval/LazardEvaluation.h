@@ -28,7 +28,7 @@ public:
 			newPoly = carl::remainder(mLiftingPoly, red.second);
 		}
 		// TODO newPoly = mFieldExtensions.embed(newPoly);
-		while (carl::isZero(newPoly) && divideZeroFactors) {
+		while (carl::is_zero(newPoly) && divideZeroFactors) {
 			if (red.first) {
 				mLiftingPoly = carl::quotient(mLiftingPoly, v - red.second);
 				newPoly = carl::substitute(mLiftingPoly, v, red.second);

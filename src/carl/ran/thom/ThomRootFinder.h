@@ -273,7 +273,7 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
 ) {
         CARL_LOG_TRACE("carl.thom.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
 	assert(m.count(p.mainVar()) == 0);
-        assert(!p.isZero());
+        assert(!p.is_zero());
         
         std::list<ThomEncoding<Number>> roots;
         
@@ -293,7 +293,7 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
         CARL_LOG_TRACE("carl.thom.rootfinder", "tmp = " << tmp);
         std::list<RealAlgebraicNumber<Number>> roots_triv;
         if(variables(tmp).size() <= 1) {
-                if(tmp.isZero()) return {RealAlgebraicNumber<Number>(0)};
+                if(tmp.is_zero()) return {RealAlgebraicNumber<Number>(0)};
                 assert(variables(tmp).size() == 1);
                  // Coeff = MultivariatePolynomial<Number>, but all coefficients of tmp are numerical
                 UnivariatePolynomial<Number> tmp_univ = tmp.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ assert(c.isUnivariate()); return c.constantPart(); }));

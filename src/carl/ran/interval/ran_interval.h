@@ -189,7 +189,7 @@ public:
 	RealAlgebraicNumberInterval(const Polynomial& p, const Interval<Number>& i)
 		: m_content(std::make_shared<content>(replaceVariable(p), i)) {
 		CARL_LOG_DEBUG("carl.ran.ir", "Creating (" << p << "," << i << ")");
-		assert(!carl::isZero(polynomial_int()) && polynomial_int().degree() > 0);
+		assert(!carl::is_zero(polynomial_int()) && polynomial_int().degree() > 0);
 		assert(interval_int().is_open_interval() || interval_int().is_point_interval());
 		// assert(interval_int().is_point_interval() || count_real_roots(sturm_sequence(), interval_int()) == 1);
 		if (interval_int().is_point_interval()) {
@@ -218,10 +218,10 @@ public:
 	}
 
 	bool is_zero() const {
-		return carl::isZero(interval_int());
+		return carl::is_zero(interval_int());
 	}
 	bool is_integral() const {
-		return interval_int().is_point_interval() && carl::isInteger(interval_int().lower());
+		return interval_int().is_point_interval() && carl::is_integer(interval_int().lower());
 	}
 	Number integer_below() const {
 		return carl::floor(interval_int().lower());

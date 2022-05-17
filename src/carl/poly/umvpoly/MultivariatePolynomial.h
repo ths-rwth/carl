@@ -19,6 +19,7 @@
 #include "functions/VariableInformation.h"
 #include <carl/numbers/numbers.h>
 #include "TermAdditionManager.h"
+#include "../typetraits.h"
 
 
 namespace carl
@@ -253,17 +254,17 @@ public:
 	/**
 	 * Check if the polynomial is zero.
 	 */
-	[[deprecated("use carl::isZero(p) instead.")]]
-	bool isZero() const {
+	[[deprecated("use carl::is_zero(p) instead.")]]
+	bool is_zero() const {
 		return mTerms.empty();
 	}
 	/**
 	 * 
      * @return 
      */
-	[[deprecated("use carl::isOne(p) instead.")]]
-	bool isOne() const {
-		return (nrTerms() == 1) && carl::isOne(lterm());
+	[[deprecated("use carl::is_one(p) instead.")]]
+	bool is_one() const {
+		return (nrTerms() == 1) && carl::is_one(lterm());
 	}
 	/**
 	 * Check if the polynomial is constant.
@@ -281,7 +282,7 @@ public:
 	 * @return true, if this polynomial consists just of one variable (with coefficient 1). 
 	 */
 	bool isVariable() const {
-		return (nrTerms() == 1) && carl::isOne(lcoeff()) && lterm().isSingleVariable();
+		return (nrTerms() == 1) && carl::is_one(lcoeff()) && lterm().isSingleVariable();
 	}
 	/**
 	 * Check if the polynomial is linear.
@@ -449,7 +450,7 @@ public:
 	 * @return The lcm of the denominators of the coefficients (without the constant one) in p divided by the gcd of numerators 
 	 *		 of the coefficients in p.
 	 */
-	template<typename C = Coeff, EnableIf<is_subset_of_rationals<C>> = dummy>
+	template<typename C = Coeff, EnableIf<is_subset_of_rationals_type<C>> = dummy>
 	Coeff coprimeFactorWithoutConstant() const;
 	
 	/**
@@ -487,12 +488,12 @@ public:
 	template<bool gatherCoeff>
 	VariablesInformation<gatherCoeff, MultivariatePolynomial> getVarInfo() const;
 	
-	template<typename C=Coeff, EnableIf<is_number<C>> = dummy>
+	template<typename C=Coeff, EnableIf<is_number_type<C>> = dummy>
 	Coeff numericContent() const;
-	template<typename C=Coeff, DisableIf<is_number<C>> = dummy>
+	template<typename C=Coeff, DisableIf<is_number_type<C>> = dummy>
 	typename UnderlyingNumberType<C>::type numericContent() const;
 	
-	template<typename C=Coeff, EnableIf<is_number<C>> = dummy>
+	template<typename C=Coeff, EnableIf<is_number_type<C>> = dummy>
 	IntNumberType mainDenom() const;
 	
 	/// @name In-place addition operators
@@ -609,11 +610,11 @@ public:
 };
 
 	template<typename C, typename O, typename P>
-	bool isOne(const MultivariatePolynomial<C,O,P>& p) {
-		return (p.nrTerms() == 1) && carl::isOne(p.lterm());
+	bool is_one(const MultivariatePolynomial<C,O,P>& p) {
+		return (p.nrTerms() == 1) && carl::is_one(p.lterm());
 	}
 	template<typename C, typename O, typename P>
-	bool isZero(const MultivariatePolynomial<C,O,P>& p) {
+	bool is_zero(const MultivariatePolynomial<C,O,P>& p) {
 		return p.nrTerms() == 0;
 	}
 
@@ -631,7 +632,7 @@ public:
 	 * @param rhs Right hand side.
 	 * @return `lhs / rhs`
 	 */
-	template<typename C, typename O, typename P, EnableIf<carl::is_number<C>> = dummy>
+	template<typename C, typename O, typename P, EnableIf<carl::is_number_type<C>> = dummy>
 	inline MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
         return MultivariatePolynomial<C,O,P>(lhs) /= rhs;
     }
@@ -651,7 +652,7 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	inline std::ostream& operator<<(std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs) {
-		if (isZero(rhs)) return os << "0";
+		if (is_zero(rhs)) return os << "0";
 		return os << carl::stream_joined(" + ", rhs);
 	}
 
@@ -662,6 +663,17 @@ public:
 			variables(t, vars);
 		}
 	}
+
+template<typename T, typename O, typename P>
+struct is_polynomial_type<carl::MultivariatePolynomial<T, O, P>>: std::true_type {};
+/**
+ * States that UnderlyingNumberType of MultivariatePolynomial<C,O,P> is UnderlyingNumberType<C>::type.
+ * @ingroup typetraits_UnderlyingNumberType
+ */
+template<typename C, typename O, typename P>
+struct UnderlyingNumberType<MultivariatePolynomial<C, O, P>>: has_subtype<typename UnderlyingNumberType<C>::type> {};
+
+	
 } // namespace carl
 
 /**

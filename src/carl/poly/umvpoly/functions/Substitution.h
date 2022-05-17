@@ -69,7 +69,7 @@ void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const Mu
 	}
 	typename MultivariatePolynomial<C,O,P>::TermsType newTerms;
 	// If we replace a variable by zero, just eliminate all terms containing the variable.
-	if(carl::isZero(value))
+	if(carl::is_zero(value))
 	{
 		bool removedLast = false;
 		for (const auto& term: p) {
@@ -197,7 +197,7 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 	auto id = tam.getId(p.nrTerms());
 	for (const auto& term: p) {
 		Term<C> resultTerm = substitute(term, substitutions);
-		if( !carl::isZero(resultTerm) )
+		if( !carl::is_zero(resultTerm) )
 		{
 			tam.template addTerm<false>(id, resultTerm );
 		}
@@ -234,7 +234,7 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 	// Substitute the variables, which have to be replaced by 0, beforehand,
 	// as this could significantly simplify this multivariate polynomial.
 	for (const auto& sub: substitutions) {
-		if(carl::isZero(sub.second))
+		if(carl::is_zero(sub.second))
 		{
 			substitute_inplace(result, sub.first, sub.second);
 			if(is_constant(result))
@@ -346,10 +346,10 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 
 template<typename Coeff>
 void substitute_inplace(UnivariatePolynomial<Coeff>& p, Variable var, const Coeff& value) {
-	if (carl::isZero(p)) return;
+	if (carl::is_zero(p)) return;
 	if (var == p.mainVar()) {
 		p = UnivariatePolynomial<Coeff>(p.mainVar(), carl::evaluate(p, value));
-	} else if constexpr (!is_number<Coeff>::value) {
+	} else if constexpr (!is_number_type<Coeff>::value) {
 		// Coefficients from a polynomial ring
 		if (value.has(var)) {
 			// Fall back to multivariate substitution.
@@ -369,7 +369,7 @@ void substitute_inplace(UnivariatePolynomial<Coeff>& p, Variable var, const Coef
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> substitute(const UnivariatePolynomial<Coeff>& p, Variable var, const Coeff& value) {
-	if constexpr (is_number<Coeff>::value) {
+	if constexpr (is_number_type<Coeff>::value) {
 		if (var == p.mainVar()) {
 			return UnivariatePolynomial<Coeff>(p.mainVar(), p.evaluate(value));
 		}

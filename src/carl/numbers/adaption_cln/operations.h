@@ -20,35 +20,35 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 
 namespace carl {
 
-inline bool isZero(const cln::cl_I& n) {
+inline bool is_zero(const cln::cl_I& n) {
 	return zerop(n);
 }
 
-inline bool isZero(const cln::cl_RA& n) {
+inline bool is_zero(const cln::cl_RA& n) {
 	return zerop(n);
 }
 
-inline bool isOne(const cln::cl_I& n) {
+inline bool is_one(const cln::cl_I& n) {
 	return n == constant_one<cln::cl_I>::get();
 }
 
-inline bool isOne(const cln::cl_RA& n) {
+inline bool is_one(const cln::cl_RA& n) {
 	return n  == constant_one<cln::cl_RA>::get();
 }
 
-inline bool isPositive(const cln::cl_I& n) {
+inline bool is_positive(const cln::cl_I& n) {
 	return n > constant_zero<cln::cl_RA>::get();
 }
 
-inline bool isPositive(const cln::cl_RA& n) {
+inline bool is_positive(const cln::cl_RA& n) {
 	return n > constant_zero<cln::cl_RA>::get();
 }
 
-inline bool isNegative(const cln::cl_I& n) {
+inline bool is_negative(const cln::cl_I& n) {
 	return n < constant_zero<cln::cl_RA>::get();
 }
 
-inline bool isNegative(const cln::cl_RA& n) {
+inline bool is_negative(const cln::cl_RA& n) {
 	return n < constant_zero<cln::cl_RA>::get();
 }
 
@@ -57,7 +57,7 @@ inline bool isNegative(const cln::cl_RA& n) {
  * @param n Fraction.
  * @return Numerator.
  */
-inline cln::cl_I getNum(const cln::cl_RA& n) {
+inline cln::cl_I get_num(const cln::cl_RA& n) {
 	return cln::numerator(n);
 }
 
@@ -66,7 +66,7 @@ inline cln::cl_I getNum(const cln::cl_RA& n) {
  * @param n Fraction.
  * @return Denominator.
  */
-inline cln::cl_I getDenom(const cln::cl_RA& n) {
+inline cln::cl_I get_denom(const cln::cl_RA& n) {
 	return cln::denominator(n);
 }
 
@@ -75,7 +75,7 @@ inline cln::cl_I getDenom(const cln::cl_RA& n) {
  * As cln::cl_I are always integral, this method returns true.
  * @return true.
  */
-inline bool isInteger(const cln::cl_I& /*unused*/) {
+inline bool is_integer(const cln::cl_I& /*unused*/) {
 	return true;
 }
 
@@ -84,8 +84,8 @@ inline bool isInteger(const cln::cl_I& /*unused*/) {
  * @param n A fraction.
  * @return true.
  */
-inline bool isInteger(const cln::cl_RA& n) {
-	return isOne(getDenom(n));
+inline bool is_integer(const cln::cl_RA& n) {
+	return is_one(get_denom(n));
 }
 
 /**
@@ -102,7 +102,7 @@ inline std::size_t bitsize(const cln::cl_I& n) {
  * @return Bit size of n.
  */
 inline std::size_t bitsize(const cln::cl_RA& n) {
-	return cln::integer_length(getNum(n)) + cln::integer_length(getDenom(n));
+	return cln::integer_length(get_num(n)) + cln::integer_length(get_denom(n));
 }
 
 /**
@@ -110,7 +110,7 @@ inline std::size_t bitsize(const cln::cl_RA& n) {
  * @param n A fraction.
  * @return Double.
  */
-inline double toDouble(const cln::cl_RA& n) {
+inline double to_double(const cln::cl_RA& n) {
 	return cln::double_approx(n);
 }
 /**
@@ -118,23 +118,23 @@ inline double toDouble(const cln::cl_RA& n) {
  * @param n An integer.
  * @return Double.
  */
-inline double toDouble(const cln::cl_I& n) {
+inline double to_double(const cln::cl_I& n) {
 	return cln::double_approx(n);
 }
 
 template<typename Integer>
-inline Integer toInt(const cln::cl_I& n);
+inline Integer to_int(const cln::cl_I& n);
 template<typename Integer>
-inline Integer toInt(const cln::cl_RA& n);
+inline Integer to_int(const cln::cl_RA& n);
 
 template<>
-inline sint toInt<sint>(const cln::cl_I& n) {
+inline sint to_int<sint>(const cln::cl_I& n) {
     assert(n <= std::numeric_limits<sint>::max());
     assert(n >= std::numeric_limits<sint>::min());
     return cln::cl_I_to_long(n);
 }
 template<>
-inline uint toInt<uint>(const cln::cl_I& n) {
+inline uint to_int<uint>(const cln::cl_I& n) {
     assert(n <= std::numeric_limits<uint>::max());
     assert(n >= std::numeric_limits<uint>::min());
     return uint(cln::cl_I_to_long(n));
@@ -142,25 +142,25 @@ inline uint toInt<uint>(const cln::cl_I& n) {
 
 
 template<typename To, typename From>
-inline To fromInt(const From& n);
+inline To from_int(const From& n);
 
 template<>
-inline cln::cl_I fromInt(const uint& n) {
+inline cln::cl_I from_int(const uint& n) {
 	return cln::cl_I(n);
 }
 
 template<>
-inline cln::cl_I fromInt(const sint& n) {
+inline cln::cl_I from_int(const sint& n) {
 	return cln::cl_I(n);
 }
 
 template<>
-inline cln::cl_RA fromInt(const uint& n) {
+inline cln::cl_RA from_int(const uint& n) {
 	return cln::cl_RA(n);
 }
 
 template<>
-inline cln::cl_RA fromInt(const sint& n) {
+inline cln::cl_RA from_int(const sint& n) {
 	return cln::cl_RA(n);
 }
 
@@ -171,17 +171,17 @@ inline cln::cl_RA fromInt(const sint& n) {
  * @return An integer.
  */
 template<>
-inline cln::cl_I toInt<cln::cl_I>(const cln::cl_RA& n) {
-	assert(isInteger(n));
-	return getNum(n);
+inline cln::cl_I to_int<cln::cl_I>(const cln::cl_RA& n) {
+	assert(is_integer(n));
+	return get_num(n);
 }
 template<>
-inline sint toInt<sint>(const cln::cl_RA& n) {
-	return toInt<sint>(toInt<cln::cl_I>(n));
+inline sint to_int<sint>(const cln::cl_RA& n) {
+	return to_int<sint>(to_int<cln::cl_I>(n));
 }
 template<>
-inline uint toInt<uint>(const cln::cl_RA& n) {
-    return toInt<uint>(toInt<cln::cl_I>(n));
+inline uint to_int<uint>(const cln::cl_RA& n) {
+    return to_int<uint>(to_int<cln::cl_I>(n));
 }
 
 /**
@@ -189,7 +189,7 @@ inline uint toInt<uint>(const cln::cl_RA& n) {
  * @param n A fraction.
  * @return n as cln::cl_LF.
  */
-inline cln::cl_LF toLF(const cln::cl_RA& n) {
+inline cln::cl_LF to_lf(const cln::cl_RA& n) {
 	return cln::cl_R_to_LF(n, std::max(cln::integer_length(cln::numerator(n)), cln::integer_length(cln::denominator(n))));
 }
 
@@ -338,7 +338,7 @@ inline void divide(const cln::cl_I& dividend, const cln::cl_I& divisor, cln::cl_
  * @return Updated a.
  */
 inline cln::cl_RA& gcd_assign(cln::cl_RA& a, const cln::cl_RA& b) {
-	a = cln::gcd(carl::getNum(a),carl::getNum(b)) / cln::lcm(carl::getDenom(a),carl::getDenom(b));
+	a = cln::gcd(carl::get_num(a),carl::get_num(b)) / cln::lcm(carl::get_denom(a),carl::get_denom(b));
 	return a;
 }
 
@@ -350,7 +350,7 @@ inline cln::cl_RA& gcd_assign(cln::cl_RA& a, const cln::cl_RA& b) {
  * @return Gcd of a and b.
  */
 inline cln::cl_RA gcd(const cln::cl_RA& a, const cln::cl_RA& b) {
-	return cln::gcd(carl::getNum(a),carl::getNum(b)) / cln::lcm(carl::getDenom(a),carl::getDenom(b));
+	return cln::gcd(carl::get_num(a),carl::get_num(b)) / cln::lcm(carl::get_denom(a),carl::get_denom(b));
 }
 
 /**
@@ -371,9 +371,9 @@ inline cln::cl_I lcm(const cln::cl_I& a, const cln::cl_I& b) {
  * @return Lcm of a and b.
  */
 inline cln::cl_RA lcm(const cln::cl_RA& a, const cln::cl_RA& b) {
-    assert( carl::isInteger( a ) );
-    assert( carl::isInteger( b ) );
-	return cln::lcm(carl::getNum(a),carl::getNum(b));
+    assert( carl::is_integer( a ) );
+    assert( carl::is_integer( b ) );
+	return cln::lcm(carl::get_num(a),carl::get_num(b));
 }
 
 /**

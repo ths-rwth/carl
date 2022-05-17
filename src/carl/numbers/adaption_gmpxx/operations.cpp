@@ -14,13 +14,13 @@ namespace carl
         mpz_class root_den;
         mpz_class root_den_rem;
         mpz_sqrtrem(root_den.__get_mp(), root_den_rem.__get_mp(), den.__get_mp());
-        if( !carl::isZero( root_den_rem ) )
+        if( !carl::is_zero( root_den_rem ) )
             return false;
 
         mpz_class root_num;
         mpz_class root_num_rem;
         mpz_sqrtrem(root_num.__get_mp(), root_num_rem.__get_mp(), num.__get_mp());
-        if( !carl::isZero( root_num_rem ) )
+        if( !carl::is_zero( root_num_rem ) )
             return false;
 
         mpq_class resNum;
@@ -108,8 +108,8 @@ namespace carl
         mpz_class den_rem;
         mpz_sqrtrem(den.__get_mp(), den_rem.__get_mp(), a.get_den().__get_mp());
 
-        if (carl::isZero(num_rem)) {
-            if (carl::isZero(den_rem)) {
+        if (carl::is_zero(num_rem)) {
+            if (carl::is_zero(den_rem)) {
                 mpq_class exact_root = mpq_class(num) / den;
                 return std::make_pair(exact_root, exact_root);
             } else {
@@ -118,7 +118,7 @@ namespace carl
                 return std::make_pair(lower, upper);
             }
         } else {
-            if (carl::isZero(den_rem)) {
+            if (carl::is_zero(den_rem)) {
                 mpq_class lower = mpq_class(num) / den;
                 mpq_class upper = (mpq_class(num) + 1) / den;
                 return std::make_pair(lower, upper);
@@ -179,8 +179,8 @@ namespace carl
         if(_infix) s << carl::abs(_number);
         else
         {
-            mpz_class d = carl::getDenom(_number);
-            if(d != mpz_class(1)) s << "(/ " << carl::abs(carl::getNum(_number)) << " " << carl::abs(d) << ")";
+            mpz_class d = carl::get_denom(_number);
+            if(d != mpz_class(1)) s << "(/ " << carl::abs(carl::get_num(_number)) << " " << carl::abs(d) << ")";
             else s << carl::abs(_number);
         }
         if(negative)

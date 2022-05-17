@@ -56,7 +56,7 @@ TEST(ModelEvaluation, EvaluateMVR)
 	MultivariateRoot<Pol> mvr(Pol(x)*z, 1);
 	auto res = evaluate(mvr, m);
 	EXPECT_TRUE(res.isRational());
-	EXPECT_TRUE(isZero(res.asRational()));
+	EXPECT_TRUE(is_zero(res.asRational()));
 }
 
 TEST(ModelEvaluation, EvaluateRANIR)

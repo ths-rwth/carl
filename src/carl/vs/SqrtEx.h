@@ -101,7 +101,7 @@ namespace carl
              */
             bool has_sqrt() const
             {
-                return !carl::isZero(m_factor);
+                return !carl::is_zero(m_factor);
             }
 
             /**
@@ -110,7 +110,7 @@ namespace carl
              */
             bool is_polynomial() const
             {
-                return carl::isZero(m_factor) && m_denominator.isConstant();
+                return carl::is_zero(m_factor) && m_denominator.isConstant();
             }
 
             /**
@@ -119,7 +119,7 @@ namespace carl
             Poly as_polynomial() const
             {
                 assert( is_polynomial() );
-                assert( !carl::isZero(m_denominator) );
+                assert( !carl::is_zero(m_denominator) );
                 return m_constant_part / m_denominator.constantPart();
             }
 
@@ -147,7 +147,7 @@ namespace carl
              */
             bool isRational() const
             {
-                return m_constant_part.isConstant() && m_denominator.isConstant() && carl::isZero(m_radicand);
+                return m_constant_part.isConstant() && m_denominator.isConstant() && carl::is_zero(m_radicand);
             }
             
             /**
@@ -175,10 +175,10 @@ namespace carl
              * @return true, if the this square root expression corresponds to an integer value;
              *         false, otherwise.
              */
-            bool isInteger() const
+            bool is_integer() const
             {
-                return carl::isZero(radicand()) && carl::isOne(denominator()) && 
-                       (carl::isZero(constantPart()) || (constantPart().isConstant() && carl::isInteger( constantPart().lcoeff() ) ) );
+                return carl::is_zero(radicand()) && carl::is_one(denominator()) && 
+                       (carl::is_zero(constantPart()) || (constantPart().isConstant() && carl::is_integer( constantPart().lcoeff() ) ) );
             }
             
             /**

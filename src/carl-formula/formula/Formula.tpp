@@ -151,7 +151,7 @@ namespace carl
     template<typename Pol>
     void Formula<Pol>::addConstraintProperties( const Constraint<Pol>& _constraint, Condition& _properties )
     {
-        if( carl::isZero(_constraint.lhs()) )
+        if( carl::is_zero(_constraint.lhs()) )
         {
             _properties |= PROP_CONTAINS_LINEAR_POLYNOMIAL;
         }

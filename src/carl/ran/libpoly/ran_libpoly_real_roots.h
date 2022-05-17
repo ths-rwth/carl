@@ -24,7 +24,7 @@ real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots(
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << polynomial << " within " << interval);
 
 	// Easy checks
-	if (carl::isZero(polynomial)) {
+	if (carl::is_zero(polynomial)) {
 		CARL_LOG_TRACE("carl.ran.libpoly", "poly is 0 -> nullified");
 		return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::nullified_response();
 	} else if (polynomial.isNumber()) {
@@ -81,7 +81,7 @@ real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots(
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << p << " within " << interval << " with assignment: " << m);
 
 	// Easy checks
-	if (carl::isZero(p)) {
+	if (carl::is_zero(p)) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 -> nullified");
 		return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::nullified_response();
 	}
@@ -125,7 +125,7 @@ real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots(
 	}
 	CARL_LOG_DEBUG("carl.ran.libpoly", "After rational substitution: " << polyCopy);
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Assignment: " << assignment);
-	if (carl::isZero(polyCopy)) {
+	if (carl::is_zero(polyCopy)) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 -> nullified");
 		return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::nullified_response();
 	} else if (!assignedRAN) {

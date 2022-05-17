@@ -95,11 +95,11 @@ template<typename T> \
 struct has_##methodname<T, typename Void<decltype( methodname(std::declval<T&>()) )>::type> : std::true_type {};
 
 has_method_struct(normalize)
-has_method_struct(isNegative)
-has_method_struct(isPositive)
+has_method_struct(is_negative)
+has_method_struct(is_positive)
 
-has_function_overload(isOne)
-has_function_overload(isZero)
+has_function_overload(is_one)
+has_function_overload(is_zero)
 
 //http://stackoverflow.com/questions/11251376/how-can-i-check-if-a-type-is-an-instantiation-of-a-given-class-template
 template < template <typename...> class Template, typename T >

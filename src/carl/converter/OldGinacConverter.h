@@ -40,25 +40,25 @@ namespace carl
             mpPolynomialCache = _cache;
         }
         
-        template<typename P = Poly, EnableIf<needs_cache<P>> = dummy>
+        template<typename P = Poly, EnableIf<needs_cache_type<P>> = dummy>
         P createPolynomial( typename P::PolyType&& _poly )
         {
             return P( std::move(_poly), mpPolynomialCache );
         }
 
-        template<typename P = Poly, EnableIf<needs_cache<P>> = dummy>
+        template<typename P = Poly, EnableIf<needs_cache_type<P>> = dummy>
         P createPolynomial( Variable::Arg _var )
         {
             return P( std::move(typename P::PolyType(_var)), mpPolynomialCache );
         }
 
-        template<typename P = Poly, EnableIf<needs_cache<P>> = dummy>
+        template<typename P = Poly, EnableIf<needs_cache_type<P>> = dummy>
         P createPolynomial( const typename P::PolyType& _poly )
         {
             return createPolynomial(typename P::PolyType(_poly));
         }
 
-        template<typename P = Poly, DisableIf<needs_cache<P>> = dummy>
+        template<typename P = Poly, DisableIf<needs_cache_type<P>> = dummy>
         P createPolynomial( Variable::Arg _var )
         {
             return P( _var );
@@ -86,7 +86,7 @@ namespace carl
             return result;
         }
 
-        template<typename P = Poly, EnableIf<is_factorized<P>> = dummy>
+        template<typename P = Poly, EnableIf<is_factorized_type<P>> = dummy>
         GiNaC::ex convertToGinac(const P& poly, const std::map<carl::Variable, GiNaC::ex>& vars)
         {
             std::lock_guard<std::recursive_mutex> lock( mMutex );

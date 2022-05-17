@@ -17,8 +17,8 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 
 namespace carl {
 
-TRAIT_TRUE(is_integer, cln::cl_I, cln);
-TRAIT_TRUE(is_rational, cln::cl_RA, cln);
+TRAIT_TRUE(is_integer_type, cln::cl_I, cln);
+TRAIT_TRUE(is_rational_type, cln::cl_RA, cln);
 
 TRAIT_TYPE(IntegralType, cln::cl_I, cln::cl_I, cln);
 TRAIT_TYPE(IntegralType, cln::cl_RA, cln::cl_I, cln);

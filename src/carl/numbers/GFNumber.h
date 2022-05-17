@@ -49,27 +49,27 @@ class GFNumber
 	
 	void normalize()
 	{
-		if(isZero() || isUnit()) return;
+		if(is_zero() || is_unit()) return;
 		assert(mGf != nullptr);
 		mGf->modulo(mN);
 	}
 	
-	bool isZero() const
+	bool is_zero() const
 	{
 		return mN == 0;
 	}
     
-	bool isOne() const
+	bool is_one() const
 	{
-		return isUnit();
+		return is_unit();
 	}
     
-	bool isUnit() const
+	bool is_unit() const
 	{
 		return mN == 1;
 	}
 	
-	const IntegerType& representingInteger() const
+	const IntegerType& representing_integer() const
 	{
 		return mN;
 	}
@@ -172,13 +172,13 @@ class GFNumber
 };
 
 template<typename IntegerT>
-bool isZero(const GFNumber<IntegerT>& _in) {
-	return _in.representingInteger() == 0;
+bool is_zero(const GFNumber<IntegerT>& _in) {
+	return _in.representing_integer() == 0;
 }
 
 template<typename IntegerT>
-bool isOne(const GFNumber<IntegerT>& _in) {
-	return _in.representingInteger() == 1;
+bool is_one(const GFNumber<IntegerT>& _in) {
+	return _in.representing_integer() == 1;
 }
 
 template<typename IntegerT>
@@ -197,7 +197,7 @@ GFNumber<IntegerT> abs(const GFNumber<IntegerT>& n) {
  * @return 
  */
 template<typename IntegerT>
-inline bool isInteger(const GFNumber<IntegerT>& /*unused*/) {
+inline bool is_integer(const GFNumber<IntegerT>& /*unused*/) {
 	return false;
 }
 

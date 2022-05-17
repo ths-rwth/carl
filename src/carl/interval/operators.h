@@ -435,7 +435,7 @@ inline Interval<Number>& operator*=(Interval<Number>& lhs, const Interval<Number
  */
 template<typename Number>
 inline Interval<Number>& operator*=(Interval<Number>& lhs, const Number& rhs) {
-	if (carl::isZero(rhs) && !lhs.is_empty()) {
+	if (carl::is_zero(rhs) && !lhs.is_empty()) {
 		lhs = Interval<Number>{0};
 		return lhs;
 	}
@@ -451,7 +451,7 @@ inline Interval<Number>& operator*=(Interval<Number>& lhs, const Number& rhs) {
  */
 template<typename Number>
 inline Interval<Number> operator/(const Interval<Number>& lhs, const Number& rhs) {
-	assert(!carl::isZero(rhs));
+	assert(!carl::is_zero(rhs));
 	if (rhs >= 0) {
 		return Interval<Number>(lhs.content() / rhs, lhs.lower_bound_type(), lhs.upper_bound_type());
 	} else {

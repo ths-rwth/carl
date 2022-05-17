@@ -26,7 +26,7 @@ std::optional<std::pair<Variable, Pol>> get_substitution(const BasicConstraint<P
 		if (e.second.maxDegree() == 1) {
 			auto d = e.second.coeffs().find(1);
 			assert(d != e.second.coeffs().end());
-			if (d->second.isConstant() && (e.first.type() != carl::VariableType::VT_INT || carl::isOne(carl::abs(d->second.constantPart())))) {
+			if (d->second.isConstant() && (e.first.type() != carl::VariableType::VT_INT || carl::is_one(carl::abs(d->second.constantPart())))) {
 				return std::make_pair(e.first, (Pol(e.first) * d->second - c.lhs()) / d->second.constantPart());
 			}
 		}

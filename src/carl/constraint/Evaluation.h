@@ -6,7 +6,7 @@
 
 namespace carl {
 
-template<typename Number, typename Poly, typename = std::enable_if_t<is_number<Number>::value>>
+template<typename Number, typename Poly, typename = std::enable_if_t<is_number_type<Number>::value>>
 bool evaluate(const BasicConstraint<Poly>& c, const Assignment<Number>& m) {
 	auto res = evaluate(c.lhs(), m);
 	return evaluate(res, c.relation());
@@ -25,7 +25,7 @@ unsigned satisfied_by(const BasicConstraint<Pol>& c, const Assignment<typename P
 	unsigned result = 2;
 	Pol tmp = carl::substitute(c.lhs(), _assignment);
 	if (tmp.isConstant()) {
-		result = carl::evaluate((isZero(tmp) ? typename Pol::NumberType(0) : tmp.trailingTerm().coeff()), c.relation()) ? 1 : 0;
+		result = carl::evaluate((is_zero(tmp) ? typename Pol::NumberType(0) : tmp.trailingTerm().coeff()), c.relation()) ? 1 : 0;
 	}
 	return result;
 }

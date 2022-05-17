@@ -24,8 +24,8 @@ class TestInterval(TestCarl):
 		self.assertEqual(i1.is_point_interval(),true)
 		self.assertEqual(i1.is_open_interval(),false)
 		self.assertEqual(i1.is_closed_interval(),true)
-		self.assertEqual(i1.isZero(),true)
-		self.assertEqual(i1.isOne(),false)
+		self.assertEqual(i1.is_zero(),true)
+		self.assertEqual(i1.is_one(),false)
 		self.assertEqual(i1.is_positive(),false)
 		self.assertEqual(i1.is_negative(),false)
 		self.assertEqual(i1.is_semi_positive(),true)
@@ -110,7 +110,7 @@ class TestInterval(TestCarl):
 		result = IntervalRational.quotient(i2,i1)
 		self.assertTrue(result.lower().equals(Rational(0)))
 		self.assertTrue(result.upper().equals(Rational(0)))
-		self.assertEquals(IntervalRational.isInteger(i2),false)
+		self.assertEquals(IntervalRational.is_integer(i2),false)
 
 }
 

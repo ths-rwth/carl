@@ -14,17 +14,17 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 
 namespace carl {
 
-TRAIT_TRUE(is_subset_of_integers, signed char, );
-TRAIT_TRUE(is_subset_of_integers, short int, );
-TRAIT_TRUE(is_subset_of_integers, int, );
-TRAIT_TRUE(is_subset_of_integers, long int, );
-TRAIT_TRUE(is_subset_of_integers, long long int, );
+TRAIT_TRUE(is_subset_of_integers_type, signed char, );
+TRAIT_TRUE(is_subset_of_integers_type, short int, );
+TRAIT_TRUE(is_subset_of_integers_type, int, );
+TRAIT_TRUE(is_subset_of_integers_type, long int, );
+TRAIT_TRUE(is_subset_of_integers_type, long long int, );
 
-TRAIT_TRUE(is_subset_of_integers, unsigned char, );
-TRAIT_TRUE(is_subset_of_integers, unsigned short int, );
-TRAIT_TRUE(is_subset_of_integers, unsigned int, );
-TRAIT_TRUE(is_subset_of_integers, unsigned long int, );
-TRAIT_TRUE(is_subset_of_integers, unsigned long long int, );
+TRAIT_TRUE(is_subset_of_integers_type, unsigned char, );
+TRAIT_TRUE(is_subset_of_integers_type, unsigned short int, );
+TRAIT_TRUE(is_subset_of_integers_type, unsigned int, );
+TRAIT_TRUE(is_subset_of_integers_type, unsigned long int, );
+TRAIT_TRUE(is_subset_of_integers_type, unsigned long long int, );
 
 
 TRAIT_TYPE(IntegralType, float, sint, );

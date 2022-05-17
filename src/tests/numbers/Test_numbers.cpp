@@ -43,22 +43,22 @@ TYPED_TEST(IntegerNumbers, Pow) {
 }*/
 
 TYPED_TEST(IntegerNumbers, Constant_Neg_Pos) {
-  EXPECT_EQ(true, carl::isZero(TypeParam(0)));
-  EXPECT_EQ(false, carl::isZero(TypeParam(1)));
-  EXPECT_EQ(false, carl::isZero(TypeParam(-1)));
+  EXPECT_EQ(true, carl::is_zero(TypeParam(0)));
+  EXPECT_EQ(false, carl::is_zero(TypeParam(1)));
+  EXPECT_EQ(false, carl::is_zero(TypeParam(-1)));
 
-  EXPECT_EQ(true, carl::isOne(TypeParam(1)));
-  EXPECT_EQ(false, carl::isOne(TypeParam(2)));
-  EXPECT_EQ(false, carl::isOne(TypeParam(0)));
-  EXPECT_EQ(false, carl::isOne(TypeParam(-1)));
+  EXPECT_EQ(true, carl::is_one(TypeParam(1)));
+  EXPECT_EQ(false, carl::is_one(TypeParam(2)));
+  EXPECT_EQ(false, carl::is_one(TypeParam(0)));
+  EXPECT_EQ(false, carl::is_one(TypeParam(-1)));
 
-  EXPECT_EQ(true, carl::isPositive(TypeParam(1)));
-  EXPECT_EQ(false, carl::isPositive(TypeParam(0)));
-  EXPECT_EQ(false, carl::isPositive(TypeParam(-1)));
+  EXPECT_EQ(true, carl::is_positive(TypeParam(1)));
+  EXPECT_EQ(false, carl::is_positive(TypeParam(0)));
+  EXPECT_EQ(false, carl::is_positive(TypeParam(-1)));
 
-  EXPECT_EQ(true, carl::isNegative(TypeParam(-1)));
-  EXPECT_EQ(false, carl::isNegative(TypeParam(0)));
-  EXPECT_EQ(false, carl::isNegative(TypeParam(1)));
+  EXPECT_EQ(true, carl::is_negative(TypeParam(-1)));
+  EXPECT_EQ(false, carl::is_negative(TypeParam(0)));
+  EXPECT_EQ(false, carl::is_negative(TypeParam(1)));
 }
 
 //TYPED_TEST(IntegerNumbers, gdc_lcm) { // not working because of native int
@@ -84,8 +84,8 @@ TYPED_TEST_CASE(RationalNumbers, RationalTypes);
 
 TYPED_TEST(RationalNumbers, Constructors) {
 	TypeParam a = TypeParam(2)/TypeParam(3);
-	EXPECT_EQ(2, carl::getNum(a));
-	EXPECT_EQ(3, carl::getDenom(a));
+	EXPECT_EQ(2, carl::get_num(a));
+	EXPECT_EQ(3, carl::get_denom(a));
 }
 
 TYPED_TEST(RationalNumbers, Squareroot) {
@@ -200,31 +200,31 @@ TYPED_TEST(RationalNumbers, sin_cos) {
 }
 
 TYPED_TEST(RationalNumbers, Constant_Neg_Pos) {
-  EXPECT_EQ(true, carl::isZero(TypeParam(0)));
-  EXPECT_EQ(false, carl::isZero(TypeParam(1)/TypeParam(10)));
-  EXPECT_EQ(false, carl::isZero(TypeParam(-1)/TypeParam(10)));
+  EXPECT_EQ(true, carl::is_zero(TypeParam(0)));
+  EXPECT_EQ(false, carl::is_zero(TypeParam(1)/TypeParam(10)));
+  EXPECT_EQ(false, carl::is_zero(TypeParam(-1)/TypeParam(10)));
 
-  EXPECT_EQ(true, carl::isOne(TypeParam(1)));
-  EXPECT_EQ(true, carl::isOne(TypeParam(2)/TypeParam(2)));
-  EXPECT_EQ(false, carl::isOne(TypeParam(11)/TypeParam(10)));
-  EXPECT_EQ(false, carl::isOne(TypeParam(0)));
-  EXPECT_EQ(false, carl::isOne(TypeParam(-1)/TypeParam(10)));
+  EXPECT_EQ(true, carl::is_one(TypeParam(1)));
+  EXPECT_EQ(true, carl::is_one(TypeParam(2)/TypeParam(2)));
+  EXPECT_EQ(false, carl::is_one(TypeParam(11)/TypeParam(10)));
+  EXPECT_EQ(false, carl::is_one(TypeParam(0)));
+  EXPECT_EQ(false, carl::is_one(TypeParam(-1)/TypeParam(10)));
 
-  EXPECT_EQ(true, carl::isPositive(TypeParam(1)/TypeParam(10)));
-  EXPECT_EQ(false, carl::isPositive(TypeParam(0)));
-  EXPECT_EQ(false, carl::isPositive(TypeParam(-1)/TypeParam(10)));
+  EXPECT_EQ(true, carl::is_positive(TypeParam(1)/TypeParam(10)));
+  EXPECT_EQ(false, carl::is_positive(TypeParam(0)));
+  EXPECT_EQ(false, carl::is_positive(TypeParam(-1)/TypeParam(10)));
 
-  EXPECT_EQ(true, carl::isNegative(TypeParam(-1)/TypeParam(10)));
-  EXPECT_EQ(false, carl::isNegative(TypeParam(0)));
-  EXPECT_EQ(false, carl::isNegative(TypeParam(1)/TypeParam(10)));
+  EXPECT_EQ(true, carl::is_negative(TypeParam(-1)/TypeParam(10)));
+  EXPECT_EQ(false, carl::is_negative(TypeParam(0)));
+  EXPECT_EQ(false, carl::is_negative(TypeParam(1)/TypeParam(10)));
 }
 
 TYPED_TEST(RationalNumbers, ToDouble_Int) {
-  double res = carl::toDouble(TypeParam(1)/TypeParam(10));
+  double res = carl::to_double(TypeParam(1)/TypeParam(10));
   EXPECT_GE(res, 0.05);
   EXPECT_LE(res, 0.15);
 
   typedef typename carl::IntegralType<TypeParam>::type IntType;
-  EXPECT_EQ(42, carl::toInt<IntType>(TypeParam(42)/TypeParam(1)));
-  EXPECT_EQ(-42, carl::toInt<IntType>(TypeParam(42)/TypeParam(-1)));
+  EXPECT_EQ(42, carl::to_int<IntType>(TypeParam(42)/TypeParam(1)));
+  EXPECT_EQ(-42, carl::to_int<IntType>(TypeParam(42)/TypeParam(-1)));
 }

@@ -98,7 +98,7 @@ class FLOAT_T<mpfr_t>
 		FLOAT_T(const FLOAT_T<F>& _float, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
 		{
 			mpfr_init2(mValue,_prec);
-			mpfr_set_d(mValue,_float.toDouble(),mpfr_rnd_t(_rnd));
+			mpfr_set_d(mValue,_float.to_double(),mpfr_rnd_t(_rnd));
 		}
 
 		~FLOAT_T()
@@ -589,7 +589,7 @@ class FLOAT_T<mpfr_t>
 		 * conversion operators
 		 */
 
-		double toDouble(CARL_RND _rnd=CARL_RND::N) const
+		double to_double(CARL_RND _rnd=CARL_RND::N) const
 		{
 			return mpfr_get_d(mValue, mpfr_rnd_t(_rnd));
 		}
@@ -600,7 +600,7 @@ class FLOAT_T<mpfr_t>
 		 */
 		explicit operator int() const
 		{
-			return (int)this->toDouble();
+			return (int)this->to_double();
 		}
 
 		/**
@@ -609,7 +609,7 @@ class FLOAT_T<mpfr_t>
 		 */
 		explicit operator long() const
 		{
-			return (long)(this->toDouble());
+			return (long)(this->to_double());
 		}
 
 		/**
@@ -618,7 +618,7 @@ class FLOAT_T<mpfr_t>
 		 */
 		explicit operator double() const
 		{
-			return this->toDouble();
+			return this->to_double();
 		}
 
 
@@ -684,7 +684,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		template<typename Other, EnableIf< is_number_type<Other>, Not<is_interval_type<Other>> > = dummy>
 		friend FLOAT_T<mpfr_t> operator +(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -692,7 +692,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		template<typename Other, EnableIf< is_number_type<Other>, Not<is_interval_type<Other>> > = dummy>
 		friend FLOAT_T<mpfr_t> operator +(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
 		{
 			return _rhs+_lhs;
@@ -719,7 +719,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		template<typename Other, EnableIf< is_number_type<Other>, Not<is_interval_type<Other>> > = dummy>
 		friend FLOAT_T<mpfr_t> operator -(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -727,7 +727,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		template<typename Other, EnableIf< is_number_type<Other>, Not<is_interval_type<Other>> > = dummy>
 		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -749,7 +749,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		template<typename Other, EnableIf< is_number_type<Other>, Not<is_interval_type<Other>> > = dummy>
 		friend FLOAT_T<mpfr_t> operator *(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -758,7 +758,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		template<typename Other, EnableIf< is_number_type<Other>, Not<is_interval_type<Other>> > = dummy>
 		friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
 		{
 			return _rhs*_lhs;
@@ -802,7 +802,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		template<typename Other, EnableIf< is_number_type<Other>, Not<is_interval_type<Other>> > = dummy>
 		friend FLOAT_T<mpfr_t> operator /(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
@@ -811,7 +811,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		template<typename Other, EnableIf< is_number_type<Other>, Not<is_interval_type<Other>> > = dummy>
 		friend FLOAT_T<mpfr_t> operator /(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
 		{
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
@@ -933,7 +933,7 @@ class FLOAT_T<mpfr_t>
 		 * @param intRep Parameter where we write the integer to.
 		 * @param a input mpfr float.
 		 */
-		static void toInt(mpz_t& intRep, const mpfr_t a) {
+		static void to_int(mpz_t& intRep, const mpfr_t a) {
 
 			//std::cout << "Bits per limb " << mp_bits_per_limb << std::endl;
 			//std::cout << "Number limbs " << std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb)) << std::endl;
@@ -1027,8 +1027,8 @@ class FLOAT_T<mpfr_t>
 			//std::cout << "Offset " << offset << std::endl;
 
 			// get integer representations, we use absolute values for simplicity.
-			toInt(intRepA, a);
-			toInt(intRepB, b);
+			to_int(intRepA, a);
+			to_int(intRepB, b);
 			mpz_abs(intRepA, intRepA);
 			mpz_abs(intRepB, intRepB);
 
@@ -1051,7 +1051,7 @@ class FLOAT_T<mpfr_t>
 						mpfr_nextbelow(zero);
 					}
 
-					toInt(intRepZero, zero);
+					to_int(intRepZero, zero);
 					mpz_abs(intRepZero, intRepZero);
 					mpz_sub(dist, intRepB,intRepZero);
 					mpz_add_ui(dist,dist, 1);
@@ -1072,7 +1072,7 @@ class FLOAT_T<mpfr_t>
 					mpfr_nextbelow(zero);
 				}
 
-				toInt(intRepZero, zero);
+				to_int(intRepZero, zero);
 				mpz_abs(intRepZero, intRepZero);
 				mpz_sub(dist, intRepA,intRepZero);
 				mpz_add_ui(dist,dist, 1);
@@ -1105,9 +1105,9 @@ class FLOAT_T<mpfr_t>
 				mpz_t d2;
 				mpz_init(d2);
 
-				toInt(intRepZeroA, zeroA);
+				to_int(intRepZeroA, zeroA);
 				mpz_abs(intRepZeroA, intRepZeroA);
-				toInt(intRepZeroB, zeroB);
+				to_int(intRepZeroB, zeroB);
 				mpz_abs(intRepZeroB, intRepZeroB);
 
 				mpz_sub(dist, intRepA,intRepZeroA);

@@ -177,7 +177,7 @@ static bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable
 					auto iter = coeffs.find(0);
 					if (iter != coeffs.end()) constantCoeff = iter->second;
 					// b!=0
-					assert(!carl::isZero(coeffs.rbegin()->second));
+					assert(!carl::is_zero(coeffs.rbegin()->second));
 					// Create state [x -> -c/b]
 					SqrtEx<Poly> sqEx(-constantCoeff, Poly(), coeffs.rbegin()->second, Poly());
 					results.push_back({std::move(sqEx), {}});

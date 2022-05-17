@@ -50,7 +50,7 @@ public:
                 if(std::distance(first, last) == 1 && first->isUnivariate()) {
                         CARL_LOG_TRACE("carl.thom.tarski.manager", "as a UNIVARIATE manager");
                         mZ = carl::to_univariate_polynomial(*first);
-                        CARL_LOG_ASSERT("carl.thom.tarski.manager", !carl::isZero(mZ), "");
+                        CARL_LOG_ASSERT("carl.thom.tarski.manager", !carl::is_zero(mZ), "");
                         mDer = derivative(mZ);
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", this->isUnivariateManager(), "");
                 }
@@ -75,7 +75,7 @@ public:
         
         QueryResultType operator()(const Polynomial& p) const {
                 CARL_LOG_TRACE("carl.thom.tarski.manager", "computing taq on " << p << " ... ");
-                if(carl::isZero(p)) return 0;
+                if(carl::is_zero(p)) return 0;
                 QueryResultType res;
                 
                 // return cached query result
@@ -128,7 +128,7 @@ public:
 private:
         
         bool isUnivariateManager() const {
-                return !carl::isZero(mZ);
+                return !carl::is_zero(mZ);
         }
         
         /*

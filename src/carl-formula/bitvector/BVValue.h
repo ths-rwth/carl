@@ -75,7 +75,7 @@ public:
 		return "#b" + output;
 	}
 
-	bool isZero() const {
+	bool is_zero() const {
 		return mValue.none();
 	}
 

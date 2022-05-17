@@ -35,10 +35,10 @@ namespace boost { namespace spirit { namespace traits {
 #endif
 #if BOOST_VERSION < 107000
 	template<> inline bool is_equal_to_one(const mpz_class& value) {
-		return carl::isOne(value);
+		return carl::is_one(value);
 	}
 	template<> inline bool is_equal_to_one(const mpq_class& value) {
-		return carl::isOne(value);
+		return carl::is_one(value);
 	}
 #endif
 }}}

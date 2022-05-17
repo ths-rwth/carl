@@ -17,32 +17,32 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 namespace carl {
 
 template<typename T>
-inline bool isZero(const T& t) {
+inline bool is_zero(const T& t) {
 	return t == 0;
 }
 
 template<typename T>
-inline bool isOne(const T& t) {
+inline bool is_one(const T& t) {
 	return t == 1;
 }
 
-template<typename T, EnableIf<has_isPositive<T>>>
-inline bool isPositive(const T& t) {
+template<typename T, EnableIf<has_is_positive<T>>>
+inline bool is_positive(const T& t) {
 	return t.is_positive();
 }
 
-template<typename T, DisableIf<has_isPositive<T>>>
-inline bool isPositive(const T& t) {
+template<typename T, DisableIf<has_is_positive<T>>>
+inline bool is_positive(const T& t) {
 	return t > 0;
 }
 
-template<typename T, EnableIf<has_isNegative<T>>>
-inline bool isNegative(const T& t) {
+template<typename T, EnableIf<has_is_negative<T>>>
+inline bool is_negative(const T& t) {
 	return t.is_negative();
 }
 
-template<typename T, DisableIf<has_isNegative<T>>>
-inline bool isNegative(const T& t) {
+template<typename T, DisableIf<has_is_negative<T>>>
+inline bool is_negative(const T& t) {
 	return t < 0;
 }
 
@@ -57,7 +57,7 @@ inline bool isNegative(const T& t) {
  * @param exp The exponent.
  * @return `basis` to the power of `exp`.
  */
-template<typename T, DisableIf<is_interval<T>> = dummy>
+template<typename T, DisableIf<is_interval_type<T>> = dummy>
 T pow(const T& basis, std::size_t exp) {
 	T res = carl::constant_one<T>().get();
 	T mult = basis;

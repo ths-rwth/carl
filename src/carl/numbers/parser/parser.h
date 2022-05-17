@@ -24,7 +24,7 @@ namespace parser {
 		template<typename Attr>
 		bool operator()(const Attr& n, std::size_t exp) {
 			std::cout << "Checking mod(" << n << ", " << Attr(carl::pow(Attr(10), exp)) << ")" << std::endl;
-			return isZero(carl::mod(n, Attr(carl::pow(Attr(10), exp))));
+			return is_zero(carl::mod(n, Attr(carl::pow(Attr(10), exp))));
 		}
 	};
 	template<> struct isDivisible<false> {
@@ -40,7 +40,7 @@ namespace parser {
 	 */
 	template<typename T>
 	struct RationalPolicies : qi::real_policies<T> {
-		static constexpr bool T_is_int = carl::is_subset_of_integers<T>::value;
+		static constexpr bool T_is_int = carl::is_subset_of_integers_type<T>::value;
 		static constexpr bool allow_leading_dot = true;
 		static constexpr bool allow_trailing_dot = true;
 		static constexpr bool expect_dot = false;
@@ -58,7 +58,7 @@ namespace parser {
 				int local_frac_digits;
 				bool res = qi::real_policies<T>::parse_frac_n(first, last, local_attr, local_frac_digits);
 				if (!res) return false;
-				if (!isZero(local_attr)) {
+				if (!is_zero(local_attr)) {
 					first = save;
 					return false;
 				}
@@ -75,7 +75,7 @@ namespace parser {
 				bool res = qi::real_policies<T>::parse_frac_n(first, last, local_attr);
 				first = save;
 				if (!res) return false;
-				if (!isZero(local_attr)) {
+				if (!is_zero(local_attr)) {
 					return false;
 				}
 			}

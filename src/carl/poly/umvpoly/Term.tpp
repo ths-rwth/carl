@@ -64,14 +64,14 @@ Term<Coefficient>::Term(const Coefficient& c, Variable v, uint e):
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::divide(const Coefficient& c) const
 {
-	assert(!carl::isZero(c));
+	assert(!carl::is_zero(c));
 	return Term(mCoeff / c, mMonomial);
 }
 
 template<typename Coefficient>
 bool Term<Coefficient>::divide(const Coefficient& c, Term& res) const
 {
-	assert(!carl::isZero(c));
+	assert(!carl::is_zero(c));
 	res.mCoeff = mCoeff / c;
 	res.mMonomial = mMonomial;
 	return true;
@@ -106,7 +106,7 @@ bool Term<Coefficient>::divide(const Monomial::Arg& m, Term& res) const
 template<typename Coefficient>
 bool Term<Coefficient>::divide(const Term& t, Term& res) const
 {
-	assert(!carl::isZero(t.mCoeff));
+	assert(!carl::is_zero(t.mCoeff));
 	if (mMonomial) {
 		if (t.mMonomial) {
 			if (mMonomial->divide(t.mMonomial, res.mMonomial)) {
@@ -128,7 +128,7 @@ bool Term<Coefficient>::divide(const Term& t, Term& res) const
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) const
 {
-	assert(carl::isOne(coeff()));
+	assert(carl::is_one(coeff()));
 	Monomial::Arg tmp = Monomial::calcLcmAndDivideBy(monomial(), m);
 	if(tmp == nullptr)
 	{
@@ -157,7 +157,7 @@ bool Term<Coefficient>::sqrt(Term<Coefficient>& res) const {
 }
 
 template<typename Coefficient>
-template<typename C, EnableIf<is_field<C>>>
+template<typename C, EnableIf<is_field_type<C>>>
 bool Term<Coefficient>::divisible(const Term& t) const {
 	if (this->monomial() == nullptr) return t.monomial() == nullptr;
 	if (t.monomial() == nullptr) return true;
@@ -165,7 +165,7 @@ bool Term<Coefficient>::divisible(const Term& t) const {
 }
 
 template<typename Coefficient>
-template<typename C, DisableIf<is_field<C>>>
+template<typename C, DisableIf<is_field_type<C>>>
 bool Term<Coefficient>::divisible(const Term& t) const {
 	if (carl::remainder(this->coeff(), t.coeff()) != Coefficient(0)) return false;
 	if (this->monomial() == nullptr) return t.monomial() == nullptr;
@@ -210,12 +210,12 @@ bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
 	if (lhs.monomial() != rhs) return false;
-	return carl::isOne(lhs.coeff());
+	return carl::is_one(lhs.coeff());
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, Variable rhs) {
 	if (lhs.monomial() != rhs) return false;
-	return carl::isOne(lhs.coeff());
+	return carl::is_one(lhs.coeff());
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Coeff& rhs) {
@@ -267,13 +267,13 @@ bool operator<(const Coeff& lhs, const Term<Coeff>& rhs) {
 template<typename Coeff>
 const Term<Coeff> operator/(const Term<Coeff>& lhs, uint rhs)
 {
-	return Term<Coeff>(lhs.coeff()/carl::fromInt<Coeff>(rhs), lhs.monomial());
+	return Term<Coeff>(lhs.coeff()/carl::from_int<Coeff>(rhs), lhs.monomial());
 }
 
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs) {
 	if (rhs.monomial()) {
-		if (!carl::isOne(rhs.coeff())) {
+		if (!carl::is_one(rhs.coeff())) {
 			os << rhs.coeff() << "*";
 		}
 		os << rhs.monomial();

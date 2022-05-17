@@ -32,28 +32,12 @@ namespace carl {
  *
  * The following functions return informations about the given numbers.
  */
-inline bool isZero(const mpz_class& n) {
-	return constant_zero<mpz_class>::get() == n;
-}
-
-inline bool isZero(const mpq_class& n) {
-	return constant_zero<mpz_class>::get() == n;
-}
-
 inline bool is_zero(const mpz_class& n) {
 	return constant_zero<mpz_class>::get() == n;
 }
 
 inline bool is_zero(const mpq_class& n) {
 	return constant_zero<mpz_class>::get() == n;
-}
-
-inline bool isOne(const mpz_class& n) {
-	return constant_one<mpz_class>::get() == n;
-}
-
-inline bool isOne(const mpq_class& n) {
-	return constant_one<mpz_class>::get() == n;
 }
 
 inline bool is_one(const mpz_class& n) {
@@ -64,43 +48,43 @@ inline bool is_one(const mpq_class& n) {
 	return constant_one<mpz_class>::get() == n;
 }
 
-inline bool isPositive(const mpz_class& n) {
+inline bool is_positive(const mpz_class& n) {
 	return n > constant_zero<mpz_class>::get();
 }
 
-inline bool isPositive(const mpq_class& n) {
+inline bool is_positive(const mpq_class& n) {
 	return n > constant_zero<mpq_class>::get();
 }
 
-inline bool isNegative(const mpz_class& n) {
+inline bool is_negative(const mpz_class& n) {
 	return n < constant_zero<mpz_class>::get();
 }
 
-inline bool isNegative(const mpq_class& n) {
+inline bool is_negative(const mpq_class& n) {
 	return n < constant_zero<mpq_class>::get();
 }
 
-inline mpz_class getNum(const mpq_class& n) {
+inline mpz_class get_num(const mpq_class& n) {
 	return n.get_num();
 }
 
-inline mpz_class getNum(const mpz_class& n) {
+inline mpz_class get_num(const mpz_class& n) {
 	return n;
 }
 
-inline mpz_class getDenom(const mpq_class& n) {
+inline mpz_class get_denom(const mpq_class& n) {
 	return n.get_den();
 }
 
-inline mpz_class getDenom(const mpz_class& n) {
+inline mpz_class get_denom(const mpz_class& n) {
 	return n;
 }
 
-inline bool isInteger(const mpq_class& n) {
+inline bool is_integer(const mpq_class& n) {
 	 return 0 != mpz_divisible_p(n.get_num_mpz_t(), n.get_den_mpz_t());
 }
 
-inline bool isInteger(const mpz_class& /*unused*/) {
+inline bool is_integer(const mpz_class& /*unused*/) {
 	return true;
 }
 
@@ -118,7 +102,7 @@ inline std::size_t bitsize(const mpz_class& n) {
  * @return Bit size of n.
  */
 inline std::size_t bitsize(const mpq_class& n) {
-	return mpz_sizeinbase(getNum(n).__get_mp(),2) + mpz_sizeinbase(getDenom(n).__get_mp(),2);
+	return mpz_sizeinbase(get_num(n).__get_mp(),2) + mpz_sizeinbase(get_denom(n).__get_mp(),2);
 }
 
 /**
@@ -127,31 +111,31 @@ inline std::size_t bitsize(const mpq_class& n) {
  * The following function convert types to other types.
  */
 
-inline double toDouble(const mpq_class& n) {
+inline double to_double(const mpq_class& n) {
 	return n.get_d();
 }
-inline double toDouble(const mpz_class& n) {
+inline double to_double(const mpz_class& n) {
 	return n.get_d();
 }
 
 template<typename Integer>
-inline Integer toInt(const mpz_class& n);
+inline Integer to_int(const mpz_class& n);
 
 template<>
-inline sint toInt<sint>(const mpz_class& n) {
+inline sint to_int<sint>(const mpz_class& n) {
     assert(n <= std::numeric_limits<signed long>::max());
     assert(n >= std::numeric_limits<signed long>::min());
     return mpz_get_si(n.get_mpz_t());
 }
 template<>
-inline uint toInt<uint>(const mpz_class& n) {
+inline uint to_int<uint>(const mpz_class& n) {
     assert(n <= std::numeric_limits<unsigned long>::max());
     assert(n >= std::numeric_limits<unsigned long>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
 
 template<typename Integer>
-inline Integer toInt(const mpq_class& n);
+inline Integer to_int(const mpq_class& n);
 
 /**
  * Convert a fraction to an integer.
@@ -160,16 +144,16 @@ inline Integer toInt(const mpq_class& n);
  * @return An integer.
  */
 template<>
-inline mpz_class toInt<mpz_class>(const mpq_class& n) {
-	assert(isInteger(n));
-	return getNum(n);
+inline mpz_class to_int<mpz_class>(const mpq_class& n) {
+	assert(is_integer(n));
+	return get_num(n);
 }
 
 template<typename To, typename From>
-inline To fromInt(const From& n);
+inline To from_int(const From& n);
 
 template<>
-inline mpz_class fromInt(const uint& n) {
+inline mpz_class from_int(const uint& n) {
 	mpz_class res;
 	mpz_set_ui(res.get_mpz_t(), n);
 	return res;
@@ -179,7 +163,7 @@ inline mpz_class fromInt(const uint& n) {
 }
 
 template<>
-inline mpz_class fromInt(const sint& n) {
+inline mpz_class from_int(const sint& n) {
 	mpz_class res;
 	mpz_set_si(res.get_mpz_t(), n);
 	return res;
@@ -189,13 +173,13 @@ inline mpz_class fromInt(const sint& n) {
 }
 
 template<>
-inline mpq_class fromInt(const uint& n) {
-	return fromInt<mpz_class>(n);
+inline mpq_class from_int(const uint& n) {
+	return from_int<mpz_class>(n);
 }
 
 template<>
-inline mpq_class fromInt(const sint& n) {
-	return fromInt<mpz_class>(n);
+inline mpq_class from_int(const sint& n) {
+	return from_int<mpz_class>(n);
 }
 
 /**
@@ -204,12 +188,12 @@ inline mpq_class fromInt(const sint& n) {
  * @return n as unsigned.
  */
 template<>
-inline sint toInt<sint>(const mpq_class& n) {
-    return toInt<sint>(toInt<mpz_class>(n));
+inline sint to_int<sint>(const mpq_class& n) {
+    return to_int<sint>(to_int<mpz_class>(n));
 }
 template<>
-inline uint toInt<uint>(const mpq_class& n) {
-	return toInt<uint>(toInt<mpz_class>(n));
+inline uint to_int<uint>(const mpq_class& n) {
+	return to_int<uint>(to_int<mpz_class>(n));
 }
 
 template<typename T>
@@ -278,12 +262,12 @@ inline mpq_class abs(const mpq_class& n) {
 }
 
 inline mpz_class round(const mpq_class& n) {
-	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
+	if (is_zero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
 	mpz_class res;
 	mpz_class rem;
 	mpz_fdiv_qr(res.get_mpz_t(), rem.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
 	rem *= 2;
-	if (rem >= getDenom(n)) ++res;
+	if (rem >= get_denom(n)) ++res;
 	return res;
 }
 
@@ -292,7 +276,7 @@ inline mpz_class round(const mpz_class& n) {
 }
 
 inline mpz_class floor(const mpq_class& n) {
-	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
+	if (is_zero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
 	mpz_class res;
 	mpz_fdiv_q(res.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
 	return res;
@@ -303,7 +287,7 @@ inline mpz_class floor(const mpz_class& n) {
 }
 
 inline mpz_class ceil(const mpq_class& n) {
-	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
+	if (is_zero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
 	mpz_class res;
 	mpz_cdiv_q(res.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
 	return res;
@@ -326,9 +310,9 @@ inline mpz_class lcm(const mpz_class& a, const mpz_class& b) {
 
 inline mpq_class gcd(const mpq_class& a, const mpq_class& b) {
     mpz_class resNum;
-	mpz_gcd(resNum.get_mpz_t(), getNum(a).get_mpz_t(), getNum(b).get_mpz_t());
+	mpz_gcd(resNum.get_mpz_t(), get_num(a).get_mpz_t(), get_num(b).get_mpz_t());
 	mpz_class resDen;
-	mpz_lcm(resDen.get_mpz_t(), getDenom(a).get_mpz_t(), getDenom(b).get_mpz_t());
+	mpz_lcm(resDen.get_mpz_t(), get_denom(a).get_mpz_t(), get_denom(b).get_mpz_t());
 	mpq_class resqNum;
 	mpq_set_z(resqNum.get_mpq_t(), resNum.get_mpz_t());
 	mpq_class resqDen;
@@ -364,9 +348,9 @@ inline mpq_class& gcd_assign(mpq_class& a, const mpq_class& b) {
 
 inline mpq_class lcm(const mpq_class& a, const mpq_class& b) {
     mpz_class resNum;
-	mpz_lcm(resNum.get_mpz_t(), getNum(a).get_mpz_t(), getNum(b).get_mpz_t());
+	mpz_lcm(resNum.get_mpz_t(), get_num(a).get_mpz_t(), get_num(b).get_mpz_t());
 	mpz_class resDen;
-	mpz_gcd(resDen.get_mpz_t(), getDenom(a).get_mpz_t(), getDenom(b).get_mpz_t());
+	mpz_gcd(resDen.get_mpz_t(), get_denom(a).get_mpz_t(), get_denom(b).get_mpz_t());
 	mpq_class resqNum;
 	mpq_set_z(resqNum.get_mpq_t(), resNum.get_mpz_t());
 	mpq_class resqDen;
@@ -449,7 +433,7 @@ inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
     //       make it that complicated, as mpz_mod always returns positive integer. Maybe there is a better way.
 	mpz_class res;
 	mpz_mod(res.get_mpz_t(), abs(n).get_mpz_t(), m.get_mpz_t());
-	return isNegative(n) ? mpz_class(-res) : res;
+	return is_negative(n) ? mpz_class(-res) : res;
 }
 
 inline mpz_class remainder(const mpz_class& n, const mpz_class& m) {
@@ -462,7 +446,7 @@ inline mpz_class quotient(const mpz_class& n, const mpz_class& d)
     //       make it that complicated, as mpz_div does round differently. Maybe there is a better way.
 	mpz_class res;
 	mpz_div(res.get_mpz_t(), abs(n).get_mpz_t(), abs(d).get_mpz_t());
-	return isNegative(n) == isNegative(d) ? res : mpz_class(-res);
+	return is_negative(n) == is_negative(d) ? res : mpz_class(-res);
 }
 
 inline mpz_class operator/(const mpz_class& n, const mpz_class& d)

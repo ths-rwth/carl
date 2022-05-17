@@ -17,7 +17,7 @@ UnivariatePolynomial<Coeff> primitive_euclidean(const UnivariatePolynomial<Coeff
 	UnivariatePolynomial<Coeff> c = primitive_part(a.normalized());
 	UnivariatePolynomial<Coeff> d = primitive_part(b.normalized());
 	
-	while (!isZero(d)) {
+	while (!is_zero(d)) {
 		UnivariatePolynomial<Coeff> r = c.prem(d);
 		c = d;
 		d = primitive_part(r.normalized());

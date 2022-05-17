@@ -31,7 +31,7 @@ public:
 		return it->second;
 	}
 	GiNaC::ex operator()(const std::pair<carl::Variable, carl::exponent>& p) {
-		assert(carl::fitsWithin<unsigned long>(p.second));
+		assert(carl::fits_within<unsigned long>(p.second));
 		return GiNaC::pow((*this)(p.first), static_cast<unsigned long>(p.second));
 	}
 	GiNaC::ex operator()(const carl::Monomial& m) {

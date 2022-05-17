@@ -103,7 +103,7 @@ private:
 	
 	template<typename Coeff>
 	void write(const MultivariatePolynomial<Coeff>& mp) {
-		if (carl::isZero(mp)) *this << "0";
+		if (carl::is_zero(mp)) *this << "0";
 		else if (mp.nrTerms() == 1) *this << mp.lterm();
 		else {
 			for (auto it = mp.rbegin(); it != mp.rend(); ++it) {
@@ -128,7 +128,7 @@ private:
 	void write(const Term<Coeff>& t) {
 		if (!t.monomial()) *this << "(" << t.coeff() << ")";
 		else {
-			if (carl::isOne(t.coeff())) {
+			if (carl::is_one(t.coeff())) {
 				*this << t.monomial();
 			} else {
 				*this << "(" << t.coeff() << ")*" << t.monomial();

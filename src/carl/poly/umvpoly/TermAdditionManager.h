@@ -104,7 +104,7 @@ public:
 
     template<bool SizeUnknown, bool NewMonomials = true>
 	void addTerm(TAMId id, const TermPtr& term) {
-		assert(!isZero(term));
+		assert(!is_zero(term));
         Tuple& data = *id;
 		assert(std::get<2>(data));
 		TermIDs& termIDs = std::get<0>(data);
@@ -117,9 +117,9 @@ public:
 				if (SizeUnknown && locId >= terms.size()) terms.resize(locId + 1);
 				assert(locId < terms.size());
                 TermPtr& t = terms[locId];
-				if (!carl::isZero(t.coeff())) {
+				if (!carl::is_zero(t.coeff())) {
 					Coeff coeff = t.coeff() + term.coeff();
-					if (carl::isZero(coeff)) {
+					if (carl::is_zero(coeff)) {
 						termIDs[monId] = 0;
 						t = std::move(TermType());
 					} else {
@@ -149,8 +149,8 @@ public:
 		for (std::size_t i = 1; i < terms.size(); i++) {
 			if (Ordering::less(terms[max], terms[i])) max = i;
 		}
-		assert(!terms[max].isConstant() || isZero(terms[max]));
-		if (isZero(terms[max])) return TermType(std::get<3>(data));
+		assert(!terms[max].isConstant() || is_zero(terms[max]));
+		if (is_zero(terms[max])) return TermType(std::get<3>(data));
 		else return terms[max];
 	}
     
@@ -160,11 +160,11 @@ public:
 		Terms& t = std::get<1>(data);
         TermIDs& termIDs = std::get<0>(data);
         #ifdef SWAP_TERMS
-		if (!isZero(std::get<3>(data))) {
+		if (!is_zero(std::get<3>(data))) {
 			t[0] = std::move(TermType(std::move(std::get<3>(data)), nullptr));
 		}
         for (auto i = t.begin(); i != t.end();) {
-			if (isZero(*i)) {
+			if (is_zero(*i)) {
 				//Avoid invalidating pointer for last element
 				if (i == --t.end()) {
 					t.pop_back();
@@ -182,7 +182,7 @@ public:
 		t.clear();
         #else
         terms.clear();
-        if (!isZero(std::get<3>(data))) {
+        if (!is_zero(std::get<3>(data))) {
 			terms.push_back( std::make_shared<const TermType>(std::move(std::get<3>(data)), nullptr) );
 		}
         auto i = t.begin();
