@@ -13,7 +13,7 @@
 
 #include "evaluation.h"
 
-#include <boost/optional.hpp>
+#include <optional>
 
 namespace carl {
 
@@ -25,7 +25,7 @@ public:
 	using NumberType = typename Pol::NumberType;
 
 private:
-	boost::optional<std::pair<Pol, Pol>> mPolynomialQuotient;
+	std::optional<std::pair<Pol, Pol>> mPolynomialQuotient;
 	CoeffType mNumberQuotient;
 	bool mIsSimplified;
 
@@ -87,7 +87,7 @@ public:
 		assert(isConstant() || !carl::is_zero(denominatorAsPolynomial()));
 	}
 
-	explicit RationalFunction(boost::optional<std::pair<Pol, Pol>>&& quotient, const CoeffType& num, bool simplified)
+	explicit RationalFunction(std::optional<std::pair<Pol, Pol>>&& quotient, const CoeffType& num, bool simplified)
 		: mPolynomialQuotient(std::move(quotient)),
 		  mNumberQuotient(num),
 		  mIsSimplified(simplified) {}
@@ -176,9 +176,9 @@ public:
 	RationalFunction inverse() const {
 		assert(!this->is_zero());
 		if (isConstant()) {
-			return RationalFunction(boost::none, 1 / mNumberQuotient, mIsSimplified);
+			return RationalFunction(std::nullopt, 1 / mNumberQuotient, mIsSimplified);
 		} else {
-			return RationalFunction(boost::optional<std::pair<Pol, Pol>>(std::pair<Pol, Pol>(mPolynomialQuotient->second, mPolynomialQuotient->first)), carl::constant_zero<CoeffType>().get(), mIsSimplified);
+			return RationalFunction(std::optional<std::pair<Pol, Pol>>(std::pair<Pol, Pol>(mPolynomialQuotient->second, mPolynomialQuotient->first)), carl::constant_zero<CoeffType>().get(), mIsSimplified);
 		}
 	}
 

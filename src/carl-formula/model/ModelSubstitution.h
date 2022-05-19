@@ -4,7 +4,7 @@
 #include <map>
 #include <memory>
 
-#include <boost/optional.hpp>
+#include <optional>
 
 #include <carl-formula/formula/Formula.h>
 #include <carl/extended/MultivariateRoot.h>
@@ -25,7 +25,7 @@ namespace carl {
 	template<typename Rational, typename Poly>
 	class ModelSubstitution {
 	private:
-		mutable boost::optional<ModelValue<Rational, Poly>> mCachedValue;
+		mutable std::optional<ModelValue<Rational, Poly>> mCachedValue;
 		
 	protected:
 		/// Evaluate this substitution with respect to the given model.
@@ -35,13 +35,13 @@ namespace carl {
 		virtual ~ModelSubstitution() noexcept = default;
 		
 		const ModelValue<Rational, Poly>& evaluate(const Model<Rational, Poly>& model) const {
-			if (mCachedValue == boost::none) {
+			if (mCachedValue == std::nullopt) {
 				mCachedValue = evaluateSubstitution(model);
 			}
 			return *mCachedValue;
 		}
 		void resetCache() const {
-			mCachedValue = boost::none;
+			mCachedValue = std::nullopt;
 		}
 		
 		/// Check if this substitution needs the given model variable.

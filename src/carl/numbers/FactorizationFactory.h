@@ -2,7 +2,7 @@
 
 #include "PrimeFactory.h"
 
-#include <boost/optional.hpp>
+#include <optional>
 
 #include <vector>
 
@@ -25,7 +25,7 @@ template<>
 class FactorizationFactory<uint> {
 private:
 	PrimeFactory<uint> mPrimes;
-	std::vector<boost::optional<std::vector<uint>>> mCache;
+	std::vector<std::optional<std::vector<uint>>> mCache;
 public:
 	FactorizationFactory() {
 		mCache.emplace_back(std::vector<uint>({}));
