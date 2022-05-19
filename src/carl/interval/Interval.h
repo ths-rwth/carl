@@ -587,7 +587,7 @@ namespace carl
         explicit Interval(Rational n):
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
-            *this = Interval<double>(n, n);
+            *this = Interval<Num>(n, n);
 			Policy::sanitize(*this);
         }
 
@@ -601,7 +601,7 @@ namespace carl
         explicit Interval(Rational lower, Rational upper):
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
-            *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
+            *this = Interval<Num>(lower, BoundType::WEAK, upper, BoundType::WEAK);
 			Policy::sanitize(*this);
         }
 
@@ -658,7 +658,7 @@ namespace carl
         explicit Interval(Float n):
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
-            *this = Interval<double>(n, n);
+            *this = Interval<Num>(n, n);
 			Policy::sanitize(*this);
         }
 
@@ -672,7 +672,7 @@ namespace carl
         explicit Interval(Float lower, Float upper):
 			mContent(), mLowerBoundType(), mUpperBoundType()
         {
-            *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
+            *this = Interval<Num>(lower, BoundType::WEAK, upper, BoundType::WEAK);
 			Policy::sanitize(*this);
         }
 
