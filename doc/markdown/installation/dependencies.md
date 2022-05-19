@@ -10,13 +10,13 @@ We use C++17 and thus need at least `g++` 7 or `clang` 5.
 
 Optional dependencies
 - `ccmake` to set cmake flags.
-- `doxygen` to build the documentation. If the documentation is built without a `doxygen` installation available, `doxygen` is built requiring `flex` and `bison` packages.
+- `doxygen` and `doxygen-latex` to build the documentation.
 - `gtest` to build the test cases.
 
-Additionally, CArL requires a few external libraries:
+Additionally, CArL requires a few external libraries, which are installed automatically by CMake if no local version is available:
+- `boost` for several additional libraries.
 - `gmp` for calculations with large numbers.
 - `Eigen3` for numerical computations.
-- `boost` for several additional libraries.
 
 To simplify the installation process, all these libraries can be built by CArL automatically if it is not available on your system. You can do this manually by running
 @code
