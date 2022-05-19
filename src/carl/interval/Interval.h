@@ -56,13 +56,7 @@ namespace carl
     template<typename Number>
     class Interval;
 
-   /**
-    * States that `boost::variant` is indeed a `boost::variant`.
-    */
    template <class Number> struct is_interval_type<carl::Interval<Number>> : std::true_type {};
-   /**
-    * States that `const boost::variant` is indeed a `boost::variant`.
-    */
    template <class Number> struct is_interval_type<const carl::Interval<Number>> : std::true_type {};
 
     /**
