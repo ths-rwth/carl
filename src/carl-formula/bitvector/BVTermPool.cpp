@@ -30,7 +30,7 @@ namespace carl
 
     BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVTerm& _operand, std::size_t _index)
     {
-        if (_operand.isConstant()) {
+        if (_operand.is_constant()) {
             switch (_type) {
                 case BVTermType::NOT: {
                     return create(BVTermType::CONSTANT, ~_operand.value());
@@ -64,12 +64,12 @@ namespace carl
     {
         // Catch expressions leading to an "undefined" result (i.e., division by zero)
         // As of SMT-LIB 2.6, this is defined as #b111...
-        if (_second.isConstant() && _second.value().is_zero()) {
+        if (_second.is_constant() && _second.value().is_zero()) {
 			switch (_type) {
 				case BVTermType::DIV_U:
 					return create(BVTermType::CONSTANT, ~BVValue(_first.width(), 0));
 				case BVTermType::DIV_S:
-					if (_first.isConstant()) {
+					if (_first.is_constant()) {
 						if (_first.value().is_zero()) {
 							// Zero -> 1
 							return create(BVTermType::CONSTANT, BVValue(_first.width(), 1));
@@ -92,7 +92,7 @@ namespace carl
         }
 
         // Evaluate term if both terms arguments are constant
-        if (_first.isConstant() && _second.isConstant()) {
+        if (_first.is_constant() && _second.is_constant()) {
             switch (_type) {
                 case BVTermType::CONCAT: {
                     return create(BVTermType::CONSTANT, _first.value().concat(_second.value()));
@@ -163,7 +163,7 @@ namespace carl
 
     BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVTerm& _operand, std::size_t _highest, std::size_t _lowest)
     {
-        if(_operand.isConstant()) {
+        if(_operand.is_constant()) {
             if(_type == BVTermType::EXTRACT) {
                 return create(BVTermType::CONSTANT, _operand.value().extract(_highest, _lowest));
             } else {

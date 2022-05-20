@@ -14,7 +14,7 @@ TEST(BVTerm, Constant)
 	carl::BVTerm bvt(carl::BVTermType::CONSTANT, val);
 	EXPECT_EQ(8, bvt.width());
 	EXPECT_EQ(carl::BVTermType::CONSTANT, bvt.type());
-	EXPECT_TRUE(bvt.isConstant());
+	EXPECT_TRUE(bvt.is_constant());
 	EXPECT_EQ(1, bvt.complexity());
 	EXPECT_FALSE(bvt.isInvalid());
 	EXPECT_EQ(val, bvt.value());
@@ -32,7 +32,7 @@ TEST(BVTerm, Variable)
 	carl::BVTerm bvt(carl::BVTermType::VARIABLE, bvv);
 	EXPECT_EQ(8, bvt.width());
 	EXPECT_EQ(carl::BVTermType::VARIABLE, bvt.type());
-	EXPECT_FALSE(bvt.isConstant());
+	EXPECT_FALSE(bvt.is_constant());
 	EXPECT_EQ(8, bvt.complexity());
 	EXPECT_FALSE(bvt.isInvalid());
 	EXPECT_EQ(bvv, bvt.variable());

@@ -150,7 +150,7 @@ public:
 				{
 					mReasons.calculateUnion(divres.mDivisor->getReasons());
 				}
-				if(divres.mDivisor->nrTerms() > 1)
+				if(divres.mDivisor->nr_terms() > 1)
 				{
 					insert(divres.mDivisor->tail(true), divres.mFactor);
 				}

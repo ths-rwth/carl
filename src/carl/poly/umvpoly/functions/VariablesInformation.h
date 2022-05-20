@@ -80,7 +80,7 @@ public:
 		}
 		if(collectCoeff)
 		{
-			typename CoeffType::MonomType::Arg m = monomial.dropVariable(ve.first);
+			typename CoeffType::MonomType::Arg m = monomial.drop_variable(ve.first);
 			if(m == nullptr)
 			{
 				it->second.updateCoeff(ve.second, typename CoeffType::TermType(termCoeff));

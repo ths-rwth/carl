@@ -110,7 +110,7 @@ namespace carl
         }
 
         // Check correctness
-        assert( mpPolynomial == nullptr || carl::is_one(mpPolynomial->coprimeFactor()) );
+        assert( mpPolynomial == nullptr || carl::is_one(mpPolynomial->coprime_factor()) );
         assert( mpPolynomial == nullptr || mFactorization.empty() || assertFactorization() );
 
         rehash();
@@ -329,7 +329,7 @@ namespace carl
             return mIrreducible == 1;
 
         assert( mpPolynomial != nullptr );
-        if ( mpPolynomial->isLinear() )
+        if ( mpPolynomial->is_linear() )
         {
             mIrreducible = 1;
             return true;
@@ -626,13 +626,13 @@ namespace carl
                         Factorization<P> refinement;
                         for( const auto& pt : factorFactorization )
                         {
-                            if( pt.first.isConstant() )
-                                constantFactor *= pt.first.constantPart();
+                            if( pt.first.is_constant() )
+                                constantFactor *= pt.first.constant_part();
                             else
                             {
                                 FactorizedPolynomial<P> fp(pt.first, ft->first.pCache());
                                 constantFactor *= carl::pow( fp.coefficient(), pt.second );
-                                refinement.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( fp.coprimeCoefficients(), pt.second ) );
+                                refinement.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( fp.coprime_coefficients(), pt.second ) );
                             }
                         }
                         ft = _pfPair.mFactorization.erase(ft);

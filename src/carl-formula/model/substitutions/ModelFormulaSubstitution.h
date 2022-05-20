@@ -18,14 +18,14 @@ namespace carl {
 			return createSubstitutionPtr<Rational,Poly,ModelFormulaSubstitution>(mFormula);
 		}
 		virtual Formula<Poly> representingFormula( const ModelVariable& mv ) {
-			assert(mv.isVariable());
+			assert(mv.is_variable());
 			return Formula<Poly>(FormulaType::IFF, Formula<Poly>(mv.asVariable()), mFormula);
 		}
 		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& m) const {
 			return evaluate(mFormula, m);
 		}
 		virtual bool dependsOn(const ModelVariable& var) const {
-			if (var.isVariable()) {
+			if (var.is_variable()) {
 				return mFormula.variables().count(var.asVariable()) > 0;
 			} else if (var.isBVVariable()) {
 				

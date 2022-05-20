@@ -50,13 +50,13 @@ TEST_F(StringParserTest, polynomialsWithExplicitMultiplication)
     
     EXPECT_NO_THROW(sp.parseTerm<mpq_class>("x*y^3*z^2"));
     MultivariatePolynomial<mpq_class> p1 = sp.parseMultivariatePolynomial<mpq_class>("x*y^3*z^2");
-    EXPECT_EQ((unsigned)1, p1.nrTerms());
+    EXPECT_EQ((unsigned)1, p1.nr_terms());
     EXPECT_NO_THROW(sp.parseMultivariatePolynomial<mpq_class>("x^23*y^4*z"));
     MultivariatePolynomial<mpq_class> p2 = sp.parseMultivariatePolynomial<mpq_class>("x^23*y^4*z");
-    EXPECT_EQ((unsigned)1, p2.nrTerms());
+    EXPECT_EQ((unsigned)1, p2.nr_terms());
     EXPECT_NO_THROW(sp.parseMultivariatePolynomial<mpq_class>("x + y^2 + x*y"));
     MultivariatePolynomial<mpq_class> p3 = sp.parseMultivariatePolynomial<mpq_class>("x + y^2 + x*y");
-    EXPECT_EQ((unsigned)3, p3.nrTerms());
+    EXPECT_EQ((unsigned)3, p3.nr_terms());
     EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("x^y"), io::InvalidInputStringException);
     EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("3^3"), io::InvalidInputStringException);
 }

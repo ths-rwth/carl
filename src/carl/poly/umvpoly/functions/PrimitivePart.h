@@ -21,7 +21,7 @@ UnivariatePolynomial<Coeff> primitive_part(const UnivariatePolynomial<Coeff>& p)
 		// By definition
 		return p;
 	}
-	if (p.isNormal()) {
+	if (p.is_normal()) {
 		return p / carl::content(p);
 	} else {
 		return p / Coeff(-carl::content(p));
@@ -34,7 +34,7 @@ UnivariatePolynomial<Coeff> primitive_part(const UnivariatePolynomial<Coeff>& p)
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> pseudo_primitive_part(const UnivariatePolynomial<Coeff>& p) {
-	auto c = p.numericContent();
+	auto c = p.numeric_content();
 	if (is_zero(c) || is_one(c)) return p;
 	return divide(p, c).quotient;
 }

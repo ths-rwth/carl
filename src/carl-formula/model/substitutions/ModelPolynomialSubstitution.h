@@ -27,14 +27,14 @@ namespace carl {
 		}
 
 		virtual Formula<Poly> representingFormula( const ModelVariable& mv ) {
-			assert(mv.isVariable());
+			assert(mv.is_variable());
 			return Formula<Poly>(mPoly - mv.asVariable(), Relation::EQ);
 		}
 		virtual ModelValue<Rational,Poly> evaluateSubstitution(const Model<Rational,Poly>& m) const {
 			return evaluate(mPoly, m);
 		}
 		virtual bool dependsOn(const ModelVariable& var) const {
-			if (!var.isVariable()) return false;
+			if (!var.is_variable()) return false;
 			return mPoly.degree(var.asVariable()) > 0;
 		}
 		virtual void print(std::ostream& os) const {

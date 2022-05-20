@@ -18,7 +18,7 @@ bool GroebnerBase<Number>::hasFiniteMon() const {
 			bool found = true;
 			for (const auto& m : lmons) {
 				assert(is_one(m.coeff()));
-				if (m.hasNoOtherVariable(v)) {
+				if (m.has_no_other_variable(v)) {
 					found = false;
 					break;
 				}
@@ -90,7 +90,7 @@ std::vector<typename GroebnerBase<Number>::Monomial> GroebnerBase<Number>::mon()
         for(const auto& v : vars) {
                 for(const auto& m : lmons) {
                         CARL_LOG_ASSERT("carl.thom.groebner", is_one(m.coeff()), "invalid monomial!");
-                        if(m.hasNoOtherVariable(v)) {
+                        if(m.has_no_other_variable(v)) {
                                 degrees.push_back(m.monomial()->tdeg());
                                 break;
                         }

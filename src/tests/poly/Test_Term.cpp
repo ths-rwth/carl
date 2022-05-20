@@ -28,8 +28,8 @@ TYPED_TEST(TermTest, Operators)
     Term<TypeParam> t(1);
     Variable v0 = carl::fresh_real_variable("v0");
     Term<TypeParam> t0(v0);
-    EXPECT_TRUE(t0.isLinear());
-    EXPECT_TRUE(t.isLinear());
+    EXPECT_TRUE(t0.is_linear());
+    EXPECT_TRUE(t.is_linear());
     EXPECT_EQ(0u, t.getNrVariables());
 }
 

@@ -57,7 +57,7 @@ public:
 
 	bool assign(Variable var, const RealAlgebraicNumberInterval<Number>& ran, bool refine_model = true) {
 		assert(m_ir_assignments.find(var) == m_ir_assignments.end());
-		if (m_original_poly.isConstant()) return true;
+		if (m_original_poly.is_constant()) return true;
 		if (!m_poly.has(var)) return false;
 
 		CARL_LOG_TRACE("carl.ran", "Assign " << var << " -> " << ran);
@@ -75,7 +75,7 @@ public:
 			carl::substitute_inplace(m_original_poly, var, MultivariatePolynomial<Number>(ran.value()));
 			CARL_LOG_TRACE("carl.ran", "Remainung poly: " << m_poly << "; original: " << m_original_poly);
 			assert(carl::variables(m_poly).size() > 1 || carl::variables(m_poly) == carlVariables({ m_var }));
-			return carl::variables(m_poly).size() == 1 || m_original_poly.isConstant();
+			return carl::variables(m_poly).size() == 1 || m_original_poly.is_constant();
 		} else {
 			CARL_LOG_TRACE("carl.ran", "Still an interval: " << ran);
 			m_ir_assignments.emplace(var, ran);
@@ -85,18 +85,18 @@ public:
 			m_poly = switch_main_variable(m_poly, m_var);
 			CARL_LOG_TRACE("carl.ran", "Remainung poly: " << m_poly << "; original: " << m_original_poly);
 			assert(carl::variables(m_poly).size() > 1 || carl::variables(m_poly) == carlVariables({ m_var }));
-			return carl::variables(m_poly).size() == 1 || m_original_poly.isConstant();
+			return carl::variables(m_poly).size() == 1 || m_original_poly.is_constant();
 		}
 	}
 
 	bool has_value() const {
-		return carl::variables(m_poly).size() == 1 || m_original_poly.isConstant();
+		return carl::variables(m_poly).size() == 1 || m_original_poly.is_constant();
 	}
 
 	auto value() {
-		if (m_original_poly.isConstant()) {
+		if (m_original_poly.is_constant()) {
 			CARL_LOG_TRACE("carl.ran", "Poly is constant: " << m_original_poly);
-			return RealAlgebraicNumberInterval<Number>(m_original_poly.constantPart());
+			return RealAlgebraicNumberInterval<Number>(m_original_poly.constant_part());
 		}
 
 		assert(carl::variables(m_poly).size() == 1 && m_poly.has(m_var));

@@ -91,8 +91,8 @@ public:
 		return s_var;
 	}
 
-	bool isUnivariate() const {
-		return m_poly.isUnivariate();
+	bool is_univariate() const {
+		return m_poly.is_univariate();
 	}
 
 	template<typename P>

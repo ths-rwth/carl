@@ -140,11 +140,11 @@ private:
 		}
 		if (psgn == m_content->lower_sign) {
 			interval_int().set_lower(pivot);
-			assert(interval_int().isConsistent());
+			assert(interval_int().is_consistent());
 			return Sign::POSITIVE;
 		} else {
 			interval_int().set_upper(pivot);
-			assert(interval_int().isConsistent());
+			assert(interval_int().is_consistent());
 			return Sign::NEGATIVE;
 		}
 	}
@@ -253,7 +253,7 @@ public:
 			if (is_numeric()) {
 				return RealAlgebraicNumberInterval<Number>(carl::abs(value()));
 			} else {
-				return RealAlgebraicNumberInterval<Number>(polynomial_int().negateVariable(), interval_int().abs());
+				return RealAlgebraicNumberInterval<Number>(polynomial_int().negate_variable(), interval_int().abs());
 			}
 		}
 	}

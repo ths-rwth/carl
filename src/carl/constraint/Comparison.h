@@ -37,10 +37,10 @@ signed compare(const BasicConstraint<Pol>& _constraintA, const BasicConstraint<P
     *                   a_i = g * b_i for all 1<=i<=k 
     *              or   b_i = g * a_i for all 1<=i<=k 
     */
-	typename Pol::NumberType one_divided_by_a = _constraintA.lhs().coprimeFactorWithoutConstant();
-	typename Pol::NumberType one_divided_by_b = _constraintB.lhs().coprimeFactorWithoutConstant();
-	typename Pol::NumberType c = _constraintA.lhs().constantPart();
-	typename Pol::NumberType d = _constraintB.lhs().constantPart();
+	typename Pol::NumberType one_divided_by_a = _constraintA.lhs().coprime_factor_without_constant();
+	typename Pol::NumberType one_divided_by_b = _constraintB.lhs().coprime_factor_without_constant();
+	typename Pol::NumberType c = _constraintA.lhs().constant_part();
+	typename Pol::NumberType d = _constraintB.lhs().constant_part();
 	assert(carl::is_one(carl::get_num(carl::abs(one_divided_by_b))));
 	Pol tmpA = (_constraintA.lhs() - c) * one_divided_by_a;
 	Pol tmpB = (_constraintB.lhs() - d) * one_divided_by_b;

@@ -22,7 +22,7 @@ MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& divi
 	//static_assert(is_field_type<C>::value, "Division only defined for field coefficients");
 	MultivariatePolynomial<C,O,P> p(dividend);
 	auto& tam = MultivariatePolynomial<C,O,P>::mTermAdditionManager;
-	auto id = tam.getId(p.nrTerms());
+	auto id = tam.getId(p.nr_terms());
 	while(!carl::is_zero(p))
 	{
 		Term<C> factor;
@@ -33,15 +33,15 @@ MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& divi
 		}
 		else
 		{
-			p.stripLT();
+			p.strip_lterm();
 		}
 	}
 	MultivariatePolynomial<C,O,P> result;
-	tam.readTerms(id, result.getTerms());
+	tam.readTerms(id, result.terms());
 	result.reset_ordered();
 	result.template makeMinimallyOrdered<false, true>();
-	assert(result.isConsistent());
-	assert(dividend.isConsistent());
+	assert(result.is_consistent());
+	assert(dividend.is_consistent());
 	return result;
 }
 

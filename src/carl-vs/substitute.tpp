@@ -265,7 +265,7 @@ namespace carl::vs::detail
         // It seems that is is assumed that lcoeffNeg * constraint.lhs() is positive if
         // a SOS decomposition exists. However, we can only follow that it's non-negative
         // (in the univariate case), for the multivariate case more requirements need to be made
-        // (therefor constraint.lhs().hasConstantTerm() ???).
+        // (therefor constraint.lhs().has_constant_term() ???).
         // This lead to wrong simplifications in very rare cases, for example
         // -100 + 140*z + -49*y^2 + -49*z^2 is wrongly simplified to true (see McsatVSBug).
         
@@ -295,7 +295,7 @@ namespace carl::vs::detail
                     {
                         case carl::Relation::EQ:
                         {
-                            if( constraint.lhs().hasConstantTerm() )
+                            if( constraint.lhs().has_constant_term() )
                             {
                                 foundNoInvalidConstraint = false;
                                 addSquares = false;
@@ -305,7 +305,7 @@ namespace carl::vs::detail
                         case carl::Relation::NEQ:
                         {
                             addSquares = false;
-                            if( constraint.lhs().hasConstantTerm() )
+                            if( constraint.lhs().has_constant_term() )
                             {
                                 constraintValid = true;
                             }
@@ -318,7 +318,7 @@ namespace carl::vs::detail
                                 addSquares = false;
                                 constraintValid = true;
                             }
-                            else if( constraint.lhs().hasConstantTerm() )
+                            else if( constraint.lhs().has_constant_term() )
                             {
                                 addSquares = false;
                                 foundNoInvalidConstraint = false;
@@ -330,7 +330,7 @@ namespace carl::vs::detail
                             addSquares = false;
                             if( lcoeffNeg )
                             {
-                                if( constraint.lhs().hasConstantTerm() )
+                                if( constraint.lhs().has_constant_term() )
                                     constraintValid = true;
                             }
                             else 
@@ -344,7 +344,7 @@ namespace carl::vs::detail
                                 addSquares = false;
                                 constraintValid = true;
                             }
-                            else if( constraint.lhs().hasConstantTerm() )
+                            else if( constraint.lhs().has_constant_term() )
                             {
                                 addSquares = false;
                                 foundNoInvalidConstraint = false;
@@ -359,7 +359,7 @@ namespace carl::vs::detail
                                 foundNoInvalidConstraint = false;
                             else
                             {
-                                if( constraint.lhs().hasConstantTerm() )
+                                if( constraint.lhs().has_constant_term() )
                                     constraintValid = true;
                             }
                         }
@@ -419,11 +419,11 @@ namespace carl::vs::detail
             for( auto factor = factorization.begin(); factor != factorization.end(); ++factor )
             {
                 Constraint<Poly> consPos = Constraint<Poly>( factor->first, relPos );
-                unsigned posConsistent = consPos.isConsistent();
+                unsigned posConsistent = consPos.is_consistent();
                 if( posConsistent != 0 )
                     positives.push_back( consPos );
                 Constraint<Poly> consNeg = Constraint<Poly>( factor->first, relNeg );
-                unsigned negConsistent = consNeg.isConsistent();
+                unsigned negConsistent = consNeg.is_consistent();
                 if( negConsistent == 0 )
                 {
                     if( posConsistent == 0 )
@@ -612,7 +612,7 @@ namespace carl::vs::detail
         {
             using Rational = typename Poly::NumberType;
             // Collect all necessary left hand sides to create the new conditions of all cases referring to the virtual substitution.
-            if( carl::pow( Rational(Rational(_subs.term().sqrt_ex().constantPart().size()) + Rational(_subs.term().sqrt_ex().factor().size()) * Rational(_subs.term().sqrt_ex().radicand().size())), _cons.maxDegree( _subs.variable() )) > (MAX_NUM_OF_TERMS*MAX_NUM_OF_TERMS) )
+            if( carl::pow( Rational(Rational(_subs.term().sqrt_ex().constant_part().size()) + Rational(_subs.term().sqrt_ex().factor().size()) * Rational(_subs.term().sqrt_ex().radicand().size())), _cons.maxDegree( _subs.variable() )) > (MAX_NUM_OF_TERMS*MAX_NUM_OF_TERMS) )
             {
                 return false;
             }
@@ -626,19 +626,19 @@ namespace carl::vs::detail
                 // Create the new decision tuples.
                 if( _cons.relation() == Relation::EQ || _cons.relation() == Relation::NEQ )
                 {
-                    // Add conjunction (sub.constantPart() = 0) to the substitution result.
+                    // Add conjunction (sub.constant_part() = 0) to the substitution result.
                     _result.emplace_back();
-                    _result.back().push_back( Constraint<Poly>( sub.constantPart(), _cons.relation() ) );
+                    _result.back().push_back( Constraint<Poly>( sub.constant_part(), _cons.relation() ) );
                 }
                 else
                 {
-                    if( !_subs.term().sqrt_ex().denominator().isConstant() )
+                    if( !_subs.term().sqrt_ex().denominator().is_constant() )
                     {
-                        // Add conjunction (sub.denominator()>0 and sub.constantPart() </>/<=/>= 0) to the substitution result.
+                        // Add conjunction (sub.denominator()>0 and sub.constant_part() </>/<=/>= 0) to the substitution result.
                         _result.emplace_back();
                         _result.back().push_back( Constraint<Poly>( sub.denominator(), Relation::GREATER ) );
-                        _result.back().push_back( Constraint<Poly>( sub.constantPart(), _cons.relation() ) );
-                        // Add conjunction (sub.denominator()<0 and sub.constantPart() >/</>=/<= 0) to the substitution result.
+                        _result.back().push_back( Constraint<Poly>( sub.constant_part(), _cons.relation() ) );
+                        // Add conjunction (sub.denominator()<0 and sub.constant_part() >/</>=/<= 0) to the substitution result.
                         Relation inverseRelation;
                         switch( _cons.relation() )
                         {
@@ -660,13 +660,13 @@ namespace carl::vs::detail
                         }
                         _result.emplace_back();
                         _result.back().push_back( Constraint<Poly>( sub.denominator(), Relation::LESS ) );
-                        _result.back().push_back( Constraint<Poly>( sub.constantPart(), inverseRelation ) );
+                        _result.back().push_back( Constraint<Poly>( sub.constant_part(), inverseRelation ) );
                     }
                     else
                     {
                         // Add conjunction (f(-c/b)*b^k </>/<=/>= 0) to the substitution result.
                         _result.emplace_back();
-                        _result.back().push_back( Constraint<Poly>( sub.constantPart(), _cons.relation() ) );
+                        _result.back().push_back( Constraint<Poly>( sub.constant_part(), _cons.relation() ) );
                     }
                 }
             }
@@ -674,38 +674,38 @@ namespace carl::vs::detail
             else
             {
                 Poly s = Poly(1);
-                if( !_subs.term().sqrt_ex().denominator().isConstant() )
+                if( !_subs.term().sqrt_ex().denominator().is_constant() )
                     s = sub.denominator();
                 switch( _cons.relation() )
                 {
                     case Relation::EQ:
                     {
-                        result = substituteNormalSqrtEq( sub.radicand(), sub.constantPart(), sub.factor(), _result, _accordingPaper );
+                        result = substituteNormalSqrtEq( sub.radicand(), sub.constant_part(), sub.factor(), _result, _accordingPaper );
                         break;
                     }
                     case Relation::NEQ:
                     {
-                        result = substituteNormalSqrtNeq( sub.radicand(), sub.constantPart(), sub.factor(), _result, _accordingPaper );
+                        result = substituteNormalSqrtNeq( sub.radicand(), sub.constant_part(), sub.factor(), _result, _accordingPaper );
                         break;
                     }
                     case Relation::LESS:
                     {
-                        result = substituteNormalSqrtLess( sub.radicand(), sub.constantPart(), sub.factor(), s, _result, _accordingPaper );
+                        result = substituteNormalSqrtLess( sub.radicand(), sub.constant_part(), sub.factor(), s, _result, _accordingPaper );
                         break;
                     }
                     case Relation::GREATER:
                     {
-                        result = substituteNormalSqrtLess( sub.radicand(), sub.constantPart(), sub.factor(), -s, _result, _accordingPaper );
+                        result = substituteNormalSqrtLess( sub.radicand(), sub.constant_part(), sub.factor(), -s, _result, _accordingPaper );
                         break;
                     }
                     case Relation::LEQ:
                     {
-                        result = substituteNormalSqrtLeq( sub.radicand(), sub.constantPart(), sub.factor(), s, _result, _accordingPaper );
+                        result = substituteNormalSqrtLeq( sub.radicand(), sub.constant_part(), sub.factor(), s, _result, _accordingPaper );
                         break;
                     }
                     case Relation::GEQ:
                     {
-                        result = substituteNormalSqrtLeq( sub.radicand(), sub.constantPart(), sub.factor(), -s, _result, _accordingPaper );
+                        result = substituteNormalSqrtLeq( sub.radicand(), sub.constant_part(), sub.factor(), -s, _result, _accordingPaper );
                         break;
                     }
                     default:

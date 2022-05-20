@@ -257,7 +257,7 @@ namespace carl
         /**
          * @return true, if the factorized polynomial is constant.
          */
-        bool isConstant() const
+        bool is_constant() const
         {
             return mpCache == nullptr;
         }
@@ -267,7 +267,7 @@ namespace carl
          */
         bool is_one() const
         {
-            return isConstant() && carl::is_one(mCoefficient);
+            return is_constant() && carl::is_one(mCoefficient);
         }
 
         /**
@@ -275,7 +275,7 @@ namespace carl
          */
         bool is_zero() const
         {
-            return isConstant() && carl::is_zero(mCoefficient);
+            return is_constant() && carl::is_zero(mCoefficient);
         }
         
         /**
@@ -283,9 +283,9 @@ namespace carl
          * the factorization has not yet been expanded.)
          * @return the number of terms
          */
-        size_t nrTerms() const
+        size_t nr_terms() const
         {
-            return polynomial().nrTerms();
+            return polynomial().nr_terms();
         }
         
         /**
@@ -327,12 +327,12 @@ namespace carl
          * Checks if the polynomial is linear.
          * @return If this is linear.
          */
-        bool isLinear() const
+        bool is_linear() const
         {
             if( existsFactorization(*this) )
             {
                 if( factorizedTrivially() )
-                    return polynomial().isLinear();
+                    return polynomial().is_linear();
                 return false;
             }
             return true;
@@ -343,7 +343,7 @@ namespace carl
          *		 of the coefficients in p.
          */
         template<typename C = CoeffType, EnableIf<is_subset_of_rationals_type<C>> = dummy>
-        CoeffType coprimeFactor() const
+        CoeffType coprime_factor() const
         {
             return constant_one<CoeffType>::get()/mCoefficient;
         }
@@ -353,13 +353,13 @@ namespace carl
          *		 of the coefficients in p.
          */
         template<typename C = CoeffType, EnableIf<is_subset_of_rationals_type<C>> = dummy>
-        CoeffType coprimeFactorWithoutConstant() const;
+        CoeffType coprime_factor_without_constant() const;
 
         /**
-         * @return p * p.coprimeFactor()
-         * @see coprimeFactor()
+         * @return p * p.coprime_factor()
+         * @see coprime_factor()
          */
-        FactorizedPolynomial<P> coprimeCoefficients() const
+        FactorizedPolynomial<P> coprime_coefficients() const
         {
             if( existsFactorization(*this) )
             {
@@ -400,7 +400,7 @@ namespace carl
          * Retrieves the constant term of this polynomial or zero, if there is no constant term.
          * @reiturn Constant term.
          */
-        CoeffType constantPart() const;
+        CoeffType constant_part() const;
         
         /**
          * Calculates the max. degree over all monomials occurring in the polynomial.
@@ -408,7 +408,7 @@ namespace carl
          * @see @cite GCL92, page 48
          * @return Total degree.
          */
-        size_t totalDegree() const;
+        size_t total_degree() const;
         
         /**
          * Returns the coefficient of the leading term.
@@ -433,12 +433,12 @@ namespace carl
          * For terms with exactly one variable, get this variable.
          * @return The only variable occuring in the term.
          */
-        Variable getSingleVariable() const
+        Variable single_variable() const
         { 
             assert( existsFactorization( *this ) );
             if( factorizedTrivially() )
-                return polynomial().getSingleVariable();
-            return content().factorization().begin()->first.getSingleVariable();
+                return polynomial().single_variable();
+            return content().factorization().begin()->first.single_variable();
         }
         
         /**
@@ -446,7 +446,7 @@ namespace carl
          * @return 
          * Notice that it might be better to use the variable information if several pieces of information are requested.
          */
-        bool isUnivariate() const;
+        bool is_univariate() const;
         
         UnivariatePolynomial<CoeffType> toUnivariatePolynomial() const
         {
@@ -459,7 +459,7 @@ namespace carl
          * Checks if the polynomial has a constant term that is not zero.
          * @return If there is a constant term unequal to zero.
          */
-        bool hasConstantTerm() const;
+        bool has_constant_term() const;
         
         /**
          * @param _var The variable to check for its occurrence.
@@ -501,9 +501,9 @@ namespace carl
                     std::map<unsigned,FactorizedPolynomial<P>> coeffs;
                     for( const auto& expCoeffPair : varI.coeffs() )
                     {
-                        if( expCoeffPair.second.isConstant() )
+                        if( expCoeffPair.second.is_constant() )
                         {
-                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constantPart() * mCoefficient ) ) );
+                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constant_part() * mCoefficient ) ) );
                         }
                         else
                         {

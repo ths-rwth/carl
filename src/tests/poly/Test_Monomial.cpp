@@ -38,18 +38,18 @@ TEST(Monomial, degreeCategories)
 	auto x = carl::fresh_real_variable("x");
 	
 	carl::Monomial::Arg m1 = carl::createMonomial(x, 1);
-	EXPECT_FALSE(m1->isConstant());
-	EXPECT_TRUE(m1->isLinear());
+	EXPECT_FALSE(m1->is_constant());
+	EXPECT_TRUE(m1->is_linear());
 	EXPECT_TRUE(m1->isAtMostLinear());
-	EXPECT_FALSE(m1->isSquare());
+	EXPECT_FALSE(m1->is_square());
 	carl::Monomial::Arg m2 = carl::createMonomial(x, 2);
-	EXPECT_FALSE(m2->isConstant());
-	EXPECT_FALSE(m2->isLinear());
+	EXPECT_FALSE(m2->is_constant());
+	EXPECT_FALSE(m2->is_linear());
 	EXPECT_FALSE(m2->isAtMostLinear());
-	EXPECT_TRUE(m2->isSquare());
+	EXPECT_TRUE(m2->is_square());
 }
 
-TEST(Monomial, hasNoOtherVariable)
+TEST(Monomial, has_no_other_variable)
 {
 	auto x = carl::fresh_real_variable("x");
 	auto y = carl::fresh_real_variable("y");
@@ -60,18 +60,18 @@ TEST(Monomial, hasNoOtherVariable)
 	carl::Monomial::Arg m5 = y*y;
 	carl::Monomial::Arg m6 = y*y*x;
 	
-	EXPECT_TRUE(m1->hasNoOtherVariable(x));
-	EXPECT_FALSE(m1->hasNoOtherVariable(y));
-	EXPECT_TRUE(m2->hasNoOtherVariable(x));
-	EXPECT_FALSE(m2->hasNoOtherVariable(y));
-	EXPECT_FALSE(m3->hasNoOtherVariable(x));
-	EXPECT_FALSE(m3->hasNoOtherVariable(y));
-	EXPECT_FALSE(m4->hasNoOtherVariable(x));
-	EXPECT_TRUE(m4->hasNoOtherVariable(y));
-	EXPECT_FALSE(m5->hasNoOtherVariable(x));
-	EXPECT_TRUE(m5->hasNoOtherVariable(y));
-	EXPECT_FALSE(m6->hasNoOtherVariable(x));
-	EXPECT_FALSE(m6->hasNoOtherVariable(y));
+	EXPECT_TRUE(m1->has_no_other_variable(x));
+	EXPECT_FALSE(m1->has_no_other_variable(y));
+	EXPECT_TRUE(m2->has_no_other_variable(x));
+	EXPECT_FALSE(m2->has_no_other_variable(y));
+	EXPECT_FALSE(m3->has_no_other_variable(x));
+	EXPECT_FALSE(m3->has_no_other_variable(y));
+	EXPECT_FALSE(m4->has_no_other_variable(x));
+	EXPECT_TRUE(m4->has_no_other_variable(y));
+	EXPECT_FALSE(m5->has_no_other_variable(x));
+	EXPECT_TRUE(m5->has_no_other_variable(y));
+	EXPECT_FALSE(m6->has_no_other_variable(x));
+	EXPECT_FALSE(m6->has_no_other_variable(y));
 }
 
 TEST(Monomial, Operators)
@@ -82,11 +82,11 @@ TEST(Monomial, Operators)
 
 	carl::Monomial::Arg m0 = carl::createMonomial(v0, 1);
 	m0 = m0 * v1;
-	EXPECT_EQ((unsigned)1,m0->exponentOfVariable(v1));
+	EXPECT_EQ((unsigned)1,m0->exponent_of_variable(v1));
 	m0 = m0 * v1;
-	EXPECT_EQ((unsigned)2,m0->exponentOfVariable(v1));
+	EXPECT_EQ((unsigned)2,m0->exponent_of_variable(v1));
 	EXPECT_EQ((unsigned)3,m0->tdeg());
-	EXPECT_EQ((unsigned)0,m0->exponentOfVariable(v2));
+	EXPECT_EQ((unsigned)0,m0->exponent_of_variable(v2));
 	m0 = m0 * v2;
 	EXPECT_EQ((unsigned)4,m0->tdeg());
 	EXPECT_EQ((unsigned)3,m0->nrVariables());

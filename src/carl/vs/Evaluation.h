@@ -18,18 +18,18 @@ std::pair<typename SqrtEx<Poly>::Rational, bool> evaluate(const SqrtEx<Poly>& sq
     using Rational = typename SqrtEx<Poly>::Rational;
 
     Poly radicandEvaluated = carl::substitute(sqrt_ex.radicand(), eval_map );
-    assert( radicandEvaluated.isConstant() );
-    Rational radicandValue = radicandEvaluated.constantPart();
+    assert( radicandEvaluated.is_constant() );
+    Rational radicandValue = radicandEvaluated.constant_part();
     assert( radicandValue >= 0 );
     Poly factorEvaluated = carl::substitute(sqrt_ex.factor(), eval_map );
-    assert( factorEvaluated.isConstant() );
-    Rational factorValue = factorEvaluated.constantPart();
-    Poly constantPartEvaluated = carl::substitute(sqrt_ex.constantPart(), eval_map );
-    assert( constantPartEvaluated.isConstant() );
-    Rational constantPartValue = constantPartEvaluated.constantPart();
+    assert( factorEvaluated.is_constant() );
+    Rational factorValue = factorEvaluated.constant_part();
+    Poly constantPartEvaluated = carl::substitute(sqrt_ex.constant_part(), eval_map );
+    assert( constantPartEvaluated.is_constant() );
+    Rational constantPartValue = constantPartEvaluated.constant_part();
     Poly denomEvaluated = carl::substitute(sqrt_ex.denominator(), eval_map );
-    assert( denomEvaluated.isConstant() );
-    Rational denomValue = denomEvaluated.constantPart();
+    assert( denomEvaluated.is_constant() );
+    Rational denomValue = denomEvaluated.constant_part();
     assert( !carl::is_zero( denomValue ) );
     // Check whether the resulting assignment is integer.
     bool exact = true;

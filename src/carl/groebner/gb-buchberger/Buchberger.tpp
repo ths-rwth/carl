@@ -49,8 +49,8 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
             assert( critPair.mP2 < pGb->getGenerators().size() );
 			CARL_LOG_DEBUG("carl.gb.buchberger", "Calculate SPol for: " << pGb->getGenerators()[critPair.mP1] << ", " << pGb->getGenerators()[critPair.mP2]);
 			// Calculates the S-Polynomial
-            assert( pGb->getGenerators()[critPair.mP1].nrTerms() != 0 );
-            assert( pGb->getGenerators()[critPair.mP2].nrTerms() != 0 );
+            assert( pGb->getGenerators()[critPair.mP1].nr_terms() != 0 );
+            assert( pGb->getGenerators()[critPair.mP2].nr_terms() != 0 );
 			Polynomial spol = carl::SPolynomial(pGb->getGenerators()[critPair.mP1], pGb->getGenerators()[critPair.mP2]);
 			spol.setReasons(pGb->getGenerators()[critPair.mP1].getReasons() | pGb->getGenerators()[critPair.mP2].getReasons());
 			CARL_LOG_DEBUG("carl.gb.buchberger", "SPol: " << spol);
@@ -63,7 +63,7 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 			if(!is_zero(remainder))
 			{
 				// If it is constant, we are done and can return {1} as GB.
-				if(remainder.isConstant())
+				if(remainder.is_constant())
 				{
 					pGb->clear();
 					pGb->addGenerator(remainder.normalize());
@@ -94,7 +94,7 @@ void Buchberger<Polynomial, AddingPolicy>::update(const size_t index)
 	
 	std::vector<Polynomial>& generators = pGb->getGenerators();
 	assert(generators.size() > index);
-	assert(!generators[index].isConstant());
+	assert(!generators[index].is_constant());
 	auto jEnd = mGbElementsIndices.end();
 
 	std::unordered_map<size_t, SPolPair> spairs;

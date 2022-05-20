@@ -20,7 +20,7 @@ void eliminate_zero_root(UnivariatePolynomial<Coeff>& p) {
 		p.coefficients()[j] = p.coefficients()[j+i];
 	}
 	p.coefficients().resize(p.coefficients().size()-i);
-	assert(p.isConsistent());
+	assert(p.is_consistent());
 }
 
 /**

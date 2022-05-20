@@ -339,7 +339,7 @@ UnivariatePolynomial<Coeff> discriminant(
 	const UnivariatePolynomial<Coeff>& p,
 	SubresultantStrategy strategy) {
 	UnivariatePolynomial<Coeff> res = resultant(p, derivative(p), strategy);
-	if (res.isNumber()) return res;
+	if (res.is_number()) return res;
 	uint d = p.degree();
 	Coeff sign = ((d * (d - 1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);
 	Coeff redCoeff = sign * p.lcoeff();
@@ -579,7 +579,7 @@ UnivariatePolynomial<Coeff> resultant_det(
 		}
 	}
 	//determinant = m.back().tcoeff();
-	determinant = determinant.coprimeCoefficients();
+	determinant = determinant.coprime_coefficients();
 	//std::cout << "det = " << determinant << std::endl;
 
 	return UnivariatePolynomial<Coeff>(f.mainVar(), determinant);

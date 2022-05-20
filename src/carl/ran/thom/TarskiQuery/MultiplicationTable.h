@@ -206,7 +206,7 @@ private:
 						break;
 					}
 				}
-				MultivariatePolynomial<Number> diff = G.stripLT();
+				MultivariatePolynomial<Number> diff = G.strip_lterm();
 				diff *= Number(-1);
 				BaseRepresentation<Number> baseRepr(mBase, diff);
 				IndexPairs pairs;

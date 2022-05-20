@@ -24,7 +24,7 @@ Coeff content(const UnivariatePolynomial<Coeff>& p) {
 		// By definition
 		return Coeff(0);
 	}
-	assert(p.isNormal());
+	assert(p.is_normal());
 	if constexpr (is_field_type<Coeff>::value) {
 		// For fields, content(p) = 1
 		return Coeff(1);

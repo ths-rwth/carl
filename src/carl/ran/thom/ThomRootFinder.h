@@ -47,7 +47,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 << "m = " << m << "\n"
                 << "interval = " << interval << "\n"
                 << "---------------------------------------------");
-        CARL_LOG_ASSERT("carl.thom.rootfinder", !p.isConstant(), "this should not be handled here but somewhere before");
+        CARL_LOG_ASSERT("carl.thom.rootfinder", !p.is_constant(), "this should not be handled here but somewhere before");
         //CARL_LOG_ASSERT("carl.thom.rootfinder", p.has(mainVar), "");
         // attention ...
         if(!p.has(mainVar)) {
@@ -63,7 +63,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
                 }
         }
         
-        if(p.isUnivariate()) {
+        if(p.is_univariate()) {
                 return realRootsThom<Number>(p, mainVar, nullptr, interval);
         }
         CARL_LOG_ASSERT("carl.thom.rootfinder", m.size() > 0, "");
@@ -296,8 +296,8 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
                 if(carl::is_zero(tmp)) return {RealAlgebraicNumber<Number>(0)};
                 assert(variables(tmp).size() == 1);
                  // Coeff = MultivariatePolynomial<Number>, but all coefficients of tmp are numerical
-                UnivariatePolynomial<Number> tmp_univ = tmp.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ assert(c.isUnivariate()); return c.constantPart(); }));
-                if(tmp_univ.zeroIsRoot()) {
+                UnivariatePolynomial<Number> tmp_univ = tmp.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ assert(c.is_univariate()); return c.constant_part(); }));
+                if(tmp_univ.zero_is_root()) {
                         roots_triv.push_back(RealAlgebraicNumber<Number>(0));
                         tmp_univ.eliminateZeroRoots();
                 }

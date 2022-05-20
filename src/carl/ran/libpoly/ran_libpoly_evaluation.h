@@ -73,8 +73,8 @@ boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation constraint " << constraint << " for assignment " << evalMap);
 
 	//Easy checks of lhs of constraint is constant
-	if (constraint.lhs().isConstant()) {
-		auto num = constraint.lhs().constantPart();
+	if (constraint.lhs().is_constant()) {
+		auto num = constraint.lhs().constant_part();
 		switch (constraint.relation()) {
 		case Relation::EQ:
 			return num == 0;

@@ -51,7 +51,7 @@ class EZGCD
 		
 		// We start with some trivial cases.
 		if(mp1 == (Coeff)1 || mp2 == (Coeff)1) return {Polynomial((Coeff)1), Polynomial((Coeff)1), Polynomial((Coeff)1)};
-		if(mp1.nrTerms() == 1 && mp2.nrTerms() == 1)
+		if(mp1.nr_terms() == 1 && mp2.nr_terms() == 1)
 		{
 			//return Polynomial(Term::gcd(*mp1.lterm(), *mp2.lterm()));
 		}

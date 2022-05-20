@@ -13,7 +13,7 @@ class MultivariatePolynomial;
 */
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> coprimePart(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q) {
-	if (p.isConstant() || q.isConstant()) {
+	if (p.is_constant() || q.is_constant()) {
 		return p;
 	}
 

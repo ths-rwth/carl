@@ -157,7 +157,7 @@ namespace carl
         }
         else
         {
-            switch( _constraint.lhs().totalDegree() )
+            switch( _constraint.lhs().total_degree() )
             {
                 case 0:
                     _properties |= PROP_CONTAINS_LINEAR_POLYNOMIAL;

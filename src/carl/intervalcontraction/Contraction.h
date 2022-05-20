@@ -53,13 +53,13 @@ namespace carl {
             {
         
                 #ifdef CONTRACTION_DEBUG
-                std::cout << __func__ << ": [Polynome]: " << p << " [#Terms]: " << p.nrTerms() << std::endl;     
+                std::cout << __func__ << ": [Polynome]: " << p << " [#Terms]: " << p.nr_terms() << std::endl;     
                 #endif
 
 
                 assert(p.has(x));
-                assert(!p.hasConstantTerm());
-                assert(p.isLinear() || (p.nrTerms() == 2 && (carl::is_one(p.begin()->coeff()) || carl::is_one(p.rbegin()->coeff()))
+                assert(!p.has_constant_term());
+                assert(p.is_linear() || (p.nr_terms() == 2 && (carl::is_one(p.begin()->coeff()) || carl::is_one(p.rbegin()->coeff()))
                                         && ((p.begin()->has(x) && !p.rbegin()->has(x)) 
                                         || (p.rbegin()->has(x) && !p.begin()->has(x)))));
                 
@@ -70,7 +70,7 @@ namespace carl {
                 #endif
 
                 // Case 1.):
-                if (p.isLinear())
+                if (p.is_linear())
                 {
                     #ifdef CONTRACTION_DEBUG
                     std::cout << __func__ << ": Case 1. (linear)... " << std::endl;     
@@ -99,7 +99,7 @@ namespace carl {
                     std::cout << __func__ << ": Case 2. (non-linear)... " << std::endl;     
                     #endif
 
-                    assert(p.nrTerms() == 2);
+                    assert(p.nr_terms() == 2);
                     typename Polynomial::TermsType::const_iterator yIter;
                     typename Polynomial::TermsType::const_iterator xIter;
                     if (p.begin()->has(x))
@@ -116,20 +116,20 @@ namespace carl {
                     }
 
                     assert(xIter->monomial() != nullptr);
-                    assert(!xIter->isLinear() || xIter->coeff() == (-1));
+                    assert(!xIter->is_linear() || xIter->coeff() == (-1));
                     //std::cout << "[Case 2]" << std::endl;
-                    if (xIter->isLinear()) 
+                    if (xIter->is_linear()) 
                     {
                         mNumerator = Polynomial ( *yIter );
                     }
                     else
                     {
-                        mRoot = xIter->monomial()->exponentOfVariable(x);
+                        mRoot = xIter->monomial()->exponent_of_variable(x);
                         #ifdef CONTRACTION_DEBUG
                         std::cout << __func__ << ": Setting mRoot:" << mRoot << std::endl;     
                         #endif
               
-                        mDenominator = xIter->monomial()->dropVariable(x);
+                        mDenominator = xIter->monomial()->drop_variable(x);
                         #ifdef CONTRACTION_DEBUG
                         std::cout << __func__ << ": Setting mDenominator:" << mDenominator << std::endl;     
                         #endif
@@ -270,7 +270,7 @@ namespace carl {
         Contraction(const Polynomial& constraint, const Polynomial& _original ):
 			Operator<Polynomial>(),
             mConstraint(constraint),
-            mpOriginal (_original.isLinear() ? nullptr : new Polynomial(_original)),
+            mpOriginal (_original.is_linear() ? nullptr : new Polynomial(_original)),
             #ifdef USE_HORNER
             mHornerForm( mpOriginal == nullptr ? constraint :  _original ),
             #endif
@@ -311,7 +311,7 @@ namespace carl {
         bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool usePropagation = false)
         {
             bool splitOccurredInContraction = false;
-            if( !usePropagation || mpOriginal == nullptr || !mConstraint.isLinear() )
+            if( !usePropagation || mpOriginal == nullptr || !mConstraint.is_linear() )
             {
                 #ifdef USE_HORNER
                 typename std::map<Variable, MultivariateHorner<Polynomial,strategy>>::const_iterator it = mDerivatives.find(variable);
@@ -596,6 +596,6 @@ namespace carl {
         }
     };
 
-    typedef Contraction<SimpleNewton, Polynomial> SimpleNewtonContraction;
+    //typedef Contraction<SimpleNewton, Polynomial> SimpleNewtonContraction;
 
 }

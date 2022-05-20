@@ -103,7 +103,7 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution_resultant(
 		CARL_LOG_DEBUG("carl.algsubs", "-> " << cur);
 	}
 	auto swpoly = switch_main_variable(cur, v);
-	if (!swpoly.isUnivariate()) {
+	if (!swpoly.is_univariate()) {
 		return std::nullopt;
 	}
 	UnivariatePolynomial<Number> result = swpoly.toNumberCoefficients();

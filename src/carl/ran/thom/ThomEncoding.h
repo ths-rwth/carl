@@ -70,7 +70,7 @@ public:
 		std::shared_ptr<ThomEncoding<Number>> point
 	)
 	{
-		CARL_LOG_ASSERT("carl.thom", te.mP.isUnivariate(), "");
+		CARL_LOG_ASSERT("carl.thom", te.mP.is_univariate(), "");
 		CARL_LOG_ASSERT("carl.thom", te.mPoint == nullptr, "");
 		CARL_LOG_ASSERT("carl.thom", point != nullptr, "");
 		std::list<ThomEncoding<Number>> roots = realRootsThom(te.mP, te.mMainVar, point);
@@ -166,7 +166,7 @@ public:
 	Sign signOnPolynomial(const Polynomial& p) const {
 		CARL_LOG_ASSERT("carl.thom", carl::variables(p).size() <= this->dimension(), "\np = " << p << "\nthis = " << *this);
 		if(carl::is_zero(p)) return Sign(0);
-		if(p.isConstant()) return Sign(carl::sgn(p.lcoeff()));
+		if(p.is_constant()) return Sign(carl::sgn(p.lcoeff()));
 		std::list<SignCondition> signs = mSd->getSigns(p);
 		SignCondition relevant = accumulateRelevantSigns();
 		for(const auto& sigma : signs) {

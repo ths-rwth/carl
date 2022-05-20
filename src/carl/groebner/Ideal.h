@@ -150,20 +150,20 @@ public:
 	}
 
 
-    bool isConstant() const
+    bool is_constant() const
     {
-        return mGenerators.size() == 1 && mGenerators.front().isConstant();
+        return mGenerators.size() == 1 && mGenerators.front().is_constant();
     }
 
     /**
      * Checks whether all polynomials occurring in this ideal are linear.
      * @return 
      */
-    bool isLinear() const
+    bool is_linear() const
     {
         for(auto it = mGenerators.begin(); it != mGenerators.end(); ++it)
         {
-            if(!it->isLinear()) return false;
+            if(!it->is_linear()) return false;
         }
         return true;
     }

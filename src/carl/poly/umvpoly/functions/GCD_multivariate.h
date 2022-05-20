@@ -51,11 +51,11 @@ MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const 
 	if (is_one(a) || is_one(b)) {
 		return MultivariatePolynomial<C,O,P>(1);
 	}
-	if (a.isConstant() && b.isConstant()) {
-		CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(a.constantPart(), b.constantPart()));
-		return MultivariatePolynomial<C,O,P>(carl::gcd(a.constantPart(), b.constantPart()));
+	if (a.is_constant() && b.is_constant()) {
+		CARL_LOG_DEBUG("carl.core.gcd", "gcd(" << a << ", " << b << ") = " << carl::gcd(a.constant_part(), b.constant_part()));
+		return MultivariatePolynomial<C,O,P>(carl::gcd(a.constant_part(), b.constant_part()));
 	}
-	if (a.isConstant() || b.isConstant()) {
+	if (a.is_constant() || b.is_constant()) {
 		return MultivariatePolynomial<C,O,P>(1);
 	}
 

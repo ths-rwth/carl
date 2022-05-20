@@ -27,7 +27,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(const UnivariatePolynomial& p):
 	mMainVar(p.mMainVar), mCoefficients(p.mCoefficients)
 {
-	assert(this->isConsistent());
+	assert(this->is_consistent());
 }
 
 template<typename Coeff>
@@ -35,14 +35,14 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(UnivariatePolynomial&& p) noex
 	mMainVar(p.mMainVar), mCoefficients()
 {
 	mCoefficients = std::move(p.mCoefficients);
-	assert(isConsistent());
+	assert(is_consistent());
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(const UnivariatePolynomial& p) {
 	mMainVar = p.mMainVar;
 	mCoefficients = p.mCoefficients;
-	assert(isConsistent());
+	assert(is_consistent());
 	return *this;
 }
 
@@ -50,7 +50,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(UnivariatePolynomial&& p) noexcept {
 	mMainVar = p.mMainVar;
 	mCoefficients = std::move(p.mCoefficients);
-	assert(isConsistent());
+	assert(is_consistent());
 	return *this;
 }
 
@@ -58,7 +58,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar)
 : mMainVar(mainVar), mCoefficients()
 {
-	assert(this->isConsistent());
+	assert(this->is_consistent());
 }
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const Coeff& coeff, std::size_t degree) :
@@ -73,16 +73,16 @@ mCoefficients(degree+1, Coeff(0)) // We would like to use 0 here, but Coeff(0) i
 	{
 		mCoefficients.clear();
 	}
-	stripLeadingZeroes();
- 	assert(isConsistent());
+	strip_leading_zeroes();
+ 	assert(is_consistent());
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, std::initializer_list<Coeff> coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
+	this->strip_leading_zeroes();
+	assert(this->is_consistent());
 }
 
 template<typename Coeff>
@@ -93,24 +93,24 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, std::initial
 	for (auto c: coefficients) {
 		this->mCoefficients.push_back(Coeff(c));
 	}
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
+	this->strip_leading_zeroes();
+	assert(this->is_consistent());
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const std::vector<Coeff>& coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
+	this->strip_leading_zeroes();
+	assert(this->is_consistent());
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, std::vector<Coeff>&& coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
+	this->strip_leading_zeroes();
+	assert(this->is_consistent());
 }
 
 template<typename Coeff>
@@ -126,8 +126,8 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable mainVar, const std::m
 		}
 		mCoefficients.push_back(expAndCoeff.second);
 	}
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
+	this->strip_leading_zeroes();
+	assert(this->is_consistent());
 }
 
 template<typename Coeff>
@@ -144,9 +144,9 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 }
 
 template<typename Coeff>
-bool UnivariatePolynomial<Coeff>::isNormal() const
+bool UnivariatePolynomial<Coeff>::is_normal() const
 {
-	return unitPart() == Coeff(1);
+	return unit_part() == Coeff(1);
 }
 
 template<typename Coefficient>
@@ -168,7 +168,7 @@ UnivariatePolynomial<Coefficient> UnivariatePolynomial<Coefficient>::mod(const C
 	{
 		result.mCoefficients.push_back(mod(coeff, modulus));
 	}
-	result.stripLeadingZeroes();
+	result.strip_leading_zeroes();
 	return result;
 }
 
@@ -193,8 +193,8 @@ UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> Univariat
 	std::vector<NumberType> coeffs;
 	coeffs.reserve(this->mCoefficients.size());
 	for (auto c: this->mCoefficients) {
-		assert(c.isConstant());
-		coeffs.push_back(c.constantPart());
+		assert(c.is_constant());
+		coeffs.push_back(c.constant_part());
 	}
 	return UnivariatePolynomial<NumberType>(this->mMainVar, coeffs);
 }
@@ -228,11 +228,11 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 	{
 		return *this;
 	}
-	return *this/unitPart();
+	return *this/unit_part();
 }
 
 template<typename Coeff>
-Coeff UnivariatePolynomial<Coeff>::unitPart() const {
+Coeff UnivariatePolynomial<Coeff>::unit_part() const {
 	if constexpr (is_field_type<Coeff>::value) {
 		// Coeffs from a field
 		return lcoeff();
@@ -255,7 +255,7 @@ Coeff UnivariatePolynomial<Coeff>::unitPart() const {
 
 template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals_type<C>>>
-Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
+Coeff UnivariatePolynomial<Coeff>::coprime_factor() const
 {
 	assert(!carl::is_zero(*this));
 	auto it = mCoefficients.begin();
@@ -270,29 +270,29 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 
 template<typename Coeff>
 template<typename C, DisableIf<is_subset_of_rationals_type<C>>>
-typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::coprimeFactor() const
+typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::coprime_factor() const
 {
 	assert(!carl::is_zero(*this));
 	auto it = mCoefficients.begin();
-	typename UnderlyingNumberType<Coeff>::type factor = it->coprimeFactor();
+	typename UnderlyingNumberType<Coeff>::type factor = it->coprime_factor();
 	for (++it; it != mCoefficients.end(); ++it) {
-		factor = carl::lcm(factor, it->coprimeFactor());
+		factor = carl::lcm(factor, it->coprime_factor());
 	}
 	return factor;
 }
 
 template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals_type<C>>>
-UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
+UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::coprime_coefficients() const
 {
-	CARL_LOG_TRACE("carl.core", *this << " .coprimeCoefficients()");
+	CARL_LOG_TRACE("carl.core", *this << " .coprime_coefficients()");
 	// Notice that even if factor is 1, we create a new polynomial
 	UnivariatePolynomial<typename IntegralType<Coeff>::type> result(mMainVar);
 	if (carl::is_zero(*this)) {
 		return result;
 	}
 	result.mCoefficients.reserve(mCoefficients.size());
-	Coeff factor = this->coprimeFactor();
+	Coeff factor = this->coprime_factor();
 	for (const Coeff& coeff: mCoefficients) {
 		assert(get_denom(coeff * factor) == 1);
 		result.mCoefficients.push_back(get_num(coeff * factor));
@@ -302,11 +302,11 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 
 template<typename Coeff>
 template<typename C, DisableIf<is_subset_of_rationals_type<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprimeCoefficients() const {
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprime_coefficients() const {
 	if (carl::is_zero(*this)) return *this;
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
-	auto factor = this->coprimeFactor();
+	auto factor = this->coprime_factor();
 	for (const Coeff& c: mCoefficients) {
 		result.mCoefficients.push_back(factor * c);
 	}
@@ -315,16 +315,16 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprimeCoefficients() c
 
 template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals_type<C>>>
-UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficientsSignPreserving() const
+UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::coprime_coefficients_sign_preserving() const
 {
-	CARL_LOG_TRACE("carl.core", *this << " .coprimeCoefficientsSignPreserving()");
+	CARL_LOG_TRACE("carl.core", *this << " .coprime_coefficients_sign_preserving()");
 	// Notice that even if factor is 1, we create a new polynomial
 	UnivariatePolynomial<typename IntegralType<Coeff>::type> result(mMainVar);
 	if (carl::is_zero(*this)) {
 		return result;
 	}
 	result.mCoefficients.reserve(mCoefficients.size());
-	Coeff factor = carl::abs(this->coprimeFactor());
+	Coeff factor = carl::abs(this->coprime_factor());
 	for (const Coeff& coeff: mCoefficients) {
 		assert(get_denom(coeff * factor) == 1);
 		result.mCoefficients.push_back(get_num(coeff * factor));
@@ -334,11 +334,11 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 
 template<typename Coeff>
 template<typename C, DisableIf<is_subset_of_rationals_type<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprimeCoefficientsSignPreserving() const {
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprime_coefficients_sign_preserving() const {
 	if (this->is_zero()) return *this;
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
-	auto factor = carl::abs(this->coprimeFactor());
+	auto factor = carl::abs(this->coprime_factor());
 	for (const Coeff& c: mCoefficients) {
 		result.mCoefficients.push_back(factor * c);
 	}
@@ -354,7 +354,7 @@ bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& divisor) c
 
 template<typename Coeff>
 template<typename C, EnableIf<is_instantiation_of<GFNumber, C>>>
-UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
+UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::to_integer_domain() const
 {
 	UnivariatePolynomial<typename IntegralType<Coeff>::type> res(mMainVar);
 	res.mCoefficients.reserve(mCoefficients.size());
@@ -363,13 +363,13 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 		assert(carl::is_integer(c));
 		res.mCoefficients.push_back(c.representing_integer());
 	}
-	res.stripLeadingZeroes();
+	res.strip_leading_zeroes();
 	return res;
 }
 
 template<typename Coeff>
 template<typename C, DisableIf<is_instantiation_of<GFNumber, C>>>
-UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
+UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::to_integer_domain() const
 {
 	UnivariatePolynomial<typename IntegralType<Coeff>::type> res(mMainVar);
 	res.mCoefficients.reserve(mCoefficients.size());
@@ -378,7 +378,7 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 		assert(carl::is_integer(c));
 		res.mCoefficients.push_back(get_num(c));
 	}
-	res.stripLeadingZeroes();
+	res.strip_leading_zeroes();
 	return res;
 }
 
@@ -393,26 +393,26 @@ UnivariatePolynomial<GFNumber<typename IntegralType<Coeff>::type>> UnivariatePol
 		assert(carl::is_integer(c));
 		res.mCoefficients.push_back(GFNumber<typename IntegralType<Coeff>::type>(c,galoisField));
 	}
-	res.stripLeadingZeroes();
+	res.strip_leading_zeroes();
 	return res;
 	
 }
 
 template<typename Coeff>
 template<typename N, EnableIf<is_subset_of_rationals_type<N>>>
-typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::numericContent() const
+typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::numeric_content() const
 {
 	if (carl::is_zero(*this)) return NumberType(0);
 	// Obtain main denominator for all coefficients.
-	IntNumberType mainDenom = this->mainDenom();
+	IntNumberType mainDenom = this->main_denom();
 	
 	// now, some coefficient * mainDenom is always integral.
 	// we convert such a product to an integral data type by get_num()
-	UnivariatePolynomial<Coeff>::NumberType c = this->numericContent(0) * mainDenom;
+	UnivariatePolynomial<Coeff>::NumberType c = this->numeric_content(0) * mainDenom;
 	assert(get_denom(c) == 1);
 	IntNumberType res = get_num(c);
 	for (std::size_t i = 1; i < this->mCoefficients.size(); i++) {
-		c = this->numericContent(i) * mainDenom;
+		c = this->numeric_content(i) * mainDenom;
 		assert(get_denom(c) == 1);
 		res = carl::gcd(get_num(c), res);
 	}
@@ -421,7 +421,7 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 
 template<typename Coeff>
 template<typename C, EnableIf<is_number_type<C>>>
-typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::mainDenom() const
+typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::main_denom() const
 {
 	IntNumberType denom = 1;
 	for (const auto& c: mCoefficients) {
@@ -432,17 +432,17 @@ typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>:
 }
 template<typename Coeff>
 template<typename C, DisableIf<is_number_type<C>>>
-typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::mainDenom() const
+typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::main_denom() const
 {
 	IntNumberType denom = 1;
 	for (const auto& c: mCoefficients) {
-		denom = carl::lcm(denom, c.mainDenom());
+		denom = carl::lcm(denom, c.main_denom());
 	}
 	return denom;
 }
 
 template<typename Coeff>
-Coeff UnivariatePolynomial<Coeff>::syntheticDivision(const Coeff& zeroOfDivisor)
+Coeff UnivariatePolynomial<Coeff>::synthetic_division(const Coeff& zeroOfDivisor)
 {
 	if(coefficients().empty()) return Coeff(0);
 	if(coefficients().size() == 1) return coefficients().back();
@@ -531,7 +531,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Univa
 			mCoefficients[i] += rhs.mCoefficients[i]; 
 		}
 	}
-	stripLeadingZeroes();
+	strip_leading_zeroes();
 	return *this;
 }
 
@@ -632,7 +632,7 @@ UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=
 	
 	if(is_finite_type<Coefficient>::value)
 	{
-		stripLeadingZeroes();
+		strip_leading_zeroes();
 	}
 	
 	return *this;		
@@ -680,7 +680,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Univa
 		}
 	}
 	mCoefficients.swap(newCoeffs);
-	stripLeadingZeroes();
+	strip_leading_zeroes();
 	return *this;
 }
 
@@ -754,7 +754,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff
 		c = quotient(c, rhs);
 	}
 	/// TODO not fully sure whether this is necessary
-	this->stripLeadingZeroes();
+	this->strip_leading_zeroes();
 	return *this;		
 }
 
@@ -772,8 +772,8 @@ UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& r
 template<typename C>
 bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
 {
-	assert(lhs.isConsistent());
-	assert(rhs.isConsistent());
+	assert(lhs.is_consistent());
+	assert(rhs.is_consistent());
 	if(lhs.mMainVar == rhs.mMainVar)
 	{
 		return lhs.mCoefficients == rhs.mCoefficients;
@@ -890,7 +890,7 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 
 template<typename Coefficient>
 template<typename C, EnableIf<is_number_type<C>>>
-bool UnivariatePolynomial<Coefficient>::isConsistent() const {
+bool UnivariatePolynomial<Coefficient>::is_consistent() const {
 	if (!mCoefficients.empty()) {
 		assert(!carl::is_zero(lcoeff()));
 	}
@@ -899,13 +899,13 @@ bool UnivariatePolynomial<Coefficient>::isConsistent() const {
 
 template<typename Coefficient>
 template<typename C, DisableIf<is_number_type<C>>>
-bool UnivariatePolynomial<Coefficient>::isConsistent() const {
+bool UnivariatePolynomial<Coefficient>::is_consistent() const {
 	if (!mCoefficients.empty()) {
 		assert(!carl::is_zero(lcoeff()));
 	}
 	for (const auto& c: mCoefficients) {
 		assert(!c.has(mainVar()));
-		assert(c.isConsistent());
+		assert(c.is_consistent());
 	}
 	return true;
 }

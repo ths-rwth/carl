@@ -43,7 +43,7 @@ namespace carl
 				} 
 				else 
 				{
-					assert(!it->lhs().denominator().isConstant());
+					assert(!it->lhs().denominator().is_constant());
 					out = PCon(it->lhs().nominator(), inverse(it->rel()));
 					out = PCon(it->lhs().nominator() * it->lhs().denominator(), it->rel());
 				}

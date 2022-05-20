@@ -233,7 +233,7 @@ namespace carl
              */
             const FormulaContent<Pol>* create(Constraint<Pol>&& _constraint) {
                 #ifdef SIMPLIFY_FORMULA
-                switch (_constraint.isConsistent()) {
+                switch (_constraint.is_consistent()) {
                     case 0: return falseFormula();
                     case 1: return trueFormula();
                     default: ;

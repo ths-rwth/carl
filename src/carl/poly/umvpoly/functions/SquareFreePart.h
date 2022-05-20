@@ -15,7 +15,7 @@ namespace carl {
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> squareFreePart(const MultivariatePolynomial<C,O,P>& polynomial) {
 	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << polynomial);
-	if (polynomial.isConstant() || polynomial.isLinear()) return polynomial;
+	if (polynomial.is_constant() || polynomial.is_linear()) return polynomial;
 
 	auto s = overloaded {
 	#if defined USE_COCOA
@@ -38,8 +38,8 @@ template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
 UnivariatePolynomial<Coeff> squareFreePart(const UnivariatePolynomial<Coeff>& p) {
 	CARL_LOG_DEBUG("carl.core.sqfree", "SquareFreePart of " << p);
 	if (is_zero(p)) return p;
-	if (p.isLinearInMainVar()) return p;
-	UnivariatePolynomial<Coeff> normalized = p.coprimeCoefficients().template convert<Coeff>();
+	if (p.is_linear_in_main_var()) return p;
+	UnivariatePolynomial<Coeff> normalized = p.coprime_coefficients().template convert<Coeff>();
 	return carl::divide(normalized, carl::gcd(normalized, derivative(normalized))).quotient;
 }
 

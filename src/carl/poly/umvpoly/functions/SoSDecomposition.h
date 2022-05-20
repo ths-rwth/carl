@@ -34,13 +34,13 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> sos_decomposition(const 
 	}
 	// TODO: If cheap, find substitution of monomials to variables such that applied to this polynomial a quadratic form is achieved.
 	// Only compute sos for quadratic forms.
-	if (p.totalDegree() != 2) {
+	if (p.total_degree() != 2) {
 		return result;
 	}
 	auto rem = p;
-	while (!rem.isConstant()) {
+	while (!rem.is_constant()) {
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Consider " << rem);
-		assert(rem.totalDegree() <= 2);
+		assert(rem.total_degree() <= 2);
 		Variable var = (*rem.lterm().monomial())[0].first;
 		// Complete the square for var
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Complete the square for " << var);
@@ -50,30 +50,30 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> sos_decomposition(const 
 			CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__);
 			return {};
 		}
-		assert(lcoeffIter->second.isConstant());
-		if (carl::is_negative(lcoeffIter->second.constantPart())) {
+		assert(lcoeffIter->second.is_constant());
+		if (carl::is_negative(lcoeffIter->second.constant_part())) {
 			CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__);
 			return {};
 		}
-		assert(!carl::is_zero(lcoeffIter->second.constantPart()));
+		assert(!carl::is_zero(lcoeffIter->second.constant_part()));
 		auto constCoeffIter = varInfos.coeffs().find(0);
 		rem = constCoeffIter != varInfos.coeffs().end() ? constCoeffIter->second : MultivariatePolynomial<C,O,P>();
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Constant part is " << rem);
 		auto coeffIter = varInfos.coeffs().find(1);
 		if (coeffIter != varInfos.coeffs().end()) {
-			MultivariatePolynomial<C,O,P> qr = coeffIter->second/(C(2)*lcoeffIter->second.constantPart());
-			result.emplace_back(lcoeffIter->second.constantPart(), MultivariatePolynomial<C,O,P>(var)+qr);
-			rem -= carl::pow(qr, 2)*lcoeffIter->second.constantPart();
+			MultivariatePolynomial<C,O,P> qr = coeffIter->second/(C(2)*lcoeffIter->second.constant_part());
+			result.emplace_back(lcoeffIter->second.constant_part(), MultivariatePolynomial<C,O,P>(var)+qr);
+			rem -= carl::pow(qr, 2)*lcoeffIter->second.constant_part();
 		} else {
-			result.emplace_back(lcoeffIter->second.constantPart(), MultivariatePolynomial<C,O,P>(var));
+			result.emplace_back(lcoeffIter->second.constant_part(), MultivariatePolynomial<C,O,P>(var));
 		}
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Add " << result.back().first << " * (" << result.back().second << ")^2");
 	}
-	if (carl::is_negative(rem.constantPart())) {
+	if (carl::is_negative(rem.constant_part())) {
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__);
 		return {};
-	} else if(!carl::is_zero(rem.constantPart())) {
-		result.emplace_back(rem.constantPart(), MultivariatePolynomial<C,O,P>(constant_one<C>::get()));
+	} else if(!carl::is_zero(rem.constant_part())) {
+		result.emplace_back(rem.constant_part(), MultivariatePolynomial<C,O,P>(constant_one<C>::get()));
 	}
 	CARL_LOG_TRACE("carl.core.sos_decomposition", "Add " << result.back().first << " * (" << result.back().second << ")^2");
 	return result;

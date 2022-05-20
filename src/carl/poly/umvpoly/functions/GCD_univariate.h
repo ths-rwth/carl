@@ -18,7 +18,7 @@ UnivariatePolynomial<Coeff> gcd_recursive(const UnivariatePolynomial<Coeff>& a, 
 	}
 //	if(is_field_type<Coeff>::value)
 //	{
-//		if(b.isConstant()) return b;
+//		if(b.is_constant()) return b;
 //	}
 	else {
 		return gcd_recursive(b, remainder(a, b));

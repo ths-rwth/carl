@@ -25,7 +25,7 @@ namespace carl {
 		}
 
 		virtual Formula<Poly> representingFormula(const ModelVariable& mv) {
-			assert(mv.isVariable());
+			assert(mv.is_variable());
 			Formulas<Poly> subs;
 			for (const auto& v: mValues) {
 				//subs.emplace_back(Formula<Poly>())
@@ -37,7 +37,7 @@ namespace carl {
 			return true;
 		}
 		virtual bool dependsOn(const ModelVariable& var) const {
-			if (!var.isVariable()) return false;
+			if (!var.is_variable()) return false;
 			for (const auto& v: mValues) {
 				
 			}

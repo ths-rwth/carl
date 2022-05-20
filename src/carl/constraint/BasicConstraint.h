@@ -64,13 +64,13 @@ public:
 	}
 
 	bool is_trivial_true() const  {
-		if(m_lhs.isConstant()) {
-			if(m_lhs.constantPart() == 0) {
+		if(m_lhs.is_constant()) {
+			if(m_lhs.constant_part() == 0) {
 				return is_weak(m_relation);
-			} else if(m_lhs.constantPart() > 0) {
+			} else if(m_lhs.constant_part() > 0) {
 				return m_relation == Relation::GEQ || m_relation == Relation::GREATER || m_relation == Relation::NEQ;
 			} else {
-				assert(m_lhs.constantPart() < 0);
+				assert(m_lhs.constant_part() < 0);
 				return m_relation == Relation::LEQ || m_relation == Relation::LESS || m_relation == Relation::NEQ;
 			}
 		}
@@ -78,13 +78,13 @@ public:
 	}
 	
 	bool is_trivial_false() const {
-		if(m_lhs.isConstant()) {
-			if(m_lhs.constantPart() == 0) {
+		if(m_lhs.is_constant()) {
+			if(m_lhs.constant_part() == 0) {
 				return is_strict(m_relation);
-			} else if(m_lhs.constantPart() > 0) {
+			} else if(m_lhs.constant_part() > 0) {
 				return m_relation == Relation::LEQ || m_relation == Relation::LESS || m_relation == Relation::EQ;
 			} else {
-				assert(m_lhs.constantPart() < 0);
+				assert(m_lhs.constant_part() < 0);
 				return m_relation == Relation::GEQ || m_relation == Relation::GREATER || m_relation == Relation::EQ;
 			}
 		}

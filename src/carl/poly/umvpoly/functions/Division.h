@@ -56,7 +56,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> divide(const MultivariatePolynom
 		new_coeffs.emplace_back(divide(t, divisor));
 	}
 	MultivariatePolynomial<Coeff,Ordering,Policies> res(std::move(new_coeffs), false, p.isOrdered());
-	assert(res.isConsistent());
+	assert(res.is_consistent());
 	return res;
 }
 
@@ -83,7 +83,7 @@ bool try_divide(const MultivariatePolynomial<Coeff,Ordering,Policies>& dividend,
 	}
 	auto& tam = MultivariatePolynomial<Coeff,Ordering,Policies>::mTermAdditionManager;
 	auto id = tam.getId(0);
-	auto thisid = tam.getId(dividend.nrTerms());
+	auto thisid = tam.getId(dividend.nr_terms());
 	for (const auto& t: dividend) {
 		tam.template addTerm<false,true>(thisid, t);
 	}
@@ -101,11 +101,11 @@ bool try_divide(const MultivariatePolynomial<Coeff,Ordering,Policies>& dividend,
 			return false;
 		}
 	}
-	tam.readTerms(id, quotient.getTerms());
+	tam.readTerms(id, quotient.terms());
 	tam.dropTerms(thisid);
 	quotient.reset_ordered();
 	quotient.template makeMinimallyOrdered<false, true>();
-	assert(quotient.isConsistent());
+	assert(quotient.is_consistent());
 	return true;
 }
 
@@ -131,11 +131,11 @@ DivisionResult<MultivariatePolynomial<Coeff,Ordering,Policies>> divide(const Mul
 			//p -= factor * divisor;
 		} else {
 			r += p.lterm();
-			p.stripLT();
+			p.strip_lterm();
 		}
 	}
-	assert(q.isConsistent());
-	assert(r.isConsistent());
+	assert(q.is_consistent());
+	assert(r.is_consistent());
 	assert(dividend == q * divisor + r);
 	return DivisionResult<MultivariatePolynomial<Coeff,Ordering,Policies>> {q,r};
 }
@@ -144,20 +144,20 @@ template<typename Coeff>
 bool try_divide(const UnivariatePolynomial<Coeff>& dividend, const Coeff& divisor, UnivariatePolynomial<Coeff>& quotient) {
 	static_assert(!is_field_type<Coeff>::value);
 	static_assert(!is_number_type<Coeff>::value);
-	assert(dividend.isConsistent());
-	assert(divisor.isConsistent());
+	assert(dividend.is_consistent());
+	assert(divisor.is_consistent());
 	Coeff quo;
 	bool res = try_divide(Coeff(dividend), divisor, quo);
 	CARL_LOG_TRACE("carl.core", Coeff(dividend) << " / " << divisor << " = " << quo);
-	assert(quo.isConsistent());
+	assert(quo.is_consistent());
 	if (res) quotient = carl::to_univariate_polynomial(quo, dividend.mainVar());
 	return res;
 }
 
 template<typename Coeff>
 DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Coeff>& p, const Coeff& divisor) {
-	assert(p.isConsistent());
-	assert(divisor.isConsistent());
+	assert(p.is_consistent());
+	assert(divisor.is_consistent());
 	if constexpr(is_field_type<Coeff>::value) {
 		UnivariatePolynomial<Coeff> res(p);
 		for (auto& c: res.coefficients()) {
@@ -172,15 +172,15 @@ DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Co
 
 template<typename Coeff>
 DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Coeff>& p, const typename UnderlyingNumberType<Coeff>::type& divisor) {
-	assert(p.isConsistent());
+	assert(p.is_consistent());
 	static_assert(is_field_type<typename UnderlyingNumberType<Coeff>::type>::value);
 
 	UnivariatePolynomial<Coeff> res(p);
-	assert(res.isConsistent());
+	assert(res.is_consistent());
 	for (auto& c: res.coefficients()) {
 		c = divide(c, divisor);
 	}
-	assert(res.isConsistent());
+	assert(res.is_consistent());
 	return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial<Coeff>(p.mainVar())};
 }
 

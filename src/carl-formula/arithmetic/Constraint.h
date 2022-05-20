@@ -192,7 +192,7 @@ public:
      *          1, if the constraint is consistent.
      *          2, if the constraint still contains variables.
      */
-	unsigned isConsistent() const {
+	unsigned is_consistent() const {
 		return m_element->m_constraint.is_consistent();
 	}
 
@@ -239,7 +239,7 @@ public:
 	/**
      * @return true, if it contains only integer valued variables.
      */
-	bool integerValued() const {
+	bool integer_valued() const {
 		return variables().filter(variable_type_filter::excluding({carl::VariableType::VT_INT})).size() == 0;
 	}
 

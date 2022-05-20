@@ -51,8 +51,8 @@ public:
 	explicit RationalFunction(const Pol& p)
 		: mNumberQuotient(),
 		  mIsSimplified(true) {
-		if (p.isConstant())
-			mNumberQuotient = p.constantPart();
+		if (p.is_constant())
+			mNumberQuotient = p.constant_part();
 		else
 			mPolynomialQuotient = std::pair<Pol, Pol>(p, std::move(Pol(1)));
 	}
@@ -60,8 +60,8 @@ public:
 	explicit RationalFunction(Pol&& p)
 		: mNumberQuotient(),
 		  mIsSimplified(true) {
-		if (p.isConstant())
-			mNumberQuotient = p.constantPart();
+		if (p.is_constant())
+			mNumberQuotient = p.constant_part();
 		else
 			mPolynomialQuotient = std::pair<Pol, Pol>(std::move(p), std::move(Pol(1)));
 	}
@@ -69,13 +69,13 @@ public:
 	explicit RationalFunction(const Pol& nom, const Pol& denom)
 		: mNumberQuotient(),
 		  mIsSimplified(false) {
-		if (nom.isConstant() && denom.isConstant()) {
-			mNumberQuotient = nom.constantPart() / denom.constantPart();
+		if (nom.is_constant() && denom.is_constant()) {
+			mNumberQuotient = nom.constant_part() / denom.constant_part();
 			mIsSimplified = true;
 		} else {
 			mPolynomialQuotient = std::pair<Pol, Pol>(nom, denom);
 			eliminateCommonFactor(!AutoSimplify);
-			assert(isConstant() || !carl::is_zero(denominatorAsPolynomial()));
+			assert(is_constant() || !carl::is_zero(denominatorAsPolynomial()));
 		}
 	}
 
@@ -84,7 +84,7 @@ public:
 		  mNumberQuotient(),
 		  mIsSimplified(false) {
 		eliminateCommonFactor(!AutoSimplify);
-		assert(isConstant() || !carl::is_zero(denominatorAsPolynomial()));
+		assert(is_constant() || !carl::is_zero(denominatorAsPolynomial()));
 	}
 
 	explicit RationalFunction(std::optional<std::pair<Pol, Pol>>&& quotient, const CoeffType& num, bool simplified)
@@ -106,7 +106,7 @@ public:
 	 * @return The nominator
 	 */
 	Pol nominator() const {
-		if (isConstant())
+		if (is_constant())
 			return Pol(carl::get_num(mNumberQuotient));
 		else
 			return mPolynomialQuotient->first;
@@ -116,7 +116,7 @@ public:
 	 * @return  The denominator
 	 */
 	Pol denominator() const {
-		if (isConstant())
+		if (is_constant())
 			return Pol(carl::get_denom(mNumberQuotient));
 		return mPolynomialQuotient->second;
 	}
@@ -125,7 +125,7 @@ public:
 	 * @return The nominator as a polynomial.
 	 */
 	const Pol& nominatorAsPolynomial() const {
-		assert(!isConstant());
+		assert(!is_constant());
 		return mPolynomialQuotient->first;
 	}
 
@@ -133,7 +133,7 @@ public:
 	 * @return  The denominator as a polynomial.
 	 */
 	const Pol& denominatorAsPolynomial() const {
-		assert(!isConstant());
+		assert(!is_constant());
 		return mPolynomialQuotient->second;
 	}
 
@@ -141,7 +141,7 @@ public:
 	 * @return The nominator as a polynomial.
 	 */
 	CoeffType nominatorAsNumber() const {
-		assert(isConstant());
+		assert(is_constant());
 		return carl::get_num(mNumberQuotient);
 	}
 
@@ -149,7 +149,7 @@ public:
 	 * @return  The denominator as a polynomial.
 	 */
 	CoeffType denominatorAsNumber() const {
-		assert(isConstant());
+		assert(is_constant());
 		return carl::get_denom(mNumberQuotient);
 	}
 
@@ -175,7 +175,7 @@ public:
 	 */
 	RationalFunction inverse() const {
 		assert(!this->is_zero());
-		if (isConstant()) {
+		if (is_constant()) {
 			return RationalFunction(std::nullopt, 1 / mNumberQuotient, mIsSimplified);
 		} else {
 			return RationalFunction(std::optional<std::pair<Pol, Pol>>(std::pair<Pol, Pol>(mPolynomialQuotient->second, mPolynomialQuotient->first)), carl::constant_zero<CoeffType>().get(), mIsSimplified);
@@ -187,27 +187,27 @@ public:
 	 * @return true if it is
 	 */
 	bool is_zero() const {
-		if (isConstant())
+		if (is_constant())
 			return carl::is_zero(mNumberQuotient);
 		assert(!carl::is_zero(denominatorAsPolynomial()));
 		return carl::is_zero(nominatorAsPolynomial());
 	}
 
 	bool is_one() const {
-		if (isConstant())
+		if (is_constant())
 			return carl::is_one(mNumberQuotient);
 		assert(!carl::is_zero(denominatorAsPolynomial()));
 		return nominatorAsPolynomial() == denominatorAsPolynomial();
 	}
 
-	bool isConstant() const {
+	bool is_constant() const {
 		return !mPolynomialQuotient;
 	}
 
-	CoeffType constantPart() const {
-		if (isConstant())
+	CoeffType constant_part() const {
+		if (is_constant())
 			return mNumberQuotient;
-		return nominatorAsPolynomial().constantPart() / denominatorAsPolynomial().constantPart();
+		return nominatorAsPolynomial().constant_part() / denominatorAsPolynomial().constant_part();
 	}
 
 	/**
@@ -225,7 +225,7 @@ public:
 	 * @param vars
 	 */
 	void gatherVariables(std::set<Variable>& vars) const {
-		if (isConstant())
+		if (is_constant())
 			return;
 		nominatorAsPolynomial().gatherVariables(vars);
 		denominatorAsPolynomial().gatherVariables(vars);
@@ -237,7 +237,7 @@ public:
 	 * @return The result of the substitution
 	 */
 	CoeffType evaluate(const std::map<Variable, CoeffType>& substitutions) const {
-		if (isConstant()) {
+		if (is_constant()) {
 			return mNumberQuotient;
 		} else {
 			return carl::evaluate(nominatorAsPolynomial(), substitutions) / carl::evaluate(denominatorAsPolynomial(), substitutions);
@@ -245,7 +245,7 @@ public:
 	}
 
 	RationalFunction substitute(const std::map<Variable, CoeffType>& substitutions) const {
-		if (isConstant())
+		if (is_constant())
 			return *this;
 		else {
 			return RationalFunction(carl::substitute(nominatorAsPolynomial(), substitutions), carl::substitute(denominatorAsPolynomial(), substitutions));
@@ -572,7 +572,7 @@ namespace std {
 template<typename Pol, bool AS>
 struct hash<carl::RationalFunction<Pol, AS>> {
 	std::size_t operator()(const carl::RationalFunction<Pol, AS>& r) const {
-		if (r.isConstant())
+		if (r.is_constant())
 			return carl::hash_all(r.nominatorAsNumber(), r.denominatorAsNumber());
 		else
 			return carl::hash_all(r.nominatorAsPolynomial(), r.denominatorAsPolynomial());

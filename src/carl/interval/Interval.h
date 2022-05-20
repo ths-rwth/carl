@@ -261,7 +261,7 @@ namespace carl
                 mUpperBoundType = BoundType::STRICT;
             }
 			Policy::sanitize(*this);
-			assert(isConsistent());
+			assert(is_consistent());
         }
 
         /**
@@ -1025,7 +1025,7 @@ namespace carl
          */
         inline bool is_infinite() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
         }
 
@@ -1035,7 +1035,7 @@ namespace carl
          */
         inline bool is_unbounded() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             return mLowerBoundType == BoundType::INFTY || mUpperBoundType == BoundType::INFTY;
         }
 
@@ -1045,7 +1045,7 @@ namespace carl
          */
         inline bool is_half_bounded() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             return (mLowerBoundType == BoundType::INFTY) != (mUpperBoundType == BoundType::INFTY);
         }
 
@@ -1055,7 +1055,7 @@ namespace carl
          */
         inline bool is_empty() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
 			if (mContent.lower() == mContent.upper()) {
 				if (mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT) return true;
 				if (mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::WEAK) return true;
@@ -1070,7 +1070,7 @@ namespace carl
          */
         inline bool is_point_interval() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             return (this->is_closed_interval() && mContent.lower() == mContent.upper());
         }
 
@@ -1080,7 +1080,7 @@ namespace carl
          */
         inline bool is_open_interval() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             return (mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT);
         }
 
@@ -1090,7 +1090,7 @@ namespace carl
          */
         inline bool is_closed_interval() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             return (mLowerBoundType == BoundType::WEAK && mUpperBoundType == BoundType::WEAK);
         }
 
@@ -1100,7 +1100,7 @@ namespace carl
          */
         inline bool is_zero() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             return this->is_point_interval() && (mContent.lower() == carl::constant_zero<Number>().get());
         }
 
@@ -1110,7 +1110,7 @@ namespace carl
          */
         inline bool is_one() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             return this->is_point_interval() && (mContent.lower() == carl::constant_one<Number>().get());
         }
 
@@ -1119,7 +1119,7 @@ namespace carl
          */
         inline bool is_positive() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             if( mLowerBoundType == BoundType::WEAK )
                 return mContent.lower() > carl::constant_zero<Number>().get();
             if( mLowerBoundType == BoundType::STRICT )
@@ -1132,7 +1132,7 @@ namespace carl
          */
         inline bool is_negative() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             if( mUpperBoundType == BoundType::WEAK )
                 return mContent.upper() < carl::constant_zero<Number>().get();
             if( mUpperBoundType == BoundType::STRICT )
@@ -1145,7 +1145,7 @@ namespace carl
          */
         inline bool is_semi_positive() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             if( mLowerBoundType != BoundType::INFTY )
                 return mContent.lower() >= carl::constant_zero<Number>().get();
             return false;
@@ -1156,7 +1156,7 @@ namespace carl
          */
         inline bool is_semi_negative() const
         {
-            assert(this->isConsistent());
+            assert(this->is_consistent());
             if( mUpperBoundType != BoundType::INFTY )
                 return mContent.upper() <= carl::constant_zero<Number>().get();
             return false;
@@ -1423,7 +1423,7 @@ namespace carl
          * A quick check for the bound values.
          * @return True if the lower bound is less or equal to the upper bound.
          */
-        bool isConsistent() const
+        bool is_consistent() const
         {
             return this->lower() <= this->upper();
         }
@@ -1451,7 +1451,7 @@ namespace carl
 */
 template<typename Number>
 bool is_zero(const Interval<Number>& i) {
-	assert(i.isConsistent());
+	assert(i.is_consistent());
 	return i.is_point_interval() && carl::is_zero(i.lower());
 }
 
@@ -1460,7 +1460,7 @@ bool is_zero(const Interval<Number>& i) {
 */
 template<typename Number>
 bool is_one(const Interval<Number>& i) {
-	assert(i.isConsistent());
+	assert(i.is_consistent());
 	return i.is_point_interval() && carl::is_one(i.lower());
 }
 

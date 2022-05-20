@@ -11,7 +11,7 @@ class TestFactorizedPolynomial(TestCarl):
 		self.assertEqual(fp1.toString(),'2')
 
 	def testGetters(self):
-		self.assertTrue(fp1.constantPart().equals(Rational(2)))
+		self.assertTrue(fp1.constant_part().equals(Rational(2)))
 
 	def testEvaluate(self):
 		map = VarRationalMap()

@@ -74,7 +74,7 @@ UnivariatePolynomial<Coeff> remainder_helper(const UnivariatePolynomial<Coeff>& 
 	}
 	auto result = UnivariatePolynomial<Coeff>(dividend.mainVar(), std::move(coeffs));
 	// strip zeros from the end as we might have pushed zeros.
-	result.stripLeadingZeroes();
+	result.strip_leading_zeroes();
 	
 	if(carl::is_zero(result) || result.degree() < divisor.degree())
 	{
@@ -188,11 +188,11 @@ MultivariatePolynomial<C,O,P> remainder(const MultivariatePolynomial<C,O,P>& div
 			if( O::degreeOrder )
 			{
 				remainder += p;
-                assert(remainder.isConsistent());
+                assert(remainder.is_consistent());
 				return remainder;
 			}
 			remainder += p.lterm();
-			p.stripLT();
+			p.strip_lterm();
 		}
 		else
 		{
@@ -204,11 +204,11 @@ MultivariatePolynomial<C,O,P> remainder(const MultivariatePolynomial<C,O,P>& div
 			else
 			{
 				remainder += p.lterm();
-				p.stripLT();
+				p.strip_lterm();
 			}
 		}
 	}
-	assert(remainder.isConsistent());
+	assert(remainder.is_consistent());
 	assert(dividend == quotient(dividend, divisor) * divisor + remainder);
 	return remainder;
 }

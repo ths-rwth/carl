@@ -10,8 +10,8 @@ Monomial::Arg gcd(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 	if(!rhs) return lhs;
 
 	CARL_LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
-	assert(lhs->isConsistent());
-	assert(rhs->isConsistent());
+	assert(lhs->is_consistent());
+	assert(rhs->is_consistent());
 
 	Monomial::Content newExps;
 	std::size_t expsum = 0;

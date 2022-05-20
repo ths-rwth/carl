@@ -99,7 +99,7 @@ public:
 	}
 
 	void collect(Variable::Arg var, const typename CoeffType::CoeffType&, const typename CoeffType::MonomType& monomial) {
-		std::size_t e = monomial.exponentOfVariable(var);
+		std::size_t e = monomial.exponent_of_variable(var);
 		if (e > 0) {
 			// One more term in which the variable occurs.
 			increaseOccurence();

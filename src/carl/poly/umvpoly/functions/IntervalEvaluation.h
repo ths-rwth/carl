@@ -51,7 +51,7 @@ inline Interval<Numeric> evaluate(const MultivariatePolynomial<Coeff, Policy, Or
 		return Interval<Numeric>(0);
 	} else {
 		Interval<Numeric> result(evaluate(p[0], map)); 
-		for (unsigned i = 1; i < p.nrTerms(); ++i) {
+		for (unsigned i = 1; i < p.nr_terms(); ++i) {
             if( result.is_infinite() )
                 return result;
 			result += evaluate(p[i], map);
