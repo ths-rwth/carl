@@ -1,7 +1,5 @@
 #include "LibpolyVariableMapper.h"
 
-#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
-
 namespace carl {
 
 VariableMapper::VariableMapper() {
@@ -75,5 +73,3 @@ void VariableMapper::setLibpolyMainVariable(const carl::Variable& mainVar) {
 }
 
 } // namespace carl
-
-#endif

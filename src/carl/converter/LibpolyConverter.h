@@ -2,8 +2,6 @@
 
 #include <carl-common/config.h>
 
-#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
-
 #include <algorithm>
 #include <map>
 
@@ -184,5 +182,3 @@ public:
 };
 
 } // namespace carl
-
-#endif

@@ -1,7 +1,5 @@
 #include "LibpolyConverter.h"
 
-#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
-
 namespace carl {
 
 struct MonomialData {
@@ -188,4 +186,3 @@ carl::Interval<Number> LibpolyConverter::toInterval(const poly::Interval& inter)
 
 } // namespace carl
 
-#endif

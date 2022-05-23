@@ -2,8 +2,6 @@
 
 #include <carl-common/config.h>
 
-#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
-
 #include <carl/core/Variable.h>
 #include <carl/core/Common.h>
 #include <carl-common/meta/SFINAE.h>
@@ -51,5 +49,3 @@ public:
 };
 
 } // namespace carl
-
-#endif

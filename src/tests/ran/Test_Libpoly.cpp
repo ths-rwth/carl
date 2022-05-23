@@ -3,8 +3,6 @@
 #include "../Common.h"
 #include <carl/core/VariablePool.h>
 
-#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
-
 #include <carl/converter/LibpolyFunctions.h>
 #include <carl/ran/ran.h>
 #include <carl/ran/real_roots.h>
@@ -149,7 +147,7 @@ TEST(LIBPOLY, nullificationBug){
 	std::map<Variable, RealAlgebraicNumberLibpoly<mpq_class>> assignment ; 
 	assignment[x0] = RealAlgebraicNumberLibpoly<mpq_class>(0) ;
 
-	auto roots = carl::ran::real_roots(carl::to_univariate_polynomial(carl_poly, x1), assignment);
+	auto roots = carl::ran::real_roots_libpoly(carl::to_univariate_polynomial(carl_poly, x1), assignment);
 	
 	EXPECT_FALSE(roots.is_nullified());
 	EXPECT_EQ(roots.roots().size(), 0);
@@ -169,7 +167,7 @@ TEST(LIBPOLY, nullificationBug2){
 	assignment[skoY] = RealAlgebraicNumberLibpoly<mpq_class>(mpq_class(-1,2)) ;
 
 
-	auto roots = carl::ran::real_roots(carl::to_univariate_polynomial(carl_poly, skoZ), assignment);
+	auto roots = carl::ran::real_roots_libpoly(carl::to_univariate_polynomial(carl_poly, skoZ), assignment);
 	
 	std::cout << roots.roots() << std::endl;
 
@@ -177,5 +175,3 @@ TEST(LIBPOLY, nullificationBug2){
 	EXPECT_FALSE(roots.roots().empty());
 
 }
-
-#endif

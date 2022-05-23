@@ -10,7 +10,7 @@
  * - A real number cannot always be adequately represented in finite memory, since
  *   it may be infinitely long. Representing
  *   it by a float or any other finite-precision representation and doing
- *   arithmatic may introduce unacceptable rouding errors.
+ *   arithmetic may introduce unacceptable rounding errors.
  *   The algebraic reals, a subset of the reals, is the set of those reals that can be represented
  *   as the root of a univariate polynomial with rational coefficients so there is always
  *   an implicit, finite, full-precision
@@ -28,35 +28,28 @@
 
 #include <carl-common/config.h>
 
-#ifdef RAN_USE_INTERVAL
+
 #include "interval/ran_interval.h"
 #include "interval/ran_interval_evaluation.h"
-#endif
 
-#ifdef RAN_USE_THOM
-#include "thom/ran_thom.h"
-#include "thom/ran_thom_evaluation.h"
-#endif
+//#include "thom/ran_thom.h"
+//#include "thom/ran_thom_evaluation.h"
 
-#ifdef RAN_USE_LIBPOLY
 #include "libpoly/ran_libpoly.h"
 #include "libpoly/ran_libpoly_evaluation.h"
-#endif
+
 
 namespace carl {
-	#ifdef RAN_USE_INTERVAL
+
 	template<typename Number>
 	using RealAlgebraicNumber = RealAlgebraicNumberInterval<Number>;
-	#endif
 
-	#ifdef RAN_USE_THOM
 	template<typename Number>
-	using RealAlgebraicNumber = RealAlgebraicNumberThom<Number>;
-	#endif
+	using RealAlgebraicNumberLibpoly = RealAlgebraicNumberLibpoly<Number>;
 
-	#ifdef RAN_USE_LIBPOLY
-	template<typename Number>
-	using RealAlgebraicNumber = RealAlgebraicNumberLibpoly<Number>;
-	#endif
+
+	//template<typename Number>
+	//using RealAlgebraicNumberThom = RealAlgebraicNumberThom<Number>;
+
 
 }

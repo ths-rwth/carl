@@ -2,7 +2,6 @@
 
 #include "LPPolynomial.h"
 
-#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
 
 namespace carl {
 
@@ -355,5 +354,3 @@ std::ostream& operator<<(std::ostream& os, const LPPolynomial& p) {
 }
 
 } // namespace carl
-
-#endif

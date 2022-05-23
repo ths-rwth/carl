@@ -4,15 +4,10 @@
 
 #pragma once
 
-#include "../../core/Polynomial.h"
-#include "../../core/Sign.h"
-#include "../../core/Variable.h"
-#include "../../core/VariableInformation.h"
-#include "../../numbers/numbers.h"
-#include "../../util/SFINAE.h"
-#include "../../util/hash.h"
 #include "LPContext.h"
 
+#include <carl/poly/umvpoly/Polynomial.h> //abstract base class Polynomoal
+#include <carl/core/Variables.h>
 #include <carl-logging/carl-logging.h>
 
 #include <functional>
@@ -21,10 +16,6 @@
 #include <memory>
 #include <poly/polyxx.h>
 #include <vector>
-
-namespace carl {
-
-} // namespace carl
 
 namespace carl {
 
@@ -506,7 +497,7 @@ LPPolynomial& operator*=(LPPolynomial& lhs, const mpz_class& rhs);
  * Checks if the polynomial is equal to zero.
  * @return If polynomial is zero.
  */
-bool is_zero(LPPolynomial& p) {
+inline bool is_zero(LPPolynomial& p) {
     return lp_polynomial_is_zero(p.get_internal());
 }
 
@@ -519,7 +510,7 @@ bool is_zero(LPPolynomial& p) {
  * Checks if the polynomial is linear or not.
  * @return If polynomial is linear.
  */
-bool is_constant(const LPPolynomial& p) {
+inline bool is_constant(const LPPolynomial& p) {
     return lp_polynomial_is_constant(p.get_internal());
 }
 
@@ -527,7 +518,7 @@ bool is_constant(const LPPolynomial& p) {
  * Checks if the polynomial is equal to one.
  * @return If polynomial is one.
  */
-bool is_one(LPPolynomial& p) {
+inline bool is_one(LPPolynomial& p) {
     if (!is_constant(p)) {
         return false;
     }
@@ -539,7 +530,7 @@ bool is_one(LPPolynomial& p) {
 /**
  * Helper function to collect Variables in a polynomial (by lp_polynomial_traverse)
  */
-static void collectVars(const lp_polynomial_context_t* ctx,
+static inline void collectVars(const lp_polynomial_context_t* ctx,
                         lp_monomial_t* m,
                         void* d) {
     carlVariables* varList = static_cast<carlVariables*>(d);
@@ -550,7 +541,7 @@ static void collectVars(const lp_polynomial_context_t* ctx,
 }
 
 /// Add the variables of the given polynomial to the variables.
-void variables(const LPPolynomial& p, carlVariables& vars) {
+inline void variables(const LPPolynomial& p, carlVariables& vars) {
     vars.clear();
     lp_polynomial_traverse(p.get_internal(), collectVars, &vars);
     return;
@@ -576,4 +567,4 @@ struct hash<carl::LPPolynomial> {
 
 } // namespace std
 
-#include "LPPolynomial.tpp"
+

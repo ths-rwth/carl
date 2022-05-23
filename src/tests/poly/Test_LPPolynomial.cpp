@@ -1,20 +1,21 @@
 #include <gtest/gtest.h>
 
 #include "../Common.h"
-#include "carl/core/VariablePool.h"
+#include <carl/core/VariablePool.h>
 
-#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
 
-#include "carl/converter/LibpolyFunctions.h"
-#include "carl/poly/lp/LPContext.h"
-#include "carl/poly/lp/LPPolynomial.h"
+#include <carl/converter/LibpolyFunctions.h>
+#include <carl/poly/lp/LPContext.h>
+#include <carl/poly/lp/LPPolynomial.h>
+
+#include <carl/ran/real_roots.h>
 
 using namespace carl;
 
 TEST(LPPOLYNOMIAL, createContext) {
-    auto x = freshRealVariable("x");
-    auto y = freshRealVariable("y");
-    auto z = freshRealVariable("z");
+    auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+    auto z = fresh_real_variable("z");
     std::vector<Variable> var_order1 = {x, y, z};
     std::vector<Variable> var_order2 = {x, y};
     std::vector<Variable> var_order3 = {x, y};
@@ -38,9 +39,9 @@ TEST(LPPOLYNOMIAL, createContext) {
 }
 
 TEST(LPPOLYNOMIAL, createPoly) {
-    auto x = freshRealVariable("x");
-    auto y = freshRealVariable("y");
-    auto z = freshRealVariable("z");
+    auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+    auto z = fresh_real_variable("z");
     std::vector<Variable> var_order1 = {x, y, z};
     LPContext ctx(var_order1);
 
@@ -71,9 +72,9 @@ TEST(LPPOLYNOMIAL, createPoly) {
 }
 
 TEST(LPPOLYNOMIAL, Operators) {
-    auto x = freshRealVariable("x");
-    auto y = freshRealVariable("y");
-    auto z = freshRealVariable("z");
+    auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+    auto z = fresh_real_variable("z");
     std::vector varOrder = {x, y, z};
     LPContext context(varOrder);
 
@@ -99,9 +100,9 @@ TEST(LPPOLYNOMIAL, Operators) {
 }
 
 TEST(LPPOLYNOMIAL, LeadingCoefficient) {
-    auto x = freshRealVariable("x");
-    auto y = freshRealVariable("y");
-    auto z = freshRealVariable("z");
+    auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+    auto z = fresh_real_variable("z");
     std::vector varOrder = {x, y, z};
     LPContext context(varOrder);
 
@@ -127,9 +128,9 @@ TEST(LPPOLYNOMIAL, LeadingCoefficient) {
 }
 
 TEST(LPPOLYNOMIAL, ConstantPart) {
-    auto x = freshRealVariable("x");
-    auto y = freshRealVariable("y");
-    auto z = freshRealVariable("z");
+    auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+    auto z = fresh_real_variable("z");
     std::vector varOrder = {x, y, z};
     LPContext context(varOrder);
 
@@ -148,9 +149,9 @@ TEST(LPPOLYNOMIAL, ConstantPart) {
 }
 
 TEST(LPPOLYNOMIAL, MainVar) {
-     auto x = freshRealVariable("x");
-    auto y = freshRealVariable("y");
-    auto z = freshRealVariable("z");
+    auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+    auto z = fresh_real_variable("z");
     std::vector varOrder = {x, y, z};
     LPContext context(varOrder);
 
@@ -172,10 +173,10 @@ TEST(LPPOLYNOMIAL, MainVar) {
 
 
 TEST(LPPOLYNOMIAL, hasVariable) {
-     auto x = freshRealVariable("x");
-    auto y = freshRealVariable("y");
-    auto z = freshRealVariable("z");
-    auto a  = freshRealVariable("a");
+     auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+    auto z = fresh_real_variable("z");
+    auto a  = fresh_real_variable("a");
     std::vector varOrder = {x, y, z};
     LPContext context(varOrder);
 
@@ -196,10 +197,10 @@ TEST(LPPOLYNOMIAL, hasVariable) {
 }
 
 TEST(LPPOLYNOMIAL, CoPrimeFactor) {
-     auto x = freshRealVariable("x");
-    auto y = freshRealVariable("y");
-    auto z = freshRealVariable("z");
-    auto a  = freshRealVariable("a");
+     auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+    auto z = fresh_real_variable("z");
+    auto a  = fresh_real_variable("a");
     std::vector varOrder = {x, y, z};
     LPContext context(varOrder);
 
@@ -224,5 +225,29 @@ TEST(LPPOLYNOMIAL, CoPrimeFactor) {
 
 }
 
+TEST(LPPOLYNOMIAL, RealRootsLP){
+    auto x = fresh_real_variable("x") ; 
+    auto y = fresh_real_variable("y") ;
 
-#endif
+    std::vector varOrder = {x, y};
+    LPContext context(varOrder);
+
+
+    LPPolynomial polyX(context, x, 7, 2);
+    LPPolynomial polyY(context, y, 5, 3);
+
+    auto res = polyX * polyY - 12;
+
+    auto res_uni = polyX * polyX - 12;
+
+    std::map<Variable, RealAlgebraicNumberLibpoly<mpq_class>> assignment ; 
+	assignment[y] = RealAlgebraicNumberLibpoly<mpq_class>(123312/123312) ;
+
+
+
+    std::cout << "RealRootsLP: " << carl::real_roots_libpoly<mpq_class>(res_uni).roots() << std::endl ;
+    std::cout << "RealRootsLP: " << carl::real_roots_libpoly<mpq_class>(res, assignment).roots() << std::endl ;
+
+
+}
+

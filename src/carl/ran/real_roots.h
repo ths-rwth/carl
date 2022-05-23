@@ -2,32 +2,56 @@
 
 #include "ran.h"
 
-#ifdef RAN_USE_INTERVAL
+
 #include "interval/ran_interval_real_roots.h"
-#endif
 
-#ifdef RAN_USE_THOM
-#include "thom/ran_thom_real_roots.h"
-#endif
 
-#ifdef RAN_USE_LIBPOLY
+
+//#include "thom/ran_thom_real_roots.h"
+
+
+
 #include "libpoly/ran_libpoly_real_roots.h"
-#endif
+
 
 namespace carl::ran {
-    #ifdef RAN_USE_INTERVAL
+
+    
+    //sadly cant use this because std::forward discards qualifiersc
+    
+
+    //Base real roots always uses interval 
+    //template<typename... Args>
+    //auto real_roots(const Args&&... args) -> decltype(carl::ran::interval::real_roots(std::forward<Args>(args)...)) {
+    //    return carl::ran::interval::real_roots(std::forward<Args>(args)...);
+    //}
+
+     //real roots using interval 
+    //template<typename... Args>
+    //auto real_roots_interval(const Args&&... args) -> decltype(carl::ran::interval::real_roots(std::forward<Args>(args)...)) {
+    //    return carl::ran::interval::real_roots(std::forward<Args>(args)...);
+    //}
+
+    //real roots using libpoly
+    //template<typename... Args>
+    //auto real_roots_libpoly(const Args&&... args) -> decltype(carl::ran::libpoly::real_roots(std::forward<Args>(args)...)) {
+    //    return carl::ran::libpoly::real_roots(std::forward<Args>(args)...);
+    //}
+
+    ////real roots using thom
+    //template<typename... Args>
+    //auto real_roots_thom(const Args&&... args) -> decltype(carl::ran::thom::real_roots(std::forward<Args>(args)...)) {
+    //    return carl::ran::thom::real_roots(std::forward<Args>(args)...);
+    //}
+
+
     using carl::ran::interval::real_roots;
-    #endif
 
-    #ifdef RAN_USE_THOM
-    using carl::ran::thom::real_roots;
-    #endif
+    using carl::ran::libpoly::real_roots_libpoly ;
 
-    #ifdef RAN_USE_LIBPOLY
-    using carl::ran::libpoly::real_roots;
-    #endif
 }
 
 namespace carl {
     using carl::ran::real_roots;
+    using carl::ran::real_roots_libpoly;
 }

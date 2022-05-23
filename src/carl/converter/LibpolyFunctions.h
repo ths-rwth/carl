@@ -2,8 +2,6 @@
 
 #include <carl-common/config.h>
 
-#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
-
 #include "LibpolyConverter.h"
 #include "LibpolyVariableMapper.h"
 
@@ -64,5 +62,3 @@ public:
 };
 
 } // namespace carl
-
-#endif

@@ -1,6 +1,5 @@
 #pragma once
 
-#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
 
 #include "../../converter/LibpolyVariableMapper.h"
 #include "../../core/Variable.h"
@@ -100,4 +99,3 @@ inline std::ostream& operator<<(std::ostream& os, const LPContext& ctx) {
 
 } // namespace carl
 
-#endif

@@ -29,13 +29,13 @@ if(USE_MPFR_FLOAT)
 	target_link_libraries(carl-shared PUBLIC MPFR_SHARED)
 	target_link_libraries(carl-static PUBLIC MPFR_STATIC)
 endif()
-if(USE_LIBPOLY OR RAN_USE_LIBPOLY)
+
 target_include_dirs_from(carl-objects SYSTEM PUBLIC LIBPOLY_SHARED LIBPOLYXX_SHARED)
 target_link_libraries(carl-shared PUBLIC LIBPOLY_SHARED)
 target_link_libraries(carl-static PUBLIC LIBPOLY_STATIC)
 target_link_libraries(carl-shared PUBLIC LIBPOLYXX_SHARED)
 target_link_libraries(carl-static PUBLIC LIBPOLYXX_STATIC)
-endif()
+
 
 #set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_END_STATIC TRUE )
 #set_target_properties( lib_carl_static PROPERTIES LINK_SEARCH_START_STATIC TRUE )
