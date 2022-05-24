@@ -173,35 +173,6 @@ bool Term<Coefficient>::divisible(const Term& t) const {
 	return this->monomial()->divisible(t.monomial());
 }
 
-template<typename Coefficient>
-template<bool gatherCoeff, typename CoeffType>
-void Term<Coefficient>::gatherVarInfo(Variable var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
-{
-	if(mMonomial)
-	{
-		varinfo.collect(var, coeff(), *mMonomial);
-	}
-	else
-	{
-		varinfo.updateCoeff( 0, *this );
-	}
-}
-
-template<typename Coefficient>
-template<bool gatherCoeff, typename CoeffType>
-void Term<Coefficient>::gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const
-{
-	if(mMonomial)
-	{
-		mMonomial->gatherVarInfo(varinfo, coeff());
-	}
-	else
-	{
-		// No change in varinfo.
-	}
-}
-
-
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 	if (lhs.coeff() != rhs.coeff()) return false;

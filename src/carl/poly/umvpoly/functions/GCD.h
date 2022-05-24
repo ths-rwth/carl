@@ -3,6 +3,7 @@
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"
 #include <carl/numbers/typetraits.h>
+#include "VarInfo.h"
 
 namespace carl {
 	template<typename C, typename O, typename P>
@@ -36,11 +37,11 @@ template<typename C, typename O, typename P>
 Monomial::Arg gcd(const MultivariatePolynomial<C,O,P>& a, const Monomial::Arg& b) {
 	if (!b) return nullptr;
 	assert(!is_zero(a));
-	VariablesInformation<false, MultivariatePolynomial<C,O,P>> varinfo = a.getVarInfo();
+	auto varinfo = carl::vars_info(a,false);
 	std::vector<std::pair<Variable, exponent>> vepairs;
 	for (const auto& ve : *b) {
-		if (varinfo.getVarInfo(ve.first)->occurence() == a.nr_terms()) {
-			vepairs.push_back(ve.first, std::min(varinfo.getVarInfo(ve.first)->minDegree(), ve.second));
+		if (varinfo.var(ve.first)->num_occurences() == a.nr_terms()) {
+			vepairs.push_back(ve.first, std::min(varinfo.var(ve.first)->min_degree(), ve.second));
 		}
 	}
 	return createMonomial(std::move(vepairs));

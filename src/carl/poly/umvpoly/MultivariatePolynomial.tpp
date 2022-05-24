@@ -583,34 +583,6 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::sqrt(MultivariatePolynomia
     return false;
 }
 
-template<typename Coeff, typename Ordering, typename Policies>
-template<bool gatherCoeff>
-VariableInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::getVarInfo(Variable::Arg v) const
-{
-	VariableInformation<gatherCoeff, MultivariatePolynomial> varinfomap;
-	// We iterate over all terms.
-	for(const auto& term : mTerms)
-	{
-		// And gather information from the terms and meanwhile up
-		term.gatherVarInfo(v, varinfomap);
-	}
-	return varinfomap;
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
-template<bool gatherCoeff>
-VariablesInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::getVarInfo() const
-{
-	VariablesInformation<gatherCoeff, MultivariatePolynomial> varinfomap;
-	// We iterate over all terms.
-	for(const auto& term : mTerms)
-	{
-		// And gather information from the terms and meanwhile up
-		term.gatherVarInfo(varinfomap);
-	}
-	return varinfomap;
-}
-
 template<typename Coeff, typename O, typename P>
 template<typename C, EnableIf<is_number_type<C>>>
 Coeff MultivariatePolynomial<Coeff,O,P>::numeric_content() const

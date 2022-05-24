@@ -52,7 +52,7 @@ static bool gather_zeros(const Constraint<Poly>& constraint, const Variable& eli
 	}
 
 	for (const auto& factor : factors) {
-		auto varInfo = factor.template getVarInfo<true>(eliminationVar);
+		auto varInfo = carl::var_info(factor,eliminationVar,true);
 		const auto& coeffs = varInfo.coeffs();
 		assert(!coeffs.empty());
 
@@ -167,7 +167,7 @@ static bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable
 			if (it != real_roots.roots().end()) {
 				size_t idx = std::distance(real_roots.roots().begin(), it);
 
-				auto varInfo = factor.template getVarInfo<true>(eliminationVar);
+				auto varInfo = carl::var_info(factor,eliminationVar,true);
 				const auto& coeffs = varInfo.coeffs();
 				assert(!coeffs.empty());
 

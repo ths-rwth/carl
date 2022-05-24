@@ -4,6 +4,7 @@
 #include "Power.h"
 
 #include "../MultivariatePolynomial.h"
+#include "VarInfo.h"
 
 namespace carl {
 
@@ -44,7 +45,7 @@ std::vector<std::pair<C,MultivariatePolynomial<C,O,P>>> sos_decomposition(const 
 		Variable var = (*rem.lterm().monomial())[0].first;
 		// Complete the square for var
 		CARL_LOG_TRACE("carl.core.sos_decomposition", "Complete the square for " << var);
-		auto varInfos = rem.template getVarInfo<true>(var);
+		auto varInfos = carl::var_info(rem, var, true);
 		auto lcoeffIter = varInfos.coeffs().find(2);
 		if (lcoeffIter == varInfos.coeffs().end()) {
 			CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__);

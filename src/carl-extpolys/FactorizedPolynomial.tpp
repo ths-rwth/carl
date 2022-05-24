@@ -438,10 +438,10 @@ namespace carl
     
     template<typename P>
     template<bool gatherCoeff>
-    VariableInformation<gatherCoeff, FactorizedPolynomial<P>> FactorizedPolynomial<P>::getVarInfo(Variable var) const
+    VarInfo<FactorizedPolynomial<P>> FactorizedPolynomial<P>::var_info(Variable var) const
     {
         // TODO: Maybe we should use the factorization for collecting degrees and coefficients.
-        VariableInformation<gatherCoeff, P> vi = polynomial().template getVarInfo<gatherCoeff>( var );
+        VarInfo<P> vi = carl::var_info(polynomial(), var, gatherCoeff);
         if( gatherCoeff )
         {
             std::map<unsigned,FactorizedPolynomial<P>> coeffs;
@@ -456,9 +456,9 @@ namespace carl
                     coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) * mCoefficient ) );
                 }
             }
-            return VariableInformation<gatherCoeff, FactorizedPolynomial<P>>( vi.maxDegree(), vi.minDegree(), vi.occurence(), std::move( coeffs ) );
+            return VarInfo<FactorizedPolynomial<P>>( vi.max_degree(), vi.min_degree(), vi.num_occurences(), std::move( coeffs ) );
         }
-        return VariableInformation<false, FactorizedPolynomial<P>>( vi.maxDegree(), vi.minDegree(), vi.occurence() );
+        return VarInfo<FactorizedPolynomial<P>>( vi.max_degree(), vi.min_degree(), vi.num_occurences() );
 
     }
     

@@ -47,11 +47,11 @@ SqrtEx<Poly> substitute( const Poly& _substituteIn, const carl::Variable _varToS
         *      ----------------------------------------------
         *                           s^n
         */
-    auto varInfo = _substituteIn.template getVarInfo<true>( _varToSubstitute );
+    auto varInfo = carl::var_info(_substituteIn, _varToSubstitute, true);
     const auto& coeffs = varInfo.coeffs();
     // Calculate the s^k:   (0<=k<=n)
     auto coeff = coeffs.begin();
-    carl::uint lastDegree = varInfo.maxDegree();
+    carl::uint lastDegree = varInfo.max_degree();
     std::vector<Poly> sk;
     sk.push_back(constant_one<Poly>::get());
     for( carl::uint i = 1; i <= lastDegree; ++i )

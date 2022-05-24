@@ -12,7 +12,7 @@
 #include <carl-common/memory/Cache.h>
 #include <carl/poly/umvpoly/functions/Division.h>
 #include "PolynomialFactorizationPair.h"
-#include <carl/poly/umvpoly/functions/VariablesInformation.h>
+#include <carl/poly/umvpoly/functions/VarInfo.h>
 
 namespace carl
 {
@@ -468,33 +468,33 @@ namespace carl
         bool has( Variable _var ) const;
     
         template<bool gatherCoeff>
-        VariableInformation<gatherCoeff, FactorizedPolynomial<P>> getVarInfo( Variable _var ) const;
+        VarInfo<FactorizedPolynomial<P>> var_info( Variable _var ) const;
 
         template<bool gatherCoeff>
-        VariablesInformation<gatherCoeff, FactorizedPolynomial<P>> getVarInfo() const
+        VarsInfo<FactorizedPolynomial<P>> var_info() const
         {
             if( existsFactorization( *this ) )
             {
-                VariablesInformation<false, P> vi = polynomial().template getVarInfo<false>();
-                std::map<Variable, VariableInformation<false, FactorizedPolynomial<P>>> resultVarInfos;
+                VarsInfo<P> vi = carl::vars_info(polynomial(),false);
+                std::map<Variable, VarInfo<FactorizedPolynomial<P>>> resultVarInfos;
                 for( const auto& varViPair : vi )
                 {
                     const auto& varI = varViPair.second;
-                    VariableInformation<false, FactorizedPolynomial<P>> viFactorized( varI.maxDegree(), varI.minDegree(), varI.occurence() );
+                    VarInfo<FactorizedPolynomial<P>> viFactorized( varI.max_degree(), varI.min_degree(), varI.num_occurences() );
                     resultVarInfos.insert( resultVarInfos.end(), std::make_pair( varViPair.first, std::move( viFactorized ) ) );
                 }
-                return VariablesInformation<false, FactorizedPolynomial<P>>(std::move(resultVarInfos));
+                return VarsInfo<FactorizedPolynomial<P>>(std::move(resultVarInfos));
             }
-            return VariablesInformation<false, FactorizedPolynomial<P>>();
+            return VarsInfo<FactorizedPolynomial<P>>();
         }
         
-        VariablesInformation<true, FactorizedPolynomial<P>> getVarInfo() const
+        VarsInfo<FactorizedPolynomial<P>> var_info() const
         {
             if( existsFactorization( *this ) )
             {
                 // TODO: Maybe we should use the factorization for collecting degrees and coefficients.
-                VariablesInformation<true, P> vi = polynomial().template getVarInfo<true>();
-                VariablesInformation<true, FactorizedPolynomial<P>> result;
+                VarsInfo<P> vi = carl::vars_info(polynomial(),true);
+                VarsInfo<FactorizedPolynomial<P>> result;
                 for( const auto& varViPair : vi )
                 {
                     const auto& varI = varViPair.second;
@@ -510,12 +510,12 @@ namespace carl
                             coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) * mCoefficient ) );
                         }
                     }
-                    VariableInformation<true, FactorizedPolynomial<P>> viFactorized( varI.maxDegree(), varI.minDegree(), varI.occurence(), std::move( coeffs ) );
+                    VarInfo<FactorizedPolynomial<P>> viFactorized( varI.max_degree(), varI.min_degree(), varI.num_occurences(), std::move( coeffs ) );
                     result.insert( result.end(), std::make_pair( varViPair.first, std::move( viFactorized ) ) );
                 }
                 return result;
             }
-            return VariablesInformation<false, FactorizedPolynomial<P>>();
+            return VarsInfo<FactorizedPolynomial<P>>();
         }
         
         /**

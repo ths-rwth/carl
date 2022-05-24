@@ -8,7 +8,7 @@
 #pragma once
 
 #include "Monomial.h"
-#include "functions/VariablesInformation.h"
+#include "MonomialPool.h"
 #include <carl/numbers/numbers.h>
 
 #include <memory>
@@ -247,12 +247,6 @@ public:
 	bool divisible(const Term& t) const;
 	template<typename C = Coefficient, DisableIf<is_field_type<C>> = dummy>
 	bool divisible(const Term& t) const;
-
-	template<bool gatherCoeff, typename CoeffType>
-	void gatherVarInfo(Variable var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
-
-	template<bool gatherCoeff, typename CoeffType>
-	void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const;
 
 	bool is_consistent() const;
 

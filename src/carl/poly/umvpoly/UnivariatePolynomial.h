@@ -11,7 +11,6 @@
 #include <carl-common/util/hash.h>
 #include <carl/core/Sign.h>
 #include <carl/core/Variable.h>
-#include "functions/VariableInformation.h"
 
 #include <functional>
 #include <list>

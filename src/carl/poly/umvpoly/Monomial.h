@@ -377,14 +377,6 @@ namespace carl
 		 */
 		Monomial::Arg sqrt() const;
 		
-		template<typename Coeff, typename VarInfo>
-		void gatherVarInfo(VarInfo& varinfo, const Coeff& coeffFromTerm) const
-		{
-			for (auto ve : mExponents )
-			{
-				varinfo.variableInTerm(ve, coeffFromTerm, *this);
-			}
-		}
 
 		///////////////////////////
 		// Orderings

@@ -15,7 +15,6 @@
 
 #include "MultivariatePolynomialPolicy.h"
 #include "Term.h"
-#include "functions/VariableInformation.h"
 #include <carl/numbers/numbers.h>
 #include "TermAdditionManager.h"
 #include "../typetraits.h"
@@ -69,8 +68,6 @@ public:
 	template<typename C, typename T>
 	using EnableIfNotSame = typename std::enable_if<!std::is_same<C,T>::value,T>::type;
     
-	template <bool gatherCoeff>
-	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 private:
 	/// A vector of all terms.
 	mutable TermsType mTerms;
@@ -385,7 +382,7 @@ public:
 	 * Checks whether the polynomial is a trivial sum of squares.
 	 * @return true if polynomial is of the form \\sum a_im_i^2 with a_i > 0 for all i.
 	 */
-	bool is_tsos() const { // TODO move
+	bool is_tsos() const {
 		return std::all_of(begin(), end(),
 			[](const auto& t){ return t.is_square(); }
 		);
@@ -401,7 +398,7 @@ public:
 		);
 	}
 	
-	bool is_reducible_identity() const; // TODO move
+	bool is_reducible_identity() const;
 
 	/**
 	 * Subtract a term times a polynomial from this polynomial.
@@ -464,13 +461,7 @@ public:
 	}
 
 	MultivariatePolynomial mod(const typename IntegralType<Coeff>::type& modulo) const;
-	
-	template<bool gatherCoeff>
-	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(Variable::Arg v) const;// TODO move
-
-	template<bool gatherCoeff>
-	VariablesInformation<gatherCoeff, MultivariatePolynomial> getVarInfo() const;// TODO move
-	
+		
 	template<typename C=Coeff, EnableIf<is_number_type<C>> = dummy>
 	Coeff numeric_content() const;
 	template<typename C=Coeff, DisableIf<is_number_type<C>> = dummy>

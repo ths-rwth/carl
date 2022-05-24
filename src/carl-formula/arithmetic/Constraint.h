@@ -2,9 +2,8 @@
 
 #include <carl-common/memory/Pool.h>
 #include <carl-common/config.h>
-#include <carl/poly/umvpoly/functions/VariableInformation.h>
 #include <carl/core/Variables.h>
-#include <carl/poly/umvpoly/functions/VariablesInformation.h>
+#include <carl/poly/umvpoly/functions/VarInfo.h>
 #include <carl/poly/umvpoly/functions/Factorization.h>
 #include <carl/core/Common.h>
 #include <carl/constraint/Simplification.h>
@@ -37,7 +36,7 @@ struct CachedConstraintContent {
 	/// A container which includes all variables occurring in the polynomial considered by this constraint.
 	mutable carlVariables m_variables;
 	/// A map which stores information about properties of the variables in this constraint.
-	mutable VariablesInformation<true, Pol> m_var_info_map;
+	mutable VarsInfo<Pol> m_var_info_map;
 	#ifdef THREAD_SAFE
 	/// Mutex for access to variable information map.
 	std::mutex m_var_info_map_mutex;
@@ -163,24 +162,24 @@ public:
      * the given flag gatherCoeff is set to true.
      */
 	template<bool gatherCoeff = false>
-	const VariableInformation<true, Pol>& varInfo(const Variable variable) const {
+	const VarInfo<Pol>& var_info(const Variable variable) const {
 		#ifdef THREAD_SAFE
 		m_element->m_var_info_map_mutex.lock();
 		#endif
-		if (!m_element->m_var_info_map.occurs(variable) || (gatherCoeff && !m_element->m_var_info_map.getVarInfo(variable)->hasCoeff())) {
-			m_element->m_var_info_map.data()[variable] = lhs().template getVarInfo<gatherCoeff>(variable);
-			assert(m_element->m_var_info_map.occurs(variable) );
+		if (!m_element->m_var_info_map.occurs(variable) || (gatherCoeff && !m_element->m_var_info_map.var(variable).has_coeff())) {
+			m_element->m_var_info_map.data()[variable] = carl::var_info(lhs(),variable,gatherCoeff);
+			assert(m_element->m_var_info_map.occurs(variable));
 		}
 		#ifdef THREAD_SAFE
 		m_element->m_var_info_map_mutex.unlock();
 		#endif
-		return *m_element->m_var_info_map.getVarInfo(variable);
+		return m_element->m_var_info_map.var(variable);
 	}
 
 	template<bool gatherCoeff = false>
-	const VariablesInformation<true, Pol>& varInfo() const {
+	const VarsInfo<Pol>& var_info() const {
 		for (const auto& var : variables()) {
-			varInfo<gatherCoeff>(var);
+			var_info<gatherCoeff>(var);
 		}
 		return m_element->m_var_info_map;
 	}
@@ -208,13 +207,13 @@ public:
      */
 	uint maxDegree(const Variable& _variable) const {
 		if (!variables().has(_variable)) return 0;
-		else return varInfo(_variable).maxDegree();
+		else return var_info(_variable).max_degree();
 	}
 
 	/**
      * @return The maximal degree of all variables in this constraint. (Monomial-wise)
      */
-	uint maxDegree() const {
+	uint max_degree() const {
 		uint result = 0;
 		for (const auto& var : variables()) {
 			uint deg = maxDegree(var);
@@ -231,7 +230,7 @@ public:
      * @return The ith coefficient of the given variable, where i is the given degree.
      */
 	Pol coefficient(const Variable& _var, uint _degree) const {
-		auto& vi = varInfo<true>(_var);
+		auto& vi = var_info<true>(_var);
 		auto d = vi.coeffs().find(_degree);
 		return d != vi.coeffs().end() ? d->second : Pol(typename Pol::NumberType(0));
 	}
@@ -333,7 +332,7 @@ void variables(const Constraint<Pol>& c, carlVariables& vars) {
 
 template<typename Pol>
 std::optional<std::pair<Variable, Pol>> get_substitution(const Constraint<Pol>& c, bool _negated = false, Variable _exclude = carl::Variable::NO_VARIABLE) {
-	return get_substitution(c.constr(), _negated, _exclude, std::optional(c.template varInfo<true>()));
+	return get_substitution(c.constr(), _negated, _exclude, std::optional(c.template var_info<true>()));
 }
 
 // implicit conversions do not work for template argument deduction
