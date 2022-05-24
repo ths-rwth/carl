@@ -514,7 +514,7 @@ TEST(MultivariatePolynomial, varInfo)
     EXPECT_EQ((unsigned)4, vi2.var(x).max_degree());
     EXPECT_EQ((unsigned)1, vi2.var(x).min_degree());
     EXPECT_EQ((unsigned)3, vi2.var(x).num_occurences());
-    EXPECT_EQ((unsigned)0, vi2.var(x).coeffs().count(0));
+    EXPECT_EQ((unsigned)1, vi2.var(x).coeffs().count(0));
     EXPECT_EQ((unsigned)0, vi2.var(x).coeffs().count(2));
     EXPECT_EQ((unsigned)0, vi2.var(x).coeffs().count(3));
     EXPECT_EQ(MultivariatePolynomial<Rational>({(Rational)1*y*y, (Rational)1*z*z}), vi2.var(x).coeffs().at(4));
