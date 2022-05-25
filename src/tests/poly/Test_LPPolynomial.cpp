@@ -4,7 +4,6 @@
 #include <carl/core/VariablePool.h>
 
 
-#include <carl/converter/LibpolyFunctions.h>
 #include <carl/poly/lp/LPContext.h>
 #include <carl/poly/lp/LPPolynomial.h>
 
@@ -225,29 +224,4 @@ TEST(LPPOLYNOMIAL, CoPrimeFactor) {
 
 }
 
-TEST(LPPOLYNOMIAL, RealRootsLP){
-    auto x = fresh_real_variable("x") ; 
-    auto y = fresh_real_variable("y") ;
-
-    std::vector varOrder = {x, y};
-    LPContext context(varOrder);
-
-
-    LPPolynomial polyX(context, x, 7, 2);
-    LPPolynomial polyY(context, y, 5, 3);
-
-    auto res = polyX * polyY - 12;
-
-    auto res_uni = polyX * polyX - 12;
-
-    std::map<Variable, RealAlgebraicNumberLibpoly<mpq_class>> assignment ; 
-	assignment[y] = RealAlgebraicNumberLibpoly<mpq_class>(123312/123312) ;
-
-
-
-    std::cout << "RealRootsLP: " << carl::real_roots_libpoly<mpq_class>(res_uni).roots() << std::endl ;
-    std::cout << "RealRootsLP: " << carl::real_roots_libpoly<mpq_class>(res, assignment).roots() << std::endl ;
-
-
-}
 

@@ -10,6 +10,8 @@
 #include <poly/polynomial_context.h>
 #include <poly/polyxx.h>
 
+#include <carl-common/util/streamingOperators.h>
+
 namespace carl {
 
 class LPContext {

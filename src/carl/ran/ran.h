@@ -44,12 +44,4 @@ namespace carl {
 	template<typename Number>
 	using RealAlgebraicNumber = RealAlgebraicNumberInterval<Number>;
 
-	template<typename Number>
-	using RealAlgebraicNumberLibpoly = RealAlgebraicNumberLibpoly<Number>;
-
-
-	//template<typename Number>
-	//using RealAlgebraicNumberThom = RealAlgebraicNumberThom<Number>;
-
-
 }

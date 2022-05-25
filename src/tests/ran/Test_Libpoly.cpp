@@ -3,7 +3,6 @@
 #include "../Common.h"
 #include <carl/core/VariablePool.h>
 
-#include <carl/converter/LibpolyFunctions.h>
 #include <carl/ran/ran.h>
 #include <carl/ran/real_roots.h>
 
