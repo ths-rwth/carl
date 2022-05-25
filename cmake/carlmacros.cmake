@@ -239,6 +239,43 @@ macro(add_new_libraries name version sources dependencies)
 	add_custom_target(${name} DEPENDS ${name}-shared ${name}-static)
 endmacro(add_new_libraries)
 
+macro(add_new_libraries_with_objects name version sources dependencies objects)
+	add_library(${name}-objects OBJECT ${sources})
+	if(NOT "${dependencies}" STREQUAL "")
+		add_dependencies(${name}-objects ${dependencies})
+	endif()
+
+	add_library(${name}-shared SHARED $<TARGET_OBJECTS:${name}-objects> ${objects})
+	set_target_properties(${name}-shared PROPERTIES
+		VERSION "${version}"
+		SOVERSION "${version}"
+		CLEAN_DIRECT_OUTPUT 1
+		OUTPUT_NAME ${name}
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+	)
+	target_include_directories(${name}-shared PUBLIC
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+	)
+
+	add_library(${name}-static STATIC $<TARGET_OBJECTS:${name}-objects> ${objects})
+	set_target_properties(${name}-static PROPERTIES
+		VERSION "${version}"
+		SOVERSION "${version}"
+		CLEAN_DIRECT_OUTPUT 1
+		OUTPUT_NAME ${name}
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+	)
+	target_include_directories(${name}-static PUBLIC
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+	)
+
+	add_custom_target(${name} DEPENDS ${name}-shared ${name}-static)
+endmacro(add_new_libraries_with_objects)
+
 macro(configure_everything)
 	file(GLOB_RECURSE tpl_files "*.in")
 	foreach(tpl ${tpl_files})
