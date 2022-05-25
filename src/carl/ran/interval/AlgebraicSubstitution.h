@@ -18,7 +18,9 @@
 
 #include <carl/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl/poly/umvpoly/UnivariatePolynomial.h>
+#ifdef USE_COCOA
 #include <carl/converter/CoCoAAdaptor.h>
+#endif
 
 #include <carl/poly/umvpoly/functions/Remainder.h>
 #include <carl/poly/umvpoly/functions/Resultant.h>
@@ -36,6 +38,7 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution_groebner(
 	const std::vector<MultivariatePolynomial<Number>>& polynomials,
 	const std::vector<Variable>& variables
 ) {
+	#ifdef USE_COCOA
 	Variable target = variables.back();
 	try {
 		CoCoAAdaptor<MultivariatePolynomial<Number>> ca(variables, true);
@@ -51,6 +54,10 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution_groebner(
 	} catch (const CoCoA::ErrorInfo& e) {
 		CARL_LOG_ERROR("carl.algsubs", "Computation of GBasis failed: " << e << " -> " << CoCoA::context(e));
 	}
+	#else
+	CARL_LOG_ERROR("carl.algsubs", "CoCoALib is not enabled");
+	assert(false);
+	#endif
 	return std::nullopt;
 	// return UnivariatePolynomial<Number>(target);
 }

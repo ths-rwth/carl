@@ -108,10 +108,10 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 	UnivariatePolynomial<Coeff> tmp = q;
 	q = pseudo_remainder(p, -q);
 	p = tmp;
-	CARL_LOG_TRACE("carl.core.resultant", "q = p.prem(-q) = " << q);
+	CARL_LOG_TRACE("carl.core.resultant", "q = pseudo_remainder(p,-q) = " << q);
 	CARL_LOG_TRACE("carl.core.resultant", "p = " << p);
 	//CARL_LOG_TRACE("carl.core.resultant", "p = q");
-	//CARL_LOG_TRACE("carl.core.resultant", "q = p.prem(-q)");
+	//CARL_LOG_TRACE("carl.core.resultant", "q = pseudo_remainder(p,-q)");
 
 	/* Parts 2 and 3
 	 * Main loop filling the subresultants chain step by step.

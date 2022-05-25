@@ -32,8 +32,8 @@ namespace gcd_detail {
 			return Polynomial(1);
 		}
 		CARL_LOG_INEFFICIENT();
-		auto A = a.toUnivariatePolynomial(x);
-		auto B = b.toUnivariatePolynomial(x);
+		auto A = carl::to_univariate_polynomial(a,x);
+		auto B = carl::to_univariate_polynomial(b,x);
 		Polynomial result(primitive_euclidean(A.normalized(), B.normalized()));
 		if (carl::is_negative(result.lcoeff()) && !(carl::is_negative(a.lcoeff()) && carl::is_negative(b.lcoeff()))) {
 			return -result;
