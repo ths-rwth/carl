@@ -45,7 +45,7 @@ TEST(LPPOLYNOMIAL, createPoly) {
     LPContext ctx(var_order1);
 
     std::initializer_list<mpz_class> list = {1, 0, 0, -3, 1, 0, 3, 0};
-    std::map<std::uint64_t, mpz_class> map = {
+    std::map<unsigned int, mpz_class> map = {
         {0, 0},
         {1, 3},
         {2, 0},

@@ -24,6 +24,8 @@ private:
     /// The libpoly polynomial.
     poly::Polynomial mPoly;
 
+    LPContext mContext ; 
+
 public:
     // Rule of five
     /**
@@ -53,11 +55,6 @@ public:
      */
     explicit LPPolynomial(const LPContext& context);
 
-    /**
-     * Construct a zero polynomial with the given polynomial context
-     * @param context The polynomial context
-     */
-    explicit LPPolynomial(const lp_polynomial_context_t* context);
 
     /**
      * Construct a LPPolynomial with the given libpoly polynomial.
@@ -93,7 +90,7 @@ public:
      * @param coeff Leading coefficient.
      * @param degree Degree.
      */
-    LPPolynomial(const LPContext& context, const Variable& var, const mpz_class& coeff, std::size_t degree = 0);
+    LPPolynomial(const LPContext& context, const Variable& var, const mpz_class& coeff, unsigned int degree = 0);
 
     /**
      * Construct polynomial with the given coefficients.
@@ -123,7 +120,7 @@ public:
      * @param coefficients Assignment of degree to coefficients.
      * @param context Context of libpoly polynomial
      */
-    LPPolynomial(const LPContext& context, const Variable& mainVar, const std::map<uint, mpz_class>& coefficients);
+    LPPolynomial(const LPContext& context, const Variable& mainVar, const std::map<unsigned int, mpz_class>& coefficients);
 
     /**
      * Destructor.
@@ -203,7 +200,7 @@ public:
      * @return The leading coefficient.
      */
     LPPolynomial lterm() const {
-        return LPPolynomial(std::move(poly::leading_coefficient(mPoly)));
+        return LPPolynomial(poly::leading_coefficient(mPoly));
     }
 
     /**
@@ -243,7 +240,7 @@ public:
      * @see @cite GCL92, page 38
      * @return Degree.
      */
-    uint degree() const {
+    size_t degree() const {
         return poly::degree(mPoly);
     }
 
@@ -290,6 +287,23 @@ public:
         return mPoly;
     }
 
+    /**
+     * @brief Get the Context object
+     * 
+     * @return const LPContext 
+     */
+    const LPContext getContext() const {
+        return mContext;
+    }
+
+    /**
+     * @brief Get the Context object
+     * 
+     * @return LPContext 
+     */
+    LPContext getContext() {
+        return mContext;
+    }
 
     /**
      * Checks if the given variable occurs in the polynomial.
@@ -355,13 +369,6 @@ public:
     }
 
     /**
-     * Reverse coefficients safely.
-     */
-    LPPolynomial reverseCoefficients() const {
-        CARL_LOG_NOTIMPLEMENTED();
-    }
-
-    /**
      * Checks if this polynomial is divisible by the given divisor, that is if the remainder is zero.
      * @param divisor Polynomial.
      * @return If divisor divides this polynomial.
@@ -380,68 +387,13 @@ public:
      * @return New polynomial.
      */
     LPPolynomial mod(const mpz_class& modulus) const;
-
-    LPPolynomial evaluateCoefficient(const std::map<Variable, mpz_class>&) const {
-        CARL_LOG_NOTIMPLEMENTED();
-    }
-
-    /**
-     * Returns the numeric content part of the i'th coefficient.
-     *
-     * If the coefficients are numbers, this is simply the i'th coefficient.
-     * If the coefficients are polynomials, this is the numeric content part of the i'th coefficient.
-     * @param i number of the coefficient
-     * @return numeric content part of i'th coefficient.
-     */
-    mpz_class numericContent(std::size_t i) const {
-        CARL_LOG_NOTIMPLEMENTED();
-    }
-
-    /**
-     * Returns the numeric unit part of the polynomial.
-     *
-     * If the coefficients are numbers, this is the sign of the leading coefficient.
-     * If the coefficients are polynomials, this is the unit part of the leading coefficient.s
-     * @return unit part of the polynomial.
-     */
-    mpz_class numericUnit() const {
-        CARL_LOG_NOTIMPLEMENTED();
-    }
-
-    /**
-     * Obtains the numeric content part of this polynomial.
-     *
-     * The numeric content part of a polynomial is defined as the gcd() of the numeric content parts of all coefficients.
-     * This is only possible if the underlying number type is either integral or fractional.
-     *
-     * As for fractional numbers, we consider the following definition:
-     *		gcd( a/b, c/d ) = gcd( a/b*l, c/d*l ) / l
-     * where l = lcm(b,d).
-     * @return numeric content part of the polynomial.
-     * @see LPPolynomials::numericContent(std::size_t)
-     */
-    mpz_class numericContent() const {
-        CARL_LOG_NOTIMPLEMENTED();
-    }
-
+    
     /**
      * Compute the main denominator of all numeric coefficients of this polynomial.
      * This method only applies if the Coefficient type is a number.
      * @return the main denominator of all coefficients of this polynomial.
      */
     mpz_class mainDenom() const {
-        CARL_LOG_NOTIMPLEMENTED();
-    }
-
-    mpz_class syntheticDivision(const mpz_class& zeroOfDivisor) {
-        CARL_LOG_NOTIMPLEMENTED();
-    }
-
-    /**
-     * Checks if zero is a real root of this polynomial.
-     * @return True if zero is a root.
-     */
-    bool zeroIsRoot() const {
         CARL_LOG_NOTIMPLEMENTED();
     }
 

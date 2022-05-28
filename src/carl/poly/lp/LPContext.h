@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "../../converter/LibpolyVariableMapper.h"
 #include "../../core/Variable.h"
 
@@ -21,12 +20,25 @@ class LPContext {
 
 public:
     /**
-     * Default constructor shall not exist. Use LPPolynomial(Variable) instead.
+     * Default constructor shall not exist.
      */
     LPContext() = delete;
 
     ~LPContext() {
         lp_polynomial_context_detach(mContext);
+    }
+
+    LPContext(const LPContext& rhs) {
+        mContext = rhs.mContext;
+        lp_polynomial_context_attach(mContext);
+        mVariableOrder = rhs.mVariableOrder;
+    }
+
+    LPContext& operator=(const LPContext& rhs) {
+        mContext = rhs.mContext;
+        lp_polynomial_context_attach(mContext);
+        mVariableOrder = rhs.mVariableOrder;
+        return *this;
     }
 
     /**
@@ -35,7 +47,7 @@ public:
     LPContext(const std::vector<Variable>& varOrder)
         : mVariableOrder(varOrder) {
 
-        CARL_LOG_DEBUG("carl.poly.lp", "Creating context with variables: " << varOrder);
+        CARL_LOG_DEBUG("carl.poly", "Creating context with variables: " << varOrder);
 
         // Add the corresponding libpoly variables into database and order
         lp_variable_db_t* var_db = lp_variable_db_new();
@@ -46,8 +58,9 @@ public:
 
         // Libpoly handles the variable order exactly the other way around
         // i.e the main Variable is not the fist one but the last one
-        for (int i = varOrder.size() - 1; i >= 0; i--) {
+        for (size_t i = varOrder.size(); i-- > 0;) {
             varName = varOrder[i].name();
+            CARL_LOG_DEBUG("carl.poly", "Variable name: " << varName << "  " << i);
             polyVar = VariableMapper::getInstance().getLibpolyVariable(varOrder[i]);
             lp_variable_db_add_variable(var_db, polyVar.get_internal(), &varName[0]);
             lp_variable_order_push(var_order, polyVar.get_internal());
@@ -65,7 +78,7 @@ public:
         // because libpoly handles the variable order exactly the other way around
         // i.e the main Variable is not the fist one but the last one
         const lp_variable_list_t* varList = lp_variable_order_get_list(mContext->var_order);
-        for (int i = lp_variable_list_size(varList) - 1; i >= 0; i--) {
+        for (size_t i = lp_variable_list_size(varList); i-- > 0;) {
             mVariableOrder.push_back(VariableMapper::getInstance().getCarlVariable(poly::Variable(varList->list[i])));
         }
     }
@@ -95,9 +108,8 @@ public:
 };
 
 inline std::ostream& operator<<(std::ostream& os, const LPContext& ctx) {
-    os << ctx.getVariableOrder() ;
-    return os ;
+    os << ctx.getVariableOrder();
+    return os;
 }
 
 } // namespace carl
-
