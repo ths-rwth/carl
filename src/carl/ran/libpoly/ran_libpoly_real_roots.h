@@ -1,5 +1,8 @@
 #pragma once
 
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 #include "../real_roots_common.h"
 #include <carl-common/config.h>
 #include <carl/core/Variable.h>
@@ -312,3 +315,5 @@ real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots_libpoly(
     return real_roots_result<RealAlgebraicNumberLibpoly<Number>>::roots_response(std::move(res));
 }
 } // namespace carl::ran::libpoly
+
+#endif

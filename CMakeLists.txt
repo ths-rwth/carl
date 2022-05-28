@@ -33,6 +33,8 @@ option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are i
 export_option(FORCE_SHIPPED_RESOURCES)
 option( FORCE_SHIPPED_GMP "Do not look in system for lib gmp" OFF )
 export_option(FORCE_SHIPPED_GMP)
+option(USE_LIBPOLY "Use LibPoly" ON)
+export_option(USE_LIBPOLY)
 option( USE_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 export_option(USE_GINAC)
 option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )

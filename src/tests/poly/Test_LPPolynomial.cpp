@@ -1,3 +1,6 @@
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 #include <gtest/gtest.h>
 
 #include "../Common.h"
@@ -225,3 +228,4 @@ TEST(LPPOLYNOMIAL, CoPrimeFactor) {
 }
 
 
+#endif

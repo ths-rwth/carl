@@ -1,5 +1,8 @@
 #pragma once
 
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 #include "../../converter/LibpolyVariableMapper.h"
 #include "../../core/Variable.h"
 
@@ -113,3 +116,5 @@ inline std::ostream& operator<<(std::ostream& os, const LPContext& ctx) {
 }
 
 } // namespace carl
+
+#endif

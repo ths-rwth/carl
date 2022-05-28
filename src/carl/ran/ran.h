@@ -35,9 +35,10 @@
 //#include "thom/ran_thom.h"
 //#include "thom/ran_thom_evaluation.h"
 
+#ifdef USE_LIBPOLY
 #include "libpoly/ran_libpoly.h"
 #include "libpoly/ran_libpoly_evaluation.h"
-
+#endif
 
 namespace carl {
 

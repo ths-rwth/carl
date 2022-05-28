@@ -1,5 +1,8 @@
 #pragma once
 
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 #include "LPPolynomial.h"
 
 #include <carl/core/Common.h>
@@ -115,3 +118,5 @@ std::vector<LPPolynomial> content_free_factors(const LPPolynomial& p) {
 }
 
 } // namespace carl
+
+#endif

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <carl-common/config.h>
+#ifdef USE_LIBPOLY
 
 #include <carl/core/Variable.h>
 #include <carl/core/Common.h>
@@ -49,3 +50,5 @@ public:
 };
 
 } // namespace carl
+
+#endif

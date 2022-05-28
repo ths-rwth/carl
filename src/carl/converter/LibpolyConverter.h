@@ -1,6 +1,7 @@
 #pragma once
 
 #include <carl-common/config.h>
+#ifdef USE_LIBPOLY
 
 #include <algorithm>
 #include <map>
@@ -182,3 +183,5 @@ public:
 };
 
 } // namespace carl
+
+#endif

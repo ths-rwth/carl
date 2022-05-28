@@ -1,6 +1,8 @@
 #pragma once
 
 #include <carl-common/config.h>
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
 
 #include "ran_libpoly.h"
 
@@ -127,3 +129,5 @@ boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<
 
 
 } // namespace carl
+
+#endif

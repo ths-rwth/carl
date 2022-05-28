@@ -1,5 +1,8 @@
 #include "LPPolynomial.h"
 
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 namespace carl {
 
 LPPolynomial::LPPolynomial(const LPPolynomial& rhs)
@@ -346,3 +349,5 @@ std::ostream& operator<<(std::ostream& os, const LPPolynomial& p) {
 }
 
 } // namespace carl
+
+#endif

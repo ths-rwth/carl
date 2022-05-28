@@ -1,5 +1,8 @@
 #pragma once
 
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 #include <limits>
 
 #include <carl/interval/Interval.h>
@@ -608,3 +611,5 @@ struct hash<carl::RealAlgebraicNumberLibpoly<Number>> {
 	}
 };
 } // namespace std
+
+#endif

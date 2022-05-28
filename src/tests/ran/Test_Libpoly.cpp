@@ -1,3 +1,6 @@
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 #include <gtest/gtest.h>
 
 #include "../Common.h"
@@ -174,3 +177,5 @@ TEST(LIBPOLY, nullificationBug2){
 	EXPECT_FALSE(roots.roots().empty());
 
 }
+
+#endif

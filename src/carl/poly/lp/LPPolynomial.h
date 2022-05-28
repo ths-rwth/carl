@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 #include "LPContext.h"
 
 #include <carl/poly/umvpoly/Polynomial.h> //abstract base class Polynomoal
@@ -520,3 +523,4 @@ struct hash<carl::LPPolynomial> {
 } // namespace std
 
 
+#endif

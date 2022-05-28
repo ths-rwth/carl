@@ -1,5 +1,7 @@
 #pragma once
 
+#include <carl-common/config.h>
+
 #include "ran.h"
 
 
@@ -10,9 +12,9 @@
 //#include "thom/ran_thom_real_roots.h"
 
 
-
+#ifdef USE_LIBPOLY
 #include "libpoly/ran_libpoly_real_roots.h"
-
+#endif
 
 namespace carl::ran {
 
@@ -47,11 +49,15 @@ namespace carl::ran {
 
     using carl::ran::interval::real_roots;
 
+    #ifdef USE_LIBPOLY
     using carl::ran::libpoly::real_roots_libpoly ;
-
+    #endif
 }
 
 namespace carl {
     using carl::ran::real_roots;
+    
+    #ifdef USE_LIBPOLY
     using carl::ran::real_roots_libpoly;
+    #endif
 }

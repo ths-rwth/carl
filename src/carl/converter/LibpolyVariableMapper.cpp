@@ -1,5 +1,8 @@
 #include "LibpolyVariableMapper.h"
 
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 namespace carl {
 
 VariableMapper::VariableMapper() {
@@ -73,3 +76,5 @@ void VariableMapper::setLibpolyMainVariable(const carl::Variable& mainVar) {
 }
 
 } // namespace carl
+
+#endif

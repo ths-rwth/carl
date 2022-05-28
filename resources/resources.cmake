@@ -168,11 +168,13 @@ IF(USE_MPFR_FLOAT)
 endif()
 
 ##### LIBPOLY
-if(NOT LIBPOLY_FOUND)
-set(LIBPOLY_FIND_VERSION "0.1.9")
-include(resources/libpoly.cmake)
+IF(USE_LIBPOLY)
+	if(NOT LIBPOLY_FOUND)
+		set(LIBPOLY_FIND_VERSION "0.1.9")
+		include(resources/libpoly.cmake)
+	endif()
+	print_resource_info("LIBPOLY" LIBPOLYXX_STATIC ${LIBPOLY_FIND_VERSION})
 endif()
-print_resource_info("LIBPOLY" LIBPOLYXX_STATIC ${LIBPOLY_FIND_VERSION})
 
 
 ##### Doxygen

@@ -1,6 +1,8 @@
 #pragma once
 
-#ifdef USE_COCOA
+#include <carl-common/config.h>
+
+#ifdef USE_COCOA && USE_LIBPOLY
 
 #include <carl/core/Variable.h>
 #include <carl/core/Variables.h>

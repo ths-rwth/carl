@@ -1,3 +1,6 @@
+#include <carl-common/config.h>
+#ifdef USE_LIBPOLY
+
 #include <gtest/gtest.h>
 
 #include "../Common.h"
@@ -140,3 +143,5 @@ TEST(LPPOLYNOMIAL, factorization) {
     std::cout << "Factorization with premade adaptor took " << duration.count() << " milliseconds." << std::endl;
 
 }
+
+#endif
