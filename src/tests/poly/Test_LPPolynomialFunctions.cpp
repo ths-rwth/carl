@@ -35,13 +35,13 @@ TEST(LPPOLYNOMIAL, Resultant) {
     auto lp_poly1 = polyX * polyY - 12;
     auto lp_poly2 = polyX * polyX * (polyY - 12) - polyY * polyY;
 
-    auto carl_poly1 = LibpolyConverter::getInstance().toCarlMultivariatePolynomial(lp_poly1.getPolynomial());
-    auto carl_poly2 = LibpolyConverter::getInstance().toCarlMultivariatePolynomial(lp_poly2.getPolynomial());
+    auto carl_poly1 = to_carl_multivariate_polynomial(lp_poly1.getPolynomial());
+    auto carl_poly2 = to_carl_multivariate_polynomial(lp_poly2.getPolynomial());
 
     auto carl_resultant = resultant(to_univariate_polynomial(carl_poly1, x), to_univariate_polynomial(carl_poly2, x));
     auto lp_resultant = resultant(lp_poly1, lp_poly2);
 
-    EXPECT_EQ(to_univariate_polynomial(LibpolyConverter::getInstance().toCarlMultivariatePolynomial(lp_resultant.getPolynomial()), x), carl_resultant);
+    EXPECT_EQ(to_univariate_polynomial(to_carl_multivariate_polynomial(lp_resultant.getPolynomial()), x), carl_resultant);
 }
 
 TEST(LPPOLYNOMIAL, RealRootsLP) {

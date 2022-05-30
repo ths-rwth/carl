@@ -13,7 +13,7 @@ std::optional<RealAlgebraicNumberLibpoly<Number>> evaluate(
 	const MultivariatePolynomial<Number>& polynomial,
 	const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& evalMap) {
 	mpz_class denom;
-	poly::Polynomial poly = LibpolyConverter::getInstance().toLibpolyPolynomial(polynomial, denom);
+	poly::Polynomial poly = to_libpoly_polynomial(polynomial, denom);
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation converted to poly: " << poly << " With denominator: " << denom);
 
 	assert(denom != 0);
@@ -95,7 +95,7 @@ boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<
 	}
 
 	//denominator can be omitted
-	poly::Polynomial poly_pol = LibpolyConverter::getInstance().toLibpolyPolynomial(constraint.lhs());
+	poly::Polynomial poly_pol = to_libpoly_polynomial(constraint.lhs());
 
 	//Turn into poly::Assignment
 	poly::Assignment assignment;

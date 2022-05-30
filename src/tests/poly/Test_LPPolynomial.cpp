@@ -115,7 +115,7 @@ TEST(LPPOLYNOMIAL, LeadingCoefficient) {
 
     auto res = polyX * polyY * polyZ * constant + polyX * polyZ*12345;
 
-    auto carl_res = LibpolyConverter::getInstance().toCarlMultivariatePolynomial(res.getPolynomial()) ;
+    auto carl_res = to_carl_multivariate_polynomial(res.getPolynomial()) ;
 
     std::cout << "Carl_Polynomial: " << carl_res << std::endl ;
     std::cout << "LP_Polynomial: " << res << std::endl;

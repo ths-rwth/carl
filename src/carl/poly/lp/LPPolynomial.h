@@ -9,7 +9,6 @@
 
 #include "LPContext.h"
 
-#include <carl/poly/umvpoly/Polynomial.h> //abstract base class Polynomoal
 #include <carl/core/Variables.h>
 #include <carl-logging/carl-logging.h>
 
@@ -22,7 +21,7 @@
 
 namespace carl {
 
-class LPPolynomial : public Polynomial {
+class LPPolynomial {
 private:
     /// The libpoly polynomial.
     poly::Polynomial mPoly;
@@ -128,7 +127,7 @@ public:
     /**
      * Destructor.
      */
-    ~LPPolynomial() override = default;
+    ~LPPolynomial() = default;
 
     // Polynomial interface implementations.
 
@@ -137,7 +136,7 @@ public:
      * @see Polynomial#isUnivariateRepresented
      * @return true.
      */
-    bool isUnivariateRepresented() const override {
+    bool isUnivariateRepresented() const {
         return poly::is_univariate(mPoly);
     }
 
@@ -146,12 +145,8 @@ public:
      * @see Polynomial#isMultivariateRepresented
      * @return false.
      */
-    bool isMultivariateRepresented() const override {
+    bool isMultivariateRepresented() const {
         return !isUnivariateRepresented();
-    }
-
-    bool isUnivariate() const {
-        return isUnivariateRepresented();
     }
 
     /**
@@ -170,7 +165,7 @@ public:
      * @return The only variable occuring in the term.
      */
     Variable getSingleVariable() const {
-        assert(isUnivariate());
+        assert(isUnivariateRepresented());
         return VariableMapper::getInstance().getCarlVariable(main_variable(mPoly));
     }
 

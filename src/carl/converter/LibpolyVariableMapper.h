@@ -36,17 +36,6 @@ public:
 	 * @return The corresponding carl variable
 	 */
 	carl::Variable getCarlVariable(const poly::Variable& var);
-
-	/**
-	 * Helper methods to alter the internal variable ordering in libpoly
-	 * The variable ordering is global (we use the same context for all polynomials) and has to be checked for each carl-polynomial
-	 * Important: Libpoly Polynomials do NOT automatically reorder according to the variable ordering
-	 * the polynomial needs to be external or manually reordered (see lp_polynomial_ensure_order)
-	 */
-	void setLibpolyVariableOrder(const std::vector<carl::Variable>& variableOrder);
-	void setLibpolyVariableOrder(const std::vector<poly::Variable>& variableOrder);
-	void setLibpolyMainVariable(const carl::Variable& mainVar);
-	void setLibpolyMainVariable(const poly::Variable& mainVar);
 };
 
 } // namespace carl

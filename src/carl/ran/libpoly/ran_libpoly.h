@@ -121,8 +121,8 @@ public:
 	RealAlgebraicNumberLibpoly(const carl::UnivariatePolynomial<Number>& p, const Interval<Number>& i) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", " Create safe from poly: " << p << " in interval: " << i);
 
-		poly::UPolynomial upoly = LibpolyConverter::getInstance().toLibpolyUPolynomial(p);
-		poly::Interval inter_poly = LibpolyConverter::getInstance().toInterval(i);
+		poly::UPolynomial upoly = to_libpoly_upolynomial(p);
+		poly::Interval inter_poly = to_libpoly_interval(i);
 
 		CARL_LOG_DEBUG("carl.ran.libpoly", " Converted to poly: " << upoly << " in interval: " << inter_poly);
 
@@ -148,7 +148,7 @@ public:
 	 * Construct from Number (usually mpq_class)
 	 */
 	RealAlgebraicNumberLibpoly(const Number& num) {
-		poly::Rational rat = LibpolyConverter::getInstance().toLibpolyRational(num);
+		poly::Rational rat = to_libpoly_rational(num);
 		lp_algebraic_number_construct_from_rational(get_internal(), rat.get_internal());
 	}
 
@@ -233,7 +233,7 @@ public:
 	Number integer_below() const {
 		poly::Integer val;
 		lp_algebraic_number_floor(get_internal(), val.get_internal());
-		return LibpolyConverter::getInstance().toNumber<Number>(val);
+		return to_rational(val);
 	}
 
 	/**
@@ -252,7 +252,7 @@ public:
 	}
 
 	const UnivariatePolynomial<mpq_class> polynomial() const {
-		return LibpolyConverter::getInstance().toCarlUnivariatePolynomial(libpoly_polynomial(), auxVariable);
+		return to_carl_univariate_polynomial(libpoly_polynomial(), auxVariable);
 	}
 
 	const Interval<Number> interval() const {
@@ -262,11 +262,11 @@ public:
 	}
 
 	const Number get_upper_bound() const {
-		return LibpolyConverter::getInstance().toNumber<Number>(poly::get_upper(libpoly_interval()));
+		return to_rational(poly::get_upper(libpoly_interval()));
 	}
 
 	const Number get_lower_bound() const {
-		return LibpolyConverter::getInstance().toNumber<Number>(poly::get_lower(libpoly_interval()));
+		return to_rational(poly::get_lower(libpoly_interval()));
 	}
 
 	/**
@@ -298,7 +298,7 @@ public:
 				mpq_init(&result);
 			}
 		}
-		Number num = LibpolyConverter::getInstance().toNumber<Number>(&result) ;
+		Number num = to_rational(&result) ;
 		lp_rational_destruct(&result) ;
 		return num ;
 	}
@@ -353,14 +353,14 @@ public:
 		assignment.set(VariableMapper::getInstance().getLibpolyVariable(p.mainVar()), poly::Value(&val));
 		lp_value_destruct(&val);
 
-		poly::Polynomial poly = LibpolyConverter::getInstance().toLibpolyPolynomial(carl::MultivariatePolynomial<Number>(p)) ;
+		poly::Polynomial poly = to_libpoly_polynomial(carl::MultivariatePolynomial<Number>(p)) ;
 		return static_cast<Sign>(poly::sgn(poly, assignment));
 	}
 
 	bool contained_in(const Interval<Number>& i) const {
 		CARL_LOG_DEBUG("carl.ran.libpoly", "ran " << *this << " contained in " << i);
 
-		poly::Interval inter = LibpolyConverter::getInstance().toInterval<Number>(i);
+		poly::Interval inter = to_libpoly_interval(i);
 
 		lp_value_t val;
 		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, get_internal());
@@ -395,7 +395,7 @@ template<typename Number>
 void refine_using(const RealAlgebraicNumberLibpoly<Number>& n, const Number& pivot) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Refining Algebraic Number : " << n);
 	//Convert pivot to libpoly rational
-	poly::Rational pivot_libpoly = LibpolyConverter::getInstance().toLibpolyRational(pivot);
+	poly::Rational pivot_libpoly = to_libpoly_rational(pivot);
 	while (!n.is_numeric() && n.libpoly_interval() == pivot_libpoly) {
 		lp_algebraic_number_refine_const(n.get_internal());
 	}
@@ -420,7 +420,7 @@ Number branching_point(const RealAlgebraicNumberLibpoly<Number>& n) {
 	refine(n);
 	poly::DyadicRational res;
 	lp_algebraic_number_get_dyadic_midpoint(n.get_internal(), res.get_internal());
-	Number num = LibpolyConverter::getInstance().toNumber<Number>(res);
+	Number num = to_rational(res);
 	return num;
 }
 
@@ -513,7 +513,7 @@ Number floor(const RealAlgebraicNumberLibpoly<Number>& n) {
 	refine(n);
 	lp_integer_t val;
 	lp_algebraic_number_floor(n.get_internal(), &val);
-	Number ret =  LibpolyConverter::getInstance().toNumber<Number>(poly::detail::cast_from(&val));
+	Number ret = to_rational(*poly::detail::cast_from(&val));
 	lp_integer_destruct(&val) ;
 	return ret ;
 }
@@ -524,7 +524,7 @@ Number ceil(const RealAlgebraicNumberLibpoly<Number>& n) {
 	refine(n);
 	lp_integer_t val;
 	lp_algebraic_number_ceiling(n.get_internal(), &val);
-	Number ret =  LibpolyConverter::getInstance().toNumber<Number>(poly::detail::cast_from(&val));
+	Number ret = to_rational(*poly::detail::cast_from(&val));
 	lp_integer_destruct(&val) ;
 	return ret ;
 }
@@ -563,7 +563,7 @@ const carl::Variable RealAlgebraicNumberLibpoly<Number>::auxVariable = fresh_rea
 template<typename Number>
 bool compare(const RealAlgebraicNumberLibpoly<Number>& lhs, const Number& rhs, const Relation relation) {
 
-	poly::Rational rat = LibpolyConverter::getInstance().toLibpolyRational<Number>(rhs);
+	poly::Rational rat = to_libpoly_rational(rhs);
 
 	//refine unitl rhs in not in interval of lhs
 	//Technically not necessary because libpoly does that in compare, but whatever
