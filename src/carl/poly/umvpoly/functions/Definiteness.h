@@ -45,7 +45,7 @@ inline std::ostream& operator<<(std::ostream& os, Definiteness d) {
 template<typename Coeff>
 Definiteness definiteness(const Term<Coeff>& t) {
 	if (t.monomial()) {
-		if (t.monomial()->isSquare()) {
+		if (t.monomial()->is_square()) {
 			return (t.coeff() < Coeff(0) ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
 		}
 	} else if (!carl::is_zero(t.coeff())) {
@@ -94,12 +94,12 @@ Definiteness definiteness(const MultivariatePolynomial<C,O,P>& p, bool full_effo
 		assert( !is_constant(p) );
 		bool lTermNegative = carl::is_negative( p.lterm().coeff() );
 		MultivariatePolynomial<C,O,P> tmp = p;
-		if( p.hasConstantTerm() )
+		if( p.has_constant_term() )
 		{
-			bool constPartNegative = carl::is_negative( p.constantPart() );
+			bool constPartNegative = carl::is_negative( p.constant_part() );
 			if( constPartNegative != lTermNegative ) return Definiteness::NON;
 			result = lTermNegative ? Definiteness::NEGATIVE : Definiteness::POSITIVE;
-			tmp -= p.constantPart();
+			tmp -= p.constant_part();
 		}
 		else
 		{

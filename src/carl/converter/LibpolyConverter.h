@@ -46,12 +46,12 @@ public:
 		CARL_LOG_DEBUG("carl.converter", "Converting Carl Multivariate Poly " << p);
 		if (carl::is_constant(p)) {
 			CARL_LOG_DEBUG("carl.converter", "Poly is constant");
-			denominator = carl::get_denom(p.constantPart());
-			auto res = poly::Polynomial(poly::Integer(carl::get_num(p.constantPart())));
+			denominator = carl::get_denom(p.constant_part());
+			auto res = poly::Polynomial(poly::Integer(carl::get_num(p.constant_part())));
 			return res;
 		}
 		//Libpoly polynomials have integer coefficients -> so we have to store the lcm of the coefficients of every term
-		Coeff coprimeFactor = p.mainDenom();
+		Coeff coprimeFactor = p.main_denom();
 		if (carl::get_denom(coprimeFactor) != 1) {
 			//if coprime factor is not an integer
 			denominator = coprimeFactor > 0 ? mpz_class(1) : mpz_class(-1);
@@ -102,7 +102,7 @@ public:
 			CARL_LOG_DEBUG("carl.converter", "Coprime Factor/ Denominator: " << denominator);
 			return poly::UPolynomial(poly::Integer(carl::get_num(p.lcoeff())));
 		}
-		Coeff coprimeFactor = p.coprimeFactor();
+		Coeff coprimeFactor = p.coprime_factor();
 
 		CARL_LOG_DEBUG("carl.converter", "Coprime Factor: " << coprimeFactor);
 

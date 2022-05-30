@@ -9,7 +9,7 @@ namespace carl {
 
 template<typename Number, typename Integer>
 Interval<Number> pow(const Interval<Number>& i, Integer exp) {
-	assert(i.isConsistent());
+	assert(i.is_consistent());
 	if (exp % 2 == 0) {
 		if (i.is_infinite()) {
 			return Interval<Number>(carl::constant_zero<Number>().get(), BoundType::WEAK, carl::constant_zero<Number>().get(), BoundType::INFTY);
@@ -49,7 +49,7 @@ void pow_assign(Interval<Number>& i, Integer exp) {
 
 template<typename Number, EnableIf<std::is_floating_point<Number>> = dummy>
 Interval<Number> sqrt(const Interval<Number>& i) {
-	assert(i.isConsistent());
+	assert(i.is_consistent());
 	Interval<Number> res;
 	if (i.upper_bound_type() != BoundType::INFTY && i.upper() < carl::constant_zero<Number>().get()) {
 		res = Interval<Number>::empty_interval();

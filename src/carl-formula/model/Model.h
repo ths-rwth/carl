@@ -154,7 +154,7 @@ namespace carl
 				auto value = ass.second;
 				if (simple) value = evaluated(ass.first);
 
-				if (ass.first.isVariable()) {
+				if (ass.first.is_variable()) {
 					os << "\t(define-fun " << ass.first << " () " << ass.first.asVariable().type() << std::endl;
 					os << "\t\t" << value << ")" << std::endl;
 				} else if (ass.first.isBVVariable()) {
@@ -180,7 +180,7 @@ namespace carl
 				auto value = ass.second;
 				if (simple) value = evaluated(ass.first);
 				
-				if (ass.first.isVariable()) {
+				if (ass.first.is_variable()) {
 					os << ass.first << " = " << value;
 				} else if (ass.first.isBVVariable()) {
 					os << ass.first << " = " << ass.first.asBVVariable().sort() << "(" << value << ")";

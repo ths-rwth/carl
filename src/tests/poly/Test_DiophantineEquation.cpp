@@ -67,10 +67,10 @@ TEST(DiophantineEquation, extended_gcd_integer) {
 cln::cl_I evaluatePolynomial(MultivariatePolynomial<cln::cl_I>& p, std::vector<cln::cl_I>& res) {
 	std::map<carl::Variable, cln::cl_I> varMap;
 	// the ordering of the values in res is like the ordering of the terms
-	std::vector<carl::Term<cln::cl_I>> terms = p.getTerms();
-	std::size_t start = p.hasConstantTerm() ? 1 : 0; // terms[0] is the constant part if there is one
+	std::vector<carl::Term<cln::cl_I>> terms = p.terms();
+	std::size_t start = p.has_constant_term() ? 1 : 0; // terms[0] is the constant part if there is one
 	for (std::size_t i = start; i < terms.size(); i++) {
-		varMap[terms[i].getSingleVariable()] = res[i - start];
+		varMap[terms[i].single_variable()] = res[i - start];
 	}
 	return carl::evaluate(p, varMap);
 }

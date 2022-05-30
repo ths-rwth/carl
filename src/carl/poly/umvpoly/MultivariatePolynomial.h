@@ -14,9 +14,7 @@
 #include <vector>
 
 #include "MultivariatePolynomialPolicy.h"
-#include "Polynomial.h"
 #include "Term.h"
-#include "functions/VariableInformation.h"
 #include <carl/numbers/numbers.h>
 #include "TermAdditionManager.h"
 #include "../typetraits.h"
@@ -41,7 +39,7 @@ class UnivariatePolynomial;
  * @ingroup multirp
  */
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
-class MultivariatePolynomial : public Polynomial, public Policies
+class MultivariatePolynomial : public Policies
 {
     template<typename Polynomial, typename Order>
     friend class TermAdditionManager;
@@ -70,8 +68,6 @@ public:
 	template<typename C, typename T>
 	using EnableIfNotSame = typename std::enable_if<!std::is_same<C,T>::value,T>::type;
     
-	template <bool gatherCoeff>
-	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 private:
 	/// A vector of all terms.
 	mutable TermsType mTerms;
@@ -120,24 +116,8 @@ public:
     explicit MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands);
 	/// @}
 	
-	~MultivariatePolynomial() noexcept override = default;
-	
-	//Polynomial interface implementations.
-	/**
-	 * @see class Polynomial
-	 * @return 
-	 */
-	bool isUnivariateRepresented() const override {
-		return false;
-	}
-	/**
-	 * @see class Polynomial
-	 * @return 
-	 */
-	bool isMultivariateRepresented() const override	{
-		return true;
-	}
-	
+	~MultivariatePolynomial() noexcept = default;
+		
 	/**
 	 * Check if the terms are ordered.
      * @return If terms are ordered.
@@ -157,18 +137,18 @@ public:
 			[](const auto& lhs, const auto& rhs){ return Ordering::less(lhs, rhs); }
 		);
 		mOrdered = true;
-        assert(this->isConsistent());
+        assert(this->is_consistent());
 	}
 	/**
 	 * The leading term
 	 * @return leading term.
 	 */
 	const Term<Coeff>& lterm() const {
-		CARL_LOG_ASSERT("carl.core", nrTerms() > 0, "Leading term undefined on zero polynomials.");
+		CARL_LOG_ASSERT("carl.core", nr_terms() > 0, "Leading term undefined on zero polynomials.");
 		return mTerms.back();
 	}
 	Term<Coeff>& lterm(){
-		CARL_LOG_ASSERT("carl.core", nrTerms() > 0, "Leading term undefined on zero polynomials.");
+		CARL_LOG_ASSERT("carl.core", nr_terms() > 0, "Leading term undefined on zero polynomials.");
 		return mTerms.back();
 	}
 	/**
@@ -199,11 +179,11 @@ public:
 	 * Give the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 */
 	const Term<Coeff>& trailingTerm() const {
-		CARL_LOG_ASSERT("carl.core", nrTerms() > 0, "Trailing term undefined on zero polynomials.");
+		CARL_LOG_ASSERT("carl.core", nr_terms() > 0, "Trailing term undefined on zero polynomials.");
 		return mTerms.front();
 	}
 	Term<Coeff>& trailingTerm() {
-		CARL_LOG_ASSERT("carl.core", nrTerms() > 0, "Trailing term undefined on zero polynomials.");
+		CARL_LOG_ASSERT("carl.core", nr_terms() > 0, "Trailing term undefined on zero polynomials.");
 		return mTerms.front();
 	}
 	
@@ -213,7 +193,7 @@ public:
 	 * @see @cite GCL92, page 48
 	 * @return Total degree.
 	 */
-	std::size_t totalDegree() const;
+	std::size_t total_degree() const;
 
 	/**
 	 * Calculates the degree of this polynomial with respect to the given variable.
@@ -224,7 +204,7 @@ public:
 		std::size_t max = 0;
 		for (const auto& t: mTerms) {
 			if (t.monomial() == nullptr) continue;
-			std::size_t c = t.monomial()->exponentOfVariable(var);
+			std::size_t c = t.monomial()->exponent_of_variable(var);
 			if (c > max) max = c;
 		}
 		return max;
@@ -241,8 +221,8 @@ public:
 		for (const auto& t: mTerms) {
 			if (t.monomial() == nullptr) {
 				if (exp == 0) res.mTerms.push_back(t);
-			} else if (t.monomial()->exponentOfVariable(var) == exp) {
-				Monomial::Arg newMon = t.monomial()->dropVariable(var);
+			} else if (t.monomial()->exponent_of_variable(var) == exp) {
+				Monomial::Arg newMon = t.monomial()->drop_variable(var);
 				res.mTerms.push_back(TermType(t.coeff(), newMon));
 			}
 		}
@@ -264,35 +244,35 @@ public:
      */
 	[[deprecated("use carl::is_one(p) instead.")]]
 	bool is_one() const {
-		return (nrTerms() == 1) && carl::is_one(lterm());
+		return (nr_terms() == 1) && carl::is_one(lterm());
 	}
 	/**
 	 * Check if the polynomial is constant.
 	 */
-	bool isConstant() const {
-		return (nrTerms() == 0) || ((nrTerms() == 1) && lterm().isConstant());
+	bool is_constant() const {
+		return (nr_terms() == 0) || ((nr_terms() == 1) && lterm().is_constant());
 	}
 	/**
 	 * Check if the polynomial is a number, i.e., a constant.
 	 */
-	bool isNumber() const {
-		return isConstant();
+	bool is_number() const {
+		return is_constant();
 	}
 	/**
 	 * @return true, if this polynomial consists just of one variable (with coefficient 1). 
 	 */
-	bool isVariable() const {
-		return (nrTerms() == 1) && carl::is_one(lcoeff()) && lterm().isSingleVariable();
+	bool is_variable() const {
+		return (nr_terms() == 1) && carl::is_one(lcoeff()) && lterm().is_single_variable();
 	}
 	/**
 	 * Check if the polynomial is linear.
 	 */
-	bool isLinear() const;
+	bool is_linear() const;
 
 	/**
 	 * Calculate the number of terms.
 	 */
-	std::size_t nrTerms() const {
+	std::size_t nr_terms() const {
 		return mTerms.size();
 	}
     
@@ -307,23 +287,23 @@ public:
 	/**
 	 * Check if the polynomial has a constant term that is not zero.
 	 */
-	bool hasConstantTerm() const {
-		return (nrTerms() > 0) && trailingTerm().isConstant();
+	bool has_constant_term() const {
+		return (nr_terms() > 0) && trailingTerm().is_constant();
 	}
     
     /**
      * @return true, if the image of this polynomial is integer-valued.
      */
-    bool integerValued() const {
+    bool integer_valued() const {
 		return std::all_of(begin(), end(),
-			[](const auto& t){ return t.integerValued(); }
+			[](const auto& t){ return t.integer_valued(); }
 		);
 	}
     
 	/**
 	 * Retrieve the constant term of this polynomial or zero, if there is no constant term.
 	 */
-	const Coeff& constantPart() const;
+	const Coeff& constant_part() const;
 	
 	auto begin() const {
 		return mTerms.begin();
@@ -338,16 +318,16 @@ public:
 		return mTerms.rend();
 	}
 
-	auto eraseTerm(typename TermsType::iterator pos) {
+	auto erase_term(typename TermsType::iterator pos) {
 		///@todo find new lterm or constant term
 		assert(false);
 		return mTerms.erase(pos);
 	}
     
-	const TermsType& getTerms() const {
+	const TermsType& terms() const {
 		return mTerms;
 	}
-	TermsType& getTerms() {
+	TermsType& terms() {
 		return mTerms;
 	}
 
@@ -363,18 +343,18 @@ public:
 	 * @return  A reference to this.
 	 */
 	///@todo find new lterm
-	MultivariatePolynomial& stripLT();
+	MultivariatePolynomial& strip_lterm();
     
-	bool hasSingleVariable() const {
-		return lterm().isSingleVariable() && nrTerms() == 1;
+	bool has_single_variable() const {
+		return lterm().is_single_variable() && nr_terms() == 1;
 	}
     
     /**
      * For terms with exactly one variable, get this variable.
      * @return The only variable occuring in the term.
      */
-    Variable getSingleVariable() const {
-        return lterm().getSingleVariable();
+    Variable single_variable() const {
+        return lterm().single_variable();
     }
     
     /**
@@ -396,15 +376,15 @@ public:
 	 * @return 
 	 * Notice that it might be better to use the variable information if several pieces of information are requested.
 	 */
-	bool isUnivariate() const;
+	bool is_univariate() const;
 
 	/**
 	 * Checks whether the polynomial is a trivial sum of squares.
 	 * @return true if polynomial is of the form \\sum a_im_i^2 with a_i > 0 for all i.
 	 */
-	bool isTsos() const {
+	bool is_tsos() const {
 		return std::all_of(begin(), end(),
-			[](const auto& t){ return t.isSquare(); }
+			[](const auto& t){ return t.is_square(); }
 		);
 	}
 	
@@ -418,7 +398,7 @@ public:
 		);
 	}
 	
-	bool isReducibleIdentity() const;
+	bool is_reducible_identity() const;
 
 	/**
 	 * Subtract a term times a polynomial from this polynomial.
@@ -444,26 +424,26 @@ public:
 	 * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
 	 *		 of the coefficients in p.
 	 */
-	Coeff coprimeFactor() const;
+	Coeff coprime_factor() const;
     
     /**
 	 * @return The lcm of the denominators of the coefficients (without the constant one) in p divided by the gcd of numerators 
 	 *		 of the coefficients in p.
 	 */
 	template<typename C = Coeff, EnableIf<is_subset_of_rationals_type<C>> = dummy>
-	Coeff coprimeFactorWithoutConstant() const;
+	Coeff coprime_factor_without_constant() const;
 	
 	/**
-	 * @return p * p.coprimeFactor()
-	 * @see coprimeFactor()
+	 * @return p * p.coprime_factor()
+	 * @see coprime_factor()
 	 */
-	MultivariatePolynomial coprimeCoefficients() const;
+	MultivariatePolynomial coprime_coefficients() const;
 
 	/**
-	 * @return p * |p.coprimeFactor()|
-	 * @see coprimeCoefficients()
+	 * @return p * |p.coprime_factor()|
+	 * @see coprime_coefficients()
 	 */
-	MultivariatePolynomial coprimeCoefficientsSignPreserving() const;
+	MultivariatePolynomial coprime_coefficients_sign_preserving() const;
 	
 	/**
 	 * For a polynomial p, returns p/lc(p)
@@ -473,7 +453,7 @@ public:
 	
 	bool divides(const MultivariatePolynomial& b) const;
 
-	MultivariatePolynomial<typename IntegralType<Coeff>::type, Ordering, Policies> toIntegerDomain() const;
+	MultivariatePolynomial<typename IntegralType<Coeff>::type, Ordering, Policies> to_integer_domain() const;
 
 	const Term<Coeff>& operator[](std::size_t index) const {
 		assert(index < mTerms.size());
@@ -481,20 +461,14 @@ public:
 	}
 
 	MultivariatePolynomial mod(const typename IntegralType<Coeff>::type& modulo) const;
-	
-	template<bool gatherCoeff>
-	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(Variable::Arg v) const;
-
-	template<bool gatherCoeff>
-	VariablesInformation<gatherCoeff, MultivariatePolynomial> getVarInfo() const;
-	
+		
 	template<typename C=Coeff, EnableIf<is_number_type<C>> = dummy>
-	Coeff numericContent() const;
+	Coeff numeric_content() const;
 	template<typename C=Coeff, DisableIf<is_number_type<C>> = dummy>
-	typename UnderlyingNumberType<C>::type numericContent() const;
+	typename UnderlyingNumberType<C>::type numeric_content() const;
 	
 	template<typename C=Coeff, EnableIf<is_number_type<C>> = dummy>
-	IntNumberType mainDenom() const;
+	IntNumberType main_denom() const;
 	
 	/// @name In-place addition operators
 	/// @{
@@ -579,7 +553,7 @@ public:
 
 	static bool compareByNrTerms(const MultivariatePolynomial& p1, const MultivariatePolynomial& p2)
 	{
-		return (p1.nrTerms() < p2.nrTerms());
+		return (p1.nr_terms() < p2.nr_terms());
 	}
 
 	
@@ -606,16 +580,16 @@ public:
 	 * <li>Only the trailing term may be constant.</li>
 	 * </ul>
 	 */
-	bool isConsistent() const;
+	bool is_consistent() const;
 };
 
 	template<typename C, typename O, typename P>
 	bool is_one(const MultivariatePolynomial<C,O,P>& p) {
-		return (p.nrTerms() == 1) && carl::is_one(p.lterm());
+		return (p.nr_terms() == 1) && carl::is_one(p.lterm());
 	}
 	template<typename C, typename O, typename P>
 	bool is_zero(const MultivariatePolynomial<C,O,P>& p) {
-		return p.nrTerms() == 0;
+		return p.nr_terms() == 0;
 	}
 
 	//template<typename C, typename O, typename P>
@@ -692,16 +666,16 @@ namespace std {
 		 */
 
 		std::size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const {
-			assert(mpoly.isConsistent());
+			assert(mpoly.is_consistent());
 #if false
-			if (mpoly.nrTerms() == 0) return 0;
-			if (mpoly.nrTerms() == 1) return carl::hash_all(mpoly[0]);
+			if (mpoly.nr_terms() == 0) return 0;
+			if (mpoly.nr_terms() == 1) return carl::hash_all(mpoly[0]);
 			std::size_t seed = 0;
 			carl::hash_add(seed, mpoly[0]);
-			for (std::size_t i = 1; i < mpoly.nrTerms() - 1; ++i) {
+			for (std::size_t i = 1; i < mpoly.nr_terms() - 1; ++i) {
 				seed = seed ^ carl::hash_all(mpoly[i]);
 			}
-			carl::hash_add(seed, mpoly[mpoly.nrTerms()-1]);
+			carl::hash_add(seed, mpoly[mpoly.nr_terms()-1]);
 			return seed;
 #else
 			mpoly.makeOrdered();

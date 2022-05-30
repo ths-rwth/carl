@@ -45,7 +45,7 @@ TEST(UnivariatePolynomial, toInteger)
 	Variable x = fresh_real_variable("x");
 	UnivariatePolynomial<Rational> pRA(x, {(Rational)0, (Rational)2});
 	UnivariatePolynomial<IntegralType<Rational>::type> pI(x, {(IntegralType<Rational>::type)0, (IntegralType<Rational>::type)2});
-	EXPECT_EQ(pI, pRA.toIntegerDomain());
+	EXPECT_EQ(pI, pRA.to_integer_domain());
 }
 
 TEST(UnivariatePolynomial, Reduction)
@@ -240,12 +240,12 @@ TEST(UnivariatePolynomial, factorization)
         EXPECT_EQ(pol, productOfFactors);
     }
     UnivariatePolynomial<Rational> pol2(x, {(Rational)-1, (Rational)2, (Rational)-6, (Rational)2});
-    std::cout << "syntheticDivision of " << pol2 << std::endl;
-    EXPECT_EQ(5, pol2.syntheticDivision((Rational)3) );
+    std::cout << "synthetic_division of " << pol2 << std::endl;
+    EXPECT_EQ(5, pol2.synthetic_division((Rational)3) );
 
     UnivariatePolynomial<Rational> pol3(x, {(Rational)-42, (Rational)0, (Rational)-12, (Rational)1});
-    std::cout << "syntheticDivision of " << pol3 << std::endl;
-    EXPECT_EQ(-123, pol3.syntheticDivision((Rational)3) );
+    std::cout << "synthetic_division of " << pol3 << std::endl;
+    EXPECT_EQ(-123, pol3.synthetic_division((Rational)3) );
 
     UnivariatePolynomial<Rational> pol4(x, {(Rational)1, (Rational)0, (Rational)1});
     UnivariatePolynomial<Rational> pol5(x, {(Rational)1, (Rational)0, (Rational)-1});
@@ -272,42 +272,42 @@ TEST(UnivariatePolynomial, factorization)
 TEST(UnivariatePolynomial, isNumber)
 {
 	Variable x = fresh_real_variable("x");
-	EXPECT_FALSE(UnivariatePolynomial<Rational>(x, {1,2,3}).isNumber());
-	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, 1).isNumber());
+	EXPECT_FALSE(UnivariatePolynomial<Rational>(x, {1,2,3}).is_number());
+	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, 1).is_number());
 }
 
 TEST(UnivariatePolynomial, isUnivariate)
 {
 	Variable x = fresh_real_variable("x");
 	//Variable y = VariablePool::getInstance().fresh_real_variable();
-	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, {1,2,3}).isUnivariate());
+	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, {1,2,3}).is_univariate());
 	//TODO: How does this work?
-	//EXPECT_FALSE(UnivariatePolynomial<UnivariatePolynomial<int>>(x, UnivariatePolynomial<int>(y, {1,2,3})).isUnivariate());
+	//EXPECT_FALSE(UnivariatePolynomial<UnivariatePolynomial<int>>(x, UnivariatePolynomial<int>(y, {1,2,3})).is_univariate());
 }
 
-TEST(UnivariatePolynomial, numericUnit)
+TEST(UnivariatePolynomial, numeric_unit)
 {
 	Variable x = fresh_real_variable("x");
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numericUnit(), 1);
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,-3}).numericUnit(), -1);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numeric_unit(), 1);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,-3}).numeric_unit(), -1);
 }
 
 TEST(UnivariatePolynomial, numericContent)
 {
 	Variable x = fresh_real_variable("x");
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numericContent(), 1);
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {15,27,3}).numericContent(), 3);
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {-1,-2,-3}).numericContent(), 1);
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {-15,-27,-3}).numericContent(), 3);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numeric_content(), 1);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {15,27,3}).numeric_content(), 3);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {-1,-2,-3}).numeric_content(), 1);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {-15,-27,-3}).numeric_content(), 3);
 }
 
-TYPED_TEST(UnivariatePolynomialIntTest, unitPart)
+TYPED_TEST(UnivariatePolynomialIntTest, unit_part)
 {
 	Variable x = fresh_real_variable("x");
-	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {1,2,3}).unitPart());
-	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {15,27,3}).unitPart());
-	EXPECT_EQ(-1,UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).unitPart());
-	EXPECT_EQ(-1,UnivariatePolynomial<TypeParam>(x, {-15,-27,-3}).unitPart());
+	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {1,2,3}).unit_part());
+	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {15,27,3}).unit_part());
+	EXPECT_EQ(-1,UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).unit_part());
+	EXPECT_EQ(-1,UnivariatePolynomial<TypeParam>(x, {-15,-27,-3}).unit_part());
 }
 
 TYPED_TEST(UnivariatePolynomialIntTest, content)
@@ -491,12 +491,12 @@ TEST(UnivariatePolynomial, coprimeFactor)
 	MultivariatePolynomial<Rational> coeff1(Rational(12)*polY*polY + Rational(6)*polY);
 	MultivariatePolynomial<Rational> coeff2(Rational(5)*polY);
 
-	std::cout << coeff1 << " -> " << coeff1.coprimeFactor() << std::endl;
-	std::cout << coeff2 << " -> " << coeff2.coprimeFactor() << std::endl;
+	std::cout << coeff1 << " -> " << coeff1.coprime_factor() << std::endl;
+	std::cout << coeff2 << " -> " << coeff2.coprime_factor() << std::endl;
 
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> pol(x, {coeff1, coeff2});
 
-	std::cout << pol << " -> " << pol.coprimeFactor() << std::endl;
+	std::cout << pol << " -> " << pol.coprime_factor() << std::endl;
 
-	ASSERT_EQ(carl::get_denom(pol.coprimeFactor()), 1);
+	ASSERT_EQ(carl::get_denom(pol.coprime_factor()), 1);
 }

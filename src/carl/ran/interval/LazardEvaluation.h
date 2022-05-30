@@ -4,8 +4,6 @@
 #include <carl/poly/umvpoly/functions/Quotient.h>
 #include <carl/poly/umvpoly/functions/Substitution.h>
 
-#ifdef USE_COCOA
-
 namespace carl::ran::interval {
 
 template<typename Rational, typename Poly>
@@ -50,5 +48,3 @@ public:
 };
 
 }
-
-#endif

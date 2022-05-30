@@ -48,7 +48,7 @@ public:
 
 	BVTermType type() const;
 
-	bool isConstant() const {
+	bool is_constant() const {
 		return type() == BVTermType::CONSTANT;
 	}
 

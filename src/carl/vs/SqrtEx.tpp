@@ -36,7 +36,7 @@ namespace carl
         m_radicand( is_zero(m_factor) ? m_factor : std::move( _radicand ) )
     {
         assert( !is_zero(m_denominator) );
-        assert( !m_radicand.isConstant() || is_zero(m_radicand) || constant_zero<Rational>::get() <= m_radicand.trailingTerm().coeff() );
+        assert( !m_radicand.is_constant() || is_zero(m_radicand) || constant_zero<Rational>::get() <= m_radicand.trailingTerm().coeff() );
         normalize();
     }
 
@@ -61,7 +61,7 @@ namespace carl
             else
             {
                 assert( !is_zero(radicand()) );
-                Rational absOfLCoeff = abs( radicand().coprimeFactor() );
+                Rational absOfLCoeff = abs( radicand().coprime_factor() );
                 Rational sqrtResult = 0;
                 if( carl::sqrt_exact( absOfLCoeff, sqrtResult ) )
                 {
@@ -81,18 +81,18 @@ namespace carl
                 }
                 else
                 {
-                    Rational ccConstantPart = m_constant_part.coprimeFactor();
+                    Rational ccConstantPart = m_constant_part.coprime_factor();
                     Poly cpConstantPart = m_constant_part * ccConstantPart;
-                    Rational ccFactor = m_factor.coprimeFactor();
+                    Rational ccFactor = m_factor.coprime_factor();
                     Poly cpFactor = m_factor * ccFactor;
                     gcdA = carl::gcd( cpConstantPart, cpFactor )*carl::gcd(ccConstantPart,ccFactor);
                 }
             }
         }
         if( is_zero(gcdA) ) return;
-        Rational ccGcdA = gcdA.coprimeFactor();
+        Rational ccGcdA = gcdA.coprime_factor();
         Poly cpGcdA = gcdA * ccGcdA;
-        Rational ccDenominator = m_denominator.coprimeFactor();
+        Rational ccDenominator = m_denominator.coprime_factor();
         Poly cpDenominator = m_denominator * ccDenominator;
         gcdA = carl::gcd( cpGcdA, cpDenominator )*carl::gcd(ccGcdA,ccDenominator);
         // Make sure that the polynomial to divide by cannot be negative, otherwise the sign of the square root expression could change.
@@ -112,9 +112,9 @@ namespace carl
         Rational denomLcm = constant_one<Rational>::get();
         if( is_zero(factor()) )
         {
-            if( !is_zero(constantPart()) )
+            if( !is_zero(constant_part()) )
             {
-                Rational cpOfConstantPart = constantPart().coprimeFactor();
+                Rational cpOfConstantPart = constant_part().coprime_factor();
                 numGcd = carl::get_num( cpOfConstantPart );
                 denomLcm = carl::get_denom( cpOfConstantPart );
             }
@@ -126,15 +126,15 @@ namespace carl
         }
         else
         {
-            Rational cpOfFactorPart = factor().coprimeFactor();
-            if( is_zero(constantPart()) )
+            Rational cpOfFactorPart = factor().coprime_factor();
+            if( is_zero(constant_part()) )
             {
                 numGcd = carl::get_num( cpOfFactorPart );
                 denomLcm = carl::get_denom( cpOfFactorPart );
             }
             else
             {
-                Rational cpOfConstantPart = constantPart().coprimeFactor();
+                Rational cpOfConstantPart = constant_part().coprime_factor();
                 numGcd = carl::gcd( carl::get_num( cpOfConstantPart ), carl::get_num( cpOfFactorPart ) );
                 denomLcm = carl::lcm( carl::get_denom( cpOfConstantPart ), carl::get_denom( cpOfFactorPart ) );
             }
@@ -143,7 +143,7 @@ namespace carl
         Rational cpFactor = numGcd/denomLcm; 
         m_constant_part *= cpFactor;
         m_factor *= cpFactor;
-        Rational cpOfDenominator = denominator().coprimeFactor();
+        Rational cpOfDenominator = denominator().coprime_factor();
         m_denominator *= cpOfDenominator;
         Rational sqrtExFactor = (denomLcm*carl::get_num( cpOfDenominator ))/(numGcd*carl::get_denom( cpOfDenominator ));
         m_constant_part *= carl::get_num( sqrtExFactor );
@@ -157,7 +157,7 @@ namespace carl
     bool SqrtEx<Poly>::operator==( const SqrtEx& _toCompareWith ) const
     {
         return    m_radicand == _toCompareWith.radicand() && m_denominator == _toCompareWith.denominator() 
-               && m_factor == _toCompareWith.factor() && m_constant_part == _toCompareWith.constantPart();
+               && m_factor == _toCompareWith.factor() && m_constant_part == _toCompareWith.constant_part();
     }
 
 	template<typename Poly>
@@ -165,7 +165,7 @@ namespace carl
     {
         if( this != &_sqrtEx )
         {
-            m_constant_part = _sqrtEx.constantPart();
+            m_constant_part = _sqrtEx.constant_part();
             m_factor       = _sqrtEx.factor();
             m_denominator  = _sqrtEx.denominator();
             if (is_zero(factor()))
@@ -190,7 +190,7 @@ namespace carl
     SqrtEx<Poly> SqrtEx<Poly>::operator+( const SqrtEx<Poly>& rhs ) const
     {
         assert( !has_sqrt() ||!rhs.has_sqrt() || radicand() == rhs.radicand() );
-        SqrtEx<Poly> result = SqrtEx<Poly>( rhs.denominator() * constantPart() + rhs.constantPart() * denominator(),
+        SqrtEx<Poly> result = SqrtEx<Poly>( rhs.denominator() * constant_part() + rhs.constant_part() * denominator(),
                          rhs.denominator() * factor() + rhs.factor() * denominator(),
                          denominator() * rhs.denominator(), radicand() );
         return result;
@@ -200,7 +200,7 @@ namespace carl
     SqrtEx<Poly> SqrtEx<Poly>::operator-( const SqrtEx<Poly>& rhs ) const
     {
         assert( !has_sqrt() || !rhs.has_sqrt() || radicand() == rhs.radicand() );
-        SqrtEx<Poly> result = SqrtEx<Poly>( rhs.denominator() * constantPart() - rhs.constantPart() * denominator(),
+        SqrtEx<Poly> result = SqrtEx<Poly>( rhs.denominator() * constant_part() - rhs.constant_part() * denominator(),
                          rhs.denominator() * factor() - rhs.factor() * denominator(),
                          denominator() * rhs.denominator(), radicand() );
         return result;
@@ -210,8 +210,8 @@ namespace carl
     SqrtEx<Poly> SqrtEx<Poly>::operator*( const SqrtEx<Poly>& rhs ) const
     {
         assert( !has_sqrt() || !rhs.has_sqrt() || radicand() == rhs.radicand() );
-        SqrtEx<Poly> result = SqrtEx<Poly>( rhs.constantPart() * constantPart() + rhs.factor() * factor() * radicand(),
-                         rhs.constantPart() * factor() + rhs.factor() * constantPart(),
+        SqrtEx<Poly> result = SqrtEx<Poly>( rhs.constant_part() * constant_part() + rhs.factor() * factor() * radicand(),
+                         rhs.constant_part() * factor() + rhs.factor() * constant_part(),
                          denominator() * rhs.denominator(), radicand() );
         return result;
     }
@@ -220,7 +220,7 @@ namespace carl
     SqrtEx<Poly> SqrtEx<Poly>::operator/( const SqrtEx<Poly>& rhs ) const
     {
         assert( !rhs.has_sqrt() );
-        SqrtEx<Poly> result = SqrtEx<Poly>( constantPart() * rhs.denominator(), factor() * rhs.denominator(),
+        SqrtEx<Poly> result = SqrtEx<Poly>( constant_part() * rhs.denominator(), factor() * rhs.denominator(),
                          denominator() * rhs.factor(), radicand() );
         return result;
     }
@@ -236,18 +236,18 @@ namespace carl
     {
         if( _infix )
         {
-            bool complexNum = has_sqrt() && !m_constant_part.isConstant();
+            bool complexNum = has_sqrt() && !m_constant_part.is_constant();
             std::stringstream result;
             if( complexNum && !carl::is_one(m_denominator) )
                 result << "(";
             if( has_sqrt() )
             {
-                if( m_constant_part.isConstant() )
+                if( m_constant_part.is_constant() )
                     result << m_constant_part;
                 else
                     result << "(" << m_constant_part << ")";
                 result << "+";
-                if( m_factor.isConstant() )
+                if( m_factor.is_constant() )
                     result << m_factor;
                 else
                     result << "(" << m_factor << ")";
@@ -255,7 +255,7 @@ namespace carl
             }
             else
             {
-                if( m_constant_part.isConstant() || carl::is_one(m_denominator))
+                if( m_constant_part.is_constant() || carl::is_one(m_denominator))
                     result << m_constant_part;
                 else
                     result << "(" << m_constant_part << ")";
@@ -265,7 +265,7 @@ namespace carl
                 if( complexNum )
                     result << ")";
                 result << "/";
-                if( m_denominator.isConstant() )
+                if( m_denominator.is_constant() )
                     result << m_denominator;
                 else
                     result << "(" << m_denominator << ")";

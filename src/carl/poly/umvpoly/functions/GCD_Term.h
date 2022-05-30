@@ -18,7 +18,7 @@ Term<Coeff> gcd(const Term<Coeff>& t1, const Term<Coeff>& t2) {
 	static_assert(is_field_type<Coeff>::value, "Not yet defined for other coefficients");
 	assert(!carl::is_zero(t1));
 	assert(!carl::is_zero(t2));
-	if (t1.isConstant() || t2.isConstant()) {
+	if (t1.is_constant() || t2.is_constant()) {
 		return Term<Coeff>(Coeff(carl::gcd(t1.coeff(), t2.coeff())));
 	}
 	return Term<Coeff>(

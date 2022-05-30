@@ -104,7 +104,7 @@ private:
 	template<typename Coeff>
 	void write(const MultivariatePolynomial<Coeff>& mp) {
 		if (carl::is_zero(mp)) *this << "0";
-		else if (mp.nrTerms() == 1) *this << mp.lterm();
+		else if (mp.nr_terms() == 1) *this << mp.lterm();
 		else {
 			for (auto it = mp.rbegin(); it != mp.rend(); ++it) {
 				if (it != mp.rbegin()) *this << " + ";
@@ -138,7 +138,7 @@ private:
 	
 	template<typename Coeff>
 	void write(const UnivariatePolynomial<Coeff>& up) {
-		if (up.isConstant()) *this << up.constantPart();
+		if (up.is_constant()) *this << up.constant_part();
 		else {
 			for (std::size_t i = 0; i < up.coefficients().size(); ++i) {
 				if (i > 0) *this << " + ";

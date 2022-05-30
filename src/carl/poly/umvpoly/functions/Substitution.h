@@ -62,8 +62,8 @@ Term<Coeff> substitute(const Term<Coeff>& t, const std::map<Variable, Term<Coeff
 
 template<typename C, typename O, typename P>
 void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const MultivariatePolynomial<C,O,P>& value) {
-	assert(p.isConsistent());
-	assert(value.isConsistent());
+	assert(p.is_consistent());
+	assert(value.is_consistent());
 	if (!p.has(var)) {
 		return;
 	}
@@ -78,13 +78,13 @@ void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const Mu
 				removedLast = false;
 			} else removedLast = true;
 		}
-		p.getTerms().swap(newTerms);
+		p.terms().swap(newTerms);
 		CARL_LOG_TRACE("carl.core", p << " [ " << var << " -> " << value << " ] = " << p);
 		if (removedLast) {
 			p.reset_ordered();
 			p.template makeMinimallyOrdered<false, true>();
 		}
-        assert(p.isConsistent());
+        assert(p.is_consistent());
 		return;
 	}
 	// Find all exponents occurring with the variable to substitute as basis.
@@ -97,7 +97,7 @@ void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const Mu
 	{
 		if(term.monomial())
 		{ // This is not the constant part.
-			exponent e = term.monomial()->exponentOfVariable(var);
+			exponent e = term.monomial()->exponent_of_variable(var);
 			if(e > 1)
 			{ // Variable occurs with exponent at least two. Insert into map and increase counter in map.
 				auto iterBoolPair = expResults.insert(std::pair<exponent, std::pair<MultivariatePolynomial<C,O,P>, size_t>>(e, def));
@@ -108,7 +108,7 @@ void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const Mu
 			}
 			else if(e == 1)
 			{ // Variable occurs with exponent one.
-				expectedResultSize += value.nrTerms();
+				expectedResultSize += value.nr_terms();
 			}
 			else
 			{ // Variable does not occur in this term.
@@ -130,13 +130,13 @@ void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const Mu
 		auto expResultB = expResultA;
 		// Calculate first one
 		expResultB->second.first = carl::pow(value, expResultB->first);
-		expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
+		expectedResultSize += expResultB->second.second * expResultB->second.first.nr_terms();
 		++expResultB;
 		while(expResultB != expResults.end())
 		{
 			// Calculate next var^e based on the last one.
 			expResultB->second.first = expResultA->second.first * carl::pow(value, expResultB->first - expResultA->first);
-			expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
+			expectedResultSize += expResultB->second.second * expResultB->second.first.nr_terms();
 			++expResultA;
 			++expResultB;
 		}
@@ -149,9 +149,9 @@ void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const Mu
 		if (term.monomial() == nullptr) {
 			tam.template addTerm<false>(id, term);
 		} else {
-			exponent e = term.monomial()->exponentOfVariable(var);
+			exponent e = term.monomial()->exponent_of_variable(var);
 			Monomial::Arg mon;
-			if (e > 0) mon = term.monomial()->dropVariable(var);
+			if (e > 0) mon = term.monomial()->drop_variable(var);
 			if (e == 1) {
 				for(auto vterm : value)
 				{
@@ -175,11 +175,11 @@ void substitute_inplace(MultivariatePolynomial<C,O,P>& p, Variable var, const Mu
 			}
 		}
 	}
-	tam.readTerms(id, p.getTerms());
+	tam.readTerms(id, p.terms());
 	p.reset_ordered();
     p.template makeMinimallyOrdered<false, true>();
-	assert(p.nrTerms() <= expectedResultSize);
-	assert(p.isConsistent());
+	assert(p.nr_terms() <= expectedResultSize);
+	assert(p.is_consistent());
 }
 
 template<typename C, typename O, typename P>
@@ -194,7 +194,7 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 	static_assert(!std::is_same<S, Term<C>>::value, "Terms are handled by a separate method.");
 	MultivariatePolynomial<C,O,P> result;
 	auto& tam = MultivariatePolynomial<C,O,P>::mTermAdditionManager;
-	auto id = tam.getId(p.nrTerms());
+	auto id = tam.getId(p.nr_terms());
 	for (const auto& term: p) {
 		Term<C> resultTerm = substitute(term, substitutions);
 		if( !carl::is_zero(resultTerm) )
@@ -202,10 +202,10 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 			tam.template addTerm<false>(id, resultTerm );
 		}
 	}
-	tam.readTerms(id, result.getTerms());
+	tam.readTerms(id, result.terms());
 	result.reset_ordered();
 	result.template makeMinimallyOrdered<false, true>();
-	assert(result.isConsistent());
+	assert(result.is_consistent());
 	return result;
 }
 
@@ -213,14 +213,14 @@ template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p, const std::map<Variable, Term<C>>& substitutions) {
 	MultivariatePolynomial<C,O,P> result;
 	auto& tam = MultivariatePolynomial<C,O,P>::mTermAdditionManager;
-	auto id = tam.getId(p.nrTerms());
+	auto id = tam.getId(p.nr_terms());
 	for (const auto& term: p) {
 		tam.template addTerm<false>(id, substitute(term, substitutions));
 	}
-	tam.readTerms(id, result.getTerms());
+	tam.readTerms(id, result.terms());
 	result.reset_ordered();
 	result.template makeMinimallyOrdered<false, true>();
-	assert(result.isConsistent());
+	assert(result.is_consistent());
 	return result;
 }
 
@@ -239,7 +239,7 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 			substitute_inplace(result, sub.first, sub.second);
 			if(is_constant(result))
 			{
-                assert(result.isConsistent());
+                assert(result.is_consistent());
 				return result;
 			}
 		}
@@ -339,7 +339,7 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 		}
 		resultB += termResult;
 	}
-	assert(resultB.isConsistent());
+	assert(resultB.is_consistent());
 	return resultB;
 }
 
@@ -363,8 +363,8 @@ void substitute_inplace(UnivariatePolynomial<Coeff>& p, Variable var, const Coef
 			}
 		}
 	}
-	p.stripLeadingZeroes();
-	assert(p.isConsistent());
+	p.strip_leading_zeroes();
+	assert(p.is_consistent());
 }
 
 template<typename Coeff>
@@ -394,7 +394,7 @@ UnivariatePolynomial<Coeff> substitute(const UnivariatePolynomial<Coeff>& p, Var
 					res[i] = substitute(p.coefficients()[i], var, value);
 				}
 				UnivariatePolynomial<Coeff> resp(p.mainVar(), res);
-				resp.stripLeadingZeroes();
+				resp.strip_leading_zeroes();
 				CARL_LOG_TRACE("carl.core.uvpolynomial", p << " [ " << var << " -> " << value << " ] = " << resp);
 				return resp;
 			}

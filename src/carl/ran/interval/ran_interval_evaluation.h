@@ -43,9 +43,9 @@ std::optional<RealAlgebraicNumberInterval<Number>> evaluate(MultivariatePolynomi
 			substitute_inplace(p, var, MultivariatePolynomial<Number>(ran.value()));
 		} 
 	}
-    if (p.isNumber()) {
-		CARL_LOG_DEBUG("carl.ran.evaluation", "Returning " << p.constantPart());
-        return RealAlgebraicNumberInterval<Number>(p.constantPart());
+    if (p.is_number()) {
+		CARL_LOG_DEBUG("carl.ran.evaluation", "Returning " << p.constant_part());
+        return RealAlgebraicNumberInterval<Number>(p.constant_part());
     }
 
 	CARL_LOG_TRACE("carl.ran.evaluation", "Remaing polynomial: " << p);
@@ -164,9 +164,9 @@ boost::tribool evaluate(const BasicConstraint<Poly>& c, const Assignment<RealAlg
 			}
 		}
 		
-		if (p.isNumber()) {
+		if (p.is_number()) {
 			CARL_LOG_DEBUG("carl.ran.evaluation", "Left hand side is constant");
-			return carl::evaluate(p.constantPart(), c.relation());
+			return carl::evaluate(p.constant_part(), c.relation());
 		}
 		BasicConstraint<Poly> constr = constraint::create_normalized_constraint(p, c.relation());
 		if (constr.is_consistent() != 2) {

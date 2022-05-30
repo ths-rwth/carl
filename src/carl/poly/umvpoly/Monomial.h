@@ -118,7 +118,7 @@ namespace carl
 				calc_total_degree();
 			}
 			calc_hash();
-			assert(isConsistent());
+			assert(is_consistent());
 		}
 
 		/**
@@ -194,14 +194,14 @@ namespace carl
 		 * Checks whether the monomial is a constant.
 		 * @return If monomial is constant.
 		 */
-		bool isConstant() const {
+		bool is_constant() const {
 			return mTotalDegree == 0;
 		}
         
         /**
          * @return true, if the image of this monomial is integer-valued.
          */
-        bool integerValued() const {
+        bool integer_valued() const {
 			auto res = std::find_if(
 				mExponents.begin(), mExponents.end(),
 				[](const auto& e){ return e.first.type() != VariableType::VT_INT; }
@@ -213,7 +213,7 @@ namespace carl
 		 * Checks whether the monomial has exactly degree one.
 		 * @return If monomial is linear.
 		 */
-		bool isLinear() const {
+		bool is_linear() const {
 			return mTotalDegree == 1;
 		}
 		
@@ -229,7 +229,7 @@ namespace carl
 		 * Checks whether the monomial is a square, i.e. whether all exponents are even.
 		 * @return If monomial is a square.
 		 */
-		bool isSquare() const {
+		bool is_square() const {
 			if (mTotalDegree % 2 == 1) return false;
 			auto res = std::find_if(
 				mExponents.begin(), mExponents.end(),
@@ -251,7 +251,7 @@ namespace carl
 		 * Asserts that there is in fact only a single variable.
 		 * @return Variable.
 		 */
-		Variable getSingleVariable() const {
+		Variable single_variable() const {
 			assert(mExponents.size() == 1);
 			return mExponents.front().first;
 		}
@@ -261,7 +261,7 @@ namespace carl
 		 * @param v Variable.
 		 * @return If there is only v.
 		 */
-		bool hasNoOtherVariable(Variable v) const {
+		bool has_no_other_variable(Variable v) const {
 			if(mExponents.size() == 1) {
 				return mExponents.front().first == v;
 			}
@@ -282,7 +282,7 @@ namespace carl
 		 * @param v Variable.
 		 * @return Exponent of v.
 		 */
-		exponent exponentOfVariable(Variable v) const {
+		exponent exponent_of_variable(Variable v) const {
 			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
 			if(it == mExponents.cend()) {
 				return 0;
@@ -304,7 +304,7 @@ namespace carl
 		 * For a monomial m = Prod( x_i^{e_i} ) * v^e, divides m by v^e
 		 * @return nullptr if result is 1, otherwise m/v^e.
 		 */
-		Monomial::Arg dropVariable(Variable v) const;
+		Monomial::Arg drop_variable(Variable v) const;
 
 		/**
 		 * Divides the monomial by a variable v.
@@ -324,7 +324,7 @@ namespace carl
 		bool divisible(const Monomial::Arg& m) const
 		{
 			if(!m) return true;
-			assert(isConsistent());
+			assert(is_consistent());
 			if(m->mTotalDegree > mTotalDegree) return false;
 			if(m->nrVariables() > nrVariables()) return false;
 			// Linear, as we expect small monomials.
@@ -371,20 +371,12 @@ namespace carl
 		bool divide(const Monomial::Arg& m, Monomial::Arg& res) const;
 		
 		/**
-		 * Calculates and returns the square root of this monomial, iff the monomial is a square as checked by isSquare().
+		 * Calculates and returns the square root of this monomial, iff the monomial is a square as checked by is_square().
 		 * Otherwise, nullptr is returned.
-		 * @return The square root of this monomial, iff the monomial is a square as checked by isSquare().
+		 * @return The square root of this monomial, iff the monomial is a square as checked by is_square().
 		 */
 		Monomial::Arg sqrt() const;
 		
-		template<typename Coeff, typename VarInfo>
-		void gatherVarInfo(VarInfo& varinfo, const Coeff& coeffFromTerm) const
-		{
-			for (auto ve : mExponents )
-			{
-				varinfo.variableInTerm(ve, coeffFromTerm, *this);
-			}
-		}
 
 		///////////////////////////
 		// Orderings
@@ -481,7 +473,7 @@ namespace carl
 		 * Checks if the monomial is consistent.
 		 * @return If this is consistent.
 		 */
-		bool isConsistent() const;
+		bool is_consistent() const;
         
         /*
          * TODO: cannot link Monomial::evaluate

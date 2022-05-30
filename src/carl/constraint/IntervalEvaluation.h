@@ -25,7 +25,7 @@ template<typename Pol>
 static unsigned consistent_with(const BasicConstraint<Pol>& c, const Assignment<Interval<double>>& _solutionInterval) {
 	auto vars = variables(c);
 	if (vars.empty())
-		return carl::evaluate(c.lhs().constantPart(), c.relation()) ? 1 : 0;
+		return carl::evaluate(c.lhs().constant_part(), c.relation()) ? 1 : 0;
 	else {
 		auto varIter = vars.begin();
 		auto varIntervalIter = _solutionInterval.begin();
@@ -125,7 +125,7 @@ static unsigned consistent_with(const BasicConstraint<Pol>& c, const Assignment<
 	_stricterRelation = c.relation();
 	auto vars = variables(c);
 	if (vars.empty())
-		return carl::evaluate(c.lhs().constantPart(), c.relation()) ? 1 : 0;
+		return carl::evaluate(c.lhs().constant_part(), c.relation()) ? 1 : 0;
 	else {
 		auto varIter = vars.begin();
 		auto varIntervalIter = _solutionInterval.begin();

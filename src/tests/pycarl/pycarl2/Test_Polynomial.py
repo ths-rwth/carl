@@ -10,11 +10,11 @@ class TestPolynomial(TestCarl):
 		self.assertEqual(p1.toString(),'x')
 
 	def testGetters(self):
-		self.assertTrue(p1.constantPart().equals(Rational(0)))
-		self.assertEquals(p1.totalDegree(),1)
+		self.assertTrue(p1.constant_part().equals(Rational(0)))
+		self.assertEquals(p1.total_degree(),1)
 		self.assertEquals(p1.degree(v1),1)
 		self.assertEquals(p1.degree(v2),0)
-		self.assertEquals(p1.nrTerms(),1)
+		self.assertEquals(p1.nr_terms(),1)
 		self.assertEquals(p1.size(),1)
 
 	def testEvaluate(self):

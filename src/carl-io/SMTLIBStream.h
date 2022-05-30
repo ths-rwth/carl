@@ -114,7 +114,7 @@ private:
 			auto value = m.second;
 			value = model.evaluated(m.first);
 			*this << "\t(define-fun " << m.first << " () ";
-			if (m.first.isVariable()) {
+			if (m.first.is_variable()) {
 				*this << m.first.asVariable().type() << std::endl;
 			} else if (m.first.isBVVariable()) {
 				*this << m.first.asBVVariable().sort() << std::endl;
@@ -171,7 +171,7 @@ private:
 	template<typename Coeff>
 	void write(const MultivariatePolynomial<Coeff>& mp) {
 		if (is_zero(mp)) *this << "0";
-		else if (mp.nrTerms() == 1) *this << mp.lterm();
+		else if (mp.nr_terms() == 1) *this << mp.lterm();
 		else {
 			*this << "(+";
 			for (auto it = mp.rbegin(); it != mp.rend(); ++it) {
@@ -223,7 +223,7 @@ private:
 	
 	template<typename Coeff>
 	void write(const UnivariatePolynomial<Coeff>& up) {
-		if (up.isConstant()) *this << up.constantPart();
+		if (up.is_constant()) *this << up.constant_part();
 		else {
 			*this << "(+";
 			for (std::size_t i = 0; i < up.coefficients().size(); ++i) {

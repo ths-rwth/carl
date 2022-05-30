@@ -52,7 +52,7 @@ class RealRootIsolation {
 
 	/// Handle zero roots (p(0) == 0)
 	void eliminate_zero_roots() {
-		if (mPolynomial.zeroIsRoot()) {
+		if (mPolynomial.zero_is_root()) {
 			if (mInterval.contains(0)) {
 				mRoots.emplace_back(0);
 			}
@@ -195,7 +195,7 @@ class RealRootIsolation {
 		// Convert to rationals
 		std::vector<Number> roots;
 		for (double r: approx) {
-			if (!isNumber(r)) continue;
+			if (!is_number(r)) continue;
 			Number n = carl::rationalize<Number>(r);
 			if (!mInterval.contains(n)) continue;
 			if (carl::is_root_of(mPolynomial, n)) {

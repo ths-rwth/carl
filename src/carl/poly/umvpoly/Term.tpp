@@ -16,41 +16,41 @@ template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c) :
 	mCoeff(c)
 {
-	assert(this->isConsistent());
+	assert(this->is_consistent());
 }
 template<typename Coefficient>
 Term<Coefficient>::Term(Variable v) :
 	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(createMonomial(v, uint(1)))
 {
-	assert(this->isConsistent());
+	assert(this->is_consistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(Monomial::Arg m) :
 	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(std::move(m))
 {
-	assert(this->isConsistent());
+	assert(this->is_consistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(Monomial::Arg&& m) :
 	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(std::move(m))
 {
-	assert(this->isConsistent());
+	assert(this->is_consistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, Monomial::Arg m) :
 	mCoeff(c), mMonomial(std::move(m))
 {
-	assert(this->isConsistent());
+	assert(this->is_consistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(Coefficient&& c, Monomial::Arg&& m) :
 	mCoeff(std::move(c)), mMonomial(std::move(m))
 {
-	assert(this->isConsistent());
+	assert(this->is_consistent());
 }
 
 template<typename Coefficient>
@@ -58,7 +58,7 @@ Term<Coefficient>::Term(const Coefficient& c, Variable v, uint e):
 	mCoeff(c),
 	mMonomial(createMonomial(v,e))
 {
-	assert(this->isConsistent());
+	assert(this->is_consistent());
 }
 
 template<typename Coefficient>
@@ -173,35 +173,6 @@ bool Term<Coefficient>::divisible(const Term& t) const {
 	return this->monomial()->divisible(t.monomial());
 }
 
-template<typename Coefficient>
-template<bool gatherCoeff, typename CoeffType>
-void Term<Coefficient>::gatherVarInfo(Variable var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
-{
-	if(mMonomial)
-	{
-		varinfo.collect(var, coeff(), *mMonomial);
-	}
-	else
-	{
-		varinfo.updateCoeff( 0, *this );
-	}
-}
-
-template<typename Coefficient>
-template<bool gatherCoeff, typename CoeffType>
-void Term<Coefficient>::gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const
-{
-	if(mMonomial)
-	{
-		mMonomial->gatherVarInfo(varinfo, coeff());
-	}
-	else
-	{
-		// No change in varinfo.
-	}
-}
-
-
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 	if (lhs.coeff() != rhs.coeff()) return false;
@@ -291,9 +262,9 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<const Term<Coef
 }
 
 template<typename Coefficient>
-bool Term<Coefficient>::isConsistent() const {
+bool Term<Coefficient>::is_consistent() const {
 	if (this->mMonomial) {
-		assert(!this->mMonomial->isConstant());
+		assert(!this->mMonomial->is_constant());
 	}
 	return true;
 }

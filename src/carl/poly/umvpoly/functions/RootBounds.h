@@ -112,7 +112,7 @@ Coeff lagrangePositiveUpperBound(const UnivariatePolynomial<Coeff>& p) {
  */
 template<typename Coeff>
 Coeff lagrangePositiveLowerBound(const UnivariatePolynomial<Coeff>& p) {
-	auto r = lagrangePositiveUpperBound(p.reverseCoefficients());
+	auto r = lagrangePositiveUpperBound(p.reverse_coefficients());
 	if (r == 0) return 0;
 	return 1/r;
 }
@@ -125,7 +125,7 @@ Coeff lagrangePositiveLowerBound(const UnivariatePolynomial<Coeff>& p) {
  */
 template<typename Coeff>
 Coeff lagrangeNegativeUpperBound(const UnivariatePolynomial<Coeff>& p) {
-	return -lagrangePositiveLowerBound(p.negateVariable());
+	return -lagrangePositiveLowerBound(p.negate_variable());
 }
 
 }

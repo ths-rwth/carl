@@ -34,7 +34,7 @@ CLANG_WARNING_RESET
 		UnivariatePolynomial<Coeff> t(p.mainVar());
 		assert(!is_zero(b));
 		UnivariatePolynomial<Coeff> c = carl::extended_gcd(p, b, s, t); // TODO: use gcd instead
-		typename IntegralType<Coeff>::type numOfCpf = get_num(c.coprimeFactor());
+		typename IntegralType<Coeff>::type numOfCpf = get_num(c.coprime_factor());
 		if(numOfCpf != 1) // TODO: is this maybe only necessary because the extended_gcd returns a polynomial with non-integer coefficients but it shouldn't?
 		{
 			c *= Coeff(numOfCpf);
@@ -58,7 +58,7 @@ CLANG_WARNING_RESET
 			{
 				CARL_LOG_TRACE("carl.core.upoly", "UnivSSF: next iteration");
 				UnivariatePolynomial<Coeff> g = carl::extended_gcd(w, z, s, t); // TODO: use gcd instead
-				numOfCpf = get_num(g.coprimeFactor());
+				numOfCpf = get_num(g.coprime_factor());
 				if(numOfCpf != 1) // TODO: is this maybe only necessary because the extended_gcd returns a polynomial with non-integer coefficients but it shouldn't?
 				{
 					g *= Coeff(numOfCpf);
@@ -118,7 +118,7 @@ UnivariatePolynomial<Coeff> exclude_linear_factors(const UnivariatePolynomial<Co
 		result = poly;
 	}
 	// Check whether the polynomial is already a linear factor.
-	if(!result.isLinearInMainVar())
+	if(!result.is_linear_in_main_var())
 	{
 		// Exclude the factor (x-r)^i, with r rational and r!=0, from result.
 		assert(result.coefficients().size() > 1);
@@ -178,7 +178,7 @@ UnivariatePolynomial<Coeff> exclude_linear_factors(const UnivariatePolynomial<Co
 				Coeff posRatZero = carl::from_int<typename IntegralType<Coeff>::type>(*tcFactor) / carl::from_int<typename IntegralType<Coeff>::type>(*lcFactor);
 				if (!positive) posRatZero = -posRatZero;
 				CARL_LOG_TRACE("carl.core.upoly", "UnivELF: consider possible non zero rational factor  " << posRatZero);
-				Coeff image = result.syntheticDivision(posRatZero);
+				Coeff image = result.synthetic_division(posRatZero);
 				if (carl::is_zero(image)) {
 					// Remove all linear factor with the found zero from result.
 					UnivariatePolynomial<Coeff> linearFactor(result.mainVar(), {-posRatZero, Coeff(1)});
@@ -190,11 +190,11 @@ UnivariatePolynomial<Coeff> exclude_linear_factors(const UnivariatePolynomial<Co
 							++retVal.first->second;
 						}
 						// Check whether result is a linear factor now.
-						if(result.isLinearInMainVar())
+						if(result.is_linear_in_main_var())
 						{
 							goto LinearFactorRemains;
 						}
-						image = result.syntheticDivision(posRatZero);
+						image = result.synthetic_division(posRatZero);
 					}
 				}
 				else if(is_integer(posRatZero))
@@ -273,7 +273,7 @@ UnivariatePolynomial<Coeff> exclude_linear_factors(const UnivariatePolynomial<Co
 					}
 					if(tcFactor == tcFactors.end())
 					{
-						Coeff factor = result.coprimeFactor();
+						Coeff factor = result.coprime_factor();
 						if (!carl::is_one(factor)) {
 							result *= factor;
 							CARL_LOG_TRACE("carl.core.upoly", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), std::initializer_list<Coeff>({(Coeff)1/factor})) << ")^" << 1 );
@@ -333,7 +333,7 @@ FactorMap<Coeff> factorization(const UnivariatePolynomial<Coeff>& p) {
 	}
 	// Make the polynomial's coefficients coprime (integral and with gcd 1).
 	UnivariatePolynomial<Coeff> remainingPoly(p.mainVar());
-	Coeff factor = p.coprimeFactor();
+	Coeff factor = p.coprime_factor();
 	if(factor == 1)
 	{
 		remainingPoly = p;
@@ -363,10 +363,10 @@ FactorMap<Coeff> factorization(const UnivariatePolynomial<Coeff>& p) {
 //		factor = (Coeff) 1;
 		for(auto expFactorPair = sff.begin(); expFactorPair != sff.end(); ++expFactorPair)
 		{
-//			Coeff cpf = expFactorPair->second.coprimeFactor();
+//			Coeff cpf = expFactorPair->second.coprime_factor();
 //			if(cpf != (Coeff) 1)
 //			{
-//				factor *= pow(expFactorPair->second.coprimeFactor(), expFactorPair->first);
+//				factor *= pow(expFactorPair->second.coprime_factor(), expFactorPair->first);
 //				expFactorPair->second /= cpf;
 //			}
 			if(!is_constant(expFactorPair->second) || !carl::is_one(expFactorPair->second.lcoeff()))
@@ -383,7 +383,7 @@ FactorMap<Coeff> factorization(const UnivariatePolynomial<Coeff>& p) {
 //		{
 //			CARL_LOG_TRACE("carl.core.upoly", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), {factor}) << ")^" << 1 );
 //			// Add the constant factor to the factors.
-//			if( result.begin()->first.isConstant() )
+//			if( result.begin()->first.is_constant() )
 //			{
 //				factor *= result.begin()->first.lcoeff();
 //				result.erase( result.begin() );

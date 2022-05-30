@@ -30,7 +30,7 @@ Formula<Pol> addConstraintBound( ConstraintBounds<Pol>& _constraintBounds, const
     bool negated = _constraint.type() == FormulaType::NOT;
     assert( _constraint.type() == FormulaType::CONSTRAINT || (negated && _constraint.subformula().type() == FormulaType::CONSTRAINT ) );
     const Constraint<Pol>& constraint = negated ? _constraint.subformula().constraint() : _constraint.constraint();
-    assert( constraint.isConsistent() == 2 );
+    assert( constraint.is_consistent() == 2 );
     typename Pol::NumberType boundValue;
     Relation relation = negated ? carl::inverse( constraint.relation() ) : constraint.relation();
     const Pol& lhs = constraint.lhs();
@@ -38,16 +38,16 @@ Formula<Pol> addConstraintBound( ConstraintBounds<Pol>& _constraintBounds, const
     bool multipliedByMinusOne = lhs.lterm().coeff() < typename Pol::NumberType( 0 );
     if( multipliedByMinusOne )
     {
-        boundValue = constraint.lhs().constantPart();
+        boundValue = constraint.lhs().constant_part();
         relation = carl::turn_around( relation );
         poly = Pol( -lhs + boundValue );
     }
     else
     {
-        boundValue = -constraint.lhs().constantPart();
+        boundValue = -constraint.lhs().constant_part();
         poly = Pol( lhs + boundValue );
     }
-    typename Pol::NumberType cf( poly.coprimeFactor() );
+    typename Pol::NumberType cf( poly.coprime_factor() );
     assert( cf > 0 );
     boundValue *= cf;
     poly *= cf;

@@ -91,10 +91,10 @@ BasicConstraint<Pol> init_bound(Variable var, Relation rel, const typename Pol::
 template<typename Pol>
 BasicConstraint<Pol> init_constraint(const Pol& lhs, Relation rel) {
 	CARL_LOG_FUNC("carl.core.constraint", lhs << ", " << rel);
-	if (lhs.isConstant()) {
+	if (lhs.is_constant()) {
 		CARL_LOG_TRACE("carl.core.constraint", lhs << " is constant, we simply evaluate.");
-		return evaluate(lhs.constantPart(), rel) ? BasicConstraint<Pol>(true) : BasicConstraint<Pol>(false);
-	} else if (lhs.totalDegree() == 1 && (rel != Relation::EQ && rel != Relation::NEQ) && lhs.isUnivariate()) {
+		return evaluate(lhs.constant_part(), rel) ? BasicConstraint<Pol>(true) : BasicConstraint<Pol>(false);
+	} else if (lhs.total_degree() == 1 && (rel != Relation::EQ && rel != Relation::NEQ) && lhs.is_univariate()) {
 		if (carl::is_negative(lhs.lcoeff())) {
 			CARL_LOG_TRACE("carl.core.constraint", "Normalizing leading coefficient of linear poly.");
 			switch (rel) {
@@ -116,10 +116,10 @@ BasicConstraint<Pol> init_constraint(const Pol& lhs, Relation rel) {
 			}
 		}
 		CARL_LOG_TRACE("carl.core.constraint", "Rewriting to bound");
-		return init_bound<Pol>(lhs.getSingleVariable(), rel, (-lhs.constantPart()) / lhs.lcoeff());
+		return init_bound<Pol>(lhs.single_variable(), rel, (-lhs.constant_part()) / lhs.lcoeff());
 	} else {
 		CARL_LOG_TRACE("carl.core.constraint", "Normalizing " << lhs << " " << rel << " 0");
-		auto new_lhs = is_zero(lhs) ? Pol(typename Pol::NumberType(0)) : lhs.coprimeCoefficients();
+		auto new_lhs = is_zero(lhs) ? Pol(typename Pol::NumberType(0)) : lhs.coprime_coefficients();
 		if (rel == Relation::EQ || rel == Relation::NEQ) {
 			if (!is_zero(new_lhs) && new_lhs.lterm().coeff() < typename Pol::NumberType(0)) new_lhs = -new_lhs;
 		} else if (rel == Relation::LEQ || rel == Relation::LESS) {
@@ -152,9 +152,9 @@ inline void normalize_integer_inplace(BasicConstraint<Pol>& constraint) {
 
 template<typename Pol>
 inline unsigned is_consistent_definiteness(const BasicConstraint<Pol>& constraint, std::optional<Definiteness> lhs_definiteness = std::nullopt)  {
-	if (constraint.lhs().isConstant()) {
+	if (constraint.lhs().is_constant()) {
 		CARL_LOG_TRACE("carl.formula.constraint", "Lhs " << constraint.lhs() << " is constant");
-		return carl::evaluate(constraint.lhs().constantPart(), constraint.relation()) ? 1 : 0;
+		return carl::evaluate(constraint.lhs().constant_part(), constraint.relation()) ? 1 : 0;
 	} else {
 		if (!lhs_definiteness) {
             lhs_definiteness = carl::definiteness(constraint.lhs(), FULL_EFFORT_FOR_DEFINITENESS_CHECK);
@@ -212,7 +212,7 @@ inline bool simplify_nonlinear_univariate_monomial_inplace(BasicConstraint<Pol>&
 	using PolyT = typename Pol::PolyType;
 
 	auto vars = variables(constraint);
-	if (!(vars.size() == 1 && !constraint.lhs().isLinear() && constraint.lhs().nrTerms() == 1)) return false;
+	if (!(vars.size() == 1 && !constraint.lhs().is_linear() && constraint.lhs().nr_terms() == 1)) return false;
 
     if (!lhs_definiteness) {
         lhs_definiteness = carl::definiteness(constraint.lhs(), FULL_EFFORT_FOR_DEFINITENESS_CHECK);
@@ -276,10 +276,10 @@ inline bool simplify_integer_inplace(BasicConstraint<Pol>& constraint) {
 
 	if (vars.integer().empty() || !vars.real().empty()) return false;
 
-	typename Pol::NumberType constPart = constraint.lhs().constantPart();
+	typename Pol::NumberType constPart = constraint.lhs().constant_part();
 	if (constPart != typename Pol::NumberType(0)) {
 		// Find the gcd of the coefficients of the non-constant terms.
-		typename Pol::NumberType g = carl::abs(constraint.lhs().coprimeFactorWithoutConstant());
+		typename Pol::NumberType g = carl::abs(constraint.lhs().coprime_factor_without_constant());
 		assert(g != typename Pol::NumberType(0));
 		if (carl::mod(carl::get_num(constPart), carl::get_denom(g)) != 0) {
 			switch (constraint.relation()) {

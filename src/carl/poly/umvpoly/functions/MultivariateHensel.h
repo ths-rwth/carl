@@ -120,7 +120,7 @@ class DiophantineEquations
                         //Variable x_1 = a[0].mainVar();
                         // sigma = zero lost of length  r
                         std::vector<Polynomial> sigma(r, Polynomial(0));
-                        for(auto& z : c.getTerms()) {
+                        for(auto& z : c.terms()) {
                                 
                         }
                 }
@@ -223,7 +223,7 @@ class DiophantineEquations
 			// e = 1 - s*a - t*b. // c = (e/modulus) mod p.
 			GFNumber<Integer> one(1,mGf_pk);
 			c =  -s*a-t*b+one;
-			UnivariatePolynomial<Integer> cf = c.toIntegerDomain();
+			UnivariatePolynomial<Integer> cf = c.to_integer_domain();
 			cf /= modulus;
 			c = cf.toFiniteDomain(mGf_p);
 			Polynomial sigmaprime =  smodp * c;

@@ -3,6 +3,7 @@
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"
 #include <carl/numbers/typetraits.h>
+#include "VarInfo.h"
 
 namespace carl {
 	template<typename C, typename O, typename P>
@@ -23,7 +24,7 @@ Term<C> gcd(const MultivariatePolynomial<C,O,P>& a, const Term<C>& b) {
 	static_assert(is_field_type<C>::value, "Only implemented for field coefficients");
 	assert(!is_zero(a));
 	assert(!is_zero(b));
-	if (b.isConstant()) return Term<C>(C(1));
+	if (b.is_constant()) return Term<C>(C(1));
 	return Term<C>(C(1), gcd(a, b.monomial()));
 }
 
@@ -36,11 +37,11 @@ template<typename C, typename O, typename P>
 Monomial::Arg gcd(const MultivariatePolynomial<C,O,P>& a, const Monomial::Arg& b) {
 	if (!b) return nullptr;
 	assert(!is_zero(a));
-	VariablesInformation<false, MultivariatePolynomial<C,O,P>> varinfo = a.getVarInfo();
+	auto varinfo = carl::vars_info(a,false);
 	std::vector<std::pair<Variable, exponent>> vepairs;
 	for (const auto& ve : *b) {
-		if (varinfo.getVarInfo(ve.first)->occurence() == a.nrTerms()) {
-			vepairs.push_back(ve.first, std::min(varinfo.getVarInfo(ve.first)->minDegree(), ve.second));
+		if (varinfo.var(ve.first)->num_occurences() == a.nr_terms()) {
+			vepairs.push_back(ve.first, std::min(varinfo.var(ve.first)->min_degree(), ve.second));
 		}
 	}
 	return createMonomial(std::move(vepairs));

@@ -24,10 +24,10 @@ namespace carl
             }
             else if (ass->second.isSqrtEx())
             {
-                if( ass->second.asSqrtEx().isConstant() && !ass->second.asSqrtEx().has_sqrt() )
+                if( ass->second.asSqrtEx().is_constant() && !ass->second.asSqrtEx().has_sqrt() )
                 {
-                    assert( ass->first.isVariable() );
-                    Rational value = ass->second.asSqrtEx().constantPart().constantPart()/ass->second.asSqrtEx().denominator().constantPart();
+                    assert( ass->first.is_variable() );
+                    Rational value = ass->second.asSqrtEx().constant_part().constant_part()/ass->second.asSqrtEx().denominator().constant_part();
                     assert( !(ass->first.asVariable().type() == carl::VariableType::VT_INT) || carl::is_integer( value ) );
                     _rationalAssigns.insert( _rationalAssigns.end(), std::make_pair(ass->first.asVariable(), value));
                 }
@@ -40,7 +40,7 @@ namespace carl
             {
                 if (ass->second.asRAN().is_numeric())
                 {
-                    assert( ass->first.isVariable() );
+                    assert( ass->first.is_variable() );
                     _rationalAssigns.insert( _rationalAssigns.end(), std::make_pair(ass->first.asVariable(), ass->second.asRAN().value()) );
                 }
             }
@@ -418,11 +418,11 @@ namespace carl
 	template<typename Rational, typename Poly>
 	Formula<Poly> representingFormula(const ModelVariable& mv, const ModelValue<Rational,Poly>& val) {
 		if (val.isBool()) {
-			assert(mv.isVariable());
+			assert(mv.is_variable());
 			if (val.asBool()) return Formula<Poly>(mv.asVariable());
 			else return Formula<Poly>(FormulaType::NOT, Formula<Poly>(mv.asVariable()));
 		} else if (val.isRational()) {
-			assert(mv.isVariable());
+			assert(mv.is_variable());
 			return Formula<Poly>(VariableAssignment<Poly>(mv.asVariable(), val.asRational()));
 		} else if (val.isSqrtEx()) {
 			assert(false);

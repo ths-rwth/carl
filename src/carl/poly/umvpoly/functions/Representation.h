@@ -16,7 +16,7 @@ namespace carl {
  */
 template<typename Coeff>
 UnivariatePolynomial<MultivariatePolynomial<typename UnderlyingNumberType<Coeff>::type>> switch_main_variable(const UnivariatePolynomial<Coeff>& p, Variable newVar) {
-	assert(p.isConsistent());
+	assert(p.is_consistent());
 	using MP = MultivariatePolynomial<typename UnderlyingNumberType<Coeff>::type>;
 	return to_univariate_polynomial(MP(p), newVar);
 }

@@ -9,10 +9,8 @@
 #include <carl/numbers/numbers.h>
 #include <carl-common/meta/SFINAE.h>
 #include <carl-common/util/hash.h>
-#include "Polynomial.h"
 #include <carl/core/Sign.h>
 #include <carl/core/Variable.h>
-#include "functions/VariableInformation.h"
 
 #include <functional>
 #include <list>
@@ -57,7 +55,7 @@ enum class PolynomialComparisonOrder {
  * @ingroup unirp
  */
 template<typename Coefficient>
-class UnivariatePolynomial : public Polynomial
+class UnivariatePolynomial
 {
 	/**
 	 * Declare all instantiations of univariate polynomials as friends.
@@ -155,29 +153,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~UnivariatePolynomial() override = default;
-
-	//Polynomial interface implementations.
-
-	/**
-	 * Checks if the polynomial is represented univariately.
-	 * @see Polynomial#isUnivariateRepresented
-	 * @return true.
-	 */
-	bool isUnivariateRepresented() const override
-	{
-		return true;
-	}
-
-	/**
-	 * Checks if the polynomial is represented multivariately.
-	 * @see Polynomial#isMultivariateRepresented
-	 * @return false.
-	 */
-	bool isMultivariateRepresented() const override
-	{
-		return false;
-	}
+	~UnivariatePolynomial() = default;
 
 	/**
 	 * Checks if the polynomial is equal to zero.
@@ -240,15 +216,15 @@ public:
 	 * @return If polynomial is constant.
 	 */
 	[[deprecated("use carl::is_constant(p) instead.")]]
-	bool isConstant() const
+	bool is_constant() const
 	{
-		assert(isConsistent());
+		assert(is_consistent());
 		return mCoefficients.size() <= 1;
 	}
 	
-	bool isLinearInMainVar() const
+	bool is_linear_in_main_var() const
 	{
-		assert(isConsistent());
+		assert(is_consistent());
 		return mCoefficients.size() <= 2;
 	}
 
@@ -256,13 +232,13 @@ public:
 	 * Checks whether the polynomial is only a number.
 	 * @return If polynomial is a number.
 	 */
-	bool isNumber() const
+	bool is_number() const
 	{
 		if constexpr (carl::is_number_type<Coefficient>::value) {
 			return mCoefficients.size() <= 1;
 		} else {
 			if (mCoefficients.empty()) return true;
-			return (mCoefficients.size() <= 1) && lcoeff().isNumber();
+			return (mCoefficients.size() <= 1) && lcoeff().is_number();
 		}
 	}
 
@@ -270,13 +246,13 @@ public:
 	 * Returns the constant part of this polynomial.
 	 * @return Constant part.
 	 */
-	NumberType constantPart() const
+	NumberType constant_part() const
 	{
 		if (mCoefficients.empty()) return NumberType(0);
 		if constexpr (carl::is_number_type<Coefficient>::value) {
 			return tcoeff();
 		} else {
-			return tcoeff().constantPart();
+			return tcoeff().constant_part();
 		}
 	}
 
@@ -284,12 +260,12 @@ public:
 	 * Checks if the polynomial is univariate, that means if only one variable occurs.
 	 * @return true.
 	 */
-	bool isUnivariate() const {
+	bool is_univariate() const {
 		if constexpr (carl::is_number_type<Coefficient>::value) {
 			return true;
 		} else {
 			for (const auto& c: coefficients()) {
-				if (!c.isNumber()) return false;
+				if (!c.is_number()) return false;
 			}
 			return true;
 		}
@@ -313,7 +289,7 @@ public:
 	 * @return Total degree.
 	 */
 	[[deprecated("use carl::total_degree(p) instead.")]]
-	uint totalDegree() const {
+	uint total_degree() const {
 		if constexpr (carl::is_number_type<Coefficient>::value) {
 			return degree();
 		} else {
@@ -321,7 +297,7 @@ public:
 			uint max = 0;
 			for (std::size_t deg = 0; deg < mCoefficients.size(); deg++) {
 				if (!mCoefficients[deg].is_zero()) {
-					uint tdeg = deg + mCoefficients[deg].totalDegree();
+					uint tdeg = deg + mCoefficients[deg].total_degree();
 					if (tdeg > max) max = tdeg;
 				}
 			}
@@ -335,7 +311,7 @@ public:
 	void truncate() {
 		assert(!mCoefficients.empty());
 		this->mCoefficients.resize(this->mCoefficients.size()-1);
-		this->stripLeadingZeroes();
+		this->strip_leading_zeroes();
 	}
 
 	/**
@@ -385,9 +361,9 @@ public:
 	 * @return Coprime factor of this polynomial.
 	 */
 	template<typename C = Coefficient, EnableIf<is_subset_of_rationals_type<C>> = dummy>
-	Coefficient coprimeFactor() const;
+	Coefficient coprime_factor() const;
 	template<typename C = Coefficient, DisableIf<is_subset_of_rationals_type<C>> = dummy>
-	typename UnderlyingNumberType<Coefficient>::type coprimeFactor() const;
+	typename UnderlyingNumberType<Coefficient>::type coprime_factor() const;
 
 	/**
 	 * Constructs a new polynomial that is scaled such that the coefficients are coprime.
@@ -396,17 +372,17 @@ public:
 	 * @return This polynomial multiplied with the coprime factor.
 	 */
 	template<typename C = Coefficient, EnableIf<is_subset_of_rationals_type<C>> = dummy>
-	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprimeCoefficients() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprime_coefficients() const;
 
 	template<typename C = Coefficient, DisableIf<is_subset_of_rationals_type<C>> = dummy>
-	UnivariatePolynomial<Coefficient> coprimeCoefficients() const;
+	UnivariatePolynomial<Coefficient> coprime_coefficients() const;
 	
 
 	template<typename C = Coefficient, EnableIf<is_subset_of_rationals_type<C>> = dummy>
-	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprimeCoefficientsSignPreserving() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprime_coefficients_sign_preserving() const;
 
 	template<typename C = Coefficient, DisableIf<is_subset_of_rationals_type<C>> = dummy>
-	UnivariatePolynomial<Coefficient> coprimeCoefficientsSignPreserving() const;
+	UnivariatePolynomial<Coefficient> coprime_coefficients_sign_preserving() const;
 
 	/**
 	 * Checks whether the polynomial is unit normal.
@@ -414,7 +390,7 @@ public:
 	 * @see @cite GCL92, page 39
 	 * @return If polynomial is normal.
 	 */
-	bool isNormal() const;
+	bool is_normal() const;
 	/**
 	 * The normal part of a polynomial is the polynomial divided by the unit part.
 	 * @see @cite GCL92, page 42.
@@ -430,13 +406,13 @@ public:
 	 * @see @cite GCL92, page 42.
 	 * @return The unit part of the polynomial.
 	 */
-	Coefficient unitPart() const;
+	Coefficient unit_part() const;
 
 	/**
 	 * Constructs a new polynomial `q` such that \f$ q(x) = p(-x) \f$ where `p` is this polynomial.
 	 * @return New polynomial with negated variable.
 	 */
-	UnivariatePolynomial negateVariable() const {
+	UnivariatePolynomial negate_variable() const {
 		UnivariatePolynomial<Coefficient> res(*this);
 		for (std::size_t deg = 0; deg < res.coefficients().size(); deg++) {
 			if (deg % 2 == 1) res.mCoefficients[deg] = -res.mCoefficients[deg];
@@ -447,13 +423,13 @@ public:
 	/**
 	 * Reverse coefficients safely.
 	 */
-	UnivariatePolynomial reverseCoefficients() const {
+	UnivariatePolynomial reverse_coefficients() const {
 		UnivariatePolynomial<Coefficient> res(*this);
 		std::reverse(res.mCoefficients.begin(), res.mCoefficients.end());
 		while(carl::is_zero(*std::prev(res.mCoefficients.end())) && std::prev(res.mCoefficients.end()) != res.mCoefficients.begin()) {
 			res.mCoefficients.erase(std::prev(res.mCoefficients.end()));
 		}
-		assert(res.isConsistent());
+		assert(res.is_consistent());
 		return res;
 	}
 	
@@ -497,10 +473,6 @@ public:
 	carl::Sign sgn(const Coefficient& value) const {
 		return carl::sgn(this->evaluate(value));
 	}
-	[[deprecated("Use carl::is_root_of() instead.")]]
-	bool isRoot(const Coefficient& value) const {
-		return this->sgn(value) == Sign::ZERO;
-	}
 	
 	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
 	UnivariatePolynomial<Coefficient> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
@@ -536,14 +508,14 @@ public:
 	 * @return 
 	 */
 	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>> = dummy>
-	UnivariatePolynomial<typename IntegralType<Coefficient>::type> toIntegerDomain() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> to_integer_domain() const;
 	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
-	UnivariatePolynomial<typename IntegralType<Coefficient>::type> toIntegerDomain() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> to_integer_domain() const;
 	
 	UnivariatePolynomial<GFNumber<typename IntegralType<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralType<Coefficient>::type>* galoisField) const;
 
 	/**
-	 * Asserts that isUnivariate() is true.
+	 * Asserts that is_univariate() is true.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number_type<C>> = dummy>
 	UnivariatePolynomial<NumberType> toNumberCoefficients() const;
@@ -561,12 +533,12 @@ public:
 	 * @param i number of the coefficient
 	 * @return numeric content part of i'th coefficient.
 	 */
-	NumberType numericContent(std::size_t i) const
+	NumberType numeric_content(std::size_t i) const
 	{
 		if constexpr (carl::is_number_type<Coefficient>::value) {
 			return this->mCoefficients[i];
 		} else {
-			return this->mCoefficients[i].numericContent();
+			return this->mCoefficients[i].numeric_content();
 		}
 	}
 
@@ -577,12 +549,12 @@ public:
 	 * If the coefficients are polynomials, this is the unit part of the leading coefficient.s
 	 * @return unit part of the polynomial.
 	 */
-	NumberType numericUnit() const
+	NumberType numeric_unit() const
 	{
 		if constexpr (carl::is_number_type<Coefficient>::value) {
 			return (this->lcoeff() >= Coefficient(0) ? NumberType(1) : NumberType(-1));
 		} else {
-			return this->lcoeff().numericUnit();
+			return this->lcoeff().numeric_unit();
 		}
 	}
 
@@ -596,20 +568,20 @@ public:
 	 *		gcd( a/b, c/d ) = gcd( a/b*l, c/d*l ) / l
 	 * where l = lcm(b,d).
 	 * @return numeric content part of the polynomial.
-	 * @see UnivariatePolynomials::numericContent(std::size_t)
+	 * @see UnivariatePolynomials::numeric_content(std::size_t)
 	 */
 	template<typename N=NumberType, EnableIf<is_subset_of_rationals_type<N>> = dummy>
-	typename UnderlyingNumberType<Coefficient>::type numericContent() const;
+	typename UnderlyingNumberType<Coefficient>::type numeric_content() const;
 
 	/**
 	 * Returns this/divisor where divisor is the numeric content of this polynomial.
 	 * @return 
 	 */
 	[[deprecated("Use carl::pseudo_primitive_part() instead.")]]
-	UnivariatePolynomial pseudoPrimpart() const {
-		auto c = this->numericContent();
+	UnivariatePolynomial pseudo_primpart() const {
+		auto c = this->numeric_content();
 		if ((c == NumberType(0)) || (c == NumberType(1))) return *this;
-		return this->divideBy(this->numericContent()).quotient;
+		return this->divideBy(this->numeric_content()).quotient;
 	}
 
 	/**
@@ -618,17 +590,17 @@ public:
 	 * @return the main denominator of all coefficients of this polynomial.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number_type<C>> = dummy>
-	IntNumberType mainDenom() const;
+	IntNumberType main_denom() const;
 	template<typename C=Coefficient, DisableIf<is_number_type<C>> = dummy>
-	IntNumberType mainDenom() const;
+	IntNumberType main_denom() const;
 
-	Coefficient syntheticDivision(const Coefficient& zeroOfDivisor);
+	Coefficient synthetic_division(const Coefficient& zeroOfDivisor);
 
 	/**
 	 * Checks if zero is a real root of this polynomial.
 	 * @return True if zero is a root.
 	 */
-	bool zeroIsRoot() const {
+	bool zero_is_root() const {
 		assert(!mCoefficients.empty());
 		return carl::is_zero(mCoefficients[0]);
 	}
@@ -813,7 +785,7 @@ public:
 	 * </ul>
 	 */
 	template<typename C=Coefficient, EnableIf<is_number_type<C>> = dummy>
-	bool isConsistent() const;
+	bool is_consistent() const;
 
 	/**
 	 * Asserts that this polynomial over polynomial coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
@@ -824,9 +796,9 @@ public:
 	 * </ul>
 	 */
 	template<typename C=Coefficient, DisableIf<is_number_type<C>> = dummy>
-	bool isConsistent() const;
+	bool is_consistent() const;
 	
-	void stripLeadingZeroes() 
+	void strip_leading_zeroes() 
 	{
 		while(mCoefficients.size() > 0 && carl::is_zero(lcoeff()))
 		{

@@ -5,11 +5,12 @@
 #include <carl/poly/umvpoly/functions/Representation.h>
 
 #ifdef USE_COCOA
-
 #include <CoCoA/library.H>
+#endif 
 
 namespace carl::ran::interval {
 namespace detail_field_extensions {
+	#ifdef USE_COCOA
 	
 	struct CoCoAConverter {
 
@@ -116,6 +117,7 @@ namespace detail_field_extensions {
 			return res;
 		}
 	};
+	#endif
 }
 
 /**
@@ -125,15 +127,16 @@ namespace detail_field_extensions {
 template<typename Rational, typename Poly>
 class FieldExtensions {
 private:
-	CoCoA::ring mQ = CoCoA::RingQQ();
 	std::map<Variable,RealAlgebraicNumberInterval<Rational>> mModel;
-	
+
+	#ifdef USE_COCOA
+	CoCoA::ring mQ = CoCoA::RingQQ();
 	detail_field_extensions::CoCoAConverter cc;
-	
+		
 	auto buildPolyRing(Variable v) {
 		return cc.buildPolyRing(mQ, v);
 	}
-	
+
 	bool evaluatesToZero(const CoCoA::RingElem& p) const {
 		auto mp = cc.convertMV<Poly>(p);
 		auto res = carl::evaluate(BasicConstraint<Poly>(mp, Relation::EQ), mModel);
@@ -145,6 +148,8 @@ private:
 	void extendRing(const CoCoA::ring& ring, const CoCoA::RingElem& p) {
 		mQ = CoCoA::NewQuotientRing(ring, CoCoA::ideal(p));
 	}
+	#endif
+	
 public:
 	/**
 	 * Extend the current number field with the field extension defined by r.
@@ -160,6 +165,7 @@ public:
 	 * In the second case, we return false and the new minimal polynomial.
 	 */
 	std::pair<bool,Poly> extend(Variable v, const RealAlgebraicNumberInterval<Rational>& r) {
+		#ifdef USE_COCOA
 		mModel.emplace(v, r);
 		if (r.is_numeric()) {
 			CARL_LOG_DEBUG("carl.fieldext", "Is numeric: " << v << " -> " << r);
@@ -185,16 +191,25 @@ public:
 		CARL_LOG_ERROR("carl.fieldext", "No factor is zero in assignment.");
 		assert(false);
 		return std::make_pair(false, Poly());
+		#else
+		CARL_LOG_ERROR("carl.fieldext", "CoCoALib is not enabled");
+		assert(false);
+		return std::make_pair(false, Poly());
+		#endif
 	}
 
 	Poly embed(const Poly& poly) { // TODO not functional yet
+		#ifdef USE_COCOA
 		CARL_LOG_DEBUG("carl.fieldext", "Embed " << poly << " into " << mQ);
 		auto f = cc.convertMV(poly, mQ);
 		CARL_LOG_DEBUG("carl.fieldext", "Embedding is " << f);
 		return cc.convertMV<Poly>(f);
+		#else
+		CARL_LOG_ERROR("carl.fieldext", "CoCoALib is not enabled");
+		assert(false);
+		return Poly();
+		#endif
 	}
 };
 
 }
-
-#endif

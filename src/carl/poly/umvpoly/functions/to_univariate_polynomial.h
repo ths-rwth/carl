@@ -17,8 +17,8 @@ template<typename C, typename O, typename P>
 UnivariatePolynomial<C> to_univariate_polynomial(const MultivariatePolynomial<C,O,P>& p) {
 	// Only correct when it is already only in one variable.
 	assert(variables(p).size() == 1);
-	Variable::Arg x = p.lmon()->getSingleVariable();
-	std::vector<C> coeffs(p.totalDegree()+1,0);
+	Variable::Arg x = p.lmon()->single_variable();
+	std::vector<C> coeffs(p.total_degree()+1,0);
 	for (const auto& t : p)
 	{
 		coeffs[t.tdeg()] = t.coeff();
@@ -33,17 +33,17 @@ UnivariatePolynomial<C> to_univariate_polynomial(const MultivariatePolynomial<C,
  */
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> to_univariate_polynomial(const MultivariatePolynomial<C,O,P>& p, Variable v) {
-	assert(p.isConsistent());
+	assert(p.is_consistent());
 	std::vector<MultivariatePolynomial<C,O,P>> coeffs(1);
 	for (const auto& term: p) {
 		if (term.monomial() == nullptr) coeffs[0] += term;
 		else {
 			const auto& mon = term.monomial();
-			auto exponent = mon->exponentOfVariable(v);
+			auto exponent = mon->exponent_of_variable(v);
 			if (exponent >= coeffs.size()) {
 				coeffs.resize(exponent + 1);
 			}
-			std::shared_ptr<const carl::Monomial> tmp = mon->dropVariable(v);
+			std::shared_ptr<const carl::Monomial> tmp = mon->drop_variable(v);
 			coeffs[exponent] += term.coeff() * tmp;
 		}
 	}

@@ -123,12 +123,12 @@ std::size_t total_degree(const MultivariatePolynomial<Coeff,Ordering,Policies>& 
 
 // template<typename C, typename O, typename P>
 // bool is_one(const MultivariatePolynomial<C,O,P>& p) {
-// 	return (p.nrTerms() == 1) && is_one(p.lterm());
+// 	return (p.nr_terms() == 1) && is_one(p.lterm());
 // }
 // 
 // template<typename C, typename O, typename P>
 // bool is_zero(const MultivariatePolynomial<C,O,P>& p) {
-// 	return p.nrTerms() == 0;
+// 	return p.nr_terms() == 0;
 // }
 
 /**
@@ -136,7 +136,7 @@ std::size_t total_degree(const MultivariatePolynomial<Coeff,Ordering,Policies>& 
  */
 template<typename Coeff, typename Ordering, typename Policies>
 bool is_constant(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
-	return (p.nrTerms() == 0) || ((p.nrTerms() == 1) && is_constant(p.lterm()));
+	return (p.nr_terms() == 0) || ((p.nr_terms() == 1) && is_constant(p.lterm()));
 }
 
 /**

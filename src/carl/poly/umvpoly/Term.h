@@ -8,7 +8,7 @@
 #pragma once
 
 #include "Monomial.h"
-#include "functions/VariablesInformation.h"
+#include "MonomialPool.h"
 #include <carl/numbers/numbers.h>
 
 #include <memory>
@@ -118,31 +118,31 @@ public:
          */
 	[[deprecated("use carl::is_one(t) instead.")]]
 	bool is_one() const {
-		return isConstant() && carl::is_one(mCoeff); //change this to mCoeff.is_one() at some point
+		return is_constant() && carl::is_one(mCoeff); //change this to mCoeff.is_one() at some point
 	}
 	/**
 		 * Checks whether the monomial is a constant.
 		 * @return 
 		 */
-	bool isConstant() const {
+	bool is_constant() const {
 		return !mMonomial;
 	}
 
 	/**
          * @return true, if the image of this term is integer-valued.
          */
-	bool integerValued() const {
+	bool integer_valued() const {
 		if (!carl::is_integer(mCoeff)) return false;
-		return !mMonomial || mMonomial->integerValued();
+		return !mMonomial || mMonomial->integer_valued();
 	}
 
 	/**
 		 * Checks whether the monomial has exactly the degree one.
 		 * @return 
 		 */
-	bool isLinear() const {
+	bool is_linear() const {
 		if (!mMonomial) return true;
-		return mMonomial->isLinear();
+		return mMonomial->is_linear();
 	}
 	/**
 		 * 
@@ -165,8 +165,8 @@ public:
 	/**
 		 * Removes the given variable from the term.
 		 */
-	Term dropVariable(Variable v) const {
-		return Term(coeff(), monomial()->dropVariable(v));
+	Term drop_variable(Variable v) const {
+		return Term(coeff(), monomial()->drop_variable(v));
 	}
 
 	/**
@@ -174,30 +174,30 @@ public:
 		 * @param v The variable which may occur.
 		 * @return true if no variable occurs, or just v occurs. 
 		 */
-	bool hasNoOtherVariable(Variable v) const {
+	bool has_no_other_variable(Variable v) const {
 		if (!mMonomial) return true;
-		return mMonomial->hasNoOtherVariable(v);
+		return mMonomial->has_no_other_variable(v);
 	}
 
-	bool isSingleVariable() const {
+	bool is_single_variable() const {
 		if (!mMonomial) return false;
-		return mMonomial->isLinear();
+		return mMonomial->is_linear();
 	}
 	/**
 		 * For terms with exactly one variable, get this variable.
 		 * @return The only variable occuring in the term.
 		 */
-	Variable getSingleVariable() const {
+	Variable single_variable() const {
 		assert(getNrVariables() == 1);
-		return mMonomial->getSingleVariable();
+		return mMonomial->single_variable();
 	}
 
 	/**
 		 * Checks if the term is a square.
 		 * @return If this is square.
 		 */
-	bool isSquare() const {
-		return (mCoeff >= CoefficientType(0)) && ((!mMonomial) || mMonomial->isSquare());
+	bool is_square() const {
+		return (mCoeff >= CoefficientType(0)) && ((!mMonomial) || mMonomial->is_square());
 	}
 
 	/**
@@ -235,7 +235,7 @@ public:
 
 	/**
 		 * Calculates the square root of this term.
-		 * Returns true, iff the term is a square as checked by isSquare().
+		 * Returns true, iff the term is a square as checked by is_square().
 		 * In that case, res will changed to be the square root.
 		 * Otherwise, res is undefined.
 		 * @param res Square root of this term.
@@ -248,13 +248,7 @@ public:
 	template<typename C = Coefficient, DisableIf<is_field_type<C>> = dummy>
 	bool divisible(const Term& t) const;
 
-	template<bool gatherCoeff, typename CoeffType>
-	void gatherVarInfo(Variable var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
-
-	template<bool gatherCoeff, typename CoeffType>
-	void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const;
-
-	bool isConsistent() const;
+	bool is_consistent() const;
 
 	/// @name Division operators
 	/// @{
@@ -319,7 +313,7 @@ void variables(const Term<Coeff>& t, carlVariables& vars) {
  */
 template<typename Coeff>
 inline bool is_one(const Term<Coeff>& term) {
-	return term.isConstant() && carl::is_one(term.coeff());
+	return term.is_constant() && carl::is_one(term.coeff());
 }
 
 template<typename Coeff>
@@ -625,7 +619,7 @@ struct hash<carl::Term<Coefficient>> {
 	 * @return Hash of term.
 	 */
 	std::size_t operator()(const carl::Term<Coefficient>& term) const {
-		if (term.isConstant()) {
+		if (term.is_constant()) {
 			return carl::hash_all(term.coeff());
 		} else {
 			return carl::hash_all(term.coeff(), *term.monomial());

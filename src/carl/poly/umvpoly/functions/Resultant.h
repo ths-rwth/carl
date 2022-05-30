@@ -104,10 +104,10 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 	UnivariatePolynomial<Coeff> tmp = q;
 	q = pseudo_remainder(p, -q);
 	p = tmp;
-	CARL_LOG_TRACE("carl.core.resultant", "q = p.prem(-q) = " << q);
+	CARL_LOG_TRACE("carl.core.resultant", "q = pseudo_remainder(p,-q) = " << q);
 	CARL_LOG_TRACE("carl.core.resultant", "p = " << p);
 	//CARL_LOG_TRACE("carl.core.resultant", "p = q");
-	//CARL_LOG_TRACE("carl.core.resultant", "q = p.prem(-q)");
+	//CARL_LOG_TRACE("carl.core.resultant", "q = pseudo_remainder(p,-q)");
 
 	/* Parts 2 and 3
 	 * Main loop filling the subresultants chain step by step.
@@ -309,7 +309,7 @@ UnivariatePolynomial<Coeff> discriminant(
 	const UnivariatePolynomial<Coeff>& p,
 	SubresultantStrategy strategy) {
 	UnivariatePolynomial<Coeff> res = resultant(p, derivative(p), strategy);
-	if (res.isNumber()) return res;
+	if (res.is_number()) return res;
 	uint d = p.degree();
 	Coeff sign = ((d * (d - 1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);
 	Coeff redCoeff = sign * p.lcoeff();
@@ -549,7 +549,7 @@ UnivariatePolynomial<Coeff> resultant_det(
 		}
 	}
 	//determinant = m.back().tcoeff();
-	determinant = determinant.coprimeCoefficients();
+	determinant = determinant.coprime_coefficients();
 	//std::cout << "det = " << determinant << std::endl;
 
 	return UnivariatePolynomial<Coeff>(f.mainVar(), determinant);

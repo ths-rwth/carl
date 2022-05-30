@@ -87,8 +87,8 @@ uint sign_variations(const UnivariatePolynomial<Coefficient>& polynomial, const 
 	p = detail_sign_variations::scale(std::move(p), interval.diameter());
 	p = detail_sign_variations::reverse(std::move(p));
 	p = detail_sign_variations::shift(p, carl::constant_one<Coefficient>::get());
-	p.stripLeadingZeroes();
-	assert(p.isConsistent());
+	p.strip_leading_zeroes();
+	assert(p.is_consistent());
 	auto res = carl::sign_variations(p.coefficients().begin(), p.coefficients().end(), [](const auto& c){ return carl::sgn(c); });
 	CARL_LOG_TRACE("carl.core", polynomial << " has " << res << " sign variations within " << interval);
 	return res;

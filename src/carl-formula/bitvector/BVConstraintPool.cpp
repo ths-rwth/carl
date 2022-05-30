@@ -17,7 +17,7 @@ namespace carl
     BVConstraintPool::ConstConstraintPtr BVConstraintPool::create(const BVCompareRelation& _relation,
         const BVTerm& _lhs, const BVTerm& _rhs)
     {
-        if(_lhs.isConstant() && _rhs.isConstant()) {
+        if(_lhs.is_constant() && _rhs.is_constant()) {
             assert(_lhs.width() == _rhs.width());
             const BVValue& lval = _lhs.value();
             const BVValue& rval = _rhs.value();

@@ -26,8 +26,8 @@ TYPED_TEST(MultivariatePolynomialTest, Constructor)
     MultivariatePolynomial<TypeParam> p0(t0);
 	
     MultivariatePolynomial<TypeParam> p1(TypeParam(3));
-    EXPECT_EQ(1, p1.nrTerms());
-    EXPECT_TRUE(p1.isLinear());
+    EXPECT_EQ(1, p1.nr_terms());
+    EXPECT_TRUE(p1.is_linear());
 }
 
 TYPED_TEST(MultivariatePolynomialTest, Operators)
@@ -38,7 +38,7 @@ TYPED_TEST(MultivariatePolynomialTest, Operators)
     MultivariatePolynomial<TypeParam> p0b(v0);
     EXPECT_EQ(p0a, p0b);
 
-    EXPECT_TRUE(p0a.isUnivariate());
+    EXPECT_TRUE(p0a.is_univariate());
 }
 
 TYPED_TEST(MultivariatePolynomialTest, getTerms)
@@ -50,7 +50,7 @@ TYPED_TEST(MultivariatePolynomialTest, getTerms)
 	p *= v0;
 	MultivariatePolynomial<TypeParam> p2 = p + TypeParam(1);
 
-	auto& t = p2.getTerms();
+	auto& t = p2.terms();
 	t.erase(t.begin());
 
 	EXPECT_EQ(p, p2);
@@ -96,26 +96,26 @@ TYPED_TEST(MultivariatePolynomialTest, Addition)
     Term<TypeParam> t0(v0);
     MultivariatePolynomial<TypeParam> p0(v0);
     p0 += 3;
-    EXPECT_EQ((unsigned)2, p0.nrTerms());
+    EXPECT_EQ((unsigned)2, p0.nr_terms());
     p0 += 3;
-    EXPECT_EQ((unsigned)2, p0.nrTerms());
+    EXPECT_EQ((unsigned)2, p0.nr_terms());
     p0 += -6;
-    EXPECT_EQ((unsigned)1, p0.nrTerms());
+    EXPECT_EQ((unsigned)1, p0.nr_terms());
 
     Variable v1 = fresh_real_variable("v1");
     Variable v2 = fresh_real_variable("v2");
     p0 += v1;
     p0 += createMonomial(v2, (exponent) 1);
-    EXPECT_EQ((unsigned)3,p0.nrTerms());
+    EXPECT_EQ((unsigned)3,p0.nr_terms());
     p0 += createMonomial(v2, (exponent) 1);
-    EXPECT_EQ((unsigned)3,p0.nrTerms());
+    EXPECT_EQ((unsigned)3,p0.nr_terms());
     p0 += Term<TypeParam>(-2,v2,1);
-    EXPECT_EQ((unsigned)2,p0.nrTerms());
+    EXPECT_EQ((unsigned)2,p0.nr_terms());
 
     MultivariatePolynomial<TypeParam> p1(v0);
     p1 += v1;
     p0 += p1;
-    EXPECT_EQ((unsigned)2,p0.nrTerms());
+    EXPECT_EQ((unsigned)2,p0.nr_terms());
     MultivariatePolynomial<TypeParam> mp2(v1);
     mp2 += (TypeParam)2 * v0;
     EXPECT_EQ(v1, mp2.lterm());
@@ -143,27 +143,27 @@ TYPED_TEST(MultivariatePolynomialTest, Substraction)
     Variable v0 = fresh_real_variable("v0");
     MultivariatePolynomial<TypeParam> p0(v0);
     p0 -= 3;
-    EXPECT_EQ((unsigned)2, p0.nrTerms());
+    EXPECT_EQ((unsigned)2, p0.nr_terms());
     p0 -= 3;
-    EXPECT_EQ((unsigned)2, p0.nrTerms());
+    EXPECT_EQ((unsigned)2, p0.nr_terms());
     p0 -= -6;
-    EXPECT_EQ((unsigned)1, p0.nrTerms());
+    EXPECT_EQ((unsigned)1, p0.nr_terms());
     Variable v1 = fresh_real_variable("v1");
     Variable v2 = fresh_real_variable("v2");
     p0 -= v1;
-    EXPECT_EQ((unsigned)2,p0.nrTerms());
+    EXPECT_EQ((unsigned)2,p0.nr_terms());
     p0 -= createMonomial(v2, (exponent) 1);
-    EXPECT_EQ((unsigned)3,p0.nrTerms());
+    EXPECT_EQ((unsigned)3,p0.nr_terms());
     p0 -= createMonomial(v2, (exponent) 1);
 
-    EXPECT_EQ((unsigned)3,p0.nrTerms());
+    EXPECT_EQ((unsigned)3,p0.nr_terms());
     p0 -= Term<TypeParam>(-2,v2,1);
-    EXPECT_EQ((unsigned)2,p0.nrTerms());
+    EXPECT_EQ((unsigned)2,p0.nr_terms());
 
     MultivariatePolynomial<TypeParam> p1(v0);
     p1 -= v1;
     p0 -= p1;
-    EXPECT_EQ((unsigned)0,p0.nrTerms());
+    EXPECT_EQ((unsigned)0,p0.nr_terms());
 }
 
 TYPED_TEST(MultivariatePolynomialTest, Multiplication)
@@ -217,31 +217,31 @@ TEST(MultivariatePolynomial, Coprime)
     MultivariatePolynomial<Rational> mp;
     mp += v0;
     MultivariatePolynomial<Rational> mp2 = mp * (Rational)2;
-    EXPECT_EQ(mp, mp.coprimeCoefficients());
+    EXPECT_EQ(mp, mp.coprime_coefficients());
 
     mp = MultivariatePolynomial<Rational>((Rational)2 * v0);
     mp += (Rational)4 * v1;
     mp2 = MultivariatePolynomial<Rational>(v0);
     mp2 += (Rational)2 * v1;
-    EXPECT_EQ(mp2, mp.coprimeCoefficients());
+    EXPECT_EQ(mp2, mp.coprime_coefficients());
 
     mp = MultivariatePolynomial<Rational>(((Rational)1)/(Rational)6 * v0);
     mp += (Rational)4 * v1;
     mp2 = MultivariatePolynomial<Rational>((Rational)1 * v0);
     mp2 += (Rational)24 * v1;
-    EXPECT_EQ(mp2, mp.coprimeCoefficients());
+    EXPECT_EQ(mp2, mp.coprime_coefficients());
 
     mp = MultivariatePolynomial<Rational>(((Rational)1)/(Rational)6 * v0);
     mp += ((Rational)1)/(Rational)4 * v1;
     mp2 = MultivariatePolynomial<Rational>((Rational)2 * v0);
     mp2 += (Rational)3 * v1;
-    EXPECT_EQ(mp2, mp.coprimeCoefficients());
+    EXPECT_EQ(mp2, mp.coprime_coefficients());
 
     MultivariatePolynomial<Rational> mpG = MultivariatePolynomial<Rational>(Rational(1)/Rational(6) * v0);
     mpG += Rational(1)/Rational(4) * v1;
     MultivariatePolynomial<Rational> mp2G = MultivariatePolynomial<Rational>(Rational(2) * v0);
     mp2G += Rational(3) * v1;
-    EXPECT_EQ(mp2G, mpG.coprimeCoefficients());
+    EXPECT_EQ(mp2G, mpG.coprime_coefficients());
 
 
 }
@@ -449,7 +449,7 @@ TEST(MultivariatePolynomial, SPolynomial)
     Variable y = fresh_real_variable("y");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     MultivariatePolynomial<Rational> g1({(Rational)3*x*x*x*x*y, (Rational)1*y*y});
-    EXPECT_EQ((unsigned)3, carl::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
+    EXPECT_EQ((unsigned)3, carl::SPolynomial(f1.normalize(), g1.normalize()).nr_terms());
     //MultivariatePolynomial<Rational> s1({(Rational)-1*x*x});
     //EXPECT_EQ(s1, MultivariatePolynomial::SPolynomial(f1.normalize(), g1.normalize()));
 
@@ -500,33 +500,33 @@ TEST(MultivariatePolynomial, varInfo)
 
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
 
-    VariablesInformation<false, MultivariatePolynomial<Rational>> vi = f1.getVarInfo<false>();
-    EXPECT_EQ((unsigned)3, vi.getVarInfo(x)->maxDegree());
-    EXPECT_EQ((unsigned)1, vi.getVarInfo(x)->minDegree());
-    EXPECT_EQ((unsigned)3, vi.getVarInfo(x)->occurence());
-    EXPECT_EQ((unsigned)3, vi.getVarInfo(y)->maxDegree());
-    EXPECT_EQ((unsigned)2, vi.getVarInfo(y)->minDegree());
-    EXPECT_EQ((unsigned)2, vi.getVarInfo(y)->occurence());
-    EXPECT_EQ(nullptr, vi.getVarInfo(z));
+    auto vi = carl::vars_info(f1, false);
+    EXPECT_EQ((unsigned)3, vi.var(x).max_degree());
+    EXPECT_EQ((unsigned)1, vi.var(x).min_degree());
+    EXPECT_EQ((unsigned)3, vi.var(x).num_occurences());
+    EXPECT_EQ((unsigned)3, vi.var(y).max_degree());
+    EXPECT_EQ((unsigned)2, vi.var(y).min_degree());
+    EXPECT_EQ((unsigned)2, vi.var(y).num_occurences());
+    EXPECT_FALSE(vi.occurs(z));
 
     MultivariatePolynomial<Rational> f2({(Rational)1*x*x*x*x*y*y, (Rational)1*x*x*x*x*z*z ,(Rational)-1*x*y, (Rational)1*z});
-    VariablesInformation<true, MultivariatePolynomial<Rational>> vi2 = f2.getVarInfo<true>();
-    EXPECT_EQ((unsigned)4, vi2.getVarInfo(x)->maxDegree());
-    EXPECT_EQ((unsigned)1, vi2.getVarInfo(x)->minDegree());
-    EXPECT_EQ((unsigned)3, vi2.getVarInfo(x)->occurence());
-    EXPECT_EQ((unsigned)0, vi2.getVarInfo(x)->coeffs().count(0));
-    EXPECT_EQ((unsigned)0, vi2.getVarInfo(x)->coeffs().count(2));
-    EXPECT_EQ((unsigned)0, vi2.getVarInfo(x)->coeffs().count(3));
-    EXPECT_EQ(MultivariatePolynomial<Rational>({(Rational)1*y*y, (Rational)1*z*z}), vi2.getVarInfo(x)->coeffs().at(4));
-    EXPECT_EQ((unsigned)2, vi2.getVarInfo(y)->maxDegree());
-    EXPECT_EQ((unsigned)1, vi2.getVarInfo(y)->minDegree());
-    EXPECT_EQ((unsigned)2, vi2.getVarInfo(y)->occurence());
-    EXPECT_EQ((Rational)-1*x, vi2.getVarInfo(y)->coeffs().at(1));
-    EXPECT_EQ((Rational)1*x*x*x*x, vi2.getVarInfo(y)->coeffs().at(2));
-    EXPECT_EQ((unsigned)2, vi2.getVarInfo(z)->maxDegree());
-    EXPECT_EQ((unsigned)1, vi2.getVarInfo(z)->minDegree());
-    EXPECT_EQ((unsigned)2, vi2.getVarInfo(z)->occurence());
-    EXPECT_EQ((Rational)1, vi2.getVarInfo(z)->coeffs().at(1));
+    auto vi2 = carl::vars_info(f2,true);
+    EXPECT_EQ((unsigned)4, vi2.var(x).max_degree());
+    EXPECT_EQ((unsigned)1, vi2.var(x).min_degree());
+    EXPECT_EQ((unsigned)3, vi2.var(x).num_occurences());
+    EXPECT_EQ((unsigned)1, vi2.var(x).coeffs().count(0));
+    EXPECT_EQ((unsigned)0, vi2.var(x).coeffs().count(2));
+    EXPECT_EQ((unsigned)0, vi2.var(x).coeffs().count(3));
+    EXPECT_EQ(MultivariatePolynomial<Rational>({(Rational)1*y*y, (Rational)1*z*z}), vi2.var(x).coeffs().at(4));
+    EXPECT_EQ((unsigned)2, vi2.var(y).max_degree());
+    EXPECT_EQ((unsigned)1, vi2.var(y).min_degree());
+    EXPECT_EQ((unsigned)2, vi2.var(y).num_occurences());
+    EXPECT_EQ((Rational)-1*x, vi2.var(y).coeffs().at(1));
+    EXPECT_EQ((Rational)1*x*x*x*x, vi2.var(y).coeffs().at(2));
+    EXPECT_EQ((unsigned)2, vi2.var(z).max_degree());
+    EXPECT_EQ((unsigned)1, vi2.var(z).min_degree());
+    EXPECT_EQ((unsigned)2, vi2.var(z).num_occurences());
+    EXPECT_EQ((Rational)1, vi2.var(z).coeffs().at(1));
 }
 
 TEST(MultivariatePolynomial, Quotient)

@@ -36,7 +36,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 // TODO make generic?
 /**
  * Find all real roots of a univariate 'polynomial' with non-numeric coefficients within a given 'interval'.
- * However, all coefficients must be types that contain numeric numbers that are retrievable by using .constantPart();
+ * However, all coefficients must be types that contain numeric numbers that are retrievable by using .constant_part();
  * The roots are sorted in ascending order.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, DisableIf<std::is_same<Coeff, Number>> = dummy>
@@ -44,8 +44,8 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
-	assert(polynomial.isUnivariate());
-	return real_roots(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constantPart(); })), interval);
+	assert(polynomial.is_univariate());
+	return real_roots(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constant_part(); })), interval);
 }
 
 /**
@@ -76,7 +76,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 		CARL_LOG_TRACE("carl.ran.realroots", "poly is 0 -> nullified");
 		return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
 	}
-	if (poly.isNumber()) {
+	if (poly.is_number()) {
 		CARL_LOG_TRACE("carl.ran.realroots", "poly is constant but not zero -> no root");
 		return real_roots_result<RealAlgebraicNumberInterval<Number>>::no_roots_response();
 	}
@@ -103,7 +103,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 		return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
 	}
 	if (ir_map.empty()) {
-		assert(polyCopy.isUnivariate());
+		assert(polyCopy.is_univariate());
 		CARL_LOG_TRACE("carl.ran.realroots", "poly " << polyCopy << " is univariate after substituting rational assignments");
 		return real_roots(polyCopy, interval);
 	} else {

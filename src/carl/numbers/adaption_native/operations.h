@@ -51,7 +51,7 @@ inline bool isInf(double d) {
 	}
 }
 
-inline bool isNumber(double d) {
+inline bool is_number(double d) {
 	return !isNaN(d) && !isInf(d);
 }
 

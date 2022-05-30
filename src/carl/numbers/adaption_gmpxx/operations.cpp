@@ -38,6 +38,7 @@ namespace carl
 
     std::pair<mpq_class,mpq_class> sqrt_safe(const mpq_class& a)
     {
+        if (mpq_sgn(a.__get_mp()) == 0) return std::make_pair(mpq_class(0),mpq_class(0));
         assert( mpq_sgn(a.__get_mp()) > 0 );
         mpz_class den = a.get_den();
         mpz_class num = a.get_num();

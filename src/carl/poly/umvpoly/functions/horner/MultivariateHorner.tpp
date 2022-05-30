@@ -19,7 +19,7 @@ namespace carl
 	if (strategy::use_arithmeticOperationsCounter)
  	{
  		//Sum of monomials
- 		arithmeticOperationsCounter = inPut.nrTerms() - 1;
+ 		arithmeticOperationsCounter = inPut.nr_terms() - 1;
 
  		typename PolynomialType::TermsType::const_iterator polynomialIt;
 		for (polynomialIt = inPut.begin(); polynomialIt != inPut.end(); polynomialIt++)
@@ -27,7 +27,7 @@ namespace carl
 			arithmeticOperationsCounter += polynomialIt->getNrVariables() - 1;
 			arithmeticOperationsCounter += polynomialIt->tdeg() - polynomialIt->getNrVariables();
 			if (polynomialIt->coeff() > 1) arithmeticOperationsCounter++;
-			if (polynomialIt->isConstant()) arithmeticOperationsCounter++;
+			if (polynomialIt->is_constant()) arithmeticOperationsCounter++;
 
 		}
  	}
@@ -218,7 +218,7 @@ namespace carl
 			counter = counter - 1;
 
 			//If Dependent Polynome contains Variables - continue with recursive Horner
-			if ( !h_dependentPart.isNumber() )
+			if ( !h_dependentPart.is_number() )
 			{
 				#ifdef DEBUG_HORNER
 					std::cout << __func__ << "    DEP->new Horner " << h_dependentPart << std::endl;
@@ -232,11 +232,11 @@ namespace carl
 			else
 			{
 				removeDependent();
-				mConst_dependent = h_dependentPart.constantPart();
+				mConst_dependent = h_dependentPart.constant_part();
 			}
 
 			//If independent Polynome contains Variables - continue with recursive Horner
-			if ( !h_independentPart.isNumber() )
+			if ( !h_independentPart.is_number() )
 			{
 				#ifdef DEBUG_HORNER
 					std::cout << __func__ << "    INDEP->new Horner " << h_independentPart << std::endl;
@@ -249,7 +249,7 @@ namespace carl
 			else
 			{
 				removeIndepenent();
-				mConst_independent =  h_independentPart.constantPart();
+				mConst_independent =  h_independentPart.constant_part();
 			}
 		}
 
@@ -261,7 +261,7 @@ namespace carl
 			#endif
 			removeIndepenent();
 			removeDependent();
-			mConst_independent = inPut.constantPart();
+			mConst_independent = inPut.constant_part();
 			this->setVariable( Variable::NO_VARIABLE );
 		}
 	}

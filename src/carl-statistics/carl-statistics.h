@@ -19,15 +19,15 @@ namespace carl {
 namespace statistics {
 
 #ifdef CARL_DEVOPTION_Statistics
-    #define CARL_INIT_STATISTICS(class, member, name) class& member = carl::statistics::get<class>(name)
+    #define CARL_INIT_STATISTICS(class, variable, name) class& variable = carl::statistics::get<class>(name)
     #define CARL_CALL_STATISTICS(function) function
-    #define CARL_TIME_START() carl::statistics::timer::start()
-    #define CARL_TIME_FINISH(timer, start) timer.finish(start)
+    #define CARL_TIME_START(variable) auto variable = carl::statistics::timer::start()
+    #define CARL_TIME_FINISH(timer, variable) timer.finish(variable)
 #else
-    #define CARL_INIT_STATISTICS(class, member, name)
+    #define CARL_INIT_STATISTICS(class, variable, name)
     #define CARL_CALL_STATISTICS(function)
-    #define CARL_TIME_START() carl::statistics::timing::time_point()
-    #define CARL_TIME_FINISH(timer, start) static_cast<carl::statistics::timing::time_point>(start)
+    #define CARL_TIME_START(variable)
+    #define CARL_TIME_FINISH(timer, start)
 #endif
 
 

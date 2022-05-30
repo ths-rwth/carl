@@ -36,10 +36,10 @@ namespace carl
     FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& _pCache, bool _polyNormalized ):
         mCacheRef( CACHE::NO_REF ),
         mpCache( carl::is_zero(_polynomial) ? nullptr : _pCache ),
-        mCoefficient( carl::is_zero(_polynomial) ? CoeffType(0) : (_polyNormalized ? CoeffType(1) : CoeffType(1)/_polynomial.coprimeFactor()) )
+        mCoefficient( carl::is_zero(_polynomial) ? CoeffType(0) : (_polyNormalized ? CoeffType(1) : CoeffType(1)/_polynomial.coprime_factor()) )
     {
-        assert( !_polyNormalized || (_polynomial.coprimeFactor() == CoeffType(1)) );
-        if ( _polynomial.isConstant() )
+        assert( !_polyNormalized || (_polynomial.coprime_factor() == CoeffType(1)) );
+        if ( _polynomial.is_constant() )
         {
             mpCache = nullptr;
         }
@@ -176,8 +176,8 @@ namespace carl
                     *this *= *it;
                     break;
                 case ConstructorOperation::DIV:
-                    assert(it->isConstant());
-                    *this /= it->constantPart();
+                    assert(it->is_constant());
+                    *this /= it->constant_part();
                     break;
               }
         }
@@ -232,46 +232,46 @@ namespace carl
     
     template<typename P>
     template<typename C, EnableIf<is_subset_of_rationals_type<C>>>
-    typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::coprimeFactorWithoutConstant() const
+    typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::coprime_factor_without_constant() const
     {
         if( existsFactorization( *this ) )
         {
             if( factorizedTrivially() )
             {
-                assert( computePolynomial(*this).coprimeFactorWithoutConstant() == polynomial().coprimeFactorWithoutConstant() / mCoefficient );
-                return polynomial().coprimeFactorWithoutConstant() / mCoefficient;
+                assert( computePolynomial(*this).coprime_factor_without_constant() == polynomial().coprime_factor_without_constant() / mCoefficient );
+                return polynomial().coprime_factor_without_constant() / mCoefficient;
             }
             auto factor = content().factorization().begin();
-            CoeffType cf = factor->first.coprimeFactorWithoutConstant();
+            CoeffType cf = factor->first.coprime_factor_without_constant();
             auto resultNum = carl::get_num( cf );
             auto resultDenom = carl::get_denom( cf );
             ++factor;
             while( factor != content().factorization().end() )
             {
-                cf = factor->first.coprimeFactorWithoutConstant();
+                cf = factor->first.coprime_factor_without_constant();
                 resultNum = carl::lcm( resultNum, carl::get_num( cf ) );
                 resultDenom = carl::gcd( resultDenom, carl::get_denom( cf ) );
                 ++factor;
             }
-            assert( computePolynomial(*this).coprimeFactorWithoutConstant() == (resultNum / (mCoefficient*resultDenom)) );
+            assert( computePolynomial(*this).coprime_factor_without_constant() == (resultNum / (mCoefficient*resultDenom)) );
             return resultNum / (mCoefficient*resultDenom);
         }
         return constant_zero<CoeffType>::get();
     }
     
     template<typename P>
-    typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::constantPart() const
+    typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::constant_part() const
     {
         if( existsFactorization( *this ) )
         {
             if( factorizedTrivially() )
-                return polynomial().constantPart() * mCoefficient;
+                return polynomial().constant_part() * mCoefficient;
             CoeffType result( mCoefficient );
             for( const auto& factor : content().factorization() )
             {
-                result *= carl::pow( factor.first.constantPart(), factor.second );
+                result *= carl::pow( factor.first.constant_part(), factor.second );
             }
-            assert( computePolynomial(*this).constantPart() == result );
+            assert( computePolynomial(*this).constant_part() == result );
             return result;
         }
         return mCoefficient;
@@ -296,18 +296,18 @@ namespace carl
     }
 
     template<typename P>
-    size_t FactorizedPolynomial<P>::totalDegree() const
+    size_t FactorizedPolynomial<P>::total_degree() const
     {
         if( existsFactorization( *this ) )
         {
             if( factorizedTrivially() )
-                return polynomial().totalDegree();
+                return polynomial().total_degree();
             exponent result = 0;
             for( const auto& factor : content().factorization() )
             {
-                result += factor.first.totalDegree() * factor.second;
+                result += factor.first.total_degree() * factor.second;
             }
-            assert( computePolynomial(*this).totalDegree() == result );
+            assert( computePolynomial(*this).total_degree() == result );
             return result;
         }
         assert( !carl::is_zero(mCoefficient) );
@@ -353,24 +353,24 @@ namespace carl
     }
     
     template<typename P>
-    bool FactorizedPolynomial<P>::isUnivariate() const
+    bool FactorizedPolynomial<P>::is_univariate() const
     {
         if( existsFactorization( *this ) )
         {
             if( factorizedTrivially() )
             {
-                return polynomial().isUnivariate();
+                return polynomial().is_univariate();
             }
             Variable foundVar = Variable::NO_VARIABLE;
             for( const auto& factor : content().factorization() )
             {
-                if( factor.first.isUnivariate() )
+                if( factor.first.is_univariate() )
                 {
                     if( foundVar == Variable::NO_VARIABLE )
                     {
-                        foundVar = factor.first.getSingleVariable();
+                        foundVar = factor.first.single_variable();
                     }
-                    else if( foundVar != factor.first.getSingleVariable() )
+                    else if( foundVar != factor.first.single_variable() )
                     {
                         return false;
                     }
@@ -397,23 +397,23 @@ namespace carl
     }
     
     template<typename P>
-    bool FactorizedPolynomial<P>::hasConstantTerm() const
+    bool FactorizedPolynomial<P>::has_constant_term() const
     {
         if( existsFactorization( *this ) )
         {
             assert( !carl::is_zero( mCoefficient ) );
             if( factorizedTrivially() )
-                return polynomial().hasConstantTerm();
+                return polynomial().has_constant_term();
             TermType result( mCoefficient );
             for( const auto& factor : content().factorization() )
             {
-                if( !factor.first.hasConstantTerm() )
+                if( !factor.first.has_constant_term() )
                 {
-                    assert( !computePolynomial(*this).hasConstantTerm() );
+                    assert( !computePolynomial(*this).has_constant_term() );
                     return false;
                 }
             }
-            assert( computePolynomial(*this).hasConstantTerm() );
+            assert( computePolynomial(*this).has_constant_term() );
             return true;
         }
         return !carl::is_zero( mCoefficient );
@@ -438,27 +438,27 @@ namespace carl
     
     template<typename P>
     template<bool gatherCoeff>
-    VariableInformation<gatherCoeff, FactorizedPolynomial<P>> FactorizedPolynomial<P>::getVarInfo(Variable var) const
+    VarInfo<FactorizedPolynomial<P>> FactorizedPolynomial<P>::var_info(Variable var) const
     {
         // TODO: Maybe we should use the factorization for collecting degrees and coefficients.
-        VariableInformation<gatherCoeff, P> vi = polynomial().template getVarInfo<gatherCoeff>( var );
+        VarInfo<P> vi = carl::var_info(polynomial(), var, gatherCoeff);
         if( gatherCoeff )
         {
             std::map<unsigned,FactorizedPolynomial<P>> coeffs;
             for( auto const& expCoeffPair : vi.coeffs() )
             {
-                if( expCoeffPair.second.isConstant() )
+                if( expCoeffPair.second.is_constant() )
                 {
-                    coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constantPart() * mCoefficient ) ) );
+                    coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constant_part() * mCoefficient ) ) );
                 }
                 else
                 {
                     coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) * mCoefficient ) );
                 }
             }
-            return VariableInformation<gatherCoeff, FactorizedPolynomial<P>>( vi.maxDegree(), vi.minDegree(), vi.occurence(), std::move( coeffs ) );
+            return VarInfo<FactorizedPolynomial<P>>( vi.max_degree(), vi.min_degree(), vi.num_occurences(), std::move( coeffs ) );
         }
-        return VariableInformation<false, FactorizedPolynomial<P>>( vi.maxDegree(), vi.minDegree(), vi.occurence() );
+        return VarInfo<FactorizedPolynomial<P>>( vi.max_degree(), vi.min_degree(), vi.num_occurences() );
 
     }
     
@@ -546,7 +546,7 @@ namespace carl
     FactorizedPolynomial<P> FactorizedPolynomial<P>::derivative( const carl::Variable& _var, unsigned _nth ) const
     {
 		assert(_nth == 1);
-		if (this->isConstant()) {
+		if (this->is_constant()) {
 			return FactorizedPolynomial<P>( constant_zero<CoeffType>::get() );
 		}
 		// TODO VERY NAIVE
@@ -626,18 +626,18 @@ namespace carl
         static_assert(is_field_type<CoeffType>::value, "Division only defined for field coefficients");
         if( _divisor.is_one() || this->is_zero() )
             return DivisionResult<FactorizedPolynomial<P>>( *this, FactorizedPolynomial<P>() );
-        if( this->isConstant() && _divisor.isConstant() )
+        if( this->is_constant() && _divisor.is_constant() )
             return DivisionResult<FactorizedPolynomial<P>>( FactorizedPolynomial<P>( this->coefficient()/_divisor.coefficient() ), FactorizedPolynomial<P>() );
-        else if( _divisor.isConstant() )
+        else if( _divisor.is_constant() )
             return DivisionResult<FactorizedPolynomial<P>>( (*this)/_divisor.coefficient(), FactorizedPolynomial<P>() );
-        else if( this->isConstant() )
+        else if( this->is_constant() )
             return DivisionResult<FactorizedPolynomial<P>>( FactorizedPolynomial<P>(), *this );
         std::pair<FactorizedPolynomial<P>,FactorizedPolynomial<P>> ret = lazyDiv( *this, _divisor );
         // TODO: maybe apply gcd, which might make this operation more expensive but a long-term investment
         DivisionResult<P> dr = ret.first.polynomial().divideBy( ret.second.polynomial() );
         // TODO: Could we calculate the quotient and remainder directly on the factorizations?
-        FactorizedPolynomial<P> q = dr.quotient.isConstant() ? FactorizedPolynomial<P>( dr.quotient.constantPart() ) : FactorizedPolynomial<P>( dr.quotient, mpCache );
-        FactorizedPolynomial<P> r = dr.remainder.isConstant() ? FactorizedPolynomial<P>( dr.remainder.constantPart() ) : FactorizedPolynomial<P>( dr.remainder, mpCache );
+        FactorizedPolynomial<P> q = dr.quotient.is_constant() ? FactorizedPolynomial<P>( dr.quotient.constant_part() ) : FactorizedPolynomial<P>( dr.quotient, mpCache );
+        FactorizedPolynomial<P> r = dr.remainder.is_constant() ? FactorizedPolynomial<P>( dr.remainder.constant_part() ) : FactorizedPolynomial<P>( dr.remainder, mpCache );
         return DivisionResult<FactorizedPolynomial<P>>( q, r );
     }
     
@@ -826,8 +826,8 @@ namespace carl
         }
         else
         {
-            if ( sum.isConstant() )
-                coefficientCommon *= sum.constantPart();
+            if ( sum.is_constant() )
+                coefficientCommon *= sum.constant_part();
             else
             {
                 FactorizedPolynomial<P> fpolySum( sum, _lhs.pCache() );

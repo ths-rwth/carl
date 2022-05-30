@@ -48,7 +48,7 @@ namespace carl {
 			res = bvt.value();
 		} else {
 			CARL_LOG_ERROR("carl.model.evaluation", "Evaluation of bitvector term did not result in a constant but " << bvt << ".");
-			assert(bvt.isConstant());
+			assert(bvt.is_constant());
 		}
 	}
 	

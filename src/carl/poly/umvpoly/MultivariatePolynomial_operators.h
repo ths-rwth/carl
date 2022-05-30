@@ -16,8 +16,8 @@ template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	// Try to avoid sorting
 	if (&lhs == &rhs) return true;
-	if (lhs.nrTerms() != rhs.nrTerms()) return false;
-	if (lhs.nrTerms() == 0) return true;
+	if (lhs.nr_terms() != rhs.nr_terms()) return false;
+	if (lhs.nr_terms() == 0) return true;
 #ifdef THREAD_SAFE
 	static std::mutex mutex;
 	std::lock_guard<std::mutex> lock(mutex);
@@ -40,28 +40,28 @@ inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Multivari
 template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
 	if (is_zero(lhs) && is_zero(rhs)) return true;
-	if (lhs.nrTerms() > 1) return false;
+	if (lhs.nr_terms() > 1) return false;
 	return lhs.lterm() == rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
-	if (lhs.nrTerms() != 1) return false;
+	if (lhs.nr_terms() != 1) return false;
 	if (lhs.lmon() != rhs) return false;
 	return carl::is_one(lhs.lcoeff());
 }
 template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable rhs) {
-	if (lhs.nrTerms() != 1) return false;
+	if (lhs.nr_terms() != 1) return false;
 	if (lhs.lmon() != rhs) return false;
 	return carl::is_one(lhs.lcoeff());
 }
 template<typename C, typename O, typename P>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-	return lhs.isConstant() && lhs.constantPart() == rhs;
+	return lhs.is_constant() && lhs.constant_part() == rhs;
 }
 template<typename C, typename O, typename P, DisableIf<std::is_integral<C>> = dummy>
 inline bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs) {
-	return lhs.isConstant() && lhs.constantPart() == rhs;
+	return lhs.is_constant() && lhs.constant_part() == rhs;
 }
 template<typename C, typename O, typename P>
 inline bool operator==(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
@@ -176,8 +176,8 @@ inline bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Multivaria
 	if (is_zero(lhs) && is_zero(rhs)) return false;
 	if (is_zero(lhs)) return true;
 	if (is_zero(rhs)) return false;
-	if (lhs.totalDegree() != rhs.totalDegree()) return lhs.totalDegree() < rhs.totalDegree();
-	if (lhs.totalDegree() == 0) return lhs.constantPart() < rhs.constantPart();
+	if (lhs.total_degree() != rhs.total_degree()) return lhs.total_degree() < rhs.total_degree();
+	if (lhs.total_degree() == 0) return lhs.constant_part() < rhs.constant_part();
 	if (lhs.lterm() < rhs.lterm()) return true;
 	if (lhs.lterm() > rhs.lterm()) return false;
 	// We have to sort now.
@@ -216,21 +216,21 @@ template<typename C, typename O, typename P>
 inline bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (is_zero(rhs)) return lhs < carl::constant_zero<C>().get();
 	if (lhs < rhs.lterm()) return true;
-	if (lhs == rhs.lterm()) return rhs.nrTerms() > 1;
+	if (lhs == rhs.lterm()) return rhs.nr_terms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (is_zero(rhs)) return false;
 	if (lhs < rhs.lterm()) return true;
-	if (lhs == rhs.lterm()) return rhs.nrTerms() > 1;
+	if (lhs == rhs.lterm()) return rhs.nr_terms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 inline bool operator<(Variable lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (is_zero(rhs)) return false;
 	if (lhs < rhs.lterm()) return true;
-	if (lhs == rhs.lterm()) return rhs.nrTerms() > 1;
+	if (lhs == rhs.lterm()) return rhs.nr_terms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>

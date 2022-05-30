@@ -15,19 +15,19 @@ namespace carl {
  *         false, otherwise.
  */
 template<typename Pol>
-std::optional<std::pair<Variable, Pol>> get_substitution(const BasicConstraint<Pol>& c, bool _negated = false, Variable _exclude = carl::Variable::NO_VARIABLE, std::optional<VariablesInformation<true, Pol>> var_info = std::nullopt) {
+std::optional<std::pair<Variable, Pol>> get_substitution(const BasicConstraint<Pol>& c, bool _negated = false, Variable _exclude = carl::Variable::NO_VARIABLE, std::optional<VarsInfo<Pol>> var_info = std::nullopt) {
 	if (var_info == std::nullopt) {
-		var_info = c.lhs().template getVarInfo<true>();
+		var_info = carl::vars_info(c.lhs(), true);
 	}
 	if ((!_negated && c.relation() != Relation::EQ) || (_negated && c.relation() != Relation::NEQ))
 		return std::nullopt;
 	for (const auto& e : *var_info) {
 		if (e.first == _exclude) continue;
-		if (e.second.maxDegree() == 1) {
+		if (e.second.max_degree() == 1) {
 			auto d = e.second.coeffs().find(1);
 			assert(d != e.second.coeffs().end());
-			if (d->second.isConstant() && (e.first.type() != carl::VariableType::VT_INT || carl::is_one(carl::abs(d->second.constantPart())))) {
-				return std::make_pair(e.first, (Pol(e.first) * d->second - c.lhs()) / d->second.constantPart());
+			if (d->second.is_constant() && (e.first.type() != carl::VariableType::VT_INT || carl::is_one(carl::abs(d->second.constant_part())))) {
+				return std::make_pair(e.first, (Pol(e.first) * d->second - c.lhs()) / d->second.constant_part());
 			}
 		}
 	}
@@ -37,15 +37,15 @@ std::optional<std::pair<Variable, Pol>> get_substitution(const BasicConstraint<P
 template<typename Pol>
 std::optional<std::pair<Variable, typename Pol::NumberType>> get_assignment(const BasicConstraint<Pol>& c) {
 	if (c.relation() != Relation::EQ) return std::nullopt;
-	if (c.lhs().nrTerms() > 2) return std::nullopt;
-	if (c.lhs().nrTerms() == 0) return std::nullopt;
-	if (!c.lhs().lterm().isSingleVariable()) return std::nullopt;
-	if (c.lhs().nrTerms() == 1) {
-		return std::make_pair(c.lhs().lterm().getSingleVariable(),0);
+	if (c.lhs().nr_terms() > 2) return std::nullopt;
+	if (c.lhs().nr_terms() == 0) return std::nullopt;
+	if (!c.lhs().lterm().is_single_variable()) return std::nullopt;
+	if (c.lhs().nr_terms() == 1) {
+		return std::make_pair(c.lhs().lterm().single_variable(),0);
 	}
-	assert(c.lhs().nrTerms() == 2);
-	if (!c.lhs().trailingTerm().isConstant()) return std::nullopt;
-	return std::make_pair(c.lhs().lterm().getSingleVariable(), -c.lhs().trailingTerm().coeff() / c.lhs().lterm().coeff());
+	assert(c.lhs().nr_terms() == 2);
+	if (!c.lhs().trailingTerm().is_constant()) return std::nullopt;
+	return std::make_pair(c.lhs().lterm().single_variable(), -c.lhs().trailingTerm().coeff() / c.lhs().lterm().coeff());
 }
 
 }

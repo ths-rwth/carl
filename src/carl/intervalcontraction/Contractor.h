@@ -95,8 +95,8 @@ public:
 		assert(p.has(v));
 		mRoot = p.degree(v);
 		for (const auto& t: p) {
-			if (t.monomial() && t.monomial()->exponentOfVariable(v) == mRoot) {
-				mDenominator += t.dropVariable(v);
+			if (t.monomial() && t.monomial()->exponent_of_variable(v) == mRoot) {
+				mDenominator += t.drop_variable(v);
 			} else {
 				mNumerator -= t;
 			}

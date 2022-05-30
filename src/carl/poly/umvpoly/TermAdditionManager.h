@@ -149,7 +149,7 @@ public:
 		for (std::size_t i = 1; i < terms.size(); i++) {
 			if (Ordering::less(terms[max], terms[i])) max = i;
 		}
-		assert(!terms[max].isConstant() || is_zero(terms[max]));
+		assert(!terms[max].is_constant() || is_zero(terms[max]));
 		if (is_zero(terms[max])) return TermType(std::get<3>(data));
 		else return terms[max];
 	}

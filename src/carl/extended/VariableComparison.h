@@ -38,7 +38,7 @@ namespace carl {
 	public:
 		VariableComparison(Variable v, const std::variant<MR, RAN>& value, Relation rel, bool neg): m_var(v), m_value(value), m_relation(rel), m_negated(neg) {}
 		VariableComparison(Variable v, const MR& value, Relation rel): m_var(v), m_value(value), m_relation(rel), m_negated(false) {
-			if (value.isUnivariate()) {
+			if (value.is_univariate()) {
 			  // If the value of type MultivariateRoot is really just univariate, we convert it to an algebraic real.
 				auto res = evaluate(value, carl::Assignment<RAN>({}));
 				if (res) {
@@ -77,7 +77,7 @@ namespace carl {
 				if (mr.poly().degree(mr.var()) != 1) return std::nullopt;
 				if (mr.k() != 1) return std::nullopt;
 				auto lcoeff = mr.poly().coeff(mr.var(), 1);
-				if (!lcoeff.isConstant()) return std::nullopt;
+				if (!lcoeff.is_constant()) return std::nullopt;
 				auto ccoeff = mr.poly().coeff(mr.var(), 0);
 				return BasicConstraint<Poly>(Poly(m_var) + ccoeff / lcoeff, rel);
 			}

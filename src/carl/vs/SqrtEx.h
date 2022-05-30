@@ -66,7 +66,7 @@ namespace carl
             /**
              * @return A constant reference to the constant part of this square root expression.
              */
-            const Poly& constantPart() const
+            const Poly& constant_part() const
             {
                 return m_constant_part;
             }
@@ -110,7 +110,7 @@ namespace carl
              */
             bool is_polynomial() const
             {
-                return carl::is_zero(m_factor) && m_denominator.isConstant();
+                return carl::is_zero(m_factor) && m_denominator.is_constant();
             }
 
             /**
@@ -120,16 +120,16 @@ namespace carl
             {
                 assert( is_polynomial() );
                 assert( !carl::is_zero(m_denominator) );
-                return m_constant_part / m_denominator.constantPart();
+                return m_constant_part / m_denominator.constant_part();
             }
 
             /**
              * @return true, if there is no variable in this square root expression;
              *          false, otherwise.
              */
-            bool isConstant() const
+            bool is_constant() const
             {
-                return m_constant_part.isConstant() && m_denominator.isConstant() && m_factor.isConstant() && m_radicand.isConstant();
+                return m_constant_part.is_constant() && m_denominator.is_constant() && m_factor.is_constant() && m_radicand.is_constant();
             }
             
             /**
@@ -137,8 +137,8 @@ namespace carl
              */
             Rational asConstant() const
             {
-                assert( isConstant() );
-                return m_constant_part.constantPart();
+                assert( is_constant() );
+                return m_constant_part.constant_part();
             }
 
             /**
@@ -147,7 +147,7 @@ namespace carl
              */
             bool isRational() const
             {
-                return m_constant_part.isConstant() && m_denominator.isConstant() && carl::is_zero(m_radicand);
+                return m_constant_part.is_constant() && m_denominator.is_constant() && carl::is_zero(m_radicand);
             }
             
             /**
@@ -155,10 +155,10 @@ namespace carl
              */
             Rational asRational() const
             {
-                if( isConstant() )
+                if( is_constant() )
                     return asConstant();
                 assert( isRational() );
-                return m_constant_part.constantPart()/m_factor.constantPart();
+                return m_constant_part.constant_part()/m_factor.constant_part();
             }
             
         private:
@@ -178,7 +178,7 @@ namespace carl
             bool is_integer() const
             {
                 return carl::is_zero(radicand()) && carl::is_one(denominator()) && 
-                       (carl::is_zero(constantPart()) || (constantPart().isConstant() && carl::is_integer( constantPart().lcoeff() ) ) );
+                       (carl::is_zero(constant_part()) || (constant_part().is_constant() && carl::is_integer( constant_part().lcoeff() ) ) );
             }
             
             /**
@@ -249,7 +249,7 @@ namespace carl
 
     template<typename Poly>
     void variables(const SqrtEx<Poly>& ex, carlVariables& vars) {
-        variables(ex.constantPart(), vars);
+        variables(ex.constant_part(), vars);
         variables(ex.factor(), vars);
         variables(ex.denominator(), vars);
         variables(ex.radicand(), vars);
@@ -272,7 +272,7 @@ namespace std
          */
         std::size_t operator()( const carl::SqrtEx<Poly>& _sqrtEx ) const 
         {
-            return ((hash<Poly>()(_sqrtEx.radicand()) ^ hash<Poly>()(_sqrtEx.denominator())) ^ hash<Poly>()(_sqrtEx.factor())) ^ hash<Poly>()(_sqrtEx.constantPart());
+            return ((hash<Poly>()(_sqrtEx.radicand()) ^ hash<Poly>()(_sqrtEx.denominator())) ^ hash<Poly>()(_sqrtEx.factor())) ^ hash<Poly>()(_sqrtEx.constant_part());
         }
     };
 } // namespace std

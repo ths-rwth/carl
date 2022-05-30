@@ -14,7 +14,7 @@ namespace carl
 		CARL_LOG_TRACE("carl.core.monomial", "Freeing " << *this);
 		MonomialPool::getInstance().free(this);
 	}
-	Monomial::Arg Monomial::dropVariable(Variable v) const
+	Monomial::Arg Monomial::drop_variable(Variable v) const
 	{
 		///@todo this should work on the shared_ptr directly. Then we could directly return this shared_ptr instead of the ugly copying.
 		CARL_LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
@@ -154,8 +154,8 @@ namespace carl
 		if (!lhs) return rhs;
 		if (!rhs) return lhs;
 		CARL_LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
-		assert(lhs->isConsistent());
-		assert(rhs->isConsistent());
+		assert(lhs->is_consistent());
+		assert(rhs->is_consistent());
 
 		Content newExps;
 		std::size_t expsum = lhs->tdeg() + rhs->tdeg();
@@ -204,7 +204,7 @@ namespace carl
 		return result;
 	}
 	
-	bool Monomial::isConsistent() const
+	bool Monomial::is_consistent() const
 	{
 		CARL_LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree << ", " << mHash);
 		if (mTotalDegree < 1) return false;
@@ -265,8 +265,8 @@ namespace carl
 			return lhs;
 		assert( rhs->tdeg() > 0 );
 		assert( lhs->tdeg() > 0 );
-		assert(lhs->isConsistent());
-		assert(rhs->isConsistent());
+		assert(lhs->is_consistent());
+		assert(rhs->is_consistent());
 		Monomial::Content newExps;
 		newExps.reserve(lhs->exponents().size() + rhs->exponents().size());
 

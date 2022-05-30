@@ -41,7 +41,7 @@ public:
 	/**
 	 * @return true, if the stored value is a variable.
 	 */
-	bool isVariable() const {
+	bool is_variable() const {
 		return std::holds_alternative<carl::Variable>(mData);
 	}
 
@@ -70,7 +70,7 @@ public:
 	 * @return The stored value as a variable.
 	 */
 	carl::Variable asVariable() const {
-		assert(isVariable());
+		assert(is_variable());
 		return std::get<carl::Variable>(mData);
 	}
 

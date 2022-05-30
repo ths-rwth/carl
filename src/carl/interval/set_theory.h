@@ -14,7 +14,7 @@ namespace carl {
  */
 template<typename Number>
 bool set_complement(const Interval<Number>& interval, Interval<Number>& resA, Interval<Number>& resB) {
-	assert(interval.isConsistent());
+	assert(interval.is_consistent());
 
 	if (interval.lower_bound_type() == BoundType::INFTY) {
 		if (interval.upper_bound_type() == BoundType::INFTY) {
@@ -50,7 +50,7 @@ bool set_complement(const Interval<Number>& interval, Interval<Number>& resA, In
  */
 template<typename Number>
 bool set_difference(const Interval<Number>& lhs, const Interval<Number>& rhs, Interval<Number>& resA, Interval<Number>& resB) {
-	assert(lhs.isConsistent() && rhs.isConsistent());
+	assert(lhs.is_consistent() && rhs.is_consistent());
 
 	if (rhs.is_empty()) {
 		resA = lhs;
@@ -97,7 +97,7 @@ bool set_difference(const Interval<Number>& lhs, const Interval<Number>& rhs, In
  */
 template<typename Number>
 Interval<Number> set_intersection(const Interval<Number>& lhs, const Interval<Number>& rhs) {
-	assert(lhs.isConsistent() && rhs.isConsistent());
+	assert(lhs.is_consistent() && rhs.is_consistent());
 
 	if (lhs.lower_bound() < rhs.lower_bound()) {
 		if (lhs.upper_bound() < rhs.upper_bound()) {
@@ -126,7 +126,7 @@ bool set_have_intersection(const Interval<Number>& lhs, const Interval<Number>& 
  */
 template<typename Number>
 bool set_is_proper_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
-	assert(lhs.isConsistent() && rhs.isConsistent());
+	assert(lhs.is_consistent() && rhs.is_consistent());
 
 	if (lhs.is_empty()) return !rhs.is_empty();
 	if (lhs.lower_bound() < rhs.lower_bound()) return false;
@@ -141,7 +141,7 @@ bool set_is_proper_subset(const Interval<Number>& lhs, const Interval<Number>& r
  */
 template<typename Number>
 bool set_is_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
-	assert(lhs.isConsistent() && rhs.isConsistent());
+	assert(lhs.is_consistent() && rhs.is_consistent());
 
 	if (lhs.is_empty()) return true;
 	if (lhs.lower_bound() < rhs.lower_bound()) return false;
@@ -160,7 +160,7 @@ bool set_is_subset(const Interval<Number>& lhs, const Interval<Number>& rhs) {
  */
 template<typename Number>
 bool set_symmetric_difference(const Interval<Number>& lhs, const Interval<Number>& rhs, Interval<Number>& resA, Interval<Number>& resB) {
-	assert(lhs.isConsistent() && rhs.isConsistent());
+	assert(lhs.is_consistent() && rhs.is_consistent());
 
 	auto intersection = set_intersection(lhs, rhs);
 	if (intersection.is_empty()) {
@@ -185,7 +185,7 @@ bool set_symmetric_difference(const Interval<Number>& lhs, const Interval<Number
  */
 template<typename Number>
 bool set_union(const Interval<Number>& lhs, const Interval<Number>& rhs, Interval<Number>& resA, Interval<Number>& resB) {
-	assert(lhs.isConsistent() && rhs.isConsistent());
+	assert(lhs.is_consistent() && rhs.is_consistent());
 
 	if (carl::bounds_connect(lhs.upper_bound(), rhs.lower_bound())) {
 		resA = Interval<Number>(lhs.lower_bound(), rhs.upper_bound());

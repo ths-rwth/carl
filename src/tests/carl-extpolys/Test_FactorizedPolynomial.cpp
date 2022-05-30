@@ -181,7 +181,7 @@ TEST(FactorizedPolynomial, Construction)
     FPol fpQuo = quotient( fpB, fpA );
     EXPECT_EQ( fpQuo, fpz );
     FPol fpBc3 = quotient( fpB, fc3 );
-    EXPECT_EQ( fpBc3.constantPart(), -1/2 );
+    EXPECT_EQ( fpBc3.constant_part(), -1/2 );
     EXPECT_EQ( fpBc3.polynomial(), fB );
     FPol fpc4A = quotient( fc4, fpA );
     EXPECT_EQ( fpc4A, fc4 );
@@ -252,9 +252,9 @@ TEST(FactorizedPolynomial, Coefficient)
     FPol fpC = fpA * fpB;
 
     EXPECT_EQ(fpc3.coefficient(), -20);
-    EXPECT_EQ(fpc3.constantPart(), -20);
+    EXPECT_EQ(fpc3.constant_part(), -20);
     EXPECT_EQ(fpC.coefficient(), 12);
-    EXPECT_EQ(fpC.constantPart(), 0);
+    EXPECT_EQ(fpC.constant_part(), 0);
 }
 
 TEST(FactorizedPolynomial, CommonDivisor)
@@ -594,8 +594,8 @@ TEST(FactorizedPolynomial, Substitution)
     substitution[x] = 3;
 
     FPol result = carl::substitute(fpc, substitution);
-    EXPECT_TRUE( result.isConstant() );
-    EXPECT_EQ( Rational(-3), result.constantPart() );
+    EXPECT_TRUE( result.is_constant() );
+    EXPECT_EQ( Rational(-3), result.constant_part() );
     EXPECT_EQ( Rational(-3), result );
     result = carl::substitute(fp1, substitution);
     EXPECT_EQ( Rational(18), result );

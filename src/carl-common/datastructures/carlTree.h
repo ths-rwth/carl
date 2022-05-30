@@ -796,7 +796,7 @@ public:
 	template<typename Iterator>
 	Iterator append(Iterator parent, const T& data) {
 		std::size_t id = createNode(data, parent.current, nodes[parent.current].depth + 1);
-		assert(isConsistent());
+		assert(is_consistent());
 		return Iterator(this, id);
 	}
 
@@ -824,7 +824,7 @@ public:
 		} else {
 			nodes[parent].firstChild = newID;
 		}
-		assert(isConsistent());
+		assert(is_consistent());
 		return PreorderIterator<false>(this, newID);
 	}
 
@@ -853,7 +853,7 @@ public:
 		if (id > 0) r->previousSibling = &(position.current->children.back());
 		position.current->children.push_back(*r);
 		if (id > 0) r->previousSibling->nextSibling = &(position.current->children.back());
-		assert(isConsistent());
+		assert(is_consistent());
 		return Iterator(&(position.current->children.back()));
 	}
 
@@ -871,7 +871,7 @@ public:
 	 */
 	template<typename Iterator>
 	Iterator erase(Iterator position) {
-		assert(this->isConsistent());
+		assert(this->is_consistent());
 		std::size_t id = position.current;
 		if (id == 0) {
 			clear();
@@ -890,7 +890,7 @@ public:
 			nodes[nodes[id].parent].firstChild = nodes[id].nextSibling;
 		}
 		eraseNode(id);
-		assert(this->isConsistent());
+		assert(this->is_consistent());
 		return position;
 	}
 	/**
@@ -951,13 +951,13 @@ private:
 	}
 
 public:
-	bool isConsistent() const {
+	bool is_consistent() const {
 		for (auto it = this->begin(); it != this->end(); ++it) {
-			assert(isConsistent(it.current));
+			assert(is_consistent(it.current));
 		}
 		return true;
 	}
-	bool isConsistent(std::size_t node) const {
+	bool is_consistent(std::size_t node) const {
 		assert(node != MAXINT);
 		assert(node < nodes.size());
 		if (nodes[node].firstChild != MAXINT) {

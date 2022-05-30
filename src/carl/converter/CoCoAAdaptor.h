@@ -212,7 +212,7 @@ public:
 	}
 	
 	Poly gcd(const Poly& p1, const Poly& p2) const {
-		auto start = CARL_TIME_START();
+		CARL_TIME_START(start);
 		auto res = convert(cocoawrapper::gcd(convert(p1), convert(p2)));
 		CARL_TIME_FINISH(cocoa::statistics().gcd, start);
 		return res;
@@ -238,7 +238,7 @@ public:
 	 * the exponents.
 	 */
 	Factors<Poly> factorize(const Poly& p, bool includeConstant = true) const {
-		auto start = CARL_TIME_START();
+		CARL_TIME_START(start);
 		auto finfo = cocoawrapper::factor(convert(p));
 		Factors<Poly> res;
 		if (includeConstant && !CoCoA::IsOne(finfo.myRemainingFactor())) {
@@ -275,7 +275,7 @@ public:
 	}
 
 	auto GBasis(const std::vector<Poly>& p) const {
-		auto start = CARL_TIME_START();
+		CARL_TIME_START(start);
 		auto res = convert(cocoawrapper::ReducedGBasis(convert(p)));
 		CARL_TIME_FINISH(cocoa::statistics().gbasis, start);
 		return res;

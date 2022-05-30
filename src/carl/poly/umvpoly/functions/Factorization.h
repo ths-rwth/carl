@@ -32,7 +32,7 @@ namespace helper {
 			CARL_LOG_WARN("carl.core.factorize", "The factorization had an incorrect sign, correct it.");
 			CARL_LOG_WARN("carl.core.factorize", reference << " -> " << factors);
 			MultivariatePolynomial<C,O,P> factor(-1);
-			auto it = std::find_if(factors.begin(), factors.end(), [](const auto& f){ return f.first.isConstant(); });
+			auto it = std::find_if(factors.begin(), factors.end(), [](const auto& f){ return f.first.is_constant(); });
 			if (it != factors.end()) {
 				assert(it->second == 1);
 				factor *= it->first;
@@ -53,13 +53,13 @@ namespace helper {
  */
 template<typename C, typename O, typename P>
 Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomial<C,O,P>& p, bool includeConstants = true) {
-	if (p.totalDegree() == 0) {
+	if (p.total_degree() == 0) {
 		if (includeConstants) {
 			return helper::trivialFactorization(p);
 		} else {
 			return {};
 		}
-	} else if (p.totalDegree() == 1) {
+	} else if (p.total_degree() == 1) {
 		return helper::trivialFactorization(p);
 	}
 
@@ -95,13 +95,13 @@ bool is_trivial(const Factors<MultivariatePolynomial<C,O,P>>& f) {
  */
 template<typename C, typename O, typename P>
 std::vector<MultivariatePolynomial<C,O,P>> irreducibleFactors(const MultivariatePolynomial<C,O,P>& p, bool includeConstants = true) {
-	if (p.totalDegree() == 0) {
+	if (p.total_degree() == 0) {
 		if (includeConstants) {
 			return {p};
 		} else {
 			return {};
 		}
-	} else if (p.totalDegree() == 1) {
+	} else if (p.total_degree() == 1) {
 		return {p};
 	}
 

@@ -123,9 +123,9 @@ public:
 	 * Checks whether the current representants of the GB contain a constant polynomial.
      * @return 
      */
-	bool basisIsConstant() const
+	bool basisis_constant() const
 	{
-		return getIdeal().isConstant();
+		return getIdeal().is_constant();
 	}
 	
 	/**

@@ -17,7 +17,7 @@ std::vector<T> solveDiophantine(MultivariatePolynomial<T>& p) {
         res = std::vector<T>();
 	
         // use an algorithm for linear equations only
-        if(p.isLinear()) {
+        if(p.is_linear()) {
             res = solveLinearDiophantine(p);  
         }
         else {
@@ -30,22 +30,22 @@ std::vector<T> solveDiophantine(MultivariatePolynomial<T>& p) {
 // Finds a single solution of a linear diophantine Equation
 template<typename T>
 std::vector<T> solveLinearDiophantine(MultivariatePolynomial<T>& equation) {
-    assert(equation.isLinear());
-    //assert(!equation.isConstant());
+    assert(equation.is_linear());
+    //assert(!equation.is_constant());
     //assert(equation.hatConstantTerm()); // change this later
     
     std::vector<T> res;
     
     // if there is no constant part return the trivial solution
-    if(!equation.hasConstantTerm()){
+    if(!equation.has_constant_term()){
         res = std::vector<T>(carl::variables(equation).size(), 0);
         return res;
     }
     
-    T const_part = equation.constantPart();
+    T const_part = equation.constant_part();
     
     // initialize coefficient vector
-    std::vector<carl::Term<T>> terms = equation.getTerms();
+    std::vector<carl::Term<T>> terms = equation.terms();
     std::vector<T> coeffs = std::vector<T>();
     for(std::size_t i = 1; i < terms.size(); i++ ) { // terms[0] is the constant part
         coeffs.push_back(terms[i].coeff());

@@ -47,7 +47,7 @@ public:
         TarskiQueryManager(InputIt first, InputIt last) {
                 CARL_LOG_TRACE("carl.thom.tarski.manager", "setting up a taq manager on " << std::vector<Polynomial>(first, last));
                 // univariate manager
-                if(std::distance(first, last) == 1 && first->isUnivariate()) {
+                if(std::distance(first, last) == 1 && first->is_univariate()) {
                         CARL_LOG_TRACE("carl.thom.tarski.manager", "as a UNIVARIATE manager");
                         mZ = carl::to_univariate_polynomial(*first);
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", !carl::is_zero(mZ), "");
@@ -86,9 +86,9 @@ public:
                 
                 // univariate manager
                 if(this->isUnivariateManager()) {
-                        CARL_LOG_ASSERT("carl.thom.tarski.manager", p.isUnivariate(), "");
+                        CARL_LOG_ASSERT("carl.thom.tarski.manager", p.is_univariate(), "");
                         UnivariatePolynomial<Number> pUniv(Variable::NO_VARIABLE);
-                        if(p.isConstant()) pUniv = UnivariatePolynomial<Number>(mZ.mainVar(), p.lcoeff());
+                        if(p.is_constant()) pUniv = UnivariatePolynomial<Number>(mZ.mainVar(), p.lcoeff());
                         else pUniv = carl::to_univariate_polynomial(p);
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", pUniv.mainVar() == mZ.mainVar(),
                                 "cannot compute tarski query of " << p << " on " << mZ);

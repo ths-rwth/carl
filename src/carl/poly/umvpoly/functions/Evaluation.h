@@ -39,7 +39,7 @@ SubstitutionType evaluate(const MultivariatePolynomial<C,O,P>& p, const std::map
 		return constant_zero<SubstitutionType>::get();
 	} else {
 		SubstitutionType result(evaluate(p[0], substitutions)); 
-		for (unsigned i = 1; i < p.nrTerms(); ++i) {
+		for (unsigned i = 1; i < p.nr_terms(); ++i) {
 			result += evaluate(p[i], substitutions);
 		}
 		return result;

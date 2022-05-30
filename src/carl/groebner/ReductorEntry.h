@@ -82,10 +82,10 @@ public:
      */
     void removeLeadingTerm()
     {
-        assert(mTail.nrTerms() != 0);
+        assert(mTail.nr_terms() != 0);
 		assert(!carl::is_zero(mMultiple));
 		mLead = mMultiple * mTail.lterm();
-        mTail.stripLT();
+        mTail.strip_lterm();
     }
 
     /**
@@ -103,7 +103,7 @@ public:
 			mLead = Term<Coeff>(newCoeff, mLead->monomial());
             return false;
         }
-        else if(mTail.nrTerms() != 0)
+        else if(mTail.nr_terms() != 0)
         {
             removeLeadingTerm();
         }

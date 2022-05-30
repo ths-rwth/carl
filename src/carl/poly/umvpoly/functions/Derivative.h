@@ -87,7 +87,7 @@ MultivariatePolynomial<C,O,P> derivative(const MultivariatePolynomial<C,O,P>& p,
 {
 	// Check for trivial cases.
 	if (n == 0) return p;
-	if (p.isConstant()) return MultivariatePolynomial<C,O,P>();
+	if (p.is_constant()) return MultivariatePolynomial<C,O,P>();
 
 	typename MultivariatePolynomial<C,O,P>::TermsType newTerms;
 	for (const auto& t: p) {

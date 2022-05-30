@@ -25,7 +25,7 @@ public:
 	
 	bool addToGb(const Polynomial& p, std::shared_ptr<Ideal<Polynomial>> gb, UpdateFnc* update)
 	{
-		if(p.isConstant())
+		if(p.is_constant())
 		{
 			gb->clear();
 			Polynomial q(1);
@@ -61,7 +61,7 @@ public:
 	
 	bool addToGb(const Polynomial& p, std::shared_ptr<Ideal<Polynomial>> gb, UpdateFnc* update)
 	{
-		if(p.isConstant())
+		if(p.is_constant())
 		{
 			gb->clear();
 			Polynomial q(1);
@@ -69,9 +69,9 @@ public:
 			gb->addGenerator(q);
 			return true;
 		}
-		else if(p.nrTerms() == 1)
+		else if(p.nr_terms() == 1)
 		{
-			assert(!p.isConstant());
+			assert(!p.is_constant());
 			Polynomial q(carl::separable_part(*p.lmon()));
 #ifdef BUCHBERGER_STATISTICS
 			if(q.lterm().tdeg() != p.lterm().tdeg()) mStats->SingleTermSFP();
@@ -80,9 +80,9 @@ public:
 			size_t index = gb->addGenerator(q);
 			(*update)(index);
 		}
-		else if(p.isTsos())
+		else if(p.is_tsos())
 		{
-			if(p.hasConstantTerm())
+			if(p.has_constant_term())
 			{
 #ifdef BUCHBERGER_STATISTICS
 				if(p.nrOfTerms() > 1) mStats->TSQWithConstant();
@@ -106,13 +106,13 @@ public:
 					if(remainder.lterm().tdeg() != r1.lterm().tdeg()) mStats->SingleTermSFP();
 #endif
 					r1.setReasons(p.getReasons());
-					remainder.stripLT();
+					remainder.strip_lterm();
 					size_t index = gb->addGenerator(r1);
 					(*update)(index);
 				}
 			}
 		}
-		else if(p.isReducibleIdentity())
+		else if(p.is_reducible_identity())
 		{
 #ifdef BUCHBERGER_STATISTICS
 			mStats->ReducibleIdentity();

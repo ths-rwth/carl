@@ -104,16 +104,16 @@ public:
 		}
 	}
 
-	bool isConstant() const {
+	bool is_constant() const {
 		return mLhs.isInvalid() && mRhs.isInvalid();
 	}
 
 	bool isAlwaysConsistent() const {
-		return isConstant() && mRelation == BVCompareRelation::EQ;
+		return is_constant() && mRelation == BVCompareRelation::EQ;
 	}
 
 	bool isAlwaysInconsistent() const {
-		return isConstant() && mRelation == BVCompareRelation::NEQ;
+		return is_constant() && mRelation == BVCompareRelation::NEQ;
 	}
 };
 

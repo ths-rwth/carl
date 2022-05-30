@@ -9,11 +9,11 @@ SqrtEx<Poly> substitute( const SqrtEx<Poly>& sqrt_ex, const std::map<Variable, t
     using Rational = typename SqrtEx<Poly>::Rational;
     Poly radicandEvaluated = carl::substitute(sqrt_ex.radicand(), eval_map );
     Poly factorEvaluated = carl::substitute(sqrt_ex.factor(), eval_map );
-    Poly constantPartEvaluated = carl::substitute(sqrt_ex.constantPart(), eval_map );
+    Poly constantPartEvaluated = carl::substitute(sqrt_ex.constant_part(), eval_map );
     Poly denomEvaluated = carl::substitute(sqrt_ex.denominator(), eval_map );
-    assert( !denomEvaluated.isConstant() || !carl::is_zero( denomEvaluated.constantPart() ) );
+    assert( !denomEvaluated.is_constant() || !carl::is_zero( denomEvaluated.constant_part() ) );
     Rational sqrtExValue;
-    if( radicandEvaluated.isConstant() && carl::sqrt_exact( radicandEvaluated.constantPart(), sqrtExValue ) )
+    if( radicandEvaluated.is_constant() && carl::sqrt_exact( radicandEvaluated.constant_part(), sqrtExValue ) )
     {
         return SqrtEx<Poly>(Poly(constantPartEvaluated + factorEvaluated * sqrtExValue), 
                 constant_zero<Poly>::get(), 
@@ -47,11 +47,11 @@ SqrtEx<Poly> substitute( const Poly& _substituteIn, const carl::Variable _varToS
         *      ----------------------------------------------
         *                           s^n
         */
-    auto varInfo = _substituteIn.template getVarInfo<true>( _varToSubstitute );
+    auto varInfo = carl::var_info(_substituteIn, _varToSubstitute, true);
     const auto& coeffs = varInfo.coeffs();
     // Calculate the s^k:   (0<=k<=n)
     auto coeff = coeffs.begin();
-    carl::uint lastDegree = varInfo.maxDegree();
+    carl::uint lastDegree = varInfo.max_degree();
     std::vector<Poly> sk;
     sk.push_back(constant_one<Poly>::get());
     for( carl::uint i = 1; i <= lastDegree; ++i )
@@ -61,7 +61,7 @@ SqrtEx<Poly> substitute( const Poly& _substituteIn, const carl::Variable _varToS
     }
     // Calculate the constant part and factor of the square root of (q+r*sqrt{t})^k 
     std::vector<Poly> qk;
-    qk.push_back( _substituteBy.constantPart() );
+    qk.push_back( _substituteBy.constant_part() );
     std::vector<Poly> rk;
     rk.push_back( _substituteBy.factor() );
     // Let (q+r*sqrt{t})^l be (q'+r'*sqrt{t}) 
@@ -69,9 +69,9 @@ SqrtEx<Poly> substitute( const Poly& _substituteIn, const carl::Variable _varToS
     for( carl::uint i = 1; i < lastDegree; ++i )
     {
         // q'*q+r'*r't
-        qk.push_back( qk.back() * _substituteBy.constantPart() + rk.back() * _substituteBy.factor() * _substituteBy.radicand() );
+        qk.push_back( qk.back() * _substituteBy.constant_part() + rk.back() * _substituteBy.factor() * _substituteBy.radicand() );
         // q'*r+r'*q
-        rk.push_back( rk.back() * _substituteBy.constantPart()  + qk.at( i - 1 ) * _substituteBy.factor() );
+        rk.push_back( rk.back() * _substituteBy.constant_part()  + qk.at( i - 1 ) * _substituteBy.factor() );
     }
     // Calculate the result:
     Poly resFactor = constant_zero<Poly>::get();
