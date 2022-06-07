@@ -1,8 +1,8 @@
-#include <carl/poly/umvpoly/functions/horner/MultivariateHorner.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/functions/horner/MultivariateHorner.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/core/VariablePool.h>
 #include <carl-io/StringParser.h>
-#include <carl/poly/umvpoly/functions/IntervalEvaluation.h>
+#include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>
 
 #ifdef USE_GINAC
 #include <cln/cln.h>

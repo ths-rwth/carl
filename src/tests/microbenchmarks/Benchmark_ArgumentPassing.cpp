@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include <carl/core/Variable.h>
+#include <carl-arith/core/Variable.h>
 #include <carl-formula/uninterpreted/UFInstance.h>
 #include <carl-formula/uninterpreted/UTerm.h>
 #include <carl-formula/uninterpreted/UVariable.h>

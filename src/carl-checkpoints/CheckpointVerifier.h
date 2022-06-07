@@ -2,7 +2,7 @@
 
 #include <carl-logging/carl-logging.h>
 #include <carl-common/memory/Singleton.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/core/VariablePool.h>
 #include <carl-formula/formula/Formula.h>
 #include <carl-common/debug/debug.h>
 

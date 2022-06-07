@@ -8,7 +8,7 @@
 #pragma once
 
 #include <carl-common/memory/Singleton.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/core/VariablePool.h>
 #include "Formula.h"
 #include <mutex>
 #include <limits>

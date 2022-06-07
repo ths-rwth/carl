@@ -2,8 +2,8 @@
 
 #include <carl-formula/bitvector/BVTermPool.h>
 #include <carl-formula/bitvector/BVConstraintPool.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/core/VariablePool.h>
 #include <carl-formula/formula/FormulaPool.h>
 #include <carl-formula/sort/SortManager.h>
 #include <carl-common/config.h>

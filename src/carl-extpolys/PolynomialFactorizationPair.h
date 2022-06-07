@@ -10,8 +10,8 @@
 #include <map>
 #include <mutex>
 
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/core/Common.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/core/Common.h>
 
 namespace carl
 {

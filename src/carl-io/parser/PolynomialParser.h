@@ -8,7 +8,7 @@
 #include "Common.h"
 
 #include <boost/version.hpp>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 
 #if BOOST_VERSION >= 105900
 #ifdef USE_CLN_NUMBERS

@@ -1,8 +1,8 @@
 #include "../Common.h"
 
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/groebner/Ideal.h>
-#include <carl/groebner/Reductor.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/groebner/Ideal.h>
+#include <carl-arith/groebner/Reductor.h>
 #include <carl-common/meta/platform.h>
 
 #include <gtest/gtest.h>

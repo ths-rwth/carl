@@ -3,10 +3,10 @@
 #include <algorithm>
 
 #include "framework/Benchmark.h"
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/poly/umvpoly/functions/GCD.h>
-#include <carl/poly/umvpoly/functions/Resultant.h>
-#include <carl/poly/umvpoly/functions/Substitution.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/functions/GCD.h>
+#include <carl-arith/poly/umvpoly/functions/Resultant.h>
+#include <carl-arith/poly/umvpoly/functions/Substitution.h>
 #include "BenchmarkTest.h"
 #include "framework/BenchmarkGenerator.h"
 

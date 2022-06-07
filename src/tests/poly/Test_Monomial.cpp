@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <carl/core/Variable.h>
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/poly/umvpoly/MonomialPool.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/MonomialPool.h>
 #include <list>
 #include <boost/variant.hpp>
 
-#include <carl/poly/umvpoly/functions/Derivative.h>
-#include <carl/poly/umvpoly/functions/Power.h>
+#include <carl-arith/poly/umvpoly/functions/Derivative.h>
+#include <carl-arith/poly/umvpoly/functions/Power.h>
 
 #include "../Common.h"
 

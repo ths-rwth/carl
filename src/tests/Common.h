@@ -3,8 +3,8 @@
 #include "util.h"
 
 #include <carl-common/config.h>
-#include <carl/interval/Interval.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/numbers/numbers.h>
 
 #include <gtest/gtest.h>
 #include <limits>

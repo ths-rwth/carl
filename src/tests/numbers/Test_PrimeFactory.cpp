@@ -1,7 +1,7 @@
 #include "../Common.h"
 
-#include <carl/numbers/PrimeFactory.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/PrimeFactory.h>
+#include <carl-arith/numbers/numbers.h>
 
 template<typename T>
 class PrimeFactory: public testing::Test {};

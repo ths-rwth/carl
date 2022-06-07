@@ -1,11 +1,11 @@
 #pragma once
 
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/core/Relation.h>
-#include <carl/poly/umvpoly/Term.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/core/Variable.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/core/Relation.h>
+#include <carl-arith/poly/umvpoly/Term.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/core/Variable.h>
 #include <carl-formula/arithmetic/Constraint.h>
 #include <carl-formula/formula/Formula.h>
 #include <carl-formula/formula/Logic.h>

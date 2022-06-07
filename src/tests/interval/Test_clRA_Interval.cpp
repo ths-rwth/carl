@@ -12,9 +12,9 @@
 CLANG_WARNING_DISABLE("-Wsign-compare")
 #include "gtest/gtest.h"
 CLANG_WARNING_RESET
-#include <carl/interval/Interval.h>
-#include <carl/interval/set_theory.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/interval/set_theory.h>
+#include <carl-arith/core/VariablePool.h>
 
 #include "../number_types.h"
 

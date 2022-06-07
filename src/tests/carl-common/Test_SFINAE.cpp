@@ -1,6 +1,6 @@
 #include "../Common.h"
 
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 #include <carl-common/meta/SFINAE.h>
 
 #include <type_traits>

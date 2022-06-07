@@ -12,8 +12,8 @@
 #include "Model.h"
 
 #include <carl-formula/formula/Formula.h>
-#include <carl/ran/ran.h>
-#include <carl/vs/SqrtEx.h>
+#include <carl-arith/ran/ran.h>
+#include <carl-arith/vs/SqrtEx.h>
 #include <carl-formula/uninterpreted/SortValue.h>
 #include <carl-formula/uninterpreted/UFModel.h>
 

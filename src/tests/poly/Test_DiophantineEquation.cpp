@@ -1,12 +1,12 @@
-#include <carl/converter/OldGinacConverter.h>
-#include <carl/poly/umvpoly/functions/DiophantineEquation.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/core/VariablePool.h>
-#include <carl/interval/Interval.h>
+#include <carl-arith/converter/OldGinacConverter.h>
+#include <carl-arith/poly/umvpoly/functions/DiophantineEquation.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/interval/Interval.h>
 #include <carl-io/StringParser.h>
 #include "gtest/gtest.h"
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 #include <list>
 
 using namespace carl;

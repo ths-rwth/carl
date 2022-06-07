@@ -7,7 +7,7 @@
 #include "BVTermContent.h"
 #include "BVTermPool.h"
 
-#include <carl/core/Variables.h>
+#include <carl-arith/core/Variables.h>
 
 #include <utility>
 

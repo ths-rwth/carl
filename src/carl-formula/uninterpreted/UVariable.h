@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <carl/core/VariablePool.h>
+#include <carl-arith/core/VariablePool.h>
 #include "../sort/Sort.h"
 #include <carl-common/util/hash.h>
 #include "../sort/SortManager.h"

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../Model.h"
-#include <carl/ran/real_roots.h>
-#include <carl/poly/umvpoly/functions/to_univariate_polynomial.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/ran/real_roots.h>
+#include <carl-arith/poly/umvpoly/functions/to_univariate_polynomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
 
 namespace carl {
 

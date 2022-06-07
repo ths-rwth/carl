@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
 
-#include <carl/poly/umvpoly/functions/Resultant.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/functions/Resultant.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/core/VariablePool.h>
 #include <carl-common/meta/platform.h>
 
 #include <random>

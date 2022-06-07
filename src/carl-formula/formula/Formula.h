@@ -20,8 +20,8 @@
 #include "../uninterpreted/UFManager.h"
 #include "../bitvector/BVConstraintPool.h"
 #include "../bitvector/BVConstraint.h"
-#include <carl/extended/VariableAssignment.h>
-#include <carl/extended/VariableComparison.h>
+#include <carl-arith/extended/VariableAssignment.h>
+#include <carl-arith/extended/VariableComparison.h>
 #include "Logic.h"
 
 #include "FormulaContent.h"

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 #include <carl-common/util/boost_util.h>
 
 #include <array>

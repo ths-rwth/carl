@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl/core/Variable.h>
+#include <carl-arith/core/Variable.h>
 #include <carl-formula/bitvector/BVVariable.h>
 #include <carl-formula/uninterpreted/UVariable.h>
 #include <carl-formula/uninterpreted/UninterpretedFunction.h>

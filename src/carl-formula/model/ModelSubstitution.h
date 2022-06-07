@@ -7,7 +7,7 @@
 #include <optional>
 
 #include <carl-formula/formula/Formula.h>
-#include <carl/extended/MultivariateRoot.h>
+#include <carl-arith/extended/MultivariateRoot.h>
 #include "ModelValue.h"
 #include "ModelVariable.h"
 

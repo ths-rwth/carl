@@ -7,7 +7,7 @@ install(
 )
 
 install(
-	TARGETS carl-shared carl-static
+	TARGETS carl-arith-shared carl-arith-static
 	EXPORT carl-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

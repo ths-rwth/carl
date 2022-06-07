@@ -1,10 +1,10 @@
 
 #include <gtest/gtest.h>
 
-#include <carl/ran/real_roots.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/poly/umvpoly/functions/Chebyshev.h>
-#include <carl/ran/interval/LazardEvaluation.h>
+#include <carl-arith/ran/real_roots.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/functions/Chebyshev.h>
+#include <carl-arith/ran/interval/LazardEvaluation.h>
 
 #include <boost/optional/optional_io.hpp>
 

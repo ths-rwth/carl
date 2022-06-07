@@ -2,10 +2,10 @@
 
 #include "../Common.h"
 
-#include <carl/converter/CoCoAAdaptor.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/poly/umvpoly/functions/CoprimePart.h>
-#include <carl/poly/umvpoly/functions/SquareFreePart.h>
+#include <carl-arith/converter/CoCoAAdaptor.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/functions/CoprimePart.h>
+#include <carl-arith/poly/umvpoly/functions/SquareFreePart.h>
 #include <carl-common/debug/Timer.h>
 
 #include <random>

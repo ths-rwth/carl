@@ -12,9 +12,9 @@
 #include <string>
 #include <boost/variant/variant.hpp>
 
-#include <carl/core/Variable.h>
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/poly/umvpoly/Term.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/Term.h>
 #include <carl-extpolys/RationalFunction.h>
 #include <carl-formula/formula/Formula.h>
 

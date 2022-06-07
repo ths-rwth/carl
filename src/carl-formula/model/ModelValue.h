@@ -3,9 +3,9 @@
 
 #include <carl-common/util/variant_util.h>
 #include <carl-formula/bitvector/BVValue.h>
-#include <carl/extended/MultivariateRoot.h>
-#include <carl/ran/ran.h>
-#include <carl/vs/SqrtEx.h>
+#include <carl-arith/extended/MultivariateRoot.h>
+#include <carl-arith/ran/ran.h>
+#include <carl-arith/vs/SqrtEx.h>
 #include <carl-formula/uninterpreted/SortValue.h>
 #include <carl-formula/uninterpreted/UFModel.h>
 

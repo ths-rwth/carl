@@ -7,7 +7,7 @@
  * @version	2013-12-16
  */
 
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 
 #ifdef USE_MPFR_FLOAT
 

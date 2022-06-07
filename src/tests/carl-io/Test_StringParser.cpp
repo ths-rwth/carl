@@ -1,8 +1,8 @@
 #include "../Common.h"
 
 #include <carl-io/StringParser.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/numbers/numbers.h>
 
 #include <type_traits>
 #include <typeinfo>

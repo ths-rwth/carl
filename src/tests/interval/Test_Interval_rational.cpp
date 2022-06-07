@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <carl/interval/Interval.h>
-#include <carl/interval/set_theory.h>
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/interval/set_theory.h>
 
 #include "../number_types.h"
 

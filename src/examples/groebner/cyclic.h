@@ -8,7 +8,7 @@
 #pragma once
 
 #include <cassert>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-io/StringParser.h>
 
 namespace carl

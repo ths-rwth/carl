@@ -11,7 +11,7 @@
 #include <carl-common/util/pointerOperations.h>
 #include <carl-common/memory/Singleton.h>
 #include "Sort.h"
-#include <carl/core/Variable.h>
+#include <carl-arith/core/Variable.h>
 
 #include <cassert>
 #include <ostream>

@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
 #include <map>
 
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/ran/ran.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/ran/ran.h>
 
 #include "../Common.h"
 

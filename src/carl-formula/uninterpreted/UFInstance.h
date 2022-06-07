@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <carl/core/Variables.h>
+#include <carl-arith/core/Variables.h>
 #include "UVariable.h"
 #include "UninterpretedFunction.h"
 

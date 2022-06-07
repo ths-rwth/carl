@@ -17,9 +17,9 @@
 #include <boost/algorithm/string.hpp>
 #include <carl-logging/carl-logging.h>
 
-#include <carl/core/VariablePool.h>
-#include <carl/poly/umvpoly/Term.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/Term.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 
 #include <carl-extpolys/RationalFunction.h>
 
