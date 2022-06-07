@@ -61,7 +61,7 @@ public:
     ///
     using PolyType = MultivariatePolynomial<Coeff, Ordering, Policies>;
     /// The type of the cache. Multivariate polynomials do not need a cache, we set it to something.
-    using CACHE = std::vector<int>;
+    using CACHE = void;
 	/// Type our terms vector.f
 	using TermsType = std::vector<Term<Coeff>>;
 	
