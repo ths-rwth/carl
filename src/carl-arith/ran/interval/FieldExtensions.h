@@ -109,7 +109,7 @@ namespace detail_field_extensions {
 		CoCoA::RingElem convertUV(const Poly& p, const CoCoA::SparsePolyRing& ring) const {
 			CoCoA::RingElem res(ring);
 			CoCoA::RingElem exp(ring, 1);
-			CoCoA::RingElem var = mSymbolThere.at(p.mainVar());
+			CoCoA::RingElem var = mSymbolThere.at(p.main_var());
 			for (std::size_t deg = 0; deg <= p.degree(); ++deg) {
 				res += convert(p.coefficients()[deg]) * exp;
 				exp *= var;

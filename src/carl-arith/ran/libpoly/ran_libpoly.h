@@ -349,7 +349,7 @@ public:
 		//Turn into value
 		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, get_internal());
 		//That copies the value into the assignment
-		assignment.set(VariableMapper::getInstance().getLibpolyVariable(p.mainVar()), poly::Value(&val));
+		assignment.set(VariableMapper::getInstance().getLibpolyVariable(p.main_var()), poly::Value(&val));
 		lp_value_destruct(&val);
 
 		poly::Polynomial poly = LibpolyConverter::getInstance().toLibpolyPolynomial(carl::MultivariatePolynomial<Number>(p)) ;

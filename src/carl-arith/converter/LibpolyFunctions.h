@@ -20,8 +20,8 @@ public:
 	template<typename Coeff>
 	carl::UnivariatePolynomial<carl::MultivariatePolynomial<Coeff>> libpoly_resultant(const carl::UnivariatePolynomial<carl::MultivariatePolynomial<Coeff>>& p1, const carl::UnivariatePolynomial<carl::MultivariatePolynomial<Coeff>>& p2) {
 
-		carl::Variable mainVar = p1.mainVar();
-		assert(p1.mainVar() == p2.mainVar()); //todo needed?
+		carl::Variable mainVar = p1.main_var();
+		assert(p1.main_var() == p2.main_var()); //todo needed?
 
 
 		//Only changes the resultant by a constant factor... is is that really needed? TODO

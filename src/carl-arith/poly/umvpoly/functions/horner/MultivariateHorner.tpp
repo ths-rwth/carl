@@ -24,8 +24,8 @@ namespace carl
  		typename PolynomialType::TermsType::const_iterator polynomialIt;
 		for (polynomialIt = inPut.begin(); polynomialIt != inPut.end(); polynomialIt++)
 		{
-			arithmeticOperationsCounter += polynomialIt->getNrVariables() - 1;
-			arithmeticOperationsCounter += polynomialIt->tdeg() - polynomialIt->getNrVariables();
+			arithmeticOperationsCounter += polynomialIt->num_variables() - 1;
+			arithmeticOperationsCounter += polynomialIt->tdeg() - polynomialIt->num_variables();
 			if (polynomialIt->coeff() > 1) arithmeticOperationsCounter++;
 			if (polynomialIt->is_constant()) arithmeticOperationsCounter++;
 

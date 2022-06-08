@@ -245,7 +245,7 @@ namespace carl {
 		type operator()(const std::tuple<CUMP<Coeff>, CUMP<Coeff>>& t) {
 			auto p1 = Conversion::template convert<P>(std::get<0>(t), ci);
 			auto p2 = Conversion::template convert<P>(std::get<1>(t), ci);
-			auto v = Conversion::template convert<V>(std::get<0>(t).mainVar(), ci);
+			auto v = Conversion::template convert<V>(std::get<0>(t).main_var(), ci);
 			return std::make_tuple(p1, p2, v);
 		}
 	};

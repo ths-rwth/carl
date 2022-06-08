@@ -92,7 +92,7 @@ real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots(
 
 	// Iterate over terms with mainVariable and check whether another Variable is 0
 	UnivariatePolynomial<Coeff> polyCopy(p);
-	carl::Variable mainVar = p.mainVar();
+	carl::Variable mainVar = p.main_var();
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has mainVar:  " << mainVar);
 	// Check nullification -- Easy cases

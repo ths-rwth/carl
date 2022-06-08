@@ -14,7 +14,7 @@ inline Monomial::Arg separable_part(const Monomial& m) {
 	for (auto& it: m) {
 		newExps.emplace_back(it.first, 1);
 	}
-	return createMonomial(std::move(newExps), m.nrVariables());
+	return createMonomial(std::move(newExps), m.num_variables());
 }
 		
 

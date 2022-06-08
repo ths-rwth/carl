@@ -117,7 +117,7 @@ class DiophantineEquations
                         // Univariate Case
                         /// @todo implement
                         // the list of equations is empty, a contains univarate polnomials
-                        //Variable x_1 = a[0].mainVar();
+                        //Variable x_1 = a[0].main_var();
                         // sigma = zero lost of length  r
                         std::vector<Polynomial> sigma(r, Polynomial(0));
                         for(auto& z : c.terms()) {
@@ -164,7 +164,7 @@ class DiophantineEquations
 	std::vector<Polynomial> MultiTermEEAlift(const std::vector<Polynomial>& a) const
 	{
 		assert(a.size() > 2);
-		const Variable& x = a.front().mainVar();
+		const Variable& x = a.front().main_var();
 		size_t r = a.size();
 		
 		std::vector<Polynomial> q(r,Polynomial(x));
@@ -199,9 +199,9 @@ class DiophantineEquations
      */
 	std::vector<Polynomial> EEAlift(Polynomial a, Polynomial b) const
 	{
-		assert(a.mainVar() == b.mainVar());
+		assert(a.main_var() == b.main_var());
 		CARL_LOG_DEBUG("carl.core.hensel", "EEALIFT: a=" << a << ", b=" << b );
-		const Variable& x = a.mainVar();
+		const Variable& x = a.main_var();
 		Polynomial amodp = a.toFiniteDomain(mGf_p);
 		Polynomial bmodp = b.toFiniteDomain(mGf_p);
 		CARL_LOG_DEBUG("carl.core.hensel", "EEALIFT: a mod p=" << amodp << ", b mod p=" << bmodp );

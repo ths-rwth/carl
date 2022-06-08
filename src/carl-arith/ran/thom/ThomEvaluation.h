@@ -27,7 +27,7 @@ RealAlgebraicNumber<Number> evaluateTE(const MultivariatePolynomial<Number>& p, 
                 << "****************************\n");
         for(const auto& entry : m) { 
                 assert(entry.second.isThom());
-                assert(entry.first == entry.second.getThomEncoding().mainVar());
+                assert(entry.first == entry.second.getThomEncoding().main_var());
         }
         assert(m.size() > 0);
         

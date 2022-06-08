@@ -252,7 +252,7 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 		{
 			const Monomial& m = *(term.monomial());
 			CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << m);
-			for(unsigned i = 0; i < m.nrVariables(); ++i)
+			for(unsigned i = 0; i < m.num_variables(); ++i)
 			{
 				CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 				if(m[i].second > 1 && substitutions.find(m[i].first) != substitutions.end())
@@ -308,7 +308,7 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 		{
 			const Monomial& m = *(term.monomial());
 			CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << m);
-			for(unsigned i = 0; i < m.nrVariables(); ++i)
+			for(unsigned i = 0; i < m.num_variables(); ++i)
 			{
 				CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 				if(m[i].second == 1)
@@ -347,15 +347,15 @@ MultivariatePolynomial<C,O,P> substitute(const MultivariatePolynomial<C,O,P>& p,
 template<typename Coeff>
 void substitute_inplace(UnivariatePolynomial<Coeff>& p, Variable var, const Coeff& value) {
 	if (carl::is_zero(p)) return;
-	if (var == p.mainVar()) {
-		p = UnivariatePolynomial<Coeff>(p.mainVar(), carl::evaluate(p, value));
+	if (var == p.main_var()) {
+		p = UnivariatePolynomial<Coeff>(p.main_var(), carl::evaluate(p, value));
 	} else if constexpr (!is_number_type<Coeff>::value) {
 		// Coefficients from a polynomial ring
 		if (value.has(var)) {
 			// Fall back to multivariate substitution.
 			MultivariatePolynomial<typename UnderlyingNumberType<Coeff>::type> tmp(p);
 			substitute_inplace(tmp, var, value);
-			p = carl::to_univariate_polynomial(tmp, p.mainVar());
+			p = carl::to_univariate_polynomial(tmp, p.main_var());
 		} else {
 			// Safely substitute into each coefficient separately
 			for (auto& c: p.coefficients()) {
@@ -370,13 +370,13 @@ void substitute_inplace(UnivariatePolynomial<Coeff>& p, Variable var, const Coef
 template<typename Coeff>
 UnivariatePolynomial<Coeff> substitute(const UnivariatePolynomial<Coeff>& p, Variable var, const Coeff& value) {
 	if constexpr (is_number_type<Coeff>::value) {
-		if (var == p.mainVar()) {
-			return UnivariatePolynomial<Coeff>(p.mainVar(), p.evaluate(value));
+		if (var == p.main_var()) {
+			return UnivariatePolynomial<Coeff>(p.main_var(), p.evaluate(value));
 		}
 		return p;
 	} else {
-		if (var == p.mainVar()) {
-			UnivariatePolynomial<Coeff> res(p.mainVar());
+		if (var == p.main_var()) {
+			UnivariatePolynomial<Coeff> res(p.main_var());
 			for (const auto& c: p.coefficients()) {
 				res += substitute(c, var, value);
 			}
@@ -387,13 +387,13 @@ UnivariatePolynomial<Coeff> substitute(const UnivariatePolynomial<Coeff>& p, Var
 				// Fall back to multivariate substitution.
 				MultivariatePolynomial<typename UnderlyingNumberType<Coeff>::type> tmp(p);
 				substitute_inplace(tmp, var, value);
-				return to_univariate_polynomial(tmp, p.mainVar());
+				return to_univariate_polynomial(tmp, p.main_var());
 			} else {
 				std::vector<Coeff> res(p.coefficients().size());
 				for (std::size_t i = 0; i < res.size(); i++) {
 					res[i] = substitute(p.coefficients()[i], var, value);
 				}
-				UnivariatePolynomial<Coeff> resp(p.mainVar(), res);
+				UnivariatePolynomial<Coeff> resp(p.main_var(), res);
 				resp.strip_leading_zeroes();
 				CARL_LOG_TRACE("carl.core.uvpolynomial", p << " [ " << var << " -> " << value << " ] = " << resp);
 				return resp;

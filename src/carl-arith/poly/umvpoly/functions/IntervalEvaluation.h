@@ -13,7 +13,7 @@ inline Interval<Numeric> evaluate(const Monomial& m, const std::map<Variable, In
 {
 	Interval<Numeric> result(1);
 	CARL_LOG_TRACE("carl.core.intervalevaluation", "Iterating over " << m);
-	for(unsigned i = 0; i < m.nrVariables(); ++i)
+	for(unsigned i = 0; i < m.num_variables(); ++i)
 	{
 		CARL_LOG_TRACE("carl.core.intervalevaluation", "Iterating: " << m[i].first);
 		// We expect every variable to be in the map.
@@ -63,9 +63,9 @@ inline Interval<Numeric> evaluate(const MultivariatePolynomial<Coeff, Policy, Or
 template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>> = dummy>
 inline Interval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
 	CARL_LOG_FUNC("carl.core.intervalevaluation", p << ", " << map);
-	assert(map.count(p.mainVar()) > 0);
+	assert(map.count(p.main_var()) > 0);
 	Interval<Numeric> res = Interval<Numeric>::empty_interval();
-	const Interval<Numeric> varValue = map.at(p.mainVar());
+	const Interval<Numeric> varValue = map.at(p.main_var());
 	Interval<Numeric> exp(1);
 	for (unsigned i = 0; i < p.degree(); i++) {
 		res += p.coefficients()[i] * exp;
@@ -79,9 +79,9 @@ inline Interval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const st
 template<typename Numeric, typename Coeff, DisableIf<std::is_same<Numeric, Coeff>> = dummy>
 inline Interval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
 	CARL_LOG_FUNC("carl.core.intervalevaluation", p << ", " << map);
-	assert(map.count(p.mainVar()) > 0);
+	assert(map.count(p.main_var()) > 0);
 	Interval<Numeric> res = Interval<Numeric>(carl::constant_zero<Numeric>().get());
-	const Interval<Numeric>& varValue = map.at(p.mainVar());
+	const Interval<Numeric>& varValue = map.at(p.main_var());
 	Interval<Numeric> exp(1);
 	for (uint i = 0; i <= p.degree(); i++) {
 		res += evaluate(p.coefficients()[i], map) * exp;

@@ -55,7 +55,7 @@ std::list<ThomEncoding<Number>> realRootsThom(
         }
         
         for(const auto& entry : m) {
-                CARL_LOG_ASSERT("carl.thom.rootfinder", entry.first == entry.second.mainVar(), "invalid map Variable -> Thom encoding");
+                CARL_LOG_ASSERT("carl.thom.rootfinder", entry.first == entry.second.main_var(), "invalid map Variable -> Thom encoding");
         }
         for(const auto& v : carl::variables(p)) {
                 if(v != mainVar) {
@@ -271,8 +271,8 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		const Interval<Number>& interval
 ) {
-        CARL_LOG_TRACE("carl.thom.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
-	assert(m.count(p.mainVar()) == 0);
+        CARL_LOG_TRACE("carl.thom.rootfinder", p << " in " << p.main_var() << ", " << m << ", " << interval);
+	assert(m.count(p.main_var()) == 0);
         assert(!carl::is_zero(p));
         
         std::list<ThomEncoding<Number>> roots;
@@ -281,7 +281,7 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
 	std::map<Variable, ThomEncoding<Number>> TEmap;
 	
 	for (Variable v: variables(tmp)) {
-		if (v == p.mainVar()) continue;
+		if (v == p.main_var()) continue;
 		assert(m.count(v) > 0);
 		if (m.at(v).is_numeric()) {
 			substitute_inplace(tmp, v, Coeff(m.at(v).value()));
@@ -344,7 +344,7 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
                         }
                 }
                
-                roots = realRootsThom<Number>(MultivariatePolynomial<Number>(tmp_univ), tmp_univ.mainVar(), nullptr, interval);
+                roots = realRootsThom<Number>(MultivariatePolynomial<Number>(tmp_univ), tmp_univ.main_var(), nullptr, interval);
                 
         }
         else {
@@ -353,7 +353,7 @@ std::list<RealAlgebraicNumber<Number>> realRootsThom(
                 MultivariatePolynomial<Number> p_multiv(tmp);
                 //std::cout << "p_multiv = " << p_multiv << std::endl;
 
-                roots = realRootsThom(p_multiv, p.mainVar(), TEmap, interval);
+                roots = realRootsThom(p_multiv, p.main_var(), TEmap, interval);
         }
         
         

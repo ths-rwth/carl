@@ -242,7 +242,7 @@ namespace carl
 		 * Returns the number of variables that occur in the monomial.
 		 * @return Number of variables.
 		 */
-		std::size_t nrVariables() const {
+		std::size_t num_variables() const {
 			return mExponents.size();
 		}
 
@@ -326,7 +326,7 @@ namespace carl
 			if(!m) return true;
 			assert(is_consistent());
 			if(m->mTotalDegree > mTotalDegree) return false;
-			if(m->nrVariables() > nrVariables()) return false;
+			if(m->num_variables() > num_variables()) return false;
 			// Linear, as we expect small monomials.
 			auto itright = m->mExponents.begin();
 			for (const auto& itleft: mExponents) {

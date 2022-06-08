@@ -26,7 +26,7 @@ UnivariatePolynomial<Coeff> remainder_helper(const UnivariatePolynomial<Coeff>& 
 	assert(dividend.degree() >= divisor.degree());
 	// Remainder in a field is zero by definition.
 	if (is_field_type<Coeff>::value && is_constant(divisor)) {
-		return UnivariatePolynomial<Coeff>(dividend.mainVar());
+		return UnivariatePolynomial<Coeff>(dividend.main_var());
 	}
 
 	Coeff factor(0); // We have to initialize it to prevent a compiler error.
@@ -72,7 +72,7 @@ UnivariatePolynomial<Coeff> remainder_helper(const UnivariatePolynomial<Coeff>& 
 			coeffs.push_back(dividend.coefficients()[i + degdiff] - factor * divisor.coefficients()[i]);
 		}
 	}
-	auto result = UnivariatePolynomial<Coeff>(dividend.mainVar(), std::move(coeffs));
+	auto result = UnivariatePolynomial<Coeff>(dividend.main_var(), std::move(coeffs));
 	// strip zeros from the end as we might have pushed zeros.
 	result.strip_leading_zeroes();
 	
@@ -104,8 +104,8 @@ UnivariatePolynomial<Coeff> remainder(const UnivariatePolynomial<Coeff>& dividen
 template<typename Coeff>
 UnivariatePolynomial<Coeff> pseudo_remainder(const UnivariatePolynomial<Coeff>& dividend, const UnivariatePolynomial<Coeff>& divisor) 
 {
-	assert(dividend.mainVar() == divisor.mainVar());
-	Variable v = dividend.mainVar();
+	assert(dividend.main_var() == divisor.main_var());
+	Variable v = dividend.main_var();
 	if (divisor.degree() == 0) return UnivariatePolynomial<Coeff>(v);
 	if (divisor.degree() > dividend.degree()) return dividend;
 

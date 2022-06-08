@@ -65,10 +65,10 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 	/* Part 1
 	 * Check and normalize input, initialize local variables.
 	 */
-	assert(pol1.mainVar() == pol2.mainVar());
+	assert(pol1.main_var() == pol2.main_var());
 	CARL_LOG_TRACE("carl.core.resultant", "subresultants(" << pol1 << ", " << pol2 << ")");
 	std::list<UnivariatePolynomial<Coeff>> subresultants;
-	Variable variable = pol1.mainVar();
+	Variable variable = pol1.main_var();
 
 	assert(!carl::is_zero(pol1));
 	assert(!carl::is_zero(pol2));
@@ -249,11 +249,11 @@ std::list<UnivariatePolynomial<Coeff>> subresultants(
 				h[d] = Coeff(t - reducedNewB);
 			}
 
-			UnivariatePolynomial<Coeff> sum(p.mainVar(), h.front() * p.coefficients()[0]);
+			UnivariatePolynomial<Coeff> sum(p.main_var(), h.front() * p.coefficients()[0]);
 			for (uint d = 1; d < pDeg; d++) {
 				sum += h[d] * p.coefficients()[d];
 			}
-			UnivariatePolynomial<Coeff> normalizedSum(p.mainVar());
+			UnivariatePolynomial<Coeff> normalizedSum(p.main_var());
 			bool res = carl::try_divide(sum, p.lcoeff(), normalizedSum);
 			assert(res || is_constant(sum));
 
@@ -280,11 +280,11 @@ std::vector<UnivariatePolynomial<Coeff>> principalSubresultantsCoefficients(
 	SubresultantStrategy strategy) {
 	// Attention: Mathematica / Wolframalpha has one entry less (the last one) which is identical to p!
 	std::list<UnivariatePolynomial<Coeff>> subres = subresultants(p, q, strategy);
-	CARL_LOG_DEBUG("carl.upoly", "PSC of " << p << " and " << q << " on " << p.mainVar() << ": " << subres);
+	CARL_LOG_DEBUG("carl.upoly", "PSC of " << p << " and " << q << " on " << p.main_var() << ": " << subres);
 	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs;
 	for (const auto& s : subres) {
 		assert(!carl::is_zero(s));
-		subresCoeffs.emplace_back(s.mainVar(), s.lcoeff());
+		subresCoeffs.emplace_back(s.main_var(), s.lcoeff());
 	}
 	return subresCoeffs;
 }
@@ -302,8 +302,8 @@ UnivariatePolynomial<Coeff> resultant(
 	const UnivariatePolynomial<Coeff>& p,
 	const UnivariatePolynomial<Coeff>& q,
 	SubresultantStrategy strategy) {
-	assert(p.mainVar() == q.mainVar());
-	if (carl::is_zero(p) || carl::is_zero(q)) return UnivariatePolynomial<Coeff>(p.mainVar());
+	assert(p.main_var() == q.main_var());
+	if (carl::is_zero(p) || carl::is_zero(q)) return UnivariatePolynomial<Coeff>(p.main_var());
 
 	auto s = overloaded {
 #if defined(USE_LIBPOLY)
@@ -320,7 +320,7 @@ UnivariatePolynomial<Coeff> resultant(
 	//if(res != res_debug){
 	//	std::cout << "P1: " << p << std::endl;
 	//	std::cout << "P2: " << q << std::endl;
-	//	std::cout << "MainVar: " << p.mainVar() << std::endl ;
+	//	std::cout << "MainVar: " << p.main_var() << std::endl ;
 	//	std::cout << "Libpoly Resultant: " << res << std::endl ;
 	//	std::cout << "Carl Resultant: " << res_debug << std::endl ;
 	//	assert(false); //TODO Manchmal anderes Vorzeichen? -> WolframAlpha stimmt mit libpoly überein
@@ -330,7 +330,7 @@ UnivariatePolynomial<Coeff> resultant(
 	if (is_constant(res)) {
 		return res;
 	} else {
-		return UnivariatePolynomial<Coeff>(p.mainVar());
+		return UnivariatePolynomial<Coeff>(p.main_var());
 	}
 }
 
@@ -358,16 +358,16 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> resultant_z3(
 	const UnivariatePolynomial<Coeff>& p,
 	const UnivariatePolynomial<Coeff>& q) {
-	//std::cout << "resultant(" << p << ", " << q << ", " << q.mainVar() << ")" << std::endl;
+	//std::cout << "resultant(" << p << ", " << q << ", " << q.main_var() << ")" << std::endl;
 	if (carl::is_zero(p) || carl::is_zero(q)) {
 		//std::cout << "Zero" << std::endl;
-		return UnivariatePolynomial<Coeff>(q.mainVar());
+		return UnivariatePolynomial<Coeff>(q.main_var());
 	}
 
 	if (is_constant(p)) {
 		//std::cout << "A is const" << std::endl;
 		if (is_constant(q)) {
-			return UnivariatePolynomial<Coeff>(q.mainVar(), Coeff(1));
+			return UnivariatePolynomial<Coeff>(q.main_var(), Coeff(1));
 		} else {
 			return carl::pow(p, q.degree());
 		}
@@ -392,8 +392,8 @@ UnivariatePolynomial<Coeff> resultant_z3(
 
 	//std::cout << "Pre" << std::endl;
 	int s = 1;
-	std::size_t degA = A.degree(q.mainVar());
-	std::size_t degB = B.degree(q.mainVar());
+	std::size_t degA = A.degree(q.main_var());
+	std::size_t degB = B.degree(q.main_var());
 	if (degA < degB) {
 		std::swap(A, B);
 		if (degA % 2 == 1 && degB % 2 == 1) s = -1;
@@ -408,14 +408,14 @@ UnivariatePolynomial<Coeff> resultant_z3(
 	while (true) {
 		//std::cout << "Loop " << A << ", " << B << std::endl;
 		//std::cout << "A = " << A << ", B = " << B << std::endl;
-		degA = A.degree(q.mainVar());
-		degB = B.degree(q.mainVar());
+		degA = A.degree(q.main_var());
+		degB = B.degree(q.main_var());
 		//std::cout << "Degrees: " << degA << " / " << degB << std::endl;
 		assert(degA >= degB);
 		std::size_t delta = degA - degB;
 		//std::cout << "1: delta = " << delta << std::endl;
 		if (degA % 2 == 1 && degB % 2 == 1) s = -s;
-		R = carl::pseudo_remainder(A, B, q.mainVar());
+		R = carl::pseudo_remainder(A, B, q.main_var());
 		A = B;
 		//std::cout << "R = " << R << std::endl;
 		//std::cout << "g = " << g << std::endl;
@@ -426,7 +426,7 @@ UnivariatePolynomial<Coeff> resultant_z3(
 			div_res = carl::try_divide(B, h, B);
 			assert(div_res);
 		}
-		g = A.lcoeff(q.mainVar());
+		g = A.lcoeff(q.main_var());
 		//std::cout << "2: delta = " << delta << std::endl;
 		//std::cout << "g = " << g << std::endl;
 		new_h = carl::pow(g, delta);
@@ -438,9 +438,9 @@ UnivariatePolynomial<Coeff> resultant_z3(
 			}
 		}
 		h = new_h;
-		if (B.degree(q.mainVar()) == 0) {
-			std::size_t degA = A.degree(q.mainVar());
-			new_h = B.lcoeff(q.mainVar());
+		if (B.degree(q.main_var()) == 0) {
+			std::size_t degA = A.degree(q.main_var());
+			new_h = B.lcoeff(q.main_var());
 			new_h = carl::pow(new_h, degA);
 			if (degA > 1) {
 				for (std::size_t i = 0; i < degA - 1; i++) {
@@ -449,8 +449,8 @@ UnivariatePolynomial<Coeff> resultant_z3(
 				}
 			}
 			h = new_h;
-			if (s < 0) return UnivariatePolynomial<Coeff>(q.mainVar(), -t * h);
-			return UnivariatePolynomial<Coeff>(q.mainVar(), t * h);
+			if (s < 0) return UnivariatePolynomial<Coeff>(q.main_var(), -t * h);
+			return UnivariatePolynomial<Coeff>(q.main_var(), t * h);
 		}
 	}
 }
@@ -463,13 +463,13 @@ UnivariatePolynomial<Coeff> eliminate(
 	const UnivariatePolynomial<Coeff>& p,
 	const UnivariatePolynomial<Coeff>& q) {
 	//std::cout << "eliminate " << p << " with " << q << std::endl;
-	assert(p.mainVar() == q.mainVar());
+	assert(p.main_var() == q.main_var());
 	assert(p.degree() >= q.degree());
 	std::size_t degdiff = p.degree() - q.degree();
 	if (degdiff == 0)
 		return p * q.lcoeff() - q * p.lcoeff();
 	else
-		return p * q.lcoeff() - q * p.lcoeff() * UnivariatePolynomial<Coeff>(p.mainVar(), Coeff(1), degdiff);
+		return p * q.lcoeff() - q * p.lcoeff() * UnivariatePolynomial<Coeff>(p.main_var(), Coeff(1), degdiff);
 }
 
 /**
@@ -480,11 +480,11 @@ UnivariatePolynomial<Coeff> resultant_det(
 	const UnivariatePolynomial<Coeff>& p,
 	const UnivariatePolynomial<Coeff>& q) {
 	if (carl::is_zero(p) || carl::is_zero(q)) {
-		return UnivariatePolynomial<Coeff>(q.mainVar());
+		return UnivariatePolynomial<Coeff>(q.main_var());
 	}
 	if (is_constant(p)) {
 		if (is_constant(q)) {
-			return UnivariatePolynomial<Coeff>(p.mainVar(), Coeff(1));
+			return UnivariatePolynomial<Coeff>(p.main_var(), Coeff(1));
 		} else {
 			return carl::pow(p, q.degree());
 		}
@@ -492,7 +492,7 @@ UnivariatePolynomial<Coeff> resultant_det(
 	if (is_constant(q)) {
 		return carl::pow(q, p.degree());
 	}
-	if (p == q) return UnivariatePolynomial<Coeff>(p.mainVar());
+	if (p == q) return UnivariatePolynomial<Coeff>(p.main_var());
 
 	UnivariatePolynomial<Coeff> f = q;
 	UnivariatePolynomial<Coeff> g = p;
@@ -545,18 +545,18 @@ UnivariatePolynomial<Coeff> resultant_det(
 		//std::cout << "-> " << gRest << std::endl;
 	}
 	// Store result of first eliminations in matrix.
-	//PolyMatrix<Coeff> matrix(f.degree() + g.degree(), f.mainVar());
+	//PolyMatrix<Coeff> matrix(f.degree() + g.degree(), f.main_var());
 	for (std::size_t i = 0; i < g.degree(); i++) {
 		// Store f-rows
 		//matrix.set(i, g.degree()-i-1, f);
 	}
 	// Finish eliminations of g-rows.
 	std::vector<UnivariatePolynomial<Coeff>> m;
-	m.resize(f.degree(), UnivariatePolynomial<Coeff>(f.mainVar()));
+	m.resize(f.degree(), UnivariatePolynomial<Coeff>(f.main_var()));
 	//matrix.set(g.degree() + f.degree()-1, 0, gRest);
 	m[f.degree() - 1] = gRest;
 	for (std::size_t i = 1; i < f.degree(); i++) {
-		gRest = eliminate(gRest * g.mainVar(), f);
+		gRest = eliminate(gRest * g.main_var(), f);
 		//matrix.set(g.degree() + f.degree()-1-i, 0, gRest);
 		m[f.degree() - 1 - i] = gRest;
 	}
@@ -582,7 +582,7 @@ UnivariatePolynomial<Coeff> resultant_det(
 	determinant = determinant.coprime_coefficients();
 	//std::cout << "det = " << determinant << std::endl;
 
-	return UnivariatePolynomial<Coeff>(f.mainVar(), determinant);
+	return UnivariatePolynomial<Coeff>(f.main_var(), determinant);
 }
 } // namespace resultant_debug
 

@@ -30,7 +30,7 @@ TYPED_TEST(TermTest, Operators)
     Term<TypeParam> t0(v0);
     EXPECT_TRUE(t0.is_linear());
     EXPECT_TRUE(t.is_linear());
-    EXPECT_EQ(0u, t.getNrVariables());
+    EXPECT_EQ(0u, t.num_variables());
 }
 
 TYPED_TEST(TermTest, Multiplication)

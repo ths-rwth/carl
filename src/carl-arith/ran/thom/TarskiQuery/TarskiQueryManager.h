@@ -88,9 +88,9 @@ public:
                 if(this->isUnivariateManager()) {
                         CARL_LOG_ASSERT("carl.thom.tarski.manager", p.is_univariate(), "");
                         UnivariatePolynomial<Number> pUniv(Variable::NO_VARIABLE);
-                        if(p.is_constant()) pUniv = UnivariatePolynomial<Number>(mZ.mainVar(), p.lcoeff());
+                        if(p.is_constant()) pUniv = UnivariatePolynomial<Number>(mZ.main_var(), p.lcoeff());
                         else pUniv = carl::to_univariate_polynomial(p);
-                        CARL_LOG_ASSERT("carl.thom.tarski.manager", pUniv.mainVar() == mZ.mainVar(),
+                        CARL_LOG_ASSERT("carl.thom.tarski.manager", pUniv.main_var() == mZ.main_var(),
                                 "cannot compute tarski query of " << p << " on " << mZ);
                         res = univariateTarskiQuery(pUniv, mZ, mDer);
                 }

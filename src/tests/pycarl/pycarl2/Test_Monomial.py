@@ -9,7 +9,7 @@ class TestMonomial(TestCarl):
 
 
 	def testGetters(self):
-		self.assertEqual(m.nrVariables(),1)
+		self.assertEqual(m.num_variables(),1)
 		self.assertEqual(m.tdeg(),3)
 
 	def testExponentsGetItem(self): 

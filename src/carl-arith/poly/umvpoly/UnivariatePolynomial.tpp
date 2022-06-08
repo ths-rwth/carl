@@ -467,7 +467,7 @@ Coeff UnivariatePolynomial<Coeff>::synthetic_division(const Coeff& zeroOfDivisor
 	{
 		thirdRow.erase(thirdRow.begin());
 		this->mCoefficients.swap(thirdRow);
-		CARL_LOG_TRACE("carl.core.upoly", "UnivSynDiv: reduced by ((" << carl::abs(get_denom(thirdRow.front())) << ")*" << mainVar() << " + (" << (thirdRow.front()<0 ? "-" : "") << carl::abs(get_num(thirdRow.front())) << "))  ->  " << *this);
+		CARL_LOG_TRACE("carl.core.upoly", "UnivSynDiv: reduced by ((" << carl::abs(get_denom(thirdRow.front())) << ")*" << main_var() << " + (" << (thirdRow.front()<0 ? "-" : "") << carl::abs(get_num(thirdRow.front())) << "))  ->  " << *this);
 		return Coeff(0);
 	}
 	return thirdRow.front();
@@ -904,7 +904,7 @@ bool UnivariatePolynomial<Coefficient>::is_consistent() const {
 		assert(!carl::is_zero(lcoeff()));
 	}
 	for (const auto& c: mCoefficients) {
-		assert(!c.has(mainVar()));
+		assert(!c.has(main_var()));
 		assert(c.is_consistent());
 	}
 	return true;

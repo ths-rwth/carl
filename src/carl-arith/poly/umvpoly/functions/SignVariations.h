@@ -17,7 +17,7 @@ template<typename Coefficient>
 UnivariatePolynomial<Coefficient> reverse(UnivariatePolynomial<Coefficient>&& p) {
 	std::vector<Coefficient> coeffs(std::move(p.coefficients()));
 	std::reverse(coeffs.begin(), coeffs.end());
-	return UnivariatePolynomial<Coefficient>(p.mainVar(), std::move(coeffs));
+	return UnivariatePolynomial<Coefficient>(p.main_var(), std::move(coeffs));
 }
 
 /**
@@ -34,7 +34,7 @@ UnivariatePolynomial<Coefficient> scale(UnivariatePolynomial<Coefficient>&& p, c
 		c *= f;
 		f *= factor;
 	}
-	return UnivariatePolynomial<Coefficient>(p.mainVar(), std::move(coeffs));
+	return UnivariatePolynomial<Coefficient>(p.main_var(), std::move(coeffs));
 }
 
 /**
@@ -56,7 +56,7 @@ UnivariatePolynomial<Coefficient> shift(const UnivariatePolynomial<Coefficient>&
 		}
 		next[0] = a * next[0] + p.coefficients()[p.coefficients().size()-2-i];
 	}
-	return UnivariatePolynomial<Coefficient>(p.mainVar(), std::move(next));
+	return UnivariatePolynomial<Coefficient>(p.main_var(), std::move(next));
 }
 
 }

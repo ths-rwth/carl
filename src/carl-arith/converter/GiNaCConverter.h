@@ -55,7 +55,7 @@ public:
 	GiNaC::ex operator()(const carl::UnivariatePolynomial<Coeff>& p) {
 		GiNaC::ex res;
 		unsigned exp = 0;
-		GiNaC::symbol mainvar = (*this)(p.mainVar());
+		GiNaC::symbol mainvar = (*this)(p.main_var());
 		for (auto c: p.coefficients()) {
 			res += GiNaC::pow(mainvar, exp) * (*this)(c);
 			exp++;

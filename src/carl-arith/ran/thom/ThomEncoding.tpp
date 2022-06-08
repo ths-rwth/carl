@@ -24,7 +24,7 @@ template<typename Number>
 ThomComparisonResult ThomEncoding<Number>::compareDifferentPoly(const ThomEncoding<Number>& lhs, const ThomEncoding<Number>& rhs) {
         using Polynomial = MultivariatePolynomial<Number>;
 
-        std::list<Polynomial> der_rhs = der(rhs.polynomial(), rhs.mainVar(), 0, rhs.polynomial().degree(rhs.mainVar()));
+        std::list<Polynomial> der_rhs = der(rhs.polynomial(), rhs.main_var(), 0, rhs.polynomial().degree(rhs.main_var()));
         SignCondition sc_lhs_on_der_rhs;
         auto it_der_rhs = der_rhs.rbegin();
         uint currLength = 1;

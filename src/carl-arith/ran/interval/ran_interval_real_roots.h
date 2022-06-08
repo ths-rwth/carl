@@ -69,8 +69,8 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 		const Assignment<RealAlgebraicNumberInterval<Number>>& varToRANMap,
 		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
-	CARL_LOG_FUNC("carl.ran.realroots", poly << " in " << poly.mainVar() << ", " << varToRANMap << ", " << interval);
-	assert(varToRANMap.count(poly.mainVar()) == 0);
+	CARL_LOG_FUNC("carl.ran.realroots", poly << " in " << poly.main_var() << ", " << varToRANMap << ", " << interval);
+	assert(varToRANMap.count(poly.main_var()) == 0);
 
 	if (carl::is_zero(poly)) {
 		CARL_LOG_TRACE("carl.ran.realroots", "poly is 0 -> nullified");
@@ -86,7 +86,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 	Assignment<RealAlgebraicNumberInterval<Number>> ir_map;
 
 	for (Variable v: carl::variables(polyCopy)) {
-		if (v == poly.mainVar()) continue;
+		if (v == poly.main_var()) continue;
 		if (varToRANMap.count(v) == 0) {
 			CARL_LOG_TRACE("carl.ran.realroots", "poly still contains unassigned variable " << v << " -> non-univariate");
 			return real_roots_result<RealAlgebraicNumberInterval<Number>>::non_univariate_response();
@@ -107,8 +107,8 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 		CARL_LOG_TRACE("carl.ran.realroots", "poly " << polyCopy << " is univariate after substituting rational assignments");
 		return real_roots(polyCopy, interval);
 	} else {
-		CARL_LOG_TRACE("carl.ran.realroots", polyCopy << " in " << polyCopy.mainVar() << ", " << varToRANMap << ", " << interval);
-		assert(ir_map.find(polyCopy.mainVar()) == ir_map.end());
+		CARL_LOG_TRACE("carl.ran.realroots", polyCopy << " in " << polyCopy.main_var() << ", " << varToRANMap << ", " << interval);
+		assert(ir_map.find(polyCopy.main_var()) == ir_map.end());
 
 		// substitute RANs with low degrees first
 		OrderedAssignment<RealAlgebraicNumberInterval<Number>> ord_ass;
@@ -132,8 +132,8 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 		std::vector<RealAlgebraicNumberInterval<Number>> roots;
 		auto res = real_roots(*evaledpoly, interval);
 		for (const auto& r: res.roots()) { // TODO can be made more efficient!
-			CARL_LOG_TRACE("carl.ran.realroots", "Checking " << polyCopy.mainVar() << " = " << r);
-			ir_map[polyCopy.mainVar()] = r;
+			CARL_LOG_TRACE("carl.ran.realroots", "Checking " << polyCopy.main_var() << " = " << r);
+			ir_map[polyCopy.main_var()] = r;
 			CARL_LOG_TRACE("carl.ran.realroots", "Evaluating " << cons << " on " << ir_map);
 			if (evaluate(cons, ir_map)) {
 				roots.emplace_back(r);

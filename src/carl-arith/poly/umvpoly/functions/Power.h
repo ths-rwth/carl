@@ -75,9 +75,9 @@ MultivariatePolynomial<C,O,P> pow_naive(const MultivariatePolynomial<C,O,P>& p, 
  */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> pow(const UnivariatePolynomial<Coeff>& p, std::size_t exp) {
-	if (exp == 0) return UnivariatePolynomial<Coeff>(p.mainVar(), constant_one<Coeff>::get());
-	if (carl::is_zero(p)) return UnivariatePolynomial<Coeff>(p.mainVar());
-	UnivariatePolynomial<Coeff> res(p.mainVar(), constant_one<Coeff>::get());
+	if (exp == 0) return UnivariatePolynomial<Coeff>(p.main_var(), constant_one<Coeff>::get());
+	if (carl::is_zero(p)) return UnivariatePolynomial<Coeff>(p.main_var());
+	UnivariatePolynomial<Coeff> res(p.main_var(), constant_one<Coeff>::get());
 	UnivariatePolynomial<Coeff> mult(p);
 	while (exp > 0) {
 		if ((exp & 1) != 0) res *= mult;

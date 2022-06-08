@@ -230,7 +230,7 @@ private:
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];
 				if (exp == 0) *this << " " << coeff;
-				else *this << " (* " << coeff << " " << Monomial(up.mainVar(), exp) << ")";
+				else *this << " (* " << coeff << " " << Monomial(up.main_var(), exp) << ")";
 			}
 			*this << ")";
 		}

@@ -64,7 +64,7 @@ std::optional<RealAlgebraicNumberInterval<Number>> evaluate(MultivariatePolynomi
 	if (var_to_interval.size() == 1) {
 		CARL_LOG_TRACE("carl.ran.evaluation", "Single interval");
 		auto poly = carl::to_univariate_polynomial(p);
-		assert(poly.mainVar() == var_to_interval.begin()->first);
+		assert(poly.main_var() == var_to_interval.begin()->first);
 		CARL_LOG_TRACE("carl.ran.evaluation", "Consider univariate poly " << poly);
 		if (m.at(var_to_interval.begin()->first).sgn(poly) == Sign::ZERO) {
 			CARL_LOG_DEBUG("carl.ran.evaluation", "Returning " << RealAlgebraicNumberInterval<Number>());
@@ -200,7 +200,7 @@ boost::tribool evaluate(const BasicConstraint<Poly>& c, const Assignment<RealAlg
 		if (var_to_interval.size() == 1) {
 			CARL_LOG_TRACE("carl.ran.evaluation", "Single interval");
 			auto poly = carl::to_univariate_polynomial(p);
-			assert(poly.mainVar() == var_to_interval.begin()->first);
+			assert(poly.main_var() == var_to_interval.begin()->first);
 			CARL_LOG_TRACE("carl.ran.evaluation", "Consider univariate poly " << poly);
 			if (m.at(var_to_interval.begin()->first).sgn(poly) == Sign::ZERO) {
 				CARL_LOG_DEBUG("carl.ran.evaluation", "Got " << RealAlgebraicNumberInterval<Number>());

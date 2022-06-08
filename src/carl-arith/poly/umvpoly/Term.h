@@ -148,9 +148,9 @@ public:
 		 * 
 		 * @return 
 		 */
-	std::size_t getNrVariables() const {
+	std::size_t num_variables() const {
 		if (!mMonomial) return 0;
-		return mMonomial->nrVariables();
+		return mMonomial->num_variables();
 	}
 
 	/**
@@ -188,7 +188,7 @@ public:
 		 * @return The only variable occuring in the term.
 		 */
 	Variable single_variable() const {
-		assert(getNrVariables() == 1);
+		assert(num_variables() == 1);
 		return mMonomial->single_variable();
 	}
 

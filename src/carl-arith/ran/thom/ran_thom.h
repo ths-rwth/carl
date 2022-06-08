@@ -40,8 +40,8 @@ public:
 	const auto& polynomial() const {
 		return thom_encoding().polynomial();
 	}
-	const auto& mainVar() const {
-		return thom_encoding().mainVar();
+	const auto& main_var() const {
+		return thom_encoding().main_var();
 	}
 	auto sign_condition() const {
 		return thom_encoding().signCondition();
@@ -96,7 +96,7 @@ Number evaluate(const MultivariatePolynomial<Number>& p, std::map<Variable, Real
 			<< "m = " << m << "\n"
 			<< "****************************\n");
 	for(const auto& entry : m) { 
-		assert(entry.first == entry.second.thom_encoding().mainVar());
+		assert(entry.first == entry.second.thom_encoding().main_var());
 	}
 	assert(m.size() > 0);
 	
@@ -209,7 +209,7 @@ bool operator<(const Number& lhs, const RealAlgebraicNumberThom<Number>& rhs) {
 
 template<typename Num>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberThom<Num>& rhs) {
-	os << "(TE " << rhs.polynomial() << " in " << rhs.mainVar() << ", " << rhs.sign_condition();
+	os << "(TE " << rhs.polynomial() << " in " << rhs.main_var() << ", " << rhs.sign_condition();
 	if (rhs.dimension() > 1) {
 		os << " OVER " << rhs.point();
 	}

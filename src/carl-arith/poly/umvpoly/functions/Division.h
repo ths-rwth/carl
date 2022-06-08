@@ -150,7 +150,7 @@ bool try_divide(const UnivariatePolynomial<Coeff>& dividend, const Coeff& diviso
 	bool res = try_divide(Coeff(dividend), divisor, quo);
 	CARL_LOG_TRACE("carl.core", Coeff(dividend) << " / " << divisor << " = " << quo);
 	assert(quo.is_consistent());
-	if (res) quotient = carl::to_univariate_polynomial(quo, dividend.mainVar());
+	if (res) quotient = carl::to_univariate_polynomial(quo, dividend.main_var());
 	return res;
 }
 
@@ -163,7 +163,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Co
 		for (auto& c: res.coefficients()) {
 			c = c / divisor;
 		}
-		return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial(p.mainVar()) };
+		return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial(p.main_var()) };
 	} else {
 		CARL_LOG_ERROR("carl.core", "Called divide() with non-field number divisor " << divisor);
 		return p;
@@ -181,7 +181,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Co
 		c = divide(c, divisor);
 	}
 	assert(res.is_consistent());
-	return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial<Coeff>(p.mainVar())};
+	return DivisionResult<UnivariatePolynomial<Coeff>> {res, UnivariatePolynomial<Coeff>(p.main_var())};
 }
 
 /**
@@ -194,7 +194,7 @@ template<typename Coeff>
 DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Coeff>& dividend, const UnivariatePolynomial<Coeff>& divisor) {
 	if constexpr (is_integer_type<Coeff>::value) {
 		assert(!carl::is_zero(divisor));
-		DivisionResult<UnivariatePolynomial<Coeff>> result {UnivariatePolynomial<Coeff>(dividend.mainVar()), dividend};
+		DivisionResult<UnivariatePolynomial<Coeff>> result {UnivariatePolynomial<Coeff>(dividend.main_var()), dividend};
 		if(carl::is_zero(dividend)) return result;
 		assert(dividend == divisor * result.quotient + result.remainder);
 
@@ -203,16 +203,16 @@ DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Co
 		uint degdiff = dividend.degree() - divisor.degree();
 		for (std::size_t offset = 0; offset <= degdiff; offset++) {
 			Coeff factor = carl::quotient(result.remainder.coefficients()[dividend.degree()-offset], divisor.lcoeff());
-			result.remainder -= UnivariatePolynomial<Coeff>(dividend.mainVar(), factor, degdiff - offset) * divisor;
+			result.remainder -= UnivariatePolynomial<Coeff>(dividend.main_var(), factor, degdiff - offset) * divisor;
 			coeffs[degdiff-offset] += factor;
 		}
-		result.quotient = UnivariatePolynomial<Coeff>(dividend.mainVar(), std::move(coeffs));
+		result.quotient = UnivariatePolynomial<Coeff>(dividend.main_var(), std::move(coeffs));
 		assert(dividend == divisor * result.quotient + result.remainder);
 		return result;
 	} else if constexpr (is_field_type<Coeff>::value) {
 		assert(!carl::is_zero(divisor));
-		assert(dividend.mainVar() == divisor.mainVar());
-		DivisionResult<UnivariatePolynomial<Coeff>> result {UnivariatePolynomial<Coeff>(dividend.mainVar()), dividend};
+		assert(dividend.main_var() == divisor.main_var());
+		DivisionResult<UnivariatePolynomial<Coeff>> result {UnivariatePolynomial<Coeff>(dividend.main_var()), dividend};
 		if(carl::is_zero(dividend)) return result;
 		assert(dividend == divisor * result.quotient + result.remainder);
 		if(divisor.degree() > dividend.degree())
@@ -225,11 +225,11 @@ DivisionResult<UnivariatePolynomial<Coeff>> divide(const UnivariatePolynomial<Co
 		{
 			Coeff factor = result.remainder.lcoeff()/divisor.lcoeff();
 			uint degdiff = result.remainder.degree() - divisor.degree();
-			result.remainder -= UnivariatePolynomial<Coeff>(dividend.mainVar(), factor, degdiff) * divisor;
+			result.remainder -= UnivariatePolynomial<Coeff>(dividend.main_var(), factor, degdiff) * divisor;
 			coeffs[degdiff] += factor;
 		}
 		while(!carl::is_zero(result.remainder) && divisor.degree() <= result.remainder.degree());
-		result.quotient = UnivariatePolynomial<Coeff>(dividend.mainVar(), std::move(coeffs));
+		result.quotient = UnivariatePolynomial<Coeff>(dividend.main_var(), std::move(coeffs));
 		assert(dividend == divisor * result.quotient + result.remainder);
 		return result;
 	} else {

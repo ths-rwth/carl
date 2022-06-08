@@ -110,7 +110,7 @@ public:
 
 	inline SignCondition signCondition() const { return mSc; }
 	inline SignCondition relevantSignCondition() const { return mSc.trailingPart(mRelevant); }
-	inline Variable::Arg mainVar() const { return mMainVar; }
+	inline Variable::Arg main_var() const { return mMainVar; }
 	inline const Polynomial& polynomial() const { return mP; } 
 	inline const ThomEncoding<Number>& point() const {assert(mPoint); return *mPoint; }
 	inline SignDetermination<Number> sd() const {assert(mSd); return *mSd; }
@@ -142,9 +142,9 @@ public:
 	}
 	
 	std::list<Variable> accumulateVariables() const {
-		if(mPoint == nullptr) return {mainVar()};
+		if(mPoint == nullptr) return {main_var()};
 		std::list<Variable> res = point().accumulateVariables();
-		res.push_front(mainVar());
+		res.push_front(main_var());
 		return res;
 	}
 	
@@ -246,11 +246,11 @@ public:
 		
 		for(auto itEncoding = thisEncodings.rbegin(); itEncoding != thisEncodings.rend(); itEncoding++) {
 			std::list<Variable> vars = result.accumulateVariables();
-			if(std::find(vars.begin(), vars.end(), itEncoding->mainVar()) != vars.end()) {
+			if(std::find(vars.begin(), vars.end(), itEncoding->main_var()) != vars.end()) {
 				continue;
 			}
 			std::shared_ptr<ThomEncoding<Number>> result_ptr = std::make_shared<ThomEncoding<Number>>(result);
-			std::list<ThomEncoding<Number>> roots = realRootsThom(itEncoding->polynomial(), itEncoding->mainVar(), result_ptr);
+			std::list<ThomEncoding<Number>> roots = realRootsThom(itEncoding->polynomial(), itEncoding->main_var(), result_ptr);
 			bool succes = false;
 			for(const auto& r : roots) {
 				if(r.accumulateRelevantSigns().isSuffixOf(signCondition)) {
@@ -368,7 +368,7 @@ public:
 			// in this case it is not necessary to compare them by the numbers they actually represent
 			return compareDifferentLevels(lhs, rhs);
 		}
-		CARL_LOG_ASSERT("carl.thom.compare", lhs.mainVar() == rhs.mainVar(), "");
+		CARL_LOG_ASSERT("carl.thom.compare", lhs.main_var() == rhs.main_var(), "");
 		
 		// 2. same underlying polynomial
 		if(lhs.polynomial() == rhs.polynomial()) {
@@ -405,7 +405,7 @@ private:
 	 *      2. they both have a different underlying point which is not nullptr
 	 */
 	static bool areComparable(const ThomEncoding<Number>& lhs, const ThomEncoding<Number>& rhs) {
-		if(lhs.mainVar() != rhs.mainVar()) {
+		if(lhs.main_var() != rhs.main_var()) {
 			return false;
 		}
 		// they have the same main var
@@ -433,7 +433,7 @@ private:
 	}
 public:
 	static ThomComparisonResult compareRational(const ThomEncoding<Number>& lhs, const Number& rhs) {
-		ThomEncoding<Number> rhs_te(rhs, lhs.mainVar(), lhs.mPoint);
+		ThomEncoding<Number> rhs_te(rhs, lhs.main_var(), lhs.mPoint);
 		return compare(lhs, rhs_te);
 	}
 	
@@ -600,7 +600,7 @@ ThomEncoding<N> operator+(const N& lhs, const ThomEncoding<N>& rhs) { return rhs
 
 template<typename N>
 std::ostream& operator<<(std::ostream& os, const ThomEncoding<N>& rhs) {
-	os << "TE " << rhs.polynomial() << " in " << rhs.mainVar() << ", " << rhs.signCondition();
+	os << "TE " << rhs.polynomial() << " in " << rhs.main_var() << ", " << rhs.signCondition();
 	if(rhs.dimension() > 1) {
 		os << " OVER " << rhs.point();
 	}

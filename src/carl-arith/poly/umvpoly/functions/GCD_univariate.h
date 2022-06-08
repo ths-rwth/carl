@@ -38,14 +38,14 @@ UnivariatePolynomial<Coeff> gcd_recursive(const UnivariatePolynomial<Coeff>& a, 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> extended_gcd(const UnivariatePolynomial<Coeff>& a, const UnivariatePolynomial<Coeff>& b,
 											UnivariatePolynomial<Coeff>& s, UnivariatePolynomial<Coeff>& t) {
-	assert(a.mainVar() == b.mainVar());
-	assert(a.mainVar() == s.mainVar());
-	assert(a.mainVar() == t.mainVar());
+	assert(a.main_var() == b.main_var());
+	assert(a.main_var() == s.main_var());
+	assert(a.main_var() == t.main_var());
 	assert(!is_zero(a));
 	assert(!is_zero(b));
 	
 	CARL_LOG_DEBUG("carl.core", "UnivEEA: a=" << a << ", b=" << b );
-	Variable x = a.mainVar();
+	Variable x = a.main_var();
 	UnivariatePolynomial<Coeff> c(a);
 	UnivariatePolynomial<Coeff> d(b);
 	c.normalizeCoefficients();
@@ -105,7 +105,7 @@ UnivariatePolynomial<Coeff> gcd(const UnivariatePolynomial<Coeff>& a, const Univ
 	// We want degree(b) <= degree(a).
 	assert(!carl::is_zero(a));
 	assert(!carl::is_zero(b));
-	assert(a.mainVar() == b.mainVar());
+	assert(a.main_var() == b.main_var());
 	if(a.degree() < b.degree()) {
 		return gcd_recursive(b.normalized(),a.normalized()).normalized();
 	} else {

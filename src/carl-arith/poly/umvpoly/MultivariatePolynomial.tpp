@@ -135,7 +135,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Un
 		if (exp == 0) {
 			for (const auto& term: c) mTermAdditionManager.template addTerm<true>(id, term);
 		} else {
-			for (const auto& term: c * Term<Coeff>(constant_one<Coeff>::get(), p.mainVar(), exp)) {
+			for (const auto& term: c * Term<Coeff>(constant_one<Coeff>::get(), p.main_var(), exp)) {
 				mTermAdditionManager.template addTerm<true>(id, term);
 			}
 		}
@@ -157,7 +157,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Un
 	for (const auto& c: p.coefficients()) {
 		if (!carl::is_zero(c)) {
 			if (exp == 0) mTerms.emplace_back(c);
-			else mTerms.emplace_back(c, p.mainVar(), exp);
+			else mTerms.emplace_back(c, p.main_var(), exp);
 		}
 		exp++;
 	}
@@ -357,7 +357,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::is_univariate() const {
 	// A constant polynomial is obviously univariate.
 	if (is_constant()) return true;
 
-	if (this->lterm().getNrVariables() > 1) {
+	if (this->lterm().num_variables() > 1) {
 		return false;
 	}
 

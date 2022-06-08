@@ -118,7 +118,7 @@ public:
 		}
 		CARL_LOG_DEBUG("carl.converter", "Coprime Factor/ Denominator: " << denominator);
 
-		mainVar = p.mainVar();
+		mainVar = p.main_var();
 		CARL_LOG_DEBUG("carl.converter", "Main Variable: " << mainVar);
 		std::vector<poly::Integer> coefficients;
 		for (const auto& c : p.coefficients()) {

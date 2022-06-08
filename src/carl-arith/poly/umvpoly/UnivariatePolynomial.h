@@ -334,7 +334,7 @@ public:
 	 * Retrieves the main variable of this polynomial.
 	 * @return Main variable.
 	 */
-	Variable mainVar() const {
+	Variable main_var() const {
 		return mMainVar;
 	}
 
@@ -344,7 +344,7 @@ public:
 	 * @return If v occurs in the polynomial.
 	 */
 	bool has(Variable v) const {
-		if (v == mainVar()) return true;
+		if (v == main_var()) return true;
 		if constexpr (!carl::is_number_type<Coefficient>::value) {
 			for (const auto& c: mCoefficients) {
 				if (c.has(v)) return true;
@@ -572,17 +572,6 @@ public:
 	 */
 	template<typename N=NumberType, EnableIf<is_subset_of_rationals_type<N>> = dummy>
 	typename UnderlyingNumberType<Coefficient>::type numeric_content() const;
-
-	/**
-	 * Returns this/divisor where divisor is the numeric content of this polynomial.
-	 * @return 
-	 */
-	[[deprecated("Use carl::pseudo_primitive_part() instead.")]]
-	UnivariatePolynomial pseudo_primpart() const {
-		auto c = this->numeric_content();
-		if ((c == NumberType(0)) || (c == NumberType(1))) return *this;
-		return this->divideBy(this->numeric_content()).quotient;
-	}
 
 	/**
 	 * Compute the main denominator of all numeric coefficients of this polynomial.
@@ -828,7 +817,7 @@ bool is_one(const UnivariatePolynomial<Coefficient>& p) {
 /// Add the variables of the given polynomial to the variables.
 template<typename Coeff>
 void variables(const UnivariatePolynomial<Coeff>& p, carlVariables& vars) {
-	if (!is_constant(p)) vars.add(p.mainVar());
+	if (!is_constant(p)) vars.add(p.main_var());
 	if constexpr (!carl::is_number_type<Coeff>::value) {
 		for (const auto& c : p.coefficients()) {
 			variables(c, vars);
@@ -859,7 +848,7 @@ struct hash<carl::UnivariatePolynomial<Coefficient>> {
 	 * @return Hash of p.
 	 */
 	std::size_t operator()(const carl::UnivariatePolynomial<Coefficient>& p) const {
-		return carl::hash_all(p.mainVar(), p.coefficients());
+		return carl::hash_all(p.main_var(), p.coefficients());
 	}
 };
 

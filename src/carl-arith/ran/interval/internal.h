@@ -27,8 +27,8 @@ namespace carl::ran::interval {
                 CARL_LOG_TRACE("carl.ran", vic.first << " -> " << vic.second << " is now " << polys.back());
             }
             polys.emplace_back(le.getLiftingPoly());
-            varOrder.emplace_back(p.mainVar());
-            CARL_LOG_TRACE("carl.ran", "main poly " << p << " in " << p.mainVar() << " is now " << polys.back());
+            varOrder.emplace_back(p.main_var());
+            CARL_LOG_TRACE("carl.ran", "main poly " << p << " in " << p.main_var() << " is now " << polys.back());
         } else {
             CARL_LOG_TRACE("carl.ran", "Substituting using field extensions only");
             FieldExtensions<Number, MultivariatePolynomial<Number>> fe;
@@ -43,8 +43,8 @@ namespace carl::ran::interval {
                 CARL_LOG_TRACE("carl.ran", vic.first << " -> " << vic.second << " is now " << polys.back());
             }
             polys.emplace_back(p);
-            varOrder.emplace_back(p.mainVar());
-            CARL_LOG_TRACE("carl.ran", "main poly " << p << " in " << p.mainVar() << " is now " << polys.back());
+            varOrder.emplace_back(p.main_var());
+            CARL_LOG_TRACE("carl.ran", "main poly " << p << " in " << p.main_var() << " is now " << polys.back());
         }
 
         CARL_LOG_TRACE("carl.ran", "Perform algebraic substitution on " << polys << " wrt " << varOrder);

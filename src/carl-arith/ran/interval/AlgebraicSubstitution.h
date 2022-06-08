@@ -76,10 +76,10 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution_groebner(
 	std::vector<Variable> varOrder;
 	for (const auto& poly: polynomials) {
 		polys.emplace_back(poly);
-		varOrder.emplace_back(poly.mainVar());
+		varOrder.emplace_back(poly.main_var());
 	}
 	polys.emplace_back(p);
-	varOrder.emplace_back(p.mainVar());
+	varOrder.emplace_back(p.main_var());
 
 	CARL_LOG_DEBUG("carl.algsubs", "Converted " << p << " and " << polynomials << " to " << polys << " under " << varOrder);
 	return algebraic_substitution_groebner(polys, varOrder);
@@ -97,14 +97,14 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution_resultant(
 	const UnivariatePolynomial<MultivariatePolynomial<Number>>& p,
 	const std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>>& polynomials
 ) {
-	Variable v = p.mainVar();
+	Variable v = p.main_var();
 	UnivariatePolynomial<MultivariatePolynomial<Number>> cur = p;
 	for (auto it = polynomials.rbegin(); it != polynomials.rend(); ++it) {
 		const auto& poly = *it;
-		if (!cur.has(poly.mainVar())) {
+		if (!cur.has(poly.main_var())) {
 			continue;
 		}
-		cur = pseudo_remainder(switch_main_variable(cur, poly.mainVar()), poly);
+		cur = pseudo_remainder(switch_main_variable(cur, poly.main_var()), poly);
 		CARL_LOG_DEBUG("carl.algsubs", "Computing resultant of " << cur << " and " << poly);
 		cur = carl::resultant(cur, poly);
 		CARL_LOG_DEBUG("carl.algsubs", "-> " << cur);

@@ -106,7 +106,7 @@ UnivariatePolynomial<C> derivative(const UnivariatePolynomial<C>& p, std::size_t
 	if (is_zero(p)) return p;
 	if (p.degree() < n) {
 		CARL_LOG_DEBUG("carl.core", "derivative(" << p << ", " << n << ") = 0");
-		return UnivariatePolynomial<C>(p.mainVar());
+		return UnivariatePolynomial<C>(p.main_var());
 	}
 
 	std::vector<C> newCoeffs;
@@ -114,8 +114,8 @@ UnivariatePolynomial<C> derivative(const UnivariatePolynomial<C>& p, std::size_t
 		std::size_t factor = detail_derivative::multiply(n + i, n);
 		newCoeffs.emplace_back(static_cast<C>(factor) * p.coefficients()[i + n]);
 	}
-	CARL_LOG_DEBUG("carl.core", "derivative(" << p << ", " << n << ") = " << UnivariatePolynomial<C>(p.mainVar(), newCoeffs));
-	return UnivariatePolynomial<C>(p.mainVar(), std::move(newCoeffs));
+	CARL_LOG_DEBUG("carl.core", "derivative(" << p << ", " << n << ") = " << UnivariatePolynomial<C>(p.main_var(), newCoeffs));
+	return UnivariatePolynomial<C>(p.main_var(), std::move(newCoeffs));
 }
 
 /**
@@ -125,14 +125,14 @@ template<typename C>
 UnivariatePolynomial<C> derivative(const UnivariatePolynomial<C>& p, Variable v, std::size_t n = 1) {
 	if (n == 0) return p;
 	if (is_zero(p)) return p;
-	if (v == p.mainVar()) return derivative(p, n);
+	if (v == p.main_var()) return derivative(p, n);
 
 	std::vector<C> newCoeffs;
 	std::transform(p.coefficients().begin(), p.coefficients().end(), std::back_inserter(newCoeffs),
 		[v,n](const auto& c) { return derivative(c, v, n); }
 	);
-	CARL_LOG_DEBUG("carl.core", "derivative(" << p << ", " << n << ") = " << UnivariatePolynomial<C>(p.mainVar(), newCoeffs));
-	return UnivariatePolynomial<C>(p.mainVar(), std::move(newCoeffs));
+	CARL_LOG_DEBUG("carl.core", "derivative(" << p << ", " << n << ") = " << UnivariatePolynomial<C>(p.main_var(), newCoeffs));
+	return UnivariatePolynomial<C>(p.main_var(), std::move(newCoeffs));
 }
 
 
