@@ -2,8 +2,8 @@
 #include <sstream>
 
 #include <carl-arith/groebner/groebner.h>
-#include <carl-arith/groebner/katsura.h>
-#include <carl-arith/groebner/cyclic.h>
+#include "groebner/katsura.h"
+#include "groebner/cyclic.h"
 #include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-common/debug/Timer.h>
 
