@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include <carl/groebner/Reductor.h>
+#include <carl-arith/groebner/Reductor.h>
 #include <carl-common/meta/platform.h>
 
 #include "../Common.h"

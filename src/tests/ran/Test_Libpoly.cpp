@@ -4,10 +4,18 @@
 #include <gtest/gtest.h>
 
 #include "../Common.h"
-#include <carl/core/VariablePool.h>
+#include <carl-arith/core/VariablePool.h>
 
+<<<<<<< HEAD
 #include <carl/ran/ran.h>
 #include <carl/ran/real_roots.h>
+=======
+#if defined(USE_LIBPOLY) || defined(RAN_USE_LIBPOLY)
+
+#include <carl-arith/converter/LibpolyFunctions.h>
+#include <carl-arith/ran/ran.h>
+#include <carl-arith/ran/real_roots.h>
+>>>>>>> development
 
 using namespace carl;
 

@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <carl/core/Variable.h>
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/poly/umvpoly/MonomialPool.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/MonomialPool.h>
 #include <list>
 #include <boost/variant.hpp>
 
-#include <carl/poly/umvpoly/functions/Derivative.h>
-#include <carl/poly/umvpoly/functions/Power.h>
+#include <carl-arith/poly/umvpoly/functions/Derivative.h>
+#include <carl-arith/poly/umvpoly/functions/Power.h>
 
 #include "../Common.h"
 
@@ -89,7 +89,7 @@ TEST(Monomial, Operators)
 	EXPECT_EQ((unsigned)0,m0->exponent_of_variable(v2));
 	m0 = m0 * v2;
 	EXPECT_EQ((unsigned)4,m0->tdeg());
-	EXPECT_EQ((unsigned)3,m0->nrVariables());
+	EXPECT_EQ((unsigned)3,m0->num_variables());
 
 	carl::Monomial::Arg m3 = carl::createMonomial(v1, 1);
 	carl::Monomial::Arg m2 = carl::createMonomial(v1, 1);

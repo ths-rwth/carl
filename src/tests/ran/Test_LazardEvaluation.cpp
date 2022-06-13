@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 
-#include <carl/ran/interval/LazardEvaluation.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/ran/interval/LazardEvaluation.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
 
 #include "../Common.h"
 

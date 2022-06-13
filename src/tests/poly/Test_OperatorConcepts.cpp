@@ -1,10 +1,10 @@
 
 #include "../Common.h"
 
-#include <carl/core/Variable.h>
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/poly/umvpoly/Term.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/Term.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 
 #include <boost/concept_check.hpp>
 #include "gtest/gtest.h"

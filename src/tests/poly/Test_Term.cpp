@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include <carl/poly/umvpoly/functions/Derivative.h>
-#include <carl/poly/umvpoly/functions/Substitution.h>
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/poly/umvpoly/Term.h>
-#include <carl/core/Variable.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/functions/Derivative.h>
+#include <carl-arith/poly/umvpoly/functions/Substitution.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/Term.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-arith/core/VariablePool.h>
 
 #include "../number_types.h"
 #include "../util.h"
@@ -30,7 +30,7 @@ TYPED_TEST(TermTest, Operators)
     Term<TypeParam> t0(v0);
     EXPECT_TRUE(t0.is_linear());
     EXPECT_TRUE(t.is_linear());
-    EXPECT_EQ(0u, t.getNrVariables());
+    EXPECT_EQ(0u, t.num_variables());
 }
 
 TYPED_TEST(TermTest, Multiplication)

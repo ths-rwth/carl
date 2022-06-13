@@ -3,10 +3,10 @@
 
 #include "../Common.h"
 
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/ran/ran.h>
-#include <carl/ran/real_roots.h>
-#include <carl/ran/interval/ran_interval_extra.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/ran/ran.h>
+#include <carl-arith/ran/real_roots.h>
+#include <carl-arith/ran/interval/ran_interval_extra.h>
 
 
 using namespace carl;

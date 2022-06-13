@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <carl/core/Variables.h>
+#include <carl-arith/core/Variables.h>
 #include "UFInstance.h"
 #include "UVariable.h"
 

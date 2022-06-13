@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <carl/poly/umvpoly/functions/GCD.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/poly/umvpoly/functions/GCD.h>
+#include <carl-arith/numbers/numbers.h>
 #include <carl-common/meta/platform.h>
 
 #include "../Common.h"

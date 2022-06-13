@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include <carl/poly/umvpoly/MonomialPool.h>
+#include <carl-arith/poly/umvpoly/MonomialPool.h>
 
 using namespace carl;
 

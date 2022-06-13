@@ -9,7 +9,7 @@
 
 #include <carl-logging/carl-logging.h>
 #include "Common.h"
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 #include "FormulaParser.h"
 #include "PolynomialParser.h"
 #include "RationalFunctionParser.h"

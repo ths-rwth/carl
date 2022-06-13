@@ -1,12 +1,12 @@
 #include "gtest/gtest.h"
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-extpolys/FactorizedPolynomial.h>
 #include <carl-extpolys/substitution.h>
-#include <carl/poly/umvpoly/functions/LCM.h>
-#include <carl/poly/umvpoly/functions/Quotient.h>
+#include <carl-arith/poly/umvpoly/functions/LCM.h>
+#include <carl-arith/poly/umvpoly/functions/Quotient.h>
 #include <carl-io/StringParser.h>
 #include <carl-common/meta/platform.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 
 #include "../Common.h"
 

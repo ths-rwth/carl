@@ -1,7 +1,7 @@
 #pragma once
 
-#include <carl/core/Variable.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-arith/core/VariablePool.h>
 
 #include "../sort/SortManager.h"
 

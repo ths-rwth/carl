@@ -1,7 +1,7 @@
 #pragma once
 
 #include <carl-logging/carl-logging.h>
-#include <carl/core/Relation.h>
+#include <carl-arith/core/Relation.h>
 #include <carl-formula/formula/Formula.h>
 
 #include <iostream>

@@ -5,11 +5,11 @@
  */
 
 #pragma once
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 #include <carl-common/util/hash.h>
 #include "FactorizedPolynomial.h"
-#include <carl/poly/umvpoly/functions/Evaluation.h>
-#include <carl/poly/umvpoly/functions/GCD.h>
+#include <carl-arith/poly/umvpoly/functions/Evaluation.h>
+#include <carl-arith/poly/umvpoly/functions/GCD.h>
 
 #include "evaluation.h"
 

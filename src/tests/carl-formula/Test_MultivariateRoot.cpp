@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/extended/MultivariateRoot.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/extended/MultivariateRoot.h>
 #include <carl-formula/formula/Formula.h>
 #include <carl-formula/model/Model.h>
 #include <carl-formula/model/evaluation/ModelEvaluation.h>

@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 #include <map>
 
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/ran/ran.h>
-#include <carl/ran/interval/ran_interval_extra.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/ran/ran.h>
+#include <carl-arith/ran/interval/ran_interval_extra.h>
 
 
 #include "../Common.h"

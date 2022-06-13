@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Model.h"
-#include <carl/extended/MultivariateRoot.h>
+#include <carl-arith/extended/MultivariateRoot.h>
 
 namespace carl {
 

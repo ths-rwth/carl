@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Visit.h"
-#include <carl/core/Variables.h>
+#include <carl-arith/core/Variables.h>
 
 namespace carl{
 

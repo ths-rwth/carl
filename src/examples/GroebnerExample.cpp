@@ -1,10 +1,10 @@
 #include <vector>
 #include <sstream>
 
-#include <carl/groebner/groebner.h>
+#include <carl-arith/groebner/groebner.h>
 #include "groebner/katsura.h"
 #include "groebner/cyclic.h"
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-common/debug/Timer.h>
 
 using namespace carl;

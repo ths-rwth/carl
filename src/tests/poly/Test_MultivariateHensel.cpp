@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <carl/poly/umvpoly/functions/MultivariateHensel.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/functions/MultivariateHensel.h>
+#include <carl-arith/core/VariablePool.h>
 #include <carl-common/meta/platform.h>
 
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 
 using namespace carl;
 /*

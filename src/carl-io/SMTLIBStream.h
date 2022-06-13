@@ -1,18 +1,18 @@
 #pragma once
 
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/core/Relation.h>
-#include <carl/poly/umvpoly/Term.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/core/Variable.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/core/Relation.h>
+#include <carl-arith/poly/umvpoly/Term.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/core/Variable.h>
 #include <carl-formula/arithmetic/Constraint.h>
-#include <carl/extended/VariableComparison.h>
+#include <carl-arith/extended/VariableComparison.h>
 #include <carl-formula/formula/Formula.h>
 #include <carl-formula/formula/Logic.h>
 #include <carl-formula/model/Model.h>
 #include <carl-formula/sort/Sort.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 #include <carl-common/util/tuple_util.h>
 #include <carl-common/util/streamingOperators.h>
 
@@ -230,7 +230,7 @@ private:
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];
 				if (exp == 0) *this << " " << coeff;
-				else *this << " (* " << coeff << " " << Monomial(up.mainVar(), exp) << ")";
+				else *this << " (* " << coeff << " " << Monomial(up.main_var(), exp) << ")";
 			}
 			*this << ")";
 		}

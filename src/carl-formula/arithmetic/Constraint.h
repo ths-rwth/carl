@@ -2,15 +2,15 @@
 
 #include <carl-common/memory/Pool.h>
 #include <carl-common/config.h>
-#include <carl/core/Variables.h>
-#include <carl/poly/umvpoly/functions/VarInfo.h>
-#include <carl/poly/umvpoly/functions/Factorization.h>
-#include <carl/core/Common.h>
-#include <carl/constraint/Simplification.h>
-#include <carl/constraint/Comparison.h>
-#include <carl/constraint/Evaluation.h>
-#include <carl/constraint/Substitution.h>
-#include <carl/constraint/Bound.h>
+#include <carl-arith/core/Variables.h>
+#include <carl-arith/poly/umvpoly/functions/VarInfo.h>
+#include <carl-arith/poly/umvpoly/functions/Factorization.h>
+#include <carl-arith/core/Common.h>
+#include <carl-arith/constraint/Simplification.h>
+#include <carl-arith/constraint/Comparison.h>
+#include <carl-arith/constraint/Evaluation.h>
+#include <carl-arith/constraint/Substitution.h>
+#include <carl-arith/constraint/Bound.h>
 
 #include <cassert>
 #include <cstring>

@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
-#include <carl/core/VariablePool.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/poly/umvpoly/functions/PrimitiveEuclidean.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/functions/PrimitiveEuclidean.h>
 
 using namespace carl;
 

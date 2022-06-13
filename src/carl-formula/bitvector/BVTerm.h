@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <carl/core/Variables.h>
+#include <carl-arith/core/Variables.h>
 #include <carl-common/util/variant_util.h>
 #include <boost/variant.hpp>
 

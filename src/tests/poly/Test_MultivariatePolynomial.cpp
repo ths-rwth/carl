@@ -1,12 +1,12 @@
 #include "gtest/gtest.h"
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/poly/umvpoly/functions/Quotient.h>
-#include <carl/poly/umvpoly/functions/SPolynomial.h>
-#include <carl/poly/umvpoly/functions/to_univariate_polynomial.h>
-#include <carl/core/VariablePool.h>
-#include <carl/interval/Interval.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/functions/Quotient.h>
+#include <carl-arith/poly/umvpoly/functions/SPolynomial.h>
+#include <carl-arith/poly/umvpoly/functions/to_univariate_polynomial.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/interval/Interval.h>
 #include <list>
-#include <carl/converter/OldGinacConverter.h>
+#include <carl-arith/converter/OldGinacConverter.h>
 #include <carl-io/StringParser.h>
 #include <carl-common/meta/platform.h>
 

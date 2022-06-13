@@ -1,5 +1,5 @@
 #include <boost/concept_check.hpp>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 #include <gtest/gtest.h>
 
 #include "../number_types.h"

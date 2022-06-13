@@ -1,7 +1,7 @@
 #include <cassert>
 
-#include <carl/poly/umvpoly/Monomial.h>
-#include <carl/poly/umvpoly/MonomialPool.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/MonomialPool.h>
 
 int main() {
 	/*

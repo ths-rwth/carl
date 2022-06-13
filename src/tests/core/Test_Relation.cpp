@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <carl/core/Relation.h>
+#include <carl-arith/core/Relation.h>
 
 #include "../get_output.h"
 #include "../invalid_value.h"

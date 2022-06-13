@@ -1,7 +1,7 @@
 #include "../Common.h"
 
-#include <carl/numbers/FactorizationFactory.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/FactorizationFactory.h>
+#include <carl-arith/numbers/numbers.h>
 
 #include <numeric>
 

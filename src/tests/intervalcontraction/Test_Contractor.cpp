@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <carl/interval/Interval.h>
-#include <carl/core/VariablePool.h>
-#include <carl/poly/umvpoly/functions/IntervalEvaluation.h>
-#include <carl/intervalcontraction/Contractor.h>
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>
+#include <carl-arith/intervalcontraction/Contractor.h>
 #include <carl-common/meta/platform.h>
 
 #include "../number_types.h"

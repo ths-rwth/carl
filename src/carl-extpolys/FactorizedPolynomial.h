@@ -8,11 +8,11 @@
 #pragma once
 
 #include <iostream>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 #include <carl-common/memory/Cache.h>
-#include <carl/poly/umvpoly/functions/Division.h>
+#include <carl-arith/poly/umvpoly/functions/Division.h>
 #include "PolynomialFactorizationPair.h"
-#include <carl/poly/umvpoly/functions/VarInfo.h>
+#include <carl-arith/poly/umvpoly/functions/VarInfo.h>
 
 namespace carl
 {

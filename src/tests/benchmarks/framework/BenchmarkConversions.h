@@ -2,14 +2,14 @@
 #include <map>
 
 #include "../config.h"
-#include <carl/converter/CArLConverter.h>
+#include <carl-arith/converter/CArLConverter.h>
 #ifdef USE_COCOA
-#include <carl/converter/CoCoAAdaptor.h>
+#include <carl-arith/converter/CoCoAAdaptor.h>
 #endif
 #ifdef USE_GINAC
-#include <carl/converter/GiNaCConverter.h>
+#include <carl-arith/converter/GiNaCConverter.h>
 #endif
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-common/util/tuple_util.h>
 
 #include "Common.h"

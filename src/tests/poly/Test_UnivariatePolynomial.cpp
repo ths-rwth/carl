@@ -1,18 +1,18 @@
 #include "gtest/gtest.h"
-#include <carl/interval/Interval.h>
-#include <carl/poly/umvpoly/functions/Content.h>
-#include <carl/poly/umvpoly/functions/Division.h>
-#include <carl/poly/umvpoly/functions/GCD.h>
-#include <carl/poly/umvpoly/functions/PrimitivePart.h>
-#include <carl/poly/umvpoly/functions/Resultant.h>
-#include <carl/poly/umvpoly/functions/Factorization_univariate.h>
-#include <carl/poly/umvpoly/functions/Derivative.h>
-#include <carl/poly/umvpoly/functions/Representation.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/poly/umvpoly/functions/Content.h>
+#include <carl-arith/poly/umvpoly/functions/Division.h>
+#include <carl-arith/poly/umvpoly/functions/GCD.h>
+#include <carl-arith/poly/umvpoly/functions/PrimitivePart.h>
+#include <carl-arith/poly/umvpoly/functions/Resultant.h>
+#include <carl-arith/poly/umvpoly/functions/Factorization_univariate.h>
+#include <carl-arith/poly/umvpoly/functions/Derivative.h>
+#include <carl-arith/poly/umvpoly/functions/Representation.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/core/VariablePool.h>
 
-#include <carl/numbers/GFNumber.h>
-#include <carl/numbers/GaloisField.h>
+#include <carl-arith/numbers/GFNumber.h>
+#include <carl-arith/numbers/GaloisField.h>
 #include <carl-common/debug/debug.h>
 #include <carl-common/meta/platform.h>
 

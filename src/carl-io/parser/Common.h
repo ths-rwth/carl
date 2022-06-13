@@ -13,12 +13,12 @@
 #include <boost/spirit/include/phoenix.hpp>
 
 #include <carl-formula/formula/Formula.h>
-#include <carl/poly/umvpoly/MonomialPool.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/MonomialPool.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-extpolys/FactorizedPolynomial.h>
 #include <carl-extpolys/RationalFunction.h>
-#include <carl/core/Variable.h>
-#include <carl/core/VariablePool.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-arith/core/VariablePool.h>
 #include <carl-common/util/streamingOperators.h>
 
 namespace spirit = boost::spirit;
