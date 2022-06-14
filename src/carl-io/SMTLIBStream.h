@@ -280,7 +280,7 @@ public:
 		// *this << "(declare-fun " << uf.name() << " (" << stream_joined(" ", uf.domain()) << ") ";
 		*this << "(declare-fun " << uf.name() << " (";
 		for (const auto& d : uf.domain()) {
-			*this << " " << uf.domain();
+			*this << " " << d;
 		}
 		*this  << ") ";
 		*this << uf.codomain() << ")" << std::endl;
