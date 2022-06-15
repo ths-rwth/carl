@@ -293,22 +293,7 @@ UnivariatePolynomial<Coeff> resultant(
 	assert(p.main_var() == q.main_var());
 	if (carl::is_zero(p) || carl::is_zero(q)) return UnivariatePolynomial<Coeff>(p.main_var());
 
-
-<<<<<<< HEAD:src/carl/poly/umvpoly/functions/Resultant.h
 	UnivariatePolynomial<Coeff> res = subresultants(p.normalized(), q.normalized(), strategy).front();
-=======
-	UnivariatePolynomial<Coeff> res = s(p, q, strategy);
-
-	//UnivariatePolynomial<Coeff> res_debug = resultant_calculate(p, q, strategy);
-	//if(res != res_debug){
-	//	std::cout << "P1: " << p << std::endl;
-	//	std::cout << "P2: " << q << std::endl;
-	//	std::cout << "MainVar: " << p.main_var() << std::endl ;
-	//	std::cout << "Libpoly Resultant: " << res << std::endl ;
-	//	std::cout << "Carl Resultant: " << res_debug << std::endl ;
-	//	assert(false); //TODO Manchmal anderes Vorzeichen? -> WolframAlpha stimmt mit libpoly überein
-	//}
->>>>>>> development:src/carl-arith/poly/umvpoly/functions/Resultant.h
 
 	CARL_LOG_TRACE("carl.core.resultant", "resultant(" << p << ", " << q << ") = " << res);
 	if (is_constant(res)) {

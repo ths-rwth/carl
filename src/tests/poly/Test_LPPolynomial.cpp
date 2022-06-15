@@ -4,13 +4,10 @@
 #include <gtest/gtest.h>
 
 #include "../Common.h"
-#include <carl/core/VariablePool.h>
-
-
-#include <carl/poly/lp/LPContext.h>
-#include <carl/poly/lp/LPPolynomial.h>
-
-#include <carl/ran/real_roots.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/poly/lp/LPContext.h>
+#include <carl-arith/poly/lp/LPPolynomial.h>
+#include <carl-arith/ran/real_roots.h>
 
 using namespace carl;
 

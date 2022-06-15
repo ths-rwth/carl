@@ -5,8 +5,6 @@
 
 #include "LPPolynomial.h"
 
-#include <carl/core/Common.h>
-
 #include "CoCoAAdaptorLP.h"
 
 namespace carl {

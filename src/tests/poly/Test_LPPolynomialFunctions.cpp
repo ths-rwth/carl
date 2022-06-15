@@ -5,20 +5,14 @@
 
 #include "../Common.h"
 #include <random>
-#include <carl/core/VariablePool.h>
-
-#include <carl/poly/lp/LPContext.h>
-#include <carl/poly/lp/LPPolynomial.h>
-
-#include <carl/poly/lp/LPFunctions.h>
-
-#include <carl/ran/real_roots.h>
-
-#include <carl/converter/LibpolyConverter.h>
-
-#include <carl/poly/umvpoly/functions/Resultant.h>
-
-#include <carl/poly/umvpoly/functions/Factorization.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/poly/lp/LPContext.h>
+#include <carl-arith/poly/lp/LPPolynomial.h>
+#include <carl-arith/poly/lp/LPFunctions.h>
+#include <carl-arith/ran/real_roots.h>
+#include <carl-arith/converter/LibpolyConverter.h>
+#include <carl-arith/poly/umvpoly/functions/Resultant.h>
+#include <carl-arith/poly/umvpoly/functions/Factorization.h>
 
 using namespace carl;
 

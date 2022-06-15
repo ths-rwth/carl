@@ -4,8 +4,8 @@
 
 #ifdef USE_COCOA && USE_LIBPOLY
 
-#include <carl/core/Variable.h>
-#include <carl/core/Variables.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-arith/core/Variables.h>
 
 #include "LPPolynomial.h"
 

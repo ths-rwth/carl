@@ -6,20 +6,6 @@
 #include <algorithm>
 #include <map>
 
-<<<<<<< HEAD:src/carl/converter/LibpolyConverter.h
-#include "LibpolyVariableMapper.h"
-#include <carl-common/memory/Singleton.h>
-#include <carl-common/meta/SFINAE.h>
-#include <carl/core/Common.h>
-#include <carl/core/Variable.h>
-#include <carl/core/Variables.h>
-#include <carl/interval/Interval.h>
-#include <carl/numbers/conversion/cln_gmp.h>
-#include <carl/poly/umvpoly/MultivariatePolynomial.h>
-#include <carl/poly/umvpoly/Term.h>
-#include <carl/poly/umvpoly/UnivariatePolynomial.h>
-#include <carl/poly/umvpoly/functions/Degree.h>
-=======
 #include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-arith/poly/umvpoly/Term.h>
 #include <carl-arith/interval/Interval.h>
@@ -32,7 +18,6 @@
 #include <carl-common/meta/SFINAE.h>
 #include <carl-common/memory/Singleton.h>
 #include "LibpolyVariableMapper.h"
->>>>>>> development:src/carl-arith/converter/LibpolyConverter.h
 
 #include <poly/polyxx.h>
 
@@ -162,7 +147,7 @@ inline poly::UPolynomial to_libpoly_upolynomial(const carl::UnivariatePolynomial
     }
     CARL_LOG_DEBUG("carl.converter", "Coprime Factor/ Denominator: " << denominator);
 
-    mainVar = p.mainVar();
+    mainVar = p.main_var();
     CARL_LOG_DEBUG("carl.converter", "Main Variable: " << mainVar);
     std::vector<poly::Integer> coefficients;
     for (const auto& c : p.coefficients()) {
@@ -310,7 +295,6 @@ inline poly::Interval to_libpoly_interval(const carl::Interval<mpq_class>& inter
 		low_open = true;
 		break;
 	}
-<<<<<<< HEAD:src/carl/converter/LibpolyConverter.h
 	poly::Value up;
 	bool up_open;
 	switch (inter.upper_bound_type()) {
@@ -326,43 +310,6 @@ inline poly::Interval to_libpoly_interval(const carl::Interval<mpq_class>& inter
 		up = poly::Value::plus_infty();
 		up_open = false;
 		break;
-=======
-
-	template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
-	poly::UPolynomial toLibpolyUPolynomial(const carl::UnivariatePolynomial<Coeff>& p, mpz_class& denominator, carl::Variable& mainVar) {
-		CARL_LOG_DEBUG("carl.converter", "Converting Carl Univariate Poly " << p);
-		if (carl::is_constant(p)) {
-			CARL_LOG_DEBUG("carl.converter", "Poly is constant");
-			denominator = carl::get_denom(p.lcoeff());
-			CARL_LOG_DEBUG("carl.converter", "Coprime Factor/ Denominator: " << denominator);
-			return poly::UPolynomial(poly::Integer(carl::get_num(p.lcoeff())));
-		}
-		Coeff coprimeFactor = p.coprime_factor();
-
-		CARL_LOG_DEBUG("carl.converter", "Coprime Factor: " << coprimeFactor);
-
-		if (carl::get_denom(coprimeFactor) != 1) {
-			//if coprime factor is not an integer
-			denominator = coprimeFactor > 0 ? mpz_class(carl::get_num(coprimeFactor)) : mpz_class(-carl::get_num(coprimeFactor));
-		} else if (coprimeFactor == 0) {
-			//Wie kann das überhaupt sein? TODO
-			denominator = mpz_class(1);
-		} else {
-			denominator = mpz_class(coprimeFactor);
-		}
-		CARL_LOG_DEBUG("carl.converter", "Coprime Factor/ Denominator: " << denominator);
-
-		mainVar = p.main_var();
-		CARL_LOG_DEBUG("carl.converter", "Main Variable: " << mainVar);
-		std::vector<poly::Integer> coefficients;
-		for (const auto& c : p.coefficients()) {
-			coefficients.emplace_back(mpz_class(c * denominator));
-		}
-		CARL_LOG_DEBUG("carl.converter", "Got Coefficients: " << coefficients);
-		CARL_LOG_DEBUG("carl.converter", "Got Polynomial: " << poly::UPolynomial(coefficients));
-
-		return poly::UPolynomial(coefficients);
->>>>>>> development:src/carl-arith/converter/LibpolyConverter.h
 	}
 	return poly::Interval(low, low_open, up, up_open);
 }

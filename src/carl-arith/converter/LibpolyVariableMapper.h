@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl-common/config.h>
+#include  <carl-common/config.h>
 #ifdef USE_LIBPOLY
 
 #include <carl-arith/core/Variable.h>
