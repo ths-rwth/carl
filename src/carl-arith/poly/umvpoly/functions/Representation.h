@@ -37,4 +37,9 @@ UnivariatePolynomial<Coeff> replace_main_variable(const UnivariatePolynomial<Coe
 	}
 }
 
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> switch_variable(const MultivariatePolynomial<C,O,P>& p, Variable old_var, Variable new_var) {
+	return substitute(p, old_var, MultivariatePolynomial<C,O,P>(new_var));
+}
+
 }
