@@ -2,8 +2,8 @@
 
 #include <carl-common/config.h>
 #include "PrimitiveEuclidean.h"
-#include "../MultivariatePolynomial.h"
 #include <carl-arith/numbers/typetraits.h>
+#include <carl-arith/poly/umvpoly/functions/to_univariate_polynomial.h>
 
 #include <carl-arith/converter/CoCoAAdaptor.h>
 #include <carl-arith/converter/OldGinacConverter.h>

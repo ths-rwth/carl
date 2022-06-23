@@ -7,10 +7,7 @@
 
 #include <carl-arith/interval/Interval.h>
 
-
 #include <boost/logic/tribool.hpp>
-#include <carl-arith/poly/umvpoly/functions/SquareFreePart.h>
-
 #include <list>
 
 #include "../../converter/LibpolyConverter.h"

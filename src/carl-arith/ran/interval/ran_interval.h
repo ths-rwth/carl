@@ -1,13 +1,12 @@
 #pragma once
 
+#include <carl-arith/poly/umvpoly/functions/SquareFreePart.h>
 #include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
 #include <carl-arith/poly/umvpoly/functions/Division.h>
 #include <carl-arith/poly/umvpoly/functions/Evaluation.h>
 #include <carl-arith/poly/umvpoly/functions/Representation.h>
 #include <carl-arith/poly/umvpoly/functions/RootBounds.h>
 #include <carl-arith/poly/umvpoly/functions/RootCounting.h>
-#include <carl-arith/poly/umvpoly/functions/SquareFreePart.h>
-#include <carl-arith/poly/umvpoly/functions/to_univariate_polynomial.h>
 #include <carl-arith/constraint/BasicConstraint.h>
 
 #include <carl-arith/interval/Interval.h>
@@ -25,6 +24,7 @@ namespace carl {
 template<typename Number>
 class RealAlgebraicNumberInterval {
 	using Polynomial = UnivariatePolynomial<Number>;
+	
 	static const Variable auxVariable;
 
 	template<typename Num>

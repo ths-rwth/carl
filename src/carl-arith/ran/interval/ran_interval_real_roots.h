@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../real_roots_common.h"
 #include "internal.h"
 #include <carl-arith/interval/Interval.h>
 #include <carl-logging/carl-logging.h>
@@ -8,7 +9,6 @@
 
 #include "RealRootIsolation.h"
 
-#include "../real_roots_common.h"
 
 #include <map>
 

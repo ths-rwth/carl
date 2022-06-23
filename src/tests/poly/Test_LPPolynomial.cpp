@@ -7,7 +7,6 @@
 #include <carl-arith/core/VariablePool.h>
 #include <carl-arith/poly/lp/LPContext.h>
 #include <carl-arith/poly/lp/LPPolynomial.h>
-#include <carl-arith/ran/real_roots.h>
 
 using namespace carl;
 
@@ -105,14 +104,18 @@ TEST(LPPOLYNOMIAL, LeadingCoefficient) {
     std::vector varOrder = {x, y, z};
     LPContext context(varOrder);
 
-    LPPolynomial polyX(context, x, 7, 2);
-    LPPolynomial polyY(context, y, 5, 3);
-    LPPolynomial polyZ(context, z, 3, 4);
+    LPPolynomial polyX(context, x, 1, 1);
+    LPPolynomial polyY(context, y, 1, 1);
+    LPPolynomial polyZ(context, z, 1, 1);
     LPPolynomial constant(context, long(12));
+    LPPolynomial test(context, x,1,1)  ; 
 
-    auto res = polyX * polyY * polyZ * constant + polyX * polyZ*12345;
+    auto res = polyX * polyX + constant * polyX * polyY ;
 
     auto carl_res = to_carl_multivariate_polynomial(res.getPolynomial()) ;
+
+    std::cout << "Carl_MainVar: " << carl_res << std::endl;
+    std::cout << "Carl_MainVar: " << res.mainVar() << std::endl;
 
     std::cout << "Carl_Polynomial: " << carl_res << std::endl ;
     std::cout << "LP_Polynomial: " << res << std::endl;

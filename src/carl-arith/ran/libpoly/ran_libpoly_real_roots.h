@@ -25,7 +25,7 @@ real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots_libpoly(
     const Interval<Number>& interval = Interval<Number>::unbounded_interval()) {
     CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << polynomial << " within " << interval);
 
-    assert(polynomial.isUnivariateRepresented());
+    assert(poly::is_univariate(polynomial.getPolynomial()));
 
     // Easy checks
     if (carl::is_zero(polynomial)) {
@@ -70,7 +70,7 @@ real_roots_result<RealAlgebraicNumberLibpoly<Number>> real_roots_libpoly(
     const Interval<Number>& interval = Interval<Number>::unbounded_interval()) {
     CARL_LOG_DEBUG("carl.ran.libpoly", polynomial << " " << m << " " << interval);
 
-    if (polynomial.isUnivariateRepresented()) {
+    if (poly::is_univariate(polynomial.getPolynomial())) {
         return real_roots_libpoly(polynomial, interval);
     }
 

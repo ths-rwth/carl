@@ -52,11 +52,22 @@ TEST(LPPOLYNOMIAL, RealRootsLP) {
 
     auto res_uni = polyX * polyX - 12;
 
+    auto res_carl = to_carl_univariate_polynomial(res.getPolynomial());
+    auto res_uni_carl = to_carl_univariate_polynomial(res_uni.getPolynomial());
+
     std::map<Variable, RealAlgebraicNumberLibpoly<mpq_class>> assignment;
     assignment[y] = RealAlgebraicNumberLibpoly<mpq_class>(123312 / 123312);
 
-    std::cout << "RealRootsLP: " << carl::real_roots_libpoly<mpq_class>(res_uni).roots() << std::endl;
-    std::cout << "RealRootsLP: " << carl::real_roots_libpoly<mpq_class>(res, assignment).roots() << std::endl;
+    std::map<Variable, RealAlgebraicNumberInterval<mpq_class>> assignment_interval;
+    assignment_interval[y] = RealAlgebraicNumberInterval<mpq_class>(123312 / 123312);
+
+    std::cout << "RealRootsLP: " << carl::real_roots(res_uni).roots() << std::endl;
+    std::cout << "RealRootsLP: " << carl::real_roots(res, assignment).roots() << std::endl;
+
+    std::cout << "RealRootsCarl: " << carl::real_roots(res_uni_carl).roots() << std::endl;
+    std::cout << "RealRootsCarl: " << carl::real_roots(res_carl, assignment_interval).roots() << std::endl;
+    
+    exit(1) ; 
 }
 
 TEST(LPPOLYNOMIAL, factorization) {
