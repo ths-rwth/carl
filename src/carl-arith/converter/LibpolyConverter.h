@@ -242,7 +242,7 @@ inline poly::Rational to_libpoly_rational(const mpq_class& num) {
 
 
 //Exact for whole numbers
-inline poly::DyadicRational get_libpoly_dyadic_approximation(const mpz_class& num, const unsigned int& precision=0) {
+inline poly::DyadicRational get_libpoly_dyadic_approximation(const mpz_class& num) {
 	return poly::DyadicRational(poly::Integer(num));
 }
 
