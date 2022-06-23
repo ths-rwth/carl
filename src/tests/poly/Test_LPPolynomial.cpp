@@ -126,6 +126,8 @@ TEST(LPPOLYNOMIAL, LeadingCoefficient) {
     std::cout << "Carl lcoeff: "  << carl_res.lcoeff() << std::endl;
     std::cout << "Carl: lterm: "   << carl_res.lterm() << std::endl;
 
+    //exit(1) ; 
+
     //carl::MultivariatePolynomials and LibPoly::Polynomial have different monomial orders and thus also different leading coefficients/terms
 }
 

@@ -66,8 +66,6 @@ TEST(LPPOLYNOMIAL, RealRootsLP) {
 
     std::cout << "RealRootsCarl: " << carl::real_roots(res_uni_carl).roots() << std::endl;
     std::cout << "RealRootsCarl: " << carl::real_roots(res_carl, assignment_interval).roots() << std::endl;
-    
-    exit(1) ; 
 }
 
 TEST(LPPOLYNOMIAL, factorization) {

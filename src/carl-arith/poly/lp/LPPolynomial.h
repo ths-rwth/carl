@@ -33,7 +33,7 @@ private:
 public:
 	
 	//Defines for real roots 
-	using CoeffType = mpq_class ; 
+	using CoeffType = mpq_class ;
 	template<typename Number>
 	using RootType = RealAlgebraicNumberLibpoly<Number>;
 
@@ -172,7 +172,6 @@ public:
 						   lp_monomial_t* m,
 						   void* d) {
 			auto& v = *static_cast<LPPolynomial_lcoeff_visitor*>(d);
-			CARL_LOG_DEBUG("carl.poly", "lcoeff: " << *reinterpret_cast<mpz_class*>(&m->a));
 			v.coeff *= *reinterpret_cast<mpz_class*>(&m->a);
 		};
 

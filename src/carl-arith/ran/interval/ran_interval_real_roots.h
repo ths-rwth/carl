@@ -19,7 +19,7 @@ namespace carl::ran::interval {
  * The roots are sorted in ascending order.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, EnableIf<std::is_same<Coeff, Number>> = dummy>
-real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
+real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
@@ -40,12 +40,12 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
  * The roots are sorted in ascending order.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, DisableIf<std::is_same<Coeff, Number>> = dummy>
-real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
+real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
 	assert(polynomial.is_univariate());
-	return real_roots(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constant_part(); })), interval);
+	return real_roots_interval(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constant_part(); })), interval);
 }
 
 /**
@@ -64,7 +64,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
  * was not univariate or is nullified.  
  */
 template<typename Coeff, typename Number>
-real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
+real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 		const UnivariatePolynomial<Coeff>& poly,
 		const Assignment<RealAlgebraicNumberInterval<Number>>& varToRANMap,
 		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
@@ -105,7 +105,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 	if (ir_map.empty()) {
 		assert(polyCopy.is_univariate());
 		CARL_LOG_TRACE("carl.ran.realroots", "poly " << polyCopy << " is univariate after substituting rational assignments");
-		return real_roots(polyCopy, interval);
+		return real_roots_interval(polyCopy, interval);
 	} else {
 		CARL_LOG_TRACE("carl.ran.realroots", polyCopy << " in " << polyCopy.main_var() << ", " << varToRANMap << ", " << interval);
 		assert(ir_map.find(polyCopy.main_var()) == ir_map.end());
@@ -130,7 +130,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots(
 		CARL_LOG_TRACE("carl.ran.realroots", "Calling on " << *evaledpoly);
 		BasicConstraint<MultivariatePolynomial<Number>> cons(MultivariatePolynomial<Number>(polyCopy), Relation::EQ);
 		std::vector<RealAlgebraicNumberInterval<Number>> roots;
-		auto res = real_roots(*evaledpoly, interval);
+		auto res = real_roots_interval(*evaledpoly, interval);
 		for (const auto& r: res.roots()) { // TODO can be made more efficient!
 			CARL_LOG_TRACE("carl.ran.realroots", "Checking " << polyCopy.main_var() << " = " << r);
 			ir_map[polyCopy.main_var()] = r;
