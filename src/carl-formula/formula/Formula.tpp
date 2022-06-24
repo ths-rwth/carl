@@ -35,27 +35,6 @@ namespace carl
             case FormulaType::TRUE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-                if (std::holds_alternative<carl::Variable>(_content.mContent)) {
-                    std::cout <<"Variable" << std::endl;
-                } else if (std::holds_alternative<Constraint<Pol>>(_content.mContent)) {
-                    std::cout <<"Constraint<Pol>" << std::endl;
-                } else if (std::holds_alternative<VariableComparison<Pol>>(_content.mContent)) {
-                    std::cout <<"VariableComparison<Pol>" << std::endl;
-                }else if (std::holds_alternative<VariableAssignment<Pol>>(_content.mContent)) {
-                    std::cout <<"VariableAssignment<Pol>" << std::endl;
-                }else if (std::holds_alternative<BVConstraint>(_content.mContent)) {
-                    std::cout <<"BVConstraint" << std::endl;
-                }else if (std::holds_alternative<UEquality>(_content.mContent)) {
-                    std::cout <<"UEquality" << std::endl;
-                }else if (std::holds_alternative<Formula<Pol>>(_content.mContent)) {
-                    std::cout <<"Formula<Pol>" << std::endl;
-                }else if (std::holds_alternative<Formulas<Pol>>(_content.mContent)) {
-                    std::cout <<"Formulas<Pol>" << std::endl;
-                }else if (std::holds_alternative<QuantifierContent<Pol>>(_content.mContent)) {
-                    std::cout <<"QuantifierContent<Pol>" << std::endl;
-                }else {
-                    std::cout << "err" << std::endl;
-                }
 		        addConstraintProperties( std::get<Constraint<Pol>>(_content.mContent), _content.mProperties );
 		        break;
             }
