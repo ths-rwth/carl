@@ -18,10 +18,10 @@ TYPED_TEST(MultivariateRootTest, Constructor)
 {
 	using Poly = MultivariatePolynomial<TypeParam>;
 	Variable x = fresh_real_variable("x");
-	Variable y = MultivariateRoot<Poly>::var();
+	Variable y = fresh_real_variable("R");
 	Poly p = x*y + TypeParam(2)*y*y;
 	
-	MultivariateRoot<Poly> mr(p, 1);
+	MultivariateRoot<Poly> mr(p, 1, y);
 	
 	EXPECT_EQ(p, mr.poly());
 	EXPECT_EQ(1, mr.k());
@@ -33,11 +33,11 @@ TYPED_TEST(MultivariateRootTest, Evaluate)
 	using Poly = MultivariatePolynomial<TypeParam>;
 	using MultiRoot = MultivariateRoot<Poly>;
 	Variable x = fresh_real_variable("x");
-	Variable y = MultivariateRoot<Poly>::var();
+	Variable y = fresh_real_variable("R");
 	Poly p = x*y + TypeParam(2)*y*y;
 	
-	MultiRoot mr1(p, 1);
-	MultiRoot mr2(p, 2);
+	MultiRoot mr1(p, 1, y);
+	MultiRoot mr2(p, 2, y);
 	
 	EXPECT_EQ(p, mr1.poly());
 	EXPECT_EQ(1, mr1.k());
@@ -64,10 +64,10 @@ TYPED_TEST(MultivariateRootTest, Evaluate2)
 	
 	Variable x = fresh_real_variable("x");
 	Variable y = fresh_real_variable("y");
-	Variable z = MultivariateRoot<Poly>::var();
+	Variable z = fresh_real_variable("R");
 	Poly p = -Poly(z)*x+Poly(z)*z+Poly(2)*z-x+Poly(1);
 	
-	VariableComparison<Poly> vc(y, MultiRoot(p, 2), Relation::GREATER, true);
+	VariableComparison<Poly> vc(y, MultiRoot(p, 2, z), Relation::GREATER, true);
 	Formula<Poly> f(vc);
 	
 	ModelT m;

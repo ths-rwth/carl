@@ -34,7 +34,7 @@ using DoubleInterval = Interval<double>;
 /*
  * 
  */
-int main(int argc, char** argv) {
+int main(int /*argc*/, char** /*argv*/) {
 
     DoubleInterval ia = DoubleInterval( 1, 4 );
     DoubleInterval ib = DoubleInterval( 2, 5 );

@@ -34,14 +34,12 @@ public:
 	using Number = typename UnderlyingNumberType<Poly>::type;
 	using RAN = RealAlgebraicNumber<Number>;
 private:
-  /**
-   * Distinguished, globally unique root-variable
-   */
-	static const Variable s_var;
 	/// Polynomial defining this root.
 	Poly m_poly;
 	/// Specifies which root to consider.
 	std::size_t m_k;
+	/// The main variable.
+	Variable m_var;
 public:
 	/**
 	 * @param poly Must mention the root-variable "_z" and
@@ -50,7 +48,7 @@ public:
 	 * @param k The index of the root of the polynomial in "_z".
 	 * The first root has index 1, the second has index 2 and so on.
 	 */
-	MultivariateRoot(const Poly& poly, std::size_t k): m_poly(poly), m_k(k) {
+	MultivariateRoot(const Poly& poly, std::size_t k, Variable var): m_poly(poly), m_k(k), m_var(var) {
 		assert(m_k > 0);
 	}
 
@@ -76,19 +74,11 @@ public:
 	}
 
 	/**
-	 * @return A copy of the underlying polynomial with the
-	 * root-variable replaced by the given variable.
-	 */
-	Poly poly(Variable var) const {
-		return carl::substitute(m_poly, s_var, Poly(var));
-	}
-
-	/**
 	 * @return The globally-unique distinguished root-variable "_z"
 	 * to allow you to build a polynomial with this variable yourself.
 	 */
-	static Variable var() noexcept {
-		return s_var;
+	Variable var() const noexcept {
+		return m_var;
 	}
 
 	bool is_univariate() const {
@@ -100,20 +90,17 @@ public:
 };
 
 template<typename Poly>
-const Variable MultivariateRoot<Poly>::s_var = carl::VariablePool::getInstance().get_fresh_persistent_variable("__z");
-
-template<typename Poly>
 inline bool operator==(const MultivariateRoot<Poly>& lhs, const MultivariateRoot<Poly>& rhs) {
-	return std::forward_as_tuple(lhs.k(), lhs.poly()) == std::forward_as_tuple(rhs.k(), rhs.poly());
+	return std::forward_as_tuple(lhs.var(), lhs.k(), lhs.poly()) == std::forward_as_tuple(lhs.var(), rhs.k(), rhs.poly());
 }
 template<typename Poly>
 inline bool operator<(const MultivariateRoot<Poly>& lhs, const MultivariateRoot<Poly>& rhs) {
-	return std::forward_as_tuple(lhs.k(), lhs.poly()) < std::forward_as_tuple(rhs.k(), rhs.poly());
+	return std::forward_as_tuple(lhs.var(), lhs.k(), lhs.poly()) < std::forward_as_tuple(lhs.var(), rhs.k(), rhs.poly());
 }
 
 template<typename P>
 std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
-	return os << "rootExpr(" << mr.poly() << ", " << mr.k() << ", " << MultivariateRoot<P>::var() << ")";
+	return os << "rootExpr(" << mr.poly() << ", " << mr.k() << ", " << mr.var() << ")";
 }
 
 /**
@@ -123,8 +110,9 @@ std::ostream& operator<<(std::ostream& os, const MultivariateRoot<P>& mr) {
  */
 template<typename Poly>
 void variables(const MultivariateRoot<Poly>& mr, carlVariables& vars) {
+	bool hadVar = vars.has(mr.var());
 	carl::variables(mr.poly(), vars);
-	vars.erase(mr.var());
+	if (!hadVar) vars.erase(mr.var());
 }
 
 /**
@@ -146,7 +134,7 @@ void substitute_inplace(MultivariateRoot<Poly>& mr, Variable var, const Poly& po
 template<typename Poly>
 std::optional<typename MultivariateRoot<Poly>::RAN> evaluate(const MultivariateRoot<Poly>& mr, const carl::Assignment<typename MultivariateRoot<Poly>::RAN>& m) {
 	CARL_LOG_DEBUG("carl.rootexpression", "Evaluate: " << mr << " against: " << m);
-	auto poly = carl::to_univariate_polynomial(mr.poly(), MultivariateRoot<Poly>::s_var);
+	auto poly = carl::to_univariate_polynomial(mr.poly(), mr.var());
 	auto result = carl::real_roots(poly, m);
 	if (!result.is_univariate()) {
 		CARL_LOG_TRACE("carl.rootexpression", poly << " is not univariate (nullified: " << result.is_nullified() << "; non-univariate: " << result.is_non_univariate() << ").");

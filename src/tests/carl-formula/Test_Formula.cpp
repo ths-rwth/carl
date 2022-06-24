@@ -393,7 +393,7 @@ TEST(Formula, Uniqueness)
 {
 	//(X !> (IR ]-594743/343, -1189485/686[, __r^2 + -1031250000/343 R))
 	Variable X = fresh_real_variable("X");
-	Variable r = MultivariateRoot<Pol>::var();
+	Variable r = fresh_real_variable("R");
 	
 	Interval<Rational> ir(Rational(-594743)/343, BoundType::STRICT, Rational(-1189485)/686, BoundType::STRICT);
 	UnivariatePolynomial<Rational> up(r, {Rational(-1031250000)/343, Rational(0), Rational(1)});

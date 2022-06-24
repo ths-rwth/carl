@@ -36,8 +36,11 @@ namespace carl {
 		Relation m_relation;
 		bool m_negated;
 	public:
-		VariableComparison(Variable v, const std::variant<MR, RAN>& value, Relation rel, bool neg): m_var(v), m_value(value), m_relation(rel), m_negated(neg) {}
+		VariableComparison(Variable v, const std::variant<MR, RAN>& value, Relation rel, bool neg): m_var(v), m_value(value), m_relation(rel), m_negated(neg) {
+			assert(!std::holds_alternative<MR>(m_value) || std::get<MR>(m_value).var() == m_var);
+		}
 		VariableComparison(Variable v, const MR& value, Relation rel): m_var(v), m_value(value), m_relation(rel), m_negated(false) {
+			assert(value.var() == m_var);
 			if (value.is_univariate()) {
 			  // If the value of type MultivariateRoot is really just univariate, we convert it to an algebraic real.
 				auto res = evaluate(value, carl::Assignment<RAN>({}));
@@ -94,11 +97,11 @@ namespace carl {
 		Poly defining_polynomial() const {
 			if (std::holds_alternative<RAN>(m_value)) {
 				const auto& ran = std::get<RAN>(m_value);
-				if (ran.is_numeric()) return Poly(m_var) - ran.value();
-				return Poly(carl::replace_main_variable(ran.polynomial(), m_var));
+				return ran.defining_polynomial(m_var);
 			} else {
 				const auto& mr = std::get<MR>(m_value);
-				return mr.poly(m_var);
+				assert(mr.var() == m_var);
+				return mr.poly();
 			}
 		}
 		VariableComparison negation() const {

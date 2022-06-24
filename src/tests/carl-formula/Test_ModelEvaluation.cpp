@@ -50,10 +50,10 @@ TEST(ModelEvaluation, Constraint)
 TEST(ModelEvaluation, EvaluateMVR)
 {
 	Variable x = fresh_real_variable("x");
-	Variable z = MultivariateRoot<Pol>::var();
+	Variable z = fresh_real_variable("R");
 	ModelT m;
 	m.assign(x, Rational(-1));
-	MultivariateRoot<Pol> mvr(Pol(x)*z, 1);
+	MultivariateRoot<Pol> mvr(Pol(x)*z, 1, z);
 	auto res = evaluate(mvr, m);
 	EXPECT_TRUE(res.isRational());
 	EXPECT_TRUE(is_zero(res.asRational()));
