@@ -40,7 +40,7 @@ endif()
 cotire(carl-arith)
 include(install)
 
-clang_tidy_recurse("${CMAKE_SOURCE_DIR}/src/carl" "")
+clang_tidy_recurse("${CMAKE_SOURCE_DIR}/src/carl-arith" "")
 
 #install_libraries(carl carl-arith-shared carl-arith-static)
 
