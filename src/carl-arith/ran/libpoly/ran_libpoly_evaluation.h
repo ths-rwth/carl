@@ -12,9 +12,7 @@ template<typename Number>
 std::optional<RealAlgebraicNumberLibpoly<Number>> evaluate(
 	const LPPolynomial& polynomial,
 	const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& evalMap) {
-	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation converted to poly: " << poly << " With denominator: " << denom);
 
-	assert(denom != 0);
 	//Turn into poly::Assignment
 	poly::Assignment assignment;
 	for (const auto& entry : evalMap) {
