@@ -146,7 +146,7 @@ bool operator==(const LPPolynomial& lhs, const mpz_class& rhs) {
     if (!lhs.isNumber()) {
         return false;
     }
-    return lhs.constantPart() == rhs;
+    return lhs.constant_part() == rhs;
 }
 bool operator==(const mpz_class& lhs, const LPPolynomial& rhs) {
     return rhs == lhs;

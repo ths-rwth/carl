@@ -200,7 +200,7 @@ public:
 	 * Returns the constant part of this polynomial.
 	 * @return Constant part.
 	 */
-	mpz_class constantPart() const {
+	mpz_class constant_part() const {
 		struct LPPolynomial_constantPart_visitor {
 			mpz_class part = 0;
 		};

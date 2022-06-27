@@ -68,6 +68,30 @@ TEST(LPPOLYNOMIAL, RealRootsLP) {
     std::cout << "RealRootsCarl: " << carl::real_roots(res_carl, assignment_interval).roots() << std::endl;
 }
 
+TEST(LPPOLYNOMIAL, Evaluate) {
+    auto x = fresh_real_variable("x");
+
+    std::vector varOrder = {x};
+    LPContext context(varOrder);
+
+    LPPolynomial polyX(context, x, 7, 2);
+
+
+    auto res = polyX * polyX - 12;
+
+    auto res_carl = to_carl_multivariate_polynomial(res.getPolynomial());
+
+    std::map<Variable, RealAlgebraicNumberLibpoly<mpq_class>> assignment;
+    assignment[x] = RealAlgebraicNumberLibpoly<mpq_class>(123312 / 123312);
+
+    std::map<Variable, RealAlgebraicNumberInterval<mpq_class>> assignment_interval;
+    assignment_interval[x] = RealAlgebraicNumberInterval<mpq_class>(123312 / 123312);
+
+    std::cout << "EvaluateLP: " << carl::evaluate(res, assignment) << std::endl;
+    std::cout << "EvaluateCarl: " << carl::evaluate(res_carl, assignment_interval) << std::endl;
+
+}
+
 TEST(LPPOLYNOMIAL, factorization) {
     auto startTime = std::chrono::high_resolution_clock::now(); 
     Variable x = fresh_real_variable("x");

@@ -136,8 +136,8 @@ std::optional<RealAlgebraicNumberInterval<Number>> evaluate(MultivariatePolynomi
 	}
 }
 
-template<typename Number, typename Poly>
-boost::tribool evaluate(const BasicConstraint<Poly>& c, const Assignment<RealAlgebraicNumberInterval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
+template<typename Number>
+boost::tribool evaluate(const BasicConstraint<MultivariatePolynomial<Number>>& c, const Assignment<RealAlgebraicNumberInterval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
 	CARL_LOG_DEBUG("carl.ran.evaluation", "Evaluating " << c << " on " << m);
 	
 	if (!use_root_bounds) {
@@ -146,7 +146,7 @@ boost::tribool evaluate(const BasicConstraint<Poly>& c, const Assignment<RealAlg
 		if (!res) return boost::indeterminate;
 		else return evaluate(res->sgn(), c.relation());
 	} else {
-		Poly p = c.lhs();
+		MultivariatePolynomial<Number> p = c.lhs();
 
 		CARL_LOG_TRACE("carl.ran.evaluation", "p = " << p);
 
@@ -168,7 +168,7 @@ boost::tribool evaluate(const BasicConstraint<Poly>& c, const Assignment<RealAlg
 			CARL_LOG_DEBUG("carl.ran.evaluation", "Left hand side is constant");
 			return carl::evaluate(p.constant_part(), c.relation());
 		}
-		BasicConstraint<Poly> constr = constraint::create_normalized_constraint(p, c.relation());
+		BasicConstraint<MultivariatePolynomial<Number>> constr = constraint::create_normalized_constraint(p, c.relation());
 		if (constr.is_consistent() != 2) {
 			CARL_LOG_DEBUG("carl.ran.evaluation", "Constraint already evaluates to value");
 			return constr.is_consistent();

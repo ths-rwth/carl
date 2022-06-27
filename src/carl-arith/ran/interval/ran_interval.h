@@ -172,13 +172,6 @@ private:
 		}
 	}
 
-	auto& polynomial_int() const {
-		return *(m_content->polynomial);
-	}
-	auto& interval_int() const {
-		return m_content->interval;
-	}
-
 public:
 	RealAlgebraicNumberInterval()
 		: m_content(std::make_shared<content>(Interval<Number>(0))) {}
@@ -304,6 +297,13 @@ public:
 			refine_internal(i.upper());
 		}
 		return i.contains(interval_int());
+	}
+
+	auto& polynomial_int() const {
+		return *(m_content->polynomial);
+	}
+	auto& interval_int() const {
+		return m_content->interval;
 	}
 };
 

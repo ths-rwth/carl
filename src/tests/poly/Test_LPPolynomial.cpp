@@ -147,9 +147,9 @@ TEST(LPPOLYNOMIAL, ConstantPart) {
     auto res_constant = polyX * polyY * polyZ + constant + polyX * polyZ*12345;
     auto res_no_constant = polyX * polyY * polyZ * constant + polyX * polyZ*12345;
 
-    EXPECT_EQ(res_constant.constantPart(), constant.constantPart());
-    EXPECT_EQ(res_constant.constantPart(), con);
-    EXPECT_EQ(res_no_constant.constantPart(), 0);
+    EXPECT_EQ(res_constant.constant_part(), constant.constant_part());
+    EXPECT_EQ(res_constant.constant_part(), con);
+    EXPECT_EQ(res_no_constant.constant_part(), 0);
 }
 
 TEST(LPPOLYNOMIAL, MainVar) {
@@ -226,7 +226,6 @@ TEST(LPPOLYNOMIAL, CoPrimeFactor) {
 
     std::cout << res1.coprimeCoefficients() << std::endl ; 
     std::cout << res2.coprimeCoefficients() << std::endl ;
-
 }
 
 
