@@ -168,7 +168,57 @@ TEST(LPPOLYNOMIAL, factorization) {
     }
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime);
     std::cout << "Factorization with premade adaptor took " << duration.count() << " milliseconds." << std::endl;
+}
 
+
+TEST(LPPOLYNOMIAL, TotalDegree){
+     auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+
+    std::vector varOrder = {x, y};
+    LPContext context(varOrder);
+
+    LPPolynomial polyX(context, x, 7, 2);
+    LPPolynomial polyY(context, y, 5, 3);
+
+    auto res = polyX * polyY - 12;  
+
+    EXPECT_EQ(res.total_degree(), 2+3);
+}
+
+TEST(LPPOLYNOMIAL, Degree){
+     auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+
+    std::vector varOrder = {x, y};
+    LPContext context(varOrder);
+
+    LPPolynomial polyX(context, x, 7, 2);
+    LPPolynomial polyY(context, y, 5, 3);
+
+    auto res = polyX * polyY - 12;  
+
+    EXPECT_EQ(res.degree(x), 2);
+    EXPECT_EQ(res.degree(y), 3);
+}
+
+
+TEST(LPPOLYNOMIAL, Coeff){
+    auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+
+    std::vector varOrder = {x, y};
+    LPContext context(varOrder);
+
+    LPPolynomial polyX(context, x, 7, 2);
+    LPPolynomial polyY(context, y, 5, 3);
+
+    auto res = polyX * polyY - 12;
+
+    auto res_carl = to_carl_multivariate_polynomial(res.getPolynomial());
+
+    EXPECT_EQ(to_carl_multivariate_polynomial(res.coeff(x,2).getPolynomial()), res_carl.coeff(x,2));
+    
 }
 
 #endif

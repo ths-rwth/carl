@@ -43,27 +43,30 @@ LPPolynomial::LPPolynomial(const poly::Polynomial& p)
 }
 
 LPPolynomial::LPPolynomial(poly::Polynomial&& p)
-    : mPoly(std::move(p)) , mContext((lp_polynomial_context_t*)lp_polynomial_get_context(p.get_internal())) {
+    : mPoly(std::move(p)), mContext((lp_polynomial_context_t*)lp_polynomial_get_context(p.get_internal())) {
     lp_polynomial_set_external(mPoly.get_internal());
 
     assert(lp_polynomial_check_order(mPoly.get_internal()));
 }
 
-LPPolynomial::LPPolynomial(const LPContext& context, long val) : mContext(context) {
+LPPolynomial::LPPolynomial(const LPContext& context, long val)
+    : mContext(context) {
     lp_polynomial_construct_simple(mPoly.get_internal(), context.getContext(), poly::Integer(val).get_internal(), 0, 0);
     lp_polynomial_set_external(mPoly.get_internal());
 
     assert(lp_polynomial_check_order(mPoly.get_internal()));
 }
 
-LPPolynomial::LPPolynomial(const LPContext& context, const Variable& var, const mpz_class& coeff, unsigned int degree) : mContext(context) {
+LPPolynomial::LPPolynomial(const LPContext& context, const Variable& var, const mpz_class& coeff, unsigned int degree)
+    : mContext(context) {
     lp_polynomial_construct_simple(mPoly.get_internal(), context.getContext(), poly::Integer(coeff).get_internal(), VariableMapper::getInstance().getLibpolyVariable(var).get_internal(), degree);
     lp_polynomial_set_external(mPoly.get_internal());
 
     assert(lp_polynomial_check_order(mPoly.get_internal()));
 }
 
-LPPolynomial::LPPolynomial(const LPContext& context, const Variable& var) : mContext(context) {
+LPPolynomial::LPPolynomial(const LPContext& context, const Variable& var)
+    : mContext(context) {
     lp_polynomial_construct_simple(mPoly.get_internal(), context.getContext(), poly::Integer(1).get_internal(), VariableMapper::getInstance().getLibpolyVariable(var).get_internal(), 1);
     lp_polynomial_set_external(mPoly.get_internal());
 
@@ -334,13 +337,134 @@ LPPolynomial LPPolynomial::coprimeCoefficients() const {
     mpz_class g = coprimeFactor();
 
     if (g == 1) {
-        return *this ;
+        return *this;
     }
 
     LPPolynomial temp(lp_polynomial_get_context(get_internal()));
-    temp += g ; 
+    temp += g;
 
     return poly::div(getPolynomial(), temp.getPolynomial());
+}
+
+std::size_t LPPolynomial::total_degree() const {
+
+    struct degree_travers {
+        std::size_t degree = 0;
+    };
+
+    auto getDegree = [](const lp_polynomial_context_t* ctx,
+                        lp_monomial_t* m,
+                        void* d) {
+        degree_travers& v = *static_cast<degree_travers*>(d);
+
+        size_t current_degree = 0;
+        // iterate over the number of variables and add up their degrees
+        for (size_t i = 0; i < m->n; i++) {
+            current_degree += m->p[i].d;
+        }
+        v.degree = std::max(v.degree, current_degree);
+    };
+
+    degree_travers travers;
+    lp_polynomial_traverse(get_internal(), getDegree, &travers);
+
+    return travers.degree;
+}
+
+std::size_t LPPolynomial::degree(Variable::Arg var) const {
+    struct degree_travers {
+        std::size_t degree = 0;
+        lp_variable_t var; // the variable we are looking for
+    };
+
+    auto getDegree = [](const lp_polynomial_context_t* ctx,
+                        lp_monomial_t* m,
+                        void* d) {
+        degree_travers& v = *static_cast<degree_travers*>(d);
+
+        size_t current_degree = 0;
+        // iterate over the number of variables and add up their degrees
+        for (size_t i = 0; i < m->n; i++) {
+            if (m->p[i].x == v.var) {
+                current_degree = m->p[i].d;
+                break;
+            }
+        }
+        v.degree = std::max(v.degree, current_degree);
+    };
+
+    degree_travers travers;
+    travers.var = VariableMapper::getInstance().getLibpolyVariable(var).get_internal();
+    lp_polynomial_traverse(get_internal(), getDegree, &travers);
+
+    return travers.degree;
+}
+
+LPPolynomial LPPolynomial::coeff(Variable::Arg var, std::size_t exp) const {
+    struct coeff_travers {
+        std::vector<lp_monomial_t> coeff;
+        const lp_polynomial_context_t* ctx; // context for the newly created monomials
+        lp_variable_t var;            // the variable we are looking for
+        std::size_t exp;              // the exponent we are looking for
+    };
+
+
+    auto getCoeff = [](const lp_polynomial_context_t* ctx,
+                       lp_monomial_t* m,
+                       void* d) {
+        coeff_travers& v = *static_cast<coeff_travers*>(d);
+
+        bool found = false;
+        // iterate each monomials, and add the ones to add
+        for (size_t i = 0; i < m->n; i++) {
+            if (m->p[i].x == v.var && m->p[i].d == v.exp) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            return;
+        }
+
+        // Make a copy (without var^exp) of each monomial and add it to the vector
+        lp_monomial_t new_monomial;
+        lp_monomial_construct(v.ctx, &new_monomial);
+        new_monomial.n = m->n -1  ; // copy the number of variables (-1 because we remove var^exp)
+        new_monomial.capacity = m->capacity ; // copy the capacity
+        lp_integer_assign(v.ctx->K, &new_monomial.a ,&m->a); // copy the coefficient
+        new_monomial.p = (power_t*)realloc(new_monomial.p, sizeof(power_t) * new_monomial.capacity); //allocate the memory for the power array
+
+        size_t current_counter = 0 ; 
+        for(size_t i = 0; i < m->n; i++){
+            if(m->p[i].x == v.var && m->p[i].d == v.exp){
+                continue;
+            }
+            new_monomial.p[current_counter].x = m->p[i].x;
+            new_monomial.p[current_counter].d = m->p[i].d;
+            current_counter++;
+        }
+        assert(current_counter == new_monomial.n);
+        v.coeff.push_back(std::move(new_monomial));
+    };
+
+    coeff_travers travers;
+    travers.var = VariableMapper::getInstance().getLibpolyVariable(var).get_internal();
+    travers.exp = exp;
+	travers.ctx = lp_polynomial_get_context(get_internal());
+    lp_polynomial_traverse(get_internal(), getCoeff, &travers);
+
+    LPPolynomial res(lp_polynomial_get_context(get_internal()));
+    for (auto m : travers.coeff) {
+        lp_polynomial_add_monomial(res.get_internal(), &m);
+    }
+
+    //free the memory allocated for the monomials
+    for(auto& m : travers.coeff){
+        lp_monomial_destruct(&m);
+    }
+
+    return res;
 }
 
 std::ostream& operator<<(std::ostream& os, const LPPolynomial& p) {

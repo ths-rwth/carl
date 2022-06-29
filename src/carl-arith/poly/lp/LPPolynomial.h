@@ -20,6 +20,7 @@
 #include <vector>
 
 #include <carl-arith/ran/libpoly/ran_libpoly.h>
+#include <carl-arith/converter/LibpolyVariableMapper.h>
 
 namespace carl {
 
@@ -36,6 +37,9 @@ public:
 	using CoeffType = mpq_class ;
 	template<typename Number>
 	using RootType = RealAlgebraicNumberLibpoly<Number>;
+
+	//For compatibility with MultivariatePolynomial
+	using NumberType = mpq_class;
 
 	/**
 	 * Default constructor shall not exist. Use LPPolynomial(Context) instead.
@@ -193,6 +197,14 @@ public:
 	 * @return If polynomial is a number.
 	 */
 	bool isNumber() const {
+		return poly::is_constant(mPoly);
+	}
+
+	/**
+	 * Checks whether the polynomial is zero.
+	 * @return If polynomial is zero.
+	 */
+	bool is_constant() const{
 		return poly::is_constant(mPoly);
 	}
 
@@ -381,6 +393,18 @@ public:
 	mpz_class mainDenom() const {
 		CARL_LOG_NOTIMPLEMENTED();
 	}
+
+	std::size_t total_degree() const ;
+
+	std::size_t degree(Variable::Arg var) const ;
+
+	/**
+	 * Calculates the coefficient of var^exp.
+	 * @param var Variable.
+	 * @param exp Exponent.
+	 * @return Coefficient of var^exp.
+	 */
+	LPPolynomial coeff(Variable::Arg var, std::size_t exp) const ;
 
 	friend std::ostream& operator<<(std::ostream& os, const LPPolynomial& rhs);
 };
