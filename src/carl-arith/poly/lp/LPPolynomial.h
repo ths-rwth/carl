@@ -363,6 +363,7 @@ public:
 	 */
 	LPPolynomial negateVariable() const {
 		CARL_LOG_NOTIMPLEMENTED();
+		return LPPolynomial(mContext);
 	}
 
 	/**
@@ -392,6 +393,7 @@ public:
 	 */
 	mpz_class mainDenom() const {
 		CARL_LOG_NOTIMPLEMENTED();
+		return mpz_class(0);
 	}
 
 	std::size_t total_degree() const ;

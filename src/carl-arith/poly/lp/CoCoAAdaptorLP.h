@@ -2,7 +2,7 @@
 
 #include <carl-common/config.h>
 
-#ifdef USE_COCOA && USE_LIBPOLY
+#if defined(USE_COCOA) && defined(USE_LIBPOLY)
 
 #include <carl-arith/core/Variable.h>
 #include <carl-arith/core/Variables.h>

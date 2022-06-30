@@ -205,6 +205,7 @@ public:
 		} else {
 			assert(false && "Invalid RAN creation");
 		}
+		return RealAlgebraicNumberLibpoly();
 	}
 
 	/**
