@@ -78,7 +78,7 @@ public:
     /**
      * Helper function to collect Terms of a libpoly polynomial to CoCoA polynomial
      */
-    static void collectTerms(const lp_polynomial_context_t* ctx,
+    static void collectTerms(const lp_polynomial_context_t* /*ctx*/,
                              lp_monomial_t* m,
                              void* d) {
         using DataLP = std::pair<CoCoA::RingElem*, std::pair<std::map<Variable, CoCoA::RingElem>, std::pair<std::vector<Variable>, std::pair<CoCoA::ring, CoCoA::SparsePolyRing>>>>;
@@ -131,7 +131,7 @@ public:
             for (std::size_t i = 0; i < exponents.size(); ++i) {
                 if (exponents[i] == 0) continue;
                 poly::Variable polyVar = VariableMapper::getInstance().getLibpolyVariable(mSymbolBack[i]);
-                termPoly *= poly::pow(polyVar, exponents[i]);
+                termPoly *= poly::pow(polyVar, (unsigned int)exponents[i]);
             }
             temPoly += termPoly;
         }

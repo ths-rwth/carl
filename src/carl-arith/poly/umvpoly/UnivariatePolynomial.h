@@ -84,8 +84,7 @@ public:
 	using CoeffType = Coefficient;
 	using PolyType = UnivariatePolynomial<Coefficient>;
 
-	template<typename Number>
-	using RootType = RealAlgebraicNumberInterval<Number>; 
+	using RootType = RealAlgebraicNumberInterval<NumberType>; 
 
 	// Rule of five
 	/**

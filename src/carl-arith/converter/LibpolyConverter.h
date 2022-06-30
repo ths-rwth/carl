@@ -34,7 +34,7 @@ inline carl::MultivariatePolynomial<mpq_class> to_carl_multivariate_polynomial(c
      * This function is called for every monomial in a polynomial (by lp_polynomial_traverse)
      * The monomial is converted to a carl term and appended to the vector in MonomialData
      */
-    auto collectMonomialData = [](const lp_polynomial_context_t* ctx, lp_monomial_t* m, void* d) {
+    auto collectMonomialData = [](const lp_polynomial_context_t* /*ctx*/, lp_monomial_t* m, void* d) {
         MonomialData* data = static_cast<MonomialData*>(d);
         carl::Term<mpq_class> term(mpz_class(&m->a));                                                              // m->a is the integer coefficient
         for (size_t i = 0; i < m->n; i++) {                                                                        // m->n is the capacity of the power array

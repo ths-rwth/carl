@@ -55,8 +55,8 @@ TEST(LPPOLYNOMIAL, RealRootsLP) {
     auto res_carl = to_carl_univariate_polynomial(res.getPolynomial());
     auto res_uni_carl = to_carl_univariate_polynomial(res_uni.getPolynomial());
 
-    std::map<Variable, RealAlgebraicNumberLibpoly<mpq_class>> assignment;
-    assignment[y] = RealAlgebraicNumberLibpoly<mpq_class>(123312 / 123312);
+    std::map<Variable, RealAlgebraicNumberLibpoly> assignment;
+    assignment[y] = RealAlgebraicNumberLibpoly(123312 / 123312);
 
     std::map<Variable, RealAlgebraicNumberInterval<mpq_class>> assignment_interval;
     assignment_interval[y] = RealAlgebraicNumberInterval<mpq_class>(123312 / 123312);
@@ -81,8 +81,8 @@ TEST(LPPOLYNOMIAL, Evaluate) {
 
     auto res_carl = to_carl_multivariate_polynomial(res.getPolynomial());
 
-    std::map<Variable, RealAlgebraicNumberLibpoly<mpq_class>> assignment;
-    assignment[x] = RealAlgebraicNumberLibpoly<mpq_class>(123312 / 123312);
+    std::map<Variable, RealAlgebraicNumberLibpoly> assignment;
+    assignment[x] = RealAlgebraicNumberLibpoly(123312 / 123312);
 
     std::map<Variable, RealAlgebraicNumberInterval<mpq_class>> assignment_interval;
     assignment_interval[x] = RealAlgebraicNumberInterval<mpq_class>(123312 / 123312);

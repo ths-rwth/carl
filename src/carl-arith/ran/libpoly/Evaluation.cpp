@@ -1,17 +1,12 @@
-#pragma once
+#include "Evaluation.h"
 
-#include <carl-common/config.h>
 #ifdef USE_LIBPOLY
-
-#include "ran_libpoly.h"
-#include "carl-arith/poly/lp/LPPolynomial.h"
 
 namespace carl {
 
-template<typename Number>
-std::optional<RealAlgebraicNumberLibpoly<Number>> evaluate(
+std::optional<RealAlgebraicNumberLibpoly> evaluate(
 	const LPPolynomial& polynomial,
-	const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& evalMap) {
+	const std::map<Variable, RealAlgebraicNumberLibpoly>& evalMap) {
 
 	//Turn into poly::Assignment
 	poly::Assignment assignment;
@@ -32,11 +27,10 @@ std::optional<RealAlgebraicNumberLibpoly<Number>> evaluate(
 		return std::nullopt;
 	}
 
-	return RealAlgebraicNumberLibpoly<Number>::create_from_value(std::move(result.get_internal()));
+	return RealAlgebraicNumberLibpoly::create_from_value(std::move(result.get_internal()));
 }
 
-template<typename Number>
-boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& evalMap) {
+boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const std::map<Variable, RealAlgebraicNumberLibpoly>& evalMap) {
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation constraint " << constraint << " for assignment " << evalMap);
 
@@ -95,7 +89,7 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 	}
 }
 
+}
 
-} // namespace carl
 
 #endif

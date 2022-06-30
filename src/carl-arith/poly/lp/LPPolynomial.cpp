@@ -83,7 +83,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, co
     for (const mpz_class& coeff : coefficients) {
         pow--;
         poly::Polynomial temp;
-        lp_polynomial_construct_simple(temp.get_internal(), context.getContext(), poly::Integer(coeff).get_internal(), var, pow);
+        lp_polynomial_construct_simple(temp.get_internal(), context.getContext(), poly::Integer(coeff).get_internal(), var, (unsigned int)pow);
         mPoly += temp;
     }
     lp_polynomial_set_external(mPoly.get_internal());
@@ -98,7 +98,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, co
     for (const mpz_class& coeff : coefficients) {
         pow--;
         poly::Polynomial temp;
-        lp_polynomial_construct_simple(temp.get_internal(), context.getContext(), poly::Integer(coeff).get_internal(), var, pow);
+        lp_polynomial_construct_simple(temp.get_internal(), context.getContext(), poly::Integer(coeff).get_internal(), var, (unsigned int)pow);
         mPoly += temp;
     }
     lp_polynomial_set_external(mPoly.get_internal());
@@ -113,7 +113,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, st
     for (const mpz_class& coeff : coefficients) {
         pow--;
         poly::Polynomial temp;
-        lp_polynomial_construct_simple(temp.get_internal(), context.getContext(), poly::Integer(std::move(coeff)).get_internal(), var, pow);
+        lp_polynomial_construct_simple(temp.get_internal(), context.getContext(), poly::Integer(std::move(coeff)).get_internal(), var, (unsigned int)pow);
         mPoly += temp;
     }
     lp_polynomial_set_external(mPoly.get_internal());
@@ -310,7 +310,7 @@ mpz_class LPPolynomial::coprimeFactor() const {
         std::vector<mpz_class> coefficients; // coefficients of the polynomial
     };
 
-    auto getCoeffs = [](const lp_polynomial_context_t* ctx,
+    auto getCoeffs = [](const lp_polynomial_context_t* /*ctx*/,
                         lp_monomial_t* m,
                         void* d) {
         coprime_factor_travers& v = *static_cast<coprime_factor_travers*>(d);
@@ -352,7 +352,7 @@ std::size_t LPPolynomial::total_degree() const {
         std::size_t degree = 0;
     };
 
-    auto getDegree = [](const lp_polynomial_context_t* ctx,
+    auto getDegree = [](const lp_polynomial_context_t* /*ctx*/,
                         lp_monomial_t* m,
                         void* d) {
         degree_travers& v = *static_cast<degree_travers*>(d);
@@ -377,7 +377,7 @@ std::size_t LPPolynomial::degree(Variable::Arg var) const {
         lp_variable_t var; // the variable we are looking for
     };
 
-    auto getDegree = [](const lp_polynomial_context_t* ctx,
+    auto getDegree = [](const lp_polynomial_context_t* /*ctx*/,
                         lp_monomial_t* m,
                         void* d) {
         degree_travers& v = *static_cast<degree_travers*>(d);
@@ -409,7 +409,7 @@ LPPolynomial LPPolynomial::coeff(Variable::Arg var, std::size_t exp) const {
     };
 
 
-    auto getCoeff = [](const lp_polynomial_context_t* ctx,
+    auto getCoeff = [](const lp_polynomial_context_t* /*ctx*/,
                        lp_monomial_t* m,
                        void* d) {
         coeff_travers& v = *static_cast<coeff_travers*>(d);

@@ -19,7 +19,7 @@
 #include <poly/polyxx.h>
 #include <vector>
 
-#include <carl-arith/ran/libpoly/ran_libpoly.h>
+#include <carl-arith/ran/libpoly/LPRan.h>
 #include <carl-arith/converter/LibpolyVariableMapper.h>
 
 namespace carl {
@@ -35,8 +35,7 @@ public:
 	
 	//Defines for real roots 
 	using CoeffType = mpq_class ;
-	template<typename Number>
-	using RootType = RealAlgebraicNumberLibpoly<Number>;
+	using RootType = RealAlgebraicNumberLibpoly;
 
 	//For compatibility with MultivariatePolynomial
 	using NumberType = mpq_class;
@@ -172,7 +171,7 @@ public:
 			mpz_class coeff = 1;
 		};
 
-		auto getCoeff = [](const lp_polynomial_context_t* ctx,
+		auto getCoeff = [](const lp_polynomial_context_t* /*ctx*/,
 						   lp_monomial_t* m,
 						   void* d) {
 			auto& v = *static_cast<LPPolynomial_lcoeff_visitor*>(d);
@@ -217,7 +216,7 @@ public:
 			mpz_class part = 0;
 		};
 
-		auto getConstantPart = [](const lp_polynomial_context_t* ctx,
+		auto getConstantPart = [](const lp_polynomial_context_t* /*ctx*/,
 								  lp_monomial_t* m,
 								  void* d) {
 			auto& v = *static_cast<LPPolynomial_constantPart_visitor*>(d);
@@ -494,7 +493,7 @@ inline bool is_one(LPPolynomial& p) {
 inline void variables(const LPPolynomial& p, carlVariables& vars) {
 	vars.clear();
 
-	auto collectVars = [](const lp_polynomial_context_t* ctx,
+	auto collectVars = [](const lp_polynomial_context_t* /*ctx*/,
 						  lp_monomial_t* m,
 						  void* d) {
 		carlVariables* varList = static_cast<carlVariables*>(d);
