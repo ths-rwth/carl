@@ -44,7 +44,7 @@ public:
 			for (const auto& name: names) {
 				if (name.second) {
 					auto it = res.second.find(name.first);
-					if (it != res.second.end()) os << "\t" << (it->second / 1000.0);
+					if (it != res.second.end()) os << "\t" << ((double)it->second / 1000.0);
 					else os << "\tnan";
 				}
 			}

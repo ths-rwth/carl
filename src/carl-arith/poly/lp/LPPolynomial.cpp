@@ -78,7 +78,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, co
 
     assert(context.has(mainVar));
     lp_variable_t var = VariableMapper::getInstance().getLibpolyVariable(mainVar).get_internal();
-    unsigned int pow = coefficients.size();
+    auto pow = coefficients.size();
 
     for (const mpz_class& coeff : coefficients) {
         pow--;
@@ -93,7 +93,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, co
     : mPoly(context.getContext()), mContext(context) {
     assert(context.has(mainVar));
     lp_variable_t var = VariableMapper::getInstance().getLibpolyVariable(mainVar).get_internal();
-    unsigned int pow = coefficients.size();
+    auto pow = coefficients.size();
 
     for (const mpz_class& coeff : coefficients) {
         pow--;
@@ -108,7 +108,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, st
     : mPoly(context.getContext()), mContext(context) {
     assert(context.has(mainVar));
     lp_variable_t var = VariableMapper::getInstance().getLibpolyVariable(mainVar).get_internal();
-    unsigned int pow = coefficients.size();
+    auto pow = coefficients.size();
 
     for (const mpz_class& coeff : coefficients) {
         pow--;
