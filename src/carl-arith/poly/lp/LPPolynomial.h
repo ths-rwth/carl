@@ -164,30 +164,30 @@ public:
 	 * Returns the leading coefficient Numerical Value.
 	 * @return The leading coefficient.
 	 */
-	const mpz_class lcoeff() const {
-		// TODO: Libpoly has a different Monomial order, this the leading coefficient is different.
-
-		struct LPPolynomial_lcoeff_visitor {
-			mpz_class coeff = 1;
-		};
-
-		auto getCoeff = [](const lp_polynomial_context_t* /*ctx*/,
-						   lp_monomial_t* m,
-						   void* d) {
-			auto& v = *static_cast<LPPolynomial_lcoeff_visitor*>(d);
-			v.coeff *= *reinterpret_cast<mpz_class*>(&m->a);
-		};
-
-		poly::Polynomial leadingPoly = poly::leading_coefficient(mPoly); // This can also have other variables
-		LPPolynomial_lcoeff_visitor visitor;
-		lp_polynomial_traverse(leadingPoly.get_internal(), getCoeff, &visitor);
-		return visitor.coeff;
-	};
+	// const mpz_class lcoeff() const {
+	// 	// TODO: Libpoly has a different Monomial order, this the leading coefficient is different.
+// 
+	// 	struct LPPolynomial_lcoeff_visitor {
+	// 		mpz_class coeff = 1;
+	// 	};
+// 
+	// 	auto getCoeff = [](const lp_polynomial_context_t* /*ctx*/,
+	// 					   lp_monomial_t* m,
+	// 					   void* d) {
+	// 		auto& v = *static_cast<LPPolynomial_lcoeff_visitor*>(d);
+	// 		v.coeff *= *reinterpret_cast<mpz_class*>(&m->a);
+	// 	};
+// 
+	// 	poly::Polynomial leadingPoly = poly::leading_coefficient(mPoly); // This can also have other variables
+	// 	LPPolynomial_lcoeff_visitor visitor;
+	// 	lp_polynomial_traverse(leadingPoly.get_internal(), getCoeff, &visitor);
+	// 	return visitor.coeff;
+	// };
 	/**
 	 * Returns the leading coefficient.
 	 * @return The leading coefficient.
 	 */
-	LPPolynomial lterm() const {
+	LPPolynomial lcoeff() const {
 		return LPPolynomial(poly::leading_coefficient(mPoly));
 	}
 
@@ -195,7 +195,7 @@ public:
 	 * Checks whether the polynomial is only a number.
 	 * @return If polynomial is a number.
 	 */
-	bool isNumber() const {
+	bool is_number() const {
 		return poly::is_constant(mPoly);
 	}
 
@@ -252,8 +252,8 @@ public:
 	 * Retrieves the main variable of this polynomial.
 	 * @return Main variable.
 	 */
-	Variable mainVar() const {
-		assert(!isNumber());
+	Variable main_var() const {
+		assert(!is_number());
 		return VariableMapper::getInstance().getCarlVariable(poly::main_variable(mPoly));
 	}
 
@@ -315,7 +315,7 @@ public:
 	 * As we can only have integer coefficients, we calculate the gcd of the coefficients of the monomial
 	 * @return Coprime factor of this polynomial.
 	 */
-	mpz_class coprimeFactor() const;
+	mpz_class coprime_factor() const;
 
 	/**
 	 * Constructs a new polynomial that is scaled such that the coefficients are coprime.
@@ -324,7 +324,7 @@ public:
 	 * @return This polynomial multiplied with the coprime factor.
 	 */
 
-	LPPolynomial coprimeCoefficients() const;
+	LPPolynomial coprime_coefficients() const;
 
 	/**
 	 * Checks whether the polynomial is unit normal.
@@ -332,7 +332,7 @@ public:
 	 * @see @cite GCL92, page 39
 	 * @return If polynomial is normal.
 	 */
-	bool isNormal() const;
+	bool is_normal() const;
 	/**
 	 * The normal part of a polynomial is the polynomial divided by the unit part.
 	 * @see @cite GCL92, page 42.
@@ -354,7 +354,7 @@ public:
 	 * @see @cite GCL92, page 42.
 	 * @return The unit part of the polynomial.
 	 */
-	mpz_class unitPart() const;
+	mpz_class unit_part() const;
 
 	/**
 	 * Constructs a new polynomial `q` such that \f$ q(x) = p(-x) \f$ where `p` is this polynomial.

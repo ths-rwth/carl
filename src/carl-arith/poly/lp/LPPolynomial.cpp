@@ -304,7 +304,7 @@ LPPolynomial& operator*=(LPPolynomial& lhs, const mpz_class& rhs) {
     return lhs;
 }
 
-mpz_class LPPolynomial::coprimeFactor() const {
+mpz_class LPPolynomial::coprime_factor() const {
     // TODO: can this be done with content/primitive part?
     struct coprime_factor_travers {
         std::vector<mpz_class> coefficients; // coefficients of the polynomial
@@ -332,7 +332,7 @@ mpz_class LPPolynomial::coprimeFactor() const {
     return res;
 }
 
-LPPolynomial LPPolynomial::coprimeCoefficients() const {
+LPPolynomial LPPolynomial::coprime_coefficients() const {
 
     mpz_class g = coprimeFactor();
 
