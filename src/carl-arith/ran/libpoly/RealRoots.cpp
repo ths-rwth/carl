@@ -5,7 +5,7 @@
 
 namespace carl::ran::libpoly {
 
-real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(
+RealRootsResult<RealAlgebraicNumberLibpoly> real_roots_libpoly(
     const LPPolynomial& polynomial,
     const Interval<RealAlgebraicNumberLibpoly::NumberType>& interval) {
     CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << polynomial << " within " << interval);
@@ -15,10 +15,10 @@ real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(
     // Easy checks
     if (carl::is_zero(polynomial)) {
         CARL_LOG_TRACE("carl.ran.libpoly", "poly is 0 -> nullified");
-        return real_roots_result<RealAlgebraicNumberLibpoly>::nullified_response();
+        return RealRootsResult<RealAlgebraicNumberLibpoly>::nullified_response();
     } else if (carl::is_constant(polynomial)) {
         CARL_LOG_TRACE("carl.ran.libpoly", "poly is constant but not zero -> no root");
-        return real_roots_result<RealAlgebraicNumberLibpoly>::no_roots_response();
+        return RealRootsResult<RealAlgebraicNumberLibpoly>::no_roots_response();
     }
 
     poly::Interval inter_poly = to_libpoly_interval(interval);
@@ -28,13 +28,13 @@ real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(
 
     if (roots.empty()) {
         CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has no roots");
-        return real_roots_result<RealAlgebraicNumberLibpoly>::no_roots_response();
+        return RealRootsResult<RealAlgebraicNumberLibpoly>::no_roots_response();
     }
 
     // sort roots in ascending order
     std::sort(roots.begin(), roots.end(), std::less<poly::AlgebraicNumber>());
 
-    // turn into real_roots_result
+    // turn into RealRootsResult
     std::vector<RealAlgebraicNumberLibpoly> res;
     for (const auto& val : roots) {
         auto tmp = RealAlgebraicNumberLibpoly(val);
@@ -45,10 +45,10 @@ real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(
         }
     }
 
-    return real_roots_result<RealAlgebraicNumberLibpoly>::roots_response(std::move(res));
+    return RealRootsResult<RealAlgebraicNumberLibpoly>::roots_response(std::move(res));
 }
 
-real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(
+RealRootsResult<RealAlgebraicNumberLibpoly> real_roots_libpoly(
     const LPPolynomial& polynomial,
     const std::map<Variable, RealAlgebraicNumberLibpoly>& m,
     const Interval<RealAlgebraicNumberLibpoly::NumberType>& interval) {
@@ -61,10 +61,10 @@ real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(
     // easy checks
     if (carl::is_zero(polynomial)) {
         CARL_LOG_TRACE("carl.ran.libpoly", "poly is 0 -> nullified");
-        return real_roots_result<RealAlgebraicNumberLibpoly>::nullified_response();
+        return RealRootsResult<RealAlgebraicNumberLibpoly>::nullified_response();
     } else if (carl::is_constant(polynomial)) {
         CARL_LOG_TRACE("carl.ran.libpoly", "poly is constant but not zero -> no root");
-        return real_roots_result<RealAlgebraicNumberLibpoly>::no_roots_response();
+        return RealRootsResult<RealAlgebraicNumberLibpoly>::no_roots_response();
     }
 
     poly::Interval inter_poly = to_libpoly_interval(interval);
@@ -95,16 +95,16 @@ real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(
 
         if (eval_val == poly::Value(long(0))) {
             CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 after substituting rational assignments -> nullified");
-            return real_roots_result<RealAlgebraicNumberLibpoly>::nullified_response();
+            return RealRootsResult<RealAlgebraicNumberLibpoly>::nullified_response();
         } else {
             CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has no roots");
-            return real_roots_result<RealAlgebraicNumberLibpoly>::no_roots_response();
+            return RealRootsResult<RealAlgebraicNumberLibpoly>::no_roots_response();
         }
     }
 
     std::sort(roots.begin(), roots.end(), std::less<poly::Value>());
 
-    // turn result into real_roots_result
+    // turn result into RealRootsResult
     std::vector<RealAlgebraicNumberLibpoly> res;
     for (const poly::Value& val : roots) {
         auto tmp = RealAlgebraicNumberLibpoly::create_from_value(val.get_internal());
@@ -115,7 +115,7 @@ real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(
         }
     }
 
-    return real_roots_result<RealAlgebraicNumberLibpoly>::roots_response(std::move(res));
+    return RealRootsResult<RealAlgebraicNumberLibpoly>::roots_response(std::move(res));
 }
 } // namespace carl::ran::libpoly
 

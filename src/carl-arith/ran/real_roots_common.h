@@ -7,7 +7,7 @@
 namespace carl::ran {
 
 template<typename RAN /*, typename = std::enable_if_t<is_ran<RAN>::value> */>
-class real_roots_result {
+class RealRootsResult {
 
 public:
     using roots_t = std::vector<RAN>;
@@ -17,25 +17,25 @@ private:
     struct non_univariate_t {};
     std::variant<roots_t, nullified_t, non_univariate_t> m_data;
 
-    real_roots_result(nullified_t)
+    RealRootsResult(nullified_t)
         : m_data(nullified_t{}){};
-    real_roots_result(non_univariate_t)
+    RealRootsResult(non_univariate_t)
         : m_data(non_univariate_t{}){};
-    real_roots_result(roots_t&& real_roots)
+    RealRootsResult(roots_t&& real_roots)
         : m_data(std::move(real_roots)){};
 
 public:
-    static real_roots_result nullified_response() {
-        return real_roots_result(nullified_t{});
+    static RealRootsResult nullified_response() {
+        return RealRootsResult(nullified_t{});
     }
-    static real_roots_result non_univariate_response() {
-        return real_roots_result(non_univariate_t{});
+    static RealRootsResult non_univariate_response() {
+        return RealRootsResult(non_univariate_t{});
     }
-    static real_roots_result roots_response(roots_t&& real_roots) {
-        return real_roots_result(std::move(real_roots));
+    static RealRootsResult roots_response(roots_t&& real_roots) {
+        return RealRootsResult(std::move(real_roots));
     }
-    static real_roots_result no_roots_response() {
-        return real_roots_result(std::vector<RAN>({}));
+    static RealRootsResult no_roots_response() {
+        return RealRootsResult(std::vector<RAN>({}));
     }
 
     bool is_nullified() const {

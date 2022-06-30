@@ -19,18 +19,18 @@ namespace carl::ran::interval {
  * The roots are sorted in ascending order.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, EnableIf<std::is_same<Coeff, Number>> = dummy>
-real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
+RealRootsResult<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
 	if (carl::is_zero(polynomial)) {
-		return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
+		return RealRootsResult<RealAlgebraicNumberInterval<Number>>::nullified_response();
 	}
 	CARL_LOG_DEBUG("carl.ran.realroots", polynomial << " within " << interval);
 	carl::ran::interval::RealRootIsolation rri(polynomial, interval);
 	auto r = rri.get_roots();
 	CARL_LOG_DEBUG("carl.ran.realroots", "-> " << r);
-	return real_roots_result<RealAlgebraicNumberInterval<Number>>::roots_response(std::move(r));
+	return RealRootsResult<RealAlgebraicNumberInterval<Number>>::roots_response(std::move(r));
 }
 
 /**
@@ -39,7 +39,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
  * The roots are sorted in ascending order.
  */
 template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type, DisableIf<std::is_same<Coeff, Number>> = dummy>
-real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
+RealRootsResult<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
 ) {
@@ -59,11 +59,11 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
  *   <li>all variables from the coefficients of 'p' must be in 'm'</li>
  * </ul>
  * The roots are sorted in ascending order.
- * Returns a real_roots_result indicating whether the roots could be isolated or the polynomial
+ * Returns a RealRootsResult indicating whether the roots could be isolated or the polynomial
  * was not univariate or is nullified.  
  */
 template<typename Coeff, typename Number>
-real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
+RealRootsResult<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 		const UnivariatePolynomial<Coeff>& poly,
 		const Assignment<RealAlgebraicNumberInterval<Number>>& varToRANMap,
 		const Interval<Number>& interval = Interval<Number>::unbounded_interval()
@@ -73,11 +73,11 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 
 	if (carl::is_zero(poly)) {
 		CARL_LOG_TRACE("carl.ran.realroots", "poly is 0 -> nullified");
-		return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
+		return RealRootsResult<RealAlgebraicNumberInterval<Number>>::nullified_response();
 	}
 	if (poly.is_number()) {
 		CARL_LOG_TRACE("carl.ran.realroots", "poly is constant but not zero -> no root");
-		return real_roots_result<RealAlgebraicNumberInterval<Number>>::no_roots_response();
+		return RealRootsResult<RealAlgebraicNumberInterval<Number>>::no_roots_response();
 	}
 
   	// We want to simplify 'poly', but it's const, so make a copy.
@@ -88,7 +88,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 		if (v == poly.main_var()) continue;
 		if (varToRANMap.count(v) == 0) {
 			CARL_LOG_TRACE("carl.ran.realroots", "poly still contains unassigned variable " << v << " -> non-univariate");
-			return real_roots_result<RealAlgebraicNumberInterval<Number>>::non_univariate_response();
+			return RealRootsResult<RealAlgebraicNumberInterval<Number>>::non_univariate_response();
 		}
 		assert(varToRANMap.count(v) > 0);
 		if (varToRANMap.at(v).is_numeric()) {
@@ -99,7 +99,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 	}
 	if (carl::is_zero(polyCopy)) {
 		CARL_LOG_TRACE("carl.ran.realroots", "poly is 0 after substituting rational assignments -> nullified");
-		return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
+		return RealRootsResult<RealAlgebraicNumberInterval<Number>>::nullified_response();
 	}
 	if (ir_map.empty()) {
 		assert(polyCopy.is_univariate());
@@ -119,11 +119,11 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 		std::optional<UnivariatePolynomial<Number>> evaledpoly = substitute_rans_into_polynomial(polyCopy, ord_ass);
 		if (!evaledpoly) {
 			CARL_LOG_TRACE("carl.ran.realroots", "poly still contains unassigned variable -> non-univariate");
-			return real_roots_result<RealAlgebraicNumberInterval<Number>>::non_univariate_response();
+			return RealRootsResult<RealAlgebraicNumberInterval<Number>>::non_univariate_response();
 		}
 		if (carl::is_zero(*evaledpoly)) {
 			CARL_LOG_TRACE("carl.ran.realroots", "got zero polynomial -> nullified");
-			return real_roots_result<RealAlgebraicNumberInterval<Number>>::nullified_response();
+			return RealRootsResult<RealAlgebraicNumberInterval<Number>>::nullified_response();
 		}
 
 		CARL_LOG_TRACE("carl.ran.realroots", "Calling on " << *evaledpoly);
@@ -140,7 +140,7 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 				CARL_LOG_TRACE("carl.ran.realroots", "Purging spurious root " << r);
 			}
 		}
-		return real_roots_result<RealAlgebraicNumberInterval<Number>>::roots_response(std::move(roots));
+		return RealRootsResult<RealAlgebraicNumberInterval<Number>>::roots_response(std::move(roots));
 	}
 }
 

@@ -16,9 +16,9 @@
 
 namespace carl::ran::libpoly {
 
-real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(const LPPolynomial& polynomial, const Interval<RealAlgebraicNumberLibpoly::NumberType>& interval = Interval<RealAlgebraicNumberLibpoly::NumberType>::unbounded_interval());
+RealRootsResult<RealAlgebraicNumberLibpoly> real_roots_libpoly(const LPPolynomial& polynomial, const Interval<RealAlgebraicNumberLibpoly::NumberType>& interval = Interval<RealAlgebraicNumberLibpoly::NumberType>::unbounded_interval());
 
-real_roots_result<RealAlgebraicNumberLibpoly> real_roots_libpoly(const LPPolynomial& polynomial, const std::map<Variable, RealAlgebraicNumberLibpoly>& m, const Interval<RealAlgebraicNumberLibpoly::NumberType>& interval = Interval<RealAlgebraicNumberLibpoly::NumberType>::unbounded_interval());
+RealRootsResult<RealAlgebraicNumberLibpoly> real_roots_libpoly(const LPPolynomial& polynomial, const std::map<Variable, RealAlgebraicNumberLibpoly>& m, const Interval<RealAlgebraicNumberLibpoly::NumberType>& interval = Interval<RealAlgebraicNumberLibpoly::NumberType>::unbounded_interval());
 
 } // namespace carl::ran::libpoly
 
