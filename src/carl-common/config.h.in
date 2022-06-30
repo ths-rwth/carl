@@ -13,7 +13,3 @@
 
 #cmakedefine USE_CLN_NUMBERS
 #cmakedefine USE_MPFR_FLOAT
-
-#cmakedefine RAN_USE_INTERVAL
-#cmakedefine RAN_USE_THOM
-#cmakedefine RAN_USE_LIBPOLY

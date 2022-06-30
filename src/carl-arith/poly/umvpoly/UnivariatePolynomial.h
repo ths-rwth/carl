@@ -26,6 +26,8 @@ namespace carl {
 //
 template<typename Coefficient> class UnivariatePolynomial;
 
+template<typename Coefficient> class RealAlgebraicNumberInterval;
+
 template<typename Coefficient>
 using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
 
@@ -34,6 +36,7 @@ using FactorMap = std::map<UnivariatePolynomial<Coefficient>, uint>;
 }
 
 #include "MultivariatePolynomial.h"
+
 
 #include <carl-logging/carl-logging.h>
 
@@ -80,6 +83,9 @@ public:
 	using CACHE = void;
 	using CoeffType = Coefficient;
 	using PolyType = UnivariatePolynomial<Coefficient>;
+
+	template<typename Number>
+	using RootType = RealAlgebraicNumberInterval<Number>; 
 
 	// Rule of five
 	/**

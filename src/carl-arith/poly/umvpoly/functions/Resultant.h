@@ -9,10 +9,6 @@
 #include "Remainder.h"
 #include "to_univariate_polynomial.h"
 
-#ifdef USE_LIBPOLY
-	#include "../../converter/LibpolyFunctions.h"
-#endif
-
 #include <list>
 #include <vector>
 
@@ -290,14 +286,6 @@ std::vector<UnivariatePolynomial<Coeff>> principalSubresultantsCoefficients(
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff> resultant_calculate(
-	const UnivariatePolynomial<Coeff>& p,
-	const UnivariatePolynomial<Coeff>& q,
-	SubresultantStrategy strategy) {
-	return subresultants(p.normalized(), q.normalized(), strategy).front();
-}
-
-template<typename Coeff>
 UnivariatePolynomial<Coeff> resultant(
 	const UnivariatePolynomial<Coeff>& p,
 	const UnivariatePolynomial<Coeff>& q,
@@ -305,26 +293,7 @@ UnivariatePolynomial<Coeff> resultant(
 	assert(p.main_var() == q.main_var());
 	if (carl::is_zero(p) || carl::is_zero(q)) return UnivariatePolynomial<Coeff>(p.main_var());
 
-	auto s = overloaded {
-#if defined(USE_LIBPOLY)
-		//TODO: heuristic to only use lp for "hard" resultants?
-		[](const UnivariatePolynomial<Coeff>& p1, const UnivariatePolynomial<Coeff>& p2, SubresultantStrategy strat) {LibpolyFunctions c; return c.libpoly_resultant(p1,p2); }
-#else
-		[](const UnivariatePolynomial<Coeff>& p1, const UnivariatePolynomial<Coeff>& p2, SubresultantStrategy strat) { return resultant_calculate(p1, p2, strat); }
-#endif
-	};
-
-	UnivariatePolynomial<Coeff> res = s(p, q, strategy);
-
-	//UnivariatePolynomial<Coeff> res_debug = resultant_calculate(p, q, strategy);
-	//if(res != res_debug){
-	//	std::cout << "P1: " << p << std::endl;
-	//	std::cout << "P2: " << q << std::endl;
-	//	std::cout << "MainVar: " << p.main_var() << std::endl ;
-	//	std::cout << "Libpoly Resultant: " << res << std::endl ;
-	//	std::cout << "Carl Resultant: " << res_debug << std::endl ;
-	//	assert(false); //TODO Manchmal anderes Vorzeichen? -> WolframAlpha stimmt mit libpoly überein
-	//}
+	UnivariatePolynomial<Coeff> res = subresultants(p.normalized(), q.normalized(), strategy).front();
 
 	CARL_LOG_TRACE("carl.core.resultant", "resultant(" << p << ", " << q << ") = " << res);
 	if (is_constant(res)) {

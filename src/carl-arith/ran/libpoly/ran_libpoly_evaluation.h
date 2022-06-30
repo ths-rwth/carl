@@ -1,22 +1,18 @@
 #pragma once
 
 #include <carl-common/config.h>
-
-#ifdef RAN_USE_LIBPOLY
+#ifdef USE_LIBPOLY
 
 #include "ran_libpoly.h"
+#include "carl-arith/poly/lp/LPPolynomial.h"
 
 namespace carl {
 
 template<typename Number>
 std::optional<RealAlgebraicNumberLibpoly<Number>> evaluate(
-	const MultivariatePolynomial<Number>& polynomial,
+	const LPPolynomial& polynomial,
 	const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& evalMap) {
-	mpz_class denom;
-	poly::Polynomial poly = LibpolyConverter::getInstance().toLibpolyPolynomial(polynomial, denom);
-	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation converted to poly: " << poly << " With denominator: " << denom);
 
-	assert(denom != 0);
 	//Turn into poly::Assignment
 	poly::Assignment assignment;
 	for (const auto& entry : evalMap) {
@@ -28,52 +24,24 @@ std::optional<RealAlgebraicNumberLibpoly<Number>> evaluate(
 		lp_value_destruct(&val);
 	}
 
-	lp_value_t* val = lp_polynomial_evaluate(poly.get_internal(), assignment.get_internal());
+	poly::Value result = poly::Value(lp_polynomial_evaluate(polynomial.get_internal(), assignment.get_internal()));
 
-	if (val->type == lp_value_type_t::LP_VALUE_NONE) {
-		CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation got nothing ");
+	CARL_LOG_DEBUG("carl.ran.libpoly", " Result: " << result);
+
+	if(poly::is_none(result)) {
 		return std::nullopt;
 	}
 
-	//Turn value into algebraic number
-	RealAlgebraicNumberLibpoly<Number> res = RealAlgebraicNumberLibpoly<Number>::create_from_value(val);
-
-	lp_value_delete(val);
-
-	//easy checks to avoid division
-	if (res.is_zero() || denom == 1) {
-		return res;
-	} else if (denom == -1) {
-		lp_algebraic_number_neg(res.get_internal(), res.get_internal());
-		return res;
-	}
-
-	lp_algebraic_number_t ret_val;
-	lp_algebraic_number_t algebraic_denom;
-
-	lp_algebraic_number_construct_zero(&ret_val);
-
-	//make denom an algebraic number
-	lp_algebraic_number_construct_from_integer(&algebraic_denom, denom.get_mpz_t());
-
-	lp_algebraic_number_div(&ret_val, res.get_internal(), &algebraic_denom);
-
-	RealAlgebraicNumberLibpoly<Number> ret(std::move(ret_val));
-
-	lp_algebraic_number_destruct(&ret_val);
-	lp_algebraic_number_destruct(&algebraic_denom);
-
-	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation got " << ret);
-	return std::optional<RealAlgebraicNumberLibpoly<Number>>(std::move(ret));
+	return RealAlgebraicNumberLibpoly<Number>::create_from_value(std::move(result.get_internal()));
 }
 
-template<typename Number, typename Poly>
-boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& evalMap) {
+template<typename Number>
+boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const std::map<Variable, RealAlgebraicNumberLibpoly<Number>>& evalMap) {
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation constraint " << constraint << " for assignment " << evalMap);
 
 	//Easy checks of lhs of constraint is constant
-	if (constraint.lhs().is_constant()) {
+	if (is_constant(constraint.lhs())) {
 		auto num = constraint.lhs().constant_part();
 		switch (constraint.relation()) {
 		case Relation::EQ:
@@ -95,7 +63,7 @@ boost::tribool evaluate(const BasicConstraint<Poly>& constraint, const std::map<
 	}
 
 	//denominator can be omitted
-	poly::Polynomial poly_pol = LibpolyConverter::getInstance().toLibpolyPolynomial(constraint.lhs());
+	poly::Polynomial poly_pol = constraint.lhs().getPolynomial() ;
 
 	//Turn into poly::Assignment
 	poly::Assignment assignment;

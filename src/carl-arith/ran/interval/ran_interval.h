@@ -1,13 +1,12 @@
 #pragma once
 
+#include <carl-arith/poly/umvpoly/functions/SquareFreePart.h>
 #include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
 #include <carl-arith/poly/umvpoly/functions/Division.h>
 #include <carl-arith/poly/umvpoly/functions/Evaluation.h>
 #include <carl-arith/poly/umvpoly/functions/Representation.h>
 #include <carl-arith/poly/umvpoly/functions/RootBounds.h>
 #include <carl-arith/poly/umvpoly/functions/RootCounting.h>
-#include <carl-arith/poly/umvpoly/functions/SquareFreePart.h>
-#include <carl-arith/poly/umvpoly/functions/to_univariate_polynomial.h>
 #include <carl-arith/constraint/BasicConstraint.h>
 
 #include <carl-arith/interval/Interval.h>
@@ -25,6 +24,7 @@ namespace carl {
 template<typename Number>
 class RealAlgebraicNumberInterval {
 	using Polynomial = UnivariatePolynomial<Number>;
+	
 	static const Variable auxVariable;
 
 	template<typename Num>
@@ -172,13 +172,6 @@ private:
 		}
 	}
 
-	auto& polynomial_int() const {
-		return *(m_content->polynomial);
-	}
-	auto& interval_int() const {
-		return m_content->interval;
-	}
-
 public:
 	RealAlgebraicNumberInterval()
 		: m_content(std::make_shared<content>(Interval<Number>(0))) {}
@@ -309,6 +302,13 @@ public:
 			refine_internal(i.upper());
 		}
 		return i.contains(interval_int());
+	}
+
+	auto& polynomial_int() const {
+		return *(m_content->polynomial);
+	}
+	auto& interval_int() const {
+		return m_content->interval;
 	}
 };
 
