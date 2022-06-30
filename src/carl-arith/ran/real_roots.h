@@ -30,6 +30,7 @@ struct real_roots_internal {
     }
 };
 
+#ifdef USE_LIBPOLY
 template<typename Number>
 struct real_roots_internal<LPPolynomial, Number> {
     static real_roots_result<LPPolynomial::RootType<Number>> real_roots(const LPPolynomial& polynomial, const Interval<Number>& interval) {
@@ -42,6 +43,7 @@ struct real_roots_internal<LPPolynomial, Number> {
         return carl::ran::libpoly::real_roots_libpoly(polynomial, assignment, interval);
     }
 };
+#endif
 
 template<typename Number, typename Coeff>
 struct real_roots_internal<UnivariatePolynomial<Coeff>, Number> {

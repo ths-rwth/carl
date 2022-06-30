@@ -33,7 +33,6 @@ real_roots_result<RealAlgebraicNumberInterval<Number>> real_roots_interval(
 	return real_roots_result<RealAlgebraicNumberInterval<Number>>::roots_response(std::move(r));
 }
 
-// TODO make generic?
 /**
  * Find all real roots of a univariate 'polynomial' with non-numeric coefficients within a given 'interval'.
  * However, all coefficients must be types that contain numeric numbers that are retrievable by using .constant_part();
