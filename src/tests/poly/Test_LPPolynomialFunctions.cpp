@@ -29,13 +29,13 @@ TEST(LPPOLYNOMIAL, Resultant) {
     auto lp_poly1 = polyX * polyY - 12;
     auto lp_poly2 = polyX * polyX * (polyY - 12) - polyY * polyY;
 
-    auto carl_poly1 = to_carl_multivariate_polynomial(lp_poly1.getPolynomial());
-    auto carl_poly2 = to_carl_multivariate_polynomial(lp_poly2.getPolynomial());
+    auto carl_poly1 = to_carl_multivariate_polynomial(lp_poly1.get_polynomial());
+    auto carl_poly2 = to_carl_multivariate_polynomial(lp_poly2.get_polynomial());
 
     auto carl_resultant = resultant(to_univariate_polynomial(carl_poly1, x), to_univariate_polynomial(carl_poly2, x));
     auto lp_resultant = resultant(lp_poly1, lp_poly2);
 
-    EXPECT_EQ(to_univariate_polynomial(to_carl_multivariate_polynomial(lp_resultant.getPolynomial()), x), carl_resultant);
+    EXPECT_EQ(to_univariate_polynomial(to_carl_multivariate_polynomial(lp_resultant.get_polynomial()), x), carl_resultant);
 }
 
 TEST(LPPOLYNOMIAL, RealRootsLP) {
@@ -52,8 +52,8 @@ TEST(LPPOLYNOMIAL, RealRootsLP) {
 
     auto res_uni = polyX * polyX - 12;
 
-    auto res_carl = to_carl_univariate_polynomial(res.getPolynomial());
-    auto res_uni_carl = to_carl_univariate_polynomial(res_uni.getPolynomial());
+    auto res_carl = to_carl_univariate_polynomial(res.get_polynomial());
+    auto res_uni_carl = to_carl_univariate_polynomial(res_uni.get_polynomial());
 
     std::map<Variable, RealAlgebraicNumberLibpoly> assignment;
     assignment[y] = RealAlgebraicNumberLibpoly(123312 / 123312);
@@ -79,7 +79,7 @@ TEST(LPPOLYNOMIAL, Evaluate) {
 
     auto res = polyX * polyX - 12;
 
-    auto res_carl = to_carl_multivariate_polynomial(res.getPolynomial());
+    auto res_carl = to_carl_multivariate_polynomial(res.get_polynomial());
 
     std::map<Variable, RealAlgebraicNumberLibpoly> assignment;
     assignment[x] = RealAlgebraicNumberLibpoly(123312 / 123312);
@@ -215,9 +215,9 @@ TEST(LPPOLYNOMIAL, Coeff){
 
     auto res = polyX * polyY - 12;
 
-    auto res_carl = to_carl_multivariate_polynomial(res.getPolynomial());
+    auto res_carl = to_carl_multivariate_polynomial(res.get_polynomial());
 
-    EXPECT_EQ(to_carl_multivariate_polynomial(res.coeff(x,2).getPolynomial()), res_carl.coeff(x,2));
+    EXPECT_EQ(to_carl_multivariate_polynomial(res.coeff(x,2).get_polynomial()), res_carl.coeff(x,2));
     
 }
 

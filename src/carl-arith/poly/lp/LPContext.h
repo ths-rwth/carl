@@ -86,11 +86,11 @@ public:
         }
     }
 
-    lp_polynomial_context_t* getContext() {
+    lp_polynomial_context_t* context() {
         return mContext;
     };
 
-    const lp_polynomial_context_t* getContext() const {
+    const lp_polynomial_context_t* context() const {
         return mContext;
     };
 

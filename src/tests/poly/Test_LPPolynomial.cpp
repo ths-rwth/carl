@@ -22,7 +22,7 @@ TEST(LPPOLYNOMIAL, createContext) {
     LPContext ctx2(var_order2);
     LPContext ctx2_2(var_order2);
     LPContext ctx3(var_order3);
-    LPContext ctx3_2(ctx3.getContext());
+    LPContext ctx3_2(ctx3.context());
 
     EXPECT_EQ(ctx1.getVariableOrder(), var_order1);
     EXPECT_EQ(ctx2.getVariableOrder(), var_order2);
@@ -112,7 +112,7 @@ TEST(LPPOLYNOMIAL, LeadingCoefficient) {
 
     auto res = polyX * polyX + constant * polyX * polyY ;
 
-    auto carl_res = to_carl_multivariate_polynomial(res.getPolynomial()) ;
+    auto carl_res = to_carl_multivariate_polynomial(res.get_polynomial()) ;
 
     std::cout << "Carl_MainVar: " << carl_res << std::endl;
     std::cout << "Carl_MainVar: " << res.main_var() << std::endl;

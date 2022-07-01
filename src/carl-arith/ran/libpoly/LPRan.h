@@ -150,9 +150,7 @@ public:
 
 	friend bool compare(const RealAlgebraicNumberLibpoly&, const RealAlgebraicNumberLibpoly&, const Relation);
 	friend bool compare(const RealAlgebraicNumberLibpoly&, const NumberType&, const Relation);
-	template<typename Poly>
-	friend boost::tribool evaluate(const BasicConstraint<Poly>&, const Assignment<RealAlgebraicNumberLibpoly>&, bool, bool);
-	friend std::optional<RealAlgebraicNumberLibpoly> evaluate(MultivariatePolynomial<NumberType>, const Assignment<RealAlgebraicNumberLibpoly>&, bool);	
+
 	friend NumberType branching_point(const RealAlgebraicNumberLibpoly& n);
 	friend NumberType sample_above(const RealAlgebraicNumberLibpoly& n);
 	friend NumberType sample_below(const RealAlgebraicNumberLibpoly& n);
@@ -162,6 +160,18 @@ public:
 	friend NumberType floor(const RealAlgebraicNumberLibpoly& n);
 	friend NumberType ceil(const RealAlgebraicNumberLibpoly& n);
 };
+
+bool compare(const RealAlgebraicNumberLibpoly&, const RealAlgebraicNumberLibpoly&, const Relation);
+bool compare(const RealAlgebraicNumberLibpoly&, const RealAlgebraicNumberLibpoly::NumberType&, const Relation);
+
+RealAlgebraicNumberLibpoly::NumberType branching_point(const RealAlgebraicNumberLibpoly& n);
+RealAlgebraicNumberLibpoly::NumberType sample_above(const RealAlgebraicNumberLibpoly& n);
+RealAlgebraicNumberLibpoly::NumberType sample_below(const RealAlgebraicNumberLibpoly& n);
+RealAlgebraicNumberLibpoly::NumberType sample_between(const RealAlgebraicNumberLibpoly& lower, const RealAlgebraicNumberLibpoly& upper);
+RealAlgebraicNumberLibpoly::NumberType sample_between(const RealAlgebraicNumberLibpoly& lower, const RealAlgebraicNumberLibpoly::NumberType& upper);
+RealAlgebraicNumberLibpoly::NumberType sample_between(const RealAlgebraicNumberLibpoly::NumberType& lower, const RealAlgebraicNumberLibpoly& upper);
+RealAlgebraicNumberLibpoly::NumberType floor(const RealAlgebraicNumberLibpoly& n);
+RealAlgebraicNumberLibpoly::NumberType ceil(const RealAlgebraicNumberLibpoly& n);
 
 void refine(const RealAlgebraicNumberLibpoly& n);
 void refine_using(const RealAlgebraicNumberLibpoly& n, const RealAlgebraicNumberLibpoly::NumberType& pivot);

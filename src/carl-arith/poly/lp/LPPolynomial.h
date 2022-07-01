@@ -155,7 +155,7 @@ public:
 	 * For terms with exactly one variable, get this variable.
 	 * @return The only variable occuring in the term.
 	 */
-	Variable getSingleVariable() const {
+	Variable single_variable() const {
 		assert(poly::is_univariate(mPoly));
 		return VariableMapper::getInstance().getCarlVariable(poly::main_variable(mPoly));
 	}
@@ -191,6 +191,15 @@ public:
 		return LPPolynomial(poly::leading_coefficient(mPoly));
 	}
 
+	/** Obtain all non-constant coefficients of a polynomial. */
+	std::vector<LPPolynomial> coefficients() const {
+		std::vector<LPPolynomial> res;
+		for (auto& p : poly::coefficients(mPoly)) {
+			res.emplace_back(std::move(p));
+		}
+		return res;
+	}
+
 	/**
 	 * Checks whether the polynomial is only a number.
 	 * @return If polynomial is a number.
@@ -205,6 +214,13 @@ public:
 	 */
 	bool is_constant() const{
 		return poly::is_constant(mPoly);
+	}
+
+	/**
+	 * @brief Check if the given polynomial is linear.
+	 */
+	bool is_linear() const {
+		return poly::is_linear(mPoly);
 	}
 
 	/**
@@ -279,7 +295,7 @@ public:
 	 *
 	 * @return const poly::Polynomial&
 	 */
-	const poly::Polynomial& getPolynomial() const {
+	const poly::Polynomial& get_polynomial() const {
 		return mPoly;
 	}
 
@@ -288,7 +304,7 @@ public:
 	 *
 	 * @return const LPContext
 	 */
-	const LPContext getContext() const {
+	const LPContext context() const {
 		return mContext;
 	}
 
@@ -297,7 +313,7 @@ public:
 	 *
 	 * @return LPContext
 	 */
-	LPContext getContext() {
+	LPContext context() {
 		return mContext;
 	}
 
@@ -390,7 +406,7 @@ public:
 	 * This method only applies if the Coefficient type is a number.
 	 * @return the main denominator of all coefficients of this polynomial.
 	 */
-	mpz_class mainDenom() const {
+	mpz_class main_denom() const {
 		CARL_LOG_NOTIMPLEMENTED();
 		return mpz_class(0);
 	}

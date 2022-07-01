@@ -57,7 +57,7 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 	}
 
 	//denominator can be omitted
-	poly::Polynomial poly_pol = constraint.lhs().getPolynomial() ;
+	poly::Polynomial poly_pol = constraint.lhs().get_polynomial() ;
 
 	//Turn into poly::Assignment
 	poly::Assignment assignment;

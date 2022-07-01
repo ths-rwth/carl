@@ -10,7 +10,7 @@ RealRootsResult<RealAlgebraicNumberLibpoly> real_roots_libpoly(
     const Interval<RealAlgebraicNumberLibpoly::NumberType>& interval) {
     CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << polynomial << " within " << interval);
 
-    assert(poly::is_univariate(polynomial.getPolynomial()));
+    assert(poly::is_univariate(polynomial.get_polynomial()));
 
     // Easy checks
     if (carl::is_zero(polynomial)) {
@@ -24,7 +24,7 @@ RealRootsResult<RealAlgebraicNumberLibpoly> real_roots_libpoly(
     poly::Interval inter_poly = to_libpoly_interval(interval);
 
     // actual calculations
-    std::vector<poly::AlgebraicNumber> roots = poly::isolate_real_roots(poly::to_univariate(polynomial.getPolynomial()));
+    std::vector<poly::AlgebraicNumber> roots = poly::isolate_real_roots(poly::to_univariate(polynomial.get_polynomial()));
 
     if (roots.empty()) {
         CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has no roots");
@@ -54,7 +54,7 @@ RealRootsResult<RealAlgebraicNumberLibpoly> real_roots_libpoly(
     const Interval<RealAlgebraicNumberLibpoly::NumberType>& interval) {
     CARL_LOG_DEBUG("carl.ran.libpoly", polynomial << " " << m << " " << interval);
 
-    if (poly::is_univariate(polynomial.getPolynomial())) {
+    if (poly::is_univariate(polynomial.get_polynomial())) {
         return real_roots_libpoly(polynomial, interval);
     }
 
@@ -85,12 +85,12 @@ RealRootsResult<RealAlgebraicNumberLibpoly> real_roots_libpoly(
         lp_value_destruct(&val);
     }
 
-    std::vector<poly::Value> roots = poly::isolate_real_roots(polynomial.getPolynomial(), assignment);
+    std::vector<poly::Value> roots = poly::isolate_real_roots(polynomial.get_polynomial(), assignment);
 
     if (roots.empty()) {
         CARL_LOG_DEBUG("carl.ran.libpoly", " Checking for nullification -> Evaluation at " << mainVar << "= 1");
         assignment.set(VariableMapper::getInstance().getLibpolyVariable(mainVar), poly::Value(long(1)));
-        poly::Value eval_val = poly::evaluate(polynomial.getPolynomial(), assignment);
+        poly::Value eval_val = poly::evaluate(polynomial.get_polynomial(), assignment);
         CARL_LOG_DEBUG("carl.ran.libpoly", " Got eval_val " << eval_val);
 
         if (eval_val == poly::Value(long(0))) {

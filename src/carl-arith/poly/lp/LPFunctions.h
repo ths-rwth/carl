@@ -15,7 +15,7 @@ namespace carl {
  * @return gcd(p,q)
  */
 LPPolynomial gcd(const LPPolynomial& p, const LPPolynomial& q) {
-    return LPPolynomial(poly::gcd(p.getPolynomial(), q.getPolynomial()));
+    return LPPolynomial(poly::gcd(p.get_polynomial(), q.get_polynomial()));
 }
 
 /*
@@ -24,7 +24,7 @@ LPPolynomial gcd(const LPPolynomial& p, const LPPolynomial& q) {
  * @return lcm(p,q)
  */
 LPPolynomial lcm(const LPPolynomial& p, const LPPolynomial& q) {
-    return LPPolynomial(poly::lcm(p.getPolynomial(), q.getPolynomial()));
+    return LPPolynomial(poly::lcm(p.get_polynomial(), q.get_polynomial()));
 }
 
 /*
@@ -33,7 +33,7 @@ LPPolynomial lcm(const LPPolynomial& p, const LPPolynomial& q) {
  * @return content(p)
  */
 LPPolynomial content(const LPPolynomial& p) {
-    return LPPolynomial(poly::content(p.getPolynomial()));
+    return LPPolynomial(poly::content(p.get_polynomial()));
 }
 
 /*
@@ -42,7 +42,7 @@ LPPolynomial content(const LPPolynomial& p) {
  * @return primitive_part(p)
  */
 LPPolynomial primitive_part(const LPPolynomial& p) {
-    return LPPolynomial(poly::primitive_part(p.getPolynomial()));
+    return LPPolynomial(poly::primitive_part(p.get_polynomial()));
 }
 
 /*
@@ -51,7 +51,7 @@ LPPolynomial primitive_part(const LPPolynomial& p) {
  * @return resultant(p,q)
  */
 LPPolynomial resultant(const LPPolynomial& p, const LPPolynomial& q) {
-    return LPPolynomial(poly::resultant(p.getPolynomial(), q.getPolynomial()));
+    return LPPolynomial(poly::resultant(p.get_polynomial(), q.get_polynomial()));
 }
 
 /*
@@ -60,31 +60,52 @@ LPPolynomial resultant(const LPPolynomial& p, const LPPolynomial& q) {
  * @return discriminant(p)
  */
 LPPolynomial discriminant(const LPPolynomial& p) {
-    return LPPolynomial(poly::discriminant(p.getPolynomial()));
-}
-
-/*
- * @brief wrapper for the factorization of LPPolynomials
- * @param LPPolynomial p
- * @return content_free_factors(p)
- */
-Factors<LPPolynomial> factorization(const LPPolynomial& p, bool includeConstant = true) {
-#ifndef USE_COCOA
-    CARL_LOG_FATAL("carl.poly", "factorization is not supported without libcocoa");
-#endif
-
-    CoCoAAdaptorLP adaptor = CoCoAAdaptorLP(p.getContext());
-
-    return adaptor.factorize(p, includeConstant);
+    return LPPolynomial(poly::discriminant(p.get_polynomial()));
 }
 
 /*
  * @brief wrapper for the factorization of LPPolynomials, this is to be preferred when factorizing multiple polynomials with the same context
  * @param LPPolynomial p, CoCoaAdaptorLP adaptor
- * @return content_free_factors(p)
+ * @return factorization(p)
  */
 Factors<LPPolynomial> factorization(const LPPolynomial& p, const CoCoAAdaptorLP& adaptor, bool includeConstant = true) {
+    #ifndef USE_COCOA
+    CARL_LOG_FATAL("carl.poly", "factorization is not supported without libcocoa");
+    #endif
     return adaptor.factorize(p, includeConstant);
+}
+
+/*
+ * @brief wrapper for the factorization of LPPolynomials
+ * @param LPPolynomial p
+ * @return factorization(p)
+ */
+Factors<LPPolynomial> factorization(const LPPolynomial& p, bool includeConstant = true) {
+    CoCoAAdaptorLP adaptor = CoCoAAdaptorLP(p.context());
+    return factorization(p, adaptor, includeConstant);
+}
+
+std::vector<LPPolynomial> irreducible_factors(const LPPolynomial& p, const CoCoAAdaptorLP& adaptor, bool includeConstants = true) {
+	#ifndef USE_COCOA
+    CARL_LOG_FATAL("carl.poly", "factorization is not supported without libcocoa");
+    #endif
+    
+    if (p.is_constant() == 0) {
+		if (includeConstants) {
+			return {p};
+		} else {
+			return {};
+		}
+	} else if (p.total_degree() == 1) {
+		return {p};
+	}
+
+    return adaptor.irreducible_factors(p, includeConstants);
+}
+
+std::vector<LPPolynomial> irreducible_factors(const LPPolynomial& p, bool includeConstants = true) {
+    CoCoAAdaptorLP adaptor = CoCoAAdaptorLP(p.context());
+    return irreducible_factors(p, adaptor, includeConstants);
 }
 
 /*
@@ -93,7 +114,7 @@ Factors<LPPolynomial> factorization(const LPPolynomial& p, const CoCoAAdaptorLP&
  * @return square_free_factorization(p)
  */
 std::vector<LPPolynomial> square_free_factors(const LPPolynomial& p) {
-    std::vector<poly::Polynomial> factors = poly::square_free_factors(p.getPolynomial());
+    std::vector<poly::Polynomial> factors = poly::square_free_factors(p.get_polynomial());
     std::vector<LPPolynomial> result;
     for (const auto& factor : factors) {
         result.push_back(LPPolynomial(std::move(factor)));
@@ -107,7 +128,7 @@ std::vector<LPPolynomial> square_free_factors(const LPPolynomial& p) {
  * @return content_free_factors(p)
  */
 std::vector<LPPolynomial> content_free_factors(const LPPolynomial& p) {
-    std::vector<poly::Polynomial> factors = poly::content_free_factors(p.getPolynomial());
+    std::vector<poly::Polynomial> factors = poly::content_free_factors(p.get_polynomial());
     std::vector<LPPolynomial> result;
     for (const auto& factor : factors) {
         result.push_back(LPPolynomial(std::move(factor)));

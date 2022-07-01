@@ -149,7 +149,7 @@ public:
     std::vector<LPPolynomial> convert(const std::vector<CoCoA::RingElem>& p) const {
         std::vector<LPPolynomial> res;
         for (const CoCoA::RingElem& poly : p)
-            res.emplace_back(convert(poly, mContext.getContext()));
+            res.emplace_back(convert(poly, mContext.context()));
         return res;
     }
 
@@ -209,10 +209,10 @@ public:
         auto finfo = cocoawrapper::factor(convert(p));
         Factors<LPPolynomial> res;
         if (includeConstant && !CoCoA::IsOne(finfo.myRemainingFactor())) {
-            res.emplace(convert(finfo.myRemainingFactor(), mContext.getContext()), 1);
+            res.emplace(convert(finfo.myRemainingFactor(), mContext.context()), 1);
         }
         for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
-            res[convert(finfo.myFactors()[i], mContext.getContext())] = finfo.myMultiplicities()[i];
+            res[convert(finfo.myFactors()[i], mContext.context())] = finfo.myMultiplicities()[i];
         }
         return res;
     }
