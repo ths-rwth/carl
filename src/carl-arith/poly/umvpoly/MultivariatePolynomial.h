@@ -64,6 +64,8 @@ public:
     using CACHE = void;
 	/// Type our terms vector.f
 	using TermsType = std::vector<Term<Coeff>>;
+	// RAN type
+	using RootType = typename UnivariatePolynomial<NumberType>::RootType; 
 	
 	template<typename C, typename T>
 	using EnableIfNotSame = typename std::enable_if<!std::is_same<C,T>::value,T>::type;

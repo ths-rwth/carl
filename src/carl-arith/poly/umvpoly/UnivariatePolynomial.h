@@ -83,8 +83,7 @@ public:
 	using CACHE = void;
 	using CoeffType = Coefficient;
 	using PolyType = UnivariatePolynomial<Coefficient>;
-
-	using RootType = RealAlgebraicNumberInterval<NumberType>; 
+	using RootType = RealAlgebraicNumberInterval<NumberType>;
 
 	// Rule of five
 	/**

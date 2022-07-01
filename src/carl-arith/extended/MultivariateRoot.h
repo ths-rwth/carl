@@ -32,7 +32,7 @@ template<typename Poly>
 class MultivariateRoot {
 public:
 	using Number = typename UnderlyingNumberType<Poly>::type;
-	using RAN = RealAlgebraicNumber<Number>;
+	using RAN = typename Poly::RootType;
 private:
 	/// Polynomial defining this root.
 	Poly m_poly;
