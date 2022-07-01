@@ -8,7 +8,7 @@
  * @version 2014-01-29
  */
 
-#include "../carl/interval/Interval.h"
+#include <carl-arith/interval/Interval.h>
 int main (int argc, char** argv)
 {
 	mpq_class a = 2;

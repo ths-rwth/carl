@@ -9,7 +9,7 @@
 
 #include <iterator>
 
-#include <carl/formula/Constraint.h>
+#include <carl-formula/arithmetic/Constraint.h>
 #include "RationalFunction.h"
 
 
@@ -37,13 +37,13 @@ namespace carl
 				{
 					out = PCon(false);
 				}
-				else if(it->lhs().denominator().isOne())
+				else if(it->lhs().denominator().is_one())
 				{
 					out = PCon(it->lhs().nominator(), it->rel());
 				} 
 				else 
 				{
-					assert(!it->lhs().denominator().isConstant());
+					assert(!it->lhs().denominator().is_constant());
 					out = PCon(it->lhs().nominator(), inverse(it->rel()));
 					out = PCon(it->lhs().nominator() * it->lhs().denominator(), it->rel());
 				}

@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
-#include "carl/interval/Interval.h"
-#include "carl/core/VariablePool.h"
-#include "carl/interval/IntervalEvaluation.h"
-#include "carl/util/platform.h"
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>
+#include <carl-common/meta/platform.h>
 
 #include "../Common.h"
 
@@ -16,10 +16,10 @@ TEST(IntervalEvaluation, Monomial)
     Interval<Rational> id( 0, 2 );
 
     std::map<Variable, Interval<Rational>> map;
-    Variable a = freshRealVariable("a");
-	Variable b = freshRealVariable("b");
-	Variable c = freshRealVariable("c");
-	Variable d = freshRealVariable("d");
+    Variable a = fresh_real_variable("a");
+	Variable b = fresh_real_variable("b");
+	Variable c = fresh_real_variable("c");
+	Variable d = fresh_real_variable("d");
     
     map[a] = ia;
     map[b] = ib;
@@ -38,25 +38,25 @@ TEST(IntervalEvaluation, Monomial)
 
 //    e7     = a + b * pow( c + a, 2 ) * d;
 
-    Interval<Rational> result = IntervalEvaluation::evaluate( e1, map );
+    Interval<Rational> result = carl::evaluate( e1, map );
     EXPECT_EQ( Interval<Rational>( 1, 14 ), result );
 
-    result = IntervalEvaluation::evaluate( e2, map );
+    result = carl::evaluate( e2, map );
     EXPECT_EQ( Interval<Rational>( -2, 26 ), result );
 
-    result = IntervalEvaluation::evaluate( e3, map );
+    result = carl::evaluate( e3, map );
     EXPECT_EQ( Interval<Rational>( -40, 62 ), result );
 
-    result = IntervalEvaluation::evaluate( e4, map );
+    result = carl::evaluate( e4, map );
     EXPECT_EQ( Interval<Rational>( -2, 11 ), result );
 
-    result = IntervalEvaluation::evaluate( e5, map );
+    result = carl::evaluate( e5, map );
     EXPECT_EQ( Interval<Rational>( 10, 16 ), result );
 
-    result = IntervalEvaluation::evaluate( e6, map );
+    result = carl::evaluate( e6, map );
     EXPECT_EQ( Interval<Rational>( 10,72 ), result );
 
-    result = IntervalEvaluation::evaluate( e7, map );
+    result = carl::evaluate( e7, map );
     EXPECT_EQ( Interval<Rational>( -159, 494 ), result );
 }
 
@@ -64,8 +64,8 @@ TEST(IntervalEvaluation, Monomial)
 TEST(IntervalEvaluation, Term)
 {
     std::map<Variable, Interval<Rational>> map;
-    Variable a = freshRealVariable("a");
-    Variable b = freshRealVariable("b");
+    Variable a = fresh_real_variable("a");
+    Variable b = fresh_real_variable("b");
 	//MultivariatePolynomial<Rational> p({(Rational)1*a*a*b*b});
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> p(b,
 		{MultivariatePolynomial<Rational>(), MultivariatePolynomial<Rational>(),
@@ -76,7 +76,7 @@ TEST(IntervalEvaluation, Term)
 		carl::BoundType::INFTY);
 	map[a] = i1;
 	map[b] = i2;
-	auto res = IntervalEvaluation::evaluate( p, map );
+	auto res = carl::evaluate( p, map );
 	
 	std::cout << p << " on " << map << " = " << res << std::endl;
 }

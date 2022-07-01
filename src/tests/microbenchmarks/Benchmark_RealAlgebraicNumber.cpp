@@ -1,13 +1,13 @@
 #include <benchmark/benchmark.h>
 
-#include <carl/ran/real_roots.h>
-#include <carl/ran/ran.h>
+#include <carl-arith/ran/real_roots.h>
+#include <carl-arith/ran/ran.h>
 
 using Poly = carl::UnivariatePolynomial<mpq_class>;
 
 class RAN_Fixture: public benchmark::Fixture {
 public:
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	Poly p = Poly(x, {-2, 0, 1}); // * Poly(x, {-2, 0, 0, 1});
 };
 

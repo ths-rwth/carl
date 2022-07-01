@@ -10,7 +10,8 @@
 #include <map>
 #include <mutex>
 
-#include <carl/core/Monomial.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/core/Common.h>
 
 namespace carl
 {
@@ -27,7 +28,7 @@ namespace carl
             {
                 for(auto f = super::begin(); f != super::end(); ++f )
                 {
-                    if( !carl::isOne( f->first.coefficient() ) )
+                    if( !carl::is_one( f->first.coefficient() ) )
                         return false;
                 }
                 return true;
@@ -201,7 +202,7 @@ namespace carl
         /**
          * @return The hash of this polynomial factorization pair.
          */
-        size_t getHash() const
+        size_t hash() const
         {
             return mHash;
         }
@@ -296,7 +297,7 @@ namespace std
     {
         size_t operator()( const carl::PolynomialFactorizationPair<P>& _pfp ) const 
         {
-            return _pfp.getHash();
+            return _pfp.hash();
         }
     };
 } // namespace std

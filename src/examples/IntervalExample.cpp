@@ -7,8 +7,8 @@
  * @version 2014-01-30
  */
 
-#include "../carl/interval/Interval.h"
-#include "../carl/numbers/numbers.h"
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/numbers/numbers.h>
 
 #ifdef USE_CLN_NUMBERS
 typedef cln::cl_RA Rational;

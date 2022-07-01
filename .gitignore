@@ -10,3 +10,5 @@ nbproject/
 **/config.h
 **/CompileInfo.cpp
 /src/carl/config.h
+CMakeCache.txt
+CMakeFiles/cmake.check_cache

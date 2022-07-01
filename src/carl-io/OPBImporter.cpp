@@ -13,7 +13,7 @@
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/support_line_pos_iterator.hpp>
 
-namespace carl {
+namespace carl::io {
 	namespace spirit = boost::spirit;
 	namespace qi = boost::spirit::qi;
 	namespace px = boost::phoenix;
@@ -21,7 +21,7 @@ namespace carl {
 	using BaseIteratorType = spirit::istream_iterator;
 	using PositionIteratorType = spirit::line_pos_iterator<BaseIteratorType>;
 	using Iterator = PositionIteratorType;
-	using ErrorHandler = carl::parser::ErrorHandler;
+	using ErrorHandler = carl::io::helper::ErrorHandler;
 	
 	struct Skipper: public qi::grammar<Iterator> {
 		Skipper(): Skipper::base_type(main, "skipper") {
@@ -72,7 +72,7 @@ namespace carl {
 		
 	private:
 		Variable addVariable(const std::string& s) {
-			carl::Variable var = freshIntegerVariable(s);
+			carl::Variable var = fresh_integer_variable(s);
 			mVariables.add(s, var);
 			return var;
 		}

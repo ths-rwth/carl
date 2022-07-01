@@ -1,13 +1,13 @@
 #pragma once
 
-#include <carl/util/SFINAE.h>
+#include <carl-common/meta/SFINAE.h>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/support_line_pos_iterator.hpp>
 
-namespace carl {
-namespace parser {
+namespace carl::io {
+namespace helper {
 	namespace spirit = boost::spirit;
 	namespace qi = boost::spirit::qi;
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <carl/core/Variable.h>
+#include <carl-arith/core/Variable.h>
 
 #include "../get_output.h"
 

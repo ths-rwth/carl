@@ -1,6 +1,6 @@
 #include "remove_duplicates.h"
 
-#include <carl/util/Bitset.h>
+#include <carl-common/datastructures/Bitset.h>
 
 #include <algorithm>
 

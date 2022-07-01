@@ -1,10 +1,10 @@
 #pragma once
 
 #include <carl-logging/carl-logging.h>
-#include <carl/util/Singleton.h>
-#include <carl/core/VariablePool.h>
-#include <carl/formula/Formula.h>
-#include <carl/util/debug.h>
+#include <carl-common/memory/Singleton.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-formula/formula/Formula.h>
+#include <carl-common/debug/debug.h>
 
 #include <any>
 
@@ -75,7 +75,6 @@ namespace checkpoints {
 	public:
 		CheckpointVerifier() {
 			carl::VariablePool::getInstance();
-			carl::ConstraintPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
 			carl::FormulaPool<carl::MultivariatePolynomial<mpq_class>>::getInstance();
 		}
 		template<typename... Args>

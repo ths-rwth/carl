@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
-#include "carl/groebner/GBProcedure.h"
+#include <carl-arith/groebner/GBProcedure.h>
 
-#include "carl/groebner/Ideal.h"
-#include "carl/groebner/groebner.h"
-#include "carl/util/platform.h"
+#include <carl-arith/groebner/Ideal.h>
+#include <carl-arith/groebner/groebner.h>
+#include <carl-common/meta/platform.h>
 
 #include "../Common.h"
 
@@ -16,8 +16,8 @@ using PolynomialWithReasonSet = MultivariatePolynomial<Coeff, GrLexOrdering, Std
 
 TEST(GB_Buchberger, T1)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
 
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x, (Rational)-2*x*y} );
     MultivariatePolynomial<Rational> f2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
@@ -46,8 +46,8 @@ TEST(GB_Buchberger, T1)
 
 TEST(GB_Buchberger, T1_ReasonSets)
 {
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
 
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x, (Rational)-2*x*y} );
     PolynomialWithReasonSet<Rational> f1rs(f1);

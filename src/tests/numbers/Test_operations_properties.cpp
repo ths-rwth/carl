@@ -1,5 +1,5 @@
-#include <carl/core/polynomialfunctions/GCD.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/poly/umvpoly/functions/GCD.h>
+#include <carl-arith/numbers/numbers.h>
 #include <gtest/gtest.h>
 
 #include "../number_types.h"
@@ -13,7 +13,7 @@ TYPED_TEST_CASE(IntegerProperties, IntegerTypes);
 
 TYPED_TEST(IntegerProperties, IntegerProperties) {
 	for (int i = -10; i < 11; i++) {
-		EXPECT_TRUE(carl::isInteger(TypeParam(i)));
+		EXPECT_TRUE(carl::is_integer(TypeParam(i)));
 	}
 }
 
@@ -24,8 +24,8 @@ TYPED_TEST_CASE(RationalProperties, RationalTypes);
 
 TYPED_TEST(RationalProperties, isInteger) {
 	for (int i = -10; i < 11; i++) {
-		EXPECT_TRUE(carl::isInteger(TypeParam(i)));
-		EXPECT_EQ(i % 2 == 0, carl::isInteger(TypeParam(i) / TypeParam(2)));
+		EXPECT_TRUE(carl::is_integer(TypeParam(i)));
+		EXPECT_EQ(i % 2 == 0, carl::is_integer(TypeParam(i) / TypeParam(2)));
 	}
 }
 
@@ -39,8 +39,8 @@ TYPED_TEST(RationalProperties, NumDenom) {
 			IntType gcd = carl::gcd(IntType(a), IntType(b));
 			// Make sure denominator is always positive.
 			if (b < 0) gcd *= IntType(-1);
-			EXPECT_EQ(carl::div(a, gcd), carl::getNum(r));
-			EXPECT_EQ(carl::div(b, gcd), carl::getDenom(r));
+			EXPECT_EQ(carl::div(a, gcd), carl::get_num(r));
+			EXPECT_EQ(carl::div(b, gcd), carl::get_denom(r));
 		}
 	}
 }

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <carl/interval/Interval.h>
+#include <carl-arith/interval/Interval.h>
 
 #include "../number_types.h"
 

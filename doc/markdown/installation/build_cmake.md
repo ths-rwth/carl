@@ -57,7 +57,6 @@ CMake Targets
 There are a few important targets in the CArL CMakeLists:
 
 - `doc`: Builds the doxygen documentation.
-- `carl-shared`: Builds the shared library.
-- `carl-static`: Builds the static library.
+- `libs`: Builds all libraries.
 - `runXTests`: Builds the tests for the `X` module.
 - `test`: Build and run all tests.

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/numbers/numbers.h>
 
 TEST(GMP, Debug)
 {
@@ -9,8 +9,8 @@ TEST(GMP, Debug)
 
 TEST(GMP, Rationalize)
 {
-	EXPECT_TRUE( carl::rationalize<mpq_class>(carl::toDouble(mpq_class(1)/mpq_class(3))) != mpq_class(1)/mpq_class(3) );
-	EXPECT_TRUE( carl::rationalize<mpq_class>(carl::toDouble(mpq_class(1)/mpq_class(20))) != mpq_class(1)/mpq_class(20) );
+	EXPECT_TRUE( carl::rationalize<mpq_class>(carl::to_double(mpq_class(1)/mpq_class(3))) != mpq_class(1)/mpq_class(3) );
+	EXPECT_TRUE( carl::rationalize<mpq_class>(carl::to_double(mpq_class(1)/mpq_class(20))) != mpq_class(1)/mpq_class(20) );
 
 	EXPECT_EQ(carl::parse<mpq_class>("1"), mpq_class(1));
 	EXPECT_EQ(carl::parse<mpq_class>("123"), mpq_class(123));

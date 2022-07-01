@@ -14,8 +14,8 @@
 
 
 #include "../config.h"
-#include "carl/util/Timer.h"
-#include "carl/core/MultivariatePolynomial.h"
+#include <carl-common/debug/Timer.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 
 #include "BenchmarkConversions.h"
 #include "BenchmarkGenerator.h"
@@ -105,11 +105,6 @@ protected:
     #ifdef USE_GINAC
 	bool operator()(const GMP& lhs, const GMP& rhs) {
 		return lhs == rhs;
-	}
-    #endif
-    #ifdef COMPARE_WITH_Z3
-	bool operator()(const ZMP& lhs, const ZMP& rhs) {
-		return eq(lhs, rhs);
 	}
     #endif
 public:

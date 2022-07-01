@@ -10,8 +10,8 @@ class TestVariable(TestCarl):
 
 
 	def testGetters(self):
-		self.assertEqual(v1.getId(),1)
-		self.assertEqual(v1.getType(),VariableType.VT_REAL)
+		self.assertEqual(v1.id(),1)
+		self.assertEqual(v1.type(),VariableType.VT_REAL)
 		self.assertEqual(v1.getRank(),0)
 
 	def testComparisons(self):

@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
 
-#include <carl/ran/real_roots.h>
-//#include <carl/ran/ran.h>
+#include <carl-arith/ran/real_roots.h>
+//#include <carl-arith/ran/ran.h>
 
 using Poly = carl::UnivariatePolynomial<mpq_class>;
 
@@ -9,17 +9,17 @@ class RF_Fixture: public benchmark::Fixture {
 };
 
 BENCHMARK_F(RF_Fixture, Real_Roots_1)(benchmark::State& state) {
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	Poly p = Poly(x, {-1, 12, -96, 384});
 	// (384)*x^3 + (-96)*x^2 + (12)*x^1 + -1
 
 	for (auto _ : state) {
-		auto rans = carl::real_roots(p, carl::Interval<mpq_class>::unboundedInterval());
+		auto rans = carl::real_roots(p, carl::Interval<mpq_class>::unbounded_interval());
 	}
 }
 
 BENCHMARK_F(RF_Fixture, Real_Roots_2)(benchmark::State& state) {
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable x = carl::fresh_real_variable("x");
 	Poly p = Poly(x, {-66864570625487788604261524190527488000000000000000000000000000000000000000000000000_mpq, 29854830731431634049898015056382132224000000000000000000000000000000000000000000000_mpq,
 	-505416087363206530647584374267211415552000000000000000000000000000000000000000000_mpq, 4175633824067780996197090619870479908864000000000000000000000000000000000000000_mpq,
 	-22123075889900509025587890607637359755264000000000000000000000000000000000000_mpq, 84105767440004379479396048598450604867584000000000000000000000000000000000_mpq,
@@ -40,7 +40,7 @@ BENCHMARK_F(RF_Fixture, Real_Roots_2)(benchmark::State& state) {
 	// -66864570625487788604261524190527488000000000000000000000000000000000000000000000000
 
 	for (auto _ : state) {
-		auto rans = carl::real_roots(p, carl::Interval<mpq_class>::unboundedInterval());
+		auto rans = carl::real_roots(p, carl::Interval<mpq_class>::unbounded_interval());
 	}
 }
 

@@ -19,7 +19,7 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(pycarl SOURCE_DIR)
 
-add_dependencies(pycarl carl-shared carl-parser)
+add_dependencies(pycarl carl-arith-shared carl-parser)
 add_dependencies(addons pycarl)
 
 add_test(NAME pycarl

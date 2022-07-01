@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <carl/core/VariablePool.h>
-#include <carl/formula/Formula.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-formula/formula/Formula.h>
 #include <carl-io/MapleStream.h>
 #include <carl-io/QEPCADStream.h>
 #include <carl-io/SMTLIBStream.h>
@@ -15,8 +15,8 @@ using FormulaT = carl::Formula<carl::MultivariatePolynomial<Rational>>;
 
 struct QEPCADExample: ::testing::Test {
 	// Taken from "Improved Projection for Cylindrical Algebraic Decomposition", Figure 1
-	carl::Variable y = carl::freshRealVariable("y");
-	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
+	carl::Variable x = carl::fresh_real_variable("x");
 	Poly p1 = Poly(x)*x + Poly(y)*y - Poly(4);
 	Poly p2 = Poly(x)*y - Poly(1);
 	Poly p3 = Poly(x)*x + Poly(y) - Poly(3);
@@ -30,7 +30,7 @@ struct QEPCADExample: ::testing::Test {
 };
 
 TEST_F(QEPCADExample, Maple) {
-	carl::MapleStream s;
+	carl::io::MapleStream s;
 	s << "restart:" << std::endl;
 	s << "start := time():" << std::endl;
 	if (extended) {
@@ -58,7 +58,7 @@ TEST_F(QEPCADExample, Maple) {
 }
 
 TEST_F(QEPCADExample, QEPCAD) {
-	carl::QEPCADStream s;
+	carl::io::QEPCADStream s;
 	// informal description
 	s << "[Example]" << std::endl;
 	// variable list
@@ -91,9 +91,9 @@ TEST_F(QEPCADExample, QEPCAD) {
 TEST_F(QEPCADExample, SMTLIB) {
 	std::ofstream out("QEPCADExample.smt2");
 	if (extended) {
-		out << carl::outputSMTLIB(carl::Logic::QF_NRA, {this->f_2});
+		out << carl::io::outputSMTLIB(carl::Logic::QF_NRA, {this->f_2});
 	} else {
-		out << carl::outputSMTLIB(carl::Logic::QF_NRA, {this->f_1});
+		out << carl::io::outputSMTLIB(carl::Logic::QF_NRA, {this->f_1});
 	}
 	out.close();
 }

@@ -17,5 +17,5 @@ Note that this documentation is, and will probably always be, work in progress.
 If you feel that some topic that is important to you is missing or some explanation is unclear, please let us know!
 
 ### Contact
-- github: https://github.com/smtrat/carl
+- github: https://github.com/ths-rwth/carl
 

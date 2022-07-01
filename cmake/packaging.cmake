@@ -20,7 +20,7 @@ if(ENABLE_PACKAGING)
 	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libgmp10, libgmp-dev, libeigen3-dev, libboost-all-dev")
 	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>")
 	set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "${PROJECT_DESCRIPTION}")
-	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/smtrat/carl")
+	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/ths-rwth/carl")
 
 	include(CPack)
 endif()

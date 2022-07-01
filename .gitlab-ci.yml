@@ -22,19 +22,6 @@ stages:
   - quality
   - documentation
 
-build-gcc10:
-  dependencies: []
-  stage: build-gcc
-  script:
-    - export CC=/usr/bin/gcc-10 && export CXX=/usr/bin/g++-10
-    - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
-  artifacts: 
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
-    paths: 
-      - build/
-      - cmake/
-      - src/
-
 build-gcc9:
   dependencies: []
   stage: build-gcc
@@ -49,12 +36,11 @@ build-gcc9:
       - src/
   only:
      - development
-
-build-gcc8:
+build-gcc12:
   dependencies: []
   stage: build-gcc
   script:
-    - export CC=/usr/bin/gcc-8 && export CXX=/usr/bin/g++-8
+    - export CC=/usr/bin/gcc-12 && export CXX=/usr/bin/g++-12
     - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
   artifacts: 
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
@@ -62,8 +48,6 @@ build-gcc8:
       - build/
       - cmake/
       - src/
-  only:
-     - development
 
 build-clang11:
   dependencies: []
@@ -77,12 +61,13 @@ build-clang11:
       - build/
       - cmake/
       - src/
-
-build-clang10:
+  only:
+     - development
+build-clang14:
   dependencies: []
   stage: build-clang
   script:
-     - export CC=/usr/bin/clang-10 && export CXX=/usr/bin/clang++-10
+     - export CC=/usr/bin/clang-14 && export CXX=/usr/bin/clang++-14
      - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
   artifacts: 
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
@@ -90,32 +75,15 @@ build-clang10:
       - build/
       - cmake/
       - src/
-  only:
-     - development
-
-build-clang9:
-  dependencies: []
-  stage: build-clang
-  script:
-     - export CC=/usr/bin/clang-9 && export CXX=/usr/bin/clang++-9
-     - MAKE_PARALLEL=-j8 TASK=parallel source .ci/build.sh
-  artifacts: 
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
-    paths: 
-      - build/
-      - cmake/
-      - src/
-  only:
-     - development
 
 test-clang: 
-  dependencies: [build-clang11]
+  dependencies: [build-clang14]
   stage: test
   script: 
     - cd build && make test #kein xml-output möglich?
 
 test-gcc: 
-  dependencies: [build-gcc10]
+  dependencies: [build-gcc12]
   stage: test
   script: 
     - cd build && make test #kein xml-output möglich?

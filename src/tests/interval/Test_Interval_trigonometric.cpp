@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <carl/interval/Interval.h>
-#include <carl/interval/trigonometric.h>
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/interval/trigonometric.h>
 
 using I = carl::Interval<double>;
 constexpr double PI = 3.141592653589793;

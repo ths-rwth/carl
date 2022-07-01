@@ -5,7 +5,7 @@
 
 
 #include "gtest/gtest.h"
-#include "../../carl/numbers/numbers.h"
+#include <carl-arith/numbers/numbers.h>
 
 #ifdef USE_MPFR_FLOAT
 TEST(mpfrFloatTest, Constructor)

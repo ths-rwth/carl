@@ -1,5 +1,5 @@
-#include <carl/core/Sign.h>
-#include <carl/util/platform.h>
+#include <carl-arith/core/Sign.h>
+#include <carl-common/meta/platform.h>
 #include <gtest/gtest.h>
 
 #include <functional>

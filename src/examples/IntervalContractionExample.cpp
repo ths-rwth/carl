@@ -5,11 +5,11 @@
  * Created on September 11, 2013, 4:56 PM
  */
 
-#include "carl/interval/Interval.h"
-#include "carl/core/VariablePool.h"
-#include "carl/core/MultivariatePolynomial.h"
-#include "carl/interval/IntervalEvaluation.h"
-#include "carl/interval/Contraction.h"
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>
+#include <carl-arith/intervalcontraction/Contraction.h>
 #include <chrono>
 #include <set>
 
@@ -34,7 +34,7 @@ using DoubleInterval = Interval<double>;
 /*
  * 
  */
-int main(int argc, char** argv) {
+int main(int /*argc*/, char** /*argv*/) {
 
     DoubleInterval ia = DoubleInterval( 1, 4 );
     DoubleInterval ib = DoubleInterval( 2, 5 );
@@ -44,10 +44,10 @@ int main(int argc, char** argv) {
 
     DoubleInterval::evalintervalmap map;
     
-    Variable a = freshRealVariable("a");
-    Variable b = freshRealVariable("b");
-    Variable c = freshRealVariable("c");
-    Variable d = freshRealVariable("d");
+    Variable a = fresh_real_variable("a");
+    Variable b = fresh_real_variable("b");
+    Variable c = fresh_real_variable("c");
+    Variable d = fresh_real_variable("d");
     
     map[a] = ia;
     map[b] = ib;

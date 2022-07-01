@@ -1,26 +1,26 @@
 #pragma once
 
-#include <carl/core/Monomial.h>
-#include <carl/core/MultivariatePolynomial.h>
-#include <carl/core/Relation.h>
-#include <carl/core/Term.h>
-#include <carl/core/UnivariatePolynomial.h>
-#include <carl/core/Variable.h>
-#include <carl/formula/Constraint.h>
-#include <carl/formula/VariableComparison.h>
-#include <carl/formula/Formula.h>
-#include <carl/formula/Logic.h>
-#include <carl-model/Model.h>
-#include <carl/formula/Sort.h>
-#include <carl/numbers/numbers.h>
-#include <carl/util/tuple_util.h>
-#include <carl/io/streamingOperators.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/core/Relation.h>
+#include <carl-arith/poly/umvpoly/Term.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-formula/arithmetic/Constraint.h>
+#include <carl-arith/extended/VariableComparison.h>
+#include <carl-formula/formula/Formula.h>
+#include <carl-formula/formula/Logic.h>
+#include <carl-formula/model/Model.h>
+#include <carl-formula/sort/Sort.h>
+#include <carl-arith/numbers/numbers.h>
+#include <carl-common/util/tuple_util.h>
+#include <carl-common/util/streamingOperators.h>
 
 #include <iostream>
 #include <sstream>
 #include <type_traits>
 
-namespace carl {
+namespace carl::io {
 
 /**
  * Allows to print carl data structures in SMTLIB syntax.
@@ -47,7 +47,7 @@ private:
 	
 	template<typename Pol>
 	void write(const VariableComparison<Pol>& c) {
-		auto constraint = c.asConstraint();
+		auto constraint = carl::as_constraint(c);
 		if (constraint) {
 			*this << *constraint;
 		} else {
@@ -59,22 +59,22 @@ private:
 
 	template<typename Pol>
 	void write(const Formula<Pol>& f) {
-		switch (f.getType()) {
+		switch (f.type()) {
 			case FormulaType::AND:
 			case FormulaType::OR:
 			case FormulaType::IFF:
 			case FormulaType::XOR:
 			case FormulaType::IMPLIES:
 			case FormulaType::ITE:
-				// 	*this << "(" << f.getType() << " " << stream_joined(" ", f.subformulas()) << ")";
-				*this << "(" << f.getType();
+				// 	*this << "(" << f.type() << " " << stream_joined(" ", f.subformulas()) << ")";
+				*this << "(" << f.type();
 				for (const auto& f : f.subformulas()) {
 					*this << " " << f;
 				}
 				*this << ")";
 				break;
 			case FormulaType::NOT:
-				*this << "(" << f.getType() << " " << f.subformula() << ")";
+				*this << "(" << f.type() << " " << f.subformula() << ")";
 				break;
 			case FormulaType::BOOL:
 				*this << f.boolean();
@@ -83,27 +83,27 @@ private:
 				*this << f.constraint();
 				break;
 			case FormulaType::VARCOMPARE:
-				*this << f.variableComparison();
+				*this << f.variable_comparison();
 				break;
 			case FormulaType::VARASSIGN:
-				*this << f.variableAssignment();
+				*this << f.variable_assignment();
 				break;
 			case FormulaType::BITVECTOR:
-				*this << f.bvConstraint();
+				*this << f.bv_constraint();
 				break;
 			case FormulaType::TRUE:
 			case FormulaType::FALSE:
-				*this << f.getType();
+				*this << f.type();
 				break;
 			case FormulaType::UEQ:
-				*this << f.uequality();
+				*this << f.u_equality();
 				break;
 			case FormulaType::EXISTS:
 			case FormulaType::FORALL:
 				CARL_LOG_ERROR("carl.smtlibstream", "Printing exists or forall is not implemented yet.");
 				break;
 			default:
-				CARL_LOG_ERROR("carl.smtlibstream", "Not supported formula type: " << f.getType());
+				CARL_LOG_ERROR("carl.smtlibstream", "Not supported formula type: " << f.type());
 		}
 	}
 	
@@ -114,7 +114,7 @@ private:
 			auto value = m.second;
 			value = model.evaluated(m.first);
 			*this << "\t(define-fun " << m.first << " () ";
-			if (m.first.isVariable()) {
+			if (m.first.is_variable()) {
 				*this << m.first.asVariable().type() << std::endl;
 			} else if (m.first.isBVVariable()) {
 				*this << m.first.asBVVariable().sort() << std::endl;
@@ -170,8 +170,8 @@ private:
 	
 	template<typename Coeff>
 	void write(const MultivariatePolynomial<Coeff>& mp) {
-		if (isZero(mp)) *this << "0";
-		else if (mp.nrTerms() == 1) *this << mp.lterm();
+		if (is_zero(mp)) *this << "0";
+		else if (mp.nr_terms() == 1) *this << mp.lterm();
 		else {
 			*this << "(+";
 			for (auto it = mp.rbegin(); it != mp.rend(); ++it) {
@@ -196,7 +196,7 @@ private:
 	void write(const Term<Coeff>& t) {
 		if (!t.monomial()) *this << t.coeff();
 		else {
-			if (carl::isOne(t.coeff())) {
+			if (carl::is_one(t.coeff())) {
 				*this << t.monomial();
 			} else {
 				*this << "(* " << t.coeff() << " " << t.monomial() << ")";
@@ -223,14 +223,14 @@ private:
 	
 	template<typename Coeff>
 	void write(const UnivariatePolynomial<Coeff>& up) {
-		if (up.isConstant()) *this << up.constantPart();
+		if (up.is_constant()) *this << up.constant_part();
 		else {
 			*this << "(+";
 			for (std::size_t i = 0; i < up.coefficients().size(); ++i) {
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];
 				if (exp == 0) *this << " " << coeff;
-				else *this << " (* " << coeff << " " << Monomial(up.mainVar(), exp) << ")";
+				else *this << " (* " << coeff << " " << Monomial(up.main_var(), exp) << ")";
 			}
 			*this << ")";
 		}
@@ -280,7 +280,7 @@ public:
 		// *this << "(declare-fun " << uf.name() << " (" << stream_joined(" ", uf.domain()) << ") ";
 		*this << "(declare-fun " << uf.name() << " (";
 		for (const auto& d : uf.domain()) {
-			*this << " " << uf.domain();
+			*this << " " << d;
 		}
 		*this  << ") ";
 		*this << uf.codomain() << ")" << std::endl;
@@ -348,10 +348,10 @@ public:
 		std::set<BVVariable> bvvs;
 		std::set<UVariable> uvs;
 		for (const auto& f: formulas) {
-			f.gatherVariables(vars);
-			f.gatherUFs(ufs);
-			f.gatherBVVariables(bvvs);
-			f.gatherUVariables(uvs);
+			carl::variables(f,vars);
+			carl::uninterpreted_functions(f,ufs);
+			carl::bitvector_variables(f,bvvs);
+			carl::uninterpreted_variables(f,uvs);
 		}
 		initialize(l, vars, ufs, bvvs, uvs);
 	}
@@ -455,7 +455,7 @@ std::ostream& operator<<(std::ostream& os, const SMTLIBScriptContainer<Pol>& sc)
 	SMTLIBStream sls;
 	sls.initialize(sc.mLogic, sc.mFormulas);
 	for (const auto& f: sc.mFormulas) sls.assertFormula(f);
-	if (!isZero(sc.mObjective)) sls.minimize(sc.mObjective);
+	if (!is_zero(sc.mObjective)) sls.minimize(sc.mObjective);
 	sls.checkSat();
 	if (sc.mGetModel) sls.getModel();
 	return os << sls;

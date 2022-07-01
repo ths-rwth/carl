@@ -1,21 +1,21 @@
 #pragma once
 
-#include <carl/core/Monomial.h>
-#include <carl/core/MultivariatePolynomial.h>
-#include <carl/core/Relation.h>
-#include <carl/core/Term.h>
-#include <carl/core/UnivariatePolynomial.h>
-#include <carl/core/Variable.h>
-#include <carl/formula/Constraint.h>
-#include <carl/formula/Formula.h>
-#include <carl/formula/Logic.h>
-#include <carl/formula/Sort.h>
+#include <carl-arith/poly/umvpoly/Monomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/core/Relation.h>
+#include <carl-arith/poly/umvpoly/Term.h>
+#include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-formula/arithmetic/Constraint.h>
+#include <carl-formula/formula/Formula.h>
+#include <carl-formula/formula/Logic.h>
+#include <carl-formula/sort/Sort.h>
 
 #include <iostream>
 #include <sstream>
 #include <type_traits>
 
-namespace carl {
+namespace carl::io {
 
 class QEPCADStream {
 private:
@@ -37,7 +37,7 @@ private:
 	
 	template<typename Pol>
 	void write(const Formula<Pol>& f) {
-		switch (f.getType()) {
+		switch (f.type()) {
 			case FormulaType::AND:
 				write(f.subformulas(), "/\\");
 				break;
@@ -66,17 +66,17 @@ private:
 				*this << f.constraint();
 				break;
 			case FormulaType::VARCOMPARE:
-				*this << f.variableComparison();
+				*this << f.variable_comparison();
 				break;
 			case FormulaType::VARASSIGN:
-				*this << f.variableAssignment();
+				*this << f.variable_assignment();
 				break;
 			case FormulaType::BITVECTOR:
 				CARL_LOG_ERROR("carl.qepcadstream", "Bitvectors are not supported by QEPCAD.");
 				break;
 			case FormulaType::TRUE:
 			case FormulaType::FALSE:
-				*this << f.getType();
+				*this << f.type();
 				break;
 			case FormulaType::UEQ:
 				CARL_LOG_ERROR("carl.qepcadstream", "Uninterpreted equalities are not supported by QEPCAD.");
@@ -109,8 +109,8 @@ private:
 	
 	template<typename Coeff>
 	void write(const MultivariatePolynomial<Coeff>& mp) {
-		if (carl::isZero(mp)) *this << "0";
-		else if (mp.nrTerms() == 1) *this << mp.lterm();
+		if (carl::is_zero(mp)) *this << "0";
+		else if (mp.nr_terms() == 1) *this << mp.lterm();
 		else {
 			for (auto it = mp.rbegin(); it != mp.rend(); ++it) {
 				if (it != mp.rbegin()) *this << " + ";
@@ -134,7 +134,7 @@ private:
 	void write(const Term<Coeff>& t) {
 		if (!t.monomial()) *this << "(" << t.coeff() << ")";
 		else {
-			if (carl::isOne(t.coeff())) {
+			if (carl::is_one(t.coeff())) {
 				*this << t.monomial();
 			} else {
 				*this << "(" << t.coeff() << ") " << t.monomial();
@@ -144,14 +144,14 @@ private:
 	
 	template<typename Coeff>
 	void write(const UnivariatePolynomial<Coeff>& up) {
-		if (up.isConstant()) *this << up.constantPart();
+		if (up.is_constant()) *this << up.constant_part();
 		else {
 			for (std::size_t i = 0; i < up.coefficients().size(); ++i) {
 				if (i > 0) *this << " + ";
 				std::size_t exp = up.coefficients().size() - i - 1;
 				const auto& coeff = up.coefficients()[exp];
 				if (exp == 0) *this << " " << coeff;
-				else *this << "(" << coeff << ") " << Monomial(up.mainVar(), exp);
+				else *this << "(" << coeff << ") " << Monomial(up.main_var(), exp);
 			}
 		}
 	}
@@ -189,7 +189,7 @@ public:
 	void initialize(std::initializer_list<Formula<Pol>> formulas) {
 		carlVariables vars;
 		for (const auto& f: formulas) {
-			f.gatherVariables(vars);
+			carl::variables(f,vars);
 		}
 		initialize(vars);
 	}

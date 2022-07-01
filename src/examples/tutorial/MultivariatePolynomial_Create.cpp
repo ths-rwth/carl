@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "carl/core/Variable.h"
-#include "carl/core/MultivariatePolynomial.h"
-#include "carl/numbers/numbers.h"
+#include <carl-arith/core/Variable.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/numbers/numbers.h>
 
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
@@ -15,8 +15,8 @@ typedef mpz_class Integer;
 #endif
 
 int main() {
-	carl::Variable x = carl::freshRealVariable("x");
-	carl::Variable y = carl::freshRealVariable("y");
+	carl::Variable x = carl::fresh_real_variable("x");
+	carl::Variable y = carl::fresh_real_variable("y");
 
 	/*
 	 * A carl::MultivariatePolynomial represents a monomial in multiple

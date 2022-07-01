@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FactorizedPolynomial.h"
-#include <carl/interval/IntervalEvaluation.h>
+#include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>
 
 namespace carl {
 
@@ -20,7 +20,7 @@ Subst evaluate(const FactorizedPolynomial<Coeff>& p, const std::map<Variable, Su
 		Subst result = p.coefficient();
 		for (const auto& factor : p.factorization()) {
 			Subst subResult = carl::evaluate(factor.first, substitutions);
-			if (carl::isZero(subResult)) {
+			if (carl::is_zero(subResult)) {
 				return constant_zero<Subst>::get();
 			}
 			result *= carl::pow(subResult, factor.second);
@@ -45,7 +45,7 @@ Interval<Numeric> evaluate(const FactorizedPolynomial<P>& p, const std::map<Vari
 		for( const auto& factor : p.factorization() )
 		{
 			Interval<Numeric> factorEvaluated = evaluate( factor.first, map );
-			if( factorEvaluated.isZero() )
+			if( factorEvaluated.is_zero() )
 				return factorEvaluated;
 			result *= factorEvaluated.pow( factor.second );
 		}

@@ -11,4 +11,3 @@
 For more information, please checkout the docs.
 
 * [CArL documentation](http://ths-rwth.github.io/carl/)
-* A getting started guide can be found at http://ths-rwth.github.io/carl/getting_started.html.

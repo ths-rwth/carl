@@ -1,12 +1,16 @@
 # Libraries..
+add_subdirectory(carl-common)
 add_subdirectory(carl-logging)
-add_subdirectory(carl)
+add_subdirectory(carl-arith)
 add_subdirectory(carl-covering)
 add_subdirectory(carl-extpolys)
 add_subdirectory(carl-io)
-add_subdirectory(carl-model)
+add_subdirectory(carl-formula)
 add_subdirectory(carl-settings)
 add_subdirectory(carl-statistics)
+
+add_custom_target(libs)
+add_dependencies(libs carl-common carl-logging carl-arith carl-covering carl-extpolys carl-io carl-formula carl-settings carl-statistics)
 
 # For unit tests.
 # We decided to always compile them, if gtest is present,

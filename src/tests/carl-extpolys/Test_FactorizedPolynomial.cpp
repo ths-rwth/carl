@@ -1,12 +1,12 @@
 #include "gtest/gtest.h"
-#include <carl/core/MultivariatePolynomial.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-extpolys/FactorizedPolynomial.h>
 #include <carl-extpolys/substitution.h>
-#include <carl/core/polynomialfunctions/LCM.h>
-#include <carl/core/polynomialfunctions/Quotient.h>
-#include <carl/util/stringparser.h>
-#include <carl/util/platform.h>
-#include <carl/numbers/numbers.h>
+#include <carl-arith/poly/umvpoly/functions/LCM.h>
+#include <carl-arith/poly/umvpoly/functions/Quotient.h>
+#include <carl-io/StringParser.h>
+#include <carl-common/meta/platform.h>
+#include <carl-arith/numbers/numbers.h>
 
 #include "../Common.h"
 
@@ -29,7 +29,7 @@ typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 bool testOperation( const std::list<std::string>& sVars, const std::string& sPol1, const std::string& sPol2, std::function<Pol( Pol, Pol )> operatorPol, std::function<FPol( FPol, FPol )> operatorFPol )
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables(sVars);
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>(sPol1);
@@ -58,7 +58,7 @@ bool testOperation( const std::list<std::string>& sVars, const std::string& sPol
 bool testOperation( const std::list<std::string>& sVars, const std::string& sPol1, const std::string& sPol2, const Pol (*functionPol)( const Pol&, const Pol& ), const FPol (*functionFPol)( const FPol&, const FPol& ) )
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables(sVars);
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>(sPol1);
@@ -86,7 +86,7 @@ bool testOperation( const std::list<std::string>& sVars, const std::string& sPol
 bool testOperation( const std::list<std::string>& sVars, const std::string& sPol1, const std::string& sPol2, const Pol (Pol::*functionPol)( const Pol& ), const FPol (FPol::*functionFPol)( const FPol& ) )
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables(sVars);
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>(sPol1);
@@ -105,7 +105,7 @@ bool testOperation( const std::list<std::string>& sVars, const std::string& sPol
 TEST(FactorizedPolynomial, Construction)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol c1 = sp.parseMultivariatePolynomial<Rational>("1");
@@ -181,7 +181,7 @@ TEST(FactorizedPolynomial, Construction)
     FPol fpQuo = quotient( fpB, fpA );
     EXPECT_EQ( fpQuo, fpz );
     FPol fpBc3 = quotient( fpB, fc3 );
-    EXPECT_EQ( fpBc3.constantPart(), -1/2 );
+    EXPECT_EQ( fpBc3.constant_part(), -1/2 );
     EXPECT_EQ( fpBc3.polynomial(), fB );
     FPol fpc4A = quotient( fc4, fpA );
     EXPECT_EQ( fpc4A, fc4 );
@@ -237,7 +237,7 @@ TEST(FactorizedPolynomial, Construction)
 TEST(FactorizedPolynomial, Coefficient)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y"});
 
     Pol fA = sp.parseMultivariatePolynomial<Rational>("3*x*y");
@@ -252,15 +252,15 @@ TEST(FactorizedPolynomial, Coefficient)
     FPol fpC = fpA * fpB;
 
     EXPECT_EQ(fpc3.coefficient(), -20);
-    EXPECT_EQ(fpc3.constantPart(), -20);
+    EXPECT_EQ(fpc3.constant_part(), -20);
     EXPECT_EQ(fpC.coefficient(), 12);
-    EXPECT_EQ(fpC.constantPart(), 0);
+    EXPECT_EQ(fpC.constant_part(), 0);
 }
 
 TEST(FactorizedPolynomial, CommonDivisor)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
@@ -282,13 +282,13 @@ TEST(FactorizedPolynomial, CommonDivisor)
 TEST(FactorizedPolynomial, GCD)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y");
     Pol pB = sp.parseMultivariatePolynomial<Rational>("2*x*y*z");
 
-    Variable t = freshRealVariable("t");
+    Variable t = fresh_real_variable("t");
     Pol one(Rational(1));
     Pol g1 = t*t - one;
     Pol g2 = t - one;
@@ -346,7 +346,7 @@ TEST(FactorizedPolynomial, GCD)
 TEST(FactorizedPolynomial, Flattening)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y*z");
@@ -383,7 +383,7 @@ TEST(FactorizedPolynomial, Flattening)
 TEST(FactorizedPolynomial, Flattening2)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x"});
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("x");
@@ -400,7 +400,7 @@ TEST(FactorizedPolynomial, Flattening2)
 TEST(FactorizedPolynomial, LCM)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("x*y");
@@ -415,8 +415,8 @@ TEST(FactorizedPolynomial, LCM)
     EXPECT_EQ( pLCM, computePolynomial( fpLCM ) );
 
     carl::VariablePool::getInstance().clear();
-    Variable y = carl::freshRealVariable("y");
-    Variable x = carl::freshRealVariable("x");
+    Variable y = carl::fresh_real_variable("y");
+    Variable x = carl::fresh_real_variable("x");
     Pol px( x );
     Pol py( y );
     Pol p1( px*py-py+Rational(1) );
@@ -465,7 +465,7 @@ TEST(FactorizedPolynomial, Multiplication)
 TEST(FactorizedPolynomial, Quotient)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("9*x");
@@ -487,7 +487,7 @@ TEST(FactorizedPolynomial, Quotient)
 TEST(FactorizedPolynomial, Destructor)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("9*x");
@@ -511,7 +511,7 @@ TEST(FactorizedPolynomial, Destructor)
 TEST(FactorizedPolynomial, Equality)
 {
     carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("9*x");
@@ -552,7 +552,7 @@ TEST(FactorizedPolynomial, Equality)
 TEST(FactorizedPolynomial, Evaluation)
 {
     carl::VariablePool::getInstance().clear();
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     Pol p1({(Rational)6*x});
     Pol p2({x});
 
@@ -575,8 +575,8 @@ TEST(FactorizedPolynomial, Evaluation)
 TEST(FactorizedPolynomial, Substitution)
 {
     carl::VariablePool::getInstance().clear();
-    Variable x = freshRealVariable("x");
-    Variable y = freshRealVariable("y");
+    Variable x = fresh_real_variable("x");
+    Variable y = fresh_real_variable("y");
     Pol pc(-3);
     Pol p1({(Rational)6*x});
     Pol p2({x});
@@ -594,8 +594,8 @@ TEST(FactorizedPolynomial, Substitution)
     substitution[x] = 3;
 
     FPol result = carl::substitute(fpc, substitution);
-    EXPECT_TRUE( result.isConstant() );
-    EXPECT_EQ( Rational(-3), result.constantPart() );
+    EXPECT_TRUE( result.is_constant() );
+    EXPECT_EQ( Rational(-3), result.constant_part() );
     EXPECT_EQ( Rational(-3), result );
     result = carl::substitute(fp1, substitution);
     EXPECT_EQ( Rational(18), result );
@@ -634,7 +634,7 @@ TEST(FactorizedPolynomial, Substitution)
 TEST(FactorizedPolynomial, Derivation)
 {
     carl::VariablePool::getInstance().clear();
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
 
     FPol c(3);
     FPol der = c.derivative(x);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <carl/config.h>
-#include <carl/numbers/numbers.h>
+#include <carl-common/config.h>
+#include <carl-arith/numbers/numbers.h>
 
 using Rational = mpq_class;
 

@@ -9,11 +9,11 @@
  */
 
 #include <gtest/gtest.h>
-#include "carl/interval/Interval.h"
-#include "carl/interval/set_theory.h"
-#include "carl/core/VariablePool.h"
-#include "carl/core/MultivariatePolynomial.h"
-#include <carl/numbers/numbers.h>
+#include <carl-arith/interval/Interval.h>
+#include <carl-arith/interval/set_theory.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/numbers/numbers.h>
 
 using namespace carl;
 
@@ -24,9 +24,9 @@ TEST(MpqInterval, Constructor)
     MpqInterval test1 = MpqInterval(-1, BoundType::WEAK, 1, BoundType::WEAK);
     MpqInterval test2 = MpqInterval(-1, BoundType::STRICT, 1, BoundType::STRICT);
 	MpqInterval test3 = MpqInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
-    EXPECT_EQ(MpqInterval(1, BoundType::WEAK, -1, BoundType::WEAK), MpqInterval::emptyInterval());
-    MpqInterval test5 = MpqInterval::unboundedInterval();
-    MpqInterval test6 = MpqInterval::emptyInterval();
+    EXPECT_EQ(MpqInterval(1, BoundType::WEAK, -1, BoundType::WEAK), MpqInterval::empty_interval());
+    MpqInterval test5 = MpqInterval::unbounded_interval();
+    MpqInterval test6 = MpqInterval::empty_interval();
 	
     MpqInterval test7 = MpqInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
     
@@ -49,43 +49,43 @@ TEST(MpqInterval, Getters)
     
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
-    EXPECT_EQ(BoundType::WEAK, test1.lowerBoundType());
-    EXPECT_EQ(BoundType::STRICT, test1.upperBoundType());
+    EXPECT_EQ(BoundType::WEAK, test1.lower_bound_type());
+    EXPECT_EQ(BoundType::STRICT, test1.upper_bound_type());
     EXPECT_EQ(-1, test2.lower());
     EXPECT_EQ(1, test2.upper());
-    EXPECT_EQ(BoundType::WEAK, test2.lowerBoundType());
-    EXPECT_EQ(BoundType::STRICT, test2.upperBoundType());
-    EXPECT_TRUE(test3.isEmpty());
-    EXPECT_EQ(BoundType::STRICT, test4.lowerBoundType());
-    EXPECT_EQ(BoundType::STRICT, test4.upperBoundType());
+    EXPECT_EQ(BoundType::WEAK, test2.lower_bound_type());
+    EXPECT_EQ(BoundType::STRICT, test2.upper_bound_type());
+    EXPECT_TRUE(test3.is_empty());
+    EXPECT_EQ(BoundType::STRICT, test4.lower_bound_type());
+    EXPECT_EQ(BoundType::STRICT, test4.upper_bound_type());
     EXPECT_EQ(0, test4.lower());
     EXPECT_EQ(0, test4.upper());
-    EXPECT_TRUE(test4.isEmpty());
+    EXPECT_TRUE(test4.is_empty());
     EXPECT_EQ(0, test5.lower());
     EXPECT_EQ(0, test5.upper());
-    EXPECT_TRUE(test5.isEmpty());
+    EXPECT_TRUE(test5.is_empty());
     EXPECT_EQ(4, test6.lower());
     EXPECT_EQ(4, test6.upper());
     
-    test1.setLower(-3);
-    test1.setUpper(5);
-    test1.setLowerBoundType(BoundType::STRICT);
-    test1.setUpperBoundType(BoundType::WEAK);
+    test1.set_lower(-3);
+    test1.set_upper(5);
+    test1.set_lower_bound_type(BoundType::STRICT);
+    test1.set_upper_bound_type(BoundType::WEAK);
     EXPECT_EQ(-3, test1.lower());
     EXPECT_EQ(5, test1.upper());
-    EXPECT_EQ(BoundType::STRICT, test1.lowerBoundType());
-    EXPECT_EQ(BoundType::WEAK, test1.upperBoundType());
+    EXPECT_EQ(BoundType::STRICT, test1.lower_bound_type());
+    EXPECT_EQ(BoundType::WEAK, test1.upper_bound_type());
     
     test1.set(4, 8);
     EXPECT_EQ(4, test1.lower());
     EXPECT_EQ(8, test1.upper());
     
-    test1.setLowerBoundType(BoundType::INFTY);
-    test1.setUpperBoundType(BoundType::INFTY);
-    EXPECT_TRUE(test1.isInfinite());
+    test1.set_lower_bound_type(BoundType::INFTY);
+    test1.set_upper_bound_type(BoundType::INFTY);
+    EXPECT_TRUE(test1.is_infinite());
 
-    test2.setUpperBoundType(BoundType::INFTY);
-    EXPECT_EQ(BoundType::INFTY, test2.upperBoundType());
+    test2.set_upper_bound_type(BoundType::INFTY);
+    EXPECT_EQ(BoundType::INFTY, test2.upper_bound_type());
     EXPECT_EQ(test2.lower(), test2.upper());
     
     test1.set(MpqInterval::BoostInterval(3, 27));
@@ -97,33 +97,33 @@ TEST(MpqInterval, Getters)
     EXPECT_EQ(3, test1.lower());
     EXPECT_EQ(27, test1.upper());
     
-	EXPECT_TRUE(test7.isOne());
-	EXPECT_TRUE(isOne(test7));
+	EXPECT_TRUE(test7.is_one());
+	EXPECT_TRUE(is_one(test7));
 	
-	EXPECT_TRUE(test8.isZero());
-	EXPECT_TRUE(isZero(test8));
+	EXPECT_TRUE(test8.is_zero());
+	EXPECT_TRUE(is_zero(test8));
 }
 
 TEST(MpqInterval, StaticCreators)
 {
-    MpqInterval i1 = MpqInterval::emptyInterval();
-    MpqInterval i2 = MpqInterval::unboundedInterval();
+    MpqInterval i1 = MpqInterval::empty_interval();
+    MpqInterval i2 = MpqInterval::unbounded_interval();
 	MpqInterval i3 = carl::constant_one<MpqInterval>().get();
 	MpqInterval i4 = carl::constant_zero<MpqInterval>().get();
     
-    EXPECT_TRUE(i1.isEmpty());
+    EXPECT_TRUE(i1.is_empty());
     EXPECT_EQ(0, i1.lower());
     EXPECT_EQ(0, i1.upper());
     
-    EXPECT_TRUE(i2.isInfinite());
-    EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
-    EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
+    EXPECT_TRUE(i2.is_infinite());
+    EXPECT_EQ(BoundType::INFTY, i2.lower_bound_type());
+    EXPECT_EQ(BoundType::INFTY, i2.upper_bound_type());
 	
-	EXPECT_TRUE(i3.isOne());
-	EXPECT_TRUE(isOne(i3));
+	EXPECT_TRUE(i3.is_one());
+	EXPECT_TRUE(is_one(i3));
 	
-	EXPECT_TRUE(i4.isZero());
-	EXPECT_TRUE(isZero(i4));
+	EXPECT_TRUE(i4.is_zero());
+	EXPECT_TRUE(is_zero(i4));
 }
 
 TEST(MpqInterval, Addition)
@@ -145,9 +145,9 @@ TEST(MpqInterval, Addition)
     result = a0.add(b1);
     EXPECT_EQ( MpqInterval(4, BoundType::INFTY, 4, BoundType::WEAK), result);
     result = a0.add(b2);
-	EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+	EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a0.add(b3);
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     
     result = a1.add(b0);
     EXPECT_EQ( MpqInterval(4, BoundType::INFTY, 4, BoundType::WEAK), result);
@@ -156,25 +156,25 @@ TEST(MpqInterval, Addition)
     result = a1.add(b2);
     EXPECT_EQ( MpqInterval(-2, BoundType::WEAK, -2, BoundType::INFTY), result);
     result = a1.add(b3);
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     
     result = a2.add(b0);
-	EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+	EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a2.add(b1);
     EXPECT_EQ( MpqInterval(-2, BoundType::WEAK, -2, BoundType::INFTY), result);
     result = a2.add(b2);
     EXPECT_EQ( MpqInterval(-2, BoundType::WEAK, -2, BoundType::INFTY), result);
     result = a2.add(b3);
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     
     result = a3.add(b0);
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a3.add(b1);
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a3.add(b2);
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a3.add(b3);
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
 }
 
 
@@ -192,13 +192,13 @@ TEST(MpqInterval, Subtraction)
     
     MpqInterval result;
 	result = a0.add(b0.inverse());
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a0.add(b1.inverse());
     EXPECT_EQ( MpqInterval(-1, BoundType::INFTY, 3, BoundType::WEAK), result);
     result = a0.add(b2.inverse());
     EXPECT_EQ( MpqInterval(-1, BoundType::INFTY, 3, BoundType::WEAK), result);
     result = a0.add(b3.inverse());
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     
     result = a1.add(b0.inverse());
     EXPECT_EQ( MpqInterval(-3, BoundType::WEAK, 1, BoundType::INFTY), result);
@@ -207,25 +207,25 @@ TEST(MpqInterval, Subtraction)
     result = a1.add(b2.inverse());
     EXPECT_EQ( MpqInterval(-1, BoundType::INFTY, 3, BoundType::WEAK), result);
     result = a1.add(b3.inverse());
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     
     result = a2.add(b0.inverse());
     EXPECT_EQ( MpqInterval(-3, BoundType::WEAK, 1, BoundType::INFTY), result);
     result = a2.add(b1.inverse());
     EXPECT_EQ( MpqInterval(-3, BoundType::WEAK, 1, BoundType::INFTY), result);
     result = a2.add(b2.inverse());
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a2.add(b3.inverse());
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     
     result = a3.add(b0.inverse());
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a3.add(b1.inverse());
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a3.add(b2.inverse());
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
     result = a3.add(b3.inverse());
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result);
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result);
 }
 
 
@@ -296,9 +296,9 @@ TEST(MpqInterval, Multiplication)
     result = c7.mul( d5 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c7.lower() * d5.upper()), BoundType::WEAK ), result );
     result = c8.mul( d0 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c8.mul( d5 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
 
     result = c0.mul( d6 );
     EXPECT_EQ( MpqInterval( mpq_class(c0.lower() * d6.upper()), BoundType::WEAK, mpq_class(c0.lower() * d6.lower()), BoundType::WEAK ),
@@ -315,15 +315,15 @@ TEST(MpqInterval, Multiplication)
     result = c3.mul( d6 );
     EXPECT_EQ( MpqInterval( 0 ), result );
     result = c4.mul( d6 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c5.mul( d6 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d6 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c7.mul( d6 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c8.mul( d6 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
 
     result = c0.mul( d1 );
     EXPECT_EQ( MpqInterval( mpq_class(c0.lower() * d1.upper()), BoundType::WEAK, mpq_class(c0.upper() * d1.lower()), BoundType::WEAK ),
@@ -364,9 +364,9 @@ TEST(MpqInterval, Multiplication)
     result = c7.mul( d7 );
     EXPECT_EQ( MpqInterval( mpq_class(c7.lower() * d7.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result );
     result = c8.mul( d1 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c8.mul( d7 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
 
     result = c0.mul( d4 );
     EXPECT_EQ( MpqInterval( 0 ), result );
@@ -392,9 +392,9 @@ TEST(MpqInterval, Multiplication)
     result = c0.mul( d8 );
     EXPECT_EQ( MpqInterval( mpq_class(c0.upper() * d8.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result );
     result = c1.mul( d2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c1.mul( d8 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c2.mul( d2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c2.lower() * d2.upper()), BoundType::WEAK ), result );
     result = c2.mul( d8 );
@@ -408,30 +408,30 @@ TEST(MpqInterval, Multiplication)
     result = c4.mul( d8 );
     EXPECT_EQ( MpqInterval( mpq_class(c4.upper() * d8.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result );
     result = c5.mul( d2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c5.mul( d8 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d8 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c7.mul( d2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c7.lower() * d2.upper()), BoundType::WEAK ), result );
     result = c7.mul( d8 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c7.lower() * d8.upper()), BoundType::WEAK ), result );
     result = c8.mul( d2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c8.mul( d8 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
 
     result = c0.mul( d9 );
     EXPECT_EQ( MpqInterval( mpq_class(c0.lower() * d9.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result );
     result = c0.mul( d8 );
     EXPECT_EQ( MpqInterval( mpq_class(c0.lower() * d8.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result );
     result = c1.mul( d9 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c1.mul( d8 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c2.mul( d9 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c2.upper() * d9.upper()), BoundType::WEAK ), result );
     result = c2.mul( d8 );
@@ -441,34 +441,34 @@ TEST(MpqInterval, Multiplication)
     result = c3.mul( d8 );
     EXPECT_EQ( MpqInterval( 0 ), result );
     result = c4.mul( d9 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c4.mul( d8 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c5.mul( d9 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c5.mul( d8 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d9 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d8 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c7.mul( d9 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c7.mul( d8 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result );
     result = c8.mul( d9 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c8.mul( d8 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
 
     result = c0.mul( d11 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c0.lower() * d11.lower()), BoundType::WEAK ), result );
     result = c0.mul( d10 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c0.lower() * d10.lower()), BoundType::WEAK ), result );
     result = c1.mul( d11 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c1.mul( d10 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c2.mul( d11 );
     EXPECT_EQ( MpqInterval( mpq_class(c2.upper() * d11.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result );
     result = c2.mul( d10 );
@@ -480,32 +480,32 @@ TEST(MpqInterval, Multiplication)
     result = c4.mul( d11 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result );
     result = c4.mul( d10 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c5.mul( d11 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c5.mul( d10 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d11 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d10 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c7.mul( d11 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c7.mul( d10 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c8.mul( d11 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c8.mul( d10 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
 
     result = c0.mul( d11 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c0.upper() * d11.lower()), BoundType::WEAK ), result );
     result = c0.mul( d3 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c0.upper() * d3.lower()), BoundType::WEAK ), result );
     result = c1.mul( d11 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c1.mul( d3 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c2.mul( d11 );
     EXPECT_EQ( MpqInterval( mpq_class(c2.lower() * d11.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result );
     result = c2.mul( d3 );
@@ -519,40 +519,40 @@ TEST(MpqInterval, Multiplication)
     result = c4.mul( d3 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(c4.upper() * d3.lower()), BoundType::WEAK ), result );
     result = c5.mul( d11 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c5.mul( d3 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d11 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d3 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c7.mul( d11 );
     EXPECT_EQ( MpqInterval( mpq_class(c7.lower() * d11.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result );
     result = c7.mul( d3 );
     EXPECT_EQ( MpqInterval( mpq_class(c7.lower() * d3.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result );
     result = c8.mul( d11 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c8.mul( d3 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
 
     result = c0.mul( d12 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c1.mul( d12 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c2.mul( d12 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c3.mul( d12 );
     EXPECT_EQ( MpqInterval( 0 ), result );
     result = c4.mul( d12 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c5.mul( d12 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c6.mul( d12 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c7.mul( d12 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
     result = c8.mul( d12 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result );
 }
 
 TEST(MpqInterval, ExtendedDivision)
@@ -669,46 +669,46 @@ TEST(MpqInterval, ExtendedDivision)
 
     //Table 8 tests with division containin 0
     a0.div_ext( b4, result1, result2 );
-    EXPECT_EQ( MpqInterval::emptyInterval(), result1 );
+    EXPECT_EQ( MpqInterval::empty_interval(), result1 );
     a1.div_ext( b4, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a2.div_ext( b4, result1, result2 );
-    EXPECT_EQ( MpqInterval::emptyInterval(), result1 );
+    EXPECT_EQ( MpqInterval::empty_interval(), result1 );
 
     a4.div_ext( b4, result1, result2 );
-    EXPECT_EQ( MpqInterval::emptyInterval(), result1 );
+    EXPECT_EQ( MpqInterval::empty_interval(), result1 );
     a5.div_ext( b4, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a6.div_ext( b4, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a7.div_ext( b4, result1, result2 );
-    EXPECT_EQ( MpqInterval::emptyInterval(), result1 );
+    EXPECT_EQ( MpqInterval::empty_interval(), result1 );
     a8.div_ext( b4, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 
     a0.div_ext( b5, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(a0.upper() / b5.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a1.div_ext( b5, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a2.div_ext( b5, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a2.lower() / b5.lower()), BoundType::WEAK ), result1 );
 
     a4.div_ext( b5, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(a4.upper() / b5.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a5.div_ext( b5, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a6.div_ext( b5, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a7.div_ext( b5, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a7.lower() / b5.lower()), BoundType::WEAK ), result1 );
     a8.div_ext( b5, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 
     a0.div_ext( b6, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(a0.upper() / b6.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a0.upper() / b6.upper()), BoundType::WEAK ), result2 );
     a1.div_ext( b6, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a2.div_ext( b6, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a2.lower() / b6.lower()), BoundType::WEAK ), result1 );
     EXPECT_EQ( MpqInterval( mpq_class(a2.lower() / b6.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result2 );
@@ -717,56 +717,56 @@ TEST(MpqInterval, ExtendedDivision)
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a4.upper() / b6.upper()), BoundType::WEAK ), result2 );
     EXPECT_EQ( MpqInterval( mpq_class(a4.upper() / b6.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a5.div_ext( b6, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a6.div_ext( b6, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a7.div_ext( b6, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a7.lower() / b6.lower()), BoundType::WEAK ), result1 );
     EXPECT_EQ( MpqInterval( mpq_class(a7.lower() / b6.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result2 );
     a8.div_ext( b6, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 
     a0.div_ext( b7, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a0.upper() / b7.upper()), BoundType::WEAK ), result1 );
     a1.div_ext( b7, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a2.div_ext( b7, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(a2.lower() / b7.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
 
     a4.div_ext( b7, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a4.upper() / b7.upper()), BoundType::WEAK ), result1 );
     a5.div_ext( b7, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a6.div_ext( b7, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a7.div_ext( b7, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(a7.lower() / b7.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a8.div_ext( b7, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 
     a0.div_ext( b8, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a1.div_ext( b8, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a2.div_ext( b8, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result1 );
 
     a4.div_ext( b8, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a5.div_ext( b8, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a6.div_ext( b8, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a7.div_ext( b8, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result1 );
     a8.div_ext( b8, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 
     a0.div_ext( b9, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a0.upper() / b9.upper()), BoundType::WEAK ), result2 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a1.div_ext( b9, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a2.div_ext( b9, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result1 );
     EXPECT_EQ( MpqInterval( mpq_class(a2.lower() / b9.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result2 );
@@ -775,20 +775,20 @@ TEST(MpqInterval, ExtendedDivision)
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a4.upper() / b9.upper()), BoundType::WEAK ), result2 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a5.div_ext( b9, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a6.div_ext( b9, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a7.div_ext( b9, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result1 );
     EXPECT_EQ( MpqInterval( mpq_class(a7.lower() / b9.upper()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result2 );
     a8.div_ext( b9, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 
     a0.div_ext( b10, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result2 );
     EXPECT_EQ( MpqInterval( mpq_class(a0.upper() / b10.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a1.div_ext( b10, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a2.div_ext( b10, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(a2.lower() / b10.lower()), BoundType::WEAK ), result1 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result2 );
@@ -797,50 +797,50 @@ TEST(MpqInterval, ExtendedDivision)
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result2 );
     EXPECT_EQ( MpqInterval( mpq_class(a4.upper() / b10.lower()), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a5.div_ext( b10, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a6.div_ext( b10, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a7.div_ext( b10, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, a7.lower() / b10.lower(), BoundType::WEAK ), result1 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result2 );
     a8.div_ext( b10, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 
     a0.div_ext( b11, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result1 );
     a1.div_ext( b11, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a2.div_ext( b11, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
 
     a4.div_ext( b11, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(-1), BoundType::INFTY, mpq_class(0), BoundType::WEAK ), result1 );
     a5.div_ext( b11, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a6.div_ext( b11, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a7.div_ext( b11, result1, result2 );
     EXPECT_EQ( MpqInterval( mpq_class(0), BoundType::WEAK, mpq_class(1), BoundType::INFTY ), result1 );
     a8.div_ext( b11, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 
     a0.div_ext( b12, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a1.div_ext( b12, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a2.div_ext( b12, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 
     a4.div_ext( b12, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a5.div_ext( b12, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a6.div_ext( b12, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a7.div_ext( b12, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
     a8.div_ext( b12, result1, result2 );
-    EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
+    EXPECT_EQ( MpqInterval::unbounded_interval(), result1 );
 }
 
 TEST(MpqInterval, Intersection)
@@ -873,14 +873,14 @@ TEST(MpqInterval, Intersection)
     
     MpqInterval b21(1,BoundType::WEAK,1,BoundType::INFTY);
     
-    EXPECT_EQ(MpqInterval::emptyInterval(), carl::set_intersection(a1, b01));
+    EXPECT_EQ(MpqInterval::empty_interval(), carl::set_intersection(a1, b01));
     EXPECT_EQ(MpqInterval(1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b02));
     EXPECT_EQ(MpqInterval(0,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b03));
     EXPECT_EQ(MpqInterval(mpq_class(-1),BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b04));
     EXPECT_EQ(MpqInterval(mpq_class(-1),BoundType::WEAK,0,BoundType::WEAK), carl::set_intersection(a1, b05));
     
     EXPECT_EQ(MpqInterval(mpq_class(-1),BoundType::WEAK,mpq_class(-1),BoundType::WEAK), carl::set_intersection(a1, b06));
-    EXPECT_EQ(MpqInterval::emptyInterval(), carl::set_intersection(a1, b07));
+    EXPECT_EQ(MpqInterval::empty_interval(), carl::set_intersection(a1, b07));
     EXPECT_EQ(MpqInterval(mpq_class(-1),BoundType::WEAK,mpq_class(-1),BoundType::WEAK), carl::set_intersection(a1, b08));
     EXPECT_EQ(MpqInterval(1,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b09));
     EXPECT_EQ(MpqInterval(0,BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b10));
@@ -888,7 +888,7 @@ TEST(MpqInterval, Intersection)
     EXPECT_EQ(MpqInterval(mpq_class(-1),BoundType::WEAK,0,BoundType::WEAK), carl::set_intersection(a1, b11));
     EXPECT_EQ(MpqInterval(-0.5,BoundType::WEAK,0.5,BoundType::WEAK), carl::set_intersection(a1, b12));
     EXPECT_EQ(MpqInterval(mpq_class(-1),BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b13));
-    EXPECT_EQ(MpqInterval::emptyInterval(), carl::set_intersection(a1, b14));
+    EXPECT_EQ(MpqInterval::empty_interval(), carl::set_intersection(a1, b14));
     EXPECT_EQ(MpqInterval(mpq_class(-1),BoundType::WEAK,1,BoundType::WEAK), carl::set_intersection(a1, b15));
     
     EXPECT_EQ(MpqInterval(mpq_class(-1),BoundType::WEAK,mpq_class(-1),BoundType::WEAK), carl::set_intersection(a1, b16));
@@ -1004,10 +1004,10 @@ TEST(MpqInterval, Properties)
     EXPECT_EQ(8, i4.diameter());
     
     // Diameter ratio
-    EXPECT_EQ(0.5, i1.diameterRatio(i2));
-    EXPECT_EQ(2, i2.diameterRatio(i1));
-    EXPECT_EQ(0.5, i3.diameterRatio(i2));
-    EXPECT_EQ(2, i4.diameterRatio(i1));
+    EXPECT_EQ(0.5, i1.diameter_ratio(i2));
+    EXPECT_EQ(2, i2.diameter_ratio(i1));
+    EXPECT_EQ(0.5, i3.diameter_ratio(i2));
+    EXPECT_EQ(2, i4.diameter_ratio(i1));
     
     // Magnitude
     EXPECT_EQ(7, i1.magnitude());

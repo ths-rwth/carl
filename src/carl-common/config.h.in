@@ -1,0 +1,15 @@
+/**
+ * Auto generated file config.h from config.h.in.
+ */ 
+#pragma once
+
+#define CARL_BUILD_${CMAKE_BUILD_TYPE}
+#cmakedefine THREAD_SAFE
+
+#cmakedefine USE_BLISS
+#cmakedefine USE_COCOA
+#cmakedefine USE_GINAC
+#cmakedefine USE_LIBPOLY
+
+#cmakedefine USE_CLN_NUMBERS
+#cmakedefine USE_MPFR_FLOAT

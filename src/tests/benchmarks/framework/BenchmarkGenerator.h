@@ -24,7 +24,7 @@ struct BenchmarkInformation {
 	BenchmarkInformation(BenchmarkSelection bs, std::size_t variableCount)
 		: selection(bs) {
 		for (std::size_t i = 0; i < variableCount; i++) {
-			variables.push_back(carl::freshRealVariable("x" + std::to_string(i)));
+			variables.push_back(carl::fresh_real_variable("x" + std::to_string(i)));
 		}
 	}
 };

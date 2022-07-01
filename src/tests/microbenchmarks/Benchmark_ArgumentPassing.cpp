@@ -1,9 +1,9 @@
 #include <benchmark/benchmark.h>
 
-#include <carl/core/Variable.h>
-#include <carl/formula/uninterpreted/UFInstance.h>
-#include <carl/formula/uninterpreted/UTerm.h>
-#include <carl/formula/uninterpreted/UVariable.h>
+#include <carl-arith/core/Variable.h>
+#include <carl-formula/uninterpreted/UFInstance.h>
+#include <carl-formula/uninterpreted/UTerm.h>
+#include <carl-formula/uninterpreted/UVariable.h>
 
 template<typename T>
 void pass_by_ref(const T& v) {
@@ -15,14 +15,14 @@ void pass_by_value(T v) {
 }
 
 static void Variable_by_ref(benchmark::State& state) {
-	carl::Variable v = carl::freshBooleanVariable();
+	carl::Variable v = carl::fresh_boolean_variable();
 	for (auto _ : state)
 		pass_by_ref(v);
 }
 BENCHMARK(Variable_by_ref);
 
 static void Variable_by_value(benchmark::State& state) {
-	carl::Variable v = carl::freshBooleanVariable();
+	carl::Variable v = carl::fresh_boolean_variable();
 	for (auto _ : state)
 		pass_by_value(v);
 }

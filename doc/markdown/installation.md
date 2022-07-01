@@ -3,16 +3,16 @@ Getting Started {#getting_started}
 
 Download
 --------
-We mirror our master branch to github.com. If you want to use the newest bleeding edge version, you can checkout from https://github.com/smtrat/carl.
+We mirror our master branch to github.com. If you want to use the newest bleeding edge version, you can checkout from https://github.com/ths-rwth/carl.
 Although we try to keep the master branch stable, there is a chance that the current revision is broken.
 You can check [here](https://travis-ci.org/smtrat/carl/builds) if the current revision compiles and all the unit tests work.
 
-We regularly tag reasonably stable versions. You can find them at https://github.com/smtrat/carl/releases.
+We regularly tag reasonably stable versions. You can find them at https://github.com/ths-rwth/carl/releases.
 
 Quick installation guide
 --------------------------------------------
 - Make sure all @subpage dependencies "dependencies" are available.
-- Download the latest release or clone the git repository from https://github.com/smtrat/carl.
+- Download the latest release or clone the git repository from https://github.com/ths-rwth/carl.
 - Prepare the build.
 @code{.sh}
 $ mkdir build && cd build && cmake ../
@@ -33,11 +33,10 @@ Supported platforms
 --------------------------------------------
 We test carl on the following platforms:
 
-- Ubuntu 14.04 LTS with several compilers on [Travis CI](https://travis-ci.org/smtrat/carl)
-- OS X 10.11 with several compilers on [Travis CI](https://travis-ci.org/smtrat/carl)
+- Ubuntu 22.04 LTS with several compilers
 
 We usually support at least all `clang` and `gcc` versions starting from those shipped with the latest Ubuntu LTS or Debian stable releases.
-As of now, this is `clang-5` and newer and `gcc-7` and newer.
+As of now, this is `clang-11` and newer and `gcc-9` and newer.
 
 Advanced building topics
 --------------------------------------------

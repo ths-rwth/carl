@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "carl/numbers/numbers.h"
+#include <carl-arith/numbers/numbers.h>
 
 #include <type_traits>
 
@@ -12,23 +12,23 @@ TEST(GaloisField, integers)
     GaloisField<mpz_class> gf3(3,1);
     GaloisFieldManager<mpz_class>& gfm = GaloisFieldManager<mpz_class>::getInstance();
     
-    const GaloisField<mpz_class>* gf5 = gfm.getField(5,1);
+    const GaloisField<mpz_class>* gf5 = gfm.field(5,1);
     GFNumber<mpz_class> a0(0,gf5);
     GFNumber<mpz_class> a1(1,gf5);
     GFNumber<mpz_class> a2(2,gf5);
     GFNumber<mpz_class> a3(3,gf5);
     GFNumber<mpz_class> a4(4,gf5);
     
-    EXPECT_EQ(mpz_class(0),a0.representingInteger());
-    EXPECT_EQ(mpz_class(1),a1.representingInteger());
-    EXPECT_EQ(mpz_class(2),a2.representingInteger());
-    EXPECT_EQ(mpz_class(-2),a3.representingInteger());
-    EXPECT_EQ(mpz_class(-1),a4.representingInteger());
+    EXPECT_EQ(mpz_class(0),a0.representing_integer());
+    EXPECT_EQ(mpz_class(1),a1.representing_integer());
+    EXPECT_EQ(mpz_class(2),a2.representing_integer());
+    EXPECT_EQ(mpz_class(-2),a3.representing_integer());
+    EXPECT_EQ(mpz_class(-1),a4.representing_integer());
     
-    EXPECT_TRUE(a0.isZero());
-    EXPECT_FALSE(a2.isZero());
-    EXPECT_TRUE(a1.isUnit());
-    EXPECT_FALSE(a3.isUnit());
+    EXPECT_TRUE(a0.is_zero());
+    EXPECT_FALSE(a2.is_zero());
+    EXPECT_TRUE(a1.is_unit());
+    EXPECT_FALSE(a3.is_unit());
     
     EXPECT_EQ(a0, a0 + a0);
     EXPECT_EQ(a1, a1 + a0);

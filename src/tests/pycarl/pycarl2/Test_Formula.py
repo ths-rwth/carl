@@ -12,7 +12,7 @@ class TestFormula(TestCarl):
 
 	def testGetters(self):
 		self.assertEqual(f4.size(),2)
-		self.assertEqual(f4.getType(),FormulaType.AND)
+		self.assertEqual(f4.type(),FormulaType.AND)
 
 	def testGetItem(self):
 		self.assertTrue(f4.getItem(1).equals(f2))

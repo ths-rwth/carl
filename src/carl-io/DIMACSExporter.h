@@ -1,16 +1,16 @@
 #pragma once
 
-#include <carl/core/logging.h>
+#include <carl-logging/carl-logging.h>
 
-#include <carl/formula/Formula.h>
-#include <carl/formula/helpers/to_cnf.h>
+#include <carl-formula/formula/Formula.h>
+#include <carl-formula/formula/functions/CNF.h>
 
 #include <iostream>
 #include <map>
 #include <vector>
 
 
-namespace carl {
+namespace carl::io {
 
 /**
  * Write formulas to the DIMAS format.
@@ -30,10 +30,10 @@ private:
 	}
 	
 	long long getLiteral(const Formula<Pol>& f) {
-		if (f.getType() == BOOL) {
+		if (f.type() == BOOL) {
 			return (long long)(id(f.boolean()));
 		}
-		if (f.getType() == NOT) {
+		if (f.type() == NOT) {
 			return -getLiteral(f.subformula());
 		}
 		CARL_LOG_ERROR("carl.dimacs", "Formula is not in pure-boolean CNF: " << f);
@@ -41,16 +41,16 @@ private:
 	}
 	
 	bool addDisjunction(const Formula<Pol>& f) {
-		if (f.getType() == BOOL || f.getType() == NOT) {
+		if (f.type() == BOOL || f.type() == NOT) {
 			long long lit = getLiteral(f);
 			if (lit == 0) return false;
 			mClauses.emplace_back(1, lit);
 			return true;
 		}
-		if (f.getType() == OR) {
+		if (f.type() == OR) {
 			std::vector<long long> clause;
 			for (const auto& sub: f) {
-				if (sub.getType() == BOOL || sub.getType() == NOT) {
+				if (sub.type() == BOOL || sub.type() == NOT) {
 					long long lit = getLiteral(sub);
 					if (lit == 0) return false;
 					clause.push_back(lit);
@@ -69,18 +69,18 @@ private:
 public:
 	bool operator()(const Formula<Pol>& formula) {
 		Formula<Pol> f = carl::to_cnf(formula);
-		if (f.getType() == TRUE) {
+		if (f.type() == TRUE) {
 			CARL_LOG_INFO("carl.dimacs", "Added TRUE to DIMACSExporter. Skipping...");
 			return true;
 		}
-		if (f.getType() == FALSE) {
+		if (f.type() == FALSE) {
 			CARL_LOG_WARN("carl.dimacs", "Added FALSE to DIMACSExporter. Skipping...");
 			return true;
 		}
-		if (f.getType() == OR || f.getType() == BOOL || f.getType() == NOT) {
+		if (f.type() == OR || f.type() == BOOL || f.type() == NOT) {
 			return addDisjunction(f);
 		}
-		if (f.getType() == AND) {
+		if (f.type() == AND) {
 			for (const auto& sub: f) {
 				if (!addDisjunction(sub)) return false;
 			}

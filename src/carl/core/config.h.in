@@ -1,6 +1,0 @@
-/**
- * Auto generated file config.h from config.h.in.
- */ 
-#pragma once
-#include "../config.h"
-#cmakedefine VARIABLE_PASS_BY_VALUE

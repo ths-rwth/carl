@@ -1,8 +1,8 @@
 #pragma once
 
-#include <carl/core/logging.h>
-#include <carl/core/Relation.h>
-#include <carl/formula/Formula.h>
+#include <carl-logging/carl-logging.h>
+#include <carl-arith/core/Relation.h>
+#include <carl-formula/formula/Formula.h>
 
 #include <iostream>
 #include <fstream>
@@ -11,7 +11,7 @@
 #include <tuple>
 #include <vector>
 
-namespace carl {
+namespace carl::io {
 
 using OPBPolynomial = std::vector<std::pair<int,carl::Variable>>;
 using OPBConstraint = std::tuple<OPBPolynomial, Relation, int>;
@@ -41,7 +41,7 @@ private:
 			auto it = variableCache.find(term.second);
 			if (it == variableCache.end()) {
 				// We haven't seen this variable, yet. Create a new map entry for it.
-				carl::Variable boolVar = carl::freshBooleanVariable();
+				carl::Variable boolVar = carl::fresh_boolean_variable();
 				variableCache[term.second] = boolVar;
 			}
 

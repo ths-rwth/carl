@@ -2,31 +2,30 @@
 add_custom_target(all-tests)
 
 add_library(TestCommon STATIC Common.cpp)
-if(COMPARE_WITH_Z3 OR RAN_USE_Z3 OR USE_Z3_NUMBERS)
-	target_link_libraries(TestCommon carl-shared ${GTEST_LIBRARIES} Z3_STATIC gomp)
-else()
-	target_link_libraries(TestCommon carl-shared ${GTEST_LIBRARIES})
-endif()
+target_link_libraries(TestCommon carl-arith-shared ${GTEST_LIBRARIES})
 add_dependencies(TestCommon resources GTESTCORE_STATIC GTESTMAIN_STATIC)
 
 ################################
 # Unit Tests
 ################################
-add_subdirectory(util)
 add_subdirectory(carl-covering)
 add_subdirectory(carl-extpolys)
 add_subdirectory(carl-io)
-add_subdirectory(carl-model)
+add_subdirectory(carl-common)
 add_subdirectory(carl-settings)
 add_subdirectory(carl-statistics)
+add_subdirectory(carl-logging)
 add_subdirectory(numbers)
-#add_subdirectory(numbers_boost)
 add_subdirectory(core)
-add_subdirectory(formula)
+add_subdirectory(poly)
+add_subdirectory(ran)
+add_subdirectory(carl-formula)
 add_subdirectory(groebner)
 add_subdirectory(interval)
+add_subdirectory(intervalcontraction)
 add_subdirectory(benchmarks)
 add_subdirectory(pycarl)
+
 # Only for debugging.
 #add_subdirectory(debug)
 

@@ -1,8 +1,8 @@
-#include "../carl/core/MultivariateHorner.h"
-#include "carl/core/MultivariatePolynomial.h"
-#include "carl/core/VariablePool.h"
-#include "carl/util/stringparser.h"
-#include "carl/interval/IntervalEvaluation.h"
+#include <carl-arith/poly/umvpoly/functions/horner/MultivariateHorner.h>
+#include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-io/StringParser.h>
+#include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>
 
 #ifdef USE_GINAC
 #include <cln/cln.h>
@@ -19,7 +19,7 @@ typedef MultivariatePolynomial<Rational> Pol;
 int main (int argc, char** argv)
 {
 	
-  StringParser sp;
+  io::StringParser sp;
 	sp.setVariables({"x", "y", "z"});
 	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2*y^4*z^5*3 + x^3*10*y^4 + 20*z^6*y^2 + 21*x^9*z^2 + 4*x*y");
 	Pol p1 = sp.parseMultivariatePolynomial<Rational>("x*y + x*z + 2*x");
@@ -56,7 +56,7 @@ int main (int argc, char** argv)
 	std::cout << "\n GREEDY_Is        :" << peterPolynom << std::endl;
   //std::cout << " GREEDY_IIs       :" << peterPolynom2 << std::endl;
 
-	Interval<double> testInterval = IntervalEvaluation::evaluate(peterPolynom ,map);
+	Interval<double> testInterval = carl::evaluate(peterPolynom ,map);
   //Interval<Rational> testInterval2 = evaluate(peterPolynom2 , map);
 
 	std::cout << "\n Evaluate Horner :" << testInterval << std::endl;
@@ -73,12 +73,12 @@ int main (int argc, char** argv)
 
   std::map<Variable, Interval<Rational>> map;
   VariablePool& vpool = VariablePool::getInstance();
-  Variable a = vpool.getFreshVariable();
-  vpool.setName(a, "a");
-  Variable b = vpool.getFreshVariable();
-  vpool.setName(b, "b");
-  Variable c = vpool.getFreshVariable();
-  vpool.setName(c, "c");
+  Variable a = vpool.get_fresh_variable();
+  vpool.set_name(a, "a");
+  Variable b = vpool.get_fresh_variable();
+  vpool.set_name(b, "b");
+  Variable c = vpool.get_fresh_variable();
+  vpool.set_name(c, "c");
 
   int l = 0;
   int n = 0;

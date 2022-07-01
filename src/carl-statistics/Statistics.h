@@ -24,8 +24,10 @@ protected:
 	template<typename T>
 	void addKeyValuePair(const std::string& key, const T& value) {
 		assert(!has_illegal_chars(key) && "spaces, (, ) are not allowed here");
+		if (has_illegal_chars(key)) return;
 		if constexpr(std::is_same<T,std::string>::value) {
 			assert(!has_illegal_chars(static_cast<std::string>(value)) && "spaces, (, ) are not allowed here");
+			if (has_illegal_chars(value)) return;
 			mCollected.emplace(key, value);
 		} else if constexpr(std::is_same<T,timer>::value) {
 			mCollected.emplace(key+"_count", std::to_string(static_cast<timer>(value).count()));

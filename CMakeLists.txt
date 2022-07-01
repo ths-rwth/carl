@@ -1,6 +1,13 @@
 cmake_minimum_required (VERSION 3.7 FATAL_ERROR)
 
+#set(CMAKE_DISABLE_SOURCE_CHANGES ON)
+set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+
 project(carl CXX)
+
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+   message(SEND_ERROR "In-source builds are not allowed.")
+endif()
 
 # path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -8,7 +15,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # Include own macros.
 include(carlmacros)
 
-set_version(22 04)
+set_version(22 06)
 
 set(PROJECT_FULLNAME "carl")
 set(PROJECT_DESCRIPTION "Computer ARithmetic Library")
@@ -33,12 +40,10 @@ option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are i
 export_option(FORCE_SHIPPED_RESOURCES)
 option( FORCE_SHIPPED_GMP "Do not look in system for lib gmp" OFF )
 export_option(FORCE_SHIPPED_GMP)
+option(USE_LIBPOLY "Use LibPoly" ON)
+export_option(USE_LIBPOLY)
 option( USE_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 export_option(USE_GINAC)
-option( COMPARE_WITH_Z3 "Compile benchmarks that compare to z3" OFF )
-option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
-option( USE_LIBPOLY "Use Libpoly for certain calculations" OFF )
-export_option(USE_LIBPOLY)
 option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )
 export_option(USE_CLN_NUMBERS)
 option( USE_COCOA "Use CoCoALib" ON )
@@ -50,29 +55,6 @@ export_option(USE_MPFR_FLOAT)
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
-
-set(RAN_IMPLEMENTATION "INTERVAL" CACHE STRING "The implementation for real algebraic numbers to be used")
-set_property(CACHE RAN_IMPLEMENTATION PROPERTY STRINGS "INTERVAL" "THOM" "Z3" "LIBPOLY")
-if (RAN_IMPLEMENTATION STREQUAL "INTERVAL")
-	set(RAN_USE_INTERVAL ON)
-else()
-	set(RAN_USE_INTERVAL OFF)
-endif()
-if (RAN_IMPLEMENTATION STREQUAL "THOM")
-	set(RAN_USE_THOM ON)
-else()
-	set(RAN_USE_THOM OFF)
-endif()
-if (RAN_IMPLEMENTATION STREQUAL "Z3")
-	set(RAN_USE_Z3 ON)
-else()
-	set(RAN_USE_Z3 OFF)
-endif()
-if (RAN_IMPLEMENTATION STREQUAL "LIBPOLY")
-	set(RAN_USE_LIBPOLY ON)
-else()
-	set(RAN_USE_LIBPOLY OFF)
-endif()
 
 
 
@@ -147,7 +129,7 @@ include(resources/resources.cmake)
 
 enable_testing()
 
-#dl must be linked LAST as this is required for the stacktrace in util/platform.h
+#dl must be linked LAST as this is required for the stacktrace in carl-common/meta/platform.h
 if (NOT WIN32)
 	list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
 endif()

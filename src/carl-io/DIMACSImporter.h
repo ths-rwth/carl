@@ -6,10 +6,10 @@
 #include <sstream>
 #include <string>
 
-#include <carl/formula/Formula.h>
-#include <carl/core/logging.h>
+#include <carl-formula/formula/Formula.h>
+#include <carl-logging/carl-logging.h>
 
-namespace carl {
+namespace carl::io {
 
 /**
  * Parser for the DIMACS format.
@@ -55,7 +55,7 @@ private:
 				std::size_t varCount = std::stoull(m[1]);
 				variables.reserve(varCount);
 				while (variables.size() < varCount) {
-					variables.emplace_back(freshBooleanVariable());
+					variables.emplace_back(fresh_boolean_variable());
 				}
 				continue;
 			}

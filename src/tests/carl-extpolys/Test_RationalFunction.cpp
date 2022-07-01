@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 #include <carl-extpolys/RationalFunction.h>
-#include <carl/core/VariablePool.h>
-#include <carl/util/stringparser.h>
+#include <carl-arith/core/VariablePool.h>
+#include <carl-io/StringParser.h>
 #include <carl-extpolys/FactorizedPolynomial.h>
-#include <carl/util/platform.h>
+#include <carl-common/meta/platform.h>
 
 #include "../Common.h"
 
@@ -18,7 +18,7 @@ typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 
 TEST(RationalFunction, Construction)
 {
-    StringParser sp;
+    carl::io::StringParser sp;
     auto pCacheA = std::make_shared<CachePol>();
     sp.setVariables({"x", "y", "z", "t", "u"});
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("3*x*y + x");
@@ -42,7 +42,7 @@ TEST(RationalFunction, Construction)
     RFunc r1(p1, p2);
     EXPECT_EQ(p1, r1.nominator());
     EXPECT_EQ(p2, r1.denominator());
-    EXPECT_FALSE(r1.isZero());
+    EXPECT_FALSE(r1.is_zero());
 
     RFunc r2(p4);
     std::cout << "Construct rational function from " << p4 << " leads to " << r2 << std::endl;
@@ -61,7 +61,7 @@ TEST(RationalFunction, Construction)
     RFactFunc rf1(fp1, fp2);
     EXPECT_EQ(computePolynomial(fp1), computePolynomial(rf1.nominator()));
     EXPECT_EQ(computePolynomial(fp2), computePolynomial(rf1.denominator()));
-    EXPECT_FALSE(rf1.isZero());
+    EXPECT_FALSE(rf1.is_zero());
 
     RFactFunc rf2(fp3);
     std::cout << "Construct factorized rational function from " << p4 << " leads to " << r2 << std::endl;
@@ -78,7 +78,7 @@ TEST(RationalFunction, Construction)
 TEST(RationalFunction, Multiplication)
 {
     //carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("3*x*y + x");
@@ -100,8 +100,8 @@ TEST(RationalFunction, Multiplication)
     RFunc r4( x );
     r4 *= x;
     EXPECT_EQ(sp.parseMultivariatePolynomial<Rational>("x^2"), r4.nominator());
-    EXPECT_FALSE(needs_cache<Pol>::value);
-    EXPECT_TRUE(needs_cache<FPol>::value);
+    EXPECT_FALSE(needs_cache_type<Pol>::value);
+    EXPECT_TRUE(needs_cache_type<FPol>::value);
 
     auto pCache = std::make_shared<CachePol>();
 
@@ -126,7 +126,7 @@ TEST(RationalFunction, Multiplication)
 
 //(1/4*PF)/((-1/4)*PF+1) * ((-1/4)*PF+1)/((-1/2)*PF+1)
     //carl::VariablePool::getInstance().clear();
-    Variable t = carl::freshRealVariable("t");
+    Variable t = carl::fresh_real_variable("t");
     Pol pf(t);
     Pol nomA( Rational(1)/Rational(4)*pf );
     Pol denA( Rational(-1)/Rational(4)*pf+Rational(1) );
@@ -143,13 +143,13 @@ TEST(RationalFunction, Multiplication)
     if( !AutoSimplify )
         rfC.simplify();
     std::cout << rfC << std::endl;
-    EXPECT_TRUE( isZero(carl::remainder(computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ), computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) )) );
+    EXPECT_TRUE( is_zero(carl::remainder(computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ), computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) )) );
 }
 
 TEST(RationalFunction, Division)
 {
     //carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("x");
@@ -186,7 +186,7 @@ TEST(RationalFunction, Division)
 TEST(RationalFunction, Addition)
 {
     //carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("1*x*z");
@@ -219,7 +219,7 @@ TEST(RationalFunction, Addition)
 TEST(RationalFunction, Subtraction)
 {
     //carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x"});
 
     Pol p0 = sp.parseMultivariatePolynomial<Rational>("1");
@@ -273,7 +273,7 @@ TEST(RationalFunction, Subtraction)
 TEST(RationalFunction, Hash)
 {
     //carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x"});
 
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("1");
@@ -290,7 +290,7 @@ TEST(RationalFunction, Hash)
 TEST(RationalFunction, Derivative)
 {
 	//carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
 	// from http://de.wikipedia.org/wiki/Quotientenregel#Beispiel
@@ -313,7 +313,7 @@ TEST(RationalFunction, Derivative)
 TEST(RationalFunction, Simplification)
 {
     //carl::VariablePool::getInstance().clear();
-    StringParser sp;
+    carl::io::StringParser sp;
     sp.setVariables({"x", "y"});
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("2*x*y+(-2)*y+3");
     Pol p2 = sp.parseMultivariatePolynomial<Rational>("128*x^12*y^7+43740*x^3+8748*x^5+109350*x^2*y+257580*x^2*y^3+63990*x^2*y^5+(-12960)*x^2*y^6+(-168750)*x^2*y^4+1080*x^2*y^7+(-228420)*x^2*y^2+(-313470)*x^3*y+(-177147)*x^5*y+975402*x^5*y^2+59292*x^7*y^2+2292705*x^4*y^3+1156860*x^4*y^5+(-311760)*x^4*y^6+(-2200500)*x^4*y^4+33480*x^4*y^7+(-2345355)*x^5*y^3+(-99720)*x^9*y^5+(-19728)*x^10*y^6+9168*x^10*y^7+444960*x^8*y^5+560880*x^7*y^6+(-100968)*x^7*y^7+(-295920)*x^8*y^6+67480*x^8*y^7+(-30760)*x^9*y^7+100080*x^9*y^6+(-1135710)*x^7*y^5+1037340*x^7*y^4+(-2222910)*x^6*y^4+(-1835892)*x^5*y^5+587088*x^5*y^6+1808910*x^6*y^5+(-705168)*x^6*y^6+2859840*x^5*y^4+(-73208)*x^5*y^7+104216*x^6*y^7+(-270000)*x^8*y^4+(-421605)*x^7*y^3+1355535*x^6*y^3+1728*x^11*y^6+9792*x^10*y^5+30240*x^9*y^4+55080*x^8*y^3+(-1284255)*x^4*y^2+(-377379)*x^6*y^2+(-1193940)*x^3*y^3+(-413190)*x^3*y^5+95760*x^3*y^6+934740*x^3*y^4+(-9000)*x^3*y^7+855360*x^3*y^2+346275*x^4*y+34992*x^6*y+(-21870)*x^2+(-1616)*x^11*y^7+(-32805)*x^4");
@@ -335,17 +335,17 @@ TEST(RationalFunction, Simplification)
     std::cout << r1 << std::endl;
     r1.simplify();
     std::cout << r1 << std::endl;
-    EXPECT_TRUE( r1.denominator().isOne() );
+    EXPECT_TRUE( r1.denominator().is_one() );
 
     RFactFunc r2( (fq2*fq2), fp4 );
     r2.simplify();
-    EXPECT_TRUE( r2.nominator().isOne() );
+    EXPECT_TRUE( r2.nominator().is_one() );
 }
 
 TEST(RationalFunction, Evaluation)
 {
     //carl::VariablePool::getInstance().clear();
-    Variable x = freshRealVariable("x");
+    Variable x = fresh_real_variable("x");
     Pol p1({Rational(3)*x});
     Pol p2(Rational(2));
 
@@ -367,11 +367,11 @@ TEST(RationalFunction, Evaluation)
 
 TEST(RationalFunction, Substitute)
 {
-    carl::StringParser parser;
+    carl::io::StringParser parser;
     parser.setVariables({"x", "y", "z"});
-	Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
-	Variable z = freshRealVariable("z");
+	Variable x = fresh_real_variable("x");
+	Variable y = fresh_real_variable("y");
+	Variable z = fresh_real_variable("z");
 
     // Nessecessary - if not present, later formula parsing fails with BUGGY exception!
     RFunc rf1 = RFunc(Pol(x));
