@@ -83,16 +83,16 @@ TEST(LPPOLYNOMIAL, Operators) {
 
     auto res = polyX + polyY + polyZ + constant;
 
-    std::cout << "polyX: " << polyX << " Main var: " << polyX.mainVar() << std::endl;
-    std::cout << "polyY: " << polyY << " Main var: " << polyY.mainVar() << std::endl;
-    std::cout << "polyZ: " << polyZ << " Main var: " << polyZ.mainVar() << std::endl;
+    std::cout << "polyX: " << polyX << " Main var: " << polyX.main_var() << std::endl;
+    std::cout << "polyY: " << polyY << " Main var: " << polyY.main_var() << std::endl;
+    std::cout << "polyZ: " << polyZ << " Main var: " << polyZ.main_var() << std::endl;
     std::cout << "constant: " << constant << std::endl;
 
     std::cout << res << std::endl;
 
     std::cout << context << std::endl;
 
-    EXPECT_EQ(res.mainVar(), x);
+    EXPECT_EQ(res.main_var(), x);
 
     EXPECT_EQ(mpz_class(17) < polyX, true);
 }
@@ -115,12 +115,12 @@ TEST(LPPOLYNOMIAL, LeadingCoefficient) {
     auto carl_res = to_carl_multivariate_polynomial(res.getPolynomial()) ;
 
     std::cout << "Carl_MainVar: " << carl_res << std::endl;
-    std::cout << "Carl_MainVar: " << res.mainVar() << std::endl;
+    std::cout << "Carl_MainVar: " << res.main_var() << std::endl;
 
     std::cout << "Carl_Polynomial: " << carl_res << std::endl ;
     std::cout << "LP_Polynomial: " << res << std::endl;
 
-    std::cout << "Poly lterm: " << res.lterm() << std::endl;
+    // std::cout << "Poly lterm: " << res.lterm() << std::endl;
     std::cout << "Poly lcoeff: " << res.lcoeff() << std::endl;
 
     std::cout << "Carl lcoeff: "  << carl_res.lcoeff() << std::endl;
@@ -168,11 +168,11 @@ TEST(LPPOLYNOMIAL, MainVar) {
     auto res_constant = polyX * polyY * polyZ + constant + polyX * polyZ*12345;
 
 
-    EXPECT_EQ(res_constant.mainVar(), x);
-    EXPECT_EQ(res_constant.mainVar(), polyX.mainVar());
-    EXPECT_EQ(polyX.mainVar(), x);
-    EXPECT_EQ(polyY.mainVar(), y);
-    EXPECT_EQ(polyZ.mainVar(), z);
+    EXPECT_EQ(res_constant.main_var(), x);
+    EXPECT_EQ(res_constant.main_var(), polyX.main_var());
+    EXPECT_EQ(polyX.main_var(), x);
+    EXPECT_EQ(polyY.main_var(), y);
+    EXPECT_EQ(polyZ.main_var(), z);
 }
 
 
@@ -201,10 +201,10 @@ TEST(LPPOLYNOMIAL, hasVariable) {
 }
 
 TEST(LPPOLYNOMIAL, CoPrimeFactor) {
-     auto x = fresh_real_variable("x");
+    auto x = fresh_real_variable("x");
     auto y = fresh_real_variable("y");
     auto z = fresh_real_variable("z");
-    auto a  = fresh_real_variable("a");
+    // auto a  = fresh_real_variable("a");
     std::vector varOrder = {x, y, z};
     LPContext context(varOrder);
 
@@ -218,14 +218,14 @@ TEST(LPPOLYNOMIAL, CoPrimeFactor) {
     auto res2 = res1 + 17*polyX ;
 
 
-    EXPECT_EQ(polyX.coprimeFactor(), mpz_class(1)) ;
-    EXPECT_EQ(constant.coprimeFactor(), mpz_class(con)) ;
-    EXPECT_EQ(res1.coprimeFactor(), mpz_class(5)) ; 
-    EXPECT_EQ(res2.coprimeFactor(), mpz_class(1)) ; 
+    EXPECT_EQ(polyX.coprime_factor(), mpz_class(1)) ;
+    EXPECT_EQ(constant.coprime_factor(), mpz_class(con)) ;
+    EXPECT_EQ(res1.coprime_factor(), mpz_class(5)) ; 
+    EXPECT_EQ(res2.coprime_factor(), mpz_class(1)) ; 
 
 
-    std::cout << res1.coprimeCoefficients() << std::endl ; 
-    std::cout << res2.coprimeCoefficients() << std::endl ;
+    std::cout << res1.coprime_coefficients() << std::endl ; 
+    std::cout << res2.coprime_coefficients() << std::endl ;
 }
 
 

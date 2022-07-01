@@ -72,7 +72,7 @@ RealRootsResult<RealAlgebraicNumberLibpoly> real_roots_libpoly(
     // Multivariate Polynomial
     // build the assignment
     poly::Assignment assignment;
-    Variable mainVar = polynomial.mainVar();
+    Variable mainVar = polynomial.main_var();
     for (Variable& var : carl::variables(polynomial)) {
         if (var == mainVar) continue;
         // We convert numbers to libpoly values and add to assignment so we can substitute them later using libpoly

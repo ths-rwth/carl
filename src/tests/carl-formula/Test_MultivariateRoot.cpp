@@ -64,10 +64,9 @@ TYPED_TEST(MultivariateRootTest, Evaluate2)
 	
 	Variable x = fresh_real_variable("x");
 	Variable y = fresh_real_variable("y");
-	Variable z = fresh_real_variable("R");
-	Poly p = -Poly(z)*x+Poly(z)*z+Poly(2)*z-x+Poly(1);
+	Poly p = -Poly(y)*x+Poly(y)*y+Poly(2)*y-x+Poly(1);
 	
-	VariableComparison<Poly> vc(y, MultiRoot(p, 2, z), Relation::GREATER, true);
+	VariableComparison<Poly> vc(y, MultiRoot(p, 2, y), Relation::GREATER, true);
 	Formula<Poly> f(vc);
 	
 	ModelT m;

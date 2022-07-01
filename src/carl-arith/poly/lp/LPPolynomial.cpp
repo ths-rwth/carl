@@ -146,7 +146,7 @@ bool operator==(const LPPolynomial& lhs, const LPPolynomial& rhs) {
     return lp_polynomial_eq(lhs.get_internal(), rhs.get_internal());
 }
 bool operator==(const LPPolynomial& lhs, const mpz_class& rhs) {
-    if (!lhs.isNumber()) {
+    if (!lhs.is_number()) {
         return false;
     }
     return lhs.constant_part() == rhs;
@@ -334,7 +334,7 @@ mpz_class LPPolynomial::coprime_factor() const {
 
 LPPolynomial LPPolynomial::coprime_coefficients() const {
 
-    mpz_class g = coprimeFactor();
+    mpz_class g = coprime_factor();
 
     if (g == 1) {
         return *this;
