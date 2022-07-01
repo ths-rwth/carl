@@ -17,9 +17,8 @@
 namespace carl {
 
 class LPContext {
-    lp_polynomial_context_t* mContext;
-
-    std::vector<Variable> mVariableOrder; // TODO store as shared pointer!
+    lp_polynomial_context_t* m_context;
+    std::shared_ptr<std::vector<Variable>> m_variable_order;
 
 public:
     /**
@@ -28,28 +27,26 @@ public:
     LPContext() = delete;
 
     ~LPContext() {
-        lp_polynomial_context_detach(mContext);
+        lp_polynomial_context_detach(m_context);
     }
 
     LPContext(const LPContext& rhs) {
-        mContext = rhs.mContext;
-        lp_polynomial_context_attach(mContext);
-        mVariableOrder = rhs.mVariableOrder;
+        m_context = rhs.m_context;
+        lp_polynomial_context_attach(m_context);
+        m_variable_order = rhs.m_variable_order;
     }
 
     LPContext& operator=(const LPContext& rhs) {
-        mContext = rhs.mContext;
-        lp_polynomial_context_attach(mContext);
-        mVariableOrder = rhs.mVariableOrder;
+        m_context = rhs.m_context;
+        lp_polynomial_context_attach(m_context);
+        m_variable_order = rhs.m_variable_order;
         return *this;
     }
 
     /**
      * Construct a Context with a given order of carl::Variable in decreasing order of precedence
      */
-    LPContext(const std::vector<Variable>& varOrder)
-        : mVariableOrder(varOrder) {
-
+    LPContext(const std::vector<Variable>& varOrder) : m_variable_order(std::make_shared<std::vector<Variable>>(varOrder)) {
         CARL_LOG_DEBUG("carl.poly", "Creating context with variables: " << varOrder);
 
         // Add the corresponding libpoly variables into database and order
@@ -70,43 +67,43 @@ public:
         }
 
         // Create the context
-        mContext = lp_polynomial_context_new(0, var_db, var_order);
+        m_context = lp_polynomial_context_new(0, var_db, var_order);
     };
 
     LPContext(lp_polynomial_context_t* ctx) {
-        mContext = ctx;
-        lp_polynomial_context_attach(mContext); // attach context to the object
+        m_context = ctx;
+        lp_polynomial_context_attach(m_context); // attach context to the object
 
         // Build the variable order for carl Variables, this has to be done in reverse order
         // because libpoly handles the variable order exactly the other way around
         // i.e the main Variable is not the fist one but the last one
-        const lp_variable_list_t* varList = lp_variable_order_get_list(mContext->var_order);
+        const lp_variable_list_t* varList = lp_variable_order_get_list(m_context->var_order);
         for (size_t i = lp_variable_list_size(varList); i-- > 0;) {
-            mVariableOrder.push_back(VariableMapper::getInstance().getCarlVariable(poly::Variable(varList->list[i])));
+            m_variable_order->push_back(VariableMapper::getInstance().getCarlVariable(poly::Variable(varList->list[i])));
         }
     }
 
     lp_polynomial_context_t* context() {
-        return mContext;
+        return m_context;
     };
 
     const lp_polynomial_context_t* context() const {
-        return mContext;
+        return m_context;
     };
 
-    std::vector<Variable> variable_order() const {
-        return mVariableOrder;
+    const std::vector<Variable>& variable_order() const {
+        return *m_variable_order;
     }
 
     bool has(const Variable& var) const {
-        return std::find(mVariableOrder.begin(), mVariableOrder.end(), var) != mVariableOrder.end();
+        return std::find(variable_order().begin(), variable_order().end(), var) != variable_order().end();
     };
 
     /**
      * @brief Returns true if the underlying variable ordering is the same as the given one.
      */
     inline bool operator==(const LPContext& rhs) const {
-        return mVariableOrder == rhs.mVariableOrder;
+        return m_variable_order == rhs.m_variable_order;
     }
 };
 
