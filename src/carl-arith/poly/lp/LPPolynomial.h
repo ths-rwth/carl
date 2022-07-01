@@ -35,7 +35,7 @@ public:
 	
 	//Defines for real roots 
 	using CoeffType = mpq_class ;
-	using RootType = RealAlgebraicNumberLibpoly;
+	using RootType = LPRealAlgebraicNumber;
 
 	//For compatibility with MultivariatePolynomial
 	using NumberType = mpq_class;

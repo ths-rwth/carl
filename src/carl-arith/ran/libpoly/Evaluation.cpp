@@ -4,9 +4,9 @@
 
 namespace carl {
 
-std::optional<RealAlgebraicNumberLibpoly> evaluate(
+std::optional<LPRealAlgebraicNumber> evaluate(
 	const LPPolynomial& polynomial,
-	const std::map<Variable, RealAlgebraicNumberLibpoly>& evalMap) {
+	const std::map<Variable, LPRealAlgebraicNumber>& evalMap) {
 
 	//Turn into poly::Assignment
 	poly::Assignment assignment;
@@ -27,10 +27,10 @@ std::optional<RealAlgebraicNumberLibpoly> evaluate(
 		return std::nullopt;
 	}
 
-	return RealAlgebraicNumberLibpoly::create_from_value(std::move(result.get_internal()));
+	return LPRealAlgebraicNumber::create_from_value(std::move(result.get_internal()));
 }
 
-boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const std::map<Variable, RealAlgebraicNumberLibpoly>& evalMap) {
+boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const std::map<Variable, LPRealAlgebraicNumber>& evalMap) {
 
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation constraint " << constraint << " for assignment " << evalMap);
 

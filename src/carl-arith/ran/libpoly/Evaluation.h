@@ -8,8 +8,8 @@
 
 namespace carl {
 
-std::optional<RealAlgebraicNumberLibpoly> evaluate(const LPPolynomial& polynomial,const std::map<Variable, RealAlgebraicNumberLibpoly>& evalMap);
-boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const std::map<Variable, RealAlgebraicNumberLibpoly>& evalMap);
+std::optional<LPRealAlgebraicNumber> evaluate(const LPPolynomial& polynomial,const std::map<Variable, LPRealAlgebraicNumber>& evalMap);
+boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const std::map<Variable, LPRealAlgebraicNumber>& evalMap);
 
 } // namespace carl
 
