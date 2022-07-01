@@ -6,7 +6,7 @@
 
 namespace carl::ran {
 
-template<typename RAN /*, typename = std::enable_if_t<is_ran<RAN>::value> */>
+template<typename RAN /*, typename = std::enable_if_t<is_ran_type<RAN>::value> */>
 class RealRootsResult {
 
 public:

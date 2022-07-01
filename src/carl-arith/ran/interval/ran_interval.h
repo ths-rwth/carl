@@ -237,11 +237,6 @@ public:
 		return interval_int().lower();
 	}
 
-	const auto defining_polynomial(Variable var) const {
-		if (is_numeric()) return MultivariatePolynomial<Number>(var) - value();
-		else return MultivariatePolynomial<Number>(carl::replace_main_variable(polynomial(), var));
-	}
-
 	RealAlgebraicNumberInterval<Number> abs() const {
 		assert(!interval_int().contains(constant_zero<Number>::get()) || interval_int().is_point_interval());
 		if (interval_int().is_semi_positive()) {
@@ -477,7 +472,7 @@ template<typename Number>
 const Variable RealAlgebraicNumberInterval<Number>::auxVariable = fresh_real_variable("__r");
 
 template<typename Number>
-struct is_ran<RealAlgebraicNumberInterval<Number>>: std::true_type {};
+struct is_ran_type<RealAlgebraicNumberInterval<Number>>: std::true_type {};
 }
 
 namespace std {

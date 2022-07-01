@@ -224,6 +224,13 @@ public:
 	}
 
 	/**
+	 * @brief Check if the given polynomial is univariate.
+	 */
+	bool is_univariate() const {
+		return poly::is_univariate(mPoly);
+	}
+
+	/**
 	 * Returns the constant part of this polynomial.
 	 * @return Constant part.
 	 */
@@ -269,8 +276,8 @@ public:
 	 * @return Main variable.
 	 */
 	Variable main_var() const {
-		assert(!is_number());
-		return VariableMapper::getInstance().getCarlVariable(poly::main_variable(mPoly));
+		if (is_number()) return carl::Variable::NO_VARIABLE;
+		else return VariableMapper::getInstance().getCarlVariable(poly::main_variable(mPoly));
 	}
 
 	/**
@@ -522,6 +529,14 @@ inline void variables(const LPPolynomial& p, carlVariables& vars) {
 	lp_polynomial_traverse(p.get_internal(), collectVars, &vars);
 	return;
 }
+
+inline LPPolynomial to_univariate_polynomial(const LPPolynomial& p, carl::Variable v) {
+	assert(p.main_var() == v);
+	return p;
+}
+
+template<>
+struct needs_context_type<LPPolynomial> : std::true_type {};
 
 } // namespace carl
 

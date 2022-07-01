@@ -185,7 +185,7 @@ inline bool is_zero(const RealAlgebraicNumberLibpoly& n) {
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberLibpoly& ran);
 
 template<>
-struct is_ran<RealAlgebraicNumberLibpoly> : std::true_type {};
+struct is_ran_type<RealAlgebraicNumberLibpoly> : std::true_type {};
 } // namespace carl
 
 namespace std {

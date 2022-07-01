@@ -218,7 +218,7 @@ std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberThom<Num>& r
 }
 
 template<typename Number>
-struct is_ran<RealAlgebraicNumberThom<Number>> { 
+struct is_ran_type<RealAlgebraicNumberThom<Number>> { 
   static const bool value = true;
 };
 

@@ -107,4 +107,7 @@ struct is_instantiation_of : std::false_type { static const bool value = false; 
 template < template <typename...> class Template, typename... Args >
 struct is_instantiation_of< Template, Template<Args...> > : std::true_type { static const bool value = true; };
 
+//template <class...> constexpr std::false_type dependent_false_v{};
+template<class> inline constexpr bool dependent_false_v = false;
+
 }

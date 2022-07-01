@@ -29,7 +29,7 @@ namespace carl {
 	public:
 		using Number = typename UnderlyingNumberType<Poly>::type;
 		using MR = MultivariateRoot<Poly>;
-		using RAN = RealAlgebraicNumber<Number>;
+		using RAN = typename MultivariateRoot<Poly>::RAN;
 	private:
 		Variable m_var;
 		std::variant<MR, RAN> m_value;
@@ -38,19 +38,25 @@ namespace carl {
 	public:
 		VariableComparison(Variable v, const std::variant<MR, RAN>& value, Relation rel, bool neg): m_var(v), m_value(value), m_relation(rel), m_negated(neg) {
 			assert(!std::holds_alternative<MR>(m_value) || std::get<MR>(m_value).var() == m_var);
+			assert(!needs_context_type<Poly>::value || !std::holds_alternative<RAN>(m_value));
 		}
 		VariableComparison(Variable v, const MR& value, Relation rel): m_var(v), m_value(value), m_relation(rel), m_negated(false) {
 			assert(value.var() == m_var);
-			if (value.is_univariate()) {
-			  // If the value of type MultivariateRoot is really just univariate, we convert it to an algebraic real.
-				auto res = evaluate(value, carl::Assignment<RAN>({}));
-				if (res) {
-					m_value = *res;
-					CARL_LOG_DEBUG("carl.multivariateroot", "Evaluated " << value << "-> " << m_value);
+			if constexpr(!needs_context_type<Poly>::value) {
+				if (value.is_univariate()) {
+				// If the value of type MultivariateRoot is really just univariate, we convert it to an algebraic real.
+					auto res = evaluate(value, carl::Assignment<RAN>({}));
+					if (res) {
+						m_value = *res;
+						CARL_LOG_DEBUG("carl.multivariateroot", "Evaluated " << value << "-> " << m_value);
+					}
 				}
 			}
+			
 		}
-		VariableComparison(Variable v, const RAN& value, Relation rel): m_var(v), m_value(value), m_relation(rel), m_negated(false) {}
+		VariableComparison(Variable v, const RAN& value, Relation rel): m_var(v), m_value(value), m_relation(rel), m_negated(false) {
+			static_assert(!needs_context_type<Poly>::value);
+		}
 
 		Variable var() const {
 			return m_var;
@@ -68,42 +74,6 @@ namespace carl {
 			return negated() ? relation() == Relation::NEQ : relation() == Relation::EQ;
 		}
 
-		/**
-		 * Convert this variable comparison "v < root(..)" into a simpler
-		 * polynomial (in)equality against zero "p(..) < 0" if that is possible.
-		 * @return std::nullopt if conversion impossible.
-		 */
-		std::optional<BasicConstraint<Poly>> as_constraint() const {
-			Relation rel = negated() ? inverse(m_relation) : m_relation;
-			if (std::holds_alternative<MR>(m_value)) {
-				const MR& mr = std::get<MR>(m_value);
-				if (mr.poly().degree(mr.var()) != 1) return std::nullopt;
-				if (mr.k() != 1) return std::nullopt;
-				auto lcoeff = mr.poly().coeff(mr.var(), 1);
-				if (!lcoeff.is_constant()) return std::nullopt;
-				auto ccoeff = mr.poly().coeff(mr.var(), 0);
-				return BasicConstraint<Poly>(Poly(m_var) + ccoeff / lcoeff, rel);
-			}
-			if (!std::get<RAN>(m_value).is_numeric()) return std::nullopt;
-			return BasicConstraint<Poly>(Poly(m_var) - Poly(std::get<RAN>(m_value).value()), rel);
-		}
-
-		/**
-		 * Return a polynomial containing the lhs-variable that has a same root
-		 * for the this lhs-variable as the value that rhs represent, e.g. if this
-		 * variable comparison is 'v < 3' then a defining polynomial could be 'v-3',
-		 * because it has the same root for variable v, i.e., v=3.
-		 */
-		Poly defining_polynomial() const {
-			if (std::holds_alternative<RAN>(m_value)) {
-				const auto& ran = std::get<RAN>(m_value);
-				return ran.defining_polynomial(m_var);
-			} else {
-				const auto& mr = std::get<MR>(m_value);
-				assert(mr.var() == m_var);
-				return mr.poly();
-			}
-		}
 		VariableComparison negation() const {
 			return VariableComparison(m_var, m_value, m_relation, !m_negated);
 		}
@@ -111,6 +81,59 @@ namespace carl {
 			return VariableComparison(m_var, m_value, carl::inverse(m_relation), m_negated);
 		}
 	};
+
+	/**
+	 * Convert this variable comparison "v < root(..)" into a simpler
+	 * polynomial (in)equality against zero "p(..) < 0" if that is possible.
+	 * @return std::nullopt if conversion impossible.
+	 */
+	template<typename Poly>
+	std::optional<BasicConstraint<Poly>> as_constraint(const VariableComparison<Poly>& f) {
+		Relation rel = f.negated() ? inverse(f.relation()) : f.relation();
+		if (std::holds_alternative<typename VariableComparison<Poly>::MR>(f.value())) {
+			const auto& mr = std::get<typename VariableComparison<Poly>::MR>(f.value());
+			if (mr.poly().degree(mr.var()) != 1) return std::nullopt;
+			if (mr.k() != 1) return std::nullopt;
+			auto lcoeff = mr.poly().coeff(mr.var(), 1);
+			if (!lcoeff.is_constant()) return std::nullopt;
+			auto ccoeff = mr.poly().coeff(mr.var(), 0);
+			return BasicConstraint<Poly>(Poly(f.var()) + ccoeff / lcoeff, rel);
+		}
+		assert(!needs_context_type<Poly>::value);
+		if constexpr(!needs_context_type<Poly>::value) {
+			if (!std::get<typename VariableComparison<Poly>::RAN>(f.value()).is_numeric()) return std::nullopt;
+			return BasicConstraint<Poly>(Poly(f.var()) - Poly(std::get<typename VariableComparison<Poly>::RAN>(f.value()).value()), rel);
+		} else {
+			static_assert(dependent_false_v<Poly>);
+		}
+	}
+
+	/**
+	 * Return a polynomial containing the lhs-variable that has a same root
+	 * for the this lhs-variable as the value that rhs represent, e.g. if this
+	 * variable comparison is 'v < 3' then a defining polynomial could be 'v-3',
+	 * because it has the same root for variable v, i.e., v=3.
+	 */
+	template<typename Poly, std::enable_if_t<!needs_context_type<Poly>::value, bool> = true>
+	Poly defining_polynomial(const VariableComparison<Poly>& f) {
+		if (std::holds_alternative<typename VariableComparison<Poly>::RAN>(f.value())) {
+			const auto& ran = std::get<typename VariableComparison<Poly>::RAN>(f.value());
+			if (ran.is_numeric()) return Poly(f.var()) - ran.value();
+			else return Poly(carl::replace_main_variable(ran.polynomial(), f.var()));
+		} else {
+			const auto& mr = std::get<typename VariableComparison<Poly>::MR>(f.value());
+			assert(mr.var() == f.var());
+			return mr.poly();
+		}
+	}
+
+	template<typename Poly, std::enable_if_t<needs_context_type<Poly>::value, bool> = true>
+	Poly defining_polynomial(const VariableComparison<Poly>& f) {
+		assert (std::holds_alternative<typename VariableComparison<Poly>::MR>(f.value()));
+		const auto& mr = std::get<typename VariableComparison<Poly>::MR>(f.value());
+		assert(mr.var() == f.var());
+		return mr.poly();
+	}
 
 	template<typename Pol>
     inline void variables(const VariableComparison<Pol>& f, carlVariables& vars) {

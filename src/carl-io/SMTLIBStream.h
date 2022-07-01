@@ -47,7 +47,7 @@ private:
 	
 	template<typename Pol>
 	void write(const VariableComparison<Pol>& c) {
-		auto constraint = c.as_constraint();
+		auto constraint = carl::as_constraint(c);
 		if (constraint) {
 			*this << *constraint;
 		} else {

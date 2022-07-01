@@ -19,7 +19,7 @@ namespace carl {
 class LPContext {
     lp_polynomial_context_t* mContext;
 
-    std::vector<Variable> mVariableOrder;
+    std::vector<Variable> mVariableOrder; // TODO store as shared pointer!
 
 public:
     /**
@@ -94,7 +94,7 @@ public:
         return mContext;
     };
 
-    std::vector<Variable> getVariableOrder() const {
+    std::vector<Variable> variable_order() const {
         return mVariableOrder;
     }
 
@@ -111,7 +111,7 @@ public:
 };
 
 inline std::ostream& operator<<(std::ostream& os, const LPContext& ctx) {
-    os << ctx.getVariableOrder();
+    os << ctx.variable_order();
     return os;
 }
 
