@@ -157,7 +157,7 @@ static bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable
 		return true;
 	}
 	else {
-		for (const auto& factor : carl::irreducibleFactors(varcomp.defining_polynomial(), false)) {
+		for (const auto& factor : carl::irreducible_factors(varcomp.defining_polynomial(), false)) {
 			assert(factor.degree(eliminationVar) > 0);
 			if (factor.degree(eliminationVar) > 2) continue;
 

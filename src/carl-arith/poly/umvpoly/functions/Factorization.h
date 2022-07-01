@@ -94,7 +94,7 @@ bool is_trivial(const Factors<MultivariatePolynomial<C,O,P>>& f) {
  * Uses CoCoALib and GiNaC, if available, depending on the coefficient type of the polynomial.
  */
 template<typename C, typename O, typename P>
-std::vector<MultivariatePolynomial<C,O,P>> irreducibleFactors(const MultivariatePolynomial<C,O,P>& p, bool includeConstants = true) {
+std::vector<MultivariatePolynomial<C,O,P>> irreducible_factors(const MultivariatePolynomial<C,O,P>& p, bool includeConstants = true) {
 	if (p.total_degree() == 0) {
 		if (includeConstants) {
 			return {p};
@@ -107,8 +107,8 @@ std::vector<MultivariatePolynomial<C,O,P>> irreducibleFactors(const Multivariate
 
 	auto s = overloaded {
 	#if defined USE_COCOA
-		[includeConstants](const MultivariatePolynomial<mpq_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpq_class,O,P>> c({p}); return c.irreducibleFactors(p, includeConstants); },
-		[includeConstants](const MultivariatePolynomial<mpz_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpz_class,O,P>> c({p}); return c.irreducibleFactors(p, includeConstants); }
+		[includeConstants](const MultivariatePolynomial<mpq_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpq_class,O,P>> c({p}); return c.irreducible_factors(p, includeConstants); },
+		[includeConstants](const MultivariatePolynomial<mpz_class,O,P>& p){ CoCoAAdaptor<MultivariatePolynomial<mpz_class,O,P>> c({p}); return c.irreducible_factors(p, includeConstants); }
 	#else
 		[includeConstants](const MultivariatePolynomial<mpq_class,O,P>& p){ return std::vector<MultivariatePolynomial<mpq_class,O,P>>({p}); },
 		[includeConstants](const MultivariatePolynomial<mpz_class,O,P>& p){ return std::vector<MultivariatePolynomial<mpz_class,O,P>>({p}); }
