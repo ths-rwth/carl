@@ -18,6 +18,7 @@
 #include <carl-arith/numbers/numbers.h>
 #include "TermAdditionManager.h"
 #include "../typetraits.h"
+#include "Context.h"
 
 
 namespace carl
@@ -66,6 +67,8 @@ public:
 	using TermsType = std::vector<Term<Coeff>>;
 	// RAN type
 	using RootType = typename UnivariatePolynomial<NumberType>::RootType; 
+
+	using ContextType = Context;
 	
 	template<typename C, typename T>
 	using EnableIfNotSame = typename std::enable_if<!std::is_same<C,T>::value,T>::type;
