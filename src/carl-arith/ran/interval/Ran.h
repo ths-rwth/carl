@@ -22,46 +22,46 @@
 namespace carl {
 
 template<typename Number>
-class RealAlgebraicNumberInterval {
+class IntRepRealAlgebraicNumber {
 	using Polynomial = UnivariatePolynomial<Number>;
 	
 	static const Variable auxVariable;
 
 	template<typename Num>
-	friend bool compare(const RealAlgebraicNumberInterval<Num>&, const RealAlgebraicNumberInterval<Num>&, const Relation);
+	friend bool compare(const IntRepRealAlgebraicNumber<Num>&, const IntRepRealAlgebraicNumber<Num>&, const Relation);
 
 	template<typename Num>
-	friend bool compare(const RealAlgebraicNumberInterval<Num>&, const Num&, const Relation);
+	friend bool compare(const IntRepRealAlgebraicNumber<Num>&, const Num&, const Relation);
 
 	template<typename Num, typename Poly>
-	friend boost::tribool evaluate(const BasicConstraint<Poly>&, const Assignment<RealAlgebraicNumberInterval<Num>>&, bool, bool);
+	friend boost::tribool evaluate(const BasicConstraint<Poly>&, const Assignment<IntRepRealAlgebraicNumber<Num>>&, bool, bool);
 
 	template<typename Num>
-	friend std::optional<RealAlgebraicNumberInterval<Num>> evaluate(MultivariatePolynomial<Num>, const Assignment<RealAlgebraicNumberInterval<Num>>&, bool);
+	friend std::optional<IntRepRealAlgebraicNumber<Num>> evaluate(MultivariatePolynomial<Num>, const Assignment<IntRepRealAlgebraicNumber<Num>>&, bool);
 
 	template<typename Num>
-	friend Num branching_point(const RealAlgebraicNumberInterval<Num>& n);
+	friend Num branching_point(const IntRepRealAlgebraicNumber<Num>& n);
 
 	template<typename Num>
-	friend Num sample_above(const RealAlgebraicNumberInterval<Num>& n);
+	friend Num sample_above(const IntRepRealAlgebraicNumber<Num>& n);
 
 	template<typename Num>
-	friend Num sample_below(const RealAlgebraicNumberInterval<Num>& n);
+	friend Num sample_below(const IntRepRealAlgebraicNumber<Num>& n);
 
 	template<typename Num>
-	friend Num sample_between(const RealAlgebraicNumberInterval<Num>& lower, const RealAlgebraicNumberInterval<Num>& upper);
+	friend Num sample_between(const IntRepRealAlgebraicNumber<Num>& lower, const IntRepRealAlgebraicNumber<Num>& upper);
 
 	template<typename Num>
-	friend Num sample_between(const RealAlgebraicNumberInterval<Num>& lower, const Num& upper);
+	friend Num sample_between(const IntRepRealAlgebraicNumber<Num>& lower, const Num& upper);
 
 	template<typename Num>
-	friend Num sample_between(const Num& lower, const RealAlgebraicNumberInterval<Num>& upper);
+	friend Num sample_between(const Num& lower, const IntRepRealAlgebraicNumber<Num>& upper);
 
 	template<typename Num>
-	friend Num floor(const RealAlgebraicNumberInterval<Num>& n);
+	friend Num floor(const IntRepRealAlgebraicNumber<Num>& n);
 
 	template<typename Num>
-	friend Num ceil(const RealAlgebraicNumberInterval<Num>& n);
+	friend Num ceil(const IntRepRealAlgebraicNumber<Num>& n);
 
 private:
 	struct content {
@@ -173,13 +173,13 @@ private:
 	}
 
 public:
-	RealAlgebraicNumberInterval()
+	IntRepRealAlgebraicNumber()
 		: m_content(std::make_shared<content>(Interval<Number>(0))) {}
 
-	RealAlgebraicNumberInterval(const Number& n)
+	IntRepRealAlgebraicNumber(const Number& n)
 		: m_content(std::make_shared<content>(Interval<Number>(n))) {}
 
-	RealAlgebraicNumberInterval(const Polynomial& p, const Interval<Number>& i)
+	IntRepRealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i)
 		: m_content(std::make_shared<content>(replaceVariable(p), i)) {
 		CARL_LOG_DEBUG("carl.ran.interval", "Creating (" << p << "," << i << ")");
 		assert(!carl::is_zero(polynomial_int()) && polynomial_int().degree() > 0);
@@ -200,14 +200,14 @@ public:
 		assert(is_consistent());
 	}
 
-	RealAlgebraicNumberInterval(const RealAlgebraicNumberInterval& ran) = default;
-	RealAlgebraicNumberInterval(RealAlgebraicNumberInterval&& ran) = default;
+	IntRepRealAlgebraicNumber(const IntRepRealAlgebraicNumber& ran) = default;
+	IntRepRealAlgebraicNumber(IntRepRealAlgebraicNumber&& ran) = default;
 
-	RealAlgebraicNumberInterval& operator=(const RealAlgebraicNumberInterval& n) = default;
-	RealAlgebraicNumberInterval& operator=(RealAlgebraicNumberInterval&& n) = default;
+	IntRepRealAlgebraicNumber& operator=(const IntRepRealAlgebraicNumber& n) = default;
+	IntRepRealAlgebraicNumber& operator=(IntRepRealAlgebraicNumber&& n) = default;
 
-	static RealAlgebraicNumberInterval<Number> create_safe(const Polynomial& p, const Interval<Number>& i) {
-		return RealAlgebraicNumberInterval<Number>(carl::squareFreePart(p), i);
+	static IntRepRealAlgebraicNumber<Number> create_safe(const Polynomial& p, const Interval<Number>& i) {
+		return IntRepRealAlgebraicNumber<Number>(carl::squareFreePart(p), i);
 	}
 
 	bool is_zero() const {
@@ -237,16 +237,16 @@ public:
 		return interval_int().lower();
 	}
 
-	RealAlgebraicNumberInterval<Number> abs() const {
+	IntRepRealAlgebraicNumber<Number> abs() const {
 		assert(!interval_int().contains(constant_zero<Number>::get()) || interval_int().is_point_interval());
 		if (interval_int().is_semi_positive()) {
 			return *this;
 		}
 		else {
 			if (is_numeric()) {
-				return RealAlgebraicNumberInterval<Number>(carl::abs(value()));
+				return IntRepRealAlgebraicNumber<Number>(carl::abs(value()));
 			} else {
-				return RealAlgebraicNumberInterval<Number>(polynomial_int().negate_variable(), interval_int().abs());
+				return IntRepRealAlgebraicNumber<Number>(polynomial_int().negate_variable(), interval_int().abs());
 			}
 		}
 	}
@@ -308,20 +308,20 @@ public:
 };
 
 template<typename Number>
-Number branching_point(const RealAlgebraicNumberInterval<Number>& n) {
+Number branching_point(const IntRepRealAlgebraicNumber<Number>& n) {
 	return carl::sample(n.interval_int());
 }
 
 template<typename Number>
-Number sample_above(const RealAlgebraicNumberInterval<Number>& n) {
+Number sample_above(const IntRepRealAlgebraicNumber<Number>& n) {
 	return carl::floor(n.interval_int().upper()) + 1;
 }
 template<typename Number>
-Number sample_below(const RealAlgebraicNumberInterval<Number>& n) {
+Number sample_below(const IntRepRealAlgebraicNumber<Number>& n) {
 	return carl::ceil(n.interval_int().lower()) - 1;
 }
 template<typename Number>
-Number sample_between(const RealAlgebraicNumberInterval<Number>& lower, const RealAlgebraicNumberInterval<Number>& upper) {
+Number sample_between(const IntRepRealAlgebraicNumber<Number>& lower, const IntRepRealAlgebraicNumber<Number>& upper) {
 	lower.refine_using(upper.interval_int().lower());
 	upper.refine_using(lower.interval_int().upper());
 	assert(lower.interval_int().upper() <= upper.interval_int().lower());
@@ -334,7 +334,7 @@ Number sample_between(const RealAlgebraicNumberInterval<Number>& lower, const Re
 	}
 }
 template<typename Number>
-Number sample_between(const RealAlgebraicNumberInterval<Number>& lower, const Number& upper) {
+Number sample_between(const IntRepRealAlgebraicNumber<Number>& lower, const Number& upper) {
 	lower.refine_using(upper);
 	assert(lower.interval_int().upper() <= upper);
 	assert(lower < upper);
@@ -347,7 +347,7 @@ Number sample_between(const RealAlgebraicNumberInterval<Number>& lower, const Nu
 	}
 }
 template<typename Number>
-Number sample_between(const Number& lower, const RealAlgebraicNumberInterval<Number>& upper) {
+Number sample_between(const Number& lower, const IntRepRealAlgebraicNumber<Number>& upper) {
 	upper.refine_using(lower);
 	assert(lower <= upper.interval_int().lower());
 	assert(lower < upper);
@@ -360,16 +360,16 @@ Number sample_between(const Number& lower, const RealAlgebraicNumberInterval<Num
 	}
 }
 template<typename Number>
-Number floor(const RealAlgebraicNumberInterval<Number>& n) {
+Number floor(const IntRepRealAlgebraicNumber<Number>& n) {
 	return carl::floor(n.interval_int().lower());
 }
 template<typename Number>
-Number ceil(const RealAlgebraicNumberInterval<Number>& n) {
+Number ceil(const IntRepRealAlgebraicNumber<Number>& n) {
 	return carl::ceil(n.interval_int().upper());
 }
 
 template<typename Number>
-bool compare(const RealAlgebraicNumberInterval<Number>& lhs, const RealAlgebraicNumberInterval<Number>& rhs, const Relation relation) {
+bool compare(const IntRepRealAlgebraicNumber<Number>& lhs, const IntRepRealAlgebraicNumber<Number>& rhs, const Relation relation) {
 	CARL_LOG_DEBUG("carl.ran.interval", "Compare " << lhs << " " << relation << " " << rhs);
 
 	if (lhs.m_content.get() == rhs.m_content.get()) {
@@ -439,7 +439,7 @@ bool compare(const RealAlgebraicNumberInterval<Number>& lhs, const RealAlgebraic
 }
 
 template<typename Number>
-bool compare(const RealAlgebraicNumberInterval<Number>& lhs, const Number& rhs, const Relation relation) {
+bool compare(const IntRepRealAlgebraicNumber<Number>& lhs, const Number& rhs, const Relation relation) {
 	auto res = lhs.refine_using(rhs);
 	if (res) {
 		return evaluate(*res, relation);
@@ -460,7 +460,7 @@ bool compare(const RealAlgebraicNumberInterval<Number>& lhs, const Number& rhs, 
 
 
 template<typename Num>
-std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberInterval<Num>& ran) {
+std::ostream& operator<<(std::ostream& os, const IntRepRealAlgebraicNumber<Num>& ran) {
 	if (!ran.is_numeric()) {
 		return os << "(IR " << ran.interval() << ", " << ran.polynomial() << ")";
 	} else {
@@ -469,16 +469,16 @@ std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberInterval<Num
 }
 
 template<typename Number>
-const Variable RealAlgebraicNumberInterval<Number>::auxVariable = fresh_real_variable("__r");
+const Variable IntRepRealAlgebraicNumber<Number>::auxVariable = fresh_real_variable("__r");
 
 template<typename Number>
-struct is_ran_type<RealAlgebraicNumberInterval<Number>>: std::true_type {};
+struct is_ran_type<IntRepRealAlgebraicNumber<Number>>: std::true_type {};
 }
 
 namespace std {
 template<typename Number>
-struct hash<carl::RealAlgebraicNumberInterval<Number>> {
-    std::size_t operator()(const carl::RealAlgebraicNumberInterval<Number>& n) const {
+struct hash<carl::IntRepRealAlgebraicNumber<Number>> {
+    std::size_t operator()(const carl::IntRepRealAlgebraicNumber<Number>& n) const {
 		return carl::hash_all(n.integer_below());
 	}
 };

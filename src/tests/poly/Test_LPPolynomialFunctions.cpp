@@ -6,9 +6,9 @@
 #include "../Common.h"
 #include <random>
 #include <carl-arith/core/VariablePool.h>
-#include <carl-arith/poly/lp/LPContext.h>
-#include <carl-arith/poly/lp/LPPolynomial.h>
-#include <carl-arith/poly/lp/Functions.h>
+#include <carl-arith/poly/libpoly/LPContext.h>
+#include <carl-arith/poly/libpoly/LPPolynomial.h>
+#include <carl-arith/poly/libpoly/Functions.h>
 #include <carl-arith/ran/real_roots.h>
 #include <carl-arith/converter/LibpolyConverter.h>
 #include <carl-arith/poly/umvpoly/functions/Resultant.h>
@@ -58,8 +58,8 @@ TEST(LPPOLYNOMIAL, RealRootsLP) {
     std::map<Variable, LPRealAlgebraicNumber> assignment;
     assignment[y] = LPRealAlgebraicNumber(123312 / 123312);
 
-    std::map<Variable, RealAlgebraicNumberInterval<mpq_class>> assignment_interval;
-    assignment_interval[y] = RealAlgebraicNumberInterval<mpq_class>(123312 / 123312);
+    std::map<Variable, IntRepRealAlgebraicNumber<mpq_class>> assignment_interval;
+    assignment_interval[y] = IntRepRealAlgebraicNumber<mpq_class>(123312 / 123312);
 
     std::cout << "RealRootsLP: " << carl::real_roots(res_uni).roots() << std::endl;
     std::cout << "RealRootsLP: " << carl::real_roots(res, assignment).roots() << std::endl;
@@ -84,8 +84,8 @@ TEST(LPPOLYNOMIAL, Evaluate) {
     std::map<Variable, LPRealAlgebraicNumber> assignment;
     assignment[x] = LPRealAlgebraicNumber(123312 / 123312);
 
-    std::map<Variable, RealAlgebraicNumberInterval<mpq_class>> assignment_interval;
-    assignment_interval[x] = RealAlgebraicNumberInterval<mpq_class>(123312 / 123312);
+    std::map<Variable, IntRepRealAlgebraicNumber<mpq_class>> assignment_interval;
+    assignment_interval[x] = IntRepRealAlgebraicNumber<mpq_class>(123312 / 123312);
 
     std::cout << "EvaluateLP: " << carl::evaluate(res, assignment) << std::endl;
     std::cout << "EvaluateCarl: " << carl::evaluate(res_carl, assignment_interval) << std::endl;

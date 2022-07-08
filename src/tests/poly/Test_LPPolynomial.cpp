@@ -5,8 +5,8 @@
 
 #include "../Common.h"
 #include <carl-arith/core/VariablePool.h>
-#include <carl-arith/poly/lp/LPContext.h>
-#include <carl-arith/poly/lp/LPPolynomial.h>
+#include <carl-arith/poly/libpoly/LPContext.h>
+#include <carl-arith/poly/libpoly/LPPolynomial.h>
 
 using namespace carl;
 

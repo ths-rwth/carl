@@ -32,7 +32,7 @@ class RealRootIsolation {
 	/// The polynomial.
 	UnivariatePolynomial<Number> mPolynomial;
 	/// The list of roots.
-	std::vector<RealAlgebraicNumberInterval<Number>> mRoots;
+	std::vector<IntRepRealAlgebraicNumber<Number>> mRoots;
 	/// The bounding interval.
 	Interval<Number> mInterval;
 	/// The sturm sequence for mPolynomial.
@@ -298,7 +298,7 @@ public:
 	}
 
 	/// Compute and sort the roots of mPolynomial within mInterval.
-	std::vector<RealAlgebraicNumberInterval<Number>> get_roots() {
+	std::vector<IntRepRealAlgebraicNumber<Number>> get_roots() {
 		if (simplify_by_factorization) {
 			auto factors = carl::factorization(mPolynomial);
 			CARL_LOG_DEBUG("carl.ran.interval", "Factorized " << mPolynomial << " to " << factors);

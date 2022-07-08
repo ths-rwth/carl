@@ -27,7 +27,7 @@ namespace carl {
  * @return Evaluation result
  */
 template<typename Number>
-std::optional<RealAlgebraicNumberInterval<Number>> evaluate(MultivariatePolynomial<Number> p, const Assignment<RealAlgebraicNumberInterval<Number>>& m, bool refine_model = true) {
+std::optional<IntRepRealAlgebraicNumber<Number>> evaluate(MultivariatePolynomial<Number> p, const Assignment<IntRepRealAlgebraicNumber<Number>>& m, bool refine_model = true) {
 	CARL_LOG_DEBUG("carl.ran.interval", "Evaluating " << p << " on " << m);
 	
 	CARL_LOG_TRACE("carl.ran.interval", "Substitute rationals");
@@ -47,7 +47,7 @@ std::optional<RealAlgebraicNumberInterval<Number>> evaluate(MultivariatePolynomi
 	}
     if (p.is_number()) {
 		CARL_LOG_DEBUG("carl.ran.interval", "Returning " << p.constant_part());
-        return RealAlgebraicNumberInterval<Number>(p.constant_part());
+        return IntRepRealAlgebraicNumber<Number>(p.constant_part());
     }
 
 	CARL_LOG_TRACE("carl.ran.interval", "Remaing polynomial: " << p);
@@ -69,8 +69,8 @@ std::optional<RealAlgebraicNumberInterval<Number>> evaluate(MultivariatePolynomi
 		assert(poly.main_var() == var_to_interval.begin()->first);
 		CARL_LOG_TRACE("carl.ran.interval", "Consider univariate poly " << poly);
 		if (m.at(var_to_interval.begin()->first).sgn(poly) == Sign::ZERO) {
-			CARL_LOG_DEBUG("carl.ran.interval", "Returning " << RealAlgebraicNumberInterval<Number>());
-			return RealAlgebraicNumberInterval<Number>();
+			CARL_LOG_DEBUG("carl.ran.interval", "Returning " << IntRepRealAlgebraicNumber<Number>());
+			return IntRepRealAlgebraicNumber<Number>();
 		}
 	}
 	
@@ -79,7 +79,7 @@ std::optional<RealAlgebraicNumberInterval<Number>> evaluate(MultivariatePolynomi
 
 	if (interval.is_point_interval()) {
 		CARL_LOG_DEBUG("carl.ran.interval", "Interval is point interval " << interval);
-		return RealAlgebraicNumberInterval<Number>(interval.lower());
+		return IntRepRealAlgebraicNumber<Number>(interval.lower());
 	}
 
 	CARL_LOG_TRACE("carl.ran.interval", "Compute result polynomial");
@@ -132,14 +132,14 @@ std::optional<RealAlgebraicNumberInterval<Number>> evaluate(MultivariatePolynomi
 	}
 	CARL_LOG_DEBUG("carl.ran.interval", "Result is " << *res << " " << interval);
 	if (interval.is_point_interval()) {
-		return RealAlgebraicNumberInterval<Number>(interval.lower());
+		return IntRepRealAlgebraicNumber<Number>(interval.lower());
 	} else {
-		return RealAlgebraicNumberInterval<Number>(*res, interval);
+		return IntRepRealAlgebraicNumber<Number>(*res, interval);
 	}
 }
 
 template<typename Number>
-boost::tribool evaluate(const BasicConstraint<MultivariatePolynomial<Number>>& c, const Assignment<RealAlgebraicNumberInterval<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
+boost::tribool evaluate(const BasicConstraint<MultivariatePolynomial<Number>>& c, const Assignment<IntRepRealAlgebraicNumber<Number>>& m, bool refine_model = true, bool use_root_bounds = true) {
 	CARL_LOG_DEBUG("carl.ran.interval", "Evaluating " << c << " on " << m);
 	
 	if (!use_root_bounds) {
@@ -205,7 +205,7 @@ boost::tribool evaluate(const BasicConstraint<MultivariatePolynomial<Number>>& c
 			assert(poly.main_var() == var_to_interval.begin()->first);
 			CARL_LOG_TRACE("carl.ran.interval", "Consider univariate poly " << poly);
 			if (m.at(var_to_interval.begin()->first).sgn(poly) == Sign::ZERO) {
-				CARL_LOG_DEBUG("carl.ran.interval", "Got " << RealAlgebraicNumberInterval<Number>());
+				CARL_LOG_DEBUG("carl.ran.interval", "Got " << IntRepRealAlgebraicNumber<Number>());
 				return evaluate(Sign::ZERO, constr.relation());
 			}
 		}

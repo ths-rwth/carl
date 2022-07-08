@@ -10,7 +10,7 @@
 #include <carl-arith/converter/LibpolyConverter.h>
 #include <carl-logging/carl-logging.h>
 
-#include <carl-arith/poly/lp/LPPolynomial.h>
+#include <carl-arith/poly/libpoly/LPPolynomial.h>
 
 #include "LPRan.h"
 

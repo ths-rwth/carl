@@ -49,7 +49,7 @@ namespace model {
 			return;
 		}
 		assert(cmp.isRational() || cmp.isRAN());
-		RealAlgebraicNumber<Rational> val = cmp.isRational() ? RealAlgebraicNumber<Rational>(cmp.asRational()) : cmp.asRAN();
+		typename Poly::RootType val = cmp.isRational() ? typename Poly::RootType(cmp.asRational()) : cmp.asRAN();
 		CARL_LOG_DEBUG("carl.model.evaluation", "rhs is " << val);
 		
 		auto it = m.find(vc.var());
@@ -59,7 +59,7 @@ namespace model {
 		}
 		const auto& value = m.evaluated(vc.var());
 		assert(value.isRational() || value.isRAN());
-		RealAlgebraicNumber<Rational> reference = value.isRational() ? RealAlgebraicNumber<Rational>(value.asRational()) : value.asRAN();
+		typename Poly::RootType reference = value.isRational() ? typename Poly::RootType(value.asRational()) : value.asRAN();
 		CARL_LOG_DEBUG("carl.model.evaluation", "Reference value: " << vc.var() << " == " << reference);
 		
 		f = Formula<Poly>(FormulaType::FALSE);

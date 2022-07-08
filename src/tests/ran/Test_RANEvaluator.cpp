@@ -12,7 +12,7 @@ using namespace carl;
 
 using Poly = MultivariatePolynomial<Rational>;
 using UPoly = UnivariatePolynomial<Rational>;
-using RAN = RealAlgebraicNumber<Rational>;
+using RAN = IntRepRealAlgebraicNumber<Rational>;
 
 #ifdef RAN_USE_INTERVAL
 
@@ -24,7 +24,7 @@ TEST(RealAlgebraicNumber, RANEvaluator)
 	Poly p = Poly(x)*Poly(x) - Poly(y) * Poly(y);
 	RAN sqrt2 = RAN::create_safe(UPoly(x, {-2,0,1}), Interval<Rational>(0, BoundType::STRICT, 2, BoundType::STRICT));
 
-	Assignment<RealAlgebraicNumber<Rational>> map;
+	Assignment<IntRepRealAlgebraicNumber<Rational>> map;
 	map.emplace(x,sqrt2);
 	map.emplace(y,sqrt2);
 

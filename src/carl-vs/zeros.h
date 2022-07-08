@@ -151,7 +151,7 @@ static bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable
 	}
 	assert(varcomp.var() == eliminationVar);
 
-	const auto& ran = std::get<RealAlgebraicNumber<Rational>>(varcomp.value());
+	const auto& ran = std::get<IntRepRealAlgebraicNumber<Rational>>(varcomp.value());
 	if (ran.is_numeric()) {
 		results.push_back({SqrtEx<Poly>(Poly(Rational(ran.value()))), Constraints<Poly>()});
 		return true;

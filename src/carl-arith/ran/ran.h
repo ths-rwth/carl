@@ -39,10 +39,3 @@
 #include "libpoly/LPRan.h"
 #include "libpoly/Evaluation.h"
 #endif
-
-namespace carl {
-
-	template<typename Number>
-	using RealAlgebraicNumber = RealAlgebraicNumberInterval<Number>;
-
-}

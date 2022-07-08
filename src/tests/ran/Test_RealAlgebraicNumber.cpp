@@ -60,9 +60,9 @@ TEST(RealAlgebraicNumber, EvalBug)
 	Variable h = fresh_real_variable("h"); 
 	UnivariatePolynomial<Rational> py(h, std::initializer_list<Rational>{-1, 1, 1});
 	Interval<Rational> iy(Rational("-212079")/Rational("131072"), BoundType::STRICT, -Rational("1696631")/Rational("1048576"), BoundType::STRICT);
-	RealAlgebraicNumber<Rational> ry = RealAlgebraicNumber<Rational>::create_safe(py, iy);
+	IntRepRealAlgebraicNumber<Rational> ry = IntRepRealAlgebraicNumber<Rational>::create_safe(py, iy);
 
-	carl::Assignment<RealAlgebraicNumber<Rational>> eval;
+	carl::Assignment<IntRepRealAlgebraicNumber<Rational>> eval;
 	eval.emplace(y,ry);
 	eval.emplace(x,Rational(0));
 
@@ -87,10 +87,10 @@ TEST(RealAlgebraicNumber, EvalBug2)
 	Variable h = fresh_real_variable("h"); 
 	UnivariatePolynomial<Rational> py(h, std::initializer_list<Rational>{11, 4, 6, 2});
 	Interval<Rational> iy(Rational("-3"), BoundType::STRICT, Rational("-2"), BoundType::STRICT);
-	RealAlgebraicNumber<Rational> ry = RealAlgebraicNumber<Rational>::create_safe(py, iy);
+	IntRepRealAlgebraicNumber<Rational> ry = IntRepRealAlgebraicNumber<Rational>::create_safe(py, iy);
 
 	//build assignment
-	carl::Assignment<RealAlgebraicNumber<Rational>> eval;
+	carl::Assignment<IntRepRealAlgebraicNumber<Rational>> eval;
 	eval.emplace(x0, Rational("-8"));
 	eval.emplace(x1, Rational("-4"));
 	eval.emplace(x2, ry);

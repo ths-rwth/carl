@@ -19,7 +19,7 @@ private:
 	Variable m_var;
 	MultivariatePolynomial<Number> m_original_poly;
 	UnivariatePolynomial<MultivariatePolynomial<Number>> m_poly;
-	std::map<Variable, const RealAlgebraicNumberInterval<Number>&> m_ir_assignments;
+	std::map<Variable, const IntRepRealAlgebraicNumber<Number>&> m_ir_assignments;
 
 public:
 	ran_evaluator(const MultivariatePolynomial<Number>& p)
@@ -28,7 +28,7 @@ public:
 		  m_poly(m_var, {MultivariatePolynomial<Number>(-m_original_poly), MultivariatePolynomial<Number>(1)})
 	{}
 
-	bool assign(const std::map<Variable, RealAlgebraicNumberInterval<Number>>& m, bool refine_model = true) {
+	bool assign(const std::map<Variable, IntRepRealAlgebraicNumber<Number>>& m, bool refine_model = true) {
 		bool evaluated = false;
 
 		for (const auto& [var, ran] : m) {
@@ -55,7 +55,7 @@ public:
 		return false;
 	}
 
-	bool assign(Variable var, const RealAlgebraicNumberInterval<Number>& ran, bool refine_model = true) {
+	bool assign(Variable var, const IntRepRealAlgebraicNumber<Number>& ran, bool refine_model = true) {
 		assert(m_ir_assignments.find(var) == m_ir_assignments.end());
 		if (m_original_poly.is_constant()) return true;
 		if (!m_poly.has(var)) return false;
@@ -96,7 +96,7 @@ public:
 	auto value() {
 		if (m_original_poly.is_constant()) {
 			CARL_LOG_TRACE("carl.ran.interval", "Poly is constant: " << m_original_poly);
-			return RealAlgebraicNumberInterval<Number>(m_original_poly.constant_part());
+			return IntRepRealAlgebraicNumber<Number>(m_original_poly.constant_part());
 		}
 
 		assert(carl::variables(m_poly).size() == 1 && m_poly.has(m_var));
@@ -115,7 +115,7 @@ public:
 		Interval<Number> interval = carl::evaluate(m_original_poly, var_to_interval);
 
 		if (interval.is_point_interval()) {
-			return RealAlgebraicNumberInterval<Number>(interval.lower());
+			return IntRepRealAlgebraicNumber<Number>(interval.lower());
 		}
 
 		auto sturm_seq = sturm_sequence(res);
@@ -139,9 +139,9 @@ public:
 			interval = carl::evaluate(m_original_poly, var_to_interval);
 		}
 		if (interval.is_point_interval()) {
-			return RealAlgebraicNumberInterval<Number>(interval.lower());
+			return IntRepRealAlgebraicNumber<Number>(interval.lower());
 		} else {
-			return RealAlgebraicNumberInterval<Number>(res, interval);
+			return IntRepRealAlgebraicNumber<Number>(res, interval);
 		}
 	}
 };
