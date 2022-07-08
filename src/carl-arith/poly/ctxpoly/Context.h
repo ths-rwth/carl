@@ -12,16 +12,16 @@ class Context {
 public:
     Context() = delete;
 
-    Context(const Context& rhs) {
-        m_variable_order = rhs.m_variable_order;
-    }
+    Context(const Context& ctx) : m_variable_order(ctx.m_variable_order) {}
+
+    Context(Context&& ctx) : m_variable_order(std::move(ctx.m_variable_order)) {}
 
     Context& operator=(const Context& rhs) {
         m_variable_order = rhs.m_variable_order;
         return *this;
     }
 
-    Context(const std::vector<Variable>& varOrder) : m_variable_order(std::make_shared<std::vector<Variable>>(varOrder)) {};
+    Context(const std::vector<Variable>& var_order) : m_variable_order(std::make_shared<std::vector<Variable>>(var_order)) {};
 
     const std::vector<Variable>& variable_order() const {
         return *m_variable_order;

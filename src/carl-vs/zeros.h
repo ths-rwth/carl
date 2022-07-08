@@ -161,11 +161,11 @@ static bool gather_zeros(const VariableComparison<Poly>& varcomp, const Variable
 			assert(factor.degree(eliminationVar) > 0);
 			if (factor.degree(eliminationVar) > 2) continue;
 
-			auto real_roots = ran::real_roots(carl::to_univariate_polynomial(factor, eliminationVar));
-			assert(real_roots.is_univariate());
-			auto it = std::find(real_roots.roots().begin(), real_roots.roots().end(), ran);
-			if (it != real_roots.roots().end()) {
-				size_t idx = std::distance(real_roots.roots().begin(), it);
+			auto roots = real_roots(carl::to_univariate_polynomial(factor, eliminationVar));
+			assert(roots.is_univariate());
+			auto it = std::find(roots.roots().begin(), roots.roots().end(), ran);
+			if (it != roots.roots().end()) {
+				size_t idx = std::distance(roots.roots().begin(), it);
 
 				auto varInfo = carl::var_info(factor,eliminationVar,true);
 				const auto& coeffs = varInfo.coeffs();

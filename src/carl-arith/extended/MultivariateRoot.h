@@ -134,10 +134,16 @@ void substitute_inplace(MultivariateRoot<Poly>& mr, Variable var, const Poly& po
 template<typename Poly>
 std::optional<typename MultivariateRoot<Poly>::RAN> evaluate(const MultivariateRoot<Poly>& mr, const carl::Assignment<typename MultivariateRoot<Poly>::RAN>& m) {
 	CARL_LOG_DEBUG("carl.rootexpression", "Evaluate: " << mr << " against: " << m);
-	auto poly = carl::to_univariate_polynomial(mr.poly(), mr.var());
-	auto result = carl::real_roots(poly, m);
+	
+	auto result = [&](){
+		if constexpr(needs_context_type<Poly>::value) {
+			return carl::real_roots(mr.poly(), m);
+		} else {
+			return carl::real_roots(carl::to_univariate_polynomial(mr.poly(), mr.var()), m);
+		}
+	}();
 	if (!result.is_univariate()) {
-		CARL_LOG_TRACE("carl.rootexpression", poly << " is not univariate (nullified: " << result.is_nullified() << "; non-univariate: " << result.is_non_univariate() << ").");
+		CARL_LOG_TRACE("carl.rootexpression", mr.poly() << " is not univariate (nullified: " << result.is_nullified() << "; non-univariate: " << result.is_non_univariate() << ").");
 		return std::nullopt;
 	}
 	CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << result.roots());

@@ -94,21 +94,21 @@ private:
 			return !m_content->polynomial && m_content->lower_sign == Sign::ZERO;
 		} else {
 			if (interval_int().contains(0) || interval_int().contains_integer()) {
-				CARL_LOG_DEBUG("carl.ran.ir", "Interval contains 0 or integer");
+				CARL_LOG_DEBUG("carl.ran.interval", "Interval contains 0 or integer");
 				return false;
 			}
 			if (polynomial_int().normalized() != carl::squareFreePart(polynomial_int()).normalized()) {
-				CARL_LOG_DEBUG("carl.ran.ir", "Poly is not square free: " << polynomial_int());
+				CARL_LOG_DEBUG("carl.ran.interval", "Poly is not square free: " << polynomial_int());
 				return false;
 			}
 			auto lsgn = carl::sgn(carl::evaluate(polynomial_int(), interval_int().lower()));
 			auto usgn = carl::sgn(carl::evaluate(polynomial_int(), interval_int().upper()));
 			if (lsgn == Sign::ZERO || usgn == Sign::ZERO || lsgn == usgn) {
-				CARL_LOG_DEBUG("carl.ran.ir", "Interval does not define a zero");
+				CARL_LOG_DEBUG("carl.ran.interval", "Interval does not define a zero");
 				return false;
 			}
 			if (m_content->lower_sign != lsgn) {
-				CARL_LOG_DEBUG("carl.ran.ir", "Lower sign does not match");
+				CARL_LOG_DEBUG("carl.ran.interval", "Lower sign does not match");
 				return false;
 			}
 			return true;
@@ -181,7 +181,7 @@ public:
 
 	RealAlgebraicNumberInterval(const Polynomial& p, const Interval<Number>& i)
 		: m_content(std::make_shared<content>(replaceVariable(p), i)) {
-		CARL_LOG_DEBUG("carl.ran.ir", "Creating (" << p << "," << i << ")");
+		CARL_LOG_DEBUG("carl.ran.interval", "Creating (" << p << "," << i << ")");
 		assert(!carl::is_zero(polynomial_int()) && polynomial_int().degree() > 0);
 		assert(interval_int().is_open_interval() || interval_int().is_point_interval());
 		// assert(interval_int().is_point_interval() || count_real_roots(sturm_sequence(), interval_int()) == 1);
@@ -284,7 +284,7 @@ public:
 		case 1:
 			return Sign::POSITIVE;
 		default:
-			CARL_LOG_ERROR("carl.ran", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
+			CARL_LOG_ERROR("carl.ran.interval", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
 			return Sign::ZERO;
 		}
 	}
@@ -370,20 +370,20 @@ Number ceil(const RealAlgebraicNumberInterval<Number>& n) {
 
 template<typename Number>
 bool compare(const RealAlgebraicNumberInterval<Number>& lhs, const RealAlgebraicNumberInterval<Number>& rhs, const Relation relation) {
-	CARL_LOG_DEBUG("carl.ran", "Compare " << lhs << " " << relation << " " << rhs);
+	CARL_LOG_DEBUG("carl.ran.interval", "Compare " << lhs << " " << relation << " " << rhs);
 
 	if (lhs.m_content.get() == rhs.m_content.get()) {
-		CARL_LOG_TRACE("carl.ran", "Contents are equal");
+		CARL_LOG_TRACE("carl.ran.interval", "Contents are equal");
 		return evaluate(Sign::ZERO, relation);
 	}
 
 	if (lhs.interval_int().is_point_interval() && rhs.interval_int().is_point_interval()) {
-		CARL_LOG_TRACE("carl.ran", "Point interval comparison");
+		CARL_LOG_TRACE("carl.ran.interval", "Point interval comparison");
 		return evaluate(lhs.interval_int().lower(), relation, rhs.interval_int().lower());
 	}
 
 	if (carl::set_have_intersection(lhs.interval_int(), rhs.interval_int())) {
-		CARL_LOG_TRACE("carl.ran", "Intervals " << lhs.interval_int() << " and " << rhs.interval_int() << " do intersect");
+		CARL_LOG_TRACE("carl.ran.interval", "Intervals " << lhs.interval_int() << " and " << rhs.interval_int() << " do intersect");
 		auto intersection = carl::set_intersection(lhs.interval_int(), rhs.interval_int());
 		assert(!intersection.is_empty());
 		lhs.refine_using(intersection.lower());
@@ -396,28 +396,28 @@ bool compare(const RealAlgebraicNumberInterval<Number>& lhs, const RealAlgebraic
 	// now: intervals are either equal or disjoint
 	assert(!carl::set_have_intersection(lhs.interval_int(), rhs.interval_int()) || lhs.interval_int() == rhs.interval_int());
 	if (lhs.interval_int() == rhs.interval_int()) {
-		CARL_LOG_TRACE("carl.ran", "Intervals " << lhs.interval_int() << " and " << rhs.interval_int() << " are equal");
+		CARL_LOG_TRACE("carl.ran.interval", "Intervals " << lhs.interval_int() << " and " << rhs.interval_int() << " are equal");
 		if (lhs.is_numeric()) {
-			CARL_LOG_TRACE("carl.ran", "Interval " << lhs.interval_int() << " is a point interval");
+			CARL_LOG_TRACE("carl.ran.interval", "Interval " << lhs.interval_int() << " is a point interval");
 			return evaluate(Sign::ZERO, relation);
 		}
 		if (lhs.polynomial_int() == rhs.polynomial_int()) {
-			CARL_LOG_TRACE("carl.ran", "Polynomials " << lhs.polynomial_int() << " and " << rhs.polynomial_int() << " are equal");
+			CARL_LOG_TRACE("carl.ran.interval", "Polynomials " << lhs.polynomial_int() << " and " << rhs.polynomial_int() << " are equal");
 			return evaluate(Sign::ZERO, relation);
 		}
 		auto g = carl::gcd(lhs.polynomial_int(), rhs.polynomial_int());
 		auto lsgn = carl::sgn(carl::evaluate(g, lhs.interval_int().lower()));
 		auto usgn = carl::sgn(carl::evaluate(g, lhs.interval_int().upper()));
 		if (lsgn != usgn) {
-			CARL_LOG_TRACE("carl.ran", "gcd(lhs,rhs) has a zero in the common interval");
+			CARL_LOG_TRACE("carl.ran.interval", "gcd(lhs,rhs) has a zero in the common interval");
 			lhs.set_polynomial(g, lsgn);
 			rhs.set_polynomial(g, lsgn);
 			return evaluate(Sign::ZERO, relation);
 		} else {
-			CARL_LOG_TRACE("carl.ran", "gcd(lhs,rhs) has no zero in the common interval");
+			CARL_LOG_TRACE("carl.ran.interval", "gcd(lhs,rhs) has no zero in the common interval");
 			if (relation == Relation::EQ) return false;
 			if (relation == Relation::NEQ) return true;
-			CARL_LOG_TRACE("carl.ran", "Refine until intervals become disjoint");
+			CARL_LOG_TRACE("carl.ran.interval", "Refine until intervals become disjoint");
 			while (lhs.interval_int() == rhs.interval_int()) {
 				lhs.refine();
 				rhs.refine();
@@ -425,7 +425,7 @@ bool compare(const RealAlgebraicNumberInterval<Number>& lhs, const RealAlgebraic
 		}
 	}
 	// now: intervals are disjoint
-	CARL_LOG_TRACE("carl.ran", "Intervals " << lhs.interval_int() << " and " << rhs.interval_int() << " are disjoint");
+	CARL_LOG_TRACE("carl.ran.interval", "Intervals " << lhs.interval_int() << " and " << rhs.interval_int() << " are disjoint");
 	assert(!carl::set_have_intersection(lhs.interval_int(), rhs.interval_int()));
 	if (lhs.interval_int().upper() <= rhs.interval_int().lower()) {
 		return relation == Relation::LESS || relation == Relation::LEQ;

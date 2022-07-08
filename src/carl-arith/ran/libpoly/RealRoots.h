@@ -14,12 +14,12 @@
 
 #include "LPRan.h"
 
-namespace carl::ran::libpoly {
+namespace carl {
 
-RealRootsResult<LPRealAlgebraicNumber> real_roots_libpoly(const LPPolynomial& polynomial, const Interval<LPRealAlgebraicNumber::NumberType>& interval = Interval<LPRealAlgebraicNumber::NumberType>::unbounded_interval());
+RealRootsResult<LPRealAlgebraicNumber> real_roots(const LPPolynomial& polynomial, const Interval<LPRealAlgebraicNumber::NumberType>& interval = Interval<LPRealAlgebraicNumber::NumberType>::unbounded_interval());
 
-RealRootsResult<LPRealAlgebraicNumber> real_roots_libpoly(const LPPolynomial& polynomial, const std::map<Variable, LPRealAlgebraicNumber>& m, const Interval<LPRealAlgebraicNumber::NumberType>& interval = Interval<LPRealAlgebraicNumber::NumberType>::unbounded_interval());
+RealRootsResult<LPRealAlgebraicNumber> real_roots(const LPPolynomial& polynomial, const std::map<Variable, LPRealAlgebraicNumber>& m, const Interval<LPRealAlgebraicNumber::NumberType>& interval = Interval<LPRealAlgebraicNumber::NumberType>::unbounded_interval());
 
-} // namespace carl::ran::libpoly
+}
 
 #endif

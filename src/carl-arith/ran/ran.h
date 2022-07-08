@@ -29,8 +29,8 @@
 #include <carl-common/config.h>
 
 
-#include "interval/ran_interval.h"
-#include "interval/ran_interval_evaluation.h"
+#include "interval/Ran.h"
+#include "interval/Evaluation.h"
 
 //#include "thom/ran_thom.h"
 //#include "thom/ran_thom_evaluation.h"

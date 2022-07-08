@@ -232,7 +232,7 @@ LPRealAlgebraicNumber LPRealAlgebraicNumber::abs() const {
 }
 
 std::size_t LPRealAlgebraicNumber::size() const {
-    //From ran_interval.h
+    //From Ran.h
     if (is_numeric()) {
         return carl::bitsize(get_lower_bound()) + carl::bitsize(get_upper_bound());
     } else {
@@ -327,7 +327,7 @@ NumberType branching_point(const LPRealAlgebraicNumber& n) {
 
 
 NumberType sample_above(const LPRealAlgebraicNumber& n) {
-	//return carl::floor(n.interval_int().upper()) + 1; From ran_interval.h
+	//return carl::floor(n.interval_int().upper()) + 1; From Ran.h
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling above: " << n);
 	refine(n);
 
@@ -336,7 +336,7 @@ NumberType sample_above(const LPRealAlgebraicNumber& n) {
 
 
 NumberType sample_below(const LPRealAlgebraicNumber& n) {
-	//return carl::ceil(n.interval_int().lower()) - 1; From ran_interval.h
+	//return carl::ceil(n.interval_int().lower()) - 1; From Ran.h
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling below: " << n);
 	refine(n);
 

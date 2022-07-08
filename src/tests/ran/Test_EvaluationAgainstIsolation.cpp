@@ -43,6 +43,6 @@ TEST(IsolationAndEvaluation, Comparison) {
 
 	varToRANMap.erase(a);
 
-	bool is_nullified = carl::ran::real_roots(carl::to_univariate_polynomial(poly, a), varToRANMap).is_nullified();
+	bool is_nullified = carl::real_roots(carl::to_univariate_polynomial(poly, a), varToRANMap).is_nullified();
 	EXPECT_TRUE(is_nullified);
 }

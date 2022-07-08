@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 
-#include <carl-arith/ran/interval/LazardEvaluation.h>
+#include <carl-arith/ran/interval/helper/LazardEvaluation.h>
 #include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
 
 #include "../Common.h"
