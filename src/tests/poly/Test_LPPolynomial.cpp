@@ -24,10 +24,10 @@ TEST(LPPOLYNOMIAL, createContext) {
     LPContext ctx3(var_order3);
     LPContext ctx3_2(ctx3.context());
 
-    EXPECT_EQ(ctx1.variable_order(), var_order1);
-    EXPECT_EQ(ctx2.variable_order(), var_order2);
-    EXPECT_EQ(ctx3.variable_order(), var_order2);
-    EXPECT_EQ(ctx3_2.variable_order(), var_order2);
+    EXPECT_EQ(ctx1.variable_ordering(), var_order1);
+    EXPECT_EQ(ctx2.variable_ordering(), var_order2);
+    EXPECT_EQ(ctx3.variable_ordering(), var_order2);
+    EXPECT_EQ(ctx3_2.variable_ordering(), var_order2);
     EXPECT_EQ(ctx3, ctx3_2);
 
     EXPECT_FALSE(ctx1 == ctx2);

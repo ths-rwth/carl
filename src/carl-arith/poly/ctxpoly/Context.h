@@ -23,12 +23,12 @@ public:
 
     Context(const std::vector<Variable>& var_order) : m_variable_order(std::make_shared<std::vector<Variable>>(var_order)) {};
 
-    const std::vector<Variable>& variable_order() const {
+    const std::vector<Variable>& variable_ordering() const {
         return *m_variable_order;
     }
 
     bool has(const Variable& var) const {
-        return std::find(variable_order().begin(), variable_order().end(), var) != variable_order().end();
+        return std::find(variable_ordering().begin(), variable_ordering().end(), var) != variable_ordering().end();
     };
 
     inline bool operator==(const Context& rhs) const {
@@ -37,7 +37,7 @@ public:
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Context& ctx) {
-    os << ctx.variable_order();
+    os << ctx.variable_ordering();
     return os;
 }
 

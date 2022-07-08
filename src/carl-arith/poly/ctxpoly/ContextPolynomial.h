@@ -22,9 +22,9 @@ private:
     static Variable main_var(const Context& ctx, const MultivariatePolynomial<Coeff, Ordering, Policies>& p) {
         auto pvars = carl::variables(p).as_vector();
         if (pvars.empty()) return carl::Variable::NO_VARIABLE;
-        for (const auto& v : pvars) assert(std::find(ctx.variable_order().begin(), ctx.variable_order().end(), v) != ctx.variable_order().end());
+        for (const auto& v : pvars) assert(std::find(ctx.variable_ordering().begin(), ctx.variable_ordering().end(), v) != ctx.variable_ordering().end());
         std::sort(pvars.begin(), pvars.end());
-        for (auto it = ctx.variable_order().rbegin(); it != ctx.variable_order().rend(); it++) {
+        for (auto it = ctx.variable_ordering().rbegin(); it != ctx.variable_ordering().rend(); it++) {
             if (binary_search(pvars.begin(), pvars.end(), *it)) return *it;
         }
         assert(false);
@@ -119,9 +119,9 @@ inline bool is_number(const ContextPolynomial<Coeff, Ordering, Policies>& p) {
 template<typename Coeff, typename Ordering, typename Policies>
 inline std::size_t level_of(const ContextPolynomial<Coeff, Ordering, Policies>& p) {
 	if (is_number(p)) return 0;
-	auto it = std::find(p.context().variable_order().begin(), p.context().variable_order().end(), p.main_var());
-	assert(it != p.context().variable_order().end());
-	return std::distance(p.context().variable_order().begin(), it)+1;
+	auto it = std::find(p.context().variable_ordering().begin(), p.context().variable_ordering().end(), p.main_var());
+	assert(it != p.context().variable_ordering().end());
+	return std::distance(p.context().variable_ordering().begin(), it)+1;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

@@ -483,9 +483,9 @@ inline bool is_univariate(const LPPolynomial& p) {
 
 inline std::size_t level_of(const LPPolynomial& p) {
 	if (is_number(p)) return 0;
-	auto it = std::find(p.context().variable_order().begin(), p.context().variable_order().end(), p.main_var());
-	assert(it != p.context().variable_order().end());
-	return std::distance(p.context().variable_order().begin(), it)+1;
+	auto it = std::find(p.context().variable_ordering().begin(), p.context().variable_ordering().end(), p.main_var());
+	assert(it != p.context().variable_ordering().end());
+	return std::distance(p.context().variable_ordering().begin(), it)+1;
 }
 
 /// Add the variables of the given polynomial to the variables.
