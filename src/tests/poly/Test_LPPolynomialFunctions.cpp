@@ -8,7 +8,7 @@
 #include <carl-arith/core/VariablePool.h>
 #include <carl-arith/poly/lp/LPContext.h>
 #include <carl-arith/poly/lp/LPPolynomial.h>
-#include <carl-arith/poly/lp/LPFunctions.h>
+#include <carl-arith/poly/lp/Functions.h>
 #include <carl-arith/ran/real_roots.h>
 #include <carl-arith/converter/LibpolyConverter.h>
 #include <carl-arith/poly/umvpoly/functions/Resultant.h>
