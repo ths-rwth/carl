@@ -13,8 +13,8 @@
 #include "../../converter/LibpolyConverter.h"
 #include "../../core/Relation.h"
 
-#include "../ran_operations.h"
-#include "../ran_operations_number.h"
+#include "../common/Operations.h"
+#include "../common/NumberOperations.h"
 
 
 namespace carl {
@@ -110,10 +110,6 @@ public:
 		return &m_content;
 	}
 
-	bool is_zero() const;
-	bool is_integral() const;
-	NumberType integer_below() const;
-
 	/**
 	 * @return true if the interval is a point or the poly has degree 1
 	 */
@@ -136,17 +132,6 @@ public:
 	 * Asserts that the interval is a point or the poly has max degree 1
 	 */
 	const NumberType value() const;
-
-	/**
-	 * Does not change the current value, checks the sign and returns a copy or negates if necessary
-	 * @return Absolute Value of the stored RAN
-	 */
-	LPRealAlgebraicNumber abs() const;
-
-	std::size_t size() const;
-	Sign sgn() const;
-	Sign sgn(const UnivariatePolynomial<NumberType>& p) const;
-	bool contained_in(const Interval<NumberType>& i) const;
 
 	friend bool compare(const LPRealAlgebraicNumber&, const LPRealAlgebraicNumber&, const Relation);
 	friend bool compare(const LPRealAlgebraicNumber&, const NumberType&, const Relation);
@@ -179,8 +164,17 @@ void refine_using(const LPRealAlgebraicNumber& n, const poly::DyadicRational& pi
 
 inline bool is_zero(const LPRealAlgebraicNumber& n) {
 	refine(n);
-	return n.is_zero();
+	return lp_algebraic_number_sgn(n.get_internal()) == 0;
 }
+
+bool is_integer(const LPRealAlgebraicNumber& n);
+LPRealAlgebraicNumber::NumberType integer_below(const LPRealAlgebraicNumber& n);
+LPRealAlgebraicNumber abs(const LPRealAlgebraicNumber& n);
+
+std::size_t size(const LPRealAlgebraicNumber& n);
+Sign sgn(const LPRealAlgebraicNumber& n);
+Sign sgn(const LPRealAlgebraicNumber& n, const UnivariatePolynomial<LPRealAlgebraicNumber::NumberType>& p);
+bool contained_in(const LPRealAlgebraicNumber& n, const Interval<LPRealAlgebraicNumber::NumberType>& i);
 
 std::ostream& operator<<(std::ostream& os, const LPRealAlgebraicNumber& ran);
 

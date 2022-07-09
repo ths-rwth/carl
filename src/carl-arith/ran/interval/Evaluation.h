@@ -68,7 +68,7 @@ std::optional<IntRepRealAlgebraicNumber<Number>> evaluate(MultivariatePolynomial
 		auto poly = carl::to_univariate_polynomial(p);
 		assert(poly.main_var() == var_to_interval.begin()->first);
 		CARL_LOG_TRACE("carl.ran.interval", "Consider univariate poly " << poly);
-		if (m.at(var_to_interval.begin()->first).sgn(poly) == Sign::ZERO) {
+		if (sgn(m.at(var_to_interval.begin()->first), poly) == Sign::ZERO) {
 			CARL_LOG_DEBUG("carl.ran.interval", "Returning " << IntRepRealAlgebraicNumber<Number>());
 			return IntRepRealAlgebraicNumber<Number>();
 		}
@@ -146,7 +146,7 @@ boost::tribool evaluate(const BasicConstraint<MultivariatePolynomial<Number>>& c
 		CARL_LOG_DEBUG("carl.ran.interval", "Evaluate constraint by evaluating poly");
 		auto res = evaluate(c.lhs(), m);
 		if (!res) return boost::indeterminate;
-		else return evaluate(res->sgn(), c.relation());
+		else return evaluate(sgn(res), c.relation());
 	} else {
 		MultivariatePolynomial<Number> p = c.lhs();
 
@@ -204,7 +204,7 @@ boost::tribool evaluate(const BasicConstraint<MultivariatePolynomial<Number>>& c
 			auto poly = carl::to_univariate_polynomial(p);
 			assert(poly.main_var() == var_to_interval.begin()->first);
 			CARL_LOG_TRACE("carl.ran.interval", "Consider univariate poly " << poly);
-			if (m.at(var_to_interval.begin()->first).sgn(poly) == Sign::ZERO) {
+			if (sgn(m.at(var_to_interval.begin()->first), poly) == Sign::ZERO) {
 				CARL_LOG_DEBUG("carl.ran.interval", "Got " << IntRepRealAlgebraicNumber<Number>());
 				return evaluate(Sign::ZERO, constr.relation());
 			}

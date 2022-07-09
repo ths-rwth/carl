@@ -9,7 +9,7 @@
 #include <carl-arith/poly/libpoly/LPContext.h>
 #include <carl-arith/poly/libpoly/LPPolynomial.h>
 #include <carl-arith/poly/libpoly/Functions.h>
-#include <carl-arith/ran/real_roots.h>
+#include <carl-arith/ran/ran.h>
 #include <carl-arith/converter/LibpolyConverter.h>
 #include <carl-arith/poly/umvpoly/functions/Resultant.h>
 #include <carl-arith/poly/umvpoly/functions/Factorization.h>

@@ -4,7 +4,7 @@
 
 #ifdef USE_LIBPOLY
 
-#include "../real_roots_common.h"
+#include "../common/RealRoots.h"
 #include <carl-arith/core/Variable.h>
 
 #include <carl-arith/converter/LibpolyConverter.h>

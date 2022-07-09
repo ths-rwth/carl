@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Model.h"
-#include <carl-arith/ran/real_roots.h>
+
 #include <carl-arith/poly/umvpoly/functions/to_univariate_polynomial.h>
 #include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>

@@ -31,6 +31,7 @@
 
 #include "interval/Ran.h"
 #include "interval/Evaluation.h"
+#include "interval/RealRoots.h"
 
 //#include "thom/ran_thom.h"
 //#include "thom/ran_thom_evaluation.h"
@@ -38,4 +39,5 @@
 #ifdef USE_LIBPOLY
 #include "libpoly/LPRan.h"
 #include "libpoly/Evaluation.h"
+#include "libpoly/RealRoots.h"
 #endif

@@ -38,7 +38,7 @@ namespace carl {
 		// if (res.isRational()) {
 		// 	  res = evaluate(res.asRational(), c.relation());
 		// } else if (res.isRAN()) {
-		// 	  res = evaluate(res.asRAN().sgn(), c.relation());
+		// 	  res = evaluate(sgn(res.asRAN()), c.relation());
 		// } else {
 		res = createSubstitution<Rational,Poly,ModelFormulaSubstitution<Rational,Poly>>(Formula<Poly>(Constraint<Poly>(p, c.relation())));
 		// }

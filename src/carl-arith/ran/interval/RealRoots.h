@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../real_roots_common.h"
+#include "../common/RealRoots.h"
 #include "Ran.h"
 #include "helper/internal.h"
 #include <carl-arith/interval/Interval.h>

@@ -13,8 +13,8 @@
 #include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>
 #include <carl-arith/interval/set_theory.h>
 
-#include "../ran_operations.h"
-#include "../ran_operations_number.h"
+#include "../common/Operations.h"
+#include "../common/NumberOperations.h"
 
 #include <list>
 #include <boost/logic/tribool.hpp>
@@ -23,8 +23,6 @@ namespace carl {
 
 template<typename Number>
 class IntRepRealAlgebraicNumber {
-	using Polynomial = UnivariatePolynomial<Number>;
-	
 	static const Variable auxVariable;
 
 	template<typename Num>
@@ -63,18 +61,21 @@ class IntRepRealAlgebraicNumber {
 	template<typename Num>
 	friend Num ceil(const IntRepRealAlgebraicNumber<Num>& n);
 
+	template<typename Num>
+	friend Sign sgn(const IntRepRealAlgebraicNumber<Num>& n, const UnivariatePolynomial<Num>& p);
+
 private:
 	struct content {
-		std::optional<Polynomial> polynomial;
+		std::optional<UnivariatePolynomial<Number>> polynomial;
 		Interval<Number> interval;
 		/// Sign of polynomial at interval.lower()
 		Sign lower_sign;
 
 		content(const Interval<Number>& i)
 			: polynomial(std::nullopt), interval(i), lower_sign(Sign::ZERO) {}
-		content(Polynomial&& p, const Interval<Number>& i)
+		content(UnivariatePolynomial<Number>&& p, const Interval<Number>& i)
 			: polynomial(std::move(p)), interval(i), lower_sign(Sign::ZERO) {}
-		content(const Polynomial& p, const Interval<Number>& i)
+		content(const UnivariatePolynomial<Number>& p, const Interval<Number>& i)
 			: polynomial(p), interval(i), lower_sign(Sign::ZERO) {}
 		void simplify_to_point() {
 			assert(interval.is_point_interval());
@@ -85,7 +86,7 @@ private:
 
 	mutable std::shared_ptr<content> m_content;
 
-	static Polynomial replaceVariable(const Polynomial& p) {
+	static UnivariatePolynomial<Number> replace_variable(const UnivariatePolynomial<Number>& p) {
 		return carl::replace_main_variable(p, auxVariable);
 	}
 
@@ -115,9 +116,9 @@ private:
 		}
 	}
 
-	void set_polynomial(const Polynomial& p, Sign lower_sign) const {
+	void set_polynomial(const UnivariatePolynomial<Number>& p, Sign lower_sign) const {
 		assert(!interval_int().is_point_interval());
-		polynomial_int() = replaceVariable(p);
+		polynomial_int() = replace_variable(p);
 		m_content->lower_sign = lower_sign;
 		assert(is_consistent());
 	}
@@ -179,8 +180,8 @@ public:
 	IntRepRealAlgebraicNumber(const Number& n)
 		: m_content(std::make_shared<content>(Interval<Number>(n))) {}
 
-	IntRepRealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i)
-		: m_content(std::make_shared<content>(replaceVariable(p), i)) {
+	IntRepRealAlgebraicNumber(const UnivariatePolynomial<Number>& p, const Interval<Number>& i)
+		: m_content(std::make_shared<content>(replace_variable(p), i)) {
 		CARL_LOG_DEBUG("carl.ran.interval", "Creating (" << p << "," << i << ")");
 		assert(!carl::is_zero(polynomial_int()) && polynomial_int().degree() > 0);
 		assert(interval_int().is_open_interval() || interval_int().is_point_interval());
@@ -206,19 +207,10 @@ public:
 	IntRepRealAlgebraicNumber& operator=(const IntRepRealAlgebraicNumber& n) = default;
 	IntRepRealAlgebraicNumber& operator=(IntRepRealAlgebraicNumber&& n) = default;
 
-	static IntRepRealAlgebraicNumber<Number> create_safe(const Polynomial& p, const Interval<Number>& i) {
+	static IntRepRealAlgebraicNumber<Number> create_safe(const UnivariatePolynomial<Number>& p, const Interval<Number>& i) {
 		return IntRepRealAlgebraicNumber<Number>(carl::squareFreePart(p), i);
 	}
 
-	bool is_zero() const {
-		return carl::is_zero(interval_int());
-	}
-	bool is_integral() const {
-		return interval_int().is_point_interval() && carl::is_integer(interval_int().lower());
-	}
-	Number integer_below() const {
-		return carl::floor(interval_int().lower());
-	}
 	bool is_numeric() const {
 		return interval_int().is_point_interval();
 	}
@@ -235,68 +227,6 @@ public:
 	const auto& value() const {
 		assert(is_numeric());
 		return interval_int().lower();
-	}
-
-	IntRepRealAlgebraicNumber<Number> abs() const {
-		assert(!interval_int().contains(constant_zero<Number>::get()) || interval_int().is_point_interval());
-		if (interval_int().is_semi_positive()) {
-			return *this;
-		}
-		else {
-			if (is_numeric()) {
-				return IntRepRealAlgebraicNumber<Number>(carl::abs(value()));
-			} else {
-				return IntRepRealAlgebraicNumber<Number>(polynomial_int().negate_variable(), interval_int().abs());
-			}
-		}
-	}
-
-	std::size_t size() const {
-		if (is_numeric()) {
-			return carl::bitsize(interval_int().lower()) + carl::bitsize(interval_int().upper());
-		} else {
-			return carl::bitsize(interval_int().lower()) + carl::bitsize(interval_int().upper()) + polynomial_int().degree();
-		}
-	}
-
-	Sign sgn() const {
-		if (interval_int().is_point_interval()) return carl::sgn(interval_int().lower());
-		assert(!interval_int().contains(constant_zero<Number>::get()));
-		if (interval_int().is_semi_positive())
-			return Sign::POSITIVE;
-		else {
-			assert(interval_int().is_semi_negative());
-			return Sign::NEGATIVE;
-		}
-	}
-
-	Sign sgn(const Polynomial& p) const {
-		Polynomial tmp = replaceVariable(p);
-		if (polynomial_int() == tmp) return Sign::ZERO;
-		auto seq = carl::sturm_sequence(polynomial_int(), derivative(polynomial_int()) * tmp);
-		int variations = carl::count_real_roots(seq, interval_int());
-		assert((variations == -1) || (variations == 0) || (variations == 1));
-		switch (variations) {
-		case -1:
-			return Sign::NEGATIVE;
-		case 0:
-			return Sign::ZERO;
-		case 1:
-			return Sign::POSITIVE;
-		default:
-			CARL_LOG_ERROR("carl.ran.interval", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
-			return Sign::ZERO;
-		}
-	}
-
-	bool contained_in(const Interval<Number>& i) const {
-		if (!is_numeric() && interval_int().contains(i.lower())) {
-			refine_internal(i.lower());
-		}
-		if (!is_numeric() && interval_int().contains(i.upper())) {
-			refine_internal(i.upper());
-		}
-		return i.contains(interval_int());
 	}
 
 	auto& polynomial_int() const {
@@ -366,6 +296,88 @@ Number floor(const IntRepRealAlgebraicNumber<Number>& n) {
 template<typename Number>
 Number ceil(const IntRepRealAlgebraicNumber<Number>& n) {
 	return carl::ceil(n.interval_int().upper());
+}
+
+template<typename Number>
+inline bool is_zero(const IntRepRealAlgebraicNumber<Number>& n) {
+	return carl::is_zero(n.interval_int());
+}
+
+template<typename Number>
+inline bool is_integer(const IntRepRealAlgebraicNumber<Number>& n) {
+	return n.interval_int().is_point_interval() && carl::is_integer(n.interval_int().lower());
+}
+
+template<typename Number>
+inline Number integer_below(const IntRepRealAlgebraicNumber<Number>& n) {
+	return carl::floor(n.interval_int().lower());
+}
+
+template<typename Number>
+static IntRepRealAlgebraicNumber<Number> abs(const IntRepRealAlgebraicNumber<Number>& n) {
+	assert(!n.interval_int().contains(constant_zero<Number>::get()) || n.interval_int().is_point_interval());
+	if (n.interval_int().is_semi_positive()) {
+		return n;
+	}
+	else {
+		if (n.is_numeric()) {
+			return IntRepRealAlgebraicNumber<Number>(carl::abs(n.value()));
+		} else {
+			return IntRepRealAlgebraicNumber<Number>(n.polynomial_int().negate_variable(), abs(n.interval_int()));
+		}
+	}
+}
+
+template<typename Number>
+std::size_t size(const IntRepRealAlgebraicNumber<Number>& n) {
+	if (n.is_numeric()) {
+		return carl::bitsize(n.interval_int().lower()) + carl::bitsize(n.interval_int().upper());
+	} else {
+		return carl::bitsize(n.interval_int().lower()) + carl::bitsize(n.interval_int().upper()) + n.polynomial_int().degree();
+	}
+}
+
+template<typename Number>
+Sign sgn(const IntRepRealAlgebraicNumber<Number>& n) {
+	if (n.interval_int().is_point_interval()) return carl::sgn(n.interval_int().lower());
+	assert(!n.interval_int().contains(constant_zero<Number>::get()));
+	if (n.interval_int().is_semi_positive())
+		return Sign::POSITIVE;
+	else {
+		assert(n.interval_int().is_semi_negative());
+		return Sign::NEGATIVE;
+	}
+}
+
+template<typename Number>
+Sign sgn(const IntRepRealAlgebraicNumber<Number>& n, const UnivariatePolynomial<Number>& p) {
+	UnivariatePolynomial<Number> tmp = IntRepRealAlgebraicNumber<Number>::replace_variable(p);
+	if (n.polynomial_int() == tmp) return Sign::ZERO;
+	auto seq = carl::sturm_sequence(n.polynomial_int(), derivative(n.polynomial_int()) * tmp);
+	int variations = carl::count_real_roots(seq, n.interval_int());
+	assert((variations == -1) || (variations == 0) || (variations == 1));
+	switch (variations) {
+	case -1:
+		return Sign::NEGATIVE;
+	case 0:
+		return Sign::ZERO;
+	case 1:
+		return Sign::POSITIVE;
+	default:
+		CARL_LOG_ERROR("carl.ran.interval", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
+		return Sign::ZERO;
+	}
+}
+
+template<typename Number>
+bool contained_in(const IntRepRealAlgebraicNumber<Number>& n, const Interval<Number>& i) {
+	if (!n.is_numeric() && n.interval_int().contains(i.lower())) {
+		n.refine_internal(i.lower());
+	}
+	if (!n.is_numeric() && n.interval_int().contains(i.upper())) {
+		n.refine_internal(i.upper());
+	}
+	return i.contains(n.interval_int());
 }
 
 template<typename Number>
@@ -479,7 +491,7 @@ namespace std {
 template<typename Number>
 struct hash<carl::IntRepRealAlgebraicNumber<Number>> {
     std::size_t operator()(const carl::IntRepRealAlgebraicNumber<Number>& n) const {
-		return carl::hash_all(n.integer_below());
+		return carl::hash_all(integer_below(n));
 	}
 };
 }

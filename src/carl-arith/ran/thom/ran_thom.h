@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ThomEncoding.h"
-#include "../ran_operations.h"
+#include "../common/Operations.h""
 
 
 #include <memory>
