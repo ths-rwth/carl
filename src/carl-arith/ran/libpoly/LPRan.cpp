@@ -213,7 +213,7 @@ LPRealAlgebraicNumber abs(const LPRealAlgebraicNumber& n) {
     }
 
     int sign = lp_algebraic_number_sgn(n.get_internal());
-    CARL_LOG_DEBUG("carl.ran.libpoly", "Algebraic NumberType abs got sign : " << sign << " of " << *this);
+    CARL_LOG_DEBUG("carl.ran.libpoly", "Algebraic NumberType abs got sign : " << sign << " of " << n);
 
     if (sign >= 0) {
         return LPRealAlgebraicNumber(n);
@@ -255,7 +255,7 @@ Sign sgn(const LPRealAlgebraicNumber& n, const UnivariatePolynomial<LPRealAlgebr
 }
 
 bool contained_in(const LPRealAlgebraicNumber& n, const Interval<LPRealAlgebraicNumber::NumberType>& i) {
-    CARL_LOG_DEBUG("carl.ran.libpoly", "ran " << *this << " contained in " << i);
+    CARL_LOG_DEBUG("carl.ran.libpoly", "ran " << n << " contained in " << i);
 
     poly::Interval inter = to_libpoly_interval(i);
 

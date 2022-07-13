@@ -78,6 +78,8 @@ public:
         // because libpoly handles the variable order exactly the other way around
         // i.e the main Variable is not the fist one but the last one
         const lp_variable_list_t* varList = lp_variable_order_get_list(m_context->var_order);
+        CARL_LOG_DEBUG("carl.poly", "Variable list size: " << lp_variable_list_size(varList));
+        m_variable_order = std::make_shared<std::vector<Variable>>();
         for (size_t i = lp_variable_list_size(varList); i-- > 0;) {
             m_variable_order->push_back(VariableMapper::getInstance().getCarlVariable(poly::Variable(varList->list[i])));
         }
@@ -103,7 +105,7 @@ public:
      * @brief Returns true if the underlying variable ordering is the same as the given one.
      */
     inline bool operator==(const LPContext& rhs) const {
-        return m_variable_order == rhs.m_variable_order;
+        return variable_ordering() == rhs.variable_ordering();
     }
 };
 
