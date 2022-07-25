@@ -2,7 +2,7 @@
 
 #include "../Common.h"
 
-#include <carl-arith/converter/CoCoAAdaptor.h>
+#include <carl-arith/poly/umvpoly/CoCoAAdaptor.h>
 #include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-arith/poly/umvpoly/functions/CoprimePart.h>
 #include <carl-arith/poly/umvpoly/functions/SquareFreePart.h>

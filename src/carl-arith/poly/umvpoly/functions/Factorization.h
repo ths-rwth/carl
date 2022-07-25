@@ -3,7 +3,7 @@
 #include "Power.h"
 
 #include <carl-logging/carl-logging.h>
-#include <carl-arith/converter/CoCoAAdaptor.h>
+#include "../CoCoAAdaptor.h"
 #include <carl-arith/converter/OldGinacConverter.h>
 #include <carl-arith/core/Common.h>
 

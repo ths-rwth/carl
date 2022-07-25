@@ -1,6 +1,6 @@
 #pragma once
 
-#include <carl-arith/converter/CoCoAAdaptor.h>
+#include "../CoCoAAdaptor.h"
 #include <carl-logging/carl-logging.h>
 
 namespace carl {
