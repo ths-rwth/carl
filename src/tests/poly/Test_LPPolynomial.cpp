@@ -7,6 +7,7 @@
 #include <carl-arith/core/VariablePool.h>
 #include <carl-arith/poly/libpoly/LPContext.h>
 #include <carl-arith/poly/libpoly/LPPolynomial.h>
+#include <carl-arith/poly/Conversion.h>
 
 using namespace carl;
 
@@ -227,6 +228,30 @@ TEST(LPPOLYNOMIAL, CoPrimeFactor) {
     std::cout << res1.coprime_coefficients() << std::endl ; 
     std::cout << res2.coprime_coefficients() << std::endl ;
 }
+
+TEST(LPPOLYNOMIAL, ConvertToMultivariate){
+    auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+
+    LPContext ctx({x, y});
+
+    LPPolynomial lp_polyX(ctx, x);
+    LPPolynomial lp_polyY(ctx, y);
+
+    carl::MultivariatePolynomial<mpq_class> carl_polyX(x);
+    carl::MultivariatePolynomial<mpq_class> carl_polyY(y);
+
+    LPPolynomial lp_poly = lp_polyX * lp_polyY * lp_polyY + lp_polyX;
+    carl::MultivariatePolynomial<mpq_class> carl_poly = carl_polyX * carl_polyY * carl_polyY + carl_polyX;
+
+    carl::MultivariatePolynomial<mpq_class> converted_lp = convert<mpq_class, GrLexOrdering, StdMultivariatePolynomialPolicies<>>(lp_poly);
+    LPPolynomial converted_carl = convert(ctx, carl_poly);
+
+    EXPECT_EQ(converted_lp, carl_poly);
+    EXPECT_EQ(converted_carl, lp_poly);
+}
+
+
 
 
 #endif

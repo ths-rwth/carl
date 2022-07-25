@@ -57,6 +57,17 @@ LPPolynomial::LPPolynomial(const LPContext& context, long val)
     assert(lp_polynomial_check_order(m_poly.get_internal()));
 }
 
+LPPolynomial::LPPolynomial(const LPContext& context, const mpz_class& val)
+    : m_context(context) {
+    
+    lp_polynomial_construct_simple(m_poly.get_internal(), context.context(), val.get_mpz_t(), lp_variable_null, 0) ;
+
+
+    assert(lp_polynomial_check_order(m_poly.get_internal()));
+}
+
+
+
 LPPolynomial::LPPolynomial(const LPContext& context, const Variable& var, const mpz_class& coeff, unsigned int degree)
     : m_context(context) {
     lp_polynomial_construct_simple(m_poly.get_internal(), context.context(), poly::Integer(coeff).get_internal(), VariableMapper::getInstance().getLibpolyVariable(var).get_internal(), degree);

@@ -89,6 +89,12 @@ public:
 	LPPolynomial(const LPContext& context, long val);
 
 	/**
+	 * Construct a LPPolynomial with only a integer.
+	 * @param mainPoly Libpoly Polynomial.
+	 */
+	LPPolynomial(const LPContext& context, const mpz_class& val);
+
+	/**
 	 * Construct from context and variable
 	 *  @param context Context of libpoly polynomial
 	 * @param var The main variable of the polynomial
