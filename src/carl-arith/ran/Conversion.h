@@ -4,26 +4,41 @@
 
 namespace carl {
 
-template<typename T, typename = std::enable_if_t<is_ran_type<T>::value>>
-T convert(const T& r) {
+template<typename T, std::enable_if_t<is_ran_type<T>::value, int> = 0>
+inline T convert(const T& r) {
     return r;
 }
 
+namespace convert_ran {
+template<typename T, typename S>
+struct ConvertHelper {};
+
 #ifdef USE_LIBPOLY
 template<typename R>
-LPRealAlgebraicNumber convert(const carl::IntRepRealAlgebraicNumber<R>& r) {
-    if(r.is_numeric()){
-        return LPRealAlgebraicNumber(r.value()) ; 
+struct ConvertHelper<LPRealAlgebraicNumber, IntRepRealAlgebraicNumber<R>> {
+    static LPRealAlgebraicNumber convert(const IntRepRealAlgebraicNumber<R>& r) {
+        if(r.is_numeric()){
+            return LPRealAlgebraicNumber(r.value()) ; 
+        }
+        return LPRealAlgebraicNumber(r.polynomial(), r.interval());
     }
-    return LPRealAlgebraicNumber(r.polynomial(), r.interval());
-}
+};
+
 template<typename R>
-IntRepRealAlgebraicNumber<R> convert(const LPRealAlgebraicNumber& r) {
-    if(r.is_numeric()){
-        return IntRepRealAlgebraicNumber<R>(r.value());
-    } 
-    return IntRepRealAlgebraicNumber<R>(r.polynomial(), r.interval());
-}
+struct ConvertHelper<IntRepRealAlgebraicNumber<R>, LPRealAlgebraicNumber> {
+    static IntRepRealAlgebraicNumber<R> convert(const LPRealAlgebraicNumber& r) {
+        if(r.is_numeric()){
+            return IntRepRealAlgebraicNumber<R>(r.value());
+        } 
+        return IntRepRealAlgebraicNumber<R>(r.polynomial(), r.interval());
+    }
+};
 #endif
+}
+
+template<typename T, typename S, std::enable_if_t<is_ran_type<T>::value && is_ran_type<S>::value && !std::is_same<T,S>::value, int> = 0>
+inline T convert(const S& r) {
+    return convert_ran::ConvertHelper<T,S>::convert(r);
+}
 
 }; // namespace carl

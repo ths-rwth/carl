@@ -97,6 +97,9 @@ template<typename Coeff, typename Ordering, typename Policies>
 struct needs_context_type<ContextPolynomial<Coeff, Ordering, Policies>> : std::true_type {};
 
 template<typename Coeff, typename Ordering, typename Policies>
+struct is_polynomial_type<ContextPolynomial<Coeff, Ordering, Policies>>: std::true_type {};
+
+template<typename Coeff, typename Ordering, typename Policies>
 inline bool is_constant(const ContextPolynomial<Coeff, Ordering, Policies>& p) {
     return is_constant(p.content());
 }

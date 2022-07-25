@@ -244,8 +244,8 @@ TEST(LPPOLYNOMIAL, ConvertToMultivariate){
     LPPolynomial lp_poly = lp_polyX * lp_polyY * lp_polyY + lp_polyX;
     carl::MultivariatePolynomial<mpq_class> carl_poly = carl_polyX * carl_polyY * carl_polyY + carl_polyX;
 
-    carl::MultivariatePolynomial<mpq_class> converted_lp = convert<mpq_class, GrLexOrdering, StdMultivariatePolynomialPolicies<>>(lp_poly);
-    LPPolynomial converted_carl = convert(ctx, carl_poly);
+    carl::MultivariatePolynomial<mpq_class> converted_lp = convert<carl::MultivariatePolynomial<mpq_class>>(lp_poly);
+    LPPolynomial converted_carl = convert<LPPolynomial>(ctx, carl_poly);
 
     EXPECT_EQ(converted_lp, carl_poly);
     EXPECT_EQ(converted_carl, lp_poly);

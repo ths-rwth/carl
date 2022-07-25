@@ -515,6 +515,9 @@ inline void variables(const LPPolynomial& p, carlVariables& vars) {
 template<>
 struct needs_context_type<LPPolynomial> : std::true_type {};
 
+template<>
+struct is_polynomial_type<LPPolynomial> : std::true_type {};
+
 } // namespace carl
 
 namespace std {

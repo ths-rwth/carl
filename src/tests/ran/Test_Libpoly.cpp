@@ -158,8 +158,8 @@ TEST(LIBPOLY, convertRan) {
 		CARL_LOG_DEBUG("carl.ran", "Roots of Poly: " << pol << ":   " << roots);
 
         for (LPRealAlgebraicNumber& root : roots) {
-            carl::IntRepRealAlgebraicNumber<mpq_class> conv = convert<mpq_class>(root);
-            carl::LPRealAlgebraicNumber converted_back = convert(conv);
+            carl::IntRepRealAlgebraicNumber<mpq_class> conv = convert<carl::IntRepRealAlgebraicNumber<mpq_class>>(root);
+            carl::LPRealAlgebraicNumber converted_back = convert<carl::LPRealAlgebraicNumber>(conv);
             EXPECT_EQ(root, converted_back);
         }
     }
