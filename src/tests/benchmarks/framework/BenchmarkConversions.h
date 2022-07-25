@@ -4,7 +4,7 @@
 #include "../config.h"
 #include <carl-arith/converter/CArLConverter.h>
 #ifdef USE_COCOA
-#include <carl-arith/converter/CoCoAAdaptor.h>
+#include <carl-arith/poly/umvpoly/CoCoAAdaptor.h>
 #endif
 #ifdef USE_GINAC
 #include <carl-arith/converter/GiNaCConverter.h>

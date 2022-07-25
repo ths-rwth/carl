@@ -2,9 +2,6 @@
 
 #include "../Common.h"
 
-// #include <carl-arith/converter/CoCoAAdaptor.h>
-
-
 #ifdef USE_COCOA
 
 #include "CoCoA/library.H"

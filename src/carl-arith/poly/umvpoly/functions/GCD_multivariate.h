@@ -5,7 +5,7 @@
 #include <carl-arith/numbers/typetraits.h>
 #include <carl-arith/poly/umvpoly/functions/to_univariate_polynomial.h>
 
-#include <carl-arith/converter/CoCoAAdaptor.h>
+#include "../CoCoAAdaptor.h"
 #include <carl-arith/converter/OldGinacConverter.h>
 
 namespace carl {

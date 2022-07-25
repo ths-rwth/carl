@@ -19,7 +19,7 @@
 #include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
 #ifdef USE_COCOA
-#include <carl-arith/converter/CoCoAAdaptor.h>
+#include <carl-arith/poly/umvpoly/CoCoAAdaptor.h>
 #endif
 
 #include <carl-arith/poly/umvpoly/functions/Remainder.h>
