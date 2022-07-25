@@ -22,7 +22,7 @@ IntRepRealAlgebraicNumber<R> convert(const LPRealAlgebraicNumber& r) {
     if(r.is_numeric()){
         return IntRepRealAlgebraicNumber<R>(r.value());
     } 
-    return IntRepRealAlgebraicNumber<R>(r.polynomial(), r.interval()); // TODO add conversion here
+    return IntRepRealAlgebraicNumber<R>(r.polynomial(), r.interval());
 }
 #endif
 
