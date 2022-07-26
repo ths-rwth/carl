@@ -89,6 +89,13 @@ public:
 	LPPolynomial(const LPContext& context, long val);
 
 	/**
+	 * Construct a LPPolynomial with only a rational.
+	 * Attention: Just the numerator is taken!
+	 * @param mainPoly Libpoly Polynomial.
+	 */
+	LPPolynomial(const LPContext& context, const mpq_class& val);
+
+	/**
 	 * Construct a LPPolynomial with only a integer.
 	 * @param mainPoly Libpoly Polynomial.
 	 */

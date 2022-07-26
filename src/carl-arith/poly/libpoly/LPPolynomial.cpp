@@ -66,6 +66,8 @@ LPPolynomial::LPPolynomial(const LPContext& context, const mpz_class& val)
     assert(lp_polynomial_check_order(m_poly.get_internal()));
 }
 
+LPPolynomial::LPPolynomial(const LPContext& context, const mpq_class& val) : LPPolynomial(context, carl::get_num(val)) {}
+
 
 
 LPPolynomial::LPPolynomial(const LPContext& context, const Variable& var, const mpz_class& coeff, unsigned int degree)
@@ -411,6 +413,23 @@ std::size_t LPPolynomial::degree(Variable::Arg var) const {
     return travers.degree;
 }
 
+mpz_class LPPolynomial::unit_part() const {
+    //As we can only have integer coefficients, they do not form a field
+    //Thus the unit part is the sign of the leading coefficient, if it is not zero
+    //Is the Poly is zero unit part is one
+    if(is_zero(*this)) {
+        return 1 ; 
+    }
+    return poly::lc_sgn(this->get_polynomial()) ;
+    
+}
+
+LPPolynomial LPPolynomial::normalized() const {
+    auto unit = unit_part() ; 
+    assert(!is_zero(unit)) ;
+    return (*this) * unit ;  
+}
+
 LPPolynomial LPPolynomial::coeff(Variable::Arg var, std::size_t exp) const {
     struct coeff_travers {
         std::vector<lp_monomial_t> coeff;
@@ -476,6 +495,11 @@ LPPolynomial LPPolynomial::coeff(Variable::Arg var, std::size_t exp) const {
     }
 
     return res;
+}
+
+bool LPPolynomial::is_normal() const {
+    return carl::is_one(this->unit_part()) ; 
+    //return carl::is_one(carl::abs(this->unit_part())) ; 
 }
 
 std::ostream& operator<<(std::ostream& os, const LPPolynomial& p) {

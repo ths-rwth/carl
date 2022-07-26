@@ -2,6 +2,7 @@
 #ifdef USE_LIBPOLY
 
 #include <gtest/gtest.h>
+#include <random>
 
 #include "../Common.h"
 #include <carl-arith/core/VariablePool.h>
@@ -249,6 +250,65 @@ TEST(LPPOLYNOMIAL, ConvertToMultivariate){
 
     EXPECT_EQ(converted_lp, carl_poly);
     EXPECT_EQ(converted_carl, lp_poly);
+}
+
+TEST(LPPOLYNOMIAL, Normalized){
+    auto x = fresh_real_variable("x");
+    auto y = fresh_real_variable("y");
+    auto z = fresh_real_variable("z");
+    std::vector<Variable> var_order = {x,y,z};
+    LPContext context(var_order);
+
+    LPPolynomial linA(context, x, {(mpz_class)-2, (mpz_class)5});
+    LPPolynomial linB(context, y, {(mpz_class)1, (mpz_class)3});
+    LPPolynomial linC(context, z, {(mpz_class)2014, (mpz_class)68});
+    LPPolynomial linD(context, x, {(mpz_class)-13, (mpz_class)4});
+    LPPolynomial linE(context, x, {(mpz_class)-20, (mpz_class)5});
+    LPPolynomial quaA(context, x, {(mpz_class)-2, (mpz_class)0, (mpz_class)1});
+    LPPolynomial quaB(context, y, {(mpz_class)3, (mpz_class)6, (mpz_class)9});
+
+    LPPolynomial polA(context, x, {(mpz_class)-2, (mpz_class)5, (mpz_class)-5, (mpz_class)3});
+    LPPolynomial polB = linA * linA;
+    LPPolynomial polC = linA * linA * linA;
+    LPPolynomial polD = linA * linB * linC * linD * linE;
+    LPPolynomial polE = quaA * linC * linD * linE;
+    LPPolynomial polF = linA * quaB * linE;
+    LPPolynomial polG = quaA * quaB * linD * linE;
+    LPPolynomial polH = polA * quaB * linD;
+    LPPolynomial polI = linA * linA * quaA * quaA * quaB * quaB * quaB * quaB;
+
+    std::vector<LPPolynomial> polys = {linA, linC, linE, quaA, quaB, polA, polB, polC, polD, polE, polF, polG, polH, polI};
+
+    unsigned seed = 21344325;
+    std::default_random_engine generator(seed);
+    for (int e = 2; e <= 20; ++e) {
+        std::cauchy_distribution<double> distribution(0.0, 3.0 + 10.0 * std::pow(0.9, e));
+        for (int j = 0; j < 10; ++j) {
+            std::vector<mpz_class> coeffs;
+            for (int i = 0; i <= e; ++i) {
+                double ran = distribution(generator);
+                int coe = (ran > INT_MAX || ran < INT_MIN) ? 0 : (int)ran;
+                coeffs.push_back((mpz_class)coe);
+            }
+            if (coeffs.back() == (mpz_class)0) {
+                coeffs.back() = (mpz_class)1;
+            }
+            LPPolynomial randomPol(context, x, coeffs);
+            polys.push_back(randomPol);
+        }
+    }
+
+    for (const carl::LPPolynomial& pol : polys) {
+        carl::MultivariatePolynomial<mpz_class> carl_pol = convert<carl::MultivariatePolynomial<mpz_class>>(pol);
+        carl::UnivariatePolynomial<carl::MultivariatePolynomial<mpz_class>> carl_pol_uni = carl::to_univariate_polynomial(carl_pol,x);
+
+        EXPECT_EQ(pol.is_normal(), carl_pol_uni.is_normal());
+        EXPECT_EQ(pol.unit_part(), carl_pol_uni.unit_part().constant_part());
+        LPPolynomial lp_normalized = pol.normalized() ; 
+        auto carl_normalized = carl_pol_uni.normalized() ;
+
+        EXPECT_EQ(carl::MultivariatePolynomial(carl_normalized), convert<carl::MultivariatePolynomial<mpz_class>>(lp_normalized));
+    }
 }
 
 
