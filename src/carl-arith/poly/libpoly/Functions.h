@@ -90,7 +90,7 @@ inline std::vector<LPPolynomial> irreducible_factors(const LPPolynomial& p, cons
     CARL_LOG_FATAL("carl.poly", "factorization is not supported without libcocoa");
     #endif
     
-    if (!is_constant(p)) {
+    if (is_constant(p)) {
 		if (includeConstants) {
 			return {p};
 		} else {

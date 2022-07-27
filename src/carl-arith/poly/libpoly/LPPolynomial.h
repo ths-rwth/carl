@@ -182,11 +182,13 @@ public:
 		return LPPolynomial(poly::leading_coefficient(m_poly));
 	}
 
-	/** Obtain all non-constant coefficients of a polynomial. */
+	/** Obtain all non-zero coefficients of a polynomial. */
 	std::vector<LPPolynomial> coefficients() const {
 		std::vector<LPPolynomial> res;
-		for (auto& p : poly::coefficients(m_poly)) {
-			res.emplace_back(std::move(p));
+		for (std::size_t deg = 0; deg <= poly::degree(m_poly); ++deg) {
+			auto coeff = poly::coefficient(m_poly, deg);
+			if (lp_polynomial_is_zero(coeff.get_internal())) continue;
+			res.emplace_back(std::move(coeff));
 		}
 		return res;
 	}
