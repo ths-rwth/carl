@@ -57,8 +57,9 @@ public:
         poly::Variable polyVar;
 
         // Libpoly handles the variable order exactly the other way around
-        // i.e the main Variable is not the fist one but the last one
-        for (size_t i = varOrder.size(); i-- > 0;) {
+        // i.e the main variable is not the first one but the last one
+        //for (size_t i = varOrder.size(); i-- > 0;) {
+        for (size_t i = 0; i < varOrder.size(); i++) {
             varName = varOrder[i].name();
             CARL_LOG_DEBUG("carl.poly", "Variable name: " << varName << "  " << i);
             polyVar = VariableMapper::getInstance().getLibpolyVariable(varOrder[i]);
@@ -79,7 +80,8 @@ public:
         // i.e the main Variable is not the fist one but the last one
         const lp_variable_list_t* varList = lp_variable_order_get_list(m_context->var_order);
         m_variable_order = std::make_shared<std::vector<Variable>>();
-        for (size_t i = lp_variable_list_size(varList); i-- > 0;) {
+        //for (size_t i = lp_variable_list_size(varList); i-- > 0;) {
+        for (size_t i = 0; i < lp_variable_list_size(varList); i++) {
             m_variable_order->push_back(VariableMapper::getInstance().getCarlVariable(poly::Variable(varList->list[i])));
         }
     }
