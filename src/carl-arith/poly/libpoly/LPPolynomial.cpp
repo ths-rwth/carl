@@ -425,6 +425,8 @@ mpz_class LPPolynomial::unit_part() const {
 }
 
 LPPolynomial LPPolynomial::normalized() const {
+    return coprime_coefficients();
+
     auto unit = unit_part() ; 
     assert(!is_zero(unit)) ;
     return (*this) * unit ;  

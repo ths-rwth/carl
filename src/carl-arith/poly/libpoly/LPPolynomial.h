@@ -320,16 +320,12 @@ public:
 	bool is_normal() const;
 	/**
 	 * The normal part of a polynomial is the polynomial divided by the unit part.
+	 * 
+	 * HACK: At the moment, this is equal to coprime_coefficients().
 	 * @see @cite GCL92, page 42.
 	 * @return This polynomial divided by the unit part.
 	 */
 	LPPolynomial normalized() const;
-
-	/**
-	 * For a polynomial p, returns p/lc(p)
-	 * @return
-	 */
-	LPPolynomial normalize() const;
 
 	/**
 	 * The unit part of a polynomial over a field is its leading coefficient for nonzero polynomials,
