@@ -85,7 +85,7 @@ public:
     }
 
     auto normalized() const {
-        return ContextPolynomial<Coeff, Ordering, Policies>(m_context, m_content.normalized());
+        return ContextPolynomial<Coeff, Ordering, Policies>(m_context, as_multivariate().normalize());
     }
 
     auto constant_part() const {
