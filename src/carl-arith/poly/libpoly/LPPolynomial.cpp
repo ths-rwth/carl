@@ -425,11 +425,16 @@ mpz_class LPPolynomial::unit_part() const {
 }
 
 LPPolynomial LPPolynomial::normalized() const {
-    return coprime_coefficients();
+    auto res = coprime_coefficients();
+    auto unit = res.unit_part() ; 
+    assert(!is_zero(unit)) ;
+    return res * unit ;  
 
+    /*
     auto unit = unit_part() ; 
     assert(!is_zero(unit)) ;
     return (*this) * unit ;  
+    */
 }
 
 LPPolynomial LPPolynomial::coeff(Variable::Arg var, std::size_t exp) const {
