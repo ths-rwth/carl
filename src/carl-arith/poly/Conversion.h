@@ -38,6 +38,12 @@ struct ConvertHelper<LPPolynomial, MultivariatePolynomial<A, B, C>> {
 			CARL_LOG_DEBUG("carl.converter", "Poly is constant");
 			return LPPolynomial(context, carl::get_num(p.constant_part()));
 		}
+
+		auto denominator = p.coprime_factor();
+		if (denominator < 0) {
+			denominator *= -1;
+		}
+		/*
 		// LPPolynomial can only have integer coefficients -> so we have to store the lcm of the coefficients of every term
 		auto coprimeFactor = p.main_denom();
 		mpz_class denominator;
@@ -47,11 +53,13 @@ struct ConvertHelper<LPPolynomial, MultivariatePolynomial<A, B, C>> {
 		} else {
 			denominator = mpz_class(coprimeFactor);
 		}
+		*/
 		CARL_LOG_DEBUG("carl.converter", "Coprime Factor/ Denominator: " << denominator);
 		LPPolynomial res(context);
 		// iterate over terms
 		for (const auto& term : p) {
 			// Multiply by denominator to make the coefficient an integer
+			assert(carl::get_denom(term.coeff() * denominator) == 1);
 			LPPolynomial t(context, mpz_class(term.coeff() * denominator));
 			// iterate over monomial
 			if (term.monomial()) {
@@ -61,6 +69,7 @@ struct ConvertHelper<LPPolynomial, MultivariatePolynomial<A, B, C>> {
 					t *=LPPolynomial(context, var_pow.first, mpz_class(1), (unsigned)var_pow.second);
 				}
 			}
+			CARL_LOG_TRACE("carl.converter", "converted term: " << term << " -> " << t);
 			res += t;
 		}
 		CARL_LOG_DEBUG("carl.converter", "Got Polynomial: " << res);
