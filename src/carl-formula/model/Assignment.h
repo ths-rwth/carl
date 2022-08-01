@@ -83,6 +83,21 @@ namespace carl
         }
         return result;
     }
+
+    template<typename Rational, typename Poly>
+    Assignment<typename Poly::RootType> get_ran_assignment(const Model<Rational,Poly>& model) {
+        Assignment<typename Poly::RootType> result;
+        for (const auto& e : model) {
+            if (e.second.isRational()) {
+                assert(e.first.is_variable());
+                result.emplace(e.first.asVariable(), typename Poly::RootType(e.second.asRational()));
+            } else if (e.second.isRAN()) {
+                assert(e.first.is_variable());
+                result.emplace(e.first.asVariable(), e.second.asRAN());
+            }
+        }
+        return result;
+    }
 }
 
 #include "Assignment.tpp"
