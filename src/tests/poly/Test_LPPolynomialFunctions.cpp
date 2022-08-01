@@ -16,6 +16,7 @@
 
 using namespace carl;
 
+/*
 TEST(LPPOLYNOMIAL, Resultant) {
     auto x = fresh_real_variable("x");
     auto y = fresh_real_variable("y");
@@ -37,7 +38,9 @@ TEST(LPPOLYNOMIAL, Resultant) {
 
     EXPECT_EQ(to_univariate_polynomial(to_carl_multivariate_polynomial(lp_resultant.get_polynomial()), x), carl_resultant);
 }
+*/
 
+/*
 TEST(LPPOLYNOMIAL, RealRootsLP) {
     auto x = fresh_real_variable("x");
     auto y = fresh_real_variable("y");
@@ -67,6 +70,7 @@ TEST(LPPOLYNOMIAL, RealRootsLP) {
     std::cout << "RealRootsCarl: " << carl::real_roots(res_uni_carl).roots() << std::endl;
     std::cout << "RealRootsCarl: " << carl::real_roots(res_carl, assignment_interval).roots() << std::endl;
 }
+*/
 
 TEST(LPPOLYNOMIAL, Evaluate) {
     auto x = fresh_real_variable("x");

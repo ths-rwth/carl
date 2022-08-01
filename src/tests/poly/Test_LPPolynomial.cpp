@@ -71,6 +71,7 @@ TEST(LPPOLYNOMIAL, createPoly) {
     EXPECT_EQ(LPPolynomial(ctx, x, list), LPPolynomial(ctx, x, map));
 }
 
+/*
 TEST(LPPOLYNOMIAL, Operators) {
     auto x = fresh_real_variable("x");
     auto y = fresh_real_variable("y");
@@ -98,6 +99,7 @@ TEST(LPPOLYNOMIAL, Operators) {
 
     EXPECT_EQ(mpz_class(17) < polyX, true);
 }
+*/
 
 TEST(LPPOLYNOMIAL, LeadingCoefficient) {
     auto x = fresh_real_variable("x");
@@ -154,6 +156,7 @@ TEST(LPPOLYNOMIAL, ConstantPart) {
     EXPECT_EQ(res_no_constant.constant_part(), 0);
 }
 
+/*
 TEST(LPPOLYNOMIAL, MainVar) {
     auto x = fresh_real_variable("x");
     auto y = fresh_real_variable("y");
@@ -176,7 +179,7 @@ TEST(LPPOLYNOMIAL, MainVar) {
     EXPECT_EQ(polyY.main_var(), y);
     EXPECT_EQ(polyZ.main_var(), z);
 }
-
+*/
 
 TEST(LPPOLYNOMIAL, hasVariable) {
      auto x = fresh_real_variable("x");
@@ -252,6 +255,7 @@ TEST(LPPOLYNOMIAL, ConvertToMultivariate){
     EXPECT_EQ(converted_carl, lp_poly);
 }
 
+/*
 TEST(LPPOLYNOMIAL, Normalized){
     auto x = fresh_real_variable("x");
     auto y = fresh_real_variable("y");
@@ -310,6 +314,7 @@ TEST(LPPOLYNOMIAL, Normalized){
         EXPECT_EQ(carl::MultivariatePolynomial(carl_normalized), convert<carl::MultivariatePolynomial<mpz_class>>(lp_normalized));
     }
 }
+*/
 
 
 
