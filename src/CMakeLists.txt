@@ -1,3 +1,5 @@
+include_directories(/carl/build/resources/include)
+
 # Libraries..
 add_subdirectory(carl-common)
 add_subdirectory(carl-logging)
