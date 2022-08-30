@@ -52,6 +52,8 @@ public:
 		assert(m_k > 0);
 	}
 
+	MultivariateRoot(): m_poly(), m_k(0), m_var() {}
+
 	/**
 	 * Return k, the index of the root.
 	 */
@@ -122,6 +124,21 @@ void variables(const MultivariateRoot<Poly>& mr, carlVariables& vars) {
 template<typename Poly>
 void substitute_inplace(MultivariateRoot<Poly>& mr, Variable var, const Poly& poly) {
 	carl::substitute_inplace(mr.poly(), var, poly);
+}
+
+template<typename Poly>
+MultivariateRoot<Poly> convert_to_mvroot(const typename MultivariateRoot<Poly>::RAN& ran, Variable var) {
+	auto k = [&](){
+		if (ran.is_numeric()) {
+			return (std::size_t)1;
+		} else {
+			auto roots = carl::real_roots(ran.polynomial());
+			auto it = std::find(roots.roots().begin(), roots.roots().end(), ran);
+			assert(it != roots.roots().end());
+			return (std::size_t)std::distance(roots.roots().begin(), it)+1;
+		}
+    }();
+	return MultivariateRoot<Poly>(Poly(switch_main_variable(ran.polynomial(), var)), k, var);
 }
 
 /**
