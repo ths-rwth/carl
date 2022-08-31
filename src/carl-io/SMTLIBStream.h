@@ -51,7 +51,6 @@ private:
 		if (constraint) {
 			*this << *constraint;
 		} else {
-			Relation rel = c.negated() ? inverse(c.relation()) : c.relation();
 			auto iroot = [&]() {
 				if (std::holds_alternative<MultivariateRoot<Pol>>(c.value())) {
 					return std::get<MultivariateRoot<Pol>>(c.value());
@@ -59,11 +58,7 @@ private:
 					return convert_to_mvroot<Pol>(std::get<typename MultivariateRoot<Pol>::RAN>(c.value()), c.var());
 				}
 			}();
-			if (rel == Relation::NEQ) {
-				*this << "(not (= " << c.var() << " (root " << iroot.poly() << " " << iroot.k() << " " << iroot.var() << ")))";
-			} else {
-				*this << "(" << rel << " " << c.var() << " (root " << iroot.poly() << " " << iroot.k() << " " << iroot.var() << "))";
-			}
+			*this << "(" << c.relation() << " " << (c.negated() ? "true" : "false") << " " << c.var() << " (root " << iroot.poly() << " " << iroot.k() << " " << iroot.var() << "))";
 		}
 	}
 
