@@ -57,8 +57,9 @@ public:
         poly::Variable polyVar;
 
         // Libpoly handles the variable order exactly the other way around
-        // i.e the main Variable is not the fist one but the last one
-        for (size_t i = varOrder.size(); i-- > 0;) {
+        // i.e the main variable is not the first one but the last one
+        //for (size_t i = varOrder.size(); i-- > 0;) {
+        for (size_t i = 0; i < varOrder.size(); i++) {
             varName = varOrder[i].name();
             CARL_LOG_DEBUG("carl.poly", "Variable name: " << varName << "  " << i);
             polyVar = VariableMapper::getInstance().getLibpolyVariable(varOrder[i]);
@@ -78,7 +79,9 @@ public:
         // because libpoly handles the variable order exactly the other way around
         // i.e the main Variable is not the fist one but the last one
         const lp_variable_list_t* varList = lp_variable_order_get_list(m_context->var_order);
-        for (size_t i = lp_variable_list_size(varList); i-- > 0;) {
+        m_variable_order = std::make_shared<std::vector<Variable>>();
+        //for (size_t i = lp_variable_list_size(varList); i-- > 0;) {
+        for (size_t i = 0; i < lp_variable_list_size(varList); i++) {
             m_variable_order->push_back(VariableMapper::getInstance().getCarlVariable(poly::Variable(varList->list[i])));
         }
     }
@@ -91,24 +94,24 @@ public:
         return m_context;
     };
 
-    const std::vector<Variable>& variable_order() const {
+    const std::vector<Variable>& variable_ordering() const {
         return *m_variable_order;
     }
 
     bool has(const Variable& var) const {
-        return std::find(variable_order().begin(), variable_order().end(), var) != variable_order().end();
+        return std::find(variable_ordering().begin(), variable_ordering().end(), var) != variable_ordering().end();
     };
 
     /**
      * @brief Returns true if the underlying variable ordering is the same as the given one.
      */
     inline bool operator==(const LPContext& rhs) const {
-        return m_variable_order == rhs.m_variable_order;
+        return variable_ordering() == rhs.variable_ordering();
     }
 };
 
 inline std::ostream& operator<<(std::ostream& os, const LPContext& ctx) {
-    os << ctx.variable_order();
+    os << ctx.variable_ordering();
     return os;
 }
 

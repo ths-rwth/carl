@@ -4,7 +4,7 @@
 #ifdef USE_LIBPOLY
 
 #include "LPRan.h"
-#include "carl-arith/poly/lp/LPPolynomial.h"
+#include "carl-arith/poly/libpoly/LPPolynomial.h"
 
 namespace carl {
 

@@ -204,4 +204,19 @@ bool is_constant(const UnivariatePolynomial<Coeff>& p) {
 	return p.coefficients().size() <= 1;
 }
 
+template<typename Coeff>
+bool is_linear(const UnivariatePolynomial<Coeff>& p) {
+	if (!p.is_linear_in_main_var()) return false;
+	if (!is_linear(p.coefficients().front())) return false;
+	bool front = true;
+	for (const auto& c : p.coefficients()) {
+		if (front) {
+			front = false;
+			continue;
+		}
+		if (!is_constant(c)) return false;
+	}
+	return true;
+}
+
 }

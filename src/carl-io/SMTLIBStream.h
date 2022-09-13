@@ -51,9 +51,14 @@ private:
 		if (constraint) {
 			*this << *constraint;
 		} else {
-			std::stringstream ss;
-			ss << c;
-			*this << ss.str();
+			auto iroot = [&]() {
+				if (std::holds_alternative<MultivariateRoot<Pol>>(c.value())) {
+					return std::get<MultivariateRoot<Pol>>(c.value());
+				} else {
+					return convert_to_mvroot<Pol>(std::get<typename MultivariateRoot<Pol>::RAN>(c.value()), c.var());
+				}
+			}();
+			*this << "(" << c.relation() << " " << (c.negated() ? "true" : "false") << " " << c.var() << " (root " << iroot.poly() << " " << iroot.k() << " " << iroot.var() << "))";
 		}
 	}
 

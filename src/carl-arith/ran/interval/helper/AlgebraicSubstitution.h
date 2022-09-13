@@ -19,7 +19,7 @@
 #include <carl-arith/poly/umvpoly/MultivariatePolynomial.h>
 #include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
 #ifdef USE_COCOA
-#include <carl-arith/converter/CoCoAAdaptor.h>
+#include <carl-arith/poly/umvpoly/CoCoAAdaptor.h>
 #endif
 
 #include <carl-arith/poly/umvpoly/functions/Remainder.h>
@@ -42,20 +42,20 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution_groebner(
 	Variable target = variables.back();
 	try {
 		CoCoAAdaptor<MultivariatePolynomial<Number>> ca(variables, true);
-		CARL_LOG_DEBUG("carl.algsubs", "Computing GBasis of " << polynomials << " with order " << variables);
+		CARL_LOG_DEBUG("carl.ran.interval", "Computing GBasis of " << polynomials << " with order " << variables);
 		auto res = ca.GBasis(polynomials);
-		CARL_LOG_DEBUG("carl.algsubs", "-> " << res);
+		CARL_LOG_DEBUG("carl.ran.interval", "-> " << res);
 		for (const auto& poly: res) {
 			if (carl::variables(poly) == carlVariables({ target })) {
-				CARL_LOG_DEBUG("carl.algsubs", "-> " << poly)
+				CARL_LOG_DEBUG("carl.ran.interval", "-> " << poly)
 				return carl::to_univariate_polynomial(poly);
 			}
 		}
 	} catch (const CoCoA::ErrorInfo& e) {
-		CARL_LOG_ERROR("carl.algsubs", "Computation of GBasis failed: " << e << " -> " << CoCoA::context(e));
+		CARL_LOG_ERROR("carl.ran.interval", "Computation of GBasis failed: " << e << " -> " << CoCoA::context(e));
 	}
 	#else
-	CARL_LOG_ERROR("carl.algsubs", "CoCoALib is not enabled");
+	CARL_LOG_ERROR("carl.ran.interval", "CoCoALib is not enabled");
 	assert(false);
 	#endif
 	return std::nullopt;
@@ -81,7 +81,7 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution_groebner(
 	polys.emplace_back(p);
 	varOrder.emplace_back(p.main_var());
 
-	CARL_LOG_DEBUG("carl.algsubs", "Converted " << p << " and " << polynomials << " to " << polys << " under " << varOrder);
+	CARL_LOG_DEBUG("carl.ran.interval", "Converted " << p << " and " << polynomials << " to " << polys << " under " << varOrder);
 	return algebraic_substitution_groebner(polys, varOrder);
 }
 
@@ -105,16 +105,16 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution_resultant(
 			continue;
 		}
 		cur = pseudo_remainder(switch_main_variable(cur, poly.main_var()), poly);
-		CARL_LOG_DEBUG("carl.algsubs", "Computing resultant of " << cur << " and " << poly);
+		CARL_LOG_DEBUG("carl.ran.interval", "Computing resultant of " << cur << " and " << poly);
 		cur = carl::resultant(cur, poly);
-		CARL_LOG_DEBUG("carl.algsubs", "-> " << cur);
+		CARL_LOG_DEBUG("carl.ran.interval", "-> " << cur);
 	}
 	auto swpoly = switch_main_variable(cur, v);
 	if (!swpoly.is_univariate()) {
 		return std::nullopt;
 	}
 	UnivariatePolynomial<Number> result = swpoly.toNumberCoefficients();
-	CARL_LOG_DEBUG("carl.algsubs", "Result: " << result);
+	CARL_LOG_DEBUG("carl.ran.interval", "Result: " << result);
 	return result;
 }
 
@@ -137,7 +137,7 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution_resultant(
 		polys.emplace_back(carl::to_univariate_polynomial(polynomials[i], variables[i]));
 	}
 
-	CARL_LOG_DEBUG("carl.algsubs", "Converted " << polynomials << " under " << variables << " to " << p << " and " << polys);
+	CARL_LOG_DEBUG("carl.ran.interval", "Converted " << polynomials << " under " << variables << " to " << p << " and " << polys);
 	return algebraic_substitution_resultant(p, polys);
 }
 
@@ -156,7 +156,7 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution(
 	const std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>>& polynomials,
 	AlgebraicSubstitutionStrategy strategy = AlgebraicSubstitutionStrategy::RESULTANT
 ) {
-	CARL_LOG_DEBUG("carl.algsubs", "Substituting " << polynomials << " into " << p);
+	CARL_LOG_DEBUG("carl.ran.interval", "Substituting " << polynomials << " into " << p);
 	switch (strategy) {
 		case AlgebraicSubstitutionStrategy::GROEBNER:
 			return algebraic_substitution_groebner(p, polynomials);
@@ -176,7 +176,7 @@ std::optional<UnivariatePolynomial<Number>> algebraic_substitution(
 	const std::vector<Variable>& variables,
 	AlgebraicSubstitutionStrategy strategy = AlgebraicSubstitutionStrategy::RESULTANT
 ) {
-	CARL_LOG_WARN("carl.algsubs", "Substituting " << polynomials << " into " << polynomials.back());
+	CARL_LOG_WARN("carl.ran.interval", "Substituting " << polynomials << " into " << polynomials.back());
 	switch (strategy) {
 		case AlgebraicSubstitutionStrategy::GROEBNER:
 			return algebraic_substitution_groebner(polynomials, variables);

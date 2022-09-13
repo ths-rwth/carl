@@ -135,6 +135,21 @@ namespace carl {
 		return mr.poly();
 	}
 
+	template<typename Poly>
+	boost::tribool evaluate(const VariableComparison<Poly>& f, const Assignment<typename VariableComparison<Poly>::RAN>& a) {
+		typename VariableComparison<Poly>::RAN lhs;
+		typename VariableComparison<Poly>::RAN rhs = a.at(f.var());
+		if (std::holds_alternative<typename VariableComparison<Poly>::RAN>(f.value())) {
+			lhs = std::get<typename VariableComparison<Poly>::RAN>(f.value());
+		} else {
+			auto res = carl::evaluate(std::get<typename VariableComparison<Poly>::MR>(f.value()), a);
+			if (!res) return boost::indeterminate;
+			else lhs = *res;
+		}
+		if (!f.negated()) return evaluate(rhs, f.relation(), lhs);
+		else return !evaluate(rhs, f.relation(), lhs);
+	}
+
 	template<typename Pol>
     inline void variables(const VariableComparison<Pol>& f, carlVariables& vars) {
 		vars.add(f.var());

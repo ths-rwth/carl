@@ -9,7 +9,7 @@ endif()
 
 ExternalProject_Add(
     CoCoALib-EP
-	URL "http://cocoa.dima.unige.it/cocoa/cocoalib/tgz/CoCoALib-${COCOA_VERSION}.tgz"
+	URL "https://cocoa.dima.unige.it/cocoa/cocoalib/tgz/CoCoALib-${COCOA_VERSION}.tgz"
 	URL_HASH SHA256=${COCOA_TGZHASH}
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES

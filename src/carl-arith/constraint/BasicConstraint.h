@@ -64,7 +64,7 @@ public:
 	}
 
 	bool is_trivial_true() const  {
-		if(m_lhs.is_constant()) {
+		if(is_constant(m_lhs)) {
 			if(m_lhs.constant_part() == 0) {
 				return is_weak(m_relation);
 			} else if(m_lhs.constant_part() > 0) {
@@ -78,7 +78,7 @@ public:
 	}
 	
 	bool is_trivial_false() const {
-		if(m_lhs.is_constant()) {
+		if(is_constant(m_lhs)) {
 			if(m_lhs.constant_part() == 0) {
 				return is_strict(m_relation);
 			} else if(m_lhs.constant_part() > 0) {

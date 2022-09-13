@@ -47,9 +47,9 @@ TYPED_TEST(MultivariateRootTest, Evaluate)
 	EXPECT_EQ(y, mr2.var());
 
 	carl::Assignment<typename MultivariateRoot<Poly>::RAN> m;
-	m.emplace(x, RealAlgebraicNumber<TypeParam>(2));
-	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(-1), *evaluate(mr1,m));
-	EXPECT_EQ(RealAlgebraicNumber<TypeParam>(0), *evaluate(mr2,m));
+	m.emplace(x, IntRepRealAlgebraicNumber<TypeParam>(2));
+	EXPECT_EQ(IntRepRealAlgebraicNumber<TypeParam>(-1), *evaluate(mr1,m));
+	EXPECT_EQ(IntRepRealAlgebraicNumber<TypeParam>(0), *evaluate(mr2,m));
 }
 
 TYPED_TEST(MultivariateRootTest, Evaluate2)
@@ -59,7 +59,7 @@ TYPED_TEST(MultivariateRootTest, Evaluate2)
 	using Poly = MultivariatePolynomial<TypeParam>;
 	using MultiRoot = MultivariateRoot<Poly>;
 	using IntervalT = Interval<TypeParam>;
-	using RANT = RealAlgebraicNumber<TypeParam>;
+	using RANT = IntRepRealAlgebraicNumber<TypeParam>;
 	using ModelT = Model<TypeParam,Poly>;
 	
 	Variable x = fresh_real_variable("x");

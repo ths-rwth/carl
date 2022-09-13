@@ -4,7 +4,7 @@
 #include <variant>
 #include <vector>
 
-namespace carl::ran {
+namespace carl {
 
 template<typename RAN /*, typename = std::enable_if_t<is_ran_type<RAN>::value> */>
 class RealRootsResult {
@@ -55,4 +55,4 @@ public:
     }
 };
 
-} // namespace carl::ran
+}

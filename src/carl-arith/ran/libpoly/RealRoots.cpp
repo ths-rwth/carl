@@ -3,9 +3,9 @@
 #ifdef USE_LIBPOLY
 
 
-namespace carl::ran::libpoly {
+namespace carl {
 
-RealRootsResult<LPRealAlgebraicNumber> real_roots_libpoly(
+RealRootsResult<LPRealAlgebraicNumber> real_roots(
     const LPPolynomial& polynomial,
     const Interval<LPRealAlgebraicNumber::NumberType>& interval) {
     CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << polynomial << " within " << interval);
@@ -48,14 +48,14 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots_libpoly(
     return RealRootsResult<LPRealAlgebraicNumber>::roots_response(std::move(res));
 }
 
-RealRootsResult<LPRealAlgebraicNumber> real_roots_libpoly(
+RealRootsResult<LPRealAlgebraicNumber> real_roots(
     const LPPolynomial& polynomial,
     const std::map<Variable, LPRealAlgebraicNumber>& m,
     const Interval<LPRealAlgebraicNumber::NumberType>& interval) {
     CARL_LOG_DEBUG("carl.ran.libpoly", polynomial << " " << m << " " << interval);
 
     if (poly::is_univariate(polynomial.get_polynomial())) {
-        return real_roots_libpoly(polynomial, interval);
+        return real_roots(polynomial, interval);
     }
 
     // easy checks
@@ -117,6 +117,6 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots_libpoly(
 
     return RealRootsResult<LPRealAlgebraicNumber>::roots_response(std::move(res));
 }
-} // namespace carl::ran::libpoly
+}
 
 #endif

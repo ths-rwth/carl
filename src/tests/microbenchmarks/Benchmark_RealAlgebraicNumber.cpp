@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include <carl-arith/ran/real_roots.h>
+
 #include <carl-arith/ran/ran.h>
 
 using Poly = carl::UnivariatePolynomial<mpq_class>;
@@ -16,7 +16,7 @@ BENCHMARK_F(RAN_Fixture, RAN_Create)(benchmark::State& state) {
 	auto p = rans[0].polynomial();
 	auto i = rans[0].interval();
 	for (auto _ : state) {
-		auto ran = carl::RealAlgebraicNumber<mpq_class>(p, i);
+		auto ran = carl::IntRepRealAlgebraicNumber<mpq_class>(p, i);
 	}
 }
 
@@ -25,7 +25,7 @@ BENCHMARK_F(RAN_Fixture, RAN_CreateRefineOld)(benchmark::State& state) {
 	auto p = rans[0].polynomial();
 	auto i = rans[0].interval();
 	for (auto _ : state) {
-		auto ran = carl::RealAlgebraicNumber<mpq_class>(p, i);
+		auto ran = carl::IntRepRealAlgebraicNumber<mpq_class>(p, i);
 		ran.refine(false);
 	}
 }
@@ -35,7 +35,7 @@ BENCHMARK_F(RAN_Fixture, RAN_CreateRefineNew)(benchmark::State& state) {
 	auto p = rans[0].polynomial();
 	auto i = rans[0].interval();
 	for (auto _ : state) {
-		auto ran = carl::RealAlgebraicNumber<mpq_class>(p, i);
+		auto ran = carl::IntRepRealAlgebraicNumber<mpq_class>(p, i);
 		ran.refine(true);
 	}
 }

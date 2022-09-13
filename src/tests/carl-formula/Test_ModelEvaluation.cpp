@@ -14,7 +14,7 @@ typedef Constraint<Pol> ConstraintT;
 typedef MultivariateRoot<Pol> MVRootT;
 typedef Formula<Pol> FormulaT;
 typedef Interval<Rational> IntervalT;
-typedef RealAlgebraicNumber<Rational> RANT;
+typedef IntRepRealAlgebraicNumber<Rational> RANT;
 typedef Model<Rational,Pol> ModelT;
 
 TEST(ModelEvaluation, Formula)

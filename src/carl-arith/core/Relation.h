@@ -105,7 +105,28 @@ inline bool evaluate(const T& t, Relation r) {
 
 template<typename T1, typename T2>
 inline bool evaluate(const T1& lhs, Relation r, const T2& rhs) {
-	return evaluate(sgn(lhs - rhs), r);
+	switch (r) {
+		case Relation::EQ:
+			return (lhs == rhs);
+			break;
+		case Relation::NEQ:
+			return (lhs != rhs) ;
+			break;
+		case Relation::LESS:
+			return (lhs < rhs);
+			break;
+		case Relation::LEQ:
+			return (lhs <= rhs);
+			break;
+		case Relation::GREATER:
+			return (lhs > rhs);
+			break;
+		case Relation::GEQ:
+			return (lhs >= rhs);
+			break;
+	}
+	assert(false);
+	return false;
 }
 	
 }

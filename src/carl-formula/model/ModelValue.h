@@ -63,7 +63,7 @@ namespace carl
 		/**
 		 * Base type we are deriving from.
 		 */
-		using Super = std::variant<bool, Rational, SqrtEx<Poly>, RealAlgebraicNumber<Rational>, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>;
+		using Super = std::variant<bool, Rational, SqrtEx<Poly>, typename Poly::RootType, BVValue, SortValue, UFModel, InfinityValue, ModelSubstitutionPtr<Rational,Poly>>;
 		
 		Super mData;
 
@@ -162,7 +162,7 @@ namespace carl
 		 * @return true, if the stored value is a real algebraic number.
 		 */
 		bool isRAN() const {
-			return std::holds_alternative<RealAlgebraicNumber<Rational>>(mData);
+			return std::holds_alternative<typename Poly::RootType>(mData);
 		}
 		
 		/**
@@ -230,9 +230,9 @@ namespace carl
 		/**
 		 * @return The stored value as a real algebraic number.
 		 */
-		const RealAlgebraicNumber<Rational>& asRAN() const {
+		const typename Poly::RootType& asRAN() const {
 			assert(isRAN());
-			return std::get<RealAlgebraicNumber<Rational>>(mData);
+			return std::get<typename Poly::RootType>(mData);
 		}
 		
 		/**

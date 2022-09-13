@@ -5,7 +5,7 @@
 #include "GCD.h"
 #include "to_univariate_polynomial.h"
 
-#include <carl-arith/converter/CoCoAAdaptor.h>
+#include "../CoCoAAdaptor.h"
 #include <carl-logging/carl-logging.h>
 #include "../MultivariatePolynomial.h"
 #include "../UnivariatePolynomial.h"

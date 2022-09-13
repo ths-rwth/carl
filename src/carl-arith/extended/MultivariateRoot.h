@@ -5,7 +5,7 @@
 #include <carl-arith/core/Variable.h>
 #include <carl-arith/numbers/numbers.h>
 #include <carl-arith/ran/ran.h>
-#include <carl-arith/ran/real_roots.h>
+
 
 #include <optional>
 #include <algorithm>
@@ -51,6 +51,8 @@ public:
 	MultivariateRoot(const Poly& poly, std::size_t k, Variable var): m_poly(poly), m_k(k), m_var(var) {
 		assert(m_k > 0);
 	}
+
+	MultivariateRoot(): m_poly(), m_k(0), m_var() {}
 
 	/**
 	 * Return k, the index of the root.
@@ -124,6 +126,21 @@ void substitute_inplace(MultivariateRoot<Poly>& mr, Variable var, const Poly& po
 	carl::substitute_inplace(mr.poly(), var, poly);
 }
 
+template<typename Poly>
+MultivariateRoot<Poly> convert_to_mvroot(const typename MultivariateRoot<Poly>::RAN& ran, Variable var) {
+	auto k = [&](){
+		if (ran.is_numeric()) {
+			return (std::size_t)1;
+		} else {
+			auto roots = carl::real_roots(ran.polynomial());
+			auto it = std::find(roots.roots().begin(), roots.roots().end(), ran);
+			assert(it != roots.roots().end());
+			return (std::size_t)std::distance(roots.roots().begin(), it)+1;
+		}
+    }();
+	return MultivariateRoot<Poly>(Poly(switch_main_variable(ran.polynomial(), var)), k, var);
+}
+
 /**
  * Return the emerging algebraic real after pluggin in a subpoint to replace
  * all variables with algebraic reals that are not the root-variable "_z".
@@ -134,10 +151,16 @@ void substitute_inplace(MultivariateRoot<Poly>& mr, Variable var, const Poly& po
 template<typename Poly>
 std::optional<typename MultivariateRoot<Poly>::RAN> evaluate(const MultivariateRoot<Poly>& mr, const carl::Assignment<typename MultivariateRoot<Poly>::RAN>& m) {
 	CARL_LOG_DEBUG("carl.rootexpression", "Evaluate: " << mr << " against: " << m);
-	auto poly = carl::to_univariate_polynomial(mr.poly(), mr.var());
-	auto result = carl::real_roots(poly, m);
+	
+	auto result = [&](){
+		if constexpr(needs_context_type<Poly>::value) {
+			return carl::real_roots(mr.poly(), m);
+		} else {
+			return carl::real_roots(carl::to_univariate_polynomial(mr.poly(), mr.var()), m);
+		}
+	}();
 	if (!result.is_univariate()) {
-		CARL_LOG_TRACE("carl.rootexpression", poly << " is not univariate (nullified: " << result.is_nullified() << "; non-univariate: " << result.is_non_univariate() << ").");
+		CARL_LOG_TRACE("carl.rootexpression", mr.poly() << " is not univariate (nullified: " << result.is_nullified() << "; non-univariate: " << result.is_non_univariate() << ").");
 		return std::nullopt;
 	}
 	CARL_LOG_DEBUG("carl.rootexpression", "Roots: " << result.roots());

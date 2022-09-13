@@ -170,8 +170,8 @@ public:
     
 	CoCoAAdaptorLP() = delete ; 
 
-    CoCoAAdaptorLP(const LPContext& ctx) : mSymbolBack(ctx.variable_order()), mRing(construct_ring(mSymbolBack)), mContext(ctx) {
-		std::vector<Variable> vars = ctx.variable_order() ; 
+    CoCoAAdaptorLP(const LPContext& ctx) : mSymbolBack(ctx.variable_ordering()), mRing(construct_ring(mSymbolBack)), mContext(ctx) {
+		std::vector<Variable> vars = ctx.variable_ordering() ; 
 
 		auto indets = CoCoA::indets(mRing);
 		for (std::size_t i = 0; i < mSymbolBack.size(); ++i) {
