@@ -1,6 +1,7 @@
 #pragma once
 
 #include <carl-arith/core/Relation.h>
+#include <carl-arith/core/Variables.h>
 
 namespace carl {
 
