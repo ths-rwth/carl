@@ -158,12 +158,12 @@ endif()
 
 ##### GTest
 if(NOT GTEST_FOUND)
-	set(GTEST_VERSION "1.8.0")
-	set(GTEST_ZIPHASH "adfafc8512ab65fd3cf7955ef0100ff5")
+	set(GTEST_VERSION "1.12.1")
+	set(GTEST_ZIPHASH "973e464e8936d4b79bb24f27b058aaef4150b06e")
 	include(resources/gtest.cmake)
 	unset(GTEST_ZIPHASH)
 endif()
-print_resource_info("GTest" GTESTMAIN_STATIC ${GTEST_VERSION})
+print_resource_info("GTest" GTESTCORE_STATIC ${GTEST_VERSION})
 
 include(resources/google-benchmark.cmake)
 
