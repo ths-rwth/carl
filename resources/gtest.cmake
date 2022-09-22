@@ -11,8 +11,6 @@ ExternalProject_Add(
 	BUILD_BYPRODUCTS <INSTALL_DIR>/lib/libgtest.a <INSTALL_DIR>/lib/libgtest_main.a
 )
 
-message(Binary Dir ${CMAKE_BINARY_DIR})
-
 set(GTEST_INCLUDE_DIR "${CMAKE_BINARY_DIR}/resources/include")
 set(GTEST_LIB "${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/lib/libgtest.a")
 set(GTEST_MAIN_LIBRARIES "${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/lib/libgtest_main.a")
@@ -34,10 +32,6 @@ if(TARGET Threads::Threads)
     set_target_properties(GTESTCORE_STATIC PROPERTIES
         INTERFACE_LINK_LIBRARIES Threads::Threads)
 endif()
-
-message(STATUS "GTest include dir: ${GTEST_INCLUDE_DIR}")
-message(STATUS "GTest libraries: ${GTEST_LIB}")
-message(STATUS "GTest main libraries: ${GTEST_MAIN_LIBRARIES}")
 
 add_dependencies(GTESTCORE_STATIC GTest-EP)
 add_dependencies(GTESTMAIN_STATIC GTest-EP)
