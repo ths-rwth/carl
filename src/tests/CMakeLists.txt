@@ -2,8 +2,9 @@
 add_custom_target(all-tests)
 
 add_library(TestCommon STATIC Common.cpp)
-target_link_libraries(TestCommon carl-arith-shared ${GTEST_LIBRARIES})
+target_link_libraries(TestCommon carl-arith-shared GTESTCORE_STATIC GTESTMAIN_STATIC pthread dl)
 add_dependencies(TestCommon resources GTESTCORE_STATIC GTESTMAIN_STATIC)
+
 
 ################################
 # Unit Tests
