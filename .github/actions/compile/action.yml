@@ -1,0 +1,29 @@
+name: Build
+description: Build carl
+inputs:
+  build-env: 
+    description: "Environment variables for the build"
+    required: true
+    default: ""
+  bliss: #Bliss does not compile on macOS, so we have to turn it off there
+    description: "Build with bliss"
+    required: false
+    default: "ON"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure CMake
+      shell: bash
+      run: |
+        echo "::group::Configure CMake"
+        echo "Use bliss: ${{inputs.bliss}}"
+        export ${{inputs.build-env}}
+        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_BLISS=${{inputs.bliss}}
+        echo "::group::Configure CMake done"
+    - name: Build carl
+      shell: bash 
+      run: |
+        echo "::group::Build carl"
+        cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target all -j$(nproc)
+        echo "::group::Build carl done"

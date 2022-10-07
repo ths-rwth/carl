@@ -1,29 +1,38 @@
 ExternalProject_Add(
     GTest-EP
 	URL https://github.com/google/googletest/archive/release-${GTEST_VERSION}.zip
-	URL_MD5 ${GTEST_ZIPHASH}
+	URL_HASH SHA1=${GTEST_ZIPHASH}
 	DOWNLOAD_NO_PROGRESS 1
-	UPDATE_COMMAND ""
+	CMAKE_ARGS
+          -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 	BUILD_COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest
 	COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest_main
 	INSTALL_COMMAND ""
-	BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${STATIC_EXT} ${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${STATIC_EXT}
+	BUILD_BYPRODUCTS <INSTALL_DIR>/lib/libgtest.a <INSTALL_DIR>/lib/libgtest_main.a
 )
 
-ExternalProject_Get_Property(GTest-EP source_dir)
-ExternalProject_Get_Property(GTest-EP binary_dir)
+set(GTEST_INCLUDE_DIR "${CMAKE_BINARY_DIR}/resources/include")
+set(GTEST_LIB "${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/lib/libgtest.a")
+set(GTEST_MAIN_LIBRARIES "${CMAKE_BINARY_DIR}/resources/src/GTest-EP-build/lib/libgtest_main.a")
 
-if(WIN32)
-	add_imported_library(GTESTCORE STATIC "${binary_dir}/googlemock/gtest/${CMAKE_BUILD_TYPE}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${STATIC_EXT}" "${source_dir}/googletest/include")
-	add_imported_library(GTESTMAIN STATIC "${binary_dir}/googlemock/gtest/${CMAKE_BUILD_TYPE}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${STATIC_EXT}" "${source_dir}/googletest/include")
+add_library(GTESTCORE_STATIC STATIC IMPORTED)
+set_target_properties(GTESTCORE_STATIC PROPERTIES
+	IMPORTED_LOCATION "${GTEST_LIB}"
+	INTERFACE_INCLUDE_DIRECTORIES "${GTEST_INCLUDE_DIR}"
+)
 
-	set(GTEST_LIBRARIES GTESTCORE_STATIC GTESTMAIN_STATIC)
-else()
-	add_imported_library(GTESTCORE STATIC "${binary_dir}/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${STATIC_EXT}" "${source_dir}/googletest/include")
-	add_imported_library(GTESTMAIN STATIC "${binary_dir}/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${STATIC_EXT}" "${source_dir}/googletest/include")
+add_library(GTESTMAIN_STATIC STATIC IMPORTED)
+set_target_properties(GTESTMAIN_STATIC PROPERTIES
+	IMPORTED_LOCATION "${GTEST_MAIN_LIBRARIES}"
+	INTERFACE_INCLUDE_DIRECTORIES "${GTEST_INCLUDE_DIR}"
+)
 
-	set(GTEST_LIBRARIES GTESTCORE_STATIC GTESTMAIN_STATIC pthread dl)
+find_package(Threads QUIET)
+if(TARGET Threads::Threads)
+    set_target_properties(GTESTCORE_STATIC PROPERTIES
+        INTERFACE_LINK_LIBRARIES Threads::Threads)
 endif()
 
 add_dependencies(GTESTCORE_STATIC GTest-EP)
 add_dependencies(GTESTMAIN_STATIC GTest-EP)
+
