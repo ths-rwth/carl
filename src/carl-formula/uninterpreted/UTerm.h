@@ -81,7 +81,6 @@ namespace carl
 		void gatherVariables(carlVariables& vars) const;
 		void gatherUFs(std::set<UninterpretedFunction>& ufs) const;
 	};
-	static_assert(std::is_literal_type<UTerm>::value, "UTerm should be a literal type.");
 
 	/**
 	 * @param lhs The uninterpreted term to the left.

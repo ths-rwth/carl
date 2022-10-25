@@ -62,7 +62,6 @@ namespace carl
     };
 
 	static_assert(std::is_trivially_copyable<UFInstance>::value, "UFInstance should be trivially copyable.");
-	static_assert(std::is_literal_type<UFInstance>::value, "UFInstance should be a literal type.");
 	static_assert(sizeof(UFInstance) == sizeof(std::size_t), "UFInstance should be as large as its id");
 
 	/**
