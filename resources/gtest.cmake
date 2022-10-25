@@ -7,7 +7,7 @@ ExternalProject_Add(
           -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 	BUILD_COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest
 	COMMAND cmake --build . --config ${CMAKE_BUILD_TYPE} --target gtest_main
-	INSTALL_COMMAND ""
+	#INSTALL_COMMAND ""
 	BUILD_BYPRODUCTS <INSTALL_DIR>/lib/libgtest.a <INSTALL_DIR>/lib/libgtest_main.a
 )
 
