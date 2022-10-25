@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <carl-arith/interval/Interval.h>
-#include <carl-arith/interval/power.h>
+#include <carl-arith/interval/Power.h>
 
 using I = carl::Interval<double>;
 

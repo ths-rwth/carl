@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <carl-arith/interval/Interval.h>
-#include <carl-arith/interval/exponential.h>
+#include <carl-arith/interval/Exponential.h>
 
 using I = carl::Interval<double>;
 

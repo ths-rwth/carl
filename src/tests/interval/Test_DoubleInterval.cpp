@@ -11,7 +11,7 @@
 
 #include "gtest/gtest.h"
 #include <carl-arith/interval/Interval.h>
-#include <carl-arith/interval/set_theory.h>
+#include <carl-arith/interval/SetTheory.h>
 #include <carl-arith/core/VariablePool.h>
 #include <iostream>
 #include <carl-common/meta/platform.h>

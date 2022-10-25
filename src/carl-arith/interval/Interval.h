@@ -30,8 +30,8 @@
 #include <carl-common/meta/platform.h>
 #include <carl-common/meta/SFINAE.h>
 #include "BoundType.h"
-#include "checking.h"
-#include "rounding.h"
+#include "policies/checking.h"
+#include "policies/rounding.h"
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
 CLANG_WARNING_DISABLE("-Wunused-local-typedef")
@@ -39,7 +39,7 @@ CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include <boost/numeric/interval/interval.hpp>
 CLANG_WARNING_RESET
 
-#include "sampling.h"
+#include "Sampling.h"
 
 #include <cassert>
 #include <cmath>
@@ -1561,4 +1561,4 @@ namespace std {
 
 #include "operators.h"
 #include "Interval.tpp"
-#include "conversion.h"
+#include "Conversion.h"
