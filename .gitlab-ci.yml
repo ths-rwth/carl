@@ -11,15 +11,10 @@ cache:
   #  - build/*.a*
   #policy: pull-push
 
-variables:
-  DOCKER_TLS_CERTDIR: "" #do not change, needed for docker in docker (quality)
-
-
 stages:
   - build-gcc
   - build-clang 
   - test
-  - quality
   - documentation
 
 build-gcc9:
@@ -87,25 +82,6 @@ test-gcc:
   stage: test
   script: 
     - cd build && make test #kein xml-output möglich?
-
-code_quality:
-  dependencies: []
-  stage: quality
-  cache: {}
-  image: docker:stable
-  allow_failure: true
-  services:
-    - docker:stable-dind
-  script:
-    - docker run
-        --env SOURCE_CODE="$PWD"
-        --volume "$PWD":/code
-        --volume /var/run/docker.sock:/var/run/docker.sock
-        "registry.gitlab.com/gitlab-org/security-products/codequality" /code
-  artifacts:
-    reports: 
-      codequality: gl-code-quality-report.json
-
 
 docs:
   stage: documentation
