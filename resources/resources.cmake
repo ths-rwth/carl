@@ -157,12 +157,9 @@ endif()
 
 
 ##### GTest
-if(NOT GTEST_FOUND)
-	set(GTEST_VERSION "1.12.1")
-	set(GTEST_ZIPHASH "973e464e8936d4b79bb24f27b058aaef4150b06e")
-	include(resources/gtest.cmake)
-	unset(GTEST_ZIPHASH)
-endif()
+set(GTEST_VERSION "1.12.1")
+set(GTEST_ZIPHASH "973e464e8936d4b79bb24f27b058aaef4150b06e")
+load_library(carl GTest ${GTEST_VERSION} REQUIRED)
 print_resource_info("GTest" GTESTCORE_STATIC ${GTEST_VERSION})
 
 include(resources/google-benchmark.cmake)
@@ -174,11 +171,9 @@ endif()
 
 ##### LIBPOLY
 IF(USE_LIBPOLY)
-	if(NOT LIBPOLY_FOUND)
-		set(LIBPOLY_FIND_VERSION "0.1.9")
-		include(resources/libpoly.cmake)
-	endif()
-	print_resource_info("LIBPOLY" LIBPOLYXX_STATIC ${LIBPOLY_FIND_VERSION})
+	set(LIBPOLY_VERSION "0.1.11")
+	load_library(carl Poly ${LIBPOLY_VERSION} REQUIRED)
+	print_resource_info("LibPoly" LIBPOLYXX_STATIC ${LIBPOLY_VERSION})
 endif()
 
 
