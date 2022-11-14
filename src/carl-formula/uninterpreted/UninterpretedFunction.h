@@ -64,7 +64,6 @@ namespace carl
 			Sort codomain() const;
 	};
 	static_assert(std::is_trivially_copyable<UninterpretedFunction>::value, "UninterpretedFunction should be trivially copyable.");
-	static_assert(std::is_literal_type<UninterpretedFunction>::value, "UninterpretedFunction should be a literal type.");
 	static_assert(sizeof(UninterpretedFunction) == sizeof(std::size_t), "UninterpretedFunction should be as large as its id");
 
 	/**

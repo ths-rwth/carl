@@ -3,8 +3,8 @@
 #include <carl-arith/poly/umvpoly/UnivariatePolynomial.h>
 #include "../Ran.h"
 
-#include <carl-arith/interval/set_theory.h>
-#include <carl-arith/interval/sampling.h>
+#include <carl-arith/interval/SetTheory.h>
+#include <carl-arith/interval/Sampling.h>
 #include <carl-arith/poly/umvpoly/functions/Factorization_univariate.h>
 #include <carl-arith/poly/umvpoly/functions/SignVariations.h>
 #include <carl-common/util/streamingOperators.h>

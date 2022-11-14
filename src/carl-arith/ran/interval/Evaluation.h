@@ -2,7 +2,7 @@
 
 #include <carl-arith/interval/Interval.h>
 #include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>
-#include <carl-arith/interval/evaluate.h>
+#include <carl-arith/interval/Evaluation.h>
 #include <carl-arith/constraint/BasicConstraint.h>
 #include <carl-arith/constraint/Simplification.h>
 

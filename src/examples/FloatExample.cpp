@@ -6,7 +6,7 @@
  * @since	2013-12-16
  * @version	2013-12-16
  */
-#include <carl-arith/interval/rounding.h>
+#include <carl-arith/interval/policies/rounding.h>
 #include <carl-arith/numbers/numbers.h>
 
 #ifdef USE_MPFR_FLOAT

@@ -63,7 +63,6 @@ public:
 	}
 };
 static_assert(std::is_trivially_copyable<UVariable>::value, "UVariable should be trivially copyable.");
-static_assert(std::is_literal_type<UVariable>::value, "UVariable should be a literal type.");
 static_assert(sizeof(UVariable) == sizeof(Variable) + sizeof(Sort), "UVariable should be as large as a Variable and a Sort");
 
 /**

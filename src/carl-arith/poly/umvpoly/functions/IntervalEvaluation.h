@@ -1,6 +1,6 @@
 #pragma once
 #include <carl-arith/interval/Interval.h>
-#include <carl-arith/interval/power.h>
+#include <carl-arith/interval/Power.h>
 
 #include "../Monomial.h"
 #include "../Term.h"

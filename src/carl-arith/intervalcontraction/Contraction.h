@@ -7,7 +7,7 @@
 
 #pragma once
 #include <carl-arith/interval/Interval.h>
-#include <carl-arith/interval/set_theory.h>
+#include <carl-arith/interval/SetTheory.h>
 #include <carl-arith/core/Sign.h>
 #include <carl-arith/poly/umvpoly/functions/horner/MultivariateHorner.h>
 #include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>

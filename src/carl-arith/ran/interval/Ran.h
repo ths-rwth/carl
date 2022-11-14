@@ -11,7 +11,7 @@
 
 #include <carl-arith/interval/Interval.h>
 #include <carl-arith/poly/umvpoly/functions/IntervalEvaluation.h>
-#include <carl-arith/interval/set_theory.h>
+#include <carl-arith/interval/SetTheory.h>
 
 #include "../common/Operations.h"
 #include "../common/NumberOperations.h"
