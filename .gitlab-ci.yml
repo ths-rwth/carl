@@ -29,8 +29,7 @@ build-gcc12:
       - build/
       - cmake/
       - src/
-  only:
-     - development
+
 build-gcc11:
   dependencies: []
   stage: build-gcc
@@ -43,6 +42,8 @@ build-gcc11:
       - build/
       - cmake/
       - src/
+  only:
+     - development
 
 build-clang14:
   dependencies: []
@@ -56,8 +57,7 @@ build-clang14:
       - build/
       - cmake/
       - src/
-  only:
-     - development
+
 build-clang13:
   dependencies: []
   stage: build-clang
@@ -70,6 +70,8 @@ build-clang13:
       - build/
       - cmake/
       - src/
+  only:
+     - development
 
 test-clang: 
   dependencies: [build-clang14]
