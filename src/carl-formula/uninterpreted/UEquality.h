@@ -106,8 +106,6 @@ namespace carl
 
     };
 
-	static_assert(std::is_literal_type<UEquality>::value, "UEquality should be a literal type.");
-
 	/**
 	 * @param lhs The left hand side.
 	 * @param rhs The right hand side.
