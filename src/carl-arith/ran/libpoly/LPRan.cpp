@@ -227,7 +227,7 @@ LPRealAlgebraicNumber abs(const LPRealAlgebraicNumber& n) {
     }
 }
 
-std::size_t size(const LPRealAlgebraicNumber& n) {
+std::size_t bitsize(const LPRealAlgebraicNumber& n) {
     //From Ran.h
     if (n.is_numeric()) {
         return carl::bitsize(n.get_lower_bound()) + carl::bitsize(n.get_upper_bound());

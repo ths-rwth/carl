@@ -50,7 +50,7 @@ public:
 		return thom_encoding().point();
 	}
 
-	std::size_t size() const {
+	std::size_t bitsize() const {
 		return thom_encoding().dimension();
 	}
 

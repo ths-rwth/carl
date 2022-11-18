@@ -329,7 +329,7 @@ static IntRepRealAlgebraicNumber<Number> abs(const IntRepRealAlgebraicNumber<Num
 }
 
 template<typename Number>
-std::size_t size(const IntRepRealAlgebraicNumber<Number>& n) {
+std::size_t bitsize(const IntRepRealAlgebraicNumber<Number>& n) {
 	if (n.is_numeric()) {
 		return carl::bitsize(n.interval_int().lower()) + carl::bitsize(n.interval_int().upper());
 	} else {
