@@ -16,7 +16,7 @@ class IntervalRationalTest: public testing::Test {};
 #define HALF TypeParam(1)/TypeParam(2)
 #define ONE TypeParam(1)
 
-TYPED_TEST_CASE(IntervalRationalTest, RationalTypes);
+TYPED_TEST_SUITE(IntervalRationalTest, RationalTypes);
 
 TYPED_TEST(IntervalRationalTest, Constructor) {
 	using Interval = Interval<TypeParam>;

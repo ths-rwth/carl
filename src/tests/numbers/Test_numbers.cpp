@@ -6,7 +6,7 @@
 template<typename T>
 class IntegerNumbers: public testing::Test {};
 
-TYPED_TEST_CASE(IntegerNumbers, IntegerTypes);
+TYPED_TEST_SUITE(IntegerNumbers, IntegerTypes);
 
 TYPED_TEST(IntegerNumbers, Division) {
   TypeParam quot;
@@ -80,7 +80,7 @@ TYPED_TEST(IntegerNumbers, Constant_Neg_Pos) {
 template<typename T>
 class RationalNumbers: public testing::Test {};
 
-TYPED_TEST_CASE(RationalNumbers, RationalTypes);
+TYPED_TEST_SUITE(RationalNumbers, RationalTypes);
 
 TYPED_TEST(RationalNumbers, Constructors) {
 	TypeParam a = TypeParam(2)/TypeParam(3);

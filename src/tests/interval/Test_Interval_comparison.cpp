@@ -12,7 +12,7 @@ class IntervalOperatorTest: public testing::Test {};
 #define ZERO TypeParam(0)
 #define ONE TypeParam(1)
 
-TYPED_TEST_CASE(IntervalOperatorTest, RationalTypes);
+TYPED_TEST_SUITE(IntervalOperatorTest, RationalTypes);
 
 /* Cases:
  * - WEAK, STRICT, INFTY x WEAK, STRICT, INFTY

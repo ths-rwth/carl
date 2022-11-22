@@ -24,15 +24,15 @@ using namespace carl;
 
 template<typename T>
 class UnivariatePolynomialTest: public testing::Test {};
-TYPED_TEST_CASE(UnivariatePolynomialTest, NumberTypes);
+TYPED_TEST_SUITE(UnivariatePolynomialTest, NumberTypes);
 
 template<typename T>
 class UnivariatePolynomialRatTest: public testing::Test {};
-TYPED_TEST_CASE(UnivariatePolynomialRatTest, RationalTypes);
+TYPED_TEST_SUITE(UnivariatePolynomialRatTest, RationalTypes);
 
 template<typename T>
 class UnivariatePolynomialIntTest: public testing::Test {};
-TYPED_TEST_CASE(UnivariatePolynomialIntTest, IntegerTypes);
+TYPED_TEST_SUITE(UnivariatePolynomialIntTest, IntegerTypes);
 
 TEST(UnivariatePolynomial, Constructor)
 {

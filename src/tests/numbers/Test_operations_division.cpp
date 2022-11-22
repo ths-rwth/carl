@@ -10,7 +10,7 @@ const int range = 10;
 template<typename T>
 class IntegerDivision: public testing::Test {};
 
-TYPED_TEST_CASE(IntegerDivision, IntegerTypes);
+TYPED_TEST_SUITE(IntegerDivision, IntegerTypes);
 
 TYPED_TEST(IntegerDivision, IntegerDivision) {
 	for (int a = -range; a <= range; a++) {
@@ -53,7 +53,7 @@ TYPED_TEST(IntegerDivision, Remainder) {
 template<typename T>
 class RationalDivision: public testing::Test {};
 
-TYPED_TEST_CASE(RationalDivision, RationalTypes);
+TYPED_TEST_SUITE(RationalDivision, RationalTypes);
 
 TYPED_TEST(RationalDivision, Division) {
 	for (int a = -range; a <= range; a++) {

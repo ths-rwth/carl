@@ -87,7 +87,7 @@ public:
 template<typename T>
 class Operators: public testing::Test {};
 
-TYPED_TEST_CASE(Operators, RationalTypes);
+TYPED_TEST_SUITE(Operators, RationalTypes);
 
 TYPED_TEST(Operators, Comparison)
 {
@@ -218,7 +218,7 @@ TYPED_TEST(Operators, InplaceMultiplication)
 template<typename T>
 class OperatorsInterval: public testing::Test {};
 
-TYPED_TEST_CASE(OperatorsInterval, IntervalTypes);
+TYPED_TEST_SUITE(OperatorsInterval, IntervalTypes);
 
 TYPED_TEST(OperatorsInterval, Comparison)
 {

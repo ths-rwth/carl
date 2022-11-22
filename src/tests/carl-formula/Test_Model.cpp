@@ -8,7 +8,7 @@
 template<typename T>
 class Model: public testing::Test {};
 
-TYPED_TEST_CASE(Model, RationalTypes);
+TYPED_TEST_SUITE(Model, RationalTypes);
 
 TYPED_TEST(Model, ModelValue)
 {

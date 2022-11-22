@@ -6,7 +6,7 @@
 template<typename T>
 class PrimeFactory: public testing::Test {};
 
-TYPED_TEST_CASE(PrimeFactory, IntegerTypes);
+TYPED_TEST_SUITE(PrimeFactory, IntegerTypes);
 
 TYPED_TEST(PrimeFactory, integers)
 {

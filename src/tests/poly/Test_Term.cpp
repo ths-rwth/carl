@@ -14,7 +14,7 @@ using namespace carl;
 template<typename T>
 class TermTest: public testing::Test {};
 
-TYPED_TEST_CASE(TermTest, RationalTypes); // TODO should use NumberTypes
+TYPED_TEST_SUITE(TermTest, RationalTypes); // TODO should use NumberTypes
 
 TYPED_TEST(TermTest, Constructor)
 {

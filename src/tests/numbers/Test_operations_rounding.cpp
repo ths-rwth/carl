@@ -8,7 +8,7 @@ using namespace carl;
 template<typename T>
 class IntegerRounding: public testing::Test {};
 
-TYPED_TEST_CASE(IntegerRounding, IntegerTypes);
+TYPED_TEST_SUITE(IntegerRounding, IntegerTypes);
 
 TYPED_TEST(IntegerRounding, IntegerRounding) {
 	for (int i = -10; i < 11; i++) {
@@ -21,7 +21,7 @@ TYPED_TEST(IntegerRounding, IntegerRounding) {
 template<typename T>
 class RationalRounding: public testing::Test {};
 
-TYPED_TEST_CASE(RationalRounding, RationalTypes);
+TYPED_TEST_SUITE(RationalRounding, RationalTypes);
 
 TYPED_TEST(RationalRounding, floor) {
 	for (int i = -10; i < 11; i++) {

@@ -13,7 +13,7 @@ using UPoly = carl::UnivariatePolynomial<Rational>;
 template<typename T>
 class RootBoundTest: public testing::Test {};
 
-TYPED_TEST_CASE(RootBoundTest, RationalTypes); // TODO should use NumberTypes
+TYPED_TEST_SUITE(RootBoundTest, RationalTypes); // TODO should use NumberTypes
 
 TYPED_TEST(RootBoundTest, CauchyBound) {
 	carl::Variable x = carl::fresh_real_variable("x");
