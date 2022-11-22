@@ -151,7 +151,7 @@ namespace carl::pool {
 
     public:
         template<typename Key>
-        PoolElement<Content>(Key&& k) : m_content(Pool<Content>::getInstance().add(std::move(k))) {}
+        PoolElement(Key&& k) : m_content(Pool<Content>::getInstance().add(std::move(k))) {}
 
         const Content& operator()() const {
             return m_content->content();
