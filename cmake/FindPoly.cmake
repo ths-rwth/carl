@@ -25,7 +25,7 @@ if(NOT LIBPOLY_FOUND_SYSTEM)
 			-DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=TRUE
 			-DGMP_INCLUDE_DIR=${GMP_INCLUDE_DIR}
 		BUILD_COMMAND ${CMAKE_COMMAND} <SOURCE_DIR>
-		COMMAND ${CMAKE_MAKE_PROGRAM} all
+		COMMAND ${CMAKE_MAKE_PROGRAM} poly polyxx static_poly static_polyxx static_pic_poly static_pic_polyxx
 		COMMAND ${CMAKE_MAKE_PROGRAM} install
 		BUILD_BYPRODUCTS 
 			<INSTALL_DIR>/lib/libpoly${STATIC_EXT}
@@ -33,11 +33,11 @@ if(NOT LIBPOLY_FOUND_SYSTEM)
 			<INSTALL_DIR>/lib/libpolyxx${STATIC_EXT}
 			<INSTALL_DIR>/lib/libpolyxx${DYNAMIC_EXT}
 	)
-	ExternalProject_Add_Step(
-	LIBPOLY-EP cleanup
-    DEPENDEES install
-    COMMAND ${CMAKE_COMMAND} -E remove_directory <BINARY_DIR>/test/
-  )
+#	ExternalProject_Add_Step(
+#		LIBPOLY-EP cleanup
+#		DEPENDEES install
+#		COMMAND ${CMAKE_COMMAND} -E remove_directory <BINARY_DIR>/test/
+#	)
 
 	get_target_property(GMP_LIBRARY GMP_STATIC IMPORTED_LOCATION)
 	get_filename_component(GMP_LIBRARY_DIR ${GMP_LIBRARY} DIRECTORY)
