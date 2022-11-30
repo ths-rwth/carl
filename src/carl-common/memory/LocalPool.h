@@ -111,15 +111,16 @@ namespace carl::pool {
         ~LocalPool() {}
 
         template<typename Key>
-        std::shared_ptr<LocalPoolElementWrapper<Content>> add(Key&& c) {
+        std::shared_ptr<LocalPoolElementWrapper<Content>> add(std::shared_ptr<LocalPool<Content>> pool, Key&& c) {
             DATASTRUCTURES_POOL_LOCK_GUARD
+            assert(pool.get() == this);
 
             typename UnderlyingSet::insert_commit_data insert_data;
             auto res = m_pool.insert_check(c, content_hash<Key>(), content_equal<Key>(), insert_data);
             if (!res.second) {
                 return res.first->m_weak_ptr.lock();
             } else {
-                auto shared = std::make_shared<LocalPoolElementWrapper<Content>>(std::move(c));
+                auto shared = std::make_shared<LocalPoolElementWrapper<Content>>(pool, std::move(c));
                 shared.get()->m_id = m_ids.get();
                 shared.get()->m_weak_ptr = shared;
                 m_pool.insert_commit(*shared.get(), insert_data);
@@ -147,7 +148,7 @@ namespace carl::pool {
 
     public:
         template<typename Key>
-        LocalPoolElement(std::shared_ptr<LocalPool<Content>>& pool, Key&& k) : m_content(pool, pool.add(std::move(k))) {}
+        LocalPoolElement(std::shared_ptr<LocalPool<Content>>& pool, Key&& k) : m_content(pool->add(pool, std::move(k))) {}
 
         const Content& operator()() const {
             return m_content->content();
@@ -161,6 +162,10 @@ namespace carl::pool {
 
         auto id() const {
             return m_content->id();
+        }
+
+        bool operator==(const LocalPoolElement& other) const {
+            return m_content == other.m_content;
         }
     };
 
