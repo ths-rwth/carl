@@ -496,7 +496,7 @@ inline std::size_t level_of(const LPPolynomial& p) {
 	if (is_number(p)) return 0;
 	auto it = std::find(p.context().variable_ordering().begin(), p.context().variable_ordering().end(), p.main_var());
 	assert(it != p.context().variable_ordering().end());
-	return std::distance(p.context().variable_ordering().begin(), it)+1;
+	return (std::size_t)std::distance(p.context().variable_ordering().begin(), it)+1;
 }
 
 /// Add the variables of the given polynomial to the variables.
