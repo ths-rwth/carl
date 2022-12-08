@@ -36,7 +36,7 @@ We test carl on the following platforms:
 - Ubuntu 22.04 LTS with several compilers
 
 We usually support at least all `clang` and `gcc` versions starting from those shipped with the latest Ubuntu LTS or Debian stable releases.
-As of now, this is `clang-11` and newer and `gcc-9` and newer.
+As of now, this is `clang-13` and newer and `gcc-11` and newer.
 
 Advanced building topics
 --------------------------------------------

@@ -50,14 +50,14 @@ Formula<Poly> to_nnf(const Formula<Poly>& formula) {
         }
         case carl::FormulaType::OR:{
             Formulas<Poly> disjunctions;
-            for(auto subformula : formula.subformulas()){
+            for(const auto& subformula : formula.subformulas()){
                 disjunctions.push_back(to_nnf(subformula));
             }
             return Formula<Poly>(carl::FormulaType::OR, std::move(disjunctions));
         }
         case carl::FormulaType::AND:{
             Formulas<Poly> conjunctions;
-            for(auto subformula : formula.subformulas()){
+            for(const auto& subformula : formula.subformulas()){
                 conjunctions.push_back(to_nnf(subformula));
             }
             return Formula<Poly>(carl::FormulaType::AND, std::move(conjunctions));

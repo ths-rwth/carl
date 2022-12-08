@@ -9,7 +9,7 @@ using namespace carl;
 template<typename T>
 class IntegerProperties: public testing::Test {};
 
-TYPED_TEST_CASE(IntegerProperties, IntegerTypes);
+TYPED_TEST_SUITE(IntegerProperties, IntegerTypes);
 
 TYPED_TEST(IntegerProperties, IntegerProperties) {
 	for (int i = -10; i < 11; i++) {
@@ -20,7 +20,7 @@ TYPED_TEST(IntegerProperties, IntegerProperties) {
 template<typename T>
 class RationalProperties: public testing::Test {};
 
-TYPED_TEST_CASE(RationalProperties, RationalTypes);
+TYPED_TEST_SUITE(RationalProperties, RationalTypes);
 
 TYPED_TEST(RationalProperties, isInteger) {
 	for (int i = -10; i < 11; i++) {

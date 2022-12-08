@@ -227,7 +227,7 @@ struct hash<carl::Variable> {
 	 * @param variable Variable.
 	 * @return Hash of variable
 	 */
-	std::size_t operator()(carl::Variable variable) const noexcept {
+	std::size_t operator()(const carl::Variable variable) const noexcept {
 		return variable.id();
 	}
 };

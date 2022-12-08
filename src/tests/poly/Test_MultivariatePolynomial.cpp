@@ -17,7 +17,7 @@ using namespace carl;
 template<typename T>
 class MultivariatePolynomialTest: public testing::Test {};
 
-TYPED_TEST_CASE(MultivariatePolynomialTest, NumberTypes);
+TYPED_TEST_SUITE(MultivariatePolynomialTest, NumberTypes);
 
 TYPED_TEST(MultivariatePolynomialTest, Constructor)
 {

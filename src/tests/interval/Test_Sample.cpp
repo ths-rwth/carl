@@ -10,7 +10,7 @@ using namespace carl;
 template<typename T>
 class SampleTest: public testing::Test {};
 
-TYPED_TEST_CASE(SampleTest, RationalTypes);
+TYPED_TEST_SUITE(SampleTest, RationalTypes);
 
 TYPED_TEST(SampleTest, Sample)
 {

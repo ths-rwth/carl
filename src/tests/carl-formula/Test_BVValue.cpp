@@ -23,7 +23,7 @@ protected:
 	{}
 };
 
-TYPED_TEST_CASE(BVValueTest, IntegerTypes);
+TYPED_TEST_SUITE(BVValueTest, IntegerTypes);
 
 
 TYPED_TEST(BVValueTest, Constructor)

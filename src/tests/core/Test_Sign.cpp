@@ -12,7 +12,7 @@
 
 template<typename T>
 class SignTest : public testing::Test {};
-TYPED_TEST_CASE(SignTest, NumberTypes);
+TYPED_TEST_SUITE(SignTest, NumberTypes);
 
 // Helper function for tests of signVariations
 template<typename Object, typename Function>

@@ -12,7 +12,7 @@ using namespace carl;
 template<typename T>
 class MultivariateRootTest: public testing::Test {};
 
-TYPED_TEST_CASE(MultivariateRootTest, RationalTypes);
+TYPED_TEST_SUITE(MultivariateRootTest, RationalTypes);
 
 TYPED_TEST(MultivariateRootTest, Constructor)
 {

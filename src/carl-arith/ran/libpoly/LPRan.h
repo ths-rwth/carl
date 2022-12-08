@@ -171,7 +171,7 @@ bool is_integer(const LPRealAlgebraicNumber& n);
 LPRealAlgebraicNumber::NumberType integer_below(const LPRealAlgebraicNumber& n);
 LPRealAlgebraicNumber abs(const LPRealAlgebraicNumber& n);
 
-std::size_t size(const LPRealAlgebraicNumber& n);
+std::size_t bitsize(const LPRealAlgebraicNumber& n);
 Sign sgn(const LPRealAlgebraicNumber& n);
 Sign sgn(const LPRealAlgebraicNumber& n, const UnivariatePolynomial<LPRealAlgebraicNumber::NumberType>& p);
 bool contained_in(const LPRealAlgebraicNumber& n, const Interval<LPRealAlgebraicNumber::NumberType>& i);

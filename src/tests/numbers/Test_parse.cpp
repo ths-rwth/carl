@@ -6,7 +6,7 @@
 template<typename T>
 class Integers: public testing::Test {};
 
-TYPED_TEST_CASE(Integers, IntegerTypes);
+TYPED_TEST_SUITE(Integers, IntegerTypes);
 
 TYPED_TEST(Integers, parse) {
 	EXPECT_EQ(TypeParam(123), carl::parse<TypeParam>("123"));
@@ -26,7 +26,7 @@ TYPED_TEST(Integers, try_parse) {
 template<typename T>
 class Rationals: public testing::Test {};
 
-TYPED_TEST_CASE(Rationals, RationalTypes);
+TYPED_TEST_SUITE(Rationals, RationalTypes);
 
 TYPED_TEST(Rationals, parse) {
 	// Integers

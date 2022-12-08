@@ -34,7 +34,7 @@ class SettingsParser: public carl::settings::SettingsParser, public carl::Single
 };
 
 TEST(Settings, all) {
-	char *argv[] = {"test", "--bool", "--string", "test", "--preset"};
+	char *argv[] = {(char*)"test", (char*)"--bool", (char*)"--string", (char*)"test", (char*)"--preset"};
 	int argc = sizeof(argv) / sizeof(char*);
 
 	auto& parser = SettingsParser::getInstance();

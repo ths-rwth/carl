@@ -18,7 +18,7 @@ public:
 template<typename T>
 class NumberHash: public testing::Test {};
 
-TYPED_TEST_CASE(NumberHash, NumberTypes);
+TYPED_TEST_SUITE(NumberHash, NumberTypes);
 
 TYPED_TEST(NumberHash, Hash) {
 	BOOST_CONCEPT_ASSERT((HashCheck<TypeParam>));
