@@ -1,10 +1,7 @@
 #pragma once
 
-//#include <carl-common/datastructures/Bitset.h>
+#include <carl-common/datastructures/Bitset.h>
 
-namespace carl {
-	class Bitset;
-};
 
 #include <ostream>
 #include <vector>
