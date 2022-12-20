@@ -153,9 +153,5 @@ if (BINDINGS_PYTHON)
 	add_subdirectory(bindings/pycarl)
 endif()
 
-# Configure addons
-include(resources/addons/addons.cmake)
-
-# Configure packaging and CI
+# Configure packaging
 include(packaging)
-include(prepare-ci)
