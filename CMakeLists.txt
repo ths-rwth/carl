@@ -19,9 +19,6 @@ set_version(22 12)
 
 set(PROJECT_FULLNAME "carl")
 set(PROJECT_DESCRIPTION "Computer ARithmetic Library")
-set(carl_NAME "CArL" )
-set(carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
-
 message(STATUS "Version: ${PROJECT_FULLNAME} ${PROJECT_VERSION_FULL}")
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -56,8 +53,6 @@ option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
 
 
-
-set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -65,8 +60,6 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "DEBUG" "RELEASE")
-
-set(CARL_LIBRARIES_DIR "${PROJECT_BINARY_DIR}/lib")
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -131,24 +124,17 @@ if (NOT WIN32)
 	list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
 endif()
 
-# Configure static analysis
+# Static analysis
 include(clang-tidy)
 include(clang-time-trace)
 include(coverage)
 
-# Configure documentation
-add_subdirectory(doc)
+# Documentation
+add_subdirectory(doc EXCLUDE_FROM_ALL)
 
-# Include actual library
+# Sources
 add_subdirectory(src)
 
-# Configure export
+# Export and Packaging
 include(export)
-
-# Configure bindings
-if (BINDINGS_PYTHON)
-	add_subdirectory(bindings/pycarl)
-endif()
-
-# Configure packaging
 include(packaging)
