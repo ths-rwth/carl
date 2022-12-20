@@ -52,7 +52,6 @@ option( USE_BLISS "Use bliss" ON )
 export_option(USE_BLISS)
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 export_option(USE_MPFR_FLOAT)
-option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
 
@@ -105,8 +104,6 @@ elseif (WIN32)
 	set(DYNAMIC_EXT ".dll")
 	set(STATIC_EXT ".lib")
 endif()
-
-include(cotire)
 
 # RPATH settings
 # don't skip the full RPATH for the build tree

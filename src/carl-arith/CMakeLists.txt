@@ -35,7 +35,6 @@ target_link_libraries(carl-arith-shared PUBLIC LIBPOLYXX_SHARED LIBPOLY_SHARED)
 target_link_libraries(carl-arith-static PUBLIC LIBPOLYXX_STATIC LIBPOLY_STATIC)
 endif()
 
-cotire(carl-arith)
 include(install)
 
 clang_tidy_recurse("${CMAKE_SOURCE_DIR}/src/carl-arith" "")
