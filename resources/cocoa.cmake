@@ -13,7 +13,7 @@ ExternalProject_Add(
 	URL_HASH SHA256=${COCOA_TGZHASH}
 	DOWNLOAD_NO_PROGRESS 1
 	BUILD_IN_SOURCE YES
-	PATCH_COMMAND sh ${CMAKE_SOURCE_DIR}/resources/cocoa/patch_auto_ptr.sh
+	PATCH_COMMAND sh ${CMAKE_SOURCE_DIR}/resources/cocoa/patch_print_errors.sh
 	COMMAND patch <SOURCE_DIR>/configuration/shell-fns.sh ${CMAKE_SOURCE_DIR}/resources/cocoa/shell-fns.sh.patch
 	CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --threadsafe-hack ${GMP_LIB_ARG}
 	BUILD_COMMAND make library
