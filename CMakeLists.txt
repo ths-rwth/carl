@@ -9,16 +9,12 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
    message(SEND_ERROR "In-source builds are not allowed.")
 endif()
 
-# path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
-# Include own macros.
 include(carlmacros)
-
-set_version(22 12)
 
 set(PROJECT_FULLNAME "carl")
 set(PROJECT_DESCRIPTION "Computer ARithmetic Library")
+set_version(22 12)
 message(STATUS "Version: ${PROJECT_FULLNAME} ${PROJECT_VERSION_FULL}")
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -119,7 +115,7 @@ include(resources/resources.cmake)
 
 enable_testing()
 
-#dl must be linked LAST as this is required for the stacktrace in carl-common/meta/platform.h
+#dl must be linked LAST as this is required for the stacktrace in carl-common/debug/debug.cpp
 if (NOT WIN32)
 	list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
 endif()

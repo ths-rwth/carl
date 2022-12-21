@@ -49,7 +49,3 @@
 #else
 	#warning "You are using an unsupported operating system."
 #endif
-
-#define __BITS (sizeof(void*))
-
-#define UNUSED(x) (void)(x)
