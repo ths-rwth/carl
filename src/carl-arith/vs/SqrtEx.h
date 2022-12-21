@@ -192,7 +192,7 @@ namespace carl
              * @param _sqrtEx A square root expression, which gets the new content of this square root expression.
              * @return A reference to this object.
              */
-            SqrtEx& operator=( const SqrtEx& _sqrtEx );
+            //SqrtEx& operator=( const SqrtEx& _sqrtEx );
             
             /**
              * @param _poly A polynomial, which gets the new content of this square root expression.
