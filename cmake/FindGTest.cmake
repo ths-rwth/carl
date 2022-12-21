@@ -53,4 +53,6 @@ if(NOT GTest_FOUND_SYSTEM)
 	add_dependencies(GTESTMAIN_STATIC GTest-EP)
 endif()
 
+set(GTEST_FOUND TRUE)
+
 mark_as_advanced(GTEST_INCLUDE_DIR GTEST_LIB GTEST_MAIN_LIBRARIES)

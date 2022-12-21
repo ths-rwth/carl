@@ -153,10 +153,13 @@ endif()
 ##### GTest
 set(GTEST_VERSION "1.12.1")
 set(GTEST_ZIPHASH "973e464e8936d4b79bb24f27b058aaef4150b06e")
-load_library(carl GTest ${GTEST_VERSION} REQUIRED)
+find_package(GTest ${GTEST_VERSION} REQUIRED QUIET)
 print_resource_info("GTest" GTESTCORE_STATIC ${GTEST_VERSION})
 
-include(resources/google-benchmark.cmake)
+set(GBENCHMARK_VERSION "1.7.1")
+find_package(GBenchmark ${GBENCHMARK_VERSION} REQUIRED QUIET)
+print_resource_info("GBenchmark" GBCORE_STATIC ${GBENCHMARK_VERSION})
+
 
 ##### MPFR
 IF(USE_MPFR_FLOAT)

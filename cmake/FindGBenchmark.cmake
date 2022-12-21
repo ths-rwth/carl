@@ -1,7 +1,7 @@
 ExternalProject_Add(
 	google-benchmark-EP
 	GIT_REPOSITORY https://github.com/google/benchmark.git
-	GIT_TAG "v1.4.1"
+	GIT_TAG "v${GBENCHMARK_VERSION}"
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=RELEASE -DBENCHMARK_DOWNLOAD_DEPENDENCIES=ON
 	UPDATE_COMMAND ""
 )
@@ -15,3 +15,7 @@ add_imported_library(GBMAIN STATIC "${install_dir}/lib/${CMAKE_FIND_LIBRARY_PREF
 
 add_dependencies(GBCORE_STATIC google-benchmark-EP)
 add_dependencies(GBMAIN_STATIC google-benchmark-EP)
+
+set(GBENCHMARK_FOUND TRUE)
+
+mark_as_advanced(GBENCHMARK_FOUND GBCORE_STATIC GBMAIN_STATIC)
