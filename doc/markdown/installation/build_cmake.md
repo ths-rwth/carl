@@ -36,9 +36,6 @@ Using `[t]`, you can enable the _advanced mode_ that shows all options. Most of 
 - *USE_COCOA* [ON, OFF] <br />
   If set to *ON*, CoCoALib can be used for advanced polynomial operations, for example multivariate gcd or factorization.
 
-- *USE_COTIRE* [ON, OFF] <br>
-  If set to *ON*, `cotire` is used to produce precompiled headers. This can reduce the compile time significantly.
-
 - *USE_GINAC* [ON, OFF] <br>
   If set to *ON*, GiNaC can be used for some polynomial operations. Note that this implies *USE_CLN_NUMBERS = ON*.
 

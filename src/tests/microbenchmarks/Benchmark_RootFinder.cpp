@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
 
 
-//#include <carl-arith/ran/ran.h>
+#include <carl-arith/ran/ran.h>
 
 using Poly = carl::UnivariatePolynomial<mpq_class>;
 

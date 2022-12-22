@@ -1,0 +1,1 @@
+sed -i -e 's/PRINT_ERRORS = 1/PRINT_ERRORS = 0/g' src/AlgebraicCore/TmpFactorDir/jaaerror.c

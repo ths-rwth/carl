@@ -43,8 +43,7 @@ TEST(DoubleInterval, Hash)
 {
     DoubleInterval test1 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::WEAK);
     std::hash<DoubleInterval> hashFkt;
-    size_t hash1 = hashFkt(test1);
-    UNUSED(hash1);
+    /*size_t hash1 =*/ hashFkt(test1);
     /*DoubleInterval test2 = DoubleInterval(-1, BoundType::STRICT, 1, BoundType::STRICT);
     DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
     EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, -1, BoundType::WEAK), DoubleInterval::empty_interval());

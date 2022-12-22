@@ -9,19 +9,12 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
    message(SEND_ERROR "In-source builds are not allowed.")
 endif()
 
-# path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
-# Include own macros.
 include(carlmacros)
-
-set_version(22 12)
 
 set(PROJECT_FULLNAME "carl")
 set(PROJECT_DESCRIPTION "Computer ARithmetic Library")
-set(carl_NAME "CArL" )
-set(carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
-
+set_version(22 12)
 message(STATUS "Version: ${PROJECT_FULLNAME} ${PROJECT_VERSION_FULL}")
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -52,13 +45,10 @@ option( USE_BLISS "Use bliss" ON )
 export_option(USE_BLISS)
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 export_option(USE_MPFR_FLOAT)
-option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 export_option(THREAD_SAFE)
 
 
-
-set(CLANG_SANITIZER "none" CACHE STRING "Compile with the respective sanitizer")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -66,8 +56,6 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "DEBUG" "RELEASE")
-
-set(CARL_LIBRARIES_DIR "${PROJECT_BINARY_DIR}/lib")
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -106,8 +94,6 @@ elseif (WIN32)
 	set(STATIC_EXT ".lib")
 endif()
 
-include(cotire)
-
 # RPATH settings
 # don't skip the full RPATH for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -129,33 +115,22 @@ include(resources/resources.cmake)
 
 enable_testing()
 
-#dl must be linked LAST as this is required for the stacktrace in carl-common/meta/platform.h
+#dl must be linked LAST as this is required for the stacktrace in carl-common/debug/debug.cpp
 if (NOT WIN32)
 	list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
 endif()
 
-# Configure static analysis
+# Static analysis
 include(clang-tidy)
 include(clang-time-trace)
 include(coverage)
 
-# Configure documentation
-add_subdirectory(doc)
+# Documentation
+add_subdirectory(doc EXCLUDE_FROM_ALL)
 
-# Include actual library
+# Sources
 add_subdirectory(src)
 
-# Configure export
+# Export and Packaging
 include(export)
-
-# Configure bindings
-if (BINDINGS_PYTHON)
-	add_subdirectory(bindings/pycarl)
-endif()
-
-# Configure addons
-include(resources/addons/addons.cmake)
-
-# Configure packaging and CI
 include(packaging)
-include(prepare-ci)

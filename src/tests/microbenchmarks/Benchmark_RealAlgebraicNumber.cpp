@@ -12,7 +12,7 @@ public:
 };
 
 BENCHMARK_F(RAN_Fixture, RAN_Create)(benchmark::State& state) {
-	auto rans = carl::real_roots(p);
+	auto rans = carl::real_roots(p).roots();
 	auto p = rans[0].polynomial();
 	auto i = rans[0].interval();
 	for (auto _ : state) {
@@ -21,21 +21,21 @@ BENCHMARK_F(RAN_Fixture, RAN_Create)(benchmark::State& state) {
 }
 
 BENCHMARK_F(RAN_Fixture, RAN_CreateRefineOld)(benchmark::State& state) {
-	auto rans = carl::real_roots(p);
+	auto rans = carl::real_roots(p).roots();
 	auto p = rans[0].polynomial();
 	auto i = rans[0].interval();
 	for (auto _ : state) {
 		auto ran = carl::IntRepRealAlgebraicNumber<mpq_class>(p, i);
-		ran.refine(false);
+		ran.refine();
 	}
 }
 
 BENCHMARK_F(RAN_Fixture, RAN_CreateRefineNew)(benchmark::State& state) {
-	auto rans = carl::real_roots(p);
+	auto rans = carl::real_roots(p).roots();
 	auto p = rans[0].polynomial();
 	auto i = rans[0].interval();
 	for (auto _ : state) {
 		auto ran = carl::IntRepRealAlgebraicNumber<mpq_class>(p, i);
-		ran.refine(true);
+		ran.refine();
 	}
 }

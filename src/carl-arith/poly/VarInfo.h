@@ -16,7 +16,7 @@ class VarInfo {
 
 public:
     VarInfo() = default;
-    VarInfo(const VarInfo& varInfo) = default;
+    // VarInfo(const VarInfo& varInfo) = default;
     VarInfo(std::size_t maxDegree, std::size_t min_degree, std::size_t occurence, std::map<std::size_t, CoeffType>&& coeffs) : m_max_degree(maxDegree), m_min_degree(min_degree), m_num_occurences(occurence), m_coeffs(coeffs) {}
 
     bool has_coeff() const {

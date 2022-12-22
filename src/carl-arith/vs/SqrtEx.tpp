@@ -160,6 +160,7 @@ namespace carl
                && m_factor == _toCompareWith.factor() && m_constant_part == _toCompareWith.constant_part();
     }
 
+    /*
 	template<typename Poly>
     SqrtEx<Poly>& SqrtEx<Poly>::operator=( const SqrtEx<Poly>& _sqrtEx )
     {
@@ -175,6 +176,7 @@ namespace carl
         }
         return *this;
     }
+    */
 
 	template<typename Poly>
     SqrtEx<Poly>& SqrtEx<Poly>::operator=( const Poly& _poly )

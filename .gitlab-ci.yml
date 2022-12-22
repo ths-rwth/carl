@@ -95,18 +95,6 @@ docs:
 
 
 #### UNUSED ## 
-#pycarl:
-#  script:
-#  - MAKE_PARALLEL=-j8 TASK=pycarl source .ci/build.sh
-#  only:
-#    - development
-#
-#addons:
-#  script:
-#  - MAKE_PARALLEL=-j8 TASK=addons source .ci/build.sh
-#  only:
-#    - development
-#
 #make_tidy:
 #  stage: tidy
 #  script:

@@ -6,8 +6,6 @@
 #include <carl-arith/poly/umvpoly/functions/Chebyshev.h>
 #include <carl-arith/ran/interval/helper/LazardEvaluation.h>
 
-#include <boost/optional/optional_io.hpp>
-
 #include "../Common.h"
 
 typedef carl::UnivariatePolynomial<Rational> UPolynomial;
