@@ -25,10 +25,12 @@ namespace carl {
 					substitute_inplace(p, var, value.asRAN().value());
 				}
 			} else if (value.isSubstitution()) {
-				const auto& subs = value.asSubstitution();
-				auto polysub = dynamic_cast<const ModelPolynomialSubstitution<Rational,Poly>*>(subs.get());
-				if (polysub != nullptr) {
-					substitute_inplace(p, var, polysub->getPoly());
+				if constexpr(std::is_same<Poly,ModelPoly>::value) {
+					const auto& subs = value.asSubstitution();
+					auto polysub = dynamic_cast<const ModelPolynomialSubstitution<Rational,Poly>*>(subs.get());
+					if (polysub != nullptr) {
+						substitute_inplace(p, var, polysub->getPoly());
+					}
 				}
 			}
 		}
