@@ -1,4 +1,5 @@
 #include "LPPolynomial.h"
+#include "helper.h"
 
 #include <carl-common/config.h>
 #ifdef USE_LIBPOLY
@@ -182,13 +183,11 @@ bool operator<(const LPPolynomial& lhs, const LPPolynomial& rhs) {
     return lp_polynomial_cmp(lhs.get_internal(), rhs.get_internal()) < 0;
 }
 bool operator<(const LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     return lp_polynomial_cmp(lhs.get_internal(), tmp.get_internal()) < 0;
 }
 bool operator<(const mpz_class& lhs, const LPPolynomial& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(rhs.get_internal()));
-    tmp += poly::Integer(lhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(rhs.get_internal()), poly::Integer(lhs));
     return lp_polynomial_cmp(tmp.get_internal(), rhs.get_internal()) < 0;
 }
 
@@ -196,13 +195,11 @@ bool operator<=(const LPPolynomial& lhs, const LPPolynomial& rhs) {
     return lp_polynomial_cmp(lhs.get_internal(), rhs.get_internal()) <= 0;
 }
 bool operator<=(const LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     return lp_polynomial_cmp(lhs.get_internal(), tmp.get_internal()) <= 0;
 }
 bool operator<=(const mpz_class& lhs, const LPPolynomial& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(rhs.get_internal()));
-    tmp += poly::Integer(lhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(rhs.get_internal()), poly::Integer(lhs));
     return lp_polynomial_cmp(tmp.get_internal(), rhs.get_internal()) <= 0;
 }
 
@@ -210,13 +207,11 @@ bool operator>(const LPPolynomial& lhs, const LPPolynomial& rhs) {
     return lp_polynomial_cmp(lhs.get_internal(), rhs.get_internal()) > 0;
 }
 bool operator>(const LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     return lp_polynomial_cmp(lhs.get_internal(), tmp.get_internal()) > 0;
 }
 bool operator>(const mpz_class& lhs, const LPPolynomial& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(rhs.get_internal()));
-    tmp += poly::Integer(lhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(rhs.get_internal()), poly::Integer(lhs));
     return lp_polynomial_cmp(tmp.get_internal(), rhs.get_internal()) > 0;
 }
 
@@ -224,13 +219,11 @@ bool operator>=(const LPPolynomial& lhs, const LPPolynomial& rhs) {
     return lp_polynomial_cmp(lhs.get_internal(), rhs.get_internal()) >= 0;
 }
 bool operator>=(const LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     return lp_polynomial_cmp(lhs.get_internal(), tmp.get_internal()) >= 0;
 }
 bool operator>=(const mpz_class& lhs, const LPPolynomial& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(rhs.get_internal()));
-    tmp += poly::Integer(lhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(rhs.get_internal()), poly::Integer(lhs));
     return lp_polynomial_cmp(tmp.get_internal(), rhs.get_internal()) >= 0;
 }
 
@@ -241,8 +234,7 @@ LPPolynomial operator+(const LPPolynomial& lhs, const LPPolynomial& rhs) {
     return result;
 }
 LPPolynomial operator+(const LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     return lhs + tmp;
 }
 LPPolynomial operator+(const mpz_class& lhs, const LPPolynomial& rhs) {
@@ -256,13 +248,11 @@ LPPolynomial operator-(const LPPolynomial& lhs, const LPPolynomial& rhs) {
     return result;
 }
 LPPolynomial operator-(const LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     return lhs - tmp;
 }
 LPPolynomial operator-(const mpz_class& lhs, const LPPolynomial& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(rhs.get_internal()));
-    tmp += poly::Integer(lhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(rhs.get_internal()), poly::Integer(lhs));
     return tmp - rhs;
 }
 
@@ -273,8 +263,7 @@ LPPolynomial operator*(const LPPolynomial& lhs, const LPPolynomial& rhs) {
     return result;
 }
 LPPolynomial operator*(const LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     return lhs * tmp;
 }
 LPPolynomial operator*(const mpz_class& lhs, const LPPolynomial& rhs) {
@@ -287,8 +276,7 @@ LPPolynomial& operator+=(LPPolynomial& lhs, const LPPolynomial& rhs) {
     return lhs;
 }
 LPPolynomial& operator+=(LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     lp_polynomial_add(lhs.get_internal(), lhs.get_internal(), tmp.get_internal());
     return lhs;
 }
@@ -299,8 +287,7 @@ LPPolynomial& operator-=(LPPolynomial& lhs, const LPPolynomial& rhs) {
     return lhs;
 }
 LPPolynomial& operator-=(LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     lp_polynomial_sub(lhs.get_internal(), lhs.get_internal(), tmp.get_internal());
     return lhs;
 }
@@ -311,8 +298,7 @@ LPPolynomial& operator*=(LPPolynomial& lhs, const LPPolynomial& rhs) {
     return lhs;
 }
 LPPolynomial& operator*=(LPPolynomial& lhs, const mpz_class& rhs) {
-    poly::Polynomial tmp(lp_polynomial_get_context(lhs.get_internal()));
-    tmp += poly::Integer(rhs);
+    poly::Polynomial tmp = poly_helper::construct_poly(lp_polynomial_get_context(lhs.get_internal()), poly::Integer(rhs));
     lp_polynomial_mul(lhs.get_internal(), lhs.get_internal(), tmp.get_internal());
     return lhs;
 }

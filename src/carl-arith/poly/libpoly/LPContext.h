@@ -56,9 +56,6 @@ public:
         std::string varName;
         poly::Variable polyVar;
 
-        // Libpoly handles the variable order exactly the other way around
-        // i.e the main variable is not the first one but the last one
-        //for (size_t i = varOrder.size(); i-- > 0;) {
         for (size_t i = 0; i < varOrder.size(); i++) {
             varName = varOrder[i].name();
             CARL_LOG_DEBUG("carl.poly", "Variable name: " << varName << "  " << i);

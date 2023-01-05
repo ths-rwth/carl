@@ -8,6 +8,7 @@
 #include <carl-arith/core/Variables.h>
 
 #include "LPPolynomial.h"
+#include "helper.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -125,12 +126,11 @@ public:
             convert(coeff, CoCoA::coeff(i));
             std::vector<long> exponents;
             CoCoA::exponents(exponents, CoCoA::PP(i));
-            poly::Polynomial termPoly(context);
-            termPoly += (poly::Integer)carl::get_num(coeff);
+            poly::Polynomial termPoly = poly_helper::construct_poly(context, (poly::Integer)carl::get_num(coeff));
 
             for (std::size_t i = 0; i < exponents.size(); ++i) {
                 if (exponents[i] == 0) continue;
-                poly::Variable polyVar = VariableMapper::getInstance().getLibpolyVariable(mSymbolBack[i]);
+                poly::Polynomial polyVar = poly_helper::construct_poly(context, VariableMapper::getInstance().getLibpolyVariable(mSymbolBack[i]));
                 termPoly *= poly::pow(polyVar, (unsigned int)exponents[i]);
             }
             temPoly += termPoly;
