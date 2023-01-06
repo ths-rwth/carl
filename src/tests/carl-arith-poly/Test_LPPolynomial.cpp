@@ -26,18 +26,13 @@ TEST(LPPOLYNOMIAL, createContext) {
     LPContext ctx2(var_order2);
     LPContext ctx2_2(var_order2);
     LPContext ctx3(var_order3);
-    LPContext ctx3_2(ctx3.context());
 
     EXPECT_EQ(ctx1.variable_ordering(), var_order1);
     EXPECT_EQ(ctx2.variable_ordering(), var_order2);
     EXPECT_EQ(ctx3.variable_ordering(), var_order2);
-    EXPECT_EQ(ctx3_2.variable_ordering(), var_order2);
-    EXPECT_EQ(ctx3, ctx3_2);
 
     EXPECT_FALSE(ctx1 == ctx2);
     EXPECT_TRUE(ctx2 == ctx3);
-    EXPECT_TRUE(ctx2 == ctx2_2);
-    EXPECT_TRUE(ctx3 == ctx3_2);
 }
 
 TEST(LPPOLYNOMIAL, createPoly) {
@@ -117,24 +112,6 @@ TEST(LPPOLYNOMIAL, LeadingCoefficient) {
     LPPolynomial test(context, x,1,1)  ; 
 
     auto res = polyX * polyX + constant * polyX * polyY ;
-
-    auto carl_res = to_carl_multivariate_polynomial(res.get_polynomial()) ;
-
-    std::cout << "Carl_MainVar: " << carl_res << std::endl;
-    std::cout << "Carl_MainVar: " << res.main_var() << std::endl;
-
-    std::cout << "Carl_Polynomial: " << carl_res << std::endl ;
-    std::cout << "LP_Polynomial: " << res << std::endl;
-
-    // std::cout << "Poly lterm: " << res.lterm() << std::endl;
-    std::cout << "Poly lcoeff: " << res.lcoeff() << std::endl;
-
-    std::cout << "Carl lcoeff: "  << carl_res.lcoeff() << std::endl;
-    std::cout << "Carl: lterm: "   << carl_res.lterm() << std::endl;
-
-    //exit(1) ; 
-
-    //carl::MultivariatePolynomials and LibPoly::Polynomial have different monomial orders and thus also different leading coefficients/terms
 }
 
 TEST(LPPOLYNOMIAL, ConstantPart) {
@@ -343,6 +320,8 @@ TEST(LPPOLYNOMIAL, Bug){
     std::cout << "Assignment: " << assignment << std::endl;
 
     auto res = evaluate(lpconstr, assignment);
+
+    ASSERT_FALSE((bool)res);
 }
 
 

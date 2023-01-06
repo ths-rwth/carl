@@ -6,9 +6,9 @@
  */
 namespace carl::poly_helper {
 
-inline poly::Polynomial construct_poly(const lp_polynomial_context_t* c, poly::Variable v) {
+inline poly::Polynomial construct_poly(const lp_polynomial_context_t* c, lp_variable_t v) {
     poly::Polynomial poly;
-    lp_polynomial_construct_simple(poly.get_internal(), c, poly::Integer(1).get_internal(), v.get_internal(), 1);
+    lp_polynomial_construct_simple(poly.get_internal(), c, poly::Integer(1).get_internal(), v, 1);
     return poly;
 }
 

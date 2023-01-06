@@ -8,6 +8,7 @@
 #ifdef USE_LIBPOLY
 
 #include "LPContext.h"
+#include "helper.h"
 
 #include <carl-arith/core/Variables.h>
 #include <carl-logging/carl-logging.h>
@@ -20,8 +21,6 @@
 #include <vector>
 
 #include <carl-arith/ran/libpoly/LPRan.h>
-#include <carl-arith/converter/LibpolyVariableMapper.h>
-
 namespace carl {
 
 class LPPolynomial {
@@ -73,14 +72,14 @@ public:
 	 * Also uses the given context.
 	 * @param mainPoly Libpoly Polynomial.
 	 */
-	LPPolynomial(const poly::Polynomial& mainPoly);
+	LPPolynomial(const LPContext& context, const poly::Polynomial& mainPoly);
 
 	/**
 	 * Moves a LPPolynomial with the given libpoly polynomial.
 	 * Also uses the given context.
 	 * @param mainPoly Libpoly Polynomial.
 	 */
-	LPPolynomial(poly::Polynomial&& mainPoly);
+	LPPolynomial(const LPContext& context, poly::Polynomial&& mainPoly);
 
 	/**
 	 * Construct a LPPolynomial with only a integer.
@@ -159,19 +158,16 @@ public:
 	 * @return One.
 	 */
 	LPPolynomial one() const {
-		// Construct zero-poly with the same context
-		poly::Polynomial temp(lp_polynomial_get_context(m_poly.get_internal()));
-		temp += poly::Integer(1);
-		return temp;
+		return LPPolynomial(m_context, 1);
 	}
 
 	/**
 	 * For terms with exactly one variable, get this variable.
-	 * @return The only variable occuring in the term.
+	 * @return The only variable occurring in the term.
 	 */
 	Variable single_variable() const {
 		assert(poly::is_univariate(m_poly));
-		return VariableMapper::getInstance().getCarlVariable(poly::main_variable(m_poly));
+		return context().carl_variable(poly::main_variable(m_poly).get_internal());
 	}
 
 	/**
@@ -179,7 +175,7 @@ public:
 	 * @return The leading coefficient.
 	 */
 	LPPolynomial lcoeff() const {
-		return LPPolynomial(poly::leading_coefficient(m_poly));
+		return LPPolynomial(m_context, poly::leading_coefficient(m_poly));
 	}
 
 	/** Obtain all non-zero coefficients of a polynomial. */
@@ -188,7 +184,7 @@ public:
 		for (std::size_t deg = 0; deg <= poly::degree(m_poly); ++deg) {
 			auto coeff = poly::coefficient(m_poly, deg);
 			if (lp_polynomial_is_zero(coeff.get_internal())) continue;
-			res.emplace_back(std::move(coeff));
+			res.emplace_back(context(), std::move(coeff));
 		}
 		return res;
 	}
@@ -239,7 +235,7 @@ public:
 	 */
 	Variable main_var() const {
 		if (poly::is_constant(m_poly)) return carl::Variable::NO_VARIABLE;
-		else return VariableMapper::getInstance().getCarlVariable(poly::main_variable(m_poly));
+		else return context().carl_variable(poly::main_variable(m_poly).get_internal());
 	}
 
 	/**
@@ -501,19 +497,24 @@ inline std::size_t level_of(const LPPolynomial& p) {
 
 /// Add the variables of the given polynomial to the variables.
 inline void variables(const LPPolynomial& p, carlVariables& vars) {
-	// vars.clear();
+	struct TraverseData {
+		carlVariables& vars;
+		const LPContext& context;
+		TraverseData(carlVariables& v, const LPContext& c) : vars(v), context(c) {}
+	};
 
 	auto collectVars = [](const lp_polynomial_context_t* /*ctx*/,
 						  lp_monomial_t* m,
 						  void* d) {
-		carlVariables* varList = static_cast<carlVariables*>(d);
+		TraverseData* data = static_cast<TraverseData*>(d);
 		for (size_t i = 0; i < m->n; i++) {
-			carl::Variable var = VariableMapper::getInstance().getCarlVariable(m->p[i].x);
-			varList->add(var);
+			carl::Variable var = data->context.carl_variable(m->p[i].x);
+			data->vars.add(var);
 		}
 	};
 
-	lp_polynomial_traverse(p.get_internal(), collectVars, &vars);
+	TraverseData d(vars, p.context());
+	lp_polynomial_traverse(p.get_internal(), collectVars, &d);
 	return;
 }
 

@@ -7,7 +7,7 @@
 #include "../common/RealRoots.h"
 #include <carl-arith/core/Variable.h>
 
-#include <carl-arith/converter/LibpolyConverter.h>
+#include "helper.h"
 #include <carl-logging/carl-logging.h>
 
 #include <carl-arith/poly/libpoly/LPPolynomial.h>
