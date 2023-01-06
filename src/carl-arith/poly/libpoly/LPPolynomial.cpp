@@ -111,6 +111,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, co
 
     for (const mpz_class& coeff : coefficients) {
         pow--;
+        if (is_zero(coeff)) continue;
         poly::Polynomial temp;
         lp_polynomial_construct_simple(temp.get_internal(), context.lp_context(), poly::Integer(coeff).get_internal(), var, (unsigned int)pow);
         m_poly += temp;

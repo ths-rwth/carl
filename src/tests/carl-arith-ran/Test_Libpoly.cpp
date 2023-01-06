@@ -36,6 +36,8 @@ TEST(LIBPOLY, convertToCarlUnivariate) {
 }
 
 TEST(LIBPOLY, convertRan) {
+    lp_trace_enable("coefficient::arith");
+
     Variable x = fresh_real_variable("x");
     std::vector<Variable> var_order = {x};
     LPContext context(var_order);
@@ -74,6 +76,7 @@ TEST(LIBPOLY, convertRan) {
             if (coeffs.back() == (mpz_class)0) {
                 coeffs.back() = (mpz_class)1;
             }
+            std::cout << coeffs << std::endl;
             LPPolynomial randomPol(context, x, coeffs);
             polys.push_back(randomPol);
         }

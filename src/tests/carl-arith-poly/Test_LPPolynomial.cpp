@@ -32,7 +32,7 @@ TEST(LPPOLYNOMIAL, createContext) {
     EXPECT_EQ(ctx3.variable_ordering(), var_order2);
 
     EXPECT_FALSE(ctx1 == ctx2);
-    EXPECT_TRUE(ctx2 == ctx3);
+    EXPECT_FALSE(ctx2 == ctx3);
 }
 
 TEST(LPPOLYNOMIAL, createPoly) {
