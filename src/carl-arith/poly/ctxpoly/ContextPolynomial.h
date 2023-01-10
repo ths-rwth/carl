@@ -72,6 +72,10 @@ public:
         return m_content.degree();
     }
 
+    auto total_degree() const {
+        return total_degree(m_content);
+    }
+
     auto coefficients() const {
         std::vector<ContextPolynomial<Coeff, Ordering, Policies>> coeffs;
         for (const auto& coeff :  m_content.coefficients()) {
