@@ -138,12 +138,40 @@ private:
 		*this << ")" << std::endl;
 	}
 	
+	template<typename Rational>
+	void write(const IntRepRealAlgebraicNumber<Rational>& ran) {
+		if (ran.is_numeric()) {
+			*this << ran.value();
+			return;
+		}
+
+		auto p = ran.polynomial();
+		auto denominator = p.coprime_factor();
+		if ((denominator < 0) == (p.lcoeff() > 0)) denominator *= -1;
+		p *= denominator;
+
+		*this << "(root-of-with-interval ";
+		const auto& coeffs = p.coefficients();
+		auto it = coeffs.begin();
+		*this << "(" << *it;
+		it++;
+		for (; it != coeffs.end(); it++) {
+			assert(carl::is_integer(*it));
+			*this << " " << *it;
+		}
+		*this << ") ";
+		*this << "(" << ran.interval().lower() << " " << ran.interval().upper() << ")";
+		*this << ")";
+	}
+
 	template<typename Rational, typename Poly>
-	void write(const ModelValue<Rational,Poly>& mv) {
+	void write(const ModelValue<Rational, Poly>& mv) {
 		if (mv.isBool()) {
 			*this << mv.asBool();
 		} else if (mv.isRational()) {
 			*this << mv.asRational();
+		} else if (mv.isRAN()) {
+			write(mv.asRAN());
 		}
 	}
 
