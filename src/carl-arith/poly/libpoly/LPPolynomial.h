@@ -167,7 +167,9 @@ public:
 	 */
 	Variable single_variable() const {
 		assert(poly::is_univariate(m_poly));
-		return context().carl_variable(poly::main_variable(m_poly).get_internal());
+		auto carl_var = context().carl_variable(poly::main_variable(m_poly).get_internal());
+		assert(carl_var.has_value());
+		return *carl_var;
 	}
 
 	/**
@@ -235,7 +237,7 @@ public:
 	 */
 	Variable main_var() const {
 		if (poly::is_constant(m_poly)) return carl::Variable::NO_VARIABLE;
-		else return context().carl_variable(poly::main_variable(m_poly).get_internal());
+		else return *(context().carl_variable(poly::main_variable(m_poly).get_internal()));
 	}
 
 	/**
@@ -508,8 +510,9 @@ inline void variables(const LPPolynomial& p, carlVariables& vars) {
 						  void* d) {
 		TraverseData* data = static_cast<TraverseData*>(d);
 		for (size_t i = 0; i < m->n; i++) {
-			carl::Variable var = data->context.carl_variable(m->p[i].x);
-			data->vars.add(var);
+			auto var = data->context.carl_variable(m->p[i].x);
+			assert(var.has_value());
+			data->vars.add(*var);
 		}
 	};
 

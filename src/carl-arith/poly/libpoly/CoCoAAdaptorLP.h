@@ -96,8 +96,9 @@ public:
             std::vector<long> exponents(data->mSymbolBack.size());
 
             for (size_t i = 0; i < m->n; i++) {
-                carl::Variable var = data->context.carl_variable(m->p[i].x);
-                auto it = data->mSymbolThere.find(var);
+                auto var = data->context.carl_variable(m->p[i].x);
+                assert(var.has_value());
+                auto it = data->mSymbolThere.find(*var);
                 assert(it != data->mSymbolThere.end());
                 long indetIndex;
                 if (CoCoA::IsIndet(indetIndex, it->second)) {
@@ -129,7 +130,9 @@ public:
 
             for (std::size_t i = 0; i < exponents.size(); ++i) {
                 if (exponents[i] == 0) continue;
-                poly::Polynomial polyVar = poly_helper::construct_poly(mContext.lp_context(), mContext.lp_variable(mSymbolBack[i]));
+                std::optional<lp_variable_t> var = mContext.lp_variable(mSymbolBack[i]);
+                assert(var.has_value());
+                poly::Polynomial polyVar = poly_helper::construct_poly(mContext.lp_context(), *var);
                 termPoly *= poly::pow(polyVar, (unsigned int)exponents[i]);
             }
             temPoly += termPoly;

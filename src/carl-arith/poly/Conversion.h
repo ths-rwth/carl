@@ -90,7 +90,9 @@ void collectTermDataFunction(const lp_polynomial_context_t* /*ctx*/, lp_monomial
 	CollectTermData<T>* data = static_cast<CollectTermData<T>*>(d);
 	carl::Term<T> term(mpz_class(&m->a));															   // m->a is the integer coefficient
 	for (size_t i = 0; i < m->n; i++) {																   // m->n is the capacity of the power array
-		term *= carl::Term<T>(1, data->context.carl_variable(m->p[i].x), m->p[i].d); // p[i].x is the variable, p[i].d is the power
+		auto carl_var = data->context.carl_variable(m->p[i].x);
+		assert(carl_var.has_value());
+		term *= carl::Term<T>(1, *carl_var, m->p[i].d); // p[i].x is the variable, p[i].d is the power
 	}
 	data->terms.emplace_back(term);
 }

@@ -15,7 +15,7 @@ std::optional<LPRealAlgebraicNumber> evaluate(
 		//Turn into value
 		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, entry.second.get_internal());
 		//That copies the value into the assignment
-		assignment.set(polynomial.context().lp_variable(entry.first), poly::Value(&val));
+		assignment.set(*(polynomial.context().lp_variable(entry.first)), poly::Value(&val));
 		lp_value_destruct(&val);
 	}
 
@@ -66,7 +66,7 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 		//Turn into value
 		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, entry.second.get_internal());
 		//That copies the value into the assignment
-		assignment.set(constraint.lhs().context().lp_variable(entry.first), poly::Value(&val));
+		assignment.set(*(constraint.lhs().context().lp_variable(entry.first)), poly::Value(&val));
 		lp_value_destruct(&val);
 	}
 

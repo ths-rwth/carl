@@ -54,19 +54,20 @@ public:
         return *this;
     }
 
-    carl::Variable carl_variable(lp_variable_t var) const {
+    std::optional<carl::Variable> carl_variable(lp_variable_t var) const {
         auto it = m_data->vars_libpoly_carl.find(var);
-        assert(it != m_data->vars_libpoly_carl.end());
+        if(it == m_data->vars_libpoly_carl.end()) return std::nullopt;
         CARL_LOG_TRACE("carl.poly", "Mapping libpoly variable " << lp_variable_db_get_name(m_data->poly_context.get_variable_db(), var) << " -> " << it->second);
         return it->second;
     }
 
-    lp_variable_t lp_variable(carl::Variable var) const {
+    std::optional<lp_variable_t> lp_variable(carl::Variable var) const {
         auto it = m_data->vars_carl_libpoly.find(var);
-        assert(it != m_data->vars_carl_libpoly.end());
+        if(it == m_data->vars_carl_libpoly.end()) return std::nullopt;
         CARL_LOG_TRACE("carl.poly", "Mapping carl variable " << var << " -> " << lp_variable_db_get_name(m_data->poly_context.get_variable_db(), it->second));
         return it->second;
     }
+
 
     /**
      * Construct a Context with a given order of carl::Variable in decreasing order of precedence
