@@ -8,7 +8,9 @@
 #include <carl-arith/core/VariablePool.h>
 #include <carl-arith/poly/libpoly/LPContext.h>
 #include <carl-arith/poly/libpoly/LPPolynomial.h>
+#include <carl-arith/ran/libpoly/Evaluation.h>
 #include <carl-arith/poly/Conversion.h>
+#include <carl-arith/constraint/Conversion.h>
 
 using namespace carl;
 
@@ -24,18 +26,13 @@ TEST(LPPOLYNOMIAL, createContext) {
     LPContext ctx2(var_order2);
     LPContext ctx2_2(var_order2);
     LPContext ctx3(var_order3);
-    LPContext ctx3_2(ctx3.context());
 
     EXPECT_EQ(ctx1.variable_ordering(), var_order1);
     EXPECT_EQ(ctx2.variable_ordering(), var_order2);
     EXPECT_EQ(ctx3.variable_ordering(), var_order2);
-    EXPECT_EQ(ctx3_2.variable_ordering(), var_order2);
-    EXPECT_EQ(ctx3, ctx3_2);
 
     EXPECT_FALSE(ctx1 == ctx2);
-    EXPECT_TRUE(ctx2 == ctx3);
-    EXPECT_TRUE(ctx2 == ctx2_2);
-    EXPECT_TRUE(ctx3 == ctx3_2);
+    EXPECT_FALSE(ctx2 == ctx3);
 }
 
 TEST(LPPOLYNOMIAL, createPoly) {
@@ -115,24 +112,6 @@ TEST(LPPOLYNOMIAL, LeadingCoefficient) {
     LPPolynomial test(context, x,1,1)  ; 
 
     auto res = polyX * polyX + constant * polyX * polyY ;
-
-    auto carl_res = to_carl_multivariate_polynomial(res.get_polynomial()) ;
-
-    std::cout << "Carl_MainVar: " << carl_res << std::endl;
-    std::cout << "Carl_MainVar: " << res.main_var() << std::endl;
-
-    std::cout << "Carl_Polynomial: " << carl_res << std::endl ;
-    std::cout << "LP_Polynomial: " << res << std::endl;
-
-    // std::cout << "Poly lterm: " << res.lterm() << std::endl;
-    std::cout << "Poly lcoeff: " << res.lcoeff() << std::endl;
-
-    std::cout << "Carl lcoeff: "  << carl_res.lcoeff() << std::endl;
-    std::cout << "Carl: lterm: "   << carl_res.lterm() << std::endl;
-
-    //exit(1) ; 
-
-    //carl::MultivariatePolynomials and LibPoly::Polynomial have different monomial orders and thus also different leading coefficients/terms
 }
 
 TEST(LPPOLYNOMIAL, ConstantPart) {
@@ -316,6 +295,34 @@ TEST(LPPOLYNOMIAL, Normalized){
 }
 */
 
+TEST(LPPOLYNOMIAL, Bug){
+// DEBUG carl.ran.libpoly Evaluation.cpp:35   evaluate():  Evaluation constraint 1*#0^2 + (1*x_1^2 + (1*x_0^2 - 1)) < 0 for assignment {x_0 : -1/2, x_1 : <4*x^2 + (-3), (-1, -3/4)>, x_2 : 0}
+
+    using Rational = mpq_class;
+    using Poly = MultivariatePolynomial<Rational>;
+    using UPoly = UnivariatePolynomial<Rational>;
+
+    auto x_0 = fresh_real_variable("x_0");
+    auto x_1 = fresh_real_variable("x_1");
+    auto x_2 = fresh_real_variable("x_2");
+    Poly poly = Poly(x_2)*Poly(x_2)+Poly(x_1)*Poly(x_1)+Poly(x_0)*Poly(x_0)-Rational(1);
+    BasicConstraint<Poly> constr(poly, Relation::LESS);
+
+    LPContext ctx({x_0,x_1,x_2});
+    auto lpconstr = convert<LPPolynomial>(ctx, constr);
+    std::cout << "LP constraint: " << lpconstr << std::endl;
+
+    Assignment<LPPolynomial::RootType> assignment;
+    assignment.emplace(x_0, LPPolynomial::RootType(Rational(-1)/Rational(2)));
+    assignment.emplace(x_1, LPPolynomial::RootType(UPoly(x_1, {Rational(-3),Rational(0),Rational(4)}), Interval<Rational>(-1,Rational(-3)/4))); // <4*x^2 + (-3), (-1, -3/4)>
+    assignment.emplace(x_2, LPPolynomial::RootType(Rational(0)));
+
+    std::cout << "Assignment: " << assignment << std::endl;
+
+    auto res = evaluate(lpconstr, assignment);
+
+    ASSERT_FALSE((bool)res);
+}
 
 
 

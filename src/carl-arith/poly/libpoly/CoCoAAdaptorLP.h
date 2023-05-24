@@ -8,6 +8,7 @@
 #include <carl-arith/core/Variables.h>
 
 #include "LPPolynomial.h"
+#include "helper.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -75,68 +76,66 @@ public:
         res = convert(r);
     }
 
-    /**
-     * Helper function to collect Terms of a libpoly polynomial to CoCoA polynomial
-     */
-    static void collectTerms(const lp_polynomial_context_t* /*ctx*/,
-                             lp_monomial_t* m,
-                             void* d) {
-        using DataLP = std::pair<CoCoA::RingElem*, std::pair<std::map<Variable, CoCoA::RingElem>, std::pair<std::vector<Variable>, std::pair<CoCoA::ring, CoCoA::SparsePolyRing>>>>;
-
-        DataLP* res = static_cast<DataLP*>(d);
-        CoCoA::RingElem* resPoly = res->first;
-        std::map<Variable, CoCoA::RingElem> mSymbolThere = res->second.first;
-        std::vector<Variable> mSymbolBack = res->second.second.first;
-        CoCoA::ring mQ = res->second.second.second.first;
-        CoCoA::SparsePolyRing mRing = res->second.second.second.second;
-
-        std::vector<long> exponents(mSymbolBack.size());
-
-        for (size_t i = 0; i < m->n; i++) {
-            carl::Variable var = VariableMapper::getInstance().getCarlVariable(m->p[i].x);
-            auto it = mSymbolThere.find(var);
-            assert(it != mSymbolThere.end());
-            long indetIndex;
-            if (CoCoA::IsIndet(indetIndex, it->second)) {
-                exponents[std::size_t(indetIndex)] = long(m->p[i].d);
-            } else {
-                assert(false && "The symbol is not an inderminant.");
-            }
-        }
-
-        auto coefPol = poly::Integer(&(m->a));
-        mpz_class* coef = poly::detail::cast_to_gmp(&coefPol);
-        *resPoly += CoCoA::monomial(mRing, convert(*(coef)), exponents);
-    }
-
     CoCoA::RingElem convert(const LPPolynomial& p) const {
+        assert(p.context() == mContext);
+        
         CoCoA::RingElem res(mRing);
-        using DataLP = std::pair<CoCoA::RingElem*, std::pair<std::map<Variable, CoCoA::RingElem>, std::pair<std::vector<Variable>, std::pair<CoCoA::ring, CoCoA::SparsePolyRing>>>>;
-        DataLP data{&res, {mSymbolThere, {mSymbolBack, {mQ, mRing}}}};
+
+        struct DataLP {
+            CoCoA::RingElem* resPoly;
+            std::map<Variable, CoCoA::RingElem> mSymbolThere;
+            std::vector<Variable> mSymbolBack;
+            CoCoA::ring mQ;
+            CoCoA::SparsePolyRing mRing;
+            const LPContext& context;
+        };
+
+        auto collectTerms = [](const lp_polynomial_context_t* /*ctx*/, lp_monomial_t* m, void* d) {
+            DataLP* data = static_cast<DataLP*>(d);
+
+            std::vector<long> exponents(data->mSymbolBack.size());
+
+            for (size_t i = 0; i < m->n; i++) {
+                carl::Variable var = data->context.carl_variable(m->p[i].x);
+                auto it = data->mSymbolThere.find(var);
+                assert(it != data->mSymbolThere.end());
+                long indetIndex;
+                if (CoCoA::IsIndet(indetIndex, it->second)) {
+                    exponents[std::size_t(indetIndex)] = long(m->p[i].d);
+                } else {
+                    assert(false && "The symbol is not an inderminant.");
+                }
+            }
+
+            auto coefPol = poly::Integer(&(m->a));
+            mpz_class* coef = poly::detail::cast_to_gmp(&coefPol);
+            *data->resPoly += CoCoA::monomial(data->mRing, convert(*(coef)), exponents);
+        };
+
+        DataLP data{&res, mSymbolThere, mSymbolBack, mQ, mRing, mContext};
         lp_polynomial_traverse(p.get_internal(), collectTerms, &data);
         return res;
     }
 
-    LPPolynomial convert(const CoCoA::RingElem& p, const lp_polynomial_context_t* context) const {
-        poly::Polynomial temPoly(context);
+    LPPolynomial convert(const CoCoA::RingElem& p) const {
+        poly::Polynomial temPoly(mContext.lp_context());
 
         for (CoCoA::SparsePolyIter i = CoCoA::BeginIter(p); !CoCoA::IsEnded(i); ++i) {
             mpq_class coeff;
             convert(coeff, CoCoA::coeff(i));
             std::vector<long> exponents;
             CoCoA::exponents(exponents, CoCoA::PP(i));
-            poly::Polynomial termPoly(context);
-            termPoly += (poly::Integer)carl::get_num(coeff);
+            poly::Polynomial termPoly = poly_helper::construct_poly(mContext.lp_context(), (poly::Integer)carl::get_num(coeff));
 
             for (std::size_t i = 0; i < exponents.size(); ++i) {
                 if (exponents[i] == 0) continue;
-                poly::Variable polyVar = VariableMapper::getInstance().getLibpolyVariable(mSymbolBack[i]);
+                poly::Polynomial polyVar = poly_helper::construct_poly(mContext.lp_context(), mContext.lp_variable(mSymbolBack[i]));
                 termPoly *= poly::pow(polyVar, (unsigned int)exponents[i]);
             }
             temPoly += termPoly;
         }
 
-        LPPolynomial res(temPoly);
+        LPPolynomial res(mContext, temPoly);
         return res;
     }
 
@@ -149,7 +148,7 @@ public:
     std::vector<LPPolynomial> convert(const std::vector<CoCoA::RingElem>& p) const {
         std::vector<LPPolynomial> res;
         for (const CoCoA::RingElem& poly : p)
-            res.emplace_back(convert(poly, mContext.context()));
+            res.emplace_back(convert(poly));
         return res;
     }
 
@@ -209,10 +208,10 @@ public:
         auto finfo = cocoawrapper::factor(convert(p));
         Factors<LPPolynomial> res;
         if (includeConstant && !CoCoA::IsOne(finfo.myRemainingFactor())) {
-            res.emplace(convert(finfo.myRemainingFactor(), mContext.context()), 1);
+            res.emplace(convert(finfo.myRemainingFactor()), 1);
         }
         for (std::size_t i = 0; i < finfo.myFactors().size(); i++) {
-            res[convert(finfo.myFactors()[i], mContext.context())] = finfo.myMultiplicities()[i];
+            res[convert(finfo.myFactors()[i])] = finfo.myMultiplicities()[i];
         }
         return res;
     }

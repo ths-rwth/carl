@@ -240,18 +240,9 @@ Sign sgn(const LPRealAlgebraicNumber& n) {
     return static_cast<Sign>(lp_algebraic_number_sgn(n.get_internal()));
 }
 
-Sign sgn(const LPRealAlgebraicNumber& n, const UnivariatePolynomial<LPRealAlgebraicNumber::NumberType>& p) {
-    //Add internal algebraic number to an libpoly assignment
-    poly::Assignment assignment ;
-    lp_value_t val;
-    //Turn into value
-    lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, n.get_internal());
-    //That copies the value into the assignment
-    assignment.set(VariableMapper::getInstance().getLibpolyVariable(p.main_var()), poly::Value(&val));
-    lp_value_destruct(&val);
-
-    poly::Polynomial poly = to_libpoly_polynomial(carl::MultivariatePolynomial<LPRealAlgebraicNumber::NumberType>(p)) ;
-    return static_cast<Sign>(poly::sgn(poly, assignment));
+Sign sgn(const LPRealAlgebraicNumber&, const UnivariatePolynomial<LPRealAlgebraicNumber::NumberType>&) {
+    assert(false);
+    return Sign::ZERO;
 }
 
 bool contained_in(const LPRealAlgebraicNumber& n, const Interval<LPRealAlgebraicNumber::NumberType>& i) {

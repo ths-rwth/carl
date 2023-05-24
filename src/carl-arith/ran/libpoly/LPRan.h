@@ -10,7 +10,7 @@
 #include <boost/logic/tribool.hpp>
 #include <list>
 
-#include "../../converter/LibpolyConverter.h"
+#include "helper.h"
 #include "../../core/Relation.h"
 
 #include "../common/Operations.h"

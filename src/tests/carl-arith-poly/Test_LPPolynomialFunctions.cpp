@@ -10,9 +10,9 @@
 #include <carl-arith/poly/libpoly/LPPolynomial.h>
 #include <carl-arith/poly/libpoly/Functions.h>
 #include <carl-arith/ran/ran.h>
-#include <carl-arith/converter/LibpolyConverter.h>
 #include <carl-arith/poly/umvpoly/functions/Resultant.h>
 #include <carl-arith/poly/umvpoly/functions/Factorization.h>
+#include <carl-arith/poly/Conversion.h>
 
 using namespace carl;
 
@@ -30,13 +30,13 @@ TEST(LPPOLYNOMIAL, Resultant) {
     auto lp_poly1 = polyX * polyY - 12;
     auto lp_poly2 = polyX * polyX * (polyY - 12) - polyY * polyY;
 
-    auto carl_poly1 = to_carl_multivariate_polynomial(lp_poly1.get_polynomial());
-    auto carl_poly2 = to_carl_multivariate_polynomial(lp_poly2.get_polynomial());
+    auto carl_poly1 = convert<MultivariatePolynomial<mpq_class>>(lp_poly1);
+    auto carl_poly2 = convert<MultivariatePolynomial<mpq_class>>(lp_poly2);
 
     auto carl_resultant = resultant(to_univariate_polynomial(carl_poly1, x), to_univariate_polynomial(carl_poly2, x));
     auto lp_resultant = resultant(lp_poly1, lp_poly2);
 
-    EXPECT_EQ(to_univariate_polynomial(to_carl_multivariate_polynomial(lp_resultant.get_polynomial()), x), carl_resultant);
+    EXPECT_EQ(to_univariate_polynomial(convert<MultivariatePolynomial<mpq_class>>(lp_resultant), x), carl_resultant);
 }
 */
 
@@ -83,7 +83,7 @@ TEST(LPPOLYNOMIAL, Evaluate) {
 
     auto res = polyX * polyX - 12;
 
-    auto res_carl = to_carl_multivariate_polynomial(res.get_polynomial());
+    auto res_carl = convert<MultivariatePolynomial<mpq_class>>(res);
 
     std::map<Variable, LPRealAlgebraicNumber> assignment;
     assignment[x] = LPRealAlgebraicNumber(123312 / 123312);
@@ -219,9 +219,9 @@ TEST(LPPOLYNOMIAL, Coeff){
 
     auto res = polyX * polyY - 12;
 
-    auto res_carl = to_carl_multivariate_polynomial(res.get_polynomial());
+    auto res_carl = convert<MultivariatePolynomial<mpq_class>>(res);
 
-    EXPECT_EQ(to_carl_multivariate_polynomial(res.coeff(x,2).get_polynomial()), res_carl.coeff(x,2));
+    EXPECT_EQ(convert<MultivariatePolynomial<mpq_class>>(res.coeff(x,2)), res_carl.coeff(x,2));
     
 }
 

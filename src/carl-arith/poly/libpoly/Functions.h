@@ -15,7 +15,7 @@ namespace carl {
  * @return gcd(p,q)
  */
 inline LPPolynomial gcd(const LPPolynomial& p, const LPPolynomial& q) {
-    return LPPolynomial(poly::gcd(p.get_polynomial(), q.get_polynomial()));
+    return LPPolynomial(p.context(), poly::gcd(p.get_polynomial(), q.get_polynomial()));
 }
 
 /*
@@ -24,7 +24,7 @@ inline LPPolynomial gcd(const LPPolynomial& p, const LPPolynomial& q) {
  * @return lcm(p,q)
  */
 inline LPPolynomial lcm(const LPPolynomial& p, const LPPolynomial& q) {
-    return LPPolynomial(poly::lcm(p.get_polynomial(), q.get_polynomial()));
+    return LPPolynomial(p.context(), poly::lcm(p.get_polynomial(), q.get_polynomial()));
 }
 
 /*
@@ -33,7 +33,7 @@ inline LPPolynomial lcm(const LPPolynomial& p, const LPPolynomial& q) {
  * @return content(p)
  */
 inline LPPolynomial content(const LPPolynomial& p) {
-    return LPPolynomial(poly::content(p.get_polynomial()));
+    return LPPolynomial(p.context(), poly::content(p.get_polynomial()));
 }
 
 /*
@@ -42,7 +42,7 @@ inline LPPolynomial content(const LPPolynomial& p) {
  * @return primitive_part(p)
  */
 inline LPPolynomial primitive_part(const LPPolynomial& p) {
-    return LPPolynomial(poly::primitive_part(p.get_polynomial()));
+    return LPPolynomial(p.context(), poly::primitive_part(p.get_polynomial()));
 }
 
 /*
@@ -51,7 +51,7 @@ inline LPPolynomial primitive_part(const LPPolynomial& p) {
  * @return resultant(p,q)
  */
 inline LPPolynomial resultant(const LPPolynomial& p, const LPPolynomial& q) {
-    return LPPolynomial(poly::resultant(p.get_polynomial(), q.get_polynomial()));
+    return LPPolynomial(p.context(), poly::resultant(p.get_polynomial(), q.get_polynomial()));
 }
 
 /*
@@ -60,7 +60,11 @@ inline LPPolynomial resultant(const LPPolynomial& p, const LPPolynomial& q) {
  * @return discriminant(p)
  */
 inline LPPolynomial discriminant(const LPPolynomial& p) {
-    return LPPolynomial(poly::discriminant(p.get_polynomial()));
+    assert(p.context().lp_context() == lp_polynomial_get_context(p.get_polynomial().get_internal()));
+    if (poly::degree(p.get_internal()) == 1) { // workaround for bug in the libpoly c++ wrapper
+        return LPPolynomial(p.context(), 1);
+    }
+    return LPPolynomial(p.context(), poly::discriminant(p.get_polynomial()));
 }
 
 /*
@@ -117,7 +121,7 @@ inline std::vector<LPPolynomial> square_free_factors(const LPPolynomial& p) {
     std::vector<poly::Polynomial> factors = poly::square_free_factors(p.get_polynomial());
     std::vector<LPPolynomial> result;
     for (const auto& factor : factors) {
-        result.push_back(LPPolynomial(std::move(factor)));
+        result.push_back(LPPolynomial(p.context(), std::move(factor)));
     }
     return result;
 }
@@ -131,7 +135,7 @@ inline std::vector<LPPolynomial> content_free_factors(const LPPolynomial& p) {
     std::vector<poly::Polynomial> factors = poly::content_free_factors(p.get_polynomial());
     std::vector<LPPolynomial> result;
     for (const auto& factor : factors) {
-        result.push_back(LPPolynomial(std::move(factor)));
+        result.push_back(LPPolynomial(p.context(), std::move(factor)));
     }
     return result;
 }

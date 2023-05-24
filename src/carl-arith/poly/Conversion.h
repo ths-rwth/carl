@@ -79,16 +79,18 @@ struct ConvertHelper<LPPolynomial, MultivariatePolynomial<A, B, C>> {
 
 namespace conversion_private {
 template<typename T>
-struct collectTermData {
+struct CollectTermData {
 	std::vector<carl::Term<T>> terms;
+	const LPContext& context;
+	CollectTermData(const LPContext& c) : context(c) {}
 };
 
 template<typename T>
 void collectTermDataFunction(const lp_polynomial_context_t* /*ctx*/, lp_monomial_t* m, void* d) {
-	collectTermData<T>* data = static_cast<collectTermData<T>*>(d);
+	CollectTermData<T>* data = static_cast<CollectTermData<T>*>(d);
 	carl::Term<T> term(mpz_class(&m->a));															   // m->a is the integer coefficient
 	for (size_t i = 0; i < m->n; i++) {																   // m->n is the capacity of the power array
-		term *= carl::Term<T>(1, VariableMapper::getInstance().getCarlVariable(m->p[i].x), m->p[i].d); // p[i].x is the variable, p[i].d is the power
+		term *= carl::Term<T>(1, data->context.carl_variable(m->p[i].x), m->p[i].d); // p[i].x is the variable, p[i].d is the power
 	}
 	data->terms.emplace_back(term);
 }
@@ -97,7 +99,7 @@ void collectTermDataFunction(const lp_polynomial_context_t* /*ctx*/, lp_monomial
 template<typename A, typename B, typename C>
 struct ConvertHelper<MultivariatePolynomial<A, B, C>, LPPolynomial> {
 	static MultivariatePolynomial<A, B, C> convert(const LPPolynomial& p) {
-		conversion_private::collectTermData<A> termdata;
+		conversion_private::CollectTermData<A> termdata(p.context());
 		CARL_LOG_DEBUG("carl.converter", "Converting LPPolynomial " << p);
 		lp_polynomial_traverse(p.get_internal(), conversion_private::collectTermDataFunction<A>, &termdata);
 

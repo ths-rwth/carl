@@ -71,7 +71,7 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
 
     // Multivariate Polynomial
     // build the assignment
-    poly::Assignment assignment;
+    poly::Assignment assignment(polynomial.context().poly_context());
     Variable mainVar = polynomial.main_var();
     for (Variable& var : carl::variables(polynomial)) {
         if (var == mainVar) continue;
@@ -80,7 +80,7 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         // Turn into value
         lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, m.at(var).get_internal());
         // That copies the value into the assignment
-        assignment.set(VariableMapper::getInstance().getLibpolyVariable(var), poly::Value(&val));
+        assignment.set(polynomial.context().lp_variable(var), poly::Value(&val));
         // Destroy the value, but dont free the algebraic number!
         lp_value_destruct(&val);
     }
@@ -89,7 +89,7 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
 
     if (roots.empty()) {
         CARL_LOG_DEBUG("carl.ran.libpoly", " Checking for nullification -> Evaluation at " << mainVar << "= 1");
-        assignment.set(VariableMapper::getInstance().getLibpolyVariable(mainVar), poly::Value(long(1)));
+        assignment.set(polynomial.context().lp_variable(mainVar), poly::Value(long(1)));
         poly::Value eval_val = poly::evaluate(polynomial.get_polynomial(), assignment);
         CARL_LOG_DEBUG("carl.ran.libpoly", " Got eval_val " << eval_val);
 
