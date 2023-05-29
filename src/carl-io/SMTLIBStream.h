@@ -160,7 +160,7 @@ private:
 			*this << " " << *it;
 		}
 		*this << ") ";
-		*this << "(" << ran.interval().lower() << " " << ran.interval().upper() << ")";
+		*this << ran.interval().lower() << " " << ran.interval().upper();
 		*this << ")";
 	}
 
