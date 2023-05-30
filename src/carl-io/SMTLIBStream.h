@@ -153,7 +153,7 @@ private:
 		*this << "(root-of-with-interval ";
 		const auto& coeffs = p.coefficients();
 		auto it = coeffs.begin();
-		*this << "(" << *it;
+		*this << "(coeffs " << *it;
 		it++;
 		for (; it != coeffs.end(); it++) {
 			assert(carl::is_integer(*it));
