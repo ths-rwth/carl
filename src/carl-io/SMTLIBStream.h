@@ -114,7 +114,7 @@ private:
 	
 	template<typename Rational, typename Poly>
 	void write(const Model<Rational,Poly>& model) {
-		*this << "(model" << std::endl;
+		*this << "(" << std::endl;
 		for (const auto& m: model) {
 			auto value = m.second;
 			value = model.evaluated(m.first);
@@ -288,6 +288,11 @@ private:
 			case VariableType::VT_BITVECTOR:		*this << "?_Bitvector"; break;
 			default:								*this << "?"; break;
 		}
+	}
+
+	void write(const bool b) {
+		if (b) *this << "true";
+		else *this << "false";
 	}
 	
 	template<typename T>
