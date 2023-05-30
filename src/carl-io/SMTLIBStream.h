@@ -114,7 +114,7 @@ private:
 	
 	template<typename Rational, typename Poly>
 	void write(const Model<Rational,Poly>& model) {
-		*this << "(" << std::endl;
+		*this << "(model " << std::endl;
 		for (const auto& m: model) {
 			auto value = m.second;
 			value = model.evaluated(m.first);
