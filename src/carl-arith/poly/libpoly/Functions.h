@@ -36,6 +36,10 @@ inline LPPolynomial content(const LPPolynomial& p) {
     return LPPolynomial(p.context(), poly::content(p.get_polynomial()));
 }
 
+inline LPPolynomial derivative(const LPPolynomial& p) {
+    return LPPolynomial(p.context(), poly::derivative(p.get_polynomial()));
+}
+
 /*
  * @brief wrapper for the polynomial primitive_part calculation using libpoly.
  * @param LPPolynomial p

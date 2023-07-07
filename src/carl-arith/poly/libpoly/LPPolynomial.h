@@ -180,6 +180,10 @@ public:
 		return LPPolynomial(m_context, poly::leading_coefficient(m_poly));
 	}
 
+	LPPolynomial coeff(std::size_t k) const {
+		return LPPolynomial(m_context, poly::coefficient(m_poly, k));
+	}
+
 	/** Obtain all non-zero coefficients of a polynomial. */
 	std::vector<LPPolynomial> coefficients() const {
 		std::vector<LPPolynomial> res;
