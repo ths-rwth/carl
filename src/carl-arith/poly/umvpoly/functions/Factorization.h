@@ -79,7 +79,7 @@ Factors<MultivariatePolynomial<C,O,P>> factorization(const MultivariatePolynomia
 	};
 
 	auto factors = s(p);
-	helper::sanitizeFactors(p, factors);
+	// helper::sanitizeFactors(p, factors);
 	return factors;
 }
 
