@@ -144,6 +144,12 @@ inline std::vector<LPPolynomial> content_free_factors(const LPPolynomial& p) {
     return result;
 }
 
+inline std::vector<LPPolynomial> groebner_basis(const std::vector<LPPolynomial>& polys) {
+    if (polys.size() <= 1) return polys;
+    CoCoAAdaptorLP adaptor = CoCoAAdaptorLP(polys.at(0).context());
+    return adaptor.GBasis(polys);
+}
+
 } // namespace carl
 
 #endif
