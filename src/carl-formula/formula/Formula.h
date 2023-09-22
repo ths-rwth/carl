@@ -490,8 +490,7 @@ namespace carl
              */
             const_iterator end() const
             {
-                assert( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR
-                        || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR );
+                assert( is_nary() );
                 return std::get<Formulas<Pol>>(mpContent->mContent).end();
             }
 
