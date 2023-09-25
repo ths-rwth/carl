@@ -275,6 +275,10 @@ void refine(const LPRealAlgebraicNumber& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Finished Refining Algebraic NumberType : " << n);
 }
 
+void LPRealAlgebraicNumber::refine() const {
+	carl::refine(*this);
+}
+
 /**
  * Refine until n is numeric (rational) or until pivot is not in the isolating interval of n
  * NOT CONST, the number is the same, but internally might change 
@@ -288,6 +292,10 @@ void refine_using(const LPRealAlgebraicNumber& n, const NumberType& pivot) {
 		lp_algebraic_number_refine_const(n.get_internal());
 	}
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Finished Refining Algebraic NumberType : " << n);
+}
+
+void LPRealAlgebraicNumber::refine_using(const NumberType& pivot) const {
+	carl::refine_using(*this, pivot);
 }
 
 /**

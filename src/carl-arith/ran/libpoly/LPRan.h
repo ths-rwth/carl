@@ -144,6 +144,9 @@ public:
 	friend NumberType sample_between(const NumberType& lower, const LPRealAlgebraicNumber& upper);
 	friend NumberType floor(const LPRealAlgebraicNumber& n);
 	friend NumberType ceil(const LPRealAlgebraicNumber& n);
+
+	void refine() const;
+	void refine_using(const LPRealAlgebraicNumber::NumberType& pivot) const;
 };
 
 bool compare(const LPRealAlgebraicNumber&, const LPRealAlgebraicNumber&, const Relation);
