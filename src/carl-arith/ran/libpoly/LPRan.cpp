@@ -154,9 +154,11 @@ const UnivariatePolynomial<NumberType> LPRealAlgebraicNumber::polynomial() const
 }
 
 const Interval<NumberType> LPRealAlgebraicNumber::interval() const {
-    const NumberType& lo = get_lower_bound();
-    const NumberType& up = get_upper_bound();
-    return Interval<NumberType>(lo, BoundType::STRICT, up, BoundType::STRICT);
+	if (is_numeric()) {
+		return Interval<NumberType>(get_lower_bound());
+	} else {
+    	return Interval<NumberType>(get_lower_bound(), BoundType::STRICT, get_upper_bound(), BoundType::STRICT);
+	}
 }
 
 const NumberType LPRealAlgebraicNumber::get_upper_bound() const {
