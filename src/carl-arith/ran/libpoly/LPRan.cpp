@@ -155,7 +155,7 @@ const UnivariatePolynomial<NumberType> LPRealAlgebraicNumber::polynomial() const
 
 const Interval<NumberType> LPRealAlgebraicNumber::interval() const {
 	if (is_numeric()) {
-		return Interval<NumberType>(get_lower_bound());
+		return Interval<NumberType>(value());
 	} else {
     	return Interval<NumberType>(get_lower_bound(), BoundType::STRICT, get_upper_bound(), BoundType::STRICT);
 	}
