@@ -21,7 +21,7 @@ namespace statistics {
 #ifdef CARL_DEVOPTION_Statistics
     #define CARL_INIT_STATISTICS(class, variable, name) class& variable = carl::statistics::get<class>(name)
     #define CARL_CALL_STATISTICS(function) function
-    #define CARL_TIME_START(variable) auto variable = carl::statistics::timer::start()
+    #define CARL_TIME_START(variable) auto variable = carl::statistics::Timer::start()
     #define CARL_TIME_FINISH(timer, variable) timer.finish(variable)
 #else
     #define CARL_INIT_STATISTICS(class, variable, name)
