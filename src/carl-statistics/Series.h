@@ -12,7 +12,7 @@ public:
     void add(std::size_t n) {
         m_sum += n;
         m_min = m_count == 0 ? n : std::min(m_min, n);
-        m_max = m_count == 0 ? n : std::min(m_max, n);
+        m_max = m_count == 0 ? n : std::max(m_max, n);
         m_count++;
     }
 
