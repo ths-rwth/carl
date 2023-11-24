@@ -401,6 +401,61 @@ std::size_t LPPolynomial::degree(Variable::Arg var) const {
     return travers.degree;
 }
 
+std::vector<std::size_t>  LPPolynomial::monomial_total_degrees() const {
+    struct degree_travers {
+        std::vector<std::size_t> degree;
+    };
+
+    auto getDegree = [](const lp_polynomial_context_t* /*ctx*/,
+                        lp_monomial_t* m,
+                        void* d) {
+        degree_travers& v = *static_cast<degree_travers*>(d);
+
+        size_t current_degree = 0;
+        // iterate over the number of variables and add up their degrees
+        for (size_t i = 0; i < m->n; i++) {
+            current_degree += m->p[i].d;
+        }
+        v.degree.push_back(current_degree);
+    };
+
+    degree_travers travers;
+    lp_polynomial_traverse(get_internal(), getDegree, &travers);
+
+    return travers.degree;
+}
+
+std::vector<std::size_t>  LPPolynomial::monomial_degrees(Variable::Arg var) const {
+    struct degree_travers {
+        std::vector<std::size_t> degree;
+        lp_variable_t var; // the variable we are looking for
+    };
+
+    auto getDegree = [](const lp_polynomial_context_t* /*ctx*/,
+                        lp_monomial_t* m,
+                        void* d) {
+        degree_travers& v = *static_cast<degree_travers*>(d);
+
+        size_t current_degree = 0;
+        // iterate over the number of variables and add up their degrees
+        for (size_t i = 0; i < m->n; i++) {
+            if (m->p[i].x == v.var) {
+                current_degree = m->p[i].d;
+                break;
+            }
+        }
+        v.degree.push_back(current_degree);
+    };
+
+    degree_travers travers;
+    auto lp_var = context().lp_variable(var);
+    assert(lp_var.has_value());
+    travers.var = *lp_var;
+    lp_polynomial_traverse(get_internal(), getDegree, &travers);
+
+    return travers.degree;
+}
+
 mpz_class LPPolynomial::unit_part() const {
     //As we can only have integer coefficients, they do not form a field
     //Thus the unit part is the sign of the leading coefficient, if it is not zero

@@ -382,6 +382,10 @@ public:
 
 	std::size_t degree(Variable::Arg var) const ;
 
+	std::vector<std::size_t> monomial_total_degrees() const;
+	std::vector<std::size_t> monomial_degrees(Variable::Arg var) const;
+
+
 	/**
 	 * Calculates the coefficient of var^exp.
 	 * @param var Variable.
