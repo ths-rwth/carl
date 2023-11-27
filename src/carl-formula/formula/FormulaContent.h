@@ -155,10 +155,12 @@ namespace carl {
             const FormulaContent<Pol> *mNegation = nullptr;
             /// The propositions of this formula.
             Condition mProperties;
+            #ifdef THREAD_SAFE
             /// Mutex for access to activity.
             mutable std::mutex mActivityMutex;
             /// Mutex for collecting the variables within this formula.
             mutable std::mutex mVariablesMutex;
+            #endif
             /// Container collecting the variables which occur in this formula.
             mutable Variables* mpVariables = nullptr;
             
