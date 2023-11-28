@@ -49,8 +49,10 @@ namespace carl
             std::unique_ptr<typename underlying_set::bucket_type[]> mPoolBuckets;
             /// The formula pool.
             underlying_set mPool;
+            #ifdef THREAD_SAFE
             /// Mutex to avoid multiple access to the pool
             mutable std::recursive_mutex mMutexPool;
+            #endif
 
             ///
             FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*> mTseitinVars;
