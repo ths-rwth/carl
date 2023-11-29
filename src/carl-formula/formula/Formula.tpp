@@ -23,13 +23,14 @@ namespace carl
         switch( _content.mType )
         {
             case FormulaType::EXISTS:
-            {
-                ///@todo do something here
-                break;
-            }
             case FormulaType::FORALL:
             {
-                ///@todo do something here
+                _content.mProperties |= PROP_CONTAINS_QUANTIFIER;
+				for (auto subFormula = std::get<Formulas<Pol>>(_content.mContent).begin(); subFormula != std::get<Formulas<Pol>>(_content.mContent).end(); ++subFormula)
+                {
+                    Condition subFormulaConds = subFormula->properties();
+                    _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+                }
                 break;
             }
             case FormulaType::TRUE:
