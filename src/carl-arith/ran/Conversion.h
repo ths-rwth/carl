@@ -1,6 +1,8 @@
 #pragma once
 
 #include <carl-common/config.h>
+#include <type_traits>
+#include <carl-arith/ran/ran.h>
 
 namespace carl {
 

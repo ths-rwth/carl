@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <vector>
+#include <set>
 
 namespace carl {
 
@@ -46,6 +47,11 @@ inline void hash_add(std::size_t& seed, const std::pair<T1, T2>& p) {
 template<typename T>
 inline void hash_add(std::size_t& seed, const std::vector<T>& v) {
 	for (const auto& t: v) carl::hash_add(seed, t);
+}
+
+template<typename T>
+inline void hash_add(std::size_t& seed, const std::set<T>& s) {
+	for (const auto& t: s) carl::hash_add(seed, t);
 }
 
 /**

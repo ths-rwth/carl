@@ -5,7 +5,7 @@
 namespace carl {
 
 enum class Logic {
-	QF_BV, QF_IDL, QF_LIA, QF_LIRA, QF_LRA, QF_NIA, QF_NIRA, QF_NRA, QF_PB, QF_RDL, QF_UF, UNDEFINED
+	QF_BV, QF_IDL, QF_LIA, QF_LIRA, QF_LRA, QF_NIA, QF_NIRA, QF_NRA, QF_PB, QF_RDL, QF_UF, NRA, LRA, UNDEFINED
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Logic& l) {
@@ -21,6 +21,8 @@ inline std::ostream& operator<<(std::ostream& os, const Logic& l) {
 		case Logic::QF_PB:		os << "QF_PB"; break;
 		case Logic::QF_RDL:		os << "QF_RDL"; break;
 		case Logic::QF_UF:		os << "QF_UF"; break;
+		case Logic::NRA:		os << "NRA"; break;
+		case Logic::LRA:		os << "LRA"; break;
 		case Logic::UNDEFINED:	os << "undefined"; break;
 	}
 	return os;
