@@ -43,7 +43,7 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& prefix, boost::co
 			} else if (f.type() == FormulaType::AND || f.type() == FormulaType::OR) {
 				Formulas<Poly> subs;
 				for (auto& sub : f.subformulas()) {
-					subs.push_back(to_pnf(sub, prefix, used_vars, false));
+					subs.push_back(to_pnf(sub, prefix, used_vars, true));
 				}
 				if (f.type() == FormulaType::AND) {
 					return Formula<Poly>(FormulaType::OR, std::move(subs));
@@ -187,6 +187,7 @@ std::pair<QuantifierPrefix, Formula<Poly>> to_pnf(const Formula<Poly>& f) {
 	QuantifierPrefix p;
 	boost::container::flat_set<Variable> used_vars = free_variables(f);
 	auto m = to_pnf(f, p, used_vars, false);
+	assert(!p.empty() || f == m);
 	return std::make_pair(p, m);
 }
 
