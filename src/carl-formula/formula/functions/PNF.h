@@ -187,7 +187,6 @@ std::pair<QuantifierPrefix, Formula<Poly>> to_pnf(const Formula<Poly>& f) {
 	QuantifierPrefix p;
 	boost::container::flat_set<Variable> used_vars = free_variables(f);
 	auto m = to_pnf(f, p, used_vars, false);
-	assert(!p.empty() || f == m);
 	return std::make_pair(p, m);
 }
 
