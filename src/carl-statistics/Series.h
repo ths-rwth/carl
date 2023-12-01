@@ -21,7 +21,7 @@ public:
         data.emplace(key+".sum",   std::to_string(m_sum));
         data.emplace(key+".min",   std::to_string(m_min));
         data.emplace(key+".max",   std::to_string(m_max));
-        data.emplace(key+".avg",   std::to_string((float)m_sum/m_count));
+        data.emplace(key+".avg",   std::to_string((float)m_sum/(float)m_count));
     }
 };
 
