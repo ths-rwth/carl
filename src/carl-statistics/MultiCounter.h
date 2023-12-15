@@ -17,7 +17,7 @@ public:
         std::stringstream ss;
 		for (const auto& [k,v] : m_data) {
             serialize(ss, k);
-			ss << ":" << v << ";";
+			ss << "=" << v << ";";
 		}
         data.emplace(key, ss.str());
     }

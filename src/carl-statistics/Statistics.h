@@ -20,14 +20,14 @@ private:
 	std::map<std::string, std::string> mCollected;
 	bool has_illegal_chars(const std::string& val) const {
 		return std::find_if(val.begin(), val.end(), [](char c) {
-				return c == '(' || c == ')' || std::isspace(static_cast<unsigned char>(c));
+				return c == ':' || c == '(' || c == ')' || std::isspace(static_cast<unsigned char>(c));
 			}) != val.end();
 	}
 protected:
 	void addKeyValuePair(const std::string& key, const std::string& value) {
-		assert(!has_illegal_chars(key) && "spaces, (, ) are not allowed here");
+		assert(!has_illegal_chars(key) && "spaces, (, ), : are not allowed here");
 		if (has_illegal_chars(key)) return;
-		assert(!has_illegal_chars(static_cast<std::string>(value)) && "spaces, (, ) are not allowed here");
+		assert(!has_illegal_chars(static_cast<std::string>(value)) && "spaces, (, ), : are not allowed here");
 		if (has_illegal_chars(value)) return;
 		mCollected.emplace(key, value);
 	}
