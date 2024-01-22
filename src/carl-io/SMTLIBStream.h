@@ -26,7 +26,7 @@ namespace carl::io {
  * Allows to print carl data structures in SMTLIB syntax.
  */
 class SMTLIBStream {
-public:
+private:
 	std::stringstream mStream;
 
 	void write(const mpz_class& n) { *this << carl::toString(n, false); }
