@@ -9,7 +9,10 @@ namespace carl {
  * the negation.
  */
 template<typename Pol>
-Formula<Pol> resolve_negation( const Formula<Pol>& f, bool _keepConstraint = true ) {
+Formula<Pol> resolve_negation( const Formula<Pol>& f, bool _keepConstraint = true, bool resolve_varcomp = false) {
+    if (resolve_varcomp &&  f.type() == FormulaType::VARCOMPARE && f.variable_comparison().negated()) {
+        return Formula<Pol>(f.variable_comparison().resolve_negation());
+    }
     if( f.type() != FormulaType::NOT ) return f;
     FormulaType newType = f.type();
     switch( f.subformula().type() )
@@ -67,7 +70,11 @@ Formula<Pol> resolve_negation( const Formula<Pol>& f, bool _keepConstraint = tru
             }
         }
         case FormulaType::VARCOMPARE: {
-            return Formula<Pol>(f.subformula().variable_comparison().negation());
+            if (resolve_varcomp) {
+                return Formula<Pol>(f.subformula().variable_comparison().invert_relation());
+            } else {
+                return Formula<Pol>(f.subformula().variable_comparison().negation());
+            }
         }
         case FormulaType::VARASSIGN: {
             assert(false);

@@ -14,7 +14,7 @@ Formula<Poly> to_nnf(const Formula<Poly>& formula) {
         return formula;
     }
     if(formula.is_literal()){
-        return resolve_negation(formula, false);
+        return resolve_negation(formula, false, true);
     }
 
     switch(formula.type()){

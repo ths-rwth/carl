@@ -80,6 +80,10 @@ namespace carl {
 		VariableComparison invert_relation() const {
 			return VariableComparison(m_var, m_value, carl::inverse(m_relation), m_negated);
 		}
+		VariableComparison resolve_negation() const {
+			if (m_negated) return VariableComparison(m_var, m_value, carl::inverse(m_relation), false);
+			else return *this;
+		}
 	};
 
 	/**
