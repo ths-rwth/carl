@@ -14,7 +14,7 @@ include(carlmacros)
 
 set(PROJECT_FULLNAME "carl")
 set(PROJECT_DESCRIPTION "Computer ARithmetic Library")
-set_version(23 05)
+set_version(24 02)
 message(STATUS "Version: ${PROJECT_FULLNAME} ${PROJECT_VERSION_FULL}")
 
 # # # # # # # # # # # # # # # # # # # # # #
