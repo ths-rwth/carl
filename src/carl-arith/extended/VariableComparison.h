@@ -80,6 +80,10 @@ namespace carl {
 		VariableComparison invert_relation() const {
 			return VariableComparison(m_var, m_value, carl::inverse(m_relation), m_negated);
 		}
+		VariableComparison resolve_negation() const {
+			if (m_negated) return VariableComparison(m_var, m_value, carl::inverse(m_relation), false);
+			else return *this;
+		}
 	};
 
 	/**
@@ -87,7 +91,7 @@ namespace carl {
 	 * polynomial (in)equality against zero "p(..) < 0" if that is possible.
 	 * @return std::nullopt if conversion impossible.
 	 */
-	template<typename Poly>
+	template<typename Poly, std::enable_if_t<!needs_context_type<Poly>::value, bool> = true>
 	std::optional<BasicConstraint<Poly>> as_constraint(const VariableComparison<Poly>& f) {
 		Relation rel = f.negated() ? inverse(f.relation()) : f.relation();
 		if (std::holds_alternative<typename VariableComparison<Poly>::MR>(f.value())) {
@@ -95,17 +99,30 @@ namespace carl {
 			if (mr.poly().degree(mr.var()) != 1) return std::nullopt;
 			if (mr.k() != 1) return std::nullopt;
 			auto lcoeff = mr.poly().coeff(mr.var(), 1);
-			if (!lcoeff.is_constant()) return std::nullopt;
+			if (!is_constant(lcoeff)) return std::nullopt;
 			auto ccoeff = mr.poly().coeff(mr.var(), 0);
 			return BasicConstraint<Poly>(Poly(f.var()) + ccoeff / lcoeff, rel);
-		}
-		assert(!needs_context_type<Poly>::value);
-		if constexpr(!needs_context_type<Poly>::value) {
-			if (!std::get<typename VariableComparison<Poly>::RAN>(f.value()).is_numeric()) return std::nullopt;
-			return BasicConstraint<Poly>(Poly(f.var()) - Poly(std::get<typename VariableComparison<Poly>::RAN>(f.value()).value()), rel);
-		} else {
-			static_assert(dependent_false_v<Poly>);
-		}
+		} else if (!std::get<typename VariableComparison<Poly>::RAN>(f.value()).is_numeric()) return std::nullopt;
+		else return BasicConstraint<Poly>(Poly(f.var()) - Poly(std::get<typename VariableComparison<Poly>::RAN>(f.value()).value()), rel);
+	}
+
+	/**
+	 * Convert this variable comparison "v < root(..)" into a simpler
+	 * polynomial (in)equality against zero "p(..) < 0" if that is possible.
+	 * @return std::nullopt if conversion impossible.
+	 */
+	template<typename Poly, std::enable_if_t<needs_context_type<Poly>::value, bool> = true>
+	std::optional<BasicConstraint<Poly>> as_constraint(const VariableComparison<Poly>& f) {
+		Relation rel = f.negated() ? inverse(f.relation()) : f.relation();
+		assert (std::holds_alternative<typename VariableComparison<Poly>::MR>(f.value()));
+		const auto& mr = std::get<typename VariableComparison<Poly>::MR>(f.value());
+		assert(mr.var() == mr.poly().main_var());
+		if (mr.poly().degree() != 1) return std::nullopt;
+		if (mr.k() != 1) return std::nullopt;
+		auto lcoeff = mr.poly().lcoeff();
+		if (!is_constant(lcoeff)) return std::nullopt;
+		auto ccoeff = mr.poly().coeff(0);
+		return BasicConstraint<Poly>(Poly(mr.poly().context(), f.var())*lcoeff + ccoeff, lcoeff>0 ? rel : carl::turn_around(rel));
 	}
 
 	/**

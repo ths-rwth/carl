@@ -85,7 +85,9 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         lp_value_destruct(&val);
     }
 
+    CARL_LOG_TRACE("carl.ran.libpoly", "Call libpoly");
     std::vector<poly::Value> roots = poly::isolate_real_roots(polynomial.get_polynomial(), assignment);
+    CARL_LOG_TRACE("carl.ran.libpoly", "Libpoly returned");
 
     if (roots.empty()) {
         CARL_LOG_DEBUG("carl.ran.libpoly", " Checking for nullification -> Evaluation at " << mainVar << "= 1");

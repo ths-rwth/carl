@@ -114,7 +114,7 @@ private:
 	
 	template<typename Rational, typename Poly>
 	void write(const Model<Rational,Poly>& model) {
-		*this << "(model" << std::endl;
+		*this << "(model " << std::endl;
 		for (const auto& m: model) {
 			auto value = m.second;
 			value = model.evaluated(m.first);
@@ -153,14 +153,14 @@ private:
 		*this << "(root-of-with-interval ";
 		const auto& coeffs = p.coefficients();
 		auto it = coeffs.begin();
-		*this << "(" << *it;
+		*this << "(coeffs " << *it;
 		it++;
 		for (; it != coeffs.end(); it++) {
 			assert(carl::is_integer(*it));
 			*this << " " << *it;
 		}
 		*this << ") ";
-		*this << "(" << ran.interval().lower() << " " << ran.interval().upper() << ")";
+		*this << ran.interval().lower() << " " << ran.interval().upper();
 		*this << ")";
 	}
 
@@ -288,6 +288,11 @@ private:
 			case VariableType::VT_BITVECTOR:		*this << "?_Bitvector"; break;
 			default:								*this << "?"; break;
 		}
+	}
+
+	void write(const bool b) {
+		if (b) *this << "true";
+		else *this << "false";
 	}
 	
 	template<typename T>

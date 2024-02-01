@@ -456,7 +456,7 @@ namespace carl
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE
                         || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ
-                        || mpContent->mType == FormulaType::BITVECTOR )
+                        || mpContent->mType == FormulaType::BITVECTOR || mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL)
                     return 1;
                 else
                     return std::get<Formulas<Pol>>(mpContent->mContent).size();
@@ -490,8 +490,7 @@ namespace carl
              */
             const_iterator end() const
             {
-                assert( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR
-                        || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR );
+                assert( is_nary() );
                 return std::get<Formulas<Pol>>(mpContent->mContent).end();
             }
 

@@ -32,20 +32,20 @@ LPPolynomial& LPPolynomial::operator=(LPPolynomial&& rhs) {
 
 LPPolynomial::LPPolynomial(const LPContext& context)
     : m_poly(context.lp_context()), m_context(context) {
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
     assert(lp_polynomial_check_order(m_poly.get_internal()));
 }
 
 LPPolynomial::LPPolynomial(const LPContext& context, const poly::Polynomial& p)
     : m_poly(p), m_context(context) {
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 
     assert(lp_polynomial_check_order(m_poly.get_internal()));
     assert(context.lp_context() == lp_polynomial_get_context(get_internal()));
 }
 LPPolynomial::LPPolynomial(const LPContext& context, poly::Polynomial&& p)
     : m_poly(std::move(p)), m_context(context) {
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 
     assert(lp_polynomial_check_order(m_poly.get_internal()));
     assert(context.lp_context() == lp_polynomial_get_context(get_internal()));
@@ -54,7 +54,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, poly::Polynomial&& p)
 LPPolynomial::LPPolynomial(const LPContext& context, long val)
     : m_context(context) {
     lp_polynomial_construct_simple(m_poly.get_internal(), context.lp_context(), poly::Integer(val).get_internal(), 0, 0);
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 
     assert(lp_polynomial_check_order(m_poly.get_internal()));
 }
@@ -62,7 +62,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, long val)
 LPPolynomial::LPPolynomial(const LPContext& context, const mpz_class& val)
     : m_context(context) {
     lp_polynomial_construct_simple(m_poly.get_internal(), context.lp_context(), val.get_mpz_t(), lp_variable_null, 0) ;
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 
     assert(lp_polynomial_check_order(m_poly.get_internal()));
 }
@@ -74,7 +74,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const mpq_class& val) : LPP
 LPPolynomial::LPPolynomial(const LPContext& context, const Variable& var, const mpz_class& coeff, unsigned int degree)
     : m_context(context) {
     lp_polynomial_construct_simple(m_poly.get_internal(), context.lp_context(), poly::Integer(coeff).get_internal(), *context.lp_variable(var), degree);
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 
     assert(lp_polynomial_check_order(m_poly.get_internal()));
 }
@@ -82,7 +82,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& var, const 
 LPPolynomial::LPPolynomial(const LPContext& context, const Variable& var)
     : m_context(context) {
     lp_polynomial_construct_simple(m_poly.get_internal(), context.lp_context(), poly::Integer(1).get_internal(), *context.lp_variable(var), 1);
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 
     assert(lp_polynomial_check_order(m_poly.get_internal()));
 }
@@ -100,7 +100,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, co
         lp_polynomial_construct_simple(temp.get_internal(), context.lp_context(), poly::Integer(coeff).get_internal(), *var, (unsigned int)pow);
         m_poly += temp;
     }
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 }
 
 LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, const std::vector<mpz_class>& coefficients)
@@ -117,7 +117,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, co
         lp_polynomial_construct_simple(temp.get_internal(), context.lp_context(), poly::Integer(coeff).get_internal(), *var, (unsigned int)pow);
         m_poly += temp;
     }
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 }
 
 LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, std::vector<mpz_class>&& coefficients)
@@ -133,7 +133,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, st
         lp_polynomial_construct_simple(temp.get_internal(), context.lp_context(), poly::Integer(std::move(coeff)).get_internal(), *var, (unsigned int)pow);
         m_poly += temp;
     }
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 }
 
 LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, const std::map<unsigned int, mpz_class>& coefficients)
@@ -147,7 +147,7 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, co
         lp_polynomial_construct_simple(temp.get_internal(), context.lp_context(), poly::Integer(coef.second).get_internal(), *var, coef.first);
         m_poly += temp;
     }
-    lp_polynomial_set_external(m_poly.get_internal());
+    //lp_polynomial_set_external(m_poly.get_internal());
 }
 
 bool LPPolynomial::has(const Variable& var) const {
@@ -390,6 +390,61 @@ std::size_t LPPolynomial::degree(Variable::Arg var) const {
             }
         }
         v.degree = std::max(v.degree, current_degree);
+    };
+
+    degree_travers travers;
+    auto lp_var = context().lp_variable(var);
+    assert(lp_var.has_value());
+    travers.var = *lp_var;
+    lp_polynomial_traverse(get_internal(), getDegree, &travers);
+
+    return travers.degree;
+}
+
+std::vector<std::size_t>  LPPolynomial::monomial_total_degrees() const {
+    struct degree_travers {
+        std::vector<std::size_t> degree;
+    };
+
+    auto getDegree = [](const lp_polynomial_context_t* /*ctx*/,
+                        lp_monomial_t* m,
+                        void* d) {
+        degree_travers& v = *static_cast<degree_travers*>(d);
+
+        size_t current_degree = 0;
+        // iterate over the number of variables and add up their degrees
+        for (size_t i = 0; i < m->n; i++) {
+            current_degree += m->p[i].d;
+        }
+        v.degree.push_back(current_degree);
+    };
+
+    degree_travers travers;
+    lp_polynomial_traverse(get_internal(), getDegree, &travers);
+
+    return travers.degree;
+}
+
+std::vector<std::size_t>  LPPolynomial::monomial_degrees(Variable::Arg var) const {
+    struct degree_travers {
+        std::vector<std::size_t> degree;
+        lp_variable_t var; // the variable we are looking for
+    };
+
+    auto getDegree = [](const lp_polynomial_context_t* /*ctx*/,
+                        lp_monomial_t* m,
+                        void* d) {
+        degree_travers& v = *static_cast<degree_travers*>(d);
+
+        size_t current_degree = 0;
+        // iterate over the number of variables and add up their degrees
+        for (size_t i = 0; i < m->n; i++) {
+            if (m->p[i].x == v.var) {
+                current_degree = m->p[i].d;
+                break;
+            }
+        }
+        v.degree.push_back(current_degree);
     };
 
     degree_travers travers;

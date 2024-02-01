@@ -154,9 +154,11 @@ const UnivariatePolynomial<NumberType> LPRealAlgebraicNumber::polynomial() const
 }
 
 const Interval<NumberType> LPRealAlgebraicNumber::interval() const {
-    const NumberType& lo = get_lower_bound();
-    const NumberType& up = get_upper_bound();
-    return Interval<NumberType>(lo, BoundType::STRICT, up, BoundType::STRICT);
+	if (is_numeric()) {
+		return Interval<NumberType>(value());
+	} else {
+    	return Interval<NumberType>(get_lower_bound(), BoundType::STRICT, get_upper_bound(), BoundType::STRICT);
+	}
 }
 
 const NumberType LPRealAlgebraicNumber::get_upper_bound() const {
@@ -275,33 +277,9 @@ void refine(const LPRealAlgebraicNumber& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Finished Refining Algebraic NumberType : " << n);
 }
 
-/**
- * Refine until n is numeric (rational) or until pivot is not in the isolating interval of n
- * NOT CONST, the number is the same, but internally might change 
- */
-
-void refine_using(const LPRealAlgebraicNumber& n, const NumberType& pivot) {
-	CARL_LOG_DEBUG("carl.ran.libpoly", "Refining Algebraic NumberType : " << n);
-	//Convert pivot to libpoly rational
-	poly::Rational pivot_libpoly = to_libpoly_rational(pivot);
-	while (!n.is_numeric() && n.libpoly_interval() == pivot_libpoly) {
-		lp_algebraic_number_refine_const(n.get_internal());
-	}
-	CARL_LOG_DEBUG("carl.ran.libpoly", "Finished Refining Algebraic NumberType : " << n);
+void LPRealAlgebraicNumber::refine() const {
+	carl::refine(*this);
 }
-
-/**
- * Same as above, but with libpoly dyadic rational as pivot 
- */
-
-void refine_using(const LPRealAlgebraicNumber& n, const poly::DyadicRational& pivot) {
-	CARL_LOG_DEBUG("carl.ran.libpoly", "Refining Algebraic NumberType : " << n);
-	while (!n.is_numeric() && n.libpoly_interval() == pivot) {
-		lp_algebraic_number_refine_const(n.get_internal());
-	}
-	CARL_LOG_DEBUG("carl.ran.libpoly", "Finished Refining Algebraic NumberType : " << n);
-}
-
 
 NumberType branching_point(const LPRealAlgebraicNumber& n) {
 	//return carl::sample(n.interval_int());
@@ -444,12 +422,7 @@ const carl::Variable LPRealAlgebraicNumber::auxVariable = fresh_real_variable("_
 
 
 bool compare(const LPRealAlgebraicNumber& lhs, const NumberType& rhs, const Relation relation) {
-
 	poly::Rational rat = to_libpoly_rational(rhs);
-
-	//refine unitl rhs in not in interval of lhs
-	//Technically not necessary because libpoly does that in compare, but whatever
-	refine_using(lhs, rhs);
 
 	int cmp = lp_algebraic_number_cmp_rational(lhs.get_internal(), rat.get_internal());
 

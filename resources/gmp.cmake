@@ -1,18 +1,26 @@
 if(UNIX)
+	message(STATUS "Trying to build GMP from source.")
+
+	# GMP needs M4 to be installed
 	find_program(M4 m4)
 	if(NOT M4)
-		message(FATAL_ERROR "Can not build gmp, missing binary for m4")
-	endif()
+		message(FATAL_ERROR "Unable to build GMP from source. Could not find M4. Please install it.")
+	endif ()
 	mark_as_advanced(M4)
 
+	# GMP needs makeinfo to be installed but is only necessary for the documentation
+	# just disable it
+	set(CONFIGURE_ENV env "MAKEINFO=true")
+
 	ExternalProject_Add(
-		GMP-EP
-		URL "https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2"
-		URL_MD5 86ee6e54ebfc4a90b643a65e402c4048
-		DOWNLOAD_NO_PROGRESS 1
-		BUILD_IN_SOURCE YES
-		CONFIGURE_COMMAND ./configure --enable-cxx --prefix=<INSTALL_DIR>
+			GMP-EP
+			URL https://ftp.gnu.org/gnu/gmp/gmp-${GMP_VERSION}.tar.bz2
+			URL_HASH SHA1=db38c7b67f8eea9f2e5b8a48d219165b2fdab11f
+			CONFIGURE_COMMAND ${CONFIGURE_ENV} <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --with-pic --enable-cxx
+			BUILD_COMMAND ${MAKE}
+			BUILD_BYPRODUCTS ${GMP_LIBRARIES}
 	)
+
 elseif(WIN32)
 	ExternalProject_Add(
 		GMP-EP
@@ -52,3 +60,5 @@ add_dependencies(GMP_STATIC GMP-EP)
 add_dependencies(GMPXX_SHARED GMP-EP)
 add_dependencies(GMPXX_STATIC GMP-EP)
 add_dependencies(resources GMP_SHARED GMP_STATIC GMPXX_SHARED GMPXX_STATIC)
+
+

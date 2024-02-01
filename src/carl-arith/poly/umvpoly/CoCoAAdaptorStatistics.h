@@ -9,9 +9,9 @@ namespace cocoa {
  
 class CoCoAAdaptorStatistics : public statistics::Statistics {
 public:
-    statistics::timer gcd;
-    statistics::timer factorize;
-    statistics::timer gbasis;
+    statistics::Timer gcd;
+    statistics::Timer factorize;
+    statistics::Timer gbasis;
     void collect() {
         Statistics::addKeyValuePair("gcd", gcd);
         Statistics::addKeyValuePair("factorize", factorize);

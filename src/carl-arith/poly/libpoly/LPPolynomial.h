@@ -180,6 +180,10 @@ public:
 		return LPPolynomial(m_context, poly::leading_coefficient(m_poly));
 	}
 
+	LPPolynomial coeff(std::size_t k) const {
+		return LPPolynomial(m_context, poly::coefficient(m_poly, k));
+	}
+
 	/** Obtain all non-zero coefficients of a polynomial. */
 	std::vector<LPPolynomial> coefficients() const {
 		std::vector<LPPolynomial> res;
@@ -377,6 +381,10 @@ public:
 	std::size_t total_degree() const ;
 
 	std::size_t degree(Variable::Arg var) const ;
+
+	std::vector<std::size_t> monomial_total_degrees() const;
+	std::vector<std::size_t> monomial_degrees(Variable::Arg var) const;
+
 
 	/**
 	 * Calculates the coefficient of var^exp.

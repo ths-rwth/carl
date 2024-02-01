@@ -36,6 +36,10 @@ inline LPPolynomial content(const LPPolynomial& p) {
     return LPPolynomial(p.context(), poly::content(p.get_polynomial()));
 }
 
+inline LPPolynomial derivative(const LPPolynomial& p) {
+    return LPPolynomial(p.context(), poly::derivative(p.get_polynomial()));
+}
+
 /*
  * @brief wrapper for the polynomial primitive_part calculation using libpoly.
  * @param LPPolynomial p
@@ -138,6 +142,12 @@ inline std::vector<LPPolynomial> content_free_factors(const LPPolynomial& p) {
         result.push_back(LPPolynomial(p.context(), std::move(factor)));
     }
     return result;
+}
+
+inline std::vector<LPPolynomial> groebner_basis(const std::vector<LPPolynomial>& polys) {
+    if (polys.size() <= 1) return polys;
+    CoCoAAdaptorLP adaptor = CoCoAAdaptorLP(polys.at(0).context());
+    return adaptor.GBasis(polys);
 }
 
 } // namespace carl

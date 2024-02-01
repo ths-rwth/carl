@@ -27,9 +27,10 @@ namespace timing {
     }
 }
 
-class timer {
+class Timer {
     std::size_t m_count = 0;
     timing::duration m_overall = timing::zero();
+    timing::time_point m_current_start;
 
 public:
     static timing::time_point start() {
@@ -39,11 +40,22 @@ public:
 		++m_count;
 		m_overall += timing::since(start);
 	}
+    void start_this() {
+		m_current_start = start();
+	}
+    void finish() {
+		finish(m_current_start);
+	}
     auto count() const {
         return m_count;
     }
     auto overall_ms() const {
         return m_overall.count();
+    }
+
+    void collect(std::map<std::string, std::string>& data, const std::string& key) const {
+        data.emplace(key+".count", std::to_string(count()));
+        data.emplace(key+".overall_ms",   std::to_string(overall_ms()));
     }
 };
 

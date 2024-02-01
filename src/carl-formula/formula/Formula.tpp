@@ -24,12 +24,18 @@ namespace carl
         {
             case FormulaType::EXISTS:
             {
-                ///@todo do something here
+                _content.mProperties |= PROP_CONTAINS_QUANTIFIER_EXISTS;
+				auto subFormula = std::get<QuantifierContent<Pol>>(_content.mContent).mFormula;
+                _content.mProperties |= (subFormula.properties() & WEAK_CONDITIONS);
+                _content.mProperties |= (subFormula.properties() & PROP_IS_IN_PNF);
                 break;
             }
             case FormulaType::FORALL:
             {
-                ///@todo do something here
+                _content.mProperties |= PROP_CONTAINS_QUANTIFIER_FORALL;
+				auto subFormula = std::get<QuantifierContent<Pol>>(_content.mContent).mFormula;
+                _content.mProperties |= (subFormula.properties() & WEAK_CONDITIONS);
+                _content.mProperties |= (subFormula.properties() & PROP_IS_IN_PNF);
                 break;
             }
             case FormulaType::TRUE:
@@ -55,11 +61,13 @@ namespace carl
                 if( PROP_IS_AN_ATOM <= subFormulaConds )
                     _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_IN_CNF | PROP_IS_LITERAL_CONJUNCTION;
                 _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+                if (!(PROP_CONTAINS_QUANTIFIER_EXISTS <= subFormulaConds) && !(PROP_CONTAINS_QUANTIFIER_FORALL <= subFormulaConds))
+                    _content.mProperties |= PROP_IS_IN_PNF;
                 break;
             }
             case FormulaType::OR:
             {
-                _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
+                _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_IN_CNF | PROP_IS_IN_NNF | PROP_IS_IN_PNF;
 				for (auto subFormula = std::get<Formulas<Pol>>(_content.mContent).begin(); subFormula != std::get<Formulas<Pol>>(_content.mContent).end(); ++subFormula)
 				{
 					Condition subFormulaConds = subFormula->properties();
@@ -71,12 +79,14 @@ namespace carl
                     if( !(PROP_IS_IN_NNF<=subFormulaConds) )
                         _content.mProperties &= ~PROP_IS_IN_NNF;
                     _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+                    if (PROP_CONTAINS_QUANTIFIER_EXISTS <= subFormulaConds || PROP_CONTAINS_QUANTIFIER_FORALL <= subFormulaConds)
+                        _content.mProperties &= ~PROP_IS_IN_PNF;
                 }
                 break;
             }
             case FormulaType::AND:
             {
-                _content.mProperties |= PROP_IS_LITERAL_CONJUNCTION | PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
+                _content.mProperties |= PROP_IS_LITERAL_CONJUNCTION | PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF | PROP_IS_IN_PNF;
 		        for (auto subFormula = std::get<Formulas<Pol>>(_content.mContent).begin(); subFormula != std::get<Formulas<Pol>>(_content.mContent).end(); ++subFormula)
                 {
                     Condition subFormulaConds = subFormula->properties();
@@ -96,6 +106,8 @@ namespace carl
                     if( !(PROP_IS_IN_NNF<=subFormulaConds) )
                         _content.mProperties &= ~PROP_IS_IN_NNF;
                     _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+                    if (PROP_CONTAINS_QUANTIFIER_EXISTS <= subFormulaConds || PROP_CONTAINS_QUANTIFIER_FORALL <= subFormulaConds)
+                        _content.mProperties &= ~PROP_IS_IN_PNF;
                 }
                 break;
             }
@@ -104,13 +116,15 @@ namespace carl
             case FormulaType::IFF:
             case FormulaType::XOR:
             {
-                _content.mProperties |= PROP_IS_IN_NNF;
+                _content.mProperties |= PROP_IS_IN_NNF | PROP_IS_IN_PNF;
 				for (auto subFormula = std::get<Formulas<Pol>>(_content.mContent).begin(); subFormula != std::get<Formulas<Pol>>(_content.mContent).end(); ++subFormula)
                 {
                     Condition subFormulaConds = subFormula->properties();
                     if( !(PROP_IS_IN_NNF<=subFormulaConds) )
                         _content.mProperties &= ~PROP_IS_IN_NNF;
                     _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+                    if (PROP_CONTAINS_QUANTIFIER_EXISTS <= subFormulaConds || PROP_CONTAINS_QUANTIFIER_FORALL <= subFormulaConds)
+                        _content.mProperties &= ~PROP_IS_IN_PNF;
                 }
                 break;
             }

@@ -1,12 +1,15 @@
 #pragma once
 
-#include "StatisticsCollector.h"
-#include "Timing.h"
-
 #include <map>
 #include <sstream>
 #include <algorithm>
 #include <assert.h>
+
+#include "StatisticsCollector.h"
+#include "Serialization.h"
+#include "Timing.h"
+#include "Series.h"
+#include "MultiCounter.h"
 
 namespace carl {
 namespace statistics {
@@ -17,27 +20,38 @@ private:
 	std::map<std::string, std::string> mCollected;
 	bool has_illegal_chars(const std::string& val) const {
 		return std::find_if(val.begin(), val.end(), [](char c) {
-				return c == '(' || c == ')' || std::isspace(static_cast<unsigned char>(c));
+				return c == ':' || c == '(' || c == ')' || std::isspace(static_cast<unsigned char>(c));
 			}) != val.end();
 	}
 protected:
+	void addKeyValuePair(const std::string& key, const std::string& value) {
+		assert(!has_illegal_chars(key) && "spaces, (, ), : are not allowed here");
+		if (has_illegal_chars(key)) return;
+		assert(!has_illegal_chars(static_cast<std::string>(value)) && "spaces, (, ), : are not allowed here");
+		if (has_illegal_chars(value)) return;
+		mCollected.emplace(key, value);
+	}
+
+	void addKeyValuePair(const std::string& key, const Timer& value) {
+		value.collect(mCollected, key);
+	}
+
+	void addKeyValuePair(const std::string& key, const Series& value) {
+		value.collect(mCollected, key);
+	}
+
+	template<typename T>
+	void addKeyValuePair(const std::string& key, const MultiCounter<T>& value) {
+		value.collect(mCollected, key);
+	}
+
 	template<typename T>
 	void addKeyValuePair(const std::string& key, const T& value) {
-		assert(!has_illegal_chars(key) && "spaces, (, ) are not allowed here");
-		if (has_illegal_chars(key)) return;
-		if constexpr(std::is_same<T,std::string>::value) {
-			assert(!has_illegal_chars(static_cast<std::string>(value)) && "spaces, (, ) are not allowed here");
-			if (has_illegal_chars(value)) return;
-			mCollected.emplace(key, value);
-		} else if constexpr(std::is_same<T,timer>::value) {
-			mCollected.emplace(key+"_count", std::to_string(static_cast<timer>(value).count()));
-			mCollected.emplace(key+"_overall_ms", std::to_string(static_cast<timer>(value).overall_ms()));
-		} else {
-			std::stringstream ss;
-			ss << value;
-			mCollected.emplace(key, ss.str());
-		}
+		std::stringstream ss;
+		serialize(ss, value);
+		mCollected.emplace(key, ss.str());
 	}
+
 public:
 	Statistics() = default;
 	virtual ~Statistics() = default;

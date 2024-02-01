@@ -22,6 +22,7 @@
 #include <vector>
 #include <deque>
 #include "boost/container/flat_set.hpp"
+#include "boost/container/flat_map.hpp"
 
 namespace carl {
 
@@ -222,6 +223,18 @@ std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t) {
  */
 template<typename Key, typename Value, typename H, typename E, typename A>
 inline std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value, H, E, A>& m) {
+	return os << "{" << stream_joined(", ", m, [](auto& o, const auto& p){ o << p.first << " : " << p.second; }) << "}";
+}
+
+/**
+ * Output a boost::container::flat_map with arbitrary content.
+ * The format is `{<key>:<value>, <key>:<value>, ...}`
+ * @param os Output stream.
+ * @param m map to be printed.
+ * @return Output stream.
+ */
+template<class Key, class T, class Compare, class AllocatorOrContainer>
+inline std::ostream& operator<<(std::ostream& os, const boost::container::flat_map<Key, T, Compare, AllocatorOrContainer>& m) {
 	return os << "{" << stream_joined(", ", m, [](auto& o, const auto& p){ o << p.first << " : " << p.second; }) << "}";
 }
 

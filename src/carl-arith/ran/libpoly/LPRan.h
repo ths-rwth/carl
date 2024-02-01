@@ -144,6 +144,8 @@ public:
 	friend NumberType sample_between(const NumberType& lower, const LPRealAlgebraicNumber& upper);
 	friend NumberType floor(const LPRealAlgebraicNumber& n);
 	friend NumberType ceil(const LPRealAlgebraicNumber& n);
+
+	void refine() const;
 };
 
 bool compare(const LPRealAlgebraicNumber&, const LPRealAlgebraicNumber&, const Relation);
@@ -159,8 +161,6 @@ LPRealAlgebraicNumber::NumberType floor(const LPRealAlgebraicNumber& n);
 LPRealAlgebraicNumber::NumberType ceil(const LPRealAlgebraicNumber& n);
 
 void refine(const LPRealAlgebraicNumber& n);
-void refine_using(const LPRealAlgebraicNumber& n, const LPRealAlgebraicNumber::NumberType& pivot);
-void refine_using(const LPRealAlgebraicNumber& n, const poly::DyadicRational& pivot);
 
 inline bool is_zero(const LPRealAlgebraicNumber& n) {
 	refine(n);

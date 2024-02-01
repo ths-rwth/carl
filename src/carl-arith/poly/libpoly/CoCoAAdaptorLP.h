@@ -242,12 +242,10 @@ public:
     // 	return res;
     // }
 
-    // auto GBasis(const std::vector<Coeff>& p) const {
-    // 	auto start = CARL_TIME_START();
-    // 	auto res = convert(cocoawrapper::ReducedGBasis(convert(p)));
-    // 	CARL_TIME_FINISH(cocoa::statistics().gbasis, start);
-    // 	return res;
-    // }
+    auto GBasis(const std::vector<LPPolynomial>& p) const {
+    	auto res = convert(cocoawrapper::ReducedGBasis(convert(p)));
+    	return res;
+    }
 };
 
 } // namespace carl
