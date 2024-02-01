@@ -25,7 +25,7 @@ add_subdirectory(carl-arith-interval)
 add_subdirectory(carl-arith-intervalcontraction)
 add_subdirectory(carl-formula)
 add_subdirectory(benchmarks)
-add_subdirectory(pycarl)
+# add_subdirectory(pycarl)
 
 # Only for debugging.
 #add_subdirectory(debug)
