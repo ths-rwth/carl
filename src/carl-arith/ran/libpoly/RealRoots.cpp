@@ -71,7 +71,8 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
 
     // Multivariate Polynomial
     // build the assignment
-    poly::Assignment assignment(polynomial.context().poly_context());
+    lp_assignment_t assignment;
+	lp_assignment_construct(&assignment, LPVariables::getInstance().lp_var_db);
     Variable mainVar = polynomial.main_var();
     for (Variable& var : carl::variables(polynomial)) {
         if (var == mainVar) continue;
@@ -80,42 +81,56 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         // Turn into value
         lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, m.at(var).get_internal());
         // That copies the value into the assignment
-        assignment.set(*(polynomial.context().lp_variable(var)), poly::Value(&val));
+        lp_assignment_set_value(&assignment, LPVariables::getInstance().lp_variable(var), &val);
         // Destroy the value, but dont free the algebraic number!
         lp_value_destruct(&val);
     }
 
     CARL_LOG_TRACE("carl.ran.libpoly", "Call libpoly");
-    std::vector<poly::Value> roots = poly::isolate_real_roots(polynomial.get_polynomial(), assignment);
+    lp_value_t* roots = new lp_value_t[poly::degree(polynomial.get_polynomial())];
+    std::size_t roots_size;
+    lp_polynomial_roots_isolate(polynomial.get_internal(), &assignment, roots, &roots_size);
+
     CARL_LOG_TRACE("carl.ran.libpoly", "Libpoly returned");
-
-    if (roots.empty()) {
+    if (roots_size == 0) {
+        delete[] roots;
         CARL_LOG_DEBUG("carl.ran.libpoly", " Checking for nullification -> Evaluation at " << mainVar << "= 1");
-        assignment.set(*(polynomial.context().lp_variable(mainVar)), poly::Value(long(1)));
-        poly::Value eval_val = poly::evaluate(polynomial.get_polynomial(), assignment);
-        CARL_LOG_DEBUG("carl.ran.libpoly", " Got eval_val " << eval_val);
+        lp_value_t val;
+        lp_value_construct_int(&val, long(1));
+        lp_assignment_set_value(&assignment, LPVariables::getInstance().lp_variable(mainVar), &val);
+        lp_value_destruct(&val);
+        auto eval_val = lp_polynomial_evaluate(polynomial.get_internal(), &assignment);
+        //CARL_LOG_DEBUG("carl.ran.libpoly", " Got eval_val " << eval_val);
 
-        if (eval_val == poly::Value(long(0))) {
+        lp_assignment_destruct(&assignment);
+
+        if (lp_value_cmp(eval_val, poly::Value(long(0)).get_internal()) == 0) {
             CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 after substituting rational assignments -> nullified");
+            lp_value_delete(eval_val);
             return RealRootsResult<LPRealAlgebraicNumber>::nullified_response();
         } else {
             CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has no roots");
+            lp_value_delete(eval_val);
             return RealRootsResult<LPRealAlgebraicNumber>::no_roots_response();
         }
     }
 
-    std::sort(roots.begin(), roots.end(), std::less<poly::Value>());
+    lp_assignment_destruct(&assignment);
 
-    // turn result into RealRootsResult
     std::vector<LPRealAlgebraicNumber> res;
-    for (const poly::Value& val : roots) {
-        auto tmp = LPRealAlgebraicNumber::create_from_value(val.get_internal());
+    for (std::size_t i = 0; i < roots_size; ++i) {
+        auto tmp = LPRealAlgebraicNumber::create_from_value(&roots[i]);
         // filter out roots not in interval
-        if (poly::contains(inter_poly, val)) {
-            CARL_LOG_DEBUG("carl.ran.libpoly", " Found root " << val);
+        if (lp_interval_contains(inter_poly.get_internal(), &roots[i])) {
+            CARL_LOG_DEBUG("carl.ran.libpoly", " Found root " << tmp);
             res.emplace_back(tmp);
         }
+        lp_value_destruct(&roots[i]);
     }
+
+    delete[] roots;
+
+    std::sort(res.begin(), res.end());
 
     return RealRootsResult<LPRealAlgebraicNumber>::roots_response(std::move(res));
 }

@@ -8,26 +8,27 @@ std::optional<LPRealAlgebraicNumber> evaluate(
 	const LPPolynomial& polynomial,
 	const std::map<Variable, LPRealAlgebraicNumber>& evalMap) {
 
-	//Turn into poly::Assignment
-	poly::Assignment assignment(polynomial.context().poly_context());
+	lp_assignment_t assignment;
+	lp_assignment_construct(&assignment, LPVariables::getInstance().lp_var_db);
 	for (const auto& entry : evalMap) {
 		lp_value_t val;
-		//Turn into value
 		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, entry.second.get_internal());
-		//That copies the value into the assignment
-		assignment.set(*(polynomial.context().lp_variable(entry.first)), poly::Value(&val));
+		lp_assignment_set_value(&assignment, LPVariables::getInstance().lp_variable(entry.first), &val);
 		lp_value_destruct(&val);
 	}
+	auto result = lp_polynomial_evaluate(polynomial.get_internal(), &assignment);
+	lp_assignment_destruct(&assignment);
 
-	poly::Value result = poly::Value(lp_polynomial_evaluate(polynomial.get_internal(), assignment.get_internal()));
-
-	CARL_LOG_DEBUG("carl.ran.libpoly", " Result: " << result);
-
-	if(poly::is_none(result)) {
+	if (result->type == LP_VALUE_NONE) {
+		CARL_LOG_DEBUG("carl.ran.libpoly", " Result: NONE");
 		return std::nullopt;
 	}
 
-	return LPRealAlgebraicNumber::create_from_value(std::move(result.get_internal()));
+	auto ran = LPRealAlgebraicNumber::create_from_value(result);
+	CARL_LOG_DEBUG("carl.ran.libpoly", " Result: " << ran);
+	lp_value_destruct(result);
+	free(result);
+	return ran;
 }
 
 boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const std::map<Variable, LPRealAlgebraicNumber>& evalMap) {
@@ -59,34 +60,46 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 	//denominator can be omitted
 	const poly::Polynomial& poly_pol = constraint.lhs().get_polynomial();
 
-	//Turn into poly::Assignment
-	poly::Assignment assignment(constraint.lhs().context().poly_context());
+	lp_assignment_t assignment;
+	lp_assignment_construct(&assignment, LPVariables::getInstance().lp_var_db);
 	for (const auto& entry : evalMap) {
-		lp_value_t val;
-		//Turn into value
+		lp_value_t val; 
 		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, entry.second.get_internal());
-		//That copies the value into the assignment
-		assignment.set(*(constraint.lhs().context().lp_variable(entry.first)), poly::Value(&val));
+		lp_assignment_set_value(&assignment, LPVariables::getInstance().lp_variable(entry.first), &val);
 		lp_value_destruct(&val);
 	}
 
+	bool result = false;
 	switch (constraint.relation()) {
 	case Relation::EQ:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::EQ);
+		result = lp_polynomial_constraint_evaluate(
+        poly_pol.get_internal(), LP_SGN_EQ_0, &assignment);
+		break;
 	case Relation::NEQ:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::NE);
+		result = lp_polynomial_constraint_evaluate(
+        poly_pol.get_internal(), LP_SGN_NE_0, &assignment);
+		break;
 	case Relation::LESS:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::LT);
+		result = lp_polynomial_constraint_evaluate(
+        poly_pol.get_internal(), LP_SGN_LT_0, &assignment);
+		break;
 	case Relation::LEQ:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::LE);
+		result = lp_polynomial_constraint_evaluate(
+        poly_pol.get_internal(), LP_SGN_LE_0, &assignment);
+		break;
 	case Relation::GREATER:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::GT);
+		result = lp_polynomial_constraint_evaluate(
+        poly_pol.get_internal(), LP_SGN_GT_0, &assignment);
+		break;
 	case Relation::GEQ:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::GE);
+		result = lp_polynomial_constraint_evaluate(
+        poly_pol.get_internal(), LP_SGN_GE_0, &assignment);
+		break;
 	default:
 		assert(false);
-		return false;
 	}
+	lp_assignment_destruct(&assignment);
+	return result;
 }
 
 }

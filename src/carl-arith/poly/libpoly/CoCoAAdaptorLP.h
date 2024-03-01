@@ -130,9 +130,8 @@ public:
 
             for (std::size_t i = 0; i < exponents.size(); ++i) {
                 if (exponents[i] == 0) continue;
-                std::optional<lp_variable_t> var = mContext.lp_variable(mSymbolBack[i]);
-                assert(var.has_value());
-                poly::Polynomial polyVar = poly_helper::construct_poly(mContext.lp_context(), *var);
+                lp_variable_t var = mContext.lp_variable(mSymbolBack[i]);
+                poly::Polynomial polyVar = poly_helper::construct_poly(mContext.lp_context(), var);
                 termPoly *= poly::pow(polyVar, (unsigned int)exponents[i]);
             }
             temPoly += termPoly;
