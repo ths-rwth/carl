@@ -26,7 +26,6 @@ public:
     lp_variable_db_t* lp_var_db;
 
     LPVariables() {
-        std::cout << "init vardb" << std::endl;
         lp_var_db = lp_variable_db_new();
     }
 
