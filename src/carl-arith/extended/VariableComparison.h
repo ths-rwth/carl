@@ -153,15 +153,26 @@ namespace carl {
 	}
 
 	template<typename Poly>
-	boost::tribool evaluate(const VariableComparison<Poly>& f, const Assignment<typename VariableComparison<Poly>::RAN>& a) {
+	boost::tribool evaluate(const VariableComparison<Poly>& f, const Assignment<typename VariableComparison<Poly>::RAN>& a, bool evaluate_non_welldef = false) {
 		typename VariableComparison<Poly>::RAN lhs;
+		if (a.find(f.var()) == a.end()) return boost::indeterminate;
 		typename VariableComparison<Poly>::RAN rhs = a.at(f.var());
 		if (std::holds_alternative<typename VariableComparison<Poly>::RAN>(f.value())) {
 			lhs = std::get<typename VariableComparison<Poly>::RAN>(f.value());
 		} else {
-			auto res = carl::evaluate(std::get<typename VariableComparison<Poly>::MR>(f.value()), a);
-			if (!res) return boost::indeterminate;
-			else lhs = *res;
+			if (!evaluate_non_welldef) {
+				auto res = carl::evaluate(std::get<typename VariableComparison<Poly>::MR>(f.value()), a);
+				if (!res) return boost::indeterminate;
+				else lhs = *res;
+			} else {
+				auto vars = carl::variables(std::get<typename VariableComparison<Poly>::MR>(f.value()));
+				for (const auto& v : vars) {
+					if (a.find(v) == a.end()) return boost::indeterminate;
+				}
+				auto res = carl::evaluate(std::get<typename VariableComparison<Poly>::MR>(f.value()), a);
+				if (!res) return f.negated();
+				else lhs = *res;
+			}
 		}
 		if (!f.negated()) return evaluate(rhs, f.relation(), lhs);
 		else return !evaluate(rhs, f.relation(), lhs);
