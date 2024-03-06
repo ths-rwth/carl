@@ -419,8 +419,8 @@ namespace carl::vs {
             assert(zeros.size() == 1);
 
             // calculate subVar1-subVar2 ~ 0 [term//subVar1][zero//subVar2]
-            carl::Variable subVar1 = carl::fresh_real_variable("__subVar1");
-            carl::Variable subVar2 = carl::fresh_real_variable("__subVar2");
+            static carl::Variable subVar1 = carl::fresh_real_variable("__subVar1");
+            static carl::Variable subVar2 = carl::fresh_real_variable("__subVar2");
             auto subRes1 = substitute(Constraint<Poly>(Poly(subVar1) - subVar2, varcompRelation), subVar1, term);
             assert(subRes1);
             CaseDistinction<Poly> result;
@@ -452,7 +452,7 @@ namespace carl::vs {
             }
             return result;
         } else if(term.is_minus_infty() ) {
-            carl::Variable subVar1 = carl::fresh_real_variable("__subVar1");
+            static carl::Variable subVar1 = carl::fresh_real_variable("__subVar1");
             return substitute(Constraint<Poly>(subVar1, varcompRelation), subVar1, Term<Poly>::minus_infty());
         } else {
             return std::nullopt;

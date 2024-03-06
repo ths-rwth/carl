@@ -7,9 +7,7 @@ namespace carl {
 std::optional<LPRealAlgebraicNumber> evaluate(
 	const LPPolynomial& polynomial,
 	const std::map<Variable, LPRealAlgebraicNumber>& evalMap) {
-
-	lp_assignment_t assignment;
-	lp_assignment_construct(&assignment, LPVariables::getInstance().lp_var_db);
+	lp_assignment_t& assignment = LPVariables::getInstance().get_assignment();
 	for (const auto& entry : evalMap) {
 		lp_value_t val;
 		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, entry.second.get_internal());
@@ -17,7 +15,6 @@ std::optional<LPRealAlgebraicNumber> evaluate(
 		lp_value_destruct(&val);
 	}
 	auto result = lp_polynomial_evaluate(polynomial.get_internal(), &assignment);
-	lp_assignment_destruct(&assignment);
 
 	if (result->type == LP_VALUE_NONE) {
 		CARL_LOG_DEBUG("carl.ran.libpoly", " Result: NONE");
@@ -57,11 +54,14 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 		}
 	}
 
+	for (const auto& v : carl::variables(constraint)) {
+		if (evalMap.find(v) == evalMap.end()) return boost::indeterminate;
+	}
+
 	//denominator can be omitted
 	const poly::Polynomial& poly_pol = constraint.lhs().get_polynomial();
 
-	lp_assignment_t assignment;
-	lp_assignment_construct(&assignment, LPVariables::getInstance().lp_var_db);
+	lp_assignment_t& assignment = LPVariables::getInstance().get_assignment();
 	for (const auto& entry : evalMap) {
 		lp_value_t val; 
 		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, entry.second.get_internal());
@@ -98,7 +98,6 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 	default:
 		assert(false);
 	}
-	lp_assignment_destruct(&assignment);
 	return result;
 }
 

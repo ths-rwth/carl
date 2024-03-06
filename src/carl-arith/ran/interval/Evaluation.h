@@ -83,7 +83,7 @@ std::optional<IntRepRealAlgebraicNumber<Number>> evaluate(MultivariatePolynomial
 	}
 
 	CARL_LOG_TRACE("carl.ran.interval", "Compute result polynomial");
-	Variable v = fresh_real_variable();
+	static Variable v = fresh_real_variable();
 	std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
 	for (const auto& [var, ran] : m) {
 		if (var_to_interval.find(var) == var_to_interval.end()) continue;
@@ -211,7 +211,7 @@ boost::tribool evaluate(const BasicConstraint<MultivariatePolynomial<Number>>& c
 		}
 
 		// compute the result polynomial	
-		Variable v = fresh_real_variable();
+		static Variable v = fresh_real_variable();
 		std::vector<UnivariatePolynomial<MultivariatePolynomial<Number>>> algebraic_information;
 		for (const auto& [var, ran] : m) {
 			if (var_to_interval.find(var) == var_to_interval.end()) continue;

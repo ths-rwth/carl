@@ -67,12 +67,16 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         return RealRootsResult<LPRealAlgebraicNumber>::no_roots_response();
     }
 
+    for (const auto& v : carl::variables(polynomial)) {
+		if (v != polynomial.main_var() && m.find(v) == m.end()) return RealRootsResult<LPRealAlgebraicNumber>::non_univariate_response();
+	}
+
     poly::Interval inter_poly = to_libpoly_interval(interval);
 
     // Multivariate Polynomial
     // build the assignment
-    lp_assignment_t assignment;
-	lp_assignment_construct(&assignment, LPVariables::getInstance().lp_var_db);
+    lp_assignment_t& assignment = LPVariables::getInstance().get_assignment();
+	
     Variable mainVar = polynomial.main_var();
     for (Variable& var : carl::variables(polynomial)) {
         if (var == mainVar) continue;
@@ -102,7 +106,6 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         auto eval_val = lp_polynomial_evaluate(polynomial.get_internal(), &assignment);
         //CARL_LOG_DEBUG("carl.ran.libpoly", " Got eval_val " << eval_val);
 
-        lp_assignment_destruct(&assignment);
 
         if (lp_value_cmp(eval_val, poly::Value(long(0)).get_internal()) == 0) {
             CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 after substituting rational assignments -> nullified");
@@ -114,8 +117,6 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
             return RealRootsResult<LPRealAlgebraicNumber>::no_roots_response();
         }
     }
-
-    lp_assignment_destruct(&assignment);
 
     std::vector<LPRealAlgebraicNumber> res;
     for (std::size_t i = 0; i < roots_size; ++i) {
