@@ -7,32 +7,29 @@ namespace carl {
 using NumberType = LPRealAlgebraicNumber::NumberType;
 
 LPRealAlgebraicNumber::~LPRealAlgebraicNumber() {
-    lp_algebraic_number_destruct(get_internal());
 }
 
-LPRealAlgebraicNumber::LPRealAlgebraicNumber() {
+LPRealAlgebraicNumber::LPRealAlgebraicNumber() : m_content(std::make_shared<LPRealAlgebraicNumber::Content>()) {
     lp_algebraic_number_construct_zero(get_internal());
 }
 
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(const poly::AlgebraicNumber& num) {
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(const poly::AlgebraicNumber& num) : LPRealAlgebraicNumber() {
     lp_algebraic_number_construct_copy(get_internal(), num.get_internal());
 }
 
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(const lp_algebraic_number_t& num) {
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(const lp_algebraic_number_t& num) : LPRealAlgebraicNumber() {
     lp_algebraic_number_construct_copy(get_internal(), &num);
 }
 
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(poly::AlgebraicNumber&& num)
-    : LPRealAlgebraicNumber() {
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(poly::AlgebraicNumber&& num) : LPRealAlgebraicNumber() {
     lp_algebraic_number_swap(get_internal(), num.get_internal());
 }
 
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(lp_algebraic_number_t&& num)
-    : LPRealAlgebraicNumber() {
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(lp_algebraic_number_t&& num) : LPRealAlgebraicNumber() {
     lp_algebraic_number_swap(get_internal(), &num);
 }
 
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(const carl::UnivariatePolynomial<NumberType>& p, const Interval<NumberType>& i) {
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(const carl::UnivariatePolynomial<NumberType>& p, const Interval<NumberType>& i) : LPRealAlgebraicNumber() {
     CARL_LOG_DEBUG("carl.ran.libpoly", " Create safe from poly: " << p << " in interval: " << i);
 
     poly::UPolynomial upoly = to_libpoly_upolynomial(p);
@@ -61,25 +58,21 @@ LPRealAlgebraicNumber::LPRealAlgebraicNumber(const carl::UnivariatePolynomial<Nu
 /**
  * Construct from NumberType (usually mpq_class)
  */
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(const NumberType& num) {
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(const NumberType& num) : LPRealAlgebraicNumber() {
     poly::Rational rat = to_libpoly_rational(num);
     lp_algebraic_number_construct_from_rational(get_internal(), rat.get_internal());
 }
 
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(const LPRealAlgebraicNumber& ran) {
-    lp_algebraic_number_construct_copy(get_internal(), ran.get_internal());
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(const LPRealAlgebraicNumber& ran) : m_content(ran.m_content) {
 }
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(LPRealAlgebraicNumber&& ran)
-    : LPRealAlgebraicNumber() {
-    lp_algebraic_number_swap(get_internal(), ran.get_internal());
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(LPRealAlgebraicNumber&& ran) : m_content(std::move(ran.m_content)) {
 }
 LPRealAlgebraicNumber& LPRealAlgebraicNumber::operator=(const LPRealAlgebraicNumber& n) {
-    lp_algebraic_number_destruct(get_internal());
-    lp_algebraic_number_construct_copy(get_internal(), n.get_internal());
+    m_content = n.m_content;
     return *this;
 }
 LPRealAlgebraicNumber& LPRealAlgebraicNumber::operator=(LPRealAlgebraicNumber&& n) {
-    lp_algebraic_number_swap(get_internal(), n.get_internal());
+    m_content = std::move(n.m_content);
     return *this;
 }
 
@@ -397,9 +390,24 @@ NumberType ceil(const LPRealAlgebraicNumber& n) {
 
 
 bool compare(const LPRealAlgebraicNumber& lhs, const LPRealAlgebraicNumber& rhs, const Relation relation) {
+    if (lhs.m_content == rhs.m_content) {
+        switch (relation) {
+        case Relation::EQ:
+        case Relation::LEQ:
+        case Relation::GEQ:
+            return true;
+        case Relation::NEQ:
+        case Relation::LESS:
+        case Relation::GREATER:
+        default:
+            return false;
+        }
+    }
+
 	int cmp = lp_algebraic_number_cmp(lhs.get_internal(), rhs.get_internal());
 	switch (relation) {
 	case Relation::EQ:
+        if (cmp == 0) lhs.m_content = rhs.m_content;
 		return cmp == 0;
 	case Relation::NEQ:
 		return cmp != 0;

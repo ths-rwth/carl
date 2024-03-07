@@ -25,11 +25,15 @@ public:
 	using NumberType = mpq_class;
 
 private:
-	lp_algebraic_number_t m_content;
+	struct Content {
+		lp_algebraic_number_t c;
+		~Content() {
+			lp_algebraic_number_destruct(&c);
+		}
+	};
+	mutable std::shared_ptr<Content> m_content;
 
 	static const Variable auxVariable;
-
-	
 
 public:
 	~LPRealAlgebraicNumber();
@@ -100,14 +104,14 @@ public:
 	 * @return Pointer to the internal libpoly algebraic number (C interface)
 	 */
 	inline lp_algebraic_number_t* get_internal() {
-		return &m_content;
+		return &(m_content->c);
 	}
 
 	/**
 	 * @return Pointer to the internal libpoly algebraic number (C interface)
 	 */
 	inline const lp_algebraic_number_t* get_internal() const {
-		return &m_content;
+		return &(m_content->c);
 	}
 
 	/**

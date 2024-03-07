@@ -22,8 +22,6 @@ class LPVariables : public Singleton<LPVariables> {
     // mapping from libpoly variables to carl variables
     std::map<lp_variable_t, carl::Variable> vars_libpoly_carl;
 
-    lp_assignment_t lp_assignment;
-
 public:
     lp_variable_db_t* lp_var_db;
 
@@ -36,7 +34,6 @@ public:
     std::optional<carl::Variable> carl_variable(lp_variable_t var) const;
     std::optional<lp_variable_t> lp_variable_opt(carl::Variable var) const;
     lp_variable_t lp_variable(carl::Variable var);
-    lp_assignment_t& get_assignment();
 };
     
 } // namespace carl

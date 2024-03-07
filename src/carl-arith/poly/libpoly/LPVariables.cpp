@@ -9,8 +9,6 @@ namespace carl {
 
 LPVariables::LPVariables() {
     lp_var_db = lp_variable_db_new();
-    lp_assignment_construct(&lp_assignment, lp_var_db);
-
     for (size_t i = 0; i < TEMP_VARIABLE_SIZE; ++ i) {
         char name[10];
         sprintf(name, "#%zu", i);
@@ -19,7 +17,6 @@ LPVariables::LPVariables() {
 }
 
 LPVariables::~LPVariables() {
-    lp_assignment_destruct(&lp_assignment);
     lp_variable_db_detach(lp_var_db);
 }
 
@@ -51,15 +48,6 @@ lp_variable_t LPVariables::lp_variable(carl::Variable var) {
         CARL_LOG_TRACE("carl.poly", "Mapping carl variable " << var << " (" << var.id() << ") -> " << lp_variable_db_get_name(lp_var_db, poly_var) << " (" << poly_var << ")");
         return poly_var;
     }
-}
-
-lp_assignment_t& LPVariables::get_assignment() {
-    if (lp_assignment.values) {
-        for (size_t i = 0; i < lp_assignment.size; ++ i) {
-            lp_assignment_set_value(&lp_assignment, i, 0);
-        }
-    }
-    return lp_assignment;
 }
     
 } // namespace carl

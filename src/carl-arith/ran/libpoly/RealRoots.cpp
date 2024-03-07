@@ -2,6 +2,8 @@
 
 #ifdef USE_LIBPOLY
 
+#include "LPAssignment.h"
+
 
 namespace carl {
 
@@ -75,20 +77,10 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
 
     // Multivariate Polynomial
     // build the assignment
-    lp_assignment_t& assignment = LPVariables::getInstance().get_assignment();
-	
     Variable mainVar = polynomial.main_var();
-    for (Variable& var : carl::variables(polynomial)) {
-        if (var == mainVar) continue;
-        // We convert numbers to libpoly values and add to assignment so we can substitute them later using libpoly
-        lp_value_t val;
-        // Turn into value
-        lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, m.at(var).get_internal());
-        // That copies the value into the assignment
-        lp_assignment_set_value(&assignment, LPVariables::getInstance().lp_variable(var), &val);
-        // Destroy the value, but dont free the algebraic number!
-        lp_value_destruct(&val);
-    }
+    auto evalMap = m;
+    evalMap.erase(mainVar);
+    lp_assignment_t& assignment = LPAssignment::getInstance().get(evalMap);
 
     CARL_LOG_TRACE("carl.ran.libpoly", "Call libpoly");
     lp_value_t* roots = new lp_value_t[poly::degree(polynomial.get_polynomial())];
