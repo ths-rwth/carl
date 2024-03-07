@@ -70,6 +70,9 @@ namespace carl {
 		const std::variant<MR, RAN>& value() const {
 			return m_value;
 		}
+		std::variant<MR, RAN>& value() {
+			return m_value;
+		}
 		bool is_equality() const {
 			return negated() ? relation() == Relation::NEQ : relation() == Relation::EQ;
 		}

@@ -1,3 +1,16 @@
+diff --git a/include/polynomial.h b/include/polynomial.h
+index 8a9533f..12123e8 100644
+--- a/include/polynomial.h
++++ b/include/polynomial.h
+@@ -109,6 +109,8 @@ int lp_polynomial_lc_sgn(const lp_polynomial_t* A);
+ /** Get the context of the given polynomial */
+ const lp_polynomial_context_t* lp_polynomial_get_context(const lp_polynomial_t* A);
+ 
++void lp_polynomial_set_context(lp_polynomial_t* A, const lp_polynomial_context_t* ctx);
++
+ /** Returns all the variables (it will not clear the output list vars) */
+ void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars);
+ 
 diff --git a/src/variable/variable_db.c b/src/variable/variable_db.c
 index 60f3df4..33866c4 100644
 --- a/src/variable/variable_db.c

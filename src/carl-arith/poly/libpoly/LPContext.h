@@ -91,6 +91,16 @@ public:
     inline bool operator==(const LPContext& rhs) const {
         return m_data == rhs.m_data;
     }
+
+    bool is_extension_of(const LPContext& other) const {
+        auto it_a = variable_ordering().begin();
+        auto it_b = other.variable_ordering().begin();
+        while (it_a != variable_ordering().end() && it_b != other.variable_ordering().end() && *it_a == *it_b) {
+            it_a++;
+            it_b++;
+        }
+        return it_b == other.variable_ordering().end();
+    }
 };
 
 inline std::ostream& operator<<(std::ostream& os, const LPContext& ctx) {

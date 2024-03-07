@@ -288,6 +288,8 @@ public:
 		return m_context;
 	}
 
+	void set_context(const LPContext& c);
+
 	/**
 	 * Checks if the given variable occurs in the polynomial.
 	 * @param v Variable.

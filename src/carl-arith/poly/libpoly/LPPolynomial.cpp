@@ -549,6 +549,19 @@ std::ostream& operator<<(std::ostream& os, const LPPolynomial& p) {
     return os;
 }
 
+void LPPolynomial::set_context(const LPContext& c) {
+    for (auto& v : variables(*this)) assert(c.has(v));
+    if (context() == c) return;
+
+    bool reorder = !(c.is_extension_of(context()) || context().is_extension_of(c));
+    m_context = c;
+    lp_polynomial_set_context(get_internal(), m_context.lp_context());
+    if (reorder) {
+        lp_polynomial_ensure_order(get_internal());
+    }
+    assert(lp_polynomial_check_order(get_internal()));
+}
+
 } // namespace carl
 
 #endif
