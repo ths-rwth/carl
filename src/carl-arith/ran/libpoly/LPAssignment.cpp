@@ -28,10 +28,7 @@ lp_assignment_t& LPAssignment::get(const carl::Assignment<LPRealAlgebraicNumber>
             }
         }
         for (const auto& entry : ass) {
-            lp_value_t val;
-            lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, entry.second.get_internal());
-            lp_assignment_set_value(&lp_assignment, LPVariables::getInstance().lp_variable(entry.first), &val);
-            lp_value_destruct(&val);
+            lp_assignment_set_value(&lp_assignment, LPVariables::getInstance().lp_variable(entry.first), entry.second.get_internal());
         }
         return lp_assignment;
     }

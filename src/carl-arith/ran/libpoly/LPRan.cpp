@@ -10,23 +10,15 @@ LPRealAlgebraicNumber::~LPRealAlgebraicNumber() {
 }
 
 LPRealAlgebraicNumber::LPRealAlgebraicNumber() : m_content(std::make_shared<LPRealAlgebraicNumber::Content>()) {
-    lp_algebraic_number_construct_zero(get_internal());
+    lp_value_construct_zero(get_internal());
 }
 
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(const poly::AlgebraicNumber& num) : LPRealAlgebraicNumber() {
-    lp_algebraic_number_construct_copy(get_internal(), num.get_internal());
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(const lp_value_t& num) : m_content(std::make_shared<LPRealAlgebraicNumber::Content>()) {
+    lp_value_construct_copy(get_internal(), &num);
 }
 
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(const lp_algebraic_number_t& num) : LPRealAlgebraicNumber() {
-    lp_algebraic_number_construct_copy(get_internal(), &num);
-}
-
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(poly::AlgebraicNumber&& num) : LPRealAlgebraicNumber() {
-    lp_algebraic_number_swap(get_internal(), num.get_internal());
-}
-
-LPRealAlgebraicNumber::LPRealAlgebraicNumber(lp_algebraic_number_t&& num) : LPRealAlgebraicNumber() {
-    lp_algebraic_number_swap(get_internal(), &num);
+LPRealAlgebraicNumber::LPRealAlgebraicNumber(lp_value_t&& num) : m_content(std::make_shared<LPRealAlgebraicNumber::Content>()) {
+    *get_internal() = num;
 }
 
 LPRealAlgebraicNumber::LPRealAlgebraicNumber(const carl::UnivariatePolynomial<NumberType>& p, const Interval<NumberType>& i) : LPRealAlgebraicNumber() {
@@ -37,30 +29,24 @@ LPRealAlgebraicNumber::LPRealAlgebraicNumber(const carl::UnivariatePolynomial<Nu
 
     CARL_LOG_DEBUG("carl.ran.libpoly", " Converted to poly: " << upoly << " in interval: " << inter_poly);
 
-    //actual calculations
     std::vector<poly::AlgebraicNumber> roots = poly::isolate_real_roots(upoly);
     std::vector<poly::AlgebraicNumber> res;
-
     for (const auto& val : roots) {
-        // filter out roots not in interval
         if (poly::contains(inter_poly, poly::Value(val))) {
             CARL_LOG_DEBUG("carl.ran.libpoly", " Found Root " << val);
             res.emplace_back(val);
         }
     }
-
     assert(res.size() == 1);
-    lp_algebraic_number_construct_zero(get_internal());
-    lp_algebraic_number_swap(get_internal(), res.front().get_internal());
-    //We dont need to free the items in res, as they're from the C++ interface
+
+    lp_value_construct_copy(get_internal(), poly::Value(res.front()).get_internal());
 }
 
 /**
  * Construct from NumberType (usually mpq_class)
  */
 LPRealAlgebraicNumber::LPRealAlgebraicNumber(const NumberType& num) : LPRealAlgebraicNumber() {
-    poly::Rational rat = to_libpoly_rational(num);
-    lp_algebraic_number_construct_from_rational(get_internal(), rat.get_internal());
+    lp_value_construct(get_internal(), LP_VALUE_RATIONAL, (lp_rational_t*)num.get_mpq_t());
 }
 
 LPRealAlgebraicNumber::LPRealAlgebraicNumber(const LPRealAlgebraicNumber& ran) : m_content(ran.m_content) {
@@ -83,63 +69,33 @@ LPRealAlgebraicNumber LPRealAlgebraicNumber::create_safe(const carl::UnivariateP
     return LPRealAlgebraicNumber(p, i);
 }
 
-/**
- * Convert a libpoly Value into an algebraic number
- * This does not free the value
- * In case the value is none or infinity this conversion is not possible
- * @param Libpoly Value (C interface)
- * @return Copy of val as a algebraic number
- */
-LPRealAlgebraicNumber LPRealAlgebraicNumber::create_from_value(const lp_value_t* val) {
-    CARL_LOG_DEBUG("carl.ran.libpoly", "Converting value into algebraic number");
-    lp_algebraic_number_t mVal;
-    if (val->type == lp_value_type_t::LP_VALUE_NONE || val->type == lp_value_type_t::LP_VALUE_MINUS_INFINITY || val->type == lp_value_type_t::LP_VALUE_PLUS_INFINITY) {
-        //If value is not assigned at all or pm infty just return an error
-        assert(false && "Invalid RAN creation");
-    } else if (val->type == lp_value_type_t::LP_VALUE_ALGEBRAIC) {
-        //val is already an algebraic number
-        lp_algebraic_number_construct_copy(&mVal, &val->value.a);
-        LPRealAlgebraicNumber ret(std::move(mVal));
-        lp_algebraic_number_destruct(&mVal);
-        return ret;
-    } else if (lp_value_is_rational(val)) {
-        //if the value is a rational number: either an integer, dyadic rational or a rational
-        lp_rational_t rat;
-        lp_rational_construct(&rat);
-        lp_value_get_rational(val, &rat);
-        lp_algebraic_number_construct_from_rational(&mVal, &rat);
-        LPRealAlgebraicNumber ret(std::move(mVal));
-        lp_algebraic_number_destruct(&mVal);
-        lp_rational_destruct(&rat);
-        return ret;
-    } else {
-        assert(false && "Invalid RAN creation");
-    }
-    return LPRealAlgebraicNumber();
-}
-
 bool is_integer(const LPRealAlgebraicNumber& n) {
-    return lp_algebraic_number_is_integer(n.get_internal());
+    return lp_value_is_integer(n.get_internal());
 }
 LPRealAlgebraicNumber::NumberType integer_below(const LPRealAlgebraicNumber& n) {
-    poly::Integer val;
-    lp_algebraic_number_floor(n.get_internal(), val.get_internal());
-    return to_rational(val);
+    lp_integer_t result;
+    lp_integer_construct(&result);
+    lp_value_floor(n.get_internal(), &result);
+    NumberType num = to_rational(&result) ;
+    lp_integer_destruct(&result) ;
+    return num;
 }
 
 /**
  * @return true if the interval is a point or the poly has degree 1
  */
 bool LPRealAlgebraicNumber::is_numeric() const {
-    return lp_algebraic_number_is_rational(get_internal());
+    return lp_value_is_rational(get_internal());
 }
 
 const poly::UPolynomial LPRealAlgebraicNumber::libpoly_polynomial() const {
-    return poly::UPolynomial(static_cast<const lp_upolynomial_t*>(get_internal()->f));
+    assert(!is_numeric());
+    return poly::UPolynomial(static_cast<const lp_upolynomial_t*>(get_internal()->value.a.f));
 }
 
 const poly::DyadicInterval& LPRealAlgebraicNumber::libpoly_interval() const {
-    return *reinterpret_cast<const poly::DyadicInterval*>(&get_internal()->I);
+    assert(!is_numeric());
+    return *reinterpret_cast<const poly::DyadicInterval*>(&get_internal()->value.a.I);
 }
 
 const UnivariatePolynomial<NumberType> LPRealAlgebraicNumber::polynomial() const {
@@ -155,11 +111,13 @@ const Interval<NumberType> LPRealAlgebraicNumber::interval() const {
 }
 
 const NumberType LPRealAlgebraicNumber::get_upper_bound() const {
-    return to_rational(poly::get_upper(libpoly_interval()));
+    if (is_numeric()) return value();
+    else return to_rational(poly::get_upper(libpoly_interval()));
 }
 
 const NumberType LPRealAlgebraicNumber::get_lower_bound() const {
-    return to_rational(poly::get_lower(libpoly_interval()));
+    if (is_numeric()) return value();
+    else return to_rational(poly::get_lower(libpoly_interval()));
 }
 
 /**
@@ -168,32 +126,12 @@ const NumberType LPRealAlgebraicNumber::get_lower_bound() const {
  */
 const NumberType LPRealAlgebraicNumber::value() const {
     assert(is_numeric());
-    lp_rational_t result ;
-    if(lp_dyadic_interval_is_point(&get_internal()->I)){
-        // It's a point value, so we just get it
-        lp_rational_construct_from_dyadic(&result, lp_dyadic_interval_get_point(&get_internal()->I));
-    }else{
-        const lp_upolynomial_t* poly = get_internal()->f ;
-        assert(lp_upolynomial_degree(poly) == 1) ;
-        // p = ax + b = 0 => x = -b/a
-        const lp_integer_t* b = lp_upolynomial_const_term(poly);
-        const lp_integer_t* a = lp_upolynomial_lead_coeff(poly);
-        if(b){
-            //b != 0
-            //we can do this, as lp_rational_t == __mpq_struct
-            mpq_init(&result);
-            mpq_set_num(&result, b);
-            mpq_set_den(&result, a);
-            mpq_canonicalize(&result);
-            mpq_neg(&result, &result);
-        }else{
-            // b = 0
-            mpq_init(&result);
-        }
-    }
+    lp_rational_t result;
+    lp_rational_construct(&result);
+    lp_value_get_rational(get_internal(), &result);
     NumberType num = to_rational(&result) ;
     lp_rational_destruct(&result) ;
-    return num ;
+    return num;
 }
 
 /**
@@ -201,29 +139,26 @@ const NumberType LPRealAlgebraicNumber::value() const {
  * @return Absolute Value of the stored RAN
  */
 LPRealAlgebraicNumber abs(const LPRealAlgebraicNumber& n) {
-
     if (n.is_numeric()) {
         CARL_LOG_DEBUG("carl.ran.libpoly", "Algebraic NumberType abs got numeric value");
         return LPRealAlgebraicNumber(carl::abs(n.value()));
     }
 
-    int sign = lp_algebraic_number_sgn(n.get_internal());
+    int sign = lp_value_sgn(n.get_internal());
     CARL_LOG_DEBUG("carl.ran.libpoly", "Algebraic NumberType abs got sign : " << sign << " of " << n);
 
     if (sign >= 0) {
         return LPRealAlgebraicNumber(n);
     } else {
-        lp_algebraic_number_t val;
-        lp_algebraic_number_construct_zero(&val);
-        lp_algebraic_number_neg(&val, n.get_internal());
+        lp_value_t val;
+        lp_value_construct_zero(&val);
+        lp_value_neg(&val, n.get_internal());
         auto ret = LPRealAlgebraicNumber(std::move(val));
-        lp_algebraic_number_destruct(&val);
-        return ret ;
+        return ret;
     }
 }
 
 std::size_t bitsize(const LPRealAlgebraicNumber& n) {
-    //From Ran.h
     if (n.is_numeric()) {
         return carl::bitsize(n.get_lower_bound()) + carl::bitsize(n.get_upper_bound());
     } else {
@@ -232,7 +167,7 @@ std::size_t bitsize(const LPRealAlgebraicNumber& n) {
 }
 
 Sign sgn(const LPRealAlgebraicNumber& n) {
-    return static_cast<Sign>(lp_algebraic_number_sgn(n.get_internal()));
+    return static_cast<Sign>(lp_value_sgn(n.get_internal()));
 }
 
 Sign sgn(const LPRealAlgebraicNumber&, const UnivariatePolynomial<LPRealAlgebraicNumber::NumberType>&) {
@@ -242,17 +177,8 @@ Sign sgn(const LPRealAlgebraicNumber&, const UnivariatePolynomial<LPRealAlgebrai
 
 bool contained_in(const LPRealAlgebraicNumber& n, const Interval<LPRealAlgebraicNumber::NumberType>& i) {
     CARL_LOG_DEBUG("carl.ran.libpoly", "ran " << n << " contained in " << i);
-
     poly::Interval inter = to_libpoly_interval(i);
-
-    lp_value_t val;
-    lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, n.get_internal());
-
-    bool b = lp_interval_contains(inter.get_internal(), &val);
-    //Destruct the value, but do not free m_content
-    lp_value_destruct(&val);
-
-    return b;
+    return lp_interval_contains(inter.get_internal(), n.get_internal());
 }
 
 
@@ -264,8 +190,10 @@ bool contained_in(const LPRealAlgebraicNumber& n, const Interval<LPRealAlgebraic
 void refine(const LPRealAlgebraicNumber& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Refining Algebraic NumberType : " << n);
 
+    if (n.is_numeric()) return;
+
 	while (poly::log_size(n.libpoly_interval()) > 0 && !n.is_numeric()) {
-		lp_algebraic_number_refine_const(n.get_internal());
+		lp_algebraic_number_refine_const(&n.get_internal()->value.a);
 	}
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Finished Refining Algebraic NumberType : " << n);
 }
@@ -275,103 +203,90 @@ void LPRealAlgebraicNumber::refine() const {
 }
 
 NumberType branching_point(const LPRealAlgebraicNumber& n) {
-	//return carl::sample(n.interval_int());
-	refine(n);
+    if (n.is_numeric()) return n.value();
+
+    refine(n);
 	poly::DyadicRational res;
-	lp_algebraic_number_get_dyadic_midpoint(n.get_internal(), res.get_internal());
-	NumberType num = to_rational(res);
-	return num;
+	lp_algebraic_number_get_dyadic_midpoint(&n.get_internal()->value.a, res.get_internal());
+	return to_rational(res);
 }
 
 
 NumberType sample_above(const LPRealAlgebraicNumber& n) {
-	//return carl::floor(n.interval_int().upper()) + 1; From Ran.h
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling above: " << n);
-	refine(n);
+	
+    lp_value_t inf;
+    lp_value_construct(&inf, LP_VALUE_PLUS_INFINITY, 0);
 
-	return carl::floor(n.get_upper_bound()) + 1;
+    lp_value_t res;
+    lp_value_get_value_between(n.get_internal(), true, &inf, true, &res);
+    auto val = to_rational(&res);
+    lp_value_destruct(&res);
+    return val;
 }
 
 
 NumberType sample_below(const LPRealAlgebraicNumber& n) {
 	//return carl::ceil(n.interval_int().lower()) - 1; From Ran.h
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling below: " << n);
-	refine(n);
+	
+    lp_value_t inf;
+    lp_value_construct(&inf, LP_VALUE_MINUS_INFINITY, 0);
 
-	return carl::ceil(n.get_lower_bound()) - 1;
+    lp_value_t res;
+    lp_value_get_value_between(&inf, true, n.get_internal(), true, &res);
+    auto val = to_rational(&res);
+    lp_value_destruct(&res);
+    return val;
 }
 
 
 NumberType sample_between(const LPRealAlgebraicNumber& lower, const LPRealAlgebraicNumber& upper) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling between: " << lower << " and " << upper);
 
-	//Make sure that the intervals are disjoint
-	while (lower.get_upper_bound() > upper.get_lower_bound()) {
-		if(lower.is_numeric()){
-			break ;
-		}
-		if(upper.is_numeric()){
-			break ;
-		}
-		lp_algebraic_number_refine_const(lower.get_internal());
-		lp_algebraic_number_refine_const(upper.get_internal());
-	}
-
-	if (lower.is_numeric()) {
-		CARL_LOG_DEBUG("carl.ran.libpoly", "Found sample between: " << sample_between(lower.value(), upper));
-		return sample_between(lower.value(), upper);
-	} else if (upper.is_numeric()) {
-		CARL_LOG_DEBUG("carl.ran.libpoly", "Found sample between: " << sample_between(lower, upper.value()));
-		return sample_between(lower, upper.value());
-	} else {
-		CARL_LOG_DEBUG("carl.ran.libpoly", "Found sample between: " << carl::sample(Interval<NumberType>(lower.get_upper_bound(), upper.get_lower_bound()), true));
-		return carl::sample(Interval<NumberType>(lower.get_upper_bound(), upper.get_lower_bound()), true);
-	}
+	lp_value_t res;
+    lp_value_get_value_between(lower.get_internal(), true, upper.get_internal(), true, &res);
+    auto val = to_rational(&res);
+    lp_value_destruct(&res);
+    return val;
 }
 
 NumberType sample_between(const LPRealAlgebraicNumber& lower, const NumberType& upper) {
-	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling between: " << lower << " and " << upper);
-	//Make sure that the intervals are disjoint
-	while (!(lower.get_upper_bound() < upper) && !lower.is_numeric()) {
-		lp_algebraic_number_refine_const(lower.get_internal());
-	}
+    CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling between: " << lower << " and " << upper);
 
-	if (lower.is_numeric()) {
-		NumberType sample = sample_between(lower.value(), upper);
-		CARL_LOG_DEBUG("carl.ran.libpoly", "Found sample between: " << sample);
-		return sample;
-	} else {
-		//sample from interval
-		NumberType sample = carl::sample(Interval<NumberType>(lower.get_upper_bound(), BoundType::WEAK, upper, BoundType::STRICT), false);
-		CARL_LOG_DEBUG("carl.ran.libpoly", "Found sample between: " << sample);
-		return sample;
-	}
+    lp_value_t v_upper;
+    lp_value_construct(&v_upper, LP_VALUE_RATIONAL, upper.get_mpq_t());
+
+    lp_value_t res;
+    lp_value_get_value_between(lower.get_internal(), true, &v_upper, true, &res);
+
+    lp_value_destruct(&v_upper);
+
+    auto val = to_rational(&res);
+    lp_value_destruct(&res);
+    return val;
 }
 
-//Make sure that the intervals are disjoint
-
 NumberType sample_between(const NumberType& lower, const LPRealAlgebraicNumber& upper) {
-	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling between: " << lower << " and " << upper);
+    CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling between: " << lower << " and " << upper);
 
-	while (!(lower < upper.get_lower_bound()) && !upper.is_numeric()) {
-		lp_algebraic_number_refine_const(upper.get_internal());
-	}
+    lp_value_t v_lower;
+    lp_value_construct(&v_lower, LP_VALUE_RATIONAL, lower.get_mpq_t());
 
+    lp_value_t res;
+    lp_value_get_value_between(&v_lower, true, upper.get_internal(), true, &res);
 
-	if (upper.is_numeric()) {
-		CARL_LOG_DEBUG("carl.ran.libpoly", "Found sample between: " << sample_between(lower, upper.value()));
-		return sample_between(lower, upper.value());
-	} else {
-		CARL_LOG_DEBUG("carl.ran.libpoly", "Found sample between: " << carl::sample(Interval<NumberType>(lower, BoundType::STRICT, upper.get_lower_bound(), BoundType::WEAK), false));
-		return carl::sample(Interval<NumberType>(lower, BoundType::STRICT, upper.get_lower_bound(), BoundType::WEAK), false);
-	}
+    lp_value_destruct(&v_lower);
+
+    auto val = to_rational(&res);
+    lp_value_destruct(&res);
+    return val;
 }
 
 NumberType floor(const LPRealAlgebraicNumber& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Floor of: " << n);
-	refine(n);
 	lp_integer_t val;
-	lp_algebraic_number_floor(n.get_internal(), &val);
+	lp_value_floor(n.get_internal(), &val);
 	NumberType ret = to_rational(*poly::detail::cast_from(&val));
 	lp_integer_destruct(&val) ;
 	return ret ;
@@ -380,14 +295,12 @@ NumberType floor(const LPRealAlgebraicNumber& n) {
 
 NumberType ceil(const LPRealAlgebraicNumber& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Ceil of: " << n);
-	refine(n);
 	lp_integer_t val;
-	lp_algebraic_number_ceiling(n.get_internal(), &val);
+	lp_value_ceiling(n.get_internal(), &val);
 	NumberType ret = to_rational(*poly::detail::cast_from(&val));
 	lp_integer_destruct(&val) ;
 	return ret ;
 }
-
 
 bool compare(const LPRealAlgebraicNumber& lhs, const LPRealAlgebraicNumber& rhs, const Relation relation) {
     if (lhs.m_content == rhs.m_content) {
@@ -404,7 +317,7 @@ bool compare(const LPRealAlgebraicNumber& lhs, const LPRealAlgebraicNumber& rhs,
         }
     }
 
-	int cmp = lp_algebraic_number_cmp(lhs.get_internal(), rhs.get_internal());
+	int cmp = lp_value_cmp(lhs.get_internal(), rhs.get_internal());
 	switch (relation) {
 	case Relation::EQ:
         if (cmp == 0) lhs.m_content = rhs.m_content;
@@ -430,9 +343,7 @@ const carl::Variable LPRealAlgebraicNumber::auxVariable = fresh_real_variable("_
 
 
 bool compare(const LPRealAlgebraicNumber& lhs, const NumberType& rhs, const Relation relation) {
-	poly::Rational rat = to_libpoly_rational(rhs);
-
-	int cmp = lp_algebraic_number_cmp_rational(lhs.get_internal(), rat.get_internal());
+	int cmp = lp_value_cmp_rational(lhs.get_internal(), (lp_rational_t*)rhs.get_mpq_t());
 
 	switch (relation) {
 	case Relation::EQ:
@@ -455,7 +366,7 @@ bool compare(const LPRealAlgebraicNumber& lhs, const NumberType& rhs, const Rela
 
 
 std::ostream& operator<<(std::ostream& os, const LPRealAlgebraicNumber& ran) {
-	char* str = lp_algebraic_number_to_string(ran.get_internal());
+	char* str = lp_value_to_string(ran.get_internal());
 	os << str;
 	free(str);
 	return os;

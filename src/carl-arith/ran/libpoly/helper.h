@@ -67,20 +67,39 @@ inline poly::UPolynomial to_libpoly_upolynomial(const carl::UnivariatePolynomial
     return poly::UPolynomial(coefficients);
 }
 
-inline mpq_class to_rational(const poly::Integer& m) {
-	return *poly::detail::cast_to_gmp(&m);
-}
-
-inline mpq_class to_rational(const poly::Rational& m) {
-	return *poly::detail::cast_to_gmp(&m);
+inline mpq_class to_rational(const lp_integer_t* m) {
+	return mpq_class(*reinterpret_cast<const mpz_class*>(m));
 }
 
 inline mpq_class to_rational(const lp_rational_t* m) {
 	return *reinterpret_cast<const mpq_class*>(m);
 }
 
+inline mpq_class to_rational(const lp_value_t* m){
+	switch(m->type){
+		case lp_value_type_t::LP_VALUE_INTEGER:
+			return to_rational(&m->value.z);
+		case lp_value_type_t::LP_VALUE_RATIONAL:
+			return to_rational(&m->value.q);
+		// case lp_value_type_t::LP_VALUE_DYADIC_RATIONAL:
+		// 	return to_rational(m->value.q);
+		default:
+			CARL_LOG_ERROR("carl.converter", "Cannot convert libpoly value: " << m << " to rational.");
+			assert(false);
+			return mpq_class(0);
+	}
+}
+
 
 inline mpz_class to_integer(const poly::Integer& m) {
+	return *poly::detail::cast_to_gmp(&m);
+}
+
+inline mpq_class to_rational(const poly::Integer& m) {
+	return *poly::detail::cast_to_gmp(&m);
+}
+
+inline mpq_class to_rational(const poly::Rational& m) {
 	return *poly::detail::cast_to_gmp(&m);
 }
 
@@ -101,10 +120,6 @@ inline mpq_class to_rational(const poly::Value& m){
 			assert(false);
 			return mpq_class(0);
 	}
-}
-
-inline poly::Rational to_libpoly_rational(const mpq_class& num) {
-	return poly::Rational(num);
 }
 
 //Exact for whole numbers

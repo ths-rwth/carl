@@ -39,11 +39,10 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
     // turn into RealRootsResult
     std::vector<LPRealAlgebraicNumber> res;
     for (const auto& val : roots) {
-        auto tmp = LPRealAlgebraicNumber(val);
         // filter out roots not in interval
         if (poly::contains(inter_poly, poly::Value(val))) {
             CARL_LOG_DEBUG("carl.ran.libpoly", " Found Root " << val);
-            res.emplace_back(tmp);
+            res.emplace_back(*poly::Value(val).get_internal());
         }
     }
 
@@ -98,7 +97,6 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         auto eval_val = lp_polynomial_evaluate(polynomial.get_internal(), &assignment);
         //CARL_LOG_DEBUG("carl.ran.libpoly", " Got eval_val " << eval_val);
 
-
         if (lp_value_cmp(eval_val, poly::Value(long(0)).get_internal()) == 0) {
             CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 after substituting rational assignments -> nullified");
             lp_value_delete(eval_val);
@@ -112,13 +110,10 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
 
     std::vector<LPRealAlgebraicNumber> res;
     for (std::size_t i = 0; i < roots_size; ++i) {
-        auto tmp = LPRealAlgebraicNumber::create_from_value(&roots[i]);
-        // filter out roots not in interval
         if (lp_interval_contains(inter_poly.get_internal(), &roots[i])) {
-            CARL_LOG_DEBUG("carl.ran.libpoly", " Found root " << tmp);
-            res.emplace_back(tmp);
+            res.emplace_back(std::move(roots[i]));
+            CARL_LOG_DEBUG("carl.ran.libpoly", " Found root " << res.back());
         }
-        lp_value_destruct(&roots[i]);
     }
 
     delete[] roots;

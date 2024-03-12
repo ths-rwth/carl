@@ -18,10 +18,8 @@ std::optional<LPRealAlgebraicNumber> evaluate(
 		return std::nullopt;
 	}
 
-	auto ran = LPRealAlgebraicNumber::create_from_value(result);
+	auto ran = LPRealAlgebraicNumber(std::move(*result));
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Result: " << ran);
-	lp_value_destruct(result);
-	free(result);
 	return ran;
 }
 
@@ -59,6 +57,8 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 	const poly::Polynomial& poly_pol = constraint.lhs().get_polynomial();
 
 	lp_assignment_t& assignment = LPAssignment::getInstance().get(evalMap);
+
+	// std::cout << lp_assignment_to_string(&assignment) << std::endl;
 
 	bool result = false;
 	switch (constraint.relation()) {
