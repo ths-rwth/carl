@@ -127,9 +127,6 @@ public:
 	friend NumberType ceil(const LPRealAlgebraicNumber& n);
 
 	void refine() const;
-
-	const poly::UPolynomial libpoly_polynomial() const;
-	const poly::DyadicInterval& libpoly_interval() const;
 };
 
 bool compare(const LPRealAlgebraicNumber&, const LPRealAlgebraicNumber&, const Relation);

@@ -88,18 +88,9 @@ bool LPRealAlgebraicNumber::is_numeric() const {
     return lp_value_is_rational(get_internal());
 }
 
-const poly::UPolynomial LPRealAlgebraicNumber::libpoly_polynomial() const {
-    assert(!is_numeric());
-    return poly::UPolynomial(static_cast<const lp_upolynomial_t*>(get_internal()->value.a.f));
-}
-
-const poly::DyadicInterval& LPRealAlgebraicNumber::libpoly_interval() const {
-    assert(!is_numeric());
-    return *reinterpret_cast<const poly::DyadicInterval*>(&get_internal()->value.a.I);
-}
-
 const UnivariatePolynomial<NumberType> LPRealAlgebraicNumber::polynomial() const {
-    return to_carl_univariate_polynomial(libpoly_polynomial(), auxVariable);
+    assert(!is_numeric());
+    return to_carl_univariate_polynomial(poly::UPolynomial(static_cast<const lp_upolynomial_t*>(get_internal()->value.a.f)), auxVariable);
 }
 
 const Interval<NumberType> LPRealAlgebraicNumber::interval() const {
@@ -110,14 +101,14 @@ const Interval<NumberType> LPRealAlgebraicNumber::interval() const {
 	}
 }
 
-const NumberType LPRealAlgebraicNumber::get_upper_bound() const {
-    if (is_numeric()) return value();
-    else return to_rational(poly::get_upper(libpoly_interval()));
-}
-
 const NumberType LPRealAlgebraicNumber::get_lower_bound() const {
     if (is_numeric()) return value();
-    else return to_rational(poly::get_lower(libpoly_interval()));
+    else return to_rational(&get_internal()->value.a.I.a);
+}
+
+const NumberType LPRealAlgebraicNumber::get_upper_bound() const {
+    if (is_numeric()) return value();
+    else return to_rational(&get_internal()->value.a.I.b);
 }
 
 /**
@@ -151,7 +142,7 @@ LPRealAlgebraicNumber abs(const LPRealAlgebraicNumber& n) {
         return LPRealAlgebraicNumber(n);
     } else {
         lp_value_t val;
-        lp_value_construct_zero(&val);
+        lp_value_construct_none(&val);
         lp_value_neg(&val, n.get_internal());
         auto ret = LPRealAlgebraicNumber(std::move(val));
         return ret;
@@ -162,7 +153,7 @@ std::size_t bitsize(const LPRealAlgebraicNumber& n) {
     if (n.is_numeric()) {
         return carl::bitsize(n.get_lower_bound()) + carl::bitsize(n.get_upper_bound());
     } else {
-        return carl::bitsize(n.get_lower_bound()) + carl::bitsize(n.get_upper_bound()) + poly::degree(n.libpoly_polynomial());
+        return carl::bitsize(n.get_lower_bound()) + carl::bitsize(n.get_upper_bound()) + lp_upolynomial_degree(n.get_internal()->value.a.f);
     }
 }
 
@@ -192,7 +183,7 @@ void refine(const LPRealAlgebraicNumber& n) {
 
     if (n.is_numeric()) return;
 
-	while (poly::log_size(n.libpoly_interval()) > 0 && !n.is_numeric()) {
+	while (lp_dyadic_interval_size(&n.get_internal()->value.a.I) > 0 && !n.is_numeric()) {
 		lp_algebraic_number_refine_const(&n.get_internal()->value.a);
 	}
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Finished Refining Algebraic NumberType : " << n);
@@ -204,11 +195,13 @@ void LPRealAlgebraicNumber::refine() const {
 
 NumberType branching_point(const LPRealAlgebraicNumber& n) {
     if (n.is_numeric()) return n.value();
-
     refine(n);
-	poly::DyadicRational res;
-	lp_algebraic_number_get_dyadic_midpoint(&n.get_internal()->value.a, res.get_internal());
-	return to_rational(res);
+    lp_dyadic_rational_t res;
+    lp_dyadic_rational_construct(&res);
+	lp_algebraic_number_get_dyadic_midpoint(&n.get_internal()->value.a, &res);
+    auto result = to_rational(&res);
+    lp_dyadic_rational_destruct(&res);
+	return result;
 }
 
 
@@ -219,6 +212,7 @@ NumberType sample_above(const LPRealAlgebraicNumber& n) {
     lp_value_construct(&inf, LP_VALUE_PLUS_INFINITY, 0);
 
     lp_value_t res;
+    lp_value_construct_none(&res);
     lp_value_get_value_between(n.get_internal(), true, &inf, true, &res);
     auto val = to_rational(&res);
     lp_value_destruct(&res);
@@ -234,6 +228,7 @@ NumberType sample_below(const LPRealAlgebraicNumber& n) {
     lp_value_construct(&inf, LP_VALUE_MINUS_INFINITY, 0);
 
     lp_value_t res;
+    lp_value_construct_none(&res);
     lp_value_get_value_between(&inf, true, n.get_internal(), true, &res);
     auto val = to_rational(&res);
     lp_value_destruct(&res);
@@ -245,6 +240,7 @@ NumberType sample_between(const LPRealAlgebraicNumber& lower, const LPRealAlgebr
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Sampling between: " << lower << " and " << upper);
 
 	lp_value_t res;
+    lp_value_construct_none(&res);
     lp_value_get_value_between(lower.get_internal(), true, upper.get_internal(), true, &res);
     auto val = to_rational(&res);
     lp_value_destruct(&res);
@@ -258,6 +254,7 @@ NumberType sample_between(const LPRealAlgebraicNumber& lower, const NumberType& 
     lp_value_construct(&v_upper, LP_VALUE_RATIONAL, upper.get_mpq_t());
 
     lp_value_t res;
+    lp_value_construct_none(&res);
     lp_value_get_value_between(lower.get_internal(), true, &v_upper, true, &res);
 
     lp_value_destruct(&v_upper);
@@ -274,6 +271,7 @@ NumberType sample_between(const NumberType& lower, const LPRealAlgebraicNumber& 
     lp_value_construct(&v_lower, LP_VALUE_RATIONAL, lower.get_mpq_t());
 
     lp_value_t res;
+    lp_value_construct_none(&res);
     lp_value_get_value_between(&v_lower, true, upper.get_internal(), true, &res);
 
     lp_value_destruct(&v_lower);
@@ -286,8 +284,9 @@ NumberType sample_between(const NumberType& lower, const LPRealAlgebraicNumber& 
 NumberType floor(const LPRealAlgebraicNumber& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Floor of: " << n);
 	lp_integer_t val;
+    lp_integer_construct(&val);
 	lp_value_floor(n.get_internal(), &val);
-	NumberType ret = to_rational(*poly::detail::cast_from(&val));
+	NumberType ret = to_rational(&val);
 	lp_integer_destruct(&val) ;
 	return ret ;
 }
@@ -296,8 +295,9 @@ NumberType floor(const LPRealAlgebraicNumber& n) {
 NumberType ceil(const LPRealAlgebraicNumber& n) {
 	CARL_LOG_DEBUG("carl.ran.libpoly", "Ceil of: " << n);
 	lp_integer_t val;
+    lp_integer_construct(&val);
 	lp_value_ceiling(n.get_internal(), &val);
-	NumberType ret = to_rational(*poly::detail::cast_from(&val));
+	NumberType ret = to_rational(&val);
 	lp_integer_destruct(&val) ;
 	return ret ;
 }

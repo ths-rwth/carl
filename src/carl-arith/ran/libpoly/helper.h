@@ -67,12 +67,33 @@ inline poly::UPolynomial to_libpoly_upolynomial(const carl::UnivariatePolynomial
     return poly::UPolynomial(coefficients);
 }
 
+inline mpz_class to_integer(const lp_integer_t* m) {
+	return *reinterpret_cast<const mpz_class*>(m);
+}
+
 inline mpq_class to_rational(const lp_integer_t* m) {
-	return mpq_class(*reinterpret_cast<const mpz_class*>(m));
+	return mpq_class(to_integer(m));
 }
 
 inline mpq_class to_rational(const lp_rational_t* m) {
 	return *reinterpret_cast<const mpq_class*>(m);
+}
+
+inline mpq_class to_rational(const lp_dyadic_rational_t* m) {
+	lp_integer_t num;
+	lp_integer_construct(&num);
+	lp_dyadic_rational_get_num(m, &num);
+
+	lp_integer_t den;
+	lp_integer_construct(&den);
+	lp_dyadic_rational_get_den(m, &den);
+
+	auto res = mpq_class(to_integer(&num), to_integer(&den));
+
+	lp_integer_destruct(&num);
+	lp_integer_destruct(&den);
+
+	return res;
 }
 
 inline mpq_class to_rational(const lp_value_t* m){
@@ -81,78 +102,13 @@ inline mpq_class to_rational(const lp_value_t* m){
 			return to_rational(&m->value.z);
 		case lp_value_type_t::LP_VALUE_RATIONAL:
 			return to_rational(&m->value.q);
-		// case lp_value_type_t::LP_VALUE_DYADIC_RATIONAL:
-		// 	return to_rational(m->value.q);
-		default:
-			CARL_LOG_ERROR("carl.converter", "Cannot convert libpoly value: " << m << " to rational.");
-			assert(false);
-			return mpq_class(0);
-	}
-}
-
-
-inline mpz_class to_integer(const poly::Integer& m) {
-	return *poly::detail::cast_to_gmp(&m);
-}
-
-inline mpq_class to_rational(const poly::Integer& m) {
-	return *poly::detail::cast_to_gmp(&m);
-}
-
-inline mpq_class to_rational(const poly::Rational& m) {
-	return *poly::detail::cast_to_gmp(&m);
-}
-
-inline mpq_class to_rational(const poly::DyadicRational& m) {
-	return mpq_class(to_integer(poly::numerator(m)), to_integer(poly::denominator(m)));
-}
-
-inline mpq_class to_rational(const poly::Value& m){
-	switch(m.get_internal()->type){
-		case lp_value_type_t::LP_VALUE_INTEGER:
-			return to_rational(poly::as_integer(m));
 		case lp_value_type_t::LP_VALUE_DYADIC_RATIONAL:
-			return to_rational(poly::as_dyadic_rational(m));
-		case lp_value_type_t::LP_VALUE_RATIONAL:
-			return to_rational(poly::as_rational(m));
+		 	return to_rational(&m->value.dy_q);
 		default:
 			CARL_LOG_ERROR("carl.converter", "Cannot convert libpoly value: " << m << " to rational.");
 			assert(false);
 			return mpq_class(0);
 	}
-}
-
-//Exact for whole numbers
-inline poly::DyadicRational get_libpoly_dyadic_approximation(const mpz_class& num) {
-	return poly::DyadicRational(poly::Integer(num));
-}
-
-/**
- * Tries to convert num = a/b into a dyadic rational of the form c/2^d
- * We take d = precision * ceil(log(2,b)) and c = ceil((a * 2^d)/(b))
- * @return Approximation to num by a dyadic rational
- */
-inline poly::DyadicRational get_libpoly_dyadic_approximation(const mpq_class& num, const unsigned int& precision) {
-	CARL_LOG_DEBUG("carl.converter", "Starting Dyadic Approximation with: " << num);
-
-	mpz_class a = num.get_num();
-	mpz_class b = num.get_den();
-
-	mpz_class d = (precision)*carl::ceil(carl::log(b)); //unsigned long
-	assert(d.fits_ulong_p());
-
-	mpz_class c = carl::ceil((a * carl::pow(mpq_class(2), d.get_ui())) / (b));
-
-	if (!c.fits_slong_p()) {
-		CARL_LOG_DEBUG("carl.converter", "Dyadic Rational: Fallback for overflow of numerator");
-		poly::DyadicRational tmp = get_libpoly_dyadic_approximation(c); //Construct with arbitrary precision
-		return poly::div_2exp(tmp, d.get_ui());
-	}
-
-	CARL_LOG_DEBUG("carl.converter", "Got d: " << d << " and c " << c);
-	CARL_LOG_DEBUG("carl.converter", "Got dyadic number: " << poly::DyadicRational(c.get_si(), d.get_ui()));
-
-	return poly::DyadicRational(c.get_si(), d.get_ui());
 }
 
 /**
@@ -193,30 +149,6 @@ inline poly::Interval to_libpoly_interval(const carl::Interval<mpq_class>& inter
 		break;
 	}
 	return poly::Interval(low, low_open, up, up_open);
-}
-
-/**
- * Converts a libpoly dyadic interval to a carl interval
- * Keeps the bound types
- */
-template<typename Number>
-inline carl::Interval<Number> to_carl_interval(const poly::DyadicInterval& inter) {
-	BoundType upper_bound = inter.get_internal()->a_open ? BoundType::STRICT : BoundType::WEAK ;
-	BoundType lower_bound = inter.get_internal()->b_open ? BoundType::STRICT : BoundType::WEAK ;
-
-	return carl::Interval<Number>(to_rational(poly::get_lower(inter)), lower_bound, to_rational(poly::get_upper(inter)), upper_bound);
-}
-
-/**
- * Converts a libpoly interval to a carl interval
- * Keeps the bound types
- */
-template<typename Number>
-inline carl::Interval<Number> to_carl_interval(const poly::Interval& inter) {
-	BoundType upper_bound = inter.get_internal()->a_open ? BoundType::STRICT : BoundType::WEAK ;
-	BoundType lower_bound = inter.get_internal()->b_open ? BoundType::STRICT : BoundType::WEAK ;
-
-	return carl::Interval<Number>(to_rational(poly::get_lower(inter)), lower_bound, to_rational(poly::get_upper(inter)), upper_bound);
 }
 
 } // namespace carl
