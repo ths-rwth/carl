@@ -25,21 +25,26 @@ LPRealAlgebraicNumber::LPRealAlgebraicNumber(const carl::UnivariatePolynomial<Nu
     CARL_LOG_DEBUG("carl.ran.libpoly", " Create safe from poly: " << p << " in interval: " << i);
 
     poly::UPolynomial upoly = to_libpoly_upolynomial(p);
-    poly::Interval inter_poly = to_libpoly_interval(i);
+    lp_interval_t* inter_poly = to_libpoly_interval(i);
 
-    CARL_LOG_DEBUG("carl.ran.libpoly", " Converted to poly: " << upoly << " in interval: " << inter_poly);
+    CARL_LOG_DEBUG("carl.ran.libpoly", " Converted to poly: " << upoly << " in interval: ");
 
     std::vector<poly::AlgebraicNumber> roots = poly::isolate_real_roots(upoly);
     std::vector<poly::AlgebraicNumber> res;
     for (const auto& val : roots) {
-        if (poly::contains(inter_poly, poly::Value(val))) {
+        lp_value_t tmp;
+        lp_value_construct(&tmp, LP_VALUE_ALGEBRAIC, val.get_internal());
+        if (lp_interval_contains(inter_poly, &tmp)) {
             CARL_LOG_DEBUG("carl.ran.libpoly", " Found Root " << val);
             res.emplace_back(val);
         }
+        lp_value_destruct(&tmp);
     }
     assert(res.size() == 1);
 
-    lp_value_construct_copy(get_internal(), poly::Value(res.front()).get_internal());
+    lp_interval_destruct(inter_poly);
+    delete inter_poly;
+    lp_value_construct(get_internal(), LP_VALUE_ALGEBRAIC, res.front().get_internal());
 }
 
 /**
@@ -90,7 +95,7 @@ bool LPRealAlgebraicNumber::is_numeric() const {
 
 const UnivariatePolynomial<NumberType> LPRealAlgebraicNumber::polynomial() const {
     assert(!is_numeric());
-    return to_carl_univariate_polynomial(poly::UPolynomial(static_cast<const lp_upolynomial_t*>(get_internal()->value.a.f)), auxVariable);
+    return to_carl_univariate_polynomial(get_internal()->value.a.f, auxVariable);
 }
 
 const Interval<NumberType> LPRealAlgebraicNumber::interval() const {
@@ -168,8 +173,11 @@ Sign sgn(const LPRealAlgebraicNumber&, const UnivariatePolynomial<LPRealAlgebrai
 
 bool contained_in(const LPRealAlgebraicNumber& n, const Interval<LPRealAlgebraicNumber::NumberType>& i) {
     CARL_LOG_DEBUG("carl.ran.libpoly", "ran " << n << " contained in " << i);
-    poly::Interval inter = to_libpoly_interval(i);
-    return lp_interval_contains(inter.get_internal(), n.get_internal());
+    lp_interval_t* inter = to_libpoly_interval(i);
+    bool res = lp_interval_contains(inter, n.get_internal());
+    lp_interval_destruct(inter); 
+    delete inter;
+    return res;
 }
 
 

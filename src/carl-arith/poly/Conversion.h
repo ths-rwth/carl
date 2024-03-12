@@ -43,37 +43,24 @@ struct ConvertHelper<LPPolynomial, MultivariatePolynomial<A, B, C>> {
 		if (denominator < 0) {
 			denominator *= -1;
 		}
-		/*
-		// LPPolynomial can only have integer coefficients -> so we have to store the lcm of the coefficients of every term
-		auto coprimeFactor = p.main_denom();
-		mpz_class denominator;
-		if (carl::get_denom(coprimeFactor) != 1) {
-			// if coprime factor is not an integer
-			denominator = coprimeFactor > 0 ? mpz_class(1) : mpz_class(-1);
-		} else {
-			denominator = mpz_class(coprimeFactor);
-		}
-		*/
+		
 		CARL_LOG_DEBUG("carl.converter", "Coprime Factor/ Denominator: " << denominator);
-		LPPolynomial res(context);
-		// iterate over terms
+		lp_polynomial_t* res = lp_polynomial_new(context.lp_context());
 		for (const auto& term : p) {
-			// Multiply by denominator to make the coefficient an integer
 			assert(carl::get_denom(term.coeff() * denominator) == 1);
-			LPPolynomial t(context, mpz_class(term.coeff() * denominator));
-			// iterate over monomial
+			lp_monomial_t t;
+			lp_monomial_construct(context.lp_context(), &t);
+			lp_monomial_set_coefficient(context.lp_context(), &t, (lp_integer_t*)mpz_class(term.coeff() * denominator).get_mpz_t());
 			if (term.monomial()) {
 				// A monomial is a vector of pairs <variable, power>
 				for (const std::pair<carl::Variable, std::size_t>& var_pow : (*term.monomial()).exponents()) {
-					// multiply 1*var^pow
-					t *=LPPolynomial(context, var_pow.first, mpz_class(1), (unsigned)var_pow.second);
+					lp_monomial_push(&t, context.lp_variable(var_pow.first), var_pow.second);
 				}
 			}
-			CARL_LOG_TRACE("carl.converter", "converted term: " << term << " -> " << t);
-			res += t;
+			lp_polynomial_add_monomial(res, &t);
+			lp_monomial_destruct(&t);
 		}
-		CARL_LOG_DEBUG("carl.converter", "Got Polynomial: " << res);
-		return res;
+		return LPPolynomial(context, poly::Polynomial(res));
 	}
 };
 

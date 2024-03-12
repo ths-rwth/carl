@@ -54,7 +54,7 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 	}
 
 	//denominator can be omitted
-	const poly::Polynomial& poly_pol = constraint.lhs().get_polynomial();
+	auto poly_pol = constraint.lhs().get_polynomial().get_internal();
 
 	lp_assignment_t& assignment = LPAssignment::getInstance().get(evalMap);
 
@@ -63,28 +63,22 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 	bool result = false;
 	switch (constraint.relation()) {
 	case Relation::EQ:
-		result = lp_polynomial_constraint_evaluate(
-        poly_pol.get_internal(), LP_SGN_EQ_0, &assignment);
+		result = lp_polynomial_constraint_evaluate(poly_pol, LP_SGN_EQ_0, &assignment);
 		break;
 	case Relation::NEQ:
-		result = lp_polynomial_constraint_evaluate(
-        poly_pol.get_internal(), LP_SGN_NE_0, &assignment);
+		result = lp_polynomial_constraint_evaluate(poly_pol, LP_SGN_NE_0, &assignment);
 		break;
 	case Relation::LESS:
-		result = lp_polynomial_constraint_evaluate(
-        poly_pol.get_internal(), LP_SGN_LT_0, &assignment);
+		result = lp_polynomial_constraint_evaluate(poly_pol, LP_SGN_LT_0, &assignment);
 		break;
 	case Relation::LEQ:
-		result = lp_polynomial_constraint_evaluate(
-        poly_pol.get_internal(), LP_SGN_LE_0, &assignment);
+		result = lp_polynomial_constraint_evaluate(poly_pol, LP_SGN_LE_0, &assignment);
 		break;
 	case Relation::GREATER:
-		result = lp_polynomial_constraint_evaluate(
-        poly_pol.get_internal(), LP_SGN_GT_0, &assignment);
+		result = lp_polynomial_constraint_evaluate(poly_pol, LP_SGN_GT_0, &assignment);
 		break;
 	case Relation::GEQ:
-		result = lp_polynomial_constraint_evaluate(
-        poly_pol.get_internal(), LP_SGN_GE_0, &assignment);
+		result = lp_polynomial_constraint_evaluate(poly_pol, LP_SGN_GE_0, &assignment);
 		break;
 	default:
 		assert(false);

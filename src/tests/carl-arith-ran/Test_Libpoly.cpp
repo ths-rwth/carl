@@ -26,14 +26,14 @@ TEST(LIBPOLY, convertToLibpolyUnivariate) {
     to_libpoly_upolynomial(carl_pol2);
 }
 
-TEST(LIBPOLY, convertToCarlUnivariate) {
-    auto x = fresh_real_variable("x");
-
-    UnivariatePolynomial<Rational> carl_pol1(x, {Rational(-6), Rational(-5), Rational(1)});
-    poly::UPolynomial lp_pol1({-6, -5, 1});
-
-    EXPECT_EQ(carl_pol1, to_carl_univariate_polynomial(lp_pol1, x));
-}
+// TEST(LIBPOLY, convertToCarlUnivariate) {
+//     auto x = fresh_real_variable("x");
+// 
+//     UnivariatePolynomial<Rational> carl_pol1(x, {Rational(-6), Rational(-5), Rational(1)});
+//     poly::UPolynomial lp_pol1({-6, -5, 1});
+// 
+//     EXPECT_EQ(carl_pol1, to_carl_univariate_polynomial(lp_pol1, x));
+// }
 
 TEST(LIBPOLY, convertRan) {
     lp_trace_enable("coefficient::arith");

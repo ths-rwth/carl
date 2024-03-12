@@ -12,7 +12,7 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
     const Interval<LPRealAlgebraicNumber::NumberType>& interval) {
     CARL_LOG_DEBUG("carl.ran.libpoly", " Real roots of " << polynomial << " within " << interval);
 
-    assert(poly::is_univariate(polynomial.get_polynomial()));
+    assert(carl::is_univariate(polynomial));
 
     // Easy checks
     if (carl::is_zero(polynomial)) {
@@ -22,8 +22,6 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         CARL_LOG_TRACE("carl.ran.libpoly", "poly is constant but not zero -> no root");
         return RealRootsResult<LPRealAlgebraicNumber>::no_roots_response();
     }
-
-    poly::Interval inter_poly = to_libpoly_interval(interval);
 
     // actual calculations
     std::vector<poly::AlgebraicNumber> roots = poly::isolate_real_roots(poly::to_univariate(polynomial.get_polynomial()));
@@ -37,14 +35,19 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
     std::sort(roots.begin(), roots.end(), std::less<poly::AlgebraicNumber>());
 
     // turn into RealRootsResult
+    lp_interval_t* inter_poly = to_libpoly_interval(interval);
+
     std::vector<LPRealAlgebraicNumber> res;
     for (const auto& val : roots) {
-        // filter out roots not in interval
-        if (poly::contains(inter_poly, poly::Value(val))) {
-            CARL_LOG_DEBUG("carl.ran.libpoly", " Found Root " << val);
-            res.emplace_back(*poly::Value(val).get_internal());
+        lp_value_t tmp;
+        lp_value_construct(&tmp, LP_VALUE_ALGEBRAIC, val.get_internal());
+        if (lp_interval_contains(inter_poly, &tmp)) {
+            res.emplace_back(std::move(tmp));
         }
     }
+
+    lp_interval_destruct(inter_poly);
+    delete inter_poly;
 
     return RealRootsResult<LPRealAlgebraicNumber>::roots_response(std::move(res));
 }
@@ -71,8 +74,6 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
     for (const auto& v : carl::variables(polynomial)) {
 		if (v != polynomial.main_var() && m.find(v) == m.end()) return RealRootsResult<LPRealAlgebraicNumber>::non_univariate_response();
 	}
-
-    poly::Interval inter_poly = to_libpoly_interval(interval);
 
     // Multivariate Polynomial
     // build the assignment
@@ -108,14 +109,16 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         }
     }
 
+    lp_interval_t* inter_poly = to_libpoly_interval(interval);
     std::vector<LPRealAlgebraicNumber> res;
     for (std::size_t i = 0; i < roots_size; ++i) {
-        if (lp_interval_contains(inter_poly.get_internal(), &roots[i])) {
+        if (lp_interval_contains(inter_poly, &roots[i])) {
             res.emplace_back(std::move(roots[i]));
             CARL_LOG_DEBUG("carl.ran.libpoly", " Found root " << res.back());
         }
     }
-
+    lp_interval_destruct(inter_poly);
+    delete inter_poly;
     delete[] roots;
 
     std::sort(res.begin(), res.end());
