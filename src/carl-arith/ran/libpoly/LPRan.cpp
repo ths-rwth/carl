@@ -22,29 +22,37 @@ LPRealAlgebraicNumber::LPRealAlgebraicNumber(lp_value_t&& num) : m_content(std::
 }
 
 LPRealAlgebraicNumber::LPRealAlgebraicNumber(const carl::UnivariatePolynomial<NumberType>& p, const Interval<NumberType>& i) : LPRealAlgebraicNumber() {
-    CARL_LOG_DEBUG("carl.ran.libpoly", " Create safe from poly: " << p << " in interval: " << i);
+    CARL_LOG_DEBUG("carl.ran.libpoly", " Create from poly: " << p << " in interval: " << i);
 
-    poly::UPolynomial upoly = to_libpoly_upolynomial(p);
+    lp_upolynomial_t* upoly = to_libpoly_upolynomial(p);
     lp_interval_t* inter_poly = to_libpoly_interval(i);
 
-    CARL_LOG_DEBUG("carl.ran.libpoly", " Converted to poly: " << upoly << " in interval: ");
+    lp_algebraic_number_t* roots = new lp_algebraic_number_t[lp_upolynomial_degree(upoly)];
+    std::size_t roots_size;
+    lp_upolynomial_roots_isolate(upoly, roots, &roots_size);
 
-    std::vector<poly::AlgebraicNumber> roots = poly::isolate_real_roots(upoly);
-    std::vector<poly::AlgebraicNumber> res;
-    for (const auto& val : roots) {
+    bool found = false;
+    for (std::size_t i = 0; i < roots_size; ++i) {
         lp_value_t tmp;
-        lp_value_construct(&tmp, LP_VALUE_ALGEBRAIC, val.get_internal());
+        lp_value_construct(&tmp, LP_VALUE_ALGEBRAIC, &roots[i]);
         if (lp_interval_contains(inter_poly, &tmp)) {
-            CARL_LOG_DEBUG("carl.ran.libpoly", " Found Root " << val);
-            res.emplace_back(val);
+            *get_internal() = tmp;
+            found = true;
+            break;
         }
         lp_value_destruct(&tmp);
     }
-    assert(res.size() == 1);
+    assert(found);
+
+    for (std::size_t i = 0; i < roots_size; ++i) {
+      lp_algebraic_number_destruct(&roots[i]);
+    }
+    delete[] roots;
+
+    lp_upolynomial_delete(upoly);
 
     lp_interval_destruct(inter_poly);
     delete inter_poly;
-    lp_value_construct(get_internal(), LP_VALUE_ALGEBRAIC, res.front().get_internal());
 }
 
 /**

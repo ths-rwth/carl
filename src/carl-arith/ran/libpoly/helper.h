@@ -87,21 +87,20 @@ inline carl::UnivariatePolynomial<mpq_class> to_carl_univariate_polynomial(const
 
 
 template<typename Coeff, EnableIf<is_subset_of_rationals_type<Coeff>> = dummy>
-inline poly::UPolynomial to_libpoly_upolynomial(const carl::UnivariatePolynomial<Coeff>& p) {
+inline lp_upolynomial_t* to_libpoly_upolynomial(const carl::UnivariatePolynomial<Coeff>& p) {
     CARL_LOG_FUNC("carl.converter", p);
-
-    mpz_class denominator;
 
     if (carl::is_constant(p)) {
         CARL_LOG_TRACE("carl.converter", "Poly is constant");
-        denominator = carl::get_denom(p.lcoeff());
-        CARL_LOG_TRACE("carl.converter", "Coprime Factor/ Denominator: " << denominator);
-        return poly::UPolynomial(poly::Integer(carl::get_num(p.lcoeff())));
+		assert(carl::get_denom(p.lcoeff())>0);
+		lp_upolynomial_t* res;
+		lp_upolynomial_construct(lp_Z, 0, (lp_integer_t*)mpz_class(carl::get_num(p.lcoeff())).get_mpz_t());
+        return res;
     }
+
     Coeff coprimeFactor = p.coprime_factor();
-
     CARL_LOG_TRACE("carl.converter", "Coprime Factor: " << coprimeFactor);
-
+	mpz_class denominator;
     if (carl::get_denom(coprimeFactor) != 1) {
         // if coprime factor is not an integer
         denominator = coprimeFactor > 0 ? mpz_class(carl::get_num(coprimeFactor)) : mpz_class(-carl::get_num(coprimeFactor));
@@ -113,12 +112,15 @@ inline poly::UPolynomial to_libpoly_upolynomial(const carl::UnivariatePolynomial
     }
     CARL_LOG_TRACE("carl.converter", "Coprime factor/ denominator: " << denominator);
 
-    std::vector<poly::Integer> coefficients;
+    std::vector<mpz_class> coefficients;
+	std::vector<const lp_integer_t*> coefficients_ptr;
     for (const auto& c : p.coefficients()) {
-        coefficients.emplace_back(mpz_class(c * denominator));
+        coefficients.emplace_back(c * denominator);
+		coefficients_ptr.emplace_back((lp_integer_t*)coefficients.back().get_mpz_t());
     }
-    CARL_LOG_TRACE("carl.converter", "-> coefficients: " << coefficients);
-    return poly::UPolynomial(coefficients);
+	lp_upolynomial_t* res;
+	lp_upolynomial_construct(lp_Z, p.coefficients().size()-1, reinterpret_cast<const lp_integer_t*>(coefficients_ptr.data()));
+    return res;
 }
 
 /**
