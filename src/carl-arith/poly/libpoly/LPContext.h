@@ -7,6 +7,7 @@
 
 #include <map>
 #include <memory>
+#include <algorithm>
 
 #include <poly/poly.h>
 #include <poly/polynomial_context.h>
