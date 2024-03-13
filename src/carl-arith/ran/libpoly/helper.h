@@ -1,7 +1,5 @@
 #pragma once
 
-// TODO cleanup, move to ran folder
-
 #include <carl-common/config.h>
 #ifdef USE_LIBPOLY
 
@@ -18,7 +16,7 @@
 #include <carl-arith/core/Common.h>
 #include <carl-common/meta/SFINAE.h>
 
-#include <poly/polyxx.h>
+#include <poly/upolynomial.h>
 
 namespace carl {
 

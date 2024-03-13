@@ -9,7 +9,7 @@
 #include "../../core/Variable.h"
 #include <poly/poly.h>
 #include <poly/polynomial_context.h>
-#include <poly/polyxx.h>
+#include <poly/assignment.h>
 #include <carl-arith/core/Common.h>
 #include "LPRan.h"
 

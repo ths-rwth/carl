@@ -55,6 +55,9 @@ public:
     static CoCoA::BigInt convert(const mpz_class& n) {
         return CoCoA::BigIntFromMPZ(n.get_mpz_t());
     }
+    static CoCoA::BigInt convert(const mpz_t n) {
+        return CoCoA::BigIntFromMPZ(n);
+    }
     mpz_class convert(const CoCoA::BigInt& n) const {
         return mpz_class(CoCoA::mpzref(n));
     }
@@ -108,9 +111,7 @@ public:
                 }
             }
 
-            auto coefPol = poly::Integer(&(m->a));
-            mpz_class* coef = poly::detail::cast_to_gmp(&coefPol);
-            *data->resPoly += CoCoA::monomial(data->mRing, convert(*(coef)), exponents);
+            *data->resPoly += CoCoA::monomial(data->mRing, convert(&(m->a)), exponents);
         };
 
         DataLP data{&res, mSymbolThere, mSymbolBack, mQ, mRing, mContext};
@@ -119,26 +120,31 @@ public:
     }
 
     LPPolynomial convert(const CoCoA::RingElem& p) const {
-        poly::Polynomial temPoly(mContext.lp_context());
+        lp_polynomial_t* res = lp_polynomial_new(mContext.lp_context());
 
         for (CoCoA::SparsePolyIter i = CoCoA::BeginIter(p); !CoCoA::IsEnded(i); ++i) {
             mpq_class coeff;
             convert(coeff, CoCoA::coeff(i));
             std::vector<long> exponents;
             CoCoA::exponents(exponents, CoCoA::PP(i));
-            poly::Polynomial termPoly = poly_helper::construct_poly(mContext.lp_context(), (poly::Integer)carl::get_num(coeff));
+
+            assert(coeff != 0);
+            assert(carl::get_denom(coeff) == 1);
+
+            lp_monomial_t t;
+			lp_monomial_construct(mContext.lp_context(), &t);
+			lp_monomial_set_coefficient(mContext.lp_context(), &t, carl::get_num(coeff).get_mpz_t());
 
             for (std::size_t i = 0; i < exponents.size(); ++i) {
                 if (exponents[i] == 0) continue;
                 lp_variable_t var = mContext.lp_variable(mSymbolBack[i]);
-                poly::Polynomial polyVar = poly_helper::construct_poly(mContext.lp_context(), var);
-                termPoly *= poly::pow(polyVar, (unsigned int)exponents[i]);
+                lp_monomial_push(&t, var, (unsigned int)exponents[i]);
             }
-            temPoly += termPoly;
+            lp_polynomial_add_monomial(res, &t);
+			lp_monomial_destruct(&t);
         }
 
-        LPPolynomial res(mContext, temPoly);
-        return res;
+        return LPPolynomial(res, mContext);;
     }
 
     std::vector<CoCoA::RingElem> convert(const std::vector<LPPolynomial>& p) const {

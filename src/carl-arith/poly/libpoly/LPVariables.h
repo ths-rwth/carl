@@ -8,9 +8,8 @@
 #include <optional>
 #include "../../core/Variable.h"
 #include <poly/poly.h>
+#include <poly/variable_db.h>
 #include <poly/polynomial_context.h>
-#include <poly/polyxx.h>
-
 
 namespace carl {
 

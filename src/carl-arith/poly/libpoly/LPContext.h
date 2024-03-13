@@ -6,10 +6,10 @@
 #include "../../core/Variable.h"
 
 #include <map>
+#include <memory>
 
 #include <poly/poly.h>
 #include <poly/polynomial_context.h>
-#include <poly/polyxx.h>
 
 #include <carl-common/util/streamingOperators.h>
 

@@ -8,6 +8,7 @@
 #ifdef USE_LIBPOLY
 
 #include "LPContext.h"
+#include <poly/polynomial.h>
 #include "helper.h"
 
 #include <carl-arith/core/Variables.h>
@@ -17,7 +18,6 @@
 #include <list>
 #include <map>
 #include <memory>
-#include <poly/polyxx.h>
 #include <vector>
 
 #include <carl-arith/ran/libpoly/LPRan.h>
@@ -26,7 +26,7 @@ namespace carl {
 class LPPolynomial {
 private:
 	/// The libpoly polynomial.
-	poly::Polynomial m_poly;
+	lp_polynomial_t* m_internal;
 
 	LPContext m_context;
 
@@ -66,20 +66,6 @@ public:
 	 * @param context Context of libpoly polynomial
 	 */
 	explicit LPPolynomial(const LPContext& context);
-
-	/**
-	 * Construct a LPPolynomial with the given libpoly polynomial.
-	 * Also uses the given context.
-	 * @param mainPoly Libpoly Polynomial.
-	 */
-	LPPolynomial(const LPContext& context, const poly::Polynomial& mainPoly);
-
-	/**
-	 * Moves a LPPolynomial with the given libpoly polynomial.
-	 * Also uses the given context.
-	 * @param mainPoly Libpoly Polynomial.
-	 */
-	LPPolynomial(const LPContext& context, poly::Polynomial&& mainPoly);
 
 	/**
 	 * Move constructor.
@@ -232,7 +218,7 @@ public:
 		};
 
 		LPPolynomial_constantPart_visitor visitor;
-		lp_polynomial_traverse(m_poly.get_internal(), getConstantPart, &visitor);
+		lp_polynomial_traverse(get_internal(), getConstantPart, &visitor);
 		return visitor.part;
 	}
 
@@ -263,7 +249,7 @@ public:
 	 * @return Libpoly Polynomial.
 	 */
 	lp_polynomial_t* get_internal() {
-		return m_poly.get_internal();
+		return m_internal;
 	}
 
 	/**
@@ -271,16 +257,7 @@ public:
 	 * @return Libpoly Polynomial.
 	 */
 	const lp_polynomial_t* get_internal() const {
-		return m_poly.get_internal();
-	}
-
-	/**
-	 * @brief Get the underlying Polynomial object
-	 *
-	 * @return const poly::Polynomial&
-	 */
-	const poly::Polynomial& get_polynomial() const {
-		return m_poly;
+		return m_internal;
 	}
 
 	/**
@@ -464,11 +441,6 @@ LPPolynomial& operator*=(LPPolynomial& lhs, const mpz_class& rhs);
 inline bool is_zero(const LPPolynomial& p) {
 	return lp_polynomial_is_zero(p.get_internal());
 }
-
-// bool isNegative(LPPolynomial<mpz_class>& p) {
-// 	// return poly::is_zero(*p.mainPoly());
-// 	return true;
-// }
 
 /**
  * Checks if the polynomial is linear or not.
