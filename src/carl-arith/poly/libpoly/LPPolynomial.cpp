@@ -51,6 +51,14 @@ LPPolynomial::LPPolynomial(const LPContext& context, poly::Polynomial&& p)
     assert(context.lp_context() == lp_polynomial_get_context(get_internal()));
 }
 
+LPPolynomial::LPPolynomial(lp_polynomial_t* p, const LPContext& context)
+    : m_poly(p), m_context(context) {
+    //lp_polynomial_set_external(m_poly.get_internal());
+
+    assert(lp_polynomial_check_order(m_poly.get_internal()));
+    assert(context.lp_context() == lp_polynomial_get_context(get_internal()));
+}
+
 LPPolynomial::LPPolynomial(const LPContext& context, long val)
     : m_context(context) {
     lp_polynomial_construct_simple(m_poly.get_internal(), context.lp_context(), poly::Integer(val).get_internal(), 0, 0);

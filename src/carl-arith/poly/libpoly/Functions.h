@@ -65,7 +65,7 @@ inline LPPolynomial resultant(const LPPolynomial& p, const LPPolynomial& q) {
  */
 inline LPPolynomial discriminant(const LPPolynomial& p) {
     assert(p.context().lp_context() == lp_polynomial_get_context(p.get_polynomial().get_internal()));
-    if (poly::degree(p.get_internal()) == 1) { // workaround for bug in the libpoly c++ wrapper
+    if (lp_polynomial_degree(p.get_internal()) == 1) { // workaround for bug in the libpoly c++ wrapper
         return LPPolynomial(p.context(), 1);
     }
     return LPPolynomial(p.context(), poly::discriminant(p.get_polynomial()));

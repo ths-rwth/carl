@@ -54,11 +54,9 @@ boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const s
 	}
 
 	//denominator can be omitted
-	auto poly_pol = constraint.lhs().get_polynomial().get_internal();
+	auto poly_pol = constraint.lhs().get_internal();
 
 	lp_assignment_t& assignment = LPAssignment::getInstance().get(evalMap);
-
-	// std::cout << lp_assignment_to_string(&assignment) << std::endl;
 
 	bool result = false;
 	switch (constraint.relation()) {

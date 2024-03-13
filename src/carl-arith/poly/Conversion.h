@@ -60,7 +60,7 @@ struct ConvertHelper<LPPolynomial, MultivariatePolynomial<A, B, C>> {
 			lp_polynomial_add_monomial(res, &t);
 			lp_monomial_destruct(&t);
 		}
-		return LPPolynomial(context, poly::Polynomial(res));
+		return LPPolynomial(res, context);
 	}
 };
 

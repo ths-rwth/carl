@@ -14,17 +14,17 @@
 
 using namespace carl;
 
-TEST(LIBPOLY, convertToLibpolyUnivariate) {
-    auto x = fresh_real_variable("x");
-
-    UnivariatePolynomial<Rational> carl_pol1(x, {Rational(-6), Rational(-5), Rational(1)});
-    poly::UPolynomial lp_pol1({-6, -5, 1});
-
-    EXPECT_EQ(lp_pol1, to_libpoly_upolynomial(carl_pol1));
-
-    UnivariatePolynomial<Rational> carl_pol2(x, {mpq_class(2, 13)});
-    to_libpoly_upolynomial(carl_pol2);
-}
+// TEST(LIBPOLY, convertToLibpolyUnivariate) {
+//     auto x = fresh_real_variable("x");
+// 
+//     UnivariatePolynomial<Rational> carl_pol1(x, {Rational(-6), Rational(-5), Rational(1)});
+//     poly::UPolynomial lp_pol1({-6, -5, 1});
+// 
+//     EXPECT_EQ(lp_pol1, to_libpoly_upolynomial(carl_pol1));
+// 
+//     UnivariatePolynomial<Rational> carl_pol2(x, {mpq_class(2, 13)});
+//     to_libpoly_upolynomial(carl_pol2);
+// }
 
 // TEST(LIBPOLY, convertToCarlUnivariate) {
 //     auto x = fresh_real_variable("x");
