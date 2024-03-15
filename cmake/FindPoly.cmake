@@ -22,9 +22,10 @@ if(NOT LIBPOLY_FOUND_SYSTEM)
 	LIBPOLY-EP
 	GIT_REPOSITORY https://github.com/SRI-CSL/libpoly
 	GIT_TAG v0.1.13
-	PATCH_COMMAND git reset --hard
-	UPDATE_COMMAND ""
-	COMMAND git apply ${CMAKE_SOURCE_DIR}/cmake/patches/libpoly_variable_db.patch
+	# PATCH_COMMAND git reset --hard
+	# UPDATE_COMMAND ""
+	# COMMAND git apply ${CMAKE_SOURCE_DIR}/cmake/patches/libpoly.patch
+	PATCH_COMMAND git apply ${CMAKE_SOURCE_DIR}/cmake/patches/libpoly.patch
 	CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 			-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 			-DLIBPOLY_BUILD_PYTHON_API=OFF
@@ -33,7 +34,7 @@ if(NOT LIBPOLY_FOUND_SYSTEM)
 			-DGMP_INCLUDE_DIR=${GMP_LIBRARY_DIR}
 			-DGMP_LIBRARY=${GMP_LIB}
 		BUILD_COMMAND ${CMAKE_COMMAND} <SOURCE_DIR>
-		COMMAND ${CMAKE_MAKE_PROGRAM} poly static_poly static_pic_poly # polyxx static_polyxx static_pic_polyxx
+		COMMAND ${CMAKE_MAKE_PROGRAM} poly static_poly static_pic_poly polyxx static_polyxx static_pic_polyxx
 		COMMAND ${CMAKE_MAKE_PROGRAM} install
 		BUILD_BYPRODUCTS 
 			<INSTALL_DIR>/lib/libpoly${STATIC_EXT}

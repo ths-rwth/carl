@@ -1,8 +1,8 @@
 diff --git a/include/polynomial.h b/include/polynomial.h
-index 734bfa9..6a2cf75 100644
+index 8a9533f..12123e8 100644
 --- a/include/polynomial.h
 +++ b/include/polynomial.h
-@@ -109,6 +109,8 @@ void lp_polynomial_lc_constant(const lp_polynomial_t* A, lp_integer_t *out);
+@@ -109,6 +109,8 @@ int lp_polynomial_lc_sgn(const lp_polynomial_t* A);
  /** Get the context of the given polynomial */
  const lp_polynomial_context_t* lp_polynomial_get_context(const lp_polynomial_t* A);
  
@@ -11,6 +11,26 @@ index 734bfa9..6a2cf75 100644
  /** Returns all the variables (it will not clear the output list vars) */
  void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars);
  
+diff --git a/src/polynomial/polynomial.c b/src/polynomial/polynomial.c
+index 11d948f..68f4a8d 100644
+--- a/src/polynomial/polynomial.c
++++ b/src/polynomial/polynomial.c
+@@ -1031,6 +1031,15 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
+     lp_value_construct_none(&x_value_backup);
+   }
+ 
++  {
++    coefficient_t A_rat;
++    lp_integer_t multiplier;
++    integer_construct(&multiplier);
++    coefficient_construct(A->ctx, &A_rat);
++    coefficient_evaluate_rationals(A->ctx, &A->data, M, &A_rat, &multiplier);
++    A = lp_polynomial_new_from_coefficient(A->ctx, &A_rat);
++  }
++
+   size_t i;
+ 
+   lp_polynomial_t** factors = 0;
 diff --git a/src/variable/variable_db.c b/src/variable/variable_db.c
 index 60f3df4..33866c4 100644
 --- a/src/variable/variable_db.c
