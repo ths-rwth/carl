@@ -12,25 +12,40 @@ index 8a9533f..12123e8 100644
  void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars);
  
 diff --git a/src/polynomial/polynomial.c b/src/polynomial/polynomial.c
-index 11d948f..68f4a8d 100644
+index 11d948f..9869451 100644
 --- a/src/polynomial/polynomial.c
 +++ b/src/polynomial/polynomial.c
-@@ -1031,6 +1031,15 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
+@@ -1031,6 +1031,17 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
      lp_value_construct_none(&x_value_backup);
    }
  
++  lp_polynomial_t* B;
 +  {
 +    coefficient_t A_rat;
 +    lp_integer_t multiplier;
 +    integer_construct(&multiplier);
 +    coefficient_construct(A->ctx, &A_rat);
 +    coefficient_evaluate_rationals(A->ctx, &A->data, M, &A_rat, &multiplier);
-+    A = lp_polynomial_new_from_coefficient(A->ctx, &A_rat);
++    B = lp_polynomial_new_from_coefficient(A->ctx, &A_rat);
++    coefficient_destruct(&A_rat);
 +  }
 +
    size_t i;
  
    lp_polynomial_t** factors = 0;
+@@ -1044,8 +1055,10 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
+   // Get the reduced polynomial
+   lp_polynomial_t A_r;
+   lp_polynomial_construct(&A_r, A->ctx);
+-  lp_polynomial_reductum_m(&A_r, A, M);
+-  assert(x == lp_polynomial_top_variable(A));
++  lp_polynomial_reductum_m(&A_r, B, M);
++  assert(x == lp_polynomial_top_variable(B));
++
++  lp_polynomial_delete(B);
+ 
+   // Get the square-free factorization
+   lp_polynomial_factor_square_free(&A_r, &factors, &multiplicities, &factors_size);
 diff --git a/src/variable/variable_db.c b/src/variable/variable_db.c
 index 60f3df4..33866c4 100644
 --- a/src/variable/variable_db.c
