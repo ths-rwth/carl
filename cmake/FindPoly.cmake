@@ -21,6 +21,7 @@ if(NOT LIBPOLY_FOUND_SYSTEM)
 	ExternalProject_Add(
 	LIBPOLY-EP
 	GIT_REPOSITORY https://github.com/SRI-CSL/libpoly
+	GIT_TAG v0.1.13
 	PATCH_COMMAND git reset --hard
 	COMMAND git apply ${CMAKE_SOURCE_DIR}/cmake/patches/libpoly_variable_db.patch
 	CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}

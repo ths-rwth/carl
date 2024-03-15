@@ -1,8 +1,8 @@
 diff --git a/include/polynomial.h b/include/polynomial.h
-index 8a9533f..12123e8 100644
+index 734bfa9..6a2cf75 100644
 --- a/include/polynomial.h
 +++ b/include/polynomial.h
-@@ -109,6 +109,8 @@ int lp_polynomial_lc_sgn(const lp_polynomial_t* A);
+@@ -109,6 +109,8 @@ void lp_polynomial_lc_constant(const lp_polynomial_t* A, lp_integer_t *out);
  /** Get the context of the given polynomial */
  const lp_polynomial_context_t* lp_polynomial_get_context(const lp_polynomial_t* A);
  
