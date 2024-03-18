@@ -32,8 +32,6 @@ lp_assignment_t& LPAssignment::get(const carl::Assignment<LPRealAlgebraicNumber>
         }
         return lp_assignment;
     }
-
-    
 }
     
 } // namespace carl

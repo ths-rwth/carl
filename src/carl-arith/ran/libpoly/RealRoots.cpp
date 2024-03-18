@@ -98,10 +98,12 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         delete[] roots;
         CARL_LOG_DEBUG("carl.ran.libpoly", " Checking for nullification -> Evaluation at " << mainVar << "= 1");
         lp_value_t val;
+        // here we know that no value for mainVar has been set, so we can safely set it!
         lp_value_construct_int(&val, long(1));
         lp_assignment_set_value(&assignment, LPVariables::getInstance().lp_variable(mainVar), &val);
         lp_value_destruct(&val);
         auto eval_val = lp_polynomial_evaluate(polynomial.get_internal(), &assignment);
+        lp_assignment_set_value(&assignment, LPVariables::getInstance().lp_variable(mainVar), 0);
         //CARL_LOG_DEBUG("carl.ran.libpoly", " Got eval_val " << eval_val);
 
         lp_value_t zero_value;
