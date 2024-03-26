@@ -30,7 +30,7 @@ namespace timing {
 class Timer {
     std::size_t m_count = 0;
     timing::duration m_overall = timing::zero();
-    timing::time_point m_current_start;
+    timing::time_point m_current_start = timing::time_point::min();
 
 public:
     static timing::time_point start() {
@@ -45,7 +45,15 @@ public:
 	}
     void finish() {
 		finish(m_current_start);
+        m_current_start = timing::time_point::min();
 	}
+    bool check_finish() {
+        if (m_current_start != timing::time_point::min()) {
+            finish();
+            return true;
+        }
+        return false;
+    }
     auto count() const {
         return m_count;
     }
@@ -53,9 +61,11 @@ public:
         return m_overall.count();
     }
 
-    void collect(std::map<std::string, std::string>& data, const std::string& key) const {
+    void collect(std::map<std::string, std::string>& data, const std::string& key) {
+        bool active_at_timeout = check_finish();
         data.emplace(key+".count", std::to_string(count()));
         data.emplace(key+".overall_ms",   std::to_string(overall_ms()));
+        data.emplace(key+".active_at_timeout", active_at_timeout ? "1" : "0");
     }
 };
 
