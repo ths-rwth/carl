@@ -30,7 +30,7 @@ build-gcc12:
       - cmake/
       - src/
 
-build-gcc11:
+.build-gcc11:
   dependencies: []
   stage: build-gcc
   script:
@@ -58,7 +58,7 @@ build-clang14:
       - cmake/
       - src/
 
-build-clang13:
+.build-clang13:
   dependencies: []
   stage: build-clang
   script:
@@ -73,7 +73,7 @@ build-clang13:
   only:
      - development
 
-test-clang: 
+.test-clang: 
   dependencies: [build-clang14]
   stage: test
   script: 
