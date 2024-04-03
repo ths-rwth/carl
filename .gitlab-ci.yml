@@ -12,14 +12,13 @@ cache:
   #policy: pull-push
 
 stages:
-  - build-gcc
-  - build-clang 
+  - build
   - test
   - documentation
 
 build-gcc12:
   dependencies: []
-  stage: build-gcc
+  stage: build
   script:
     - export CC=/usr/bin/gcc-12 && export CXX=/usr/bin/g++-12
     - MAKE_PARALLEL=-j8 TASK=all source .ci/build.sh
@@ -33,7 +32,7 @@ build-gcc12:
 
 .build-gcc11:
   dependencies: []
-  stage: build-gcc
+  stage: build
   script:
     - export CC=/usr/bin/gcc-11 && export CXX=/usr/bin/g++-11
     - MAKE_PARALLEL=-j8 TASK=all source .ci/build.sh
@@ -49,7 +48,7 @@ build-gcc12:
 
 build-clang14:
   dependencies: []
-  stage: build-clang
+  stage: build
   script:
      - export CC=/usr/bin/clang-14 && export CXX=/usr/bin/clang++-14
      - MAKE_PARALLEL=-j8 TASK=all source .ci/build.sh
@@ -63,7 +62,7 @@ build-clang14:
 
 .build-clang13:
   dependencies: []
-  stage: build-clang
+  stage: build
   script:
      - export CC=/usr/bin/clang-13 && export CXX=/usr/bin/clang++-13
      - MAKE_PARALLEL=-j8 TASK=all source .ci/build.sh
