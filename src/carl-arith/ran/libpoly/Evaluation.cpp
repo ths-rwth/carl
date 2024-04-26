@@ -2,91 +2,66 @@
 
 #ifdef USE_LIBPOLY
 
+#include "LPAssignment.h"
+
+
 namespace carl {
 
 std::optional<LPRealAlgebraicNumber> evaluate(
 	const LPPolynomial& polynomial,
 	const std::map<Variable, LPRealAlgebraicNumber>& evalMap) {
+	lp_assignment_t& assignment = LPAssignment::getInstance().get(evalMap);
+	auto result = lp_polynomial_evaluate(polynomial.get_internal(), &assignment);
 
-	//Turn into poly::Assignment
-	poly::Assignment assignment(polynomial.context().poly_context());
-	for (const auto& entry : evalMap) {
-		lp_value_t val;
-		//Turn into value
-		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, entry.second.get_internal());
-		//That copies the value into the assignment
-		assignment.set(*(polynomial.context().lp_variable(entry.first)), poly::Value(&val));
-		lp_value_destruct(&val);
-	}
-
-	poly::Value result = poly::Value(lp_polynomial_evaluate(polynomial.get_internal(), assignment.get_internal()));
-
-	CARL_LOG_DEBUG("carl.ran.libpoly", " Result: " << result);
-
-	if(poly::is_none(result)) {
+	if (result->type == LP_VALUE_NONE) {
+		CARL_LOG_DEBUG("carl.ran.libpoly", " Result: NONE");
 		return std::nullopt;
 	}
 
-	return LPRealAlgebraicNumber::create_from_value(std::move(result.get_internal()));
+	auto ran = LPRealAlgebraicNumber(std::move(*result));
+	CARL_LOG_DEBUG("carl.ran.libpoly", " Result: " << ran);
+	return ran;
+}
+
+inline auto lp_sign(carl::Relation rel) {
+	switch (rel) {
+	case Relation::EQ:
+		return LP_SGN_EQ_0;
+	case Relation::NEQ:
+		return LP_SGN_NE_0;
+	case Relation::LESS:
+		return LP_SGN_LT_0;
+	case Relation::LEQ:
+		return LP_SGN_LE_0;
+	case Relation::GREATER:
+		return LP_SGN_GT_0;
+	case Relation::GEQ:
+		return LP_SGN_GE_0;
+	default:
+		assert(false);
+		return LP_SGN_EQ_0;
+	}
 }
 
 boost::tribool evaluate(const BasicConstraint<LPPolynomial>& constraint, const std::map<Variable, LPRealAlgebraicNumber>& evalMap) {
-
 	CARL_LOG_DEBUG("carl.ran.libpoly", " Evaluation constraint " << constraint << " for assignment " << evalMap);
 
-	//Easy checks of lhs of constraint is constant
 	if (is_constant(constraint.lhs())) {
-		auto num = constraint.lhs().constant_part();
-		switch (constraint.relation()) {
-		case Relation::EQ:
-			return num == 0;
-		case Relation::NEQ:
-			return num != 0;
-		case Relation::LESS:
-			return num < 0;
-		case Relation::LEQ:
-			return num <= 0;
-		case Relation::GREATER:
-			return num > 0;
-		case Relation::GEQ:
-			return num >= 0;
-		default:
-			assert(false);
-			return false;
+		return carl::evaluate(constraint.lhs().constant_part(), constraint.relation());
+	}
+
+	auto poly_pol = constraint.lhs().get_internal();
+	lp_assignment_t& assignment = LPAssignment::getInstance().get(evalMap);
+
+	for (const auto& v : carl::variables(constraint)) {
+		if (evalMap.find(v) == evalMap.end()) {
+			int result = lp_polynomial_constraint_evaluate_subs(poly_pol, lp_sign(constraint.relation()), &assignment);
+			if (result == -1) return boost::indeterminate;
+			else return result;
 		}
 	}
-
-	//denominator can be omitted
-	const poly::Polynomial& poly_pol = constraint.lhs().get_polynomial();
-
-	//Turn into poly::Assignment
-	poly::Assignment assignment(constraint.lhs().context().poly_context());
-	for (const auto& entry : evalMap) {
-		lp_value_t val;
-		//Turn into value
-		lp_value_construct(&val, lp_value_type_t::LP_VALUE_ALGEBRAIC, entry.second.get_internal());
-		//That copies the value into the assignment
-		assignment.set(*(constraint.lhs().context().lp_variable(entry.first)), poly::Value(&val));
-		lp_value_destruct(&val);
-	}
-
-	switch (constraint.relation()) {
-	case Relation::EQ:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::EQ);
-	case Relation::NEQ:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::NE);
-	case Relation::LESS:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::LT);
-	case Relation::LEQ:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::LE);
-	case Relation::GREATER:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::GT);
-	case Relation::GEQ:
-		return evaluate_constraint(poly_pol, assignment, poly::SignCondition::GE);
-	default:
-		assert(false);
-		return false;
-	}
+	
+	return lp_polynomial_constraint_evaluate(poly_pol, lp_sign(constraint.relation()), &assignment);
 }
 
 }

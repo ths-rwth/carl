@@ -2,7 +2,7 @@
 
 mkdir -p build || return 1
 cd build/ || return 1
-cmake -D DEVELOPER=ON -D USE_BLISS=ON -D USE_COCOA=ON  ../ || return 1
+cmake -D DEVELOPER=ON -D USE_BLISS=ON -D USE_COCOA=ON -D USE_LIBPOLY=ON  ../ || return 1
 
 function keep_waiting() {
   while true; do
@@ -61,11 +61,11 @@ elif [[ ${TASK} == "documentation" ]]; then
 	git push -f origin master || return 1
 
 elif [[ ${TASK} == "tidy" ]]; then
-
 	/usr/bin/time make ${MAKE_PARALLEL} tidy || return 1
 
-elif [[ ${TASK} == "parallel" ]]; then
+elif [[ ${TASK} == "all" ]]; then
 	/usr/bin/time make ${MAKE_PARALLEL} || return 1
+
 else
 	/usr/bin/time make || return 1
 fi

@@ -3,7 +3,7 @@
 #include <map>
 #include <sstream>
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 
 #include "StatisticsCollector.h"
 #include "Serialization.h"
@@ -32,7 +32,7 @@ protected:
 		mCollected.emplace(key, value);
 	}
 
-	void addKeyValuePair(const std::string& key, const Timer& value) {
+	void addKeyValuePair(const std::string& key, Timer& value) {
 		value.collect(mCollected, key);
 	}
 

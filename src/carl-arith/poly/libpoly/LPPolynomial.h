@@ -8,6 +8,7 @@
 #ifdef USE_LIBPOLY
 
 #include "LPContext.h"
+#include <poly/polynomial.h>
 #include "helper.h"
 
 #include <carl-arith/core/Variables.h>
@@ -17,7 +18,6 @@
 #include <list>
 #include <map>
 #include <memory>
-#include <poly/polyxx.h>
 #include <vector>
 
 #include <carl-arith/ran/libpoly/LPRan.h>
@@ -26,7 +26,7 @@ namespace carl {
 class LPPolynomial {
 private:
 	/// The libpoly polynomial.
-	poly::Polynomial m_poly;
+	lp_polynomial_t* m_internal;
 
 	LPContext m_context;
 
@@ -68,18 +68,9 @@ public:
 	explicit LPPolynomial(const LPContext& context);
 
 	/**
-	 * Construct a LPPolynomial with the given libpoly polynomial.
-	 * Also uses the given context.
-	 * @param mainPoly Libpoly Polynomial.
+	 * Move constructor.
 	 */
-	LPPolynomial(const LPContext& context, const poly::Polynomial& mainPoly);
-
-	/**
-	 * Moves a LPPolynomial with the given libpoly polynomial.
-	 * Also uses the given context.
-	 * @param mainPoly Libpoly Polynomial.
-	 */
-	LPPolynomial(const LPContext& context, poly::Polynomial&& mainPoly);
+	LPPolynomial(lp_polynomial_t* p, const LPContext& context);
 
 	/**
 	 * Construct a LPPolynomial with only a integer.
@@ -166,10 +157,27 @@ public:
 	 * @return The only variable occurring in the term.
 	 */
 	Variable single_variable() const {
-		assert(poly::is_univariate(m_poly));
-		auto carl_var = context().carl_variable(poly::main_variable(m_poly).get_internal());
+		assert(lp_polynomial_is_univariate(get_internal()));
+		auto carl_var = context().carl_variable(lp_polynomial_top_variable(get_internal()));
 		assert(carl_var.has_value());
 		return *carl_var;
+	}
+
+	LPPolynomial coeff(std::size_t k) const {
+		lp_polynomial_t* res = lp_polynomial_alloc();
+		lp_polynomial_construct(res, m_context.lp_context());
+		lp_polynomial_get_coefficient(res, get_internal(), k);
+		return LPPolynomial(res, m_context);
+	}
+
+	/**
+	 * Get the maximal exponent of the main variable.
+	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
+	 * @see @cite GCL92, page 38
+	 * @return Degree.
+	 */
+	size_t degree() const {
+		return lp_polynomial_degree(get_internal());
 	}
 
 	/**
@@ -177,20 +185,16 @@ public:
 	 * @return The leading coefficient.
 	 */
 	LPPolynomial lcoeff() const {
-		return LPPolynomial(m_context, poly::leading_coefficient(m_poly));
-	}
-
-	LPPolynomial coeff(std::size_t k) const {
-		return LPPolynomial(m_context, poly::coefficient(m_poly, k));
+		return coeff(degree());
 	}
 
 	/** Obtain all non-zero coefficients of a polynomial. */
 	std::vector<LPPolynomial> coefficients() const {
 		std::vector<LPPolynomial> res;
-		for (std::size_t deg = 0; deg <= poly::degree(m_poly); ++deg) {
-			auto coeff = poly::coefficient(m_poly, deg);
-			if (lp_polynomial_is_zero(coeff.get_internal())) continue;
-			res.emplace_back(context(), std::move(coeff));
+		for (std::size_t deg = 0; deg <= degree(); ++deg) {
+			auto cf = coeff(deg);
+			if (lp_polynomial_is_zero(cf.get_internal())) continue;
+			res.emplace_back(std::move(cf));
 		}
 		return res;
 	}
@@ -214,25 +218,20 @@ public:
 		};
 
 		LPPolynomial_constantPart_visitor visitor;
-		lp_polynomial_traverse(m_poly.get_internal(), getConstantPart, &visitor);
+		lp_polynomial_traverse(get_internal(), getConstantPart, &visitor);
 		return visitor.part;
-	}
-
-	/**
-	 * Get the maximal exponent of the main variable.
-	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
-	 * @see @cite GCL92, page 38
-	 * @return Degree.
-	 */
-	size_t degree() const {
-		return poly::degree(m_poly);
 	}
 
 	/**
 	 * Removes the leading term from the polynomial.
 	 */
 	void truncate() {
-		m_poly -= poly::leading_coefficient(m_poly);
+		lp_polynomial_t* lcoeff = lp_polynomial_alloc();
+		lp_polynomial_construct(lcoeff, m_context.lp_context());
+		lp_polynomial_get_coefficient(lcoeff, get_internal(), lp_polynomial_degree(get_internal()));
+		lp_polynomial_sub(get_internal(), get_internal(), lcoeff);
+		lp_polynomial_delete(lcoeff);
+		//*this -= lcoeff();
 	}
 
 	/**
@@ -240,8 +239,8 @@ public:
 	 * @return Main variable.
 	 */
 	Variable main_var() const {
-		if (poly::is_constant(m_poly)) return carl::Variable::NO_VARIABLE;
-		else return *(context().carl_variable(poly::main_variable(m_poly).get_internal()));
+		if (lp_polynomial_is_constant(get_internal())) return carl::Variable::NO_VARIABLE;
+		else return *(context().carl_variable(lp_polynomial_top_variable(get_internal())));
 	}
 
 	/**
@@ -250,7 +249,7 @@ public:
 	 * @return Libpoly Polynomial.
 	 */
 	lp_polynomial_t* get_internal() {
-		return m_poly.get_internal();
+		return m_internal;
 	}
 
 	/**
@@ -258,16 +257,7 @@ public:
 	 * @return Libpoly Polynomial.
 	 */
 	const lp_polynomial_t* get_internal() const {
-		return m_poly.get_internal();
-	}
-
-	/**
-	 * @brief Get the underlying Polynomial object
-	 *
-	 * @return const poly::Polynomial&
-	 */
-	const poly::Polynomial& get_polynomial() const {
-		return m_poly;
+		return m_internal;
 	}
 
 	/**
@@ -287,6 +277,8 @@ public:
 	LPContext& context() {
 		return m_context;
 	}
+
+	void set_context(const LPContext& c);
 
 	/**
 	 * Checks if the given variable occurs in the polynomial.
@@ -447,20 +439,15 @@ LPPolynomial& operator*=(LPPolynomial& lhs, const mpz_class& rhs);
  * @return If polynomial is zero.
  */
 inline bool is_zero(const LPPolynomial& p) {
-	return poly::is_zero(p.get_polynomial());
+	return lp_polynomial_is_zero(p.get_internal());
 }
-
-// bool isNegative(LPPolynomial<mpz_class>& p) {
-// 	// return poly::is_zero(*p.mainPoly());
-// 	return true;
-// }
 
 /**
  * Checks if the polynomial is linear or not.
  * @return If polynomial is linear.
  */
 inline bool is_constant(const LPPolynomial& p) {
-	return poly::is_constant(p.get_polynomial());
+	return lp_polynomial_is_constant(p.get_internal());
 }
 
 /**
@@ -471,9 +458,13 @@ inline bool is_one(const LPPolynomial& p) {
 	if (!is_constant(p)) {
 		return false;
 	}
-	poly::Polynomial temp(lp_polynomial_get_context(p.get_internal()));
-	temp += poly::Integer(mpz_class(1));
-	return lp_polynomial_eq(p.get_internal(), temp.get_internal());
+
+	lp_polynomial_t* one = lp_polynomial_alloc();
+	mpz_class one_int(1);
+	lp_polynomial_construct_simple(one, p.context().lp_context(), one_int.get_mpz_t(), lp_variable_null, 0);
+	bool res = lp_polynomial_eq(p.get_internal(), one);
+	lp_polynomial_delete(one);
+	return res;
 }
 
 /**
@@ -488,14 +479,14 @@ inline bool is_number(const LPPolynomial& p) {
  * @brief Check if the given polynomial is linear.
  */
 inline bool is_linear(const LPPolynomial& p) {
-	return poly::is_linear(p.get_polynomial());
+	return lp_polynomial_is_linear(p.get_internal());
 }
 
 /**
  * @brief Check if the given polynomial is univariate.
  */
 inline bool is_univariate(const LPPolynomial& p) {
-	return poly::is_univariate(p.get_polynomial());
+	return lp_polynomial_is_univariate(p.get_internal());
 }
 
 inline std::size_t level_of(const LPPolynomial& p) {

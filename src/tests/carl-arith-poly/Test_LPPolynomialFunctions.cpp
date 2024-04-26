@@ -158,9 +158,8 @@ TEST(LPPOLYNOMIAL, factorization) {
 
     startTime = std::chrono::high_resolution_clock::now();
 
-    CoCoAAdaptorLP adaptor(context);
     for (const auto& pol : polys) {
-        const auto& factors = carl::factorization(pol, adaptor);
+        const auto& factors = carl::factorization(pol);
         LPPolynomial productOfFactors = LPPolynomial(context, x, (mpz_class)1);
         for (const auto& factor : factors) {
             EXPECT_NE((unsigned)0, factor.second);

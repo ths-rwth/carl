@@ -25,11 +25,15 @@ public:
 	using NumberType = mpq_class;
 
 private:
-	lp_algebraic_number_t m_content;
+	struct Content {
+		lp_value_t c;
+		~Content() {
+			lp_value_destruct(&c);
+		}
+	};
+	mutable std::shared_ptr<Content> m_content;
 
 	static const Variable auxVariable;
-
-	
 
 public:
 	~LPRealAlgebraicNumber();
@@ -43,25 +47,14 @@ public:
 	 * Construct from libpoly Algebraic NumberType and takes ownership
 	 * @param num, LibPoly Algebraic Number
 	 */
-	LPRealAlgebraicNumber(const poly::AlgebraicNumber& num);
+	LPRealAlgebraicNumber(const lp_value_t& num);
 
-	/**
-	 * Construct from libpoly Algebraic NumberType and takes ownership
-	 * @param num, LibPoly Algebraic Number
-	 */
-	LPRealAlgebraicNumber(const lp_algebraic_number_t& num);
-
-	/**
-	 * Move from libpoly Algebraic NumberType (C++ Interface)
-	 * @param num, LibPoly Algebraic Number
-	 */
-	LPRealAlgebraicNumber(poly::AlgebraicNumber&& num);
 
 	/**
 	 * Move from libpoly Algebraic NumberType (C Interface) 
 	 * @param num, LibPoly Algebraic Number
 	 */
-	LPRealAlgebraicNumber(lp_algebraic_number_t&& num);
+	LPRealAlgebraicNumber(lp_value_t&& num);
 
 	/**
 	 * Construct from Polynomial and Interval
@@ -88,26 +81,17 @@ public:
 	static LPRealAlgebraicNumber create_safe(const carl::UnivariatePolynomial<NumberType>& p, const Interval<NumberType>& i);
 
 	/**
-	 * Convert a libpoly Value into an algebraic number
-	 * This does not free the value
-	 * In case the value is none or infinity this conversion is not possible
-	 * @param Libpoly Value (C interface)
-	 * @return Copy of val as a algebraic number
-	 */
-	static LPRealAlgebraicNumber create_from_value(const lp_value_t* val) ;
-
-	/**
 	 * @return Pointer to the internal libpoly algebraic number (C interface)
 	 */
-	inline lp_algebraic_number_t* get_internal() {
-		return &m_content;
+	inline lp_value_t* get_internal() {
+		return &(m_content->c);
 	}
 
 	/**
 	 * @return Pointer to the internal libpoly algebraic number (C interface)
 	 */
-	inline const lp_algebraic_number_t* get_internal() const {
-		return &m_content;
+	inline const lp_value_t* get_internal() const {
+		return &(m_content->c);
 	}
 
 	/**
@@ -115,9 +99,6 @@ public:
 	 */
 	bool is_numeric() const;
 
-	const poly::UPolynomial libpoly_polynomial() const;
-
-	const poly::DyadicInterval& libpoly_interval() const;
 
 	const UnivariatePolynomial<NumberType> polynomial() const;
 
@@ -164,7 +145,7 @@ void refine(const LPRealAlgebraicNumber& n);
 
 inline bool is_zero(const LPRealAlgebraicNumber& n) {
 	refine(n);
-	return lp_algebraic_number_sgn(n.get_internal()) == 0;
+	return lp_value_sgn(n.get_internal()) == 0;
 }
 
 bool is_integer(const LPRealAlgebraicNumber& n);
@@ -187,7 +168,7 @@ template<>
 struct hash<carl::LPRealAlgebraicNumber> {
 	std::size_t operator()(const carl::LPRealAlgebraicNumber& n) const {
 		//Todo test if the precisions needs to be adjusted
-		return lp_algebraic_number_hash_approx(n.get_internal(), 0);
+		return lp_value_hash_approx(n.get_internal(), 0);
 	}
 };
 } // namespace std

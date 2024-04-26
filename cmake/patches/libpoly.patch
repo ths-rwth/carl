@@ -1,0 +1,103 @@
+diff --git a/include/polynomial.h b/include/polynomial.h
+index 8a9533f..2905513 100644
+--- a/include/polynomial.h
++++ b/include/polynomial.h
+@@ -109,6 +109,8 @@ int lp_polynomial_lc_sgn(const lp_polynomial_t* A);
+ /** Get the context of the given polynomial */
+ const lp_polynomial_context_t* lp_polynomial_get_context(const lp_polynomial_t* A);
+ 
++void lp_polynomial_set_context(lp_polynomial_t* A, const lp_polynomial_context_t* ctx);
++
+ /** Returns all the variables (it will not clear the output list vars) */
+ void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars);
+ 
+@@ -337,6 +339,8 @@ lp_polynomial_t* lp_polynomial_constraint_explain_infer_bounds(const lp_polynomi
+  */
+ int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
+ 
++int lp_polynomial_constraint_evaluate_subs(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
++
+ /**
+  * Given a polynomial A(x1, ..., xn, y) with y being the top variable, a root index,
+  * a sign condition, and an assignment M that assigns x1, ..., xn, the function
+diff --git a/src/polynomial/polynomial.c b/src/polynomial/polynomial.c
+index 11d948f..7468ab6 100644
+--- a/src/polynomial/polynomial.c
++++ b/src/polynomial/polynomial.c
+@@ -1031,6 +1031,18 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
+     lp_value_construct_none(&x_value_backup);
+   }
+ 
++  lp_polynomial_t* B;
++  {
++    coefficient_t A_rat;
++    lp_integer_t multiplier;
++    integer_construct(&multiplier);
++    coefficient_construct(A->ctx, &A_rat);
++    coefficient_evaluate_rationals(A->ctx, &A->data, M, &A_rat, &multiplier);
++    B = lp_polynomial_new_from_coefficient(A->ctx, &A_rat);
++    coefficient_destruct(&A_rat);
++    integer_destruct(&multiplier);
++  }
++
+   size_t i;
+ 
+   lp_polynomial_t** factors = 0;
+@@ -1044,11 +1056,13 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
+   // Get the reduced polynomial
+   lp_polynomial_t A_r;
+   lp_polynomial_construct(&A_r, A->ctx);
+-  lp_polynomial_reductum_m(&A_r, A, M);
+-  assert(x == lp_polynomial_top_variable(A));
+-
+-  // Get the square-free factorization
+-  lp_polynomial_factor_square_free(&A_r, &factors, &multiplicities, &factors_size);
++  if (x == lp_polynomial_top_variable(B)) {
++    lp_polynomial_reductum_m(&A_r, B, M);
++    assert(x == lp_polynomial_top_variable(B));
++    // Get the square-free factorization
++    lp_polynomial_factor_square_free(&A_r, &factors, &multiplicities, &factors_size);
++  }
++  lp_polynomial_delete(B);
+ 
+   // Count the max number of roots
+   size_t total_degree = 0;
+@@ -1943,6 +1957,22 @@ int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_conditio
+   return lp_sign_condition_consistent(sgn_condition, p_sign);
+ }
+ 
++int lp_polynomial_constraint_evaluate_subs(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
++  coefficient_t A_rat;
++  lp_integer_t multiplier;
++  integer_construct(&multiplier);
++  coefficient_construct(A->ctx, &A_rat);
++  coefficient_evaluate_rationals(A->ctx, &A->data, M, &A_rat, &multiplier);
++  integer_destruct(&multiplier);
++  int res = -1;
++  if (A_rat.type == COEFFICIENT_NUMERIC) {
++    int sgn = integer_sgn(lp_Z, &A_rat.value.num);
++    res = lp_sign_condition_consistent(sgn_condition, sgn);  
++  }
++  coefficient_destruct(&A_rat);
++  return res;
++}
++
+ int lp_polynomial_root_constraint_evaluate(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
+ 
+   int eval;
+diff --git a/src/variable/variable_db.c b/src/variable/variable_db.c
+index 60f3df4..33866c4 100644
+--- a/src/variable/variable_db.c
++++ b/src/variable/variable_db.c
+@@ -63,9 +63,11 @@ void lp_variable_db_add_variable(lp_variable_db_t* var_db, lp_variable_t var, co
+   assert(var_db);
+   while (var >= var_db->capacity) {
+     lp_variable_db_resize(var_db, 2*var_db->capacity);
++    var_db->size = var_db->capacity < var ? var_db->capacity : var;
+   }
+   assert(var_db->variable_names[var] == 0);
+   var_db->variable_names[var] = strdup(name);
++  var_db->size = var_db->size < var ? var : var_db->size;
+ }
+ 
+ void lp_variable_db_construct(lp_variable_db_t* var_db) {
