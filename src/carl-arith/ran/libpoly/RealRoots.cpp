@@ -102,21 +102,14 @@ RealRootsResult<LPRealAlgebraicNumber> real_roots(
         lp_value_construct_int(&val, long(1));
         lp_assignment_set_value(&assignment, LPVariables::getInstance().lp_variable(mainVar), &val);
         lp_value_destruct(&val);
-        auto eval_val = lp_polynomial_evaluate(polynomial.get_internal(), &assignment);
+        auto eval_sgn = lp_polynomial_sgn(polynomial.get_internal(), &assignment);
         lp_assignment_set_value(&assignment, LPVariables::getInstance().lp_variable(mainVar), 0);
-        //CARL_LOG_DEBUG("carl.ran.libpoly", " Got eval_val " << eval_val);
 
-        lp_value_t zero_value;
-        lp_value_construct_zero(&zero_value);
-        if (lp_value_cmp(eval_val, &zero_value) == 0) {
-            lp_value_destruct(&zero_value);
-            CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 after substituting rational assignments -> nullified");
-            lp_value_delete(eval_val);
+        if (eval_sgn == 0) {
+            CARL_LOG_DEBUG("carl.ran.libpoly", "poly is 0 -> nullified");
             return RealRootsResult<LPRealAlgebraicNumber>::nullified_response();
         } else {
-            lp_value_destruct(&zero_value);
             CARL_LOG_DEBUG("carl.ran.libpoly", "Poly has no roots");
-            lp_value_delete(eval_val);
             return RealRootsResult<LPRealAlgebraicNumber>::no_roots_response();
         }
     }
