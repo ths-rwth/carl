@@ -140,7 +140,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~LPPolynomial() = default;
+	~LPPolynomial();
 
 	// Polynomial interface implementations.
 

@@ -14,6 +14,7 @@ LPPolynomial::LPPolynomial(const LPPolynomial& rhs)
 
 LPPolynomial::LPPolynomial(LPPolynomial&& rhs)
     : m_internal(rhs.m_internal), m_context(std::move(rhs.m_context)) {
+    rhs.m_internal = 0;
     assert(lp_polynomial_check_order(get_internal()));
 }
 
@@ -27,6 +28,7 @@ LPPolynomial& LPPolynomial::operator=(const LPPolynomial& rhs) {
 LPPolynomial& LPPolynomial::operator=(LPPolynomial&& rhs) {
     m_internal = rhs.m_internal;
     m_context = std::move(rhs.m_context);
+    rhs.m_internal = 0;
     assert(lp_polynomial_check_order(get_internal()));
     return *this;
 }
@@ -150,6 +152,11 @@ LPPolynomial::LPPolynomial(const LPContext& context, const Variable& mainVar, co
 		lp_monomial_destruct(&t);
     }
     //lp_polynomial_set_external(get_internal());
+}
+
+LPPolynomial::~LPPolynomial() {
+    // std::cout << ">>>>>>>>>>> K : " << m_context.lp_context()->K << "\n";
+    if (m_internal) lp_polynomial_delete(m_internal);
 }
 
 bool LPPolynomial::has(const Variable& var) const {
