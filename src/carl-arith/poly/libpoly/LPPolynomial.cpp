@@ -26,6 +26,7 @@ LPPolynomial& LPPolynomial::operator=(const LPPolynomial& rhs) {
 }
 
 LPPolynomial& LPPolynomial::operator=(LPPolynomial&& rhs) {
+    if (m_internal) lp_polynomial_delete(m_internal);
     m_internal = rhs.m_internal;
     m_context = std::move(rhs.m_context);
     rhs.m_internal = 0;
