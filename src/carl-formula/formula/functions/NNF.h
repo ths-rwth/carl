@@ -11,7 +11,7 @@ Formula<Poly> to_nnf(const Formula<Poly>& formula) {
         return formula;
     }
     if(formula.is_atom()){
-        return formula;
+        return resolve_negation(formula, false, true);
     }
     if(formula.is_literal()){
         return resolve_negation(formula, false, true);
