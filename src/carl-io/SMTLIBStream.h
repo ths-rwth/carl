@@ -58,7 +58,11 @@ private:
 					return convert_to_mvroot<Pol>(std::get<typename MultivariateRoot<Pol>::RAN>(c.value()), c.var());
 				}
 			}();
-			*this << "(" << (c.negated() ? "not" : "") << c.relation() << " " << c.var() << " (root " << iroot.poly() << " " << iroot.k() << " " << iroot.var() << "))";
+			if (c.relation() == Relation::NEQ) {
+				*this << "(not (" << (c.negated() ? "not" : "") << "= " << c.var() << " (root " << iroot.poly() << " " << iroot.k() << " " << iroot.var() << ")))";
+			} else {
+				*this << "(" << (c.negated() ? "not" : "") << c.relation() << " " << c.var() << " (root " << iroot.poly() << " " << iroot.k() << " " << iroot.var() << "))";
+			}
 		}
 	}
 
