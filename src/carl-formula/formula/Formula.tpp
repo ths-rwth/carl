@@ -136,12 +136,15 @@ namespace carl
             }
 			case FormulaType::VARCOMPARE:
 			{
-				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
+				_content.mProperties |= STRONG_CONDITIONS; //| PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
+                _content.mProperties |= PROP_CONTAINS_NONLINEAR_POLYNOMIAL;
+                _content.mProperties |= PROP_CONTAINS_ROOT_EXPRESSION;
 				break;
 			}
 			case FormulaType::VARASSIGN:
 			{
-				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
+				_content.mProperties |= STRONG_CONDITIONS; //| PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS;
+                _content.mProperties |= PROP_CONTAINS_ROOT_EXPRESSION;
 				break;
 			}
             case FormulaType::BITVECTOR:
