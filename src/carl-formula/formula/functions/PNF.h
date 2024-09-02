@@ -92,7 +92,9 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& prefix, boost::co
 				} else {
 					used_vars.insert(v);
 				}
-				prefix.push_back(std::make_pair(q, v));
+				if (sub.variables().find(v) != sub.variables().end()) {
+					prefix.push_back(std::make_pair(q, v));
+				}
 			}
 			return to_pnf(sub, prefix, used_vars, negated);
 		}
