@@ -98,6 +98,27 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& prefix, boost::co
 			}
 			return to_pnf(sub, prefix, used_vars, negated);
 		}
+		case FormulaType::AUX_EXISTS: {
+			Quantifier q = Quantifier::EXISTS;
+			Formula<Poly> sub = f.quantified_formula();
+			Formula<Poly> sub_aux = f.quantified_aux_formula();
+			for (auto v : f.quantified_variables()) {
+				if (used_vars.contains(v)) {
+					auto new_v = fresh_variable(v.type());
+					std::stringstream ss; ss << v.name() << "_" << new_v.id();
+					VariablePool::getInstance().set_name(new_v, ss.str());
+					sub = substitute(sub, v, Poly(new_v));
+					sub_aux = substitute(sub_aux, v, Poly(new_v));
+					v = new_v;
+				} else {
+					used_vars.insert(v);
+				}
+				if (sub.variables().find(v) != sub.variables().end() || sub_aux.variables().find(v) != sub_aux.variables().end()) {
+					prefix.push_back(std::make_pair(q, v));
+				}
+			}
+			return carl::Formula(carl::FormulaType::AND, sub_aux, to_pnf(sub, prefix, used_vars, negated)); 
+		}
 		case FormulaType::IMPLIES:
 			if (negated) {
 				return Formula<Poly>(FormulaType::AND, {to_pnf(f.premise(), prefix, used_vars, false), to_pnf(f.conclusion(), prefix, used_vars, true)});
@@ -143,7 +164,8 @@ void free_variables(const Formula<Poly>& f, boost::container::flat_set<Variable>
 			break;
 		}
 		case FormulaType::EXISTS:
-		case FormulaType::FORALL: {
+		case FormulaType::FORALL:
+		case FormulaType::AUX_EXISTS: {
 			auto old = current_quantified_vars;
 			current_quantified_vars.insert(f.quantified_variables().begin(), f.quantified_variables().end());
 			free_variables(f.quantified_formula(), current_quantified_vars, free_vars);

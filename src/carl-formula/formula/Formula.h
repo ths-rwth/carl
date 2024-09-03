@@ -175,6 +175,14 @@ namespace carl
                 Formula( _type, std::move( std::vector<Variable>( _vars ) ), _term )
             {}
 
+            explicit Formula( FormulaType _type, std::vector<Variable>&& _vars, const Formula& _aux_term, const Formula& _term ):
+                Formula( FormulaPool<Pol>::getInstance().create( _type, std::move( _vars ), _aux_term, _term ) )
+            {}
+
+            explicit Formula( FormulaType _type, const std::vector<Variable>& _vars, const Formula& _aux_term, const Formula& _term ):
+                Formula( _type, std::move( std::vector<Variable>( _vars ) ), _aux_term, _term )
+            {}
+
             explicit Formula( const UTerm& _lhs, const UTerm& _rhs, bool _negated ):
                 Formula( FormulaPool<Pol>::getInstance().create( _lhs, _rhs, _negated ) )
             {}
@@ -380,8 +388,12 @@ namespace carl
              */
 			const std::vector<carl::Variable>& quantified_variables() const
 			{
-				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
-				return std::get<QuantifierContent<Pol>>(mpContent->mContent).mVariables;
+				if ( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL )
+				    return std::get<QuantifierContent<Pol>>(mpContent->mContent).mVariables;
+                else {
+                    assert (mpContent->mType == FormulaType::AUX_EXISTS );
+				    return std::get<AuxQuantifierContent<Pol>>(mpContent->mContent).mVariables;
+                }
 			}
 
             /**
@@ -389,8 +401,18 @@ namespace carl
              */
 			const Formula& quantified_formula() const
 			{
-				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
-				return std::get<QuantifierContent<Pol>>(mpContent->mContent).mFormula;
+				if( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL)
+                    return std::get<QuantifierContent<Pol>>(mpContent->mContent).mFormula;
+                else {
+                    assert (mpContent->mType == FormulaType::AUX_EXISTS );
+				    return std::get<AuxQuantifierContent<Pol>>(mpContent->mContent).mFormula;
+                }
+			}
+
+            const Formula& quantified_aux_formula() const
+			{
+				assert (mpContent->mType == FormulaType::AUX_EXISTS );
+				return std::get<AuxQuantifierContent<Pol>>(mpContent->mContent).mAuxFormula;
 			}
 
             /**

@@ -30,6 +30,14 @@ namespace carl
                 _content.mProperties |= (subFormula.properties() & PROP_IS_IN_PNF);
                 break;
             }
+            case FormulaType::AUX_EXISTS:
+            {
+                _content.mProperties |= PROP_CONTAINS_QUANTIFIER_EXISTS;
+				auto subFormula = std::get<AuxQuantifierContent<Pol>>(_content.mContent).mFormula;
+                _content.mProperties |= (subFormula.properties() & WEAK_CONDITIONS);
+                _content.mProperties |= (subFormula.properties() & ~PROP_IS_IN_PNF);
+                break;
+            }
             case FormulaType::FORALL:
             {
                 _content.mProperties |= PROP_CONTAINS_QUANTIFIER_FORALL;

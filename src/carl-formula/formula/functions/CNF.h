@@ -136,6 +136,7 @@ Formula<Poly> to_cnf_or(const Formula<Poly>& f, bool keep_constraints, bool simp
 				break;
 			}
 			case FormulaType::EXISTS:
+			case FormulaType::AUX_EXISTS:
 			case FormulaType::FORALL:
 				CARL_LOG_ERROR("carl.formula.cnf", "Cannot transform quantified formula to CNF");
 				assert(false);

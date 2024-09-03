@@ -29,6 +29,7 @@ void variables(const Formula<Pol>& f, carlVariables& vars) {
                     f.u_equality().gatherVariables(vars);
                     break;
                 case FormulaType::EXISTS:
+                case FormulaType::AUX_EXISTS:
                 case FormulaType::FORALL:
                     vars.add(f.quantified_variables().begin(),f.quantified_variables().end());
                     break;

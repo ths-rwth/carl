@@ -35,6 +35,10 @@ void visit(const Formula<Pol>& formula, /*std::function<void(const Formula<Pol>&
 		case FORALL:
 			visit(formula.quantified_formula(), func);
 			break;
+		case AUX_EXISTS:
+			visit(formula.quantified_formula(), func);
+			visit(formula.quantified_aux_formula(), func);
+			break;
 	}
 	func(formula);
 }

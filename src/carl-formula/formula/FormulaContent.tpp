@@ -112,6 +112,16 @@ namespace carl {
         assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
     }
 
+	template<typename Pol>
+    FormulaContent<Pol>::FormulaContent(FormulaType _type, std::vector<carl::Variable>&& _vars, const Formula<Pol>& _aux_term, const Formula<Pol>& _term):
+        ///@todo Construct reasonable hash
+        mHash( _term.hash() ),
+		mType(_type),
+		mContent(AuxQuantifierContent<Pol>(std::move(_vars), std::move(Formula<Pol>(_aux_term)), std::move(Formula<Pol>(_term))))
+	{
+        assert(_type == FormulaType::AUX_EXISTS);
+    }
+
     template<typename Pol>
     bool FormulaContent<Pol>::operator==(const FormulaContent& _content) const {
 		CARL_LOG_TRACE("carl.formula", *this << " == " << _content << " (" << mId << " / " << _content.mId << ")");

@@ -34,7 +34,7 @@ namespace carl {
      */
     enum FormulaType {
         // Generic
-        ITE, EXISTS, FORALL,
+        ITE, EXISTS, FORALL, AUX_EXISTS,
         
         // Core Theory
         TRUE, FALSE,
@@ -119,6 +119,28 @@ namespace carl {
             return (mFormula == _qc.mFormula) && (mVariables == _qc.mVariables);
         }
     };	
+
+    template<typename Pol>
+    struct AuxQuantifierContent
+    {
+        /// The quantified variables.
+        std::vector<carl::Variable> mVariables;
+        /// The guard.
+        Formula<Pol> mAuxFormula;
+        /// The formula bound by this quantifier.
+        Formula<Pol> mFormula;
+
+        AuxQuantifierContent( std::vector<carl::Variable>&& _vars, Formula<Pol>&& _aux_formula, Formula<Pol>&& _formula ):
+            mVariables( std::move(_vars) ),
+            mAuxFormula( std::move(_aux_formula) ), 
+            mFormula( std::move(_formula) )
+        {}
+
+        bool operator==(const AuxQuantifierContent& _qc) const
+        {
+            return (mAuxFormula == _qc.mAuxFormula) && (mFormula == _qc.mFormula) && (mVariables == _qc.mVariables);
+        }
+    };	
 	
     template<typename Pol>
     class FormulaContent : public boost::intrusive::unordered_set_base_hook<>
@@ -150,7 +172,8 @@ namespace carl {
                         UEquality, // The uninterpreted equality, in case this formula wraps an uninterpreted equality.
                         Formula<Pol>, // The only sub-formula, in case this formula is an negation.
                         Formulas<Pol>, // The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-                        QuantifierContent<Pol>> mContent; // The quantifed variables and the bound formula, in case this formula is a quantified formula.
+                        QuantifierContent<Pol>,
+                        AuxQuantifierContent<Pol>> mContent; // The quantifed variables and the bound formula, in case this formula is a quantified formula.
             /// The negation
             const FormulaContent<Pol> *mNegation = nullptr;
             /// The propositions of this formula.
@@ -220,6 +243,9 @@ namespace carl {
              */
             FormulaContent(FormulaType _type, std::vector<carl::Variable>&& _vars, const Formula<Pol>& _term);
 
+            FormulaContent(FormulaType _type, std::vector<carl::Variable>&& _vars, const Formula<Pol>& _aux_term, const Formula<Pol>& _term);
+
+
             
         public:
 
@@ -252,6 +278,7 @@ namespace carl {
                     case FormulaType::IFF: return true;
                     case FormulaType::ITE: return true;
                     case FormulaType::EXISTS: return false;
+                    case FormulaType::AUX_EXISTS: return false;
                     case FormulaType::FORALL: return false;
                     case FormulaType::CONSTRAINT: return false;
 					case FormulaType::VARCOMPARE: return false;
@@ -294,6 +321,10 @@ namespace carl {
 				os << "(exists";
 				for (auto v: std::get<QuantifierContent<Pol>>(f.mContent).mVariables) os << " " << v;
 				return os << ")(" << std::get<QuantifierContent<Pol>>(f.mContent).mFormula << ")";
+            case FormulaType::AUX_EXISTS:
+				os << "(aux_exists";
+				for (auto v: std::get<AuxQuantifierContent<Pol>>(f.mContent).mVariables) os << " " << v;
+				return os << ")(" << std::get<AuxQuantifierContent<Pol>>(f.mContent).mAuxFormula << ")(" << std::get<AuxQuantifierContent<Pol>>(f.mContent).mFormula << ")";
 			case FormulaType::FORALL:
 				os << "(forall";
 				for (auto v: std::get<QuantifierContent<Pol>>(f.mContent).mVariables) os << " " << v;
