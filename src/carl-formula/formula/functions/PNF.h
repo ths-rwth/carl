@@ -28,7 +28,7 @@ inline std::ostream& operator<<(std::ostream& os, const Quantifier& type) {
 using QuantifierPrefix = std::vector<std::pair<Quantifier, carl::Variable>>;
 
 template<typename Poly>
-Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& prefix, boost::container::flat_set<Variable>& used_vars, bool negated = false) {
+Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& reverse_prefix, boost::container::flat_set<Variable>& used_vars, bool negated = false) {
 	switch (f.type()) {
 		case FormulaType::AND:
 		case FormulaType::IFF:
@@ -37,13 +37,13 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& prefix, boost::co
 			if (!negated) {
 				Formulas<Poly> subs;
 				for (auto& sub : f.subformulas()) {
-					subs.push_back(to_pnf(sub, prefix, used_vars, false));
+					subs.push_back(to_pnf(sub, reverse_prefix, used_vars, false));
 				}
 				return Formula<Poly>(f.type(), std::move(subs));
 			} else if (f.type() == FormulaType::AND || f.type() == FormulaType::OR) {
 				Formulas<Poly> subs;
 				for (auto& sub : f.subformulas()) {
-					subs.push_back(to_pnf(sub, prefix, used_vars, true));
+					subs.push_back(to_pnf(sub, reverse_prefix, used_vars, true));
 				}
 				if (f.type() == FormulaType::AND) {
 					return Formula<Poly>(FormulaType::OR, std::move(subs));
@@ -54,13 +54,13 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& prefix, boost::co
 				Formulas<Poly> sub1;
 				Formulas<Poly> sub2;
 				for (auto& sub : f.subformulas()) {
-					sub1.push_back(to_pnf(sub, prefix, used_vars, true));
-					sub2.push_back(to_pnf(sub, prefix, used_vars, false));
+					sub1.push_back(to_pnf(sub, reverse_prefix, used_vars, true));
+					sub2.push_back(to_pnf(sub, reverse_prefix, used_vars, false));
 				}
 				return Formula<Poly>(FormulaType::AND, {Formula<Poly>(FormulaType::OR, std::move(sub1)), Formula<Poly>(FormulaType::OR, std::move(sub2))});
 			} else if (f.type() == FormulaType::XOR) {
-				auto lhs = to_pnf(f, prefix, used_vars, false);
-				auto rhs = to_pnf(formula::aux::connectPrecedingSubformulas(f), prefix, used_vars, false);
+				auto lhs = to_pnf(f, reverse_prefix, used_vars, false);
+				auto rhs = to_pnf(formula::aux::connectPrecedingSubformulas(f), reverse_prefix, used_vars, false);
 				return Formula<Poly>(FormulaType::IFF, std::vector<Formula<Poly>>({lhs, rhs}));
 			}
 			assert(false);
@@ -92,11 +92,15 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& prefix, boost::co
 				} else {
 					used_vars.insert(v);
 				}
-				if (sub.variables().find(v) != sub.variables().end()) {
-					prefix.push_back(std::make_pair(q, v));
+			}
+
+			auto subres = to_pnf(sub, reverse_prefix, used_vars, negated);
+			for (auto v : f.quantified_variables()) {
+				if (subres.variables().find(v) != subres.variables().end()) {
+					reverse_prefix.push_back(std::make_pair(q, v));
 				}
 			}
-			return to_pnf(sub, prefix, used_vars, negated);
+			return subres;
 		}
 		case FormulaType::AUX_EXISTS: {
 			Quantifier q = Quantifier::EXISTS;
@@ -113,22 +117,26 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& prefix, boost::co
 				} else {
 					used_vars.insert(v);
 				}
-				if (sub.variables().find(v) != sub.variables().end() || sub_aux.variables().find(v) != sub_aux.variables().end()) {
-					prefix.push_back(std::make_pair(q, v));
+			}
+
+			auto subres = carl::Formula(carl::FormulaType::AND, sub_aux, to_pnf(sub, reverse_prefix, used_vars, negated));
+			for (auto v : f.quantified_variables()) {
+				if (subres.variables().find(v) != subres.variables().end()) {
+					reverse_prefix.push_back(std::make_pair(q, v));
 				}
 			}
-			return carl::Formula(carl::FormulaType::AND, sub_aux, to_pnf(sub, prefix, used_vars, negated)); 
+			return subres;
 		}
 		case FormulaType::IMPLIES:
 			if (negated) {
-				return Formula<Poly>(FormulaType::AND, {to_pnf(f.premise(), prefix, used_vars, false), to_pnf(f.conclusion(), prefix, used_vars, true)});
+				return Formula<Poly>(FormulaType::AND, {to_pnf(f.premise(), reverse_prefix, used_vars, false), to_pnf(f.conclusion(), reverse_prefix, used_vars, true)});
 			} else {
-				return Formula<Poly>(FormulaType::IMPLIES, {to_pnf(f.premise(), prefix, used_vars, false), to_pnf(f.conclusion(), prefix, used_vars, false)});
+				return Formula<Poly>(FormulaType::OR, {to_pnf(f.premise(), reverse_prefix, used_vars, true), to_pnf(f.conclusion(), reverse_prefix, used_vars, false)});
 			}
 		case FormulaType::ITE:
-			return Formula<Poly>(FormulaType::ITE, {to_pnf(f.condition(), prefix, used_vars, negated), to_pnf(f.first_case(), prefix, used_vars, negated), to_pnf(f.second_case(), prefix, used_vars, negated)});
+			return Formula<Poly>(FormulaType::ITE, {to_pnf(f.condition(), reverse_prefix, used_vars, negated), to_pnf(f.first_case(), reverse_prefix, used_vars, negated), to_pnf(f.second_case(), reverse_prefix, used_vars, negated)});
 		case FormulaType::NOT:
-			return to_pnf(f.subformula(), prefix, used_vars, !negated);
+			return to_pnf(f.subformula(), reverse_prefix, used_vars, !negated);
 		default:
 			assert(false);
 			return Formula<Poly>(FormulaType::FALSE);
@@ -164,11 +172,20 @@ void free_variables(const Formula<Poly>& f, boost::container::flat_set<Variable>
 			break;
 		}
 		case FormulaType::EXISTS:
-		case FormulaType::FORALL:
+		case FormulaType::FORALL: {
+			auto old = current_quantified_vars;
+			current_quantified_vars.insert(f.quantified_variables().begin(), f.quantified_variables().end());
+			free_variables(f.quantified_formula(), current_quantified_vars, free_vars);
+			current_quantified_vars = old;
+			break;
+		}
 		case FormulaType::AUX_EXISTS: {
 			auto old = current_quantified_vars;
 			current_quantified_vars.insert(f.quantified_variables().begin(), f.quantified_variables().end());
 			free_variables(f.quantified_formula(), current_quantified_vars, free_vars);
+			current_quantified_vars = old;
+			current_quantified_vars.insert(f.quantified_variables().begin(), f.quantified_variables().end());
+			free_variables(f.quantified_aux_formula(), current_quantified_vars, free_vars);
 			current_quantified_vars = old;
 			break;
 		}
@@ -211,6 +228,7 @@ std::pair<QuantifierPrefix, Formula<Poly>> to_pnf(const Formula<Poly>& f) {
 	QuantifierPrefix p;
 	boost::container::flat_set<Variable> used_vars = free_variables(f);
 	auto m = to_pnf(f, p, used_vars, false);
+	std::reverse(p.begin(), p.end());
 	return std::make_pair(p, m);
 }
 

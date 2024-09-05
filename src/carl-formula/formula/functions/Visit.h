@@ -110,6 +110,14 @@ Formula<Pol> visit_result(const Formula<Pol>& formula, /*std::function<Formula<P
 			}
 			break;
 		}
+		case AUX_EXISTS: {
+			Formula<Pol> sub = visit_result(formula.quantified_formula(), func);
+			Formula<Pol> sub_aux = visit_result(formula.quantified_aux_formula(), func);
+			if (sub != formula.quantified_formula() || sub_aux != formula.quantified_aux_formula()) {
+				newFormula = Formula<Pol>(formula.type(), formula.quantified_variables(), sub_aux, sub);
+			}
+			break;
+		}
 	}
 	return func(newFormula);
 }

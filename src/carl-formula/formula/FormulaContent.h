@@ -65,6 +65,7 @@ namespace carl {
 			case FormulaType::ITE: return "ite";
 			case FormulaType::EXISTS: return "exists";
 			case FormulaType::FORALL: return "forall";
+            case FormulaType::AUX_EXISTS: return "aux_exists";
             case FormulaType::TRUE: return "true";
             case FormulaType::FALSE: return "false";
 			case FormulaType::BOOL: return "bool";
