@@ -22,8 +22,19 @@ namespace helper {
 		const std::map<Variable,typename Formula<Pol>::PolynomialType>& replacements;
 		explicit PolynomialSubstitutor(const std::map<Variable,typename Formula<Pol>::PolynomialType>& repl): replacements(repl) {}
 		Formula<Pol> operator()(const Formula<Pol>& formula) {
-			if (formula.type() != FormulaType::CONSTRAINT) return formula;
-			return Formula<Pol>(carl::substitute(formula.constraint().lhs(), replacements), formula.constraint().relation());
+			if (formula.type() == FormulaType::CONSTRAINT) {
+				return Formula<Pol>(carl::substitute(formula.constraint().lhs(), replacements), formula.constraint().relation());
+			} else if (formula.type() == FormulaType::VARCOMPARE) {
+				assert(false);
+				return formula;
+				// we would need to substitute var() as well...
+				//if (std::holds_alternative<VariableComparison<Pol>::RAN>(formula.variable_comparison().value())) {
+				//} else {
+				//	return Formula<Pol>(VariableComparison<Pol>(formula.variable_comparison().var(),carl::substitute(carl::defining_polynomial(formula.variable_comparison()), replacements), formula.variable_comparison().relation(), formula.variable_comparison().negated()));
+				//}
+			} else {
+				return formula;
+			}
 		}
 	};
 
