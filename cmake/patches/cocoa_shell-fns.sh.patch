@@ -1,4 +1,4 @@
 16c16
-<     TMP_DIR="/tmp/CoCoALib-config-$USER/$TODAY/$1-$TIME-$$"
+<     TMP_DIR="/tmp/CoCoALib-config/$USER-$TODAY/$1-$TIME-$$"
 ---
 >     TMP_DIR="/tmp/CoCoALib-config-$USER-$TODAY/$1-$TIME-$$"
