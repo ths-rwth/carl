@@ -82,20 +82,22 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& reverse_prefix, b
 		case FormulaType::FORALL: {
 			Quantifier q = ((f.type() == FormulaType::EXISTS) ^ negated) ? Quantifier::EXISTS : Quantifier::FORALL;
 			Formula<Poly> sub = f.quantified_formula();
+			carl::Variables new_qvars;
 			for (auto v : f.quantified_variables()) {
 				if (used_vars.contains(v)) {
 					auto new_v = fresh_variable(v.type());
 					std::stringstream ss; ss << v.name() << "_" << new_v.id();
 					VariablePool::getInstance().set_name(new_v, ss.str());
 					sub = substitute(sub, v, Poly(new_v));
-					v = new_v;
+					new_qvars.insert(new_v);
 				} else {
 					used_vars.insert(v);
+					new_qvars.insert(v);
 				}
 			}
 
 			auto subres = to_pnf(sub, reverse_prefix, used_vars, negated);
-			for (auto v : f.quantified_variables()) {
+			for (auto v : new_qvars) {
 				if (subres.variables().find(v) != subres.variables().end()) {
 					reverse_prefix.push_back(std::make_pair(q, v));
 				}
@@ -106,6 +108,7 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& reverse_prefix, b
 			Quantifier q = Quantifier::EXISTS;
 			Formula<Poly> sub = f.quantified_formula();
 			Formula<Poly> sub_aux = f.quantified_aux_formula();
+			carl::Variables new_qvars;
 			for (auto v : f.quantified_variables()) {
 				if (used_vars.contains(v)) {
 					auto new_v = fresh_variable(v.type());
@@ -113,14 +116,15 @@ Formula<Poly> to_pnf(const Formula<Poly>& f, QuantifierPrefix& reverse_prefix, b
 					VariablePool::getInstance().set_name(new_v, ss.str());
 					sub = substitute(sub, v, Poly(new_v));
 					sub_aux = substitute(sub_aux, v, Poly(new_v));
-					v = new_v;
+					new_qvars.insert(new_v);
 				} else {
 					used_vars.insert(v);
+					new_qvars.insert(v);
 				}
 			}
 
 			auto subres = carl::Formula(carl::FormulaType::AND, sub_aux, to_pnf(sub, reverse_prefix, used_vars, negated));
-			for (auto v : f.quantified_variables()) {
+			for (auto v : new_qvars) {
 				if (subres.variables().find(v) != subres.variables().end()) {
 					reverse_prefix.push_back(std::make_pair(q, v));
 				}
