@@ -9,14 +9,23 @@ env:
 jobs:
   build: 
     strategy:
+      fail-fast: false
       matrix:
         include: 
-          - name: ubuntu:gcc
+          - name: ubuntu-22.04:gcc
             os: ubuntu-22.04
             env: CC=gcc CXX=g++
 
-          - name: ubuntu:clang
+          - name: ubuntu-22.04:clang
             os: ubuntu-22.04
+            env: CC=clang CXX=clang++
+
+          - name: ubuntu-26.04:gcc
+            os: ubuntu-26.04
+            env: CC=gcc CXX=g++
+
+          - name: ubuntu-26.04:clang
+            os: ubuntu-26.04
             env: CC=clang CXX=clang++
 
           - name: macos

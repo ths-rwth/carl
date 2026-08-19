@@ -9,7 +9,7 @@ runs:
       run: |
         echo "::group::Install Linux Dependencies"
         sudo apt update
-        sudo apt install -y libgmp-dev libboost-all-dev libeigen3-dev libreadline-dev libgtest-dev clang-12
+        sudo apt install -y libgmp-dev libboost-all-dev libeigen3-dev libreadline-dev libgtest-dev clang
         echo "::group::Install Linux Dependencies done"
 
     - name: "Install macOS Dependencies"
